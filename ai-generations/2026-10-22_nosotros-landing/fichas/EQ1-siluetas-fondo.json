@@ -1,0 +1,18 @@
+{
+  "id": "EQ1-siluetas-fondo",
+  "formato": "16:9",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "haz": "one wide, cool blue-white light source far behind the crowd, low and centred, its beams fanning forward through the haze between the people",
+  "escena": "SCENE (a background plate, photographed in a large dark studio): a dense crowd of about ninety people — women and men of different builds, heights and hairstyles, some with laptops or folders under the arm, one holding a tablet, a few with headphones around the neck — stand together facing the camera in loose staggered rows, mid-conversation — a few turning to each other, one pointing at a tablet, one laughing with a hand raised — that recede deep into the room, shoulder to shoulder, filling the whole width of the frame. Every single person reads ONLY as a dark silhouette: no faces, no features, no eyes, no logos, no colour on their clothes — just outlines softly rimmed by the cool light behind them. The rows fade progressively into thick navy-blue haze, so the farthest people are faint ghosts. The haze glows deep navy and cobalt blue (#0375DB) around the light, never white, never warm. The crowd occupies only the MIDDLE band of the frame; the top 30% above their heads is calm, deep navy haze with no heads or objects in it; the bottom 40% of the frame, in front of the crowd, is an EMPTY dark floor zone in deep shadow, with nobody standing in it and no object on it — it is reserved: five people will be composited there later. Camera at chest height, 50mm, perfectly level, frontal. Nothing warm, amber or golden; no text, no logos, no screens with content.",
+  "lecho": {
+    "objeto": "the dark polished studio floor in the immediate foreground",
+    "tono": "DEEP navy-black floor in shadow, matte, out of focus, catching only a faint cool reflection of the haze"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep navy haze above the heads of the crowd, top third of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

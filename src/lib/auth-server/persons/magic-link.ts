@@ -42,14 +42,22 @@ export const normalizeEmail = (value: string): string => value.trim().toLowerCas
  * navegador lo trata como absoluto: sin este filtro, el magic link es un open redirect.
  */
 export const sanitizeReturnTo = (value: string | null | undefined): string | null => {
-  if (!value) return null
+  if (!value || /[\u0000-\u001f\u007f-\u009f]/u.test(value)) return null
 
   const trimmed = value.trim()
 
-  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || trimmed.length > MAX_RETURN_TO_LENGTH) return null
-  if (trimmed.includes('\\') || trimmed.includes('\n') || trimmed.includes('\r')) return null
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//') || trimmed.length > MAX_RETURN_TO_LENGTH || trimmed.includes('\\')) return null
 
-  return trimmed
+  try {
+    // The URL parser removes HTAB/CR/LF before interpreting an authority. Compare the parsed origin,
+    // then reject a normalized network-path reference (dot segments can produce a leading `//`).
+    const base = new URL('https://auth-return.invalid')
+    const target = new URL(trimmed, base)
+
+    if (target.origin !== base.origin || target.username || target.password || target.pathname.startsWith('//')) return null
+
+    return target.pathname + target.search + target.hash
+  } catch { return null }
 }
 
 export type MagicLinkMailerPort = {
@@ -411,5 +419,6 @@ export const consumeMagicLink = async (
 
   await recordAttempt('success', null, person.subject)
 
-  return { status: 'authenticated', session, returnTo: record.returnTo }
+  // Revalidate persisted continuations too: links issued before a parser hardening must not bypass it.
+  return { status: 'authenticated', session, returnTo: sanitizeReturnTo(record.returnTo) }
 }

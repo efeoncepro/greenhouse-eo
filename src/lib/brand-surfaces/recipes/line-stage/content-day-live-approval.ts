@@ -144,7 +144,10 @@ export const contentDayLiveApproval: RecipeBuilder = ({ intent, manifest, recipe
     throw new SurfacePieceError(`El canal (\`channel.tool\`) es uno de ${channel.options.join(' · ')}.`, 'invalid-intent')
   }
 
-  const channelIcon = ch.tool === 'slack' ? productIcon('slack', 'El canal (`channel.tool`)', line) : toolIsotype(ch.tool, 'El canal (`channel.tool`)')
+  // Slack es un producto de Salesforce en cualquier línea: su ícono sale del kit de Salesforce aunque el deck sea de
+  // HubSpot (caso Assetplan 2026-10-27, que atiende por Slack Connect en una propuesta `revenue-hubspot`).
+  const channelIcon =
+    ch.tool === 'slack' ? productIcon('slack', 'El canal (`channel.tool`)', 'revenue-salesforce') : toolIsotype(ch.tool, 'El canal (`channel.tool`)')
 
   const ag = (intent.agent ?? {}) as AgentIntent
   const agentIcon = ag.icon === undefined ? null : productIcon(ag.icon, 'El avatar del agente (`agent.icon`)', line)

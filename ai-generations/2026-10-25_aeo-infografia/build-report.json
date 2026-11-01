@@ -1,0 +1,29 @@
+{
+  "iconAudit": {
+    "ok": true,
+    "issues": []
+  },
+  "files": [
+    {
+      "file": "delivery/aeo-motor-respuesta-desktop-light.svg",
+      "w": 1600,
+      "h": 930,
+      "bytes": 190738,
+      "sha256": "facbcfd6981fd7d336d461515314e83daf6349454eb00aa5b800b77b7ab47c64",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    },
+    {
+      "file": "delivery/aeo-motor-respuesta-mobile-light.svg",
+      "w": 900,
+      "h": 2578,
+      "bytes": 172058,
+      "sha256": "76f63a1a7cda20137f5096912af111d4a255f607566e92b89009fbe85db01340",
+      "outOfCanvasOrFooter": [],
+      "textCrossesOrbit": []
+    }
+  ],
+  "fit": [
+    "pregunta «¿Cómo aparezco»: 207 > 204"
+  ]
+}

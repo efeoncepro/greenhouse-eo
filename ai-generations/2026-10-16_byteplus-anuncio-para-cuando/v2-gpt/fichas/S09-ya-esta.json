@@ -1,0 +1,19 @@
+{
+ "id": "S09-ya-esta",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn, out of focus behind him. Close-up, 85mm f/2: Antonio calmly turns his open laptop to face the camera with one hand, confident closed-mouth half-smile, looking into the lens. The room around him is cool, flat and grey, BUT the laptop screen blasts intense vivid orange and teal light onto his face, chest and hand like opening a portal, colored spill on his skin and on the navy jacket, tiny bright particles in the air near the screen. The screen itself is just glowing color, no readable content. Antonio wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, CLOSED, with its embroidered emblem on the left chest exactly as in the references, over a plain white t-shirt.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "persona": "antonio"
+  }
+ ],
+ "identidad": [
+  {
+   "persona": "antonio"
+  }
+ ],
+ "lecho": "sin-lecho"
+}

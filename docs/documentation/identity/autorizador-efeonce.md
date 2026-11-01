@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.5
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-07 por Codex (TASK-1832)
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -16,17 +16,25 @@ Efeonce ID autentica a las personas y emite tokens propios para conectar aplicac
 El acceso corporativo usa Microsoft como proveedor de login; la autoridad para cada aplicación y
 organización la resuelve Efeonce. Compartir un emisor no comparte permisos entre empleados y clientes.
 
+## Estado Auth+Rooms al 26 de octubre
+
+El canary real único pasó con Microsoft/MFA, OIDC, una imagen PNG privada y un correo recibido; se cerró.
+La revisión `00168-vzb` conserva first-party/OTP false, sin HMAC/authority montados; no abre clientes ni
+migra el portal. El login V4 servido no acredita aceptación de una nueva UI. Desarrollarla aislada sigue
+permitido. El control production/main está sólo LOCAL+PR #263/#264 abiertas, retenidas sin merge ni deploy.
+[Estado detallado y corte de CI](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
 ## Qué hace hoy
 
 La base de TASK-1828 (servicio, llaves y dirección pública), el OAuth de TASK-1829 y la autenticación de
 personas de TASK-1830 están integrados. TASK-1836 agrega el recorrido corporativo y TASK-1831 su consumo
-en el gateway. La cohorte interna y una certificación externa sintética están activas; esto no abre clientes
-reales. Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes;
+en el gateway. La cohorte interna y la certificación externa sintética cuentan con evidencia fechada;
+no se infiere de ella una activación general ni la vigencia actual de cada cliente externo. En la matriz fechada de septiembre, Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` quedaron verdes;
 los clientes OAuth Claude renovaron post-TTL sin ampliar scopes.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |
-| **Servicio** | Un programa pequeño corriendo en Google Cloud (Cloud Run, región `us-east4`), uno solo para staging y producción. | **En producción desde 2026-09-04** (release `9100bbd2765d`, revisión `auth-server-00005-pk8`). |
+| **Servicio** | Un programa pequeño corriendo en Google Cloud (Cloud Run, región `us-east4`), un único servicio productivo, sin aislamiento Auth staging. | **En producción desde 2026-09-04** (release `9100bbd2765d`, revisión `auth-server-00005-pk8`). |
 | **Dirección** | `https://auth.efeonce.org`, servida por la **misma puerta de entrada** (balanceador, IP y protección anti-abuso) que ya usa `mcp.efeonce.org`. No se creó una puerta nueva. | Vivo; certificado activo. |
 | **Llave de firma** | La "máquina de sellar" pases. Vive en un módulo de hardware de Google Cloud (Cloud KMS HSM): el servicio puede pedirle que firme, pero **nadie puede sacar la llave de ahí**, ni siquiera Efeonce. | Creada y rotada una vez (ver más abajo). |
 | **Registro de llaves** | Una tabla propia (`greenhouse_auth.signing_keys`) que dice qué versión de la llave está activa, cuál está en retiro y cuál ya se retiró, con un historial que no se puede borrar. Sólo guarda la parte **pública**. | Aplicado en la base de datos. |
@@ -203,7 +211,7 @@ una auditoría que no se puede editar ni borrar, con IPs, agentes y sujetos guar
 Ni el piloto interno ni el canary externo sintético acreditan disponibilidad general para clientes. La matriz
 técnica de clientes MCP objetivo está verde, pero multicontexto, cleanup de TASK-1832 y la primera cohorte
 consentida de TASK-1841 siguen abiertos. Un test omitido nunca cuenta como aprobado.
-El aseguramiento de TASK-1833 y la convergencia del portal de TASK-1834 tampoco quedan cerrados por este canary.
+El aseguramiento de TASK-1833 y la convergencia del portal de TASK-2063 tampoco quedan cerrados por este canary.
 La invitación externa de TASK-1837 está productiva, pero su escritura delegada no se habilita al canary
 read-only ni se usa como evidencia de customer access.
 
@@ -218,8 +226,9 @@ El login del portal Greenhouse conserva su contrato. Efeonce ID tiene cookie y s
 - El portal expone dos rutas de administración (registrar cliente confidencial, revocar consentimiento) que
   llaman a los **mismos commands** que usa el emisor; no hay lógica duplicada en la UI.
 - Comparte el **repositorio** (`services/auth-server/`) y el **carril de despliegue** de los workers Cloud Run:
-  se despliega a staging al empujar a `develop` y a producción sólo por el release controlado (el primero fue
-  `9100bbd2765d`, 2026-09-04). Como es un solo servicio, la misma revisión sirve staging y producción.
+  el YAML remoto anterior todavía puede desplegar el único servicio productivo al empujar a `develop`.
+  La corrección production/main está preparada en PR #263/#264, sin integrar por retención humana. Ninguna
+  etiqueta staging aísla ese host. El primer release fue `9100bbd2765d`,2026-09-04.
 - El emisor está registrado como environment `efeonce-auth`, activo para el piloto. Su `issuerClass`
   no decide si la persona es interna o externa; el binding persistido y el resolver correspondiente lo hacen.
 - Usa las mismas piezas de **observabilidad**: incidentes en Sentry (dominio `identity`, componente

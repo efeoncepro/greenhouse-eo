@@ -126,6 +126,8 @@ export const CHANGE_GATED_RUNTIME_PATHS: Readonly<Record<string, readonly string
     'pnpm-lock.yaml',
     'tsconfig.json',
     'services/auth-server',
+    'scripts/auth-server/rooms-config-drift.py',
+    '.github/workflows/auth-server-deploy.yml',
     'services/_shared',
     'src/lib',
     'src/emails',

@@ -1,0 +1,9 @@
+Edit image 1, a still from a commercial film. Change ONLY the printed label on the big flying can in the middle of the frame.
+
+Problem to fix: the vertical brand name on that can is cut and reads "REAKR"; the first letter is missing.
+
+Fix: the brand name on the big can must read the full word B-R-E-A-K-R (BREAKR, six letters, exactly this spelling), printed vertically along the can, reading from the bottom of the can to the top: the letter B sits low, just above the silver bottom rim and over the teal band, and the last R ends near the top shoulder. Make the letters slightly smaller if needed so all six fit on the visible face of the can, exactly as on the reference can of image 2. Keep the small vertical line ORANGE BREAK next to it, complete.
+
+Image 2 = the label reference: copy its proportions, letter style, colours (orange #F04E12 body, teal #14B3AD band with a thin cream line) and layout.
+
+Keep EVERYTHING else exactly as in image 1: the can's shape, size, position, tilt, droplets, reflections and lighting; the laptop and its screen artwork; the water splash, ice, orange slices, window, city and light. Photographic, premium.

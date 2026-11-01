@@ -1,0 +1,46 @@
+{
+ "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/13-cdmx-breakr-v1.png",
+ "content": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/activos/kv-9x16.png",
+ "occlusionRef": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v5/13-cdmx.png",
+ "quad": [
+  [
+   314,
+   34
+  ],
+  [
+   771,
+   116
+  ],
+  [
+   792,
+   1000
+  ],
+  [
+   305,
+   980
+  ]
+ ],
+ "modules": [
+  12,
+  24
+ ],
+ "exposure": 1.4,
+ "falloff": [
+  1.0,
+  0.8
+ ],
+ "bloom": 0.65,
+ "grain": 3,
+ "out": "cdmx-led-b.png",
+ "maskOut": "cdmx-mask-b.png",
+ "occlusionBox": [
+  270,
+  760,
+  430,
+  1010
+ ],
+ "bloomThreshold": 120,
+ "bloomLarge": 30,
+ "bloomSmall": 5,
+ "lensBlur": 0.9
+}

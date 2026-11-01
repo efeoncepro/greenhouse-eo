@@ -1,0 +1,1658 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "Efeonce-Analisis-Prospeccion-2026-10-24",
+  "input": {
+    "artifactId": "Efeonce-Analisis-Prospeccion-2026-10-24",
+    "slides": [
+      {
+        "slideId": "portada",
+        "contentType": "report-cover",
+        "slots": {
+          "editionLabel": "Comercial · Prospección · Octubre 2026",
+          "productLabel": "COMERCIAL",
+          "eyebrow": "Efeonce · Dirección comercial",
+          "reportTitle": "Prospección: actividad, avance y resultados",
+          "reportSubtitle": "Histórico 2025–2026 y acciones de octubre. Cómo convertir investigación en conversaciones y ventas.",
+          "confidentialityLine": "Confidencial · Uso interno · Versión 1 · 24 de octubre de 2026"
+        }
+      },
+      {
+        "slideId": "resumen",
+        "contentType": "report-summary",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Resumen ejecutivo",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Resumen ejecutivo",
+          "thesis": "Hay actividad sostenida; los avances se concentran en necesidades concretas y relaciones existentes.",
+          "thesisLead": "El volumen de investigación supera el avance comercial. El histórico sí registra ventas, pero la ola de octubre todavía no acredita cierres ganados. La prioridad es convertir las conversaciones abiertas y corregir el seguimiento.",
+          "essentialsLabel": "Lo esencial",
+          "essentials": [
+            {
+              "figure": "146",
+              "title": "Correos de prospección en octubre",
+              "detail": "A 62 cuentas y 88 casillas. Se excluyen ocho intentos fallidos del conteo de envíos.",
+              "folio": "p. 06"
+            },
+            {
+              "figure": "11,3 %",
+              "title": "Cuentas con respuesta humana por email",
+              "detail": "Siete de 62: cuatro sin cierre negativo y tres negativas. Una conversación adicional se documentó en LinkedIn.",
+              "folio": "p. 07"
+            },
+            {
+              "figure": "9,0 %",
+              "title": "Ganados entre negocios cerrados",
+              "detail": "20 ganados y 202 perdidos en el CRM histórico. Es una tasa registral; incluye expansión y cierres administrativos.",
+              "folio": "p. 04"
+            },
+            {
+              "figure": "52",
+              "title": "Casos conservados por el radar",
+              "detail": "29 siguen en investigación. El último reporte no entrega una nueva compra lista para recomendar postulación.",
+              "folio": "p. 10"
+            },
+            {
+              "figure": "0",
+              "title": "Ganados en negocios creados en octubre",
+              "detail": "Es un corte temprano: no demuestra que la ola fracasó ni permite calcular aún su rentabilidad.",
+              "folio": "p. 13"
+            }
+          ],
+          "decision": {
+            "label": "Decisión propuesta",
+            "text": "Concentrar el esfuerzo en demanda confirmada, referidos y expansión; limitar preparación sin admisión; medir costo y siguiente compromiso por cuenta.",
+            "signature": "Recomendación de Efeonce"
+          },
+          "folio": {
+            "page": "02",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "cobertura",
+        "contentType": "report-table",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Evidencia cuantitativa",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Evidencia comercial",
+          "heroFigure": "1.701",
+          "heroText": "Actividades salientes históricas; incluyen operación y calendarios.",
+          "tableTitle": "Qué se cuantificó y qué significa",
+          "boardTitle": "Qué se cuantificó y qué significa",
+          "tableColumns": [
+            {
+              "label": "#"
+            },
+            {
+              "label": "Universo"
+            },
+            {
+              "label": "Cantidad"
+            },
+            {
+              "label": "Unidad"
+            }
+          ],
+          "tableRows": [
+            {
+              "entity": "Correo histórico de Julio",
+              "valueA": "1.701",
+              "valueB": "Actividades"
+            },
+            {
+              "entity": "Inventario comercial",
+              "valueA": "298",
+              "valueB": "Negocios"
+            },
+            {
+              "entity": "Empresas investigadas",
+              "valueA": "159",
+              "valueB": "Empresas CRM"
+            },
+            {
+              "entity": "Contactos investigados",
+              "valueA": "185",
+              "valueB": "Contactos CRM"
+            },
+            {
+              "entity": "Contactos con email presente",
+              "valueA": "172 / 185",
+              "valueB": "Presencia"
+            },
+            {
+              "entity": "Historial de radar",
+              "valueA": "52",
+              "valueB": "Casos"
+            },
+            {
+              "entity": "Correo de prospección octubre",
+              "valueA": "146",
+              "valueB": "Enviados"
+            },
+            {
+              "entity": "Cuentas contactadas octubre",
+              "valueA": "62",
+              "valueB": "Agrupaciones"
+            }
+          ],
+          "barMode": "none",
+          "source": {
+            "label": "Fuente",
+            "text": "CRM y Outlook, leídos el 24/10/2026."
+          },
+          "coverage": {
+            "label": "Cobertura",
+            "text": "Los universos se solapan; nunca se suman como un embudo."
+          },
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Investigar, registrar, contactar, conversar y vender son hitos diferentes."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Evaluar por cuenta e iniciativa; separar captación de expansión y operación.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "03",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "historico",
+        "contentType": "report-table",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Evidencia cuantitativa",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Evidencia comercial",
+          "heroFigure": "20 / 222",
+          "heroText": "Negocios ganados entre cerrados: 9,0 %; no tasa de propuestas.",
+          "tableTitle": "El histórico favorece el acceso directo",
+          "boardTitle": "El histórico favorece el acceso directo",
+          "tableColumns": [
+            {
+              "label": "#"
+            },
+            {
+              "label": "Canal registrado"
+            },
+            {
+              "label": "Ganados/cerrados"
+            },
+            {
+              "label": "Tasa"
+            }
+          ],
+          "tableRows": [
+            {
+              "entity": "Prospección directa",
+              "valueA": "7 / 20",
+              "valueB": "35,0 %"
+            },
+            {
+              "entity": "Referidos",
+              "valueA": "3 / 10",
+              "valueB": "30,0 %"
+            },
+            {
+              "entity": "Marketing",
+              "valueA": "1 / 5",
+              "valueB": "20,0 %"
+            },
+            {
+              "entity": "Partnership",
+              "valueA": "1 / 5",
+              "valueB": "20,0 %"
+            },
+            {
+              "entity": "WherEX",
+              "valueA": "2 / 22",
+              "valueB": "9,1 %"
+            },
+            {
+              "entity": "Mercado público",
+              "valueA": "1 / 88",
+              "valueB": "1,1 %"
+            },
+            {
+              "entity": "Marketing + prospección",
+              "valueA": "0 / 1",
+              "valueB": "0,0 %"
+            },
+            {
+              "entity": "Sin canal de origen",
+              "valueA": "5 / 71",
+              "valueB": "7,0 %"
+            }
+          ],
+          "barMode": "none",
+          "source": {
+            "label": "Fuente",
+            "text": "298 negocios actuales de HubSpot; canal de adquisición registrado."
+          },
+          "coverage": {
+            "label": "Cobertura",
+            "text": "118 de 298 carecen de canal. Mezcla captación, expansión y no postulación."
+          },
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La relación entre canal y resultado orienta la inversión; no demuestra causalidad."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Favorecer acceso verificable y registrar por separado cada etapa del proceso.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "04",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "ventas",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "La mitad de los ganados corresponde a clientes existentes",
+          "lead": "El CRM registra 20 ganados: diez de negocio existente, nueve de negocio nuevo y uno sin tipo.",
+          "paragraphs": [
+            "Negocio nuevo: 9 ganados de 147 cerrados (6,1 %). Negocio existente: 10 de 57 (17,5 %). Son cohortes de distinta madurez y no una prueba experimental.",
+            "El histórico registra resultados en SKY, Berel, SSilva, ANAM/Ecoriles, Aguas Andinas, DDSoft y entidades públicas. Renovación, ampliación, licencias y adquisición no deben atribuirse a una sola campaña.",
+            "El negocio de Blog SEO/AEO de SKY fue creado en julio y figura ganado en septiembre. No es un cierre producido por la prospección de octubre.",
+            "Cuatro ganados no tienen monto y otro tiene cero. Los importes mezclan monedas y períodos: no se suman como facturación, ingresos cobrados o retorno de inversión."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La expansión y la relación existente son una fuente comprobable de continuidad comercial."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Reservar capacidad para ambas, con metas separadas de adquisición nueva.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "05",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "resumen-campanas",
+        "contentType": "report-table",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Evidencia cuantitativa",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Evidencia comercial",
+          "heroFigure": "62",
+          "heroText": "Agrupaciones por cuenta; 88 casillas destinatarias o en copia.",
+          "tableTitle": "Octubre: 146 correos para 62 cuentas",
+          "boardTitle": "Octubre: 146 correos para 62 cuentas",
+          "tableColumns": [
+            {
+              "label": "#"
+            },
+            {
+              "label": "Recorrido principal"
+            },
+            {
+              "label": "Cuentas"
+            },
+            {
+              "label": "Correos"
+            }
+          ],
+          "tableRows": [
+            {
+              "entity": "Agente y reactivación",
+              "valueA": "19",
+              "valueB": "52"
+            },
+            {
+              "entity": "Señal / investigación focal",
+              "valueA": "32",
+              "valueB": "68"
+            },
+            {
+              "entity": "Procesos de compra",
+              "valueA": "5",
+              "valueB": "16"
+            },
+            {
+              "entity": "Conversación o relación previa",
+              "valueA": "6",
+              "valueB": "10"
+            }
+          ],
+          "barMode": "none",
+          "source": {
+            "label": "Fuente",
+            "text": "Enviados de Outlook del 1 al 24 de octubre, conciliados con CRM."
+          },
+          "coverage": {
+            "label": "Cobertura",
+            "text": "Incluye rechazos y correos correctivos; no son 146 primeros contactos."
+          },
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "El grupo automatizado aporta 52 envíos y una respuesta humana, negativa."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Evaluar pertinencia y errores antes de aumentar destinatarios o frecuencia.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "06",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "respuestas",
+        "contentType": "report-table",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Evidencia cuantitativa",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Evidencia comercial",
+          "heroFigure": "7 / 62",
+          "heroText": "Respuesta humana por email en octubre: 11,3 % observado.",
+          "tableTitle": "Las respuestas tienen desenlaces diferentes",
+          "boardTitle": "Las respuestas tienen desenlaces diferentes",
+          "tableColumns": [
+            {
+              "label": "#"
+            },
+            {
+              "label": "Cuenta"
+            },
+            {
+              "label": "Respuesta"
+            },
+            {
+              "label": "Estado"
+            }
+          ],
+          "tableRows": [
+            {
+              "entity": "izipay",
+              "valueA": "Invitación",
+              "valueB": "Proceso"
+            },
+            {
+              "entity": "Olivos del Sur",
+              "valueA": "Recepción",
+              "valueB": "Revisión"
+            },
+            {
+              "entity": "Pichincha / Pibank Perú",
+              "valueA": "Precisiones",
+              "valueB": "Evaluación"
+            },
+            {
+              "entity": "Momentum",
+              "valueA": "Revisará",
+              "valueB": "Revisión"
+            },
+            {
+              "entity": "Fabrimetal",
+              "valueA": "Otra agencia",
+              "valueB": "Detener"
+            },
+            {
+              "entity": "TVN",
+              "valueA": "Entrada tardía",
+              "valueB": "Detener"
+            },
+            {
+              "entity": "Socopur",
+              "valueA": "Proceso cerrado",
+              "valueB": "Detener"
+            }
+          ],
+          "barMode": "none",
+          "source": {
+            "label": "Fuente",
+            "text": "Mensajes originales de Outlook; clasificación manual del contenido."
+          },
+          "coverage": {
+            "label": "Cobertura",
+            "text": "Se excluyen newsletter de Duemint y respuestas automáticas."
+          },
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Cuatro cuentas siguen en revisión; ninguna de esas respuestas acredita una compra."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Assetplan suma conversación útil en LinkedIn; mantener su canal diferenciado.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "07",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "acceso",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "El mejor avance aparece cuando el comprador confirma su trabajo pendiente",
+          "lead": "La muestra favorece conversaciones concretas. Su tamaño y madurez impiden declarar un canal ganador.",
+          "paragraphs": [
+            "Assetplan confirmó liderazgo de CRM, 90 usuarios y unas 25 horas mensuales de apoyo. Se envió propuesta. Es evidencia de necesidad y evaluación; presupuesto final, cierre y aceptación siguen pendientes.",
+            "Pibank pidió propuesta de SEO/GEO/AEO y luego precisiones de impuestos, costos y referencias. SGS tuvo reunión y recibió propuesta técnica; faltan datos para cerrar la económica.",
+            "izipay invitó a participar y acusó interés. Falta confirmar admisión de proveedor extranjero, documentación y calendario. La invitación ocurrió después del acercamiento, sin prueba de que éste la causara.",
+            "Olivos recepciona antecedentes para evaluación interna. Momentum revisaría la propuesta. Son continuidades comerciales; todavía no hay encargo o siguiente compromiso bilateral acreditados."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La pertinencia abre una conversación; después importa acordar una decisión concreta."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Priorizar Assetplan, Pibank y SGS; respetar las esperas y calendarios de Compras.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "08",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "ejecucion",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "Los fallos de ejecución reducen el rendimiento medible",
+          "lead": "El CRM conserva 153 actividades en la cohorte; ocho fallaron. Outlook acredita 146 copias enviadas.",
+          "paragraphs": [
+            "La conciliación explica la diferencia: 153 actividades menos ocho fallidas, más un envío de Forus ausente en ese resultado CRM. Los envíos de Outlook incluyen mensajes que después rebotaron.",
+            "Rebotes identificados: Forus, Unilever, izipay y Bivien. Tres figuran como BOUNCED en la extracción y Forus tiene NDR documental. Correo válido en un proveedor no garantiza entrega.",
+            "El agente de prospección conserva nueve contactos con error, diez en curso y dos finalizados. Dos que figuraban en curso el 21/10 ya están finalizados. Error no equivale a negativa.",
+            "Hay 13 contactos actualmente inscritos en secuencias. Las de Glasstech y Antalis se guardaron sin inscripción: diez textos preparados y cero envíos. Arcor tiene pendiente su canal LinkedIn."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Programación y automatización activa no prueban despacho, entrega ni conversación."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Conciliar cada error y respuesta; evitar seguimientos paralelos a la misma cuenta.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "09",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "radar",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "El radar produce investigación; la admisión y la oportunidad siguen siendo el cuello de botella",
+          "lead": "52 casos conservados, 51 entradas de ejecución y actualización; 29 casos siguen en investigación.",
+          "paragraphs": [
+            "El reporte del 24/10 cubre cuatro mercados y cinco líneas. Registra 52 consultas de descubrimiento, pero ninguna compra nueva con evidencia suficiente para recomendar postulación. Acceso parcial no equivale a ausencia de demanda.",
+            "Socopur se detectó el 06/10 y el interés cerraba el 05/10: un día calendario tarde. TVN tampoco admitió entrada posterior. Esenttia ya estaba adjudicada cuando se trabajó como posible oportunidad.",
+            "Se documentan ofertas presentadas de UTEM, Sika creativa y Gana programática. UTEM figura perdida; las otras conservan evaluación pendiente. La tasa de adjudicación no se calcula con casos aún abiertos.",
+            "En el CRM, al menos 32 de los 34 perdidos con motivo cargado describen no presentación, descarte o error de admisión. Los otros 168 perdidos no tienen motivo estructurado. No son 202 derrotas competitivas verificadas."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La detección sólo vale comercialmente si deja tiempo útil y condiciones de participación."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Medir primera puerta y margen útil; decidir pronto si preparar una oferta o archivar.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "10",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "continuidad",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "La demora propia también consume oportunidades con interés",
+          "lead": "Momentum muestra una falla de continuidad distinta de la falta de respuesta del comprador.",
+          "paragraphs": [
+            "El 8 de septiembre el comprador informó que estaba en la reunión y no había nadie. El 29 volvió a pedir la propuesta; el 8 de octubre preguntó si llegaría o avanzaba con otro partner.",
+            "La propuesta salió el 12/10 y el comprador respondió el 13/10 que la revisaría. Este caso no permite culpar a la demanda ni al canal: hay fricción propia documentada que merece corrección.",
+            "El lote de seis cuentas del 13/10 recibió 18 correos hasta el 22/10. No hay respuesta humana localizada; Bivien terminó rebotando. No hay base para afirmar que más pasos por sí solos mejoran la conversión.",
+            "Ocho cuentas focalizadas recibieron su primer email entre el 22 y el 24/10. Carecen de una ventana suficiente para evaluar respuesta. Compararlas directamente con cuentas trabajadas desde el 8/10 distorsionaría el resultado."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La capacidad de cumplir lo prometido debe crecer antes que el volumen de nuevos contactos."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Dar responsable y fecha a cada compromiso propio; medir antigüedad por cohorte.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "11",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "prioridades",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Análisis comercial",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Efectividad de la prospección",
+          "assertion": "La siguiente inversión debe concentrarse en convertir y aprender",
+          "lead": "Recomendación para Julio y Commercial; no modifica automatizaciones ni inicia nuevas comunicaciones.",
+          "paragraphs": [
+            "Prioridad 1: Assetplan, Pibank y SGS. Convertir necesidades en alcance, dato pendiente y siguiente decisión bilateral. Mantener las condiciones ya enviadas; no rehacer propuestas sin feedback.",
+            "Prioridad 2: izipay, Olivos y Momentum. Resolver admisión o primera evaluación en el momento permitido por cada hilo. Pierre Fabre de medios y su iniciativa CRM se siguen por separado.",
+            "Prioridad 3: revisar errores del agente y rebotes; conservar STOP de TVN, Socopur, Fabrimetal y Esenttia. Conciliar las fechas vencidas del pipeline antes de usarlo como forecast.",
+            "Para la siguiente cohorte, registrar horas, preventa, créditos y herramientas por cuenta. Comparar respuesta humana, próximo paso acordado, propuesta presentada, resultado e ingreso cobrado a igual antigüedad."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "No hay datos completos de costo o atribución para calcular CAC, ROI o rentabilidad por canal."
+            },
+            {
+              "kind": "action",
+              "label": "Decisión propuesta",
+              "text": "Priorizar con evidencia; confirmar la mejora con una cohorte nueva y comparable.",
+              "signature": "Recomendación de Efeonce"
+            }
+          ],
+          "folio": {
+            "page": "12",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "limites",
+        "contentType": "report-limits",
+        "slots": {
+          "clientName": "Confidencial · Uso interno",
+          "runningSection": "Método y límites",
+          "runningPeriod": "Corte: 24 de octubre de 2026",
+          "footerEdition": "Comercial · Prospección · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Método y límites",
+          "heroFigure": "6",
+          "heroText": "límites que cambian la interpretación de los resultados",
+          "assertion": "Este informe evalúa evidencia; no certifica ingresos ni causalidad",
+          "limits": [
+            {
+              "subject": "Universos distintos",
+              "cause": "298 negocios, 159 empresas, 185 contactos, 52 casos y 62 cuentas de octubre se solapan; no forman un embudo único."
+            },
+            {
+              "subject": "Historia de correo",
+              "cause": "1.701 actividades son metadatos desde enero de 2025. Cuerpos e interacciones se revisaron en los hilos recientes relevantes."
+            },
+            {
+              "subject": "Cobertura de respuestas",
+              "cause": "88 casillas y sus hilos; otros alias y canales pueden contener respuestas no incluidas. Tasas observadas, no exhaustivas."
+            },
+            {
+              "subject": "LinkedIn",
+              "cause": "Se usa evidencia conservada por caso. No se reabrió el buzón completo ni se calcula una tasa global de InMail."
+            },
+            {
+              "subject": "Atribución y madurez",
+              "cause": "118 negocios sin canal; cohortes de distintas fechas, expansión mezclada y cierres administrativos limitan comparaciones."
+            },
+            {
+              "subject": "Costo y resultado",
+              "cause": "Faltan horas, costos completos y contratos/cobros conciliados. Ganado en CRM no es facturación ni dinero recibido."
+            }
+          ],
+          "methodologyLabel": "Fuentes y cálculo",
+          "methodology": [
+            "HubSpot y Outlook: lectura del 24/10/2026; portal de Efeonce e identidad de Julio comprobados.",
+            "298 negocios y 1.701 actividades salientes, sin IDs repetidos. Outlook: 376 copias desde septiembre.",
+            "Respuestas: 21 mensajes desde septiembre, 14 de octubre; clasificación separa humanos, OOO y newsletter.",
+            "Radar y expedientes por cuenta al 24/10; prevalecen sus actualizaciones.",
+            "Ganados/cerrados = 20/222. Respuesta humana email = 7/62; no se confunde con respuesta favorable."
+          ],
+          "folio": {
+            "page": "13",
+            "total": "14"
+          }
+        }
+      },
+      {
+        "slideId": "contraportada",
+        "contentType": "report-back-cover",
+        "slots": {
+          "editionLabel": "Comercial · Prospección · Octubre 2026",
+          "contact": {
+            "email": "sales@efeoncepro.com",
+            "phonePrimary": "+56 9 3732 3064",
+            "phoneSecondary": "+1 (239) 235-2073",
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+          },
+          "marketsLine": "Chile · Estados Unidos · Colombia · México · Perú",
+          "legalLine": "Efeonce Group SpA · RUT 77.357.182-1 · Confidencial · Uso interno · Corte 24/10/2026"
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "insights-report",
+    "version": "0.2",
+    "registryHash": "8223faae6aa8ff84571121d6fb61a60484a752b8216a9061238abee3d4b9952d",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "report-cover",
+      "slots": {
+        "editionLabel": "Comercial · Prospección · Octubre 2026",
+        "productLabel": "COMERCIAL",
+        "eyebrow": "Efeonce · Dirección comercial",
+        "reportTitle": "Prospección: actividad, avance y resultados",
+        "reportSubtitle": "Histórico 2025–2026 y acciones de octubre. Cómo convertir investigación en conversaciones y ventas.",
+        "confidentialityLine": "Confidencial · Uso interno · Versión 1 · 24 de octubre de 2026"
+      },
+      "template": "ReportCoverPage",
+      "contractHash": "6164aad7227406740e839bb2b90b8a824becaef3bdfba4743ddca68b007e873f",
+      "templateHash": "0f7e0714aa9fc73276175804898b7c54c77da984e717c17cedcdd52c8f882f84"
+    },
+    {
+      "slideId": "resumen",
+      "contentType": "report-summary",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Resumen ejecutivo",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Resumen ejecutivo",
+        "thesis": "Hay actividad sostenida; los avances se concentran en necesidades concretas y relaciones existentes.",
+        "thesisLead": "El volumen de investigación supera el avance comercial. El histórico sí registra ventas, pero la ola de octubre todavía no acredita cierres ganados. La prioridad es convertir las conversaciones abiertas y corregir el seguimiento.",
+        "essentialsLabel": "Lo esencial",
+        "essentials": [
+          {
+            "figure": "146",
+            "title": "Correos de prospección en octubre",
+            "detail": "A 62 cuentas y 88 casillas. Se excluyen ocho intentos fallidos del conteo de envíos.",
+            "folio": "p. 06"
+          },
+          {
+            "figure": "11,3 %",
+            "title": "Cuentas con respuesta humana por email",
+            "detail": "Siete de 62: cuatro sin cierre negativo y tres negativas. Una conversación adicional se documentó en LinkedIn.",
+            "folio": "p. 07"
+          },
+          {
+            "figure": "9,0 %",
+            "title": "Ganados entre negocios cerrados",
+            "detail": "20 ganados y 202 perdidos en el CRM histórico. Es una tasa registral; incluye expansión y cierres administrativos.",
+            "folio": "p. 04"
+          },
+          {
+            "figure": "52",
+            "title": "Casos conservados por el radar",
+            "detail": "29 siguen en investigación. El último reporte no entrega una nueva compra lista para recomendar postulación.",
+            "folio": "p. 10"
+          },
+          {
+            "figure": "0",
+            "title": "Ganados en negocios creados en octubre",
+            "detail": "Es un corte temprano: no demuestra que la ola fracasó ni permite calcular aún su rentabilidad.",
+            "folio": "p. 13"
+          }
+        ],
+        "decision": {
+          "label": "Decisión propuesta",
+          "text": "Concentrar el esfuerzo en demanda confirmada, referidos y expansión; limitar preparación sin admisión; medir costo y siguiente compromiso por cuenta.",
+          "signature": "Recomendación de Efeonce"
+        },
+        "folio": {
+          "page": "02",
+          "total": "14"
+        }
+      },
+      "template": "ReportSummaryPage",
+      "contractHash": "a029e03a04f18d28e793879096f31eb3ab0ca11b04348cf7e8884230d4fff816",
+      "templateHash": "c41bd6cff24d32a6707027ed45703289389de735836c840270c8e2089d4319a7"
+    },
+    {
+      "slideId": "cobertura",
+      "contentType": "report-table",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Evidencia cuantitativa",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Evidencia comercial",
+        "heroFigure": "1.701",
+        "heroText": "Actividades salientes históricas; incluyen operación y calendarios.",
+        "tableTitle": "Qué se cuantificó y qué significa",
+        "boardTitle": "Qué se cuantificó y qué significa",
+        "tableColumns": [
+          {
+            "label": "#"
+          },
+          {
+            "label": "Universo"
+          },
+          {
+            "label": "Cantidad"
+          },
+          {
+            "label": "Unidad"
+          }
+        ],
+        "tableRows": [
+          {
+            "entity": "Correo histórico de Julio",
+            "valueA": "1.701",
+            "valueB": "Actividades"
+          },
+          {
+            "entity": "Inventario comercial",
+            "valueA": "298",
+            "valueB": "Negocios"
+          },
+          {
+            "entity": "Empresas investigadas",
+            "valueA": "159",
+            "valueB": "Empresas CRM"
+          },
+          {
+            "entity": "Contactos investigados",
+            "valueA": "185",
+            "valueB": "Contactos CRM"
+          },
+          {
+            "entity": "Contactos con email presente",
+            "valueA": "172 / 185",
+            "valueB": "Presencia"
+          },
+          {
+            "entity": "Historial de radar",
+            "valueA": "52",
+            "valueB": "Casos"
+          },
+          {
+            "entity": "Correo de prospección octubre",
+            "valueA": "146",
+            "valueB": "Enviados"
+          },
+          {
+            "entity": "Cuentas contactadas octubre",
+            "valueA": "62",
+            "valueB": "Agrupaciones"
+          }
+        ],
+        "barMode": "none",
+        "source": {
+          "label": "Fuente",
+          "text": "CRM y Outlook, leídos el 24/10/2026."
+        },
+        "coverage": {
+          "label": "Cobertura",
+          "text": "Los universos se solapan; nunca se suman como un embudo."
+        },
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Investigar, registrar, contactar, conversar y vender son hitos diferentes."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Evaluar por cuenta e iniciativa; separar captación de expansión y operación.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "03",
+          "total": "14"
+        }
+      },
+      "template": "ReportTablePage",
+      "contractHash": "d8a4ece3988ab47eb895163a9369acad4c7d2675ee1b58cf69ba43e1ecbde3f2",
+      "templateHash": "5fa1821743983c1d12ac74e095f1dbc03044d89b4a9c5e600ed583cdf2a6e0f9"
+    },
+    {
+      "slideId": "historico",
+      "contentType": "report-table",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Evidencia cuantitativa",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Evidencia comercial",
+        "heroFigure": "20 / 222",
+        "heroText": "Negocios ganados entre cerrados: 9,0 %; no tasa de propuestas.",
+        "tableTitle": "El histórico favorece el acceso directo",
+        "boardTitle": "El histórico favorece el acceso directo",
+        "tableColumns": [
+          {
+            "label": "#"
+          },
+          {
+            "label": "Canal registrado"
+          },
+          {
+            "label": "Ganados/cerrados"
+          },
+          {
+            "label": "Tasa"
+          }
+        ],
+        "tableRows": [
+          {
+            "entity": "Prospección directa",
+            "valueA": "7 / 20",
+            "valueB": "35,0 %"
+          },
+          {
+            "entity": "Referidos",
+            "valueA": "3 / 10",
+            "valueB": "30,0 %"
+          },
+          {
+            "entity": "Marketing",
+            "valueA": "1 / 5",
+            "valueB": "20,0 %"
+          },
+          {
+            "entity": "Partnership",
+            "valueA": "1 / 5",
+            "valueB": "20,0 %"
+          },
+          {
+            "entity": "WherEX",
+            "valueA": "2 / 22",
+            "valueB": "9,1 %"
+          },
+          {
+            "entity": "Mercado público",
+            "valueA": "1 / 88",
+            "valueB": "1,1 %"
+          },
+          {
+            "entity": "Marketing + prospección",
+            "valueA": "0 / 1",
+            "valueB": "0,0 %"
+          },
+          {
+            "entity": "Sin canal de origen",
+            "valueA": "5 / 71",
+            "valueB": "7,0 %"
+          }
+        ],
+        "barMode": "none",
+        "source": {
+          "label": "Fuente",
+          "text": "298 negocios actuales de HubSpot; canal de adquisición registrado."
+        },
+        "coverage": {
+          "label": "Cobertura",
+          "text": "118 de 298 carecen de canal. Mezcla captación, expansión y no postulación."
+        },
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La relación entre canal y resultado orienta la inversión; no demuestra causalidad."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Favorecer acceso verificable y registrar por separado cada etapa del proceso.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "04",
+          "total": "14"
+        }
+      },
+      "template": "ReportTablePage",
+      "contractHash": "d8a4ece3988ab47eb895163a9369acad4c7d2675ee1b58cf69ba43e1ecbde3f2",
+      "templateHash": "5fa1821743983c1d12ac74e095f1dbc03044d89b4a9c5e600ed583cdf2a6e0f9"
+    },
+    {
+      "slideId": "ventas",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "La mitad de los ganados corresponde a clientes existentes",
+        "lead": "El CRM registra 20 ganados: diez de negocio existente, nueve de negocio nuevo y uno sin tipo.",
+        "paragraphs": [
+          "Negocio nuevo: 9 ganados de 147 cerrados (6,1 %). Negocio existente: 10 de 57 (17,5 %). Son cohortes de distinta madurez y no una prueba experimental.",
+          "El histórico registra resultados en SKY, Berel, SSilva, ANAM/Ecoriles, Aguas Andinas, DDSoft y entidades públicas. Renovación, ampliación, licencias y adquisición no deben atribuirse a una sola campaña.",
+          "El negocio de Blog SEO/AEO de SKY fue creado en julio y figura ganado en septiembre. No es un cierre producido por la prospección de octubre.",
+          "Cuatro ganados no tienen monto y otro tiene cero. Los importes mezclan monedas y períodos: no se suman como facturación, ingresos cobrados o retorno de inversión."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La expansión y la relación existente son una fuente comprobable de continuidad comercial."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Reservar capacidad para ambas, con metas separadas de adquisición nueva.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "05",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "resumen-campanas",
+      "contentType": "report-table",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Evidencia cuantitativa",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Evidencia comercial",
+        "heroFigure": "62",
+        "heroText": "Agrupaciones por cuenta; 88 casillas destinatarias o en copia.",
+        "tableTitle": "Octubre: 146 correos para 62 cuentas",
+        "boardTitle": "Octubre: 146 correos para 62 cuentas",
+        "tableColumns": [
+          {
+            "label": "#"
+          },
+          {
+            "label": "Recorrido principal"
+          },
+          {
+            "label": "Cuentas"
+          },
+          {
+            "label": "Correos"
+          }
+        ],
+        "tableRows": [
+          {
+            "entity": "Agente y reactivación",
+            "valueA": "19",
+            "valueB": "52"
+          },
+          {
+            "entity": "Señal / investigación focal",
+            "valueA": "32",
+            "valueB": "68"
+          },
+          {
+            "entity": "Procesos de compra",
+            "valueA": "5",
+            "valueB": "16"
+          },
+          {
+            "entity": "Conversación o relación previa",
+            "valueA": "6",
+            "valueB": "10"
+          }
+        ],
+        "barMode": "none",
+        "source": {
+          "label": "Fuente",
+          "text": "Enviados de Outlook del 1 al 24 de octubre, conciliados con CRM."
+        },
+        "coverage": {
+          "label": "Cobertura",
+          "text": "Incluye rechazos y correos correctivos; no son 146 primeros contactos."
+        },
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "El grupo automatizado aporta 52 envíos y una respuesta humana, negativa."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Evaluar pertinencia y errores antes de aumentar destinatarios o frecuencia.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "06",
+          "total": "14"
+        }
+      },
+      "template": "ReportTablePage",
+      "contractHash": "d8a4ece3988ab47eb895163a9369acad4c7d2675ee1b58cf69ba43e1ecbde3f2",
+      "templateHash": "5fa1821743983c1d12ac74e095f1dbc03044d89b4a9c5e600ed583cdf2a6e0f9"
+    },
+    {
+      "slideId": "respuestas",
+      "contentType": "report-table",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Evidencia cuantitativa",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Evidencia comercial",
+        "heroFigure": "7 / 62",
+        "heroText": "Respuesta humana por email en octubre: 11,3 % observado.",
+        "tableTitle": "Las respuestas tienen desenlaces diferentes",
+        "boardTitle": "Las respuestas tienen desenlaces diferentes",
+        "tableColumns": [
+          {
+            "label": "#"
+          },
+          {
+            "label": "Cuenta"
+          },
+          {
+            "label": "Respuesta"
+          },
+          {
+            "label": "Estado"
+          }
+        ],
+        "tableRows": [
+          {
+            "entity": "izipay",
+            "valueA": "Invitación",
+            "valueB": "Proceso"
+          },
+          {
+            "entity": "Olivos del Sur",
+            "valueA": "Recepción",
+            "valueB": "Revisión"
+          },
+          {
+            "entity": "Pichincha / Pibank Perú",
+            "valueA": "Precisiones",
+            "valueB": "Evaluación"
+          },
+          {
+            "entity": "Momentum",
+            "valueA": "Revisará",
+            "valueB": "Revisión"
+          },
+          {
+            "entity": "Fabrimetal",
+            "valueA": "Otra agencia",
+            "valueB": "Detener"
+          },
+          {
+            "entity": "TVN",
+            "valueA": "Entrada tardía",
+            "valueB": "Detener"
+          },
+          {
+            "entity": "Socopur",
+            "valueA": "Proceso cerrado",
+            "valueB": "Detener"
+          }
+        ],
+        "barMode": "none",
+        "source": {
+          "label": "Fuente",
+          "text": "Mensajes originales de Outlook; clasificación manual del contenido."
+        },
+        "coverage": {
+          "label": "Cobertura",
+          "text": "Se excluyen newsletter de Duemint y respuestas automáticas."
+        },
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Cuatro cuentas siguen en revisión; ninguna de esas respuestas acredita una compra."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Assetplan suma conversación útil en LinkedIn; mantener su canal diferenciado.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "07",
+          "total": "14"
+        }
+      },
+      "template": "ReportTablePage",
+      "contractHash": "d8a4ece3988ab47eb895163a9369acad4c7d2675ee1b58cf69ba43e1ecbde3f2",
+      "templateHash": "5fa1821743983c1d12ac74e095f1dbc03044d89b4a9c5e600ed583cdf2a6e0f9"
+    },
+    {
+      "slideId": "acceso",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "El mejor avance aparece cuando el comprador confirma su trabajo pendiente",
+        "lead": "La muestra favorece conversaciones concretas. Su tamaño y madurez impiden declarar un canal ganador.",
+        "paragraphs": [
+          "Assetplan confirmó liderazgo de CRM, 90 usuarios y unas 25 horas mensuales de apoyo. Se envió propuesta. Es evidencia de necesidad y evaluación; presupuesto final, cierre y aceptación siguen pendientes.",
+          "Pibank pidió propuesta de SEO/GEO/AEO y luego precisiones de impuestos, costos y referencias. SGS tuvo reunión y recibió propuesta técnica; faltan datos para cerrar la económica.",
+          "izipay invitó a participar y acusó interés. Falta confirmar admisión de proveedor extranjero, documentación y calendario. La invitación ocurrió después del acercamiento, sin prueba de que éste la causara.",
+          "Olivos recepciona antecedentes para evaluación interna. Momentum revisaría la propuesta. Son continuidades comerciales; todavía no hay encargo o siguiente compromiso bilateral acreditados."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La pertinencia abre una conversación; después importa acordar una decisión concreta."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Priorizar Assetplan, Pibank y SGS; respetar las esperas y calendarios de Compras.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "08",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "ejecucion",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "Los fallos de ejecución reducen el rendimiento medible",
+        "lead": "El CRM conserva 153 actividades en la cohorte; ocho fallaron. Outlook acredita 146 copias enviadas.",
+        "paragraphs": [
+          "La conciliación explica la diferencia: 153 actividades menos ocho fallidas, más un envío de Forus ausente en ese resultado CRM. Los envíos de Outlook incluyen mensajes que después rebotaron.",
+          "Rebotes identificados: Forus, Unilever, izipay y Bivien. Tres figuran como BOUNCED en la extracción y Forus tiene NDR documental. Correo válido en un proveedor no garantiza entrega.",
+          "El agente de prospección conserva nueve contactos con error, diez en curso y dos finalizados. Dos que figuraban en curso el 21/10 ya están finalizados. Error no equivale a negativa.",
+          "Hay 13 contactos actualmente inscritos en secuencias. Las de Glasstech y Antalis se guardaron sin inscripción: diez textos preparados y cero envíos. Arcor tiene pendiente su canal LinkedIn."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Programación y automatización activa no prueban despacho, entrega ni conversación."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Conciliar cada error y respuesta; evitar seguimientos paralelos a la misma cuenta.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "09",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "radar",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "El radar produce investigación; la admisión y la oportunidad siguen siendo el cuello de botella",
+        "lead": "52 casos conservados, 51 entradas de ejecución y actualización; 29 casos siguen en investigación.",
+        "paragraphs": [
+          "El reporte del 24/10 cubre cuatro mercados y cinco líneas. Registra 52 consultas de descubrimiento, pero ninguna compra nueva con evidencia suficiente para recomendar postulación. Acceso parcial no equivale a ausencia de demanda.",
+          "Socopur se detectó el 06/10 y el interés cerraba el 05/10: un día calendario tarde. TVN tampoco admitió entrada posterior. Esenttia ya estaba adjudicada cuando se trabajó como posible oportunidad.",
+          "Se documentan ofertas presentadas de UTEM, Sika creativa y Gana programática. UTEM figura perdida; las otras conservan evaluación pendiente. La tasa de adjudicación no se calcula con casos aún abiertos.",
+          "En el CRM, al menos 32 de los 34 perdidos con motivo cargado describen no presentación, descarte o error de admisión. Los otros 168 perdidos no tienen motivo estructurado. No son 202 derrotas competitivas verificadas."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La detección sólo vale comercialmente si deja tiempo útil y condiciones de participación."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Medir primera puerta y margen útil; decidir pronto si preparar una oferta o archivar.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "10",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "continuidad",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "La demora propia también consume oportunidades con interés",
+        "lead": "Momentum muestra una falla de continuidad distinta de la falta de respuesta del comprador.",
+        "paragraphs": [
+          "El 8 de septiembre el comprador informó que estaba en la reunión y no había nadie. El 29 volvió a pedir la propuesta; el 8 de octubre preguntó si llegaría o avanzaba con otro partner.",
+          "La propuesta salió el 12/10 y el comprador respondió el 13/10 que la revisaría. Este caso no permite culpar a la demanda ni al canal: hay fricción propia documentada que merece corrección.",
+          "El lote de seis cuentas del 13/10 recibió 18 correos hasta el 22/10. No hay respuesta humana localizada; Bivien terminó rebotando. No hay base para afirmar que más pasos por sí solos mejoran la conversión.",
+          "Ocho cuentas focalizadas recibieron su primer email entre el 22 y el 24/10. Carecen de una ventana suficiente para evaluar respuesta. Compararlas directamente con cuentas trabajadas desde el 8/10 distorsionaría el resultado."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La capacidad de cumplir lo prometido debe crecer antes que el volumen de nuevos contactos."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Dar responsable y fecha a cada compromiso propio; medir antigüedad por cohorte.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "11",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "prioridades",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Análisis comercial",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Efectividad de la prospección",
+        "assertion": "La siguiente inversión debe concentrarse en convertir y aprender",
+        "lead": "Recomendación para Julio y Commercial; no modifica automatizaciones ni inicia nuevas comunicaciones.",
+        "paragraphs": [
+          "Prioridad 1: Assetplan, Pibank y SGS. Convertir necesidades en alcance, dato pendiente y siguiente decisión bilateral. Mantener las condiciones ya enviadas; no rehacer propuestas sin feedback.",
+          "Prioridad 2: izipay, Olivos y Momentum. Resolver admisión o primera evaluación en el momento permitido por cada hilo. Pierre Fabre de medios y su iniciativa CRM se siguen por separado.",
+          "Prioridad 3: revisar errores del agente y rebotes; conservar STOP de TVN, Socopur, Fabrimetal y Esenttia. Conciliar las fechas vencidas del pipeline antes de usarlo como forecast.",
+          "Para la siguiente cohorte, registrar horas, preventa, créditos y herramientas por cuenta. Comparar respuesta humana, próximo paso acordado, propuesta presentada, resultado e ingreso cobrado a igual antigüedad."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "No hay datos completos de costo o atribución para calcular CAC, ROI o rentabilidad por canal."
+          },
+          {
+            "kind": "action",
+            "label": "Decisión propuesta",
+            "text": "Priorizar con evidencia; confirmar la mejora con una cohorte nueva y comparable.",
+            "signature": "Recomendación de Efeonce"
+          }
+        ],
+        "folio": {
+          "page": "12",
+          "total": "14"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "limites",
+      "contentType": "report-limits",
+      "slots": {
+        "clientName": "Confidencial · Uso interno",
+        "runningSection": "Método y límites",
+        "runningPeriod": "Corte: 24 de octubre de 2026",
+        "footerEdition": "Comercial · Prospección · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Método y límites",
+        "heroFigure": "6",
+        "heroText": "límites que cambian la interpretación de los resultados",
+        "assertion": "Este informe evalúa evidencia; no certifica ingresos ni causalidad",
+        "limits": [
+          {
+            "subject": "Universos distintos",
+            "cause": "298 negocios, 159 empresas, 185 contactos, 52 casos y 62 cuentas de octubre se solapan; no forman un embudo único."
+          },
+          {
+            "subject": "Historia de correo",
+            "cause": "1.701 actividades son metadatos desde enero de 2025. Cuerpos e interacciones se revisaron en los hilos recientes relevantes."
+          },
+          {
+            "subject": "Cobertura de respuestas",
+            "cause": "88 casillas y sus hilos; otros alias y canales pueden contener respuestas no incluidas. Tasas observadas, no exhaustivas."
+          },
+          {
+            "subject": "LinkedIn",
+            "cause": "Se usa evidencia conservada por caso. No se reabrió el buzón completo ni se calcula una tasa global de InMail."
+          },
+          {
+            "subject": "Atribución y madurez",
+            "cause": "118 negocios sin canal; cohortes de distintas fechas, expansión mezclada y cierres administrativos limitan comparaciones."
+          },
+          {
+            "subject": "Costo y resultado",
+            "cause": "Faltan horas, costos completos y contratos/cobros conciliados. Ganado en CRM no es facturación ni dinero recibido."
+          }
+        ],
+        "methodologyLabel": "Fuentes y cálculo",
+        "methodology": [
+          "HubSpot y Outlook: lectura del 24/10/2026; portal de Efeonce e identidad de Julio comprobados.",
+          "298 negocios y 1.701 actividades salientes, sin IDs repetidos. Outlook: 376 copias desde septiembre.",
+          "Respuestas: 21 mensajes desde septiembre, 14 de octubre; clasificación separa humanos, OOO y newsletter.",
+          "Radar y expedientes por cuenta al 24/10; prevalecen sus actualizaciones.",
+          "Ganados/cerrados = 20/222. Respuesta humana email = 7/62; no se confunde con respuesta favorable."
+        ],
+        "folio": {
+          "page": "13",
+          "total": "14"
+        }
+      },
+      "template": "ReportLimitsPage",
+      "contractHash": "362097d477a202f06776e5c3fc75923f7c1aeba1c3e93209926ad66764836046",
+      "templateHash": "1e9f6700669a1b04c155c2c5a1db8781ae427e79eccfe77158f203bbdc848b24"
+    },
+    {
+      "slideId": "contraportada",
+      "contentType": "report-back-cover",
+      "slots": {
+        "editionLabel": "Comercial · Prospección · Octubre 2026",
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phonePrimary": "+56 9 3732 3064",
+          "phoneSecondary": "+1 (239) 235-2073",
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        },
+        "marketsLine": "Chile · Estados Unidos · Colombia · México · Perú",
+        "legalLine": "Efeonce Group SpA · RUT 77.357.182-1 · Confidencial · Uso interno · Corte 24/10/2026"
+      },
+      "template": "ReportBackCoverPage",
+      "contractHash": "354d007b38172b3bbc5885777d3cb7f61959346b89f9da43423d68de7fa28b7b",
+      "templateHash": "33b4b0f1c551ad32fbe267a832a6e3bf13ded5b331b8329113ed4b9b1bfba288"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "a1799bf28372efd37ade66d96d9a5f4bf11b2124fe8c7f1a3ffc2fbf1cd446b0"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    }
+  ],
+  "validators": []
+}

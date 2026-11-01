@@ -1,0 +1,223 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "de1e55edd839",
+  "key": "de1e55edd8390432ab0885dd23c2e60106016db8af4143066bec8a0accc7d385",
+  "status": "completed",
+  "createdAt": "2026-10-23T02:41:52.072Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-22_nosotros-landing/rostro/J3-base.png",
+    "imageSha256": "0a8d99e36fb2b75d2de82dfa70e41971e2764d99639c427678643d823f5e374f",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-22_nosotros-landing/rostro/mask-rostro.png",
+    "maskSha256": "1b1ff6dd589b415230d5bd204aa801cd08485d314d1f05f509d7f7f11b3cfb35",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png",
+        "sha256": "8108e9fa4a17843fbcd80630ac5a4ccfe5b66757530936d3743c1507802fe9cf"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Image 1 is a real photograph of this man speaking on a conference stage. Refine ONLY his face inside the marked zone so it is unmistakably the same person as in the reference portrait: same face shape, same nose, same glasses with thin grey metal frames, same beard with its exact grey pattern, same curly salt-and-pepper hair line. Keep his head angle exactly as it is (slight three-quarter turn to his right), keep his expression (a calm, confident half-smile) and keep the stage lighting, colour and shadows exactly as they are.\n\nThe main fix is the EYES: they must look alive and focused, both eyes converging on one person in the audience to his right, with the iris as a full circle, white of the eye visible on both sides, a small real catchlight from the stage lights in each iris, natural upper lids with their crease, defined lash line. Never a glassy, vacant or dead stare, never looking into the lens. Skin stays real: irregular pores and fine facial hair, even healthy tone, no plastic skin, no beauty retouching, no added wrinkles. The glasses keep their lens reflections consistent with the scene. Do not change anything outside his face.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 1 is a real photograph of this man speaking on a conference stage. Refine ONLY his face inside the marked zone so it is unmistakably the same person as in the reference portrait: same face shape, same nose, same glasses with thin grey metal frames, same beard with its exact grey pattern, same curly salt-and-pepper hair line. Keep his head angle exactly as it is (slight three-quarter turn to his right), keep his expression (a calm, confident half-smile) and keep the stage lighting, colour and shadows exactly as they are.\n\nThe main fix is the EYES: they must look alive and focused, both eyes converging on one person in the audience to his right, with the iris as a full circle, white of the eye visible on both sides, a small real catchlight from the stage lights in each iris, natural upper lids with their crease, defined lash line. Never a glassy, vacant or dead stare, never looking into the lens. Skin stays real: irregular pores and fine facial hair, even healthy tone, no plastic skin, no beauty retouching, no added wrinkles. The glasses keep their lens reflections consistent with the scene. Do not change anything outside his face.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.03723114390432099,
+    "editable": 60715,
+    "soft": 1047,
+    "protected": 1597118
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 228,
+      "top": 73,
+      "width": 600,
+      "height": 564
+    },
+    "target": {
+      "width": 1056,
+      "height": 992
+    },
+    "aspectError": 0.0006447453255963534,
+    "reason": "la zona con contexto ocupa 20.3 % de la imagen: se genera recortada a 1056x992"
+  },
+  "estimate": {
+    "usd": 0.0988,
+    "basis": "2 × salida 1056x992 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 20.479,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -3,
+        "scale": 1,
+        "stillError": 4.96,
+        "bestError": 3.44,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.01,
+        1.43,
+        0.87
+      ],
+      "protected": {
+        "pixels": 1597118,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 60715,
+        "maxDelta": 232,
+        "meanDelta": 20.738,
+        "worst": {
+          "x": 451,
+          "y": 433
+        }
+      },
+      "seam": {
+        "pixels": 1047,
+        "maxDelta": 67,
+        "meanDelta": 5.442,
+        "worst": {
+          "x": 399,
+          "y": 288
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1597118,
+        "maxDelta": 207,
+        "meanDelta": 1.53,
+        "worst": {
+          "x": 661,
+          "y": 611
+        }
+      },
+      "outputUsd": 0.0494,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3975,
+        "input_tokens_details": {
+          "image_tokens": 3567,
+          "text_tokens": 408
+        },
+        "output_tokens": 1646,
+        "output_tokens_details": {
+          "image_tokens": 1646,
+          "text_tokens": 0
+        },
+        "total_tokens": 5621
+      },
+      "meta": {
+        "size": "1056x992",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 16.104,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.13,
+        "bestError": 4.13,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -1.11,
+        -0.17,
+        -0.06
+      ],
+      "protected": {
+        "pixels": 1597118,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 60715,
+        "maxDelta": 236,
+        "meanDelta": 16.3,
+        "worst": {
+          "x": 449,
+          "y": 426
+        }
+      },
+      "seam": {
+        "pixels": 1047,
+        "maxDelta": 89,
+        "meanDelta": 4.717,
+        "worst": {
+          "x": 402,
+          "y": 284
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1597118,
+        "maxDelta": 205,
+        "meanDelta": 1.449,
+        "worst": {
+          "x": 461,
+          "y": 541
+        }
+      },
+      "outputUsd": 0.0494,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3975,
+        "input_tokens_details": {
+          "image_tokens": 3567,
+          "text_tokens": 408
+        },
+        "output_tokens": 1646,
+        "output_tokens_details": {
+          "image_tokens": 1646,
+          "text_tokens": 0
+        },
+        "total_tokens": 5621
+      },
+      "meta": {
+        "size": "1056x992",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

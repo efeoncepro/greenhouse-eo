@@ -1,0 +1,9 @@
+{
+  "pieza": "Efeonce — Ese anuncio puede ser el tuyo (ChatGPT Ads, v9, música eleven_music_v2_5)", "duracion_s": 15.0, "fps": 24, "tempo_bpm": 120,
+  "cues": [
+    { "t": 3.8, "hasta": 3.98, "imagen": "Pausa antes del envío", "sonido": "silencio (stop-time)" },
+    { "t": 4.0, "imagen": "Se envía; la seda explota", "sonido": "golpe: vuelve la banda" },
+    { "t": 9.85, "hasta": 10.03, "imagen": "La esfera en vuelo", "sonido": "silencio (stop-time)" },
+    { "t": 10.05, "imagen": "La esfera aterriza como punto del titular", "sonido": "golpe: el acorde final de la banda" }
+  ]
+}

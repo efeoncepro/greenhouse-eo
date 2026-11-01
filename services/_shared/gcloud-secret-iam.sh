@@ -8,7 +8,9 @@
 
 extract_secret_name() {
   local ref="$1"
-  local normalized="${ref%%:latest}"
+  # IAM is attached to the secret, not its version. Numeric pinned references are
+  # as valid as :latest; leaving :1 here targets a nonexistent secret during deploy.
+  local normalized="${ref%%:*}"
 
   if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
     normalized="${normalized#projects/}"

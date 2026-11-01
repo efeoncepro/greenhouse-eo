@@ -1,0 +1,10 @@
+{
+  "provider": "byteplus",
+  "model": "dreamina-seedance-2-0-260128",
+  "taskId": "cgt-20261021193322-dtjvk",
+  "status": "succeeded",
+  "usage": {
+    "completion_tokens": 245388,
+    "total_tokens": 245388
+  }
+}

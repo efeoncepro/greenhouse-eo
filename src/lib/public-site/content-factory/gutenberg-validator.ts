@@ -15,6 +15,20 @@ import {
   glitchDropContentHasLink,
   splitGlitchDropContent
 } from './gutenberg-glitch-drop'
+import {
+  EDITORIAL_CHART_ALLOWED_ATTRIBUTES,
+  EDITORIAL_CHART_BLOCK_NAME,
+  editorialChartErrorCode,
+  isEditorialChartTone
+} from './gutenberg-editorial-chart'
+import {
+  GROWTH_CTA_ALLOWED_ATTRIBUTES,
+  GROWTH_CTA_BLOCK_NAME,
+  isGrowthCtaLocation,
+  isGrowthCtaMark,
+  isGrowthCtaSlug,
+  isGrowthCtaTone
+} from './gutenberg-growth-cta'
 
 export type GutenbergDraftValidationOptions = {
   allowedBlocks?: string[]
@@ -37,6 +51,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/column',
   'core/columns',
   'core/embed',
+  'core/code',
   'core/gallery',
   'core/group',
   'core/details',
@@ -54,6 +69,10 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   // Dynamic Efeonce POV callout (plugin efeonce-editorial-blocks). Allowed only in its
   // governed shape: self-closing, `content` without links or HTML other than <br>.
   GLITCH_DROP_BLOCK_NAME,
+  // Governed Growth CTA placement (plugin efeonce-editorial-blocks ≥ 0.7.0): self-closing, cta/location/emphasis.
+  GROWTH_CTA_BLOCK_NAME,
+  // «Gráfico Efeonce» (plugin efeonce-editorial-blocks): self-closing, chart data validated by the shared contract.
+  EDITORIAL_CHART_BLOCK_NAME,
   'yoast-seo/table-of-contents'
 ]
 
@@ -81,6 +100,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   mediaBlocks: ['core/image', 'core/embed'],
   enrichmentBlocks: [
     'core/list',
+    'core/code',
     'core/quote',
     'core/pullquote',
     'core/details',
@@ -786,6 +806,132 @@ const findRedundancyNeighbour = (
  * text separated by `<br>`, no links or other HTML. A drop that repeats the
  * neighbouring paragraph is a warning (the 251941 QA finding).
  */
+/**
+ * `efeoncepro/growth-cta` is allowed only in the governed shape the spec emits: self-closing, `cta` (a valid slug),
+ * optional `location` and `emphasis`. The copy lives in the Growth CTA engine, so there is nothing else to validate
+ * in the post; whether the blog surface allows the slug is checked on the live page (the block prints nothing).
+ */
+/**
+ * `efeoncepro/chart` is allowed only in the governed shape the spec emits: self-closing, the allowed attributes, and a
+ * `chart` that the shared contract accepts (the same rules as the renderer and EO_Chart::validate). An invalid chart
+ * prints nothing on the public page, so it blocks the draft instead of shipping an empty figure.
+ */
+const validateEditorialChartBlocks = (blocks: ParsedGutenbergBlockComment[], findings: ContentFactoryValidationFinding[]) => {
+  for (const block of blocks) {
+    if (block.blockName !== EDITORIAL_CHART_BLOCK_NAME || block.closing) continue
+
+    const path = `draft.postContent[${block.index}]`
+
+    if (!block.selfClosing) {
+      findings.push({
+        severity: 'block',
+        code: 'chart_not_self_closing',
+        message: `${EDITORIAL_CHART_BLOCK_NAME} is a dynamic block: it is a self-closing comment with the chart in attrs.chart.`,
+        path
+      })
+    }
+
+    const unsupportedAttrs = Object.keys(block.attrs).filter(
+      key => key !== '__invalidJson' && !(EDITORIAL_CHART_ALLOWED_ATTRIBUTES as readonly string[]).includes(key)
+    )
+
+    if (unsupportedAttrs.length > 0) {
+      findings.push({
+        severity: 'block',
+        code: 'chart_attrs_unsupported',
+        message: `${EDITORIAL_CHART_BLOCK_NAME} only accepts ${EDITORIAL_CHART_ALLOWED_ATTRIBUTES.join(', ')}; found ${unsupportedAttrs.join(', ')}.`,
+        path
+      })
+    }
+
+    const code = editorialChartErrorCode(block.attrs.chart)
+
+    if (code) {
+      findings.push({
+        severity: 'block',
+        code: 'chart_data_invalid',
+        message: `${EDITORIAL_CHART_BLOCK_NAME} chart does not validate (${code}); the public page would print nothing.`,
+        path
+      })
+    }
+
+    if (block.attrs.tone !== undefined && !isEditorialChartTone(block.attrs.tone)) {
+      findings.push({
+        severity: 'block',
+        code: 'chart_tone_invalid',
+        message: `${EDITORIAL_CHART_BLOCK_NAME} tone must be light or dark.`,
+        path
+      })
+    }
+  }
+}
+
+const validateGrowthCtaBlocks = (blocks: ParsedGutenbergBlockComment[], findings: ContentFactoryValidationFinding[]) => {
+  for (const block of blocks) {
+    if (block.blockName !== GROWTH_CTA_BLOCK_NAME || block.closing) continue
+
+    const path = `draft.postContent[${block.index}]`
+
+    if (!block.selfClosing) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_not_self_closing',
+        message: `${GROWTH_CTA_BLOCK_NAME} is a dynamic block: it is a self-closing comment with cta/location/emphasis.`,
+        path
+      })
+    }
+
+    const unsupportedAttrs = Object.keys(block.attrs).filter(
+      key => key !== '__invalidJson' && !(GROWTH_CTA_ALLOWED_ATTRIBUTES as readonly string[]).includes(key)
+    )
+
+    if (unsupportedAttrs.length > 0) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_attrs_unsupported',
+        message: `${GROWTH_CTA_BLOCK_NAME} only accepts ${GROWTH_CTA_ALLOWED_ATTRIBUTES.join(', ')}; found ${unsupportedAttrs.join(', ')}.`,
+        path
+      })
+    }
+
+    if (!isGrowthCtaSlug(block.attrs.cta)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_slug_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} needs the slug of a published Growth CTA in attrs.cta.`,
+        path
+      })
+    }
+
+    if (block.attrs.tone !== undefined && !isGrowthCtaTone(block.attrs.tone)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_tone_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} tone must be dark or light.`,
+        path
+      })
+    }
+
+    if (block.attrs.mark !== undefined && !isGrowthCtaMark(block.attrs.mark)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_mark_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} mark must be one of the official product lockups (aeo-assessment).`,
+        path
+      })
+    }
+
+    if (block.attrs.location !== undefined && !isGrowthCtaLocation(block.attrs.location)) {
+      findings.push({
+        severity: 'block',
+        code: 'growth_cta_location_invalid',
+        message: `${GROWTH_CTA_BLOCK_NAME} location must be snake_case (cta_location measurement param).`,
+        path
+      })
+    }
+  }
+}
+
 const validateGlitchDropBlocks = (
   postContent: string,
   blocks: ParsedGutenbergBlockComment[],
@@ -1036,6 +1182,8 @@ export const validateGeneratedGutenbergDraft = (
   validateGovernedHtmlJsonLdBlocks(postContent, blocks, findings)
   validateDetailsBlocks(postContent, blocks, findings)
   validateGlitchDropBlocks(postContent, blocks, findings)
+  validateGrowthCtaBlocks(blocks, findings)
+  validateEditorialChartBlocks(blocks, findings)
   validateButtonBlocks(postContent, blocks, findings)
 
   if (postContent.length < 600) {

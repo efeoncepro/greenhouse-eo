@@ -1,0 +1,46 @@
+{
+  "schema": "manzanitas.piece-provenance.v1",
+  "artifactId": "MCM-demo-blog-inbound",
+  "channel": "blog",
+  "topicLine": "revenue-hubspot",
+  "intent": {
+    "file": "demo-actual-revenue.json",
+    "sha256": "2dbc52624b2e8287779fb00516620336b241dd9bdbdcb210bfd73080a6ede634"
+  },
+  "axis": {
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-brand-assets": "0.4.25",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-ui-contracts": "0.3.40"
+  },
+  "assets": [
+    {
+      "ref": "photo:s01-blog-banner-escena",
+      "kind": "photo",
+      "source": {
+        "path": "../../2026-09-28_manzanitas-cine/plates/MC5g-169-blog-evidencia.png",
+        "sha256": "bd78c09e6b047c6a7eea84ee41048f305e46ca90c5b15031867ae8a19d9442fa"
+      },
+      "processed": {
+        "sha256": "d4acf7054ad4e01f9a949afa37d54a7b2e6805c8d92b6332158607c18d5d3d5c",
+        "width": 1200,
+        "height": 630
+      }
+    }
+  ],
+  "outputs": {
+    "stills": {
+      "catalog": "manzanitas-stills",
+      "templates": [
+        "s01-blog-banner-escena:BlogBanner"
+      ],
+      "manifestSha256": "a9493ee27e199676fb9c01a00b75cf98c92dbddc78a40d23e8732105521c9892",
+      "pngs": [
+        {
+          "file": "sueltas/01-s01-blog-banner-escena.png",
+          "sha256": "07b77c624f9c7cc69958a6b892485a404a6f829099bc669c0a8b754a2632ebe8"
+        }
+      ]
+    }
+  }
+}

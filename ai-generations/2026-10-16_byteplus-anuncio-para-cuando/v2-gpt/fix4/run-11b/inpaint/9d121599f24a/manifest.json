@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9d121599f24a",
+  "key": "9d121599f24a2222cbba3739e44eba085dca523dfda7b6620f155589f7ebfdc3",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:35:40.872Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S11r-b.png",
+    "imageSha256": "6d234565eac6c25b0f85ac6a851ec9b38165d8c95c1ec59b0519c89a785fd651",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/11b.png",
+    "maskSha256": "75c4880a9495e24d5c4bdd21a3822c702e71ecaf89c50104cb4bea0958d6f00c",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/ref-vaso-paula.png",
+        "sha256": "06beb4bec2815b989f096da0fef98e2186a80defa7d11e991c70418f9408b92e"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zones. The can flying in the air is EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), same position and tilt, wet with droplets. In her hand: her kraft paper coffee cup with a matte black lid exactly like image 3, splashed with water. Bottom left foreground: the man's forearm in a deep navy bomber jacket sleeve with his hand resting by his laptop, out of focus. Bottom right foreground: a navy blue ceramic mug, out of focus. Keep everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked zones. The can flying in the air is EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), same position and tilt, wet with droplets. In her hand: her kraft paper coffee cup with a matte black lid exactly like image 3, splashed with water. Bottom left foreground: the man's forearm in a deep navy bomber jacket sleeve with his hand resting by his laptop, out of focus. Bottom right foreground: a navy blue ceramic mug, out of focus. Keep everything outside the zones unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.17925872802734374,
+    "editable": 208328,
+    "soft": 26630,
+    "protected": 1075762
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 48.686,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -5,
+        "dy": -5,
+        "scale": 1,
+        "stillError": 14.37,
+        "bestError": 9.27,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1075762,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 208328,
+        "maxDelta": 235,
+        "meanDelta": 53.173,
+        "worst": {
+          "x": 327,
+          "y": 229
+        }
+      },
+      "seam": {
+        "pixels": 26630,
+        "maxDelta": 194,
+        "meanDelta": 13.582,
+        "worst": {
+          "x": 328,
+          "y": 251
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1075762,
+        "maxDelta": 249,
+        "meanDelta": 19.077,
+        "worst": {
+          "x": 373,
+          "y": 261
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3291,
+        "input_tokens_details": {
+          "image_tokens": 3006,
+          "text_tokens": 285
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4801
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

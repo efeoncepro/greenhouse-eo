@@ -1,9 +1,9 @@
 # Motor de CTAs y Popups — `growth.cta`
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-10-23 por Claude (formulario en diálogo, TASK-2044)
+> **Ultima actualizacion:** 2026-10-24 por Claude (diálogo en producción, primer consumidor Partners)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio:** `greenhouse-growth-ctas` (Claude + Codex; se actualiza con cada cambio del motor)
 
@@ -78,10 +78,12 @@ La superficie de gobernanza vive en el **menú Growth** (junto a AEO y Forms), v
 ## Formulario en un diálogo — TASK-2044
 
 La acción «abrir formulario» puede presentar el formulario en un diálogo (popup) que el visitante abre con el botón,
-con su propio encabezado. No es un popup que aparece solo: no tiene tope de frecuencia ni reglas de interrupción. Hasta
-que el renderer de TASK-2045 llegue a producción, el formulario se sigue abriendo dentro de la tarjeta.
+con su propio encabezado. No es un popup que aparece solo: no tiene tope de frecuencia ni reglas de interrupción. Está
+en producción desde el 2026-10-24: el primero en usarlo es «Quiero ser partner» en la página de Partners, que abre el
+formulario para plataformas que quieren aliarse con Efeonce. Se sabe que cerrar el diálogo con el cursor en el primer
+campo registra un error de validación que el visitante no cometió; se corregirá en el renderer.
 
-> Detalle técnico: [arquitectura §30](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md) ·
+> Detalle técnico: [arquitectura §30–§31](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md) ·
 > `src/lib/growth/ctas/contracts.ts` · `src/lib/growth/ctas/action-registry.ts`
 
 ## Quién puede operarlo

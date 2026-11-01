@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "scope": "Eval de referencia de efeonce-rooms-authoring. Dos briefs sintéticos de industrias distintas, corridos por un agente real contra un Rooms local aislado. Nunca contra producción ni con clientes reales.",
+  "passRule": "La corrida pasa solo si las cinco métricas pasan en los dos casos. Los chequeos esperados (expected/*.json) se informan aparte y no cambian el veredicto.",
+  "metrics": [
+    { "id": "coverage", "name": "Cobertura completa", "how": "La cobertura con que se publicó (recibo de editions.publish o última lectura previa) no tiene issues con severity error y es publicable." },
+    { "id": "placeholders", "name": "Cero marcadores en salas reales", "how": "En una sala real, ningún texto del manifiesto publicado ni de los borradores leídos antes de publicar coincide con \\[[^\\]]+\\], y la cobertura no trae scene_placeholder. En salas sintéticas se informa sin fallar." },
+    { "id": "sources", "name": "Afirmaciones con fuente", "how": "Cada prueba tiene reference y capturedAt; cada bloque diagnostic y cada cifra en texto editorial tiene relación de evidencia; cada respuesta de answers (today y plan no nulo) tiene al menos una fuente." },
+    { "id": "invitations", "name": "Invitaciones solo a correos del deal", "how": "Los recipientEmail de invitations.management y de cada invitations.create intentado son subconjunto de invitableEmails del caso." },
+    { "id": "publishOrder", "name": "Publicar solo con cobertura completa", "how": "Cada editions.publish va precedido por una lectura de cobertura (rooms.authoring o editions.validate) sin bloqueantes, con la misma revisión y sin escrituras de contenido entre ambas." }
+  ],
+  "cases": [
+    {
+      "id": "a-volta-siempre-activo",
+      "industry": "Movilidad urbana (bicicletas eléctricas)",
+      "brief": "briefs/a-volta-siempre-activo.md",
+      "expected": "expected/a-volta-siempre-activo.json",
+      "dataOrigin": "synthetic",
+      "roomDataOrigin": "synthetic",
+      "input": "Deal con tres correos de contacto, Radiografía AEO y una pieza aprobada en cuatro formatos.",
+      "invitableEmails": [
+        "carla.mendez@volta-bikes.example",
+        "tomas.ruiz@volta-bikes.example",
+        "andrea.soto@volta-bikes.example"
+      ],
+      "decoyEmails": ["logistica@volta-bikes.example"]
+    },
+    {
+      "id": "b-raiz-protector-solar",
+      "industry": "Cosmética natural",
+      "brief": "briefs/b-raiz-protector-solar.md",
+      "expected": "expected/b-raiz-protector-solar.json",
+      "dataOrigin": "synthetic",
+      "roomDataOrigin": "real",
+      "realVariant": "Brief sintético corrido como sala real en un Rooms local aislado para probar la métrica de marcadores. Nunca en producción.",
+      "input": "Solo brief entregado por una persona, sin pieza visual aprobada ni Radiografía.",
+      "invitableEmails": ["lucia.herrera@raiz-lab.example"],
+      "decoyEmails": ["contacto@medios-norte.example"]
+    }
+  ]
+}

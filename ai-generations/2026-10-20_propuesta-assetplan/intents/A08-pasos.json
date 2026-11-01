@@ -15,31 +15,31 @@
       "Hablemos"
     ]
   },
-  "body": "Adjuntamos la cotización formal: inversión y condiciones.",
+  "body": "Adjuntamos la cotización formal a 30 horas, con condiciones.",
   "agenda": {
-    "kicker": "01 · Revisión · 30 min",
-    "title": "Revisemos la propuesta",
-    "descriptor": "30 min por videollamada · alcance, tiempos de respuesta y dudas",
+    "kicker": "01 · Segunda reunión · 45 min",
+    "title": "Conoce a tu contraparte",
+    "descriptor": "Tu Especialista de CRM, tu equipo y el plan de inicio",
     "days": [
       {
-        "weekday": "Mié",
-        "day": "21"
-      },
-      {
         "weekday": "Jue",
-        "day": "22"
+        "day": "29"
       },
       {
         "weekday": "Vie",
-        "day": "23"
+        "day": "30"
       },
       {
         "weekday": "Lun",
-        "day": "26"
+        "day": "2"
       },
       {
         "weekday": "Mar",
-        "day": "27"
+        "day": "3"
+      },
+      {
+        "weekday": "Mié",
+        "day": "4"
       }
     ],
     "times": [
@@ -49,24 +49,24 @@
       "17:00"
     ],
     "chosen": {
-      "day": 2,
+      "day": 4,
       "time": 2
     },
-    "summary": "Jueves 22 · 11:30 · hora de Chile",
-    "cta": "Agenda la revisión"
+    "summary": "Martes 3 · 11:30 · hora de Chile",
+    "cta": "Agenda la reunión"
   },
   "nextSteps": [
     {
       "number": "02",
       "label": "Acuerdos",
       "title": "Alcance",
-      "desc": "Tiempos de respuesta, inicio y accesos Partner."
+      "desc": "Inicio antes de diciembre, accesos Partner y canal."
     },
     {
       "number": "03",
       "label": "On-Going",
       "title": "Primer ciclo",
-      "desc": "El canal al día desde el primer mes."
+      "desc": "El canal al día antes de tus vacaciones."
     }
   ]
 }

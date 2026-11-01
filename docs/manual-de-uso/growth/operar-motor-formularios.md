@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.12 — 2026-10-24 (Claude, publicar la píldora de Glitch y consentimiento por el acto de suscribirse, TASK-2053/2054)
+> **Version:** 1.13 — 2026-10-31 (Claude, revisar el copy de un formulario publicado con destino; texto de ejemplo «Tu correo» en Glitch)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -175,6 +175,71 @@ muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnsti
 dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
 `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
 (dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
+
+## Revisar el copy de un formulario publicado
+
+Sirve para cambiar un texto visible (etiqueta, texto de ejemplo, ayuda, CTA) de un formulario que ya está publicado,
+sin tocar nada más. Una versión publicada no se edita: se crea una versión nueva con el cambio, pasa por revisión, se
+publica y la anterior queda retirada. Casos de referencia:
+
+- **Con destino** (HubSpot): `scripts/growth/revise-glitch-pill-placeholder.ts` (2026-10-31, texto de ejemplo «Tu correo»
+  en la suscripción a Glitch).
+- **Sin destino** (`greenhouse_only`): `scripts/growth/revise-content-marketing-form-copy.ts` (2026-08-31); exige que la
+  versión no tenga destino.
+
+**Antes de empezar:**
+
+- Acceso a PostgreSQL con el perfil `ops` (el script lo aplica; si corres local, levanta el proxy con `pnpm pg:connect`).
+- Copia el script de referencia que corresponda y fija en él la clave del formulario, su slug, la superficie y la
+  versión publicada que esperas encontrar. El script debe detenerse si cualquiera de esas cuatro no coincide.
+- **Si un agente lo corre**, pide la autorización del operador para el `--apply` antes de empezar: escribe en la base
+  compartida y publica, y el clasificador de permisos del modo automático lo bloquea hasta que el operador permite ese
+  comando de forma explícita (pasó el 2026-10-31).
+
+**Paso a paso:**
+
+1. **Dry-run** (sin flags). Los scripts que importan `@/lib/growth/forms/*` necesitan el shim de `server-only`:
+
+   ```bash
+   pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/<script>.ts
+   ```
+
+   Compila en memoria la versión nueva con el mismo compiler de la publicación (incluido el destino tal como se va a
+   copiar) y sólo lee la base. Debe responder `dry_run_verified`; si no, no sigas.
+2. **Aplicar** con `--apply` (mismo comando). El script crea el borrador conservando todo lo demás
+   (`preserveFormVersionFields`: campos, validación, copy, etiquetas y aviso de la píldora, consentimiento, seguridad,
+   políticas), **copia el destino**, pasa la versión por revisión, vuelve a comprobar justo antes de publicar que nadie
+   cambió la versión publicada ni la superficie, publica y retira la anterior.
+3. **Copiar el destino es obligatorio** cuando el formulario tiene uno: los destinos son **por versión**, así que una
+   versión clonada nace sin destino y, si se publica así, los envíos dejan de llegar a HubSpot. El script lo agrega con
+   `addDestination` antes de la revisión, con los mismos `provider`, `adapter_kind`, `adapter_version`,
+   `endpoint_status`, `delivery_mode`, `mapping_json`, `consent_requirements_json` y `retry_policy_json` de la versión
+   anterior, y comprueba que el mapeo quedó idéntico.
+4. **Verificar:**
+   - El script relee el contrato público del formulario para su superficie y origen, y confirma el texto nuevo y la
+     presentación. Deja la evidencia en `tmp/` (archivo con permisos `600`, sin datos privados).
+   - Si no cambiaste el aviso de consentimiento, su huella tampoco cambia y el consentimiento sigue igual. Si lo
+     cambiaste, la huella es otra: revisa antes el alcance con quien aprobó el consentimiento.
+   - Abre cada página que incrusta el formulario y mira el texto nuevo. Un mismo formulario puede estar en varias
+     páginas: el cambio de Glitch se vio en el pie de página y en las siete píldoras de la portada del blog.
+   - Si el formulario tiene política de medición publicitaria, revincúlala a la versión nueva (ver la sección
+     siguiente, «Después de publicar, revincula la medición»).
+
+**Qué no hacer:**
+
+- No publiques una versión clonada sin revisar sus destinos: nace sin destino aunque la anterior lo tuviera.
+- No cambies el texto desde la página del sitio: los textos del formulario vienen del contrato publicado.
+- No achiques la letra del campo para que quepa un texto largo: el renderer la fija en 16 px porque con menos el iPhone
+  hace zoom al tocar el campo. Acorta el texto.
+
+**Problemas comunes:**
+
+- El script falla al cargar, antes de leer la base, con un error del paquete `server-only`: falta
+  `--require ./scripts/lib/server-only-shim.cjs` (ese paquete lanza un error al importarse fuera de Next.js).
+- El script se detiene por «drift» de la versión publicada: alguien publicó otra versión entretanto. Relee el estado
+  actual y actualiza el script; no fuerces.
+- Se detiene después de crear el borrador: revisa el borrador y el estado gobernado antes de reintentar (el script no
+  imprime datos privados).
 
 ## Cambiar el diseño de un formulario publicado (opciones visibles, pasos, íconos)
 
@@ -377,9 +442,10 @@ landing: se declara en una versión nueva del formulario.
 6. La piel va en el CSS del anfitrión con tokens `--ghf-*` y hooks `data-ghf-part` (tabla en el contrato de runtime;
    ejemplo: `scripts/public-website/partners-source/partner-dialog-skin.css`).
 
-**Qué no hacer:** no publiques una versión con `{privacyLink}` mientras el renderer de TASK-2045 (`1.1.0`) no esté en
-producción: el renderer actual muestra el marcador tal cual. `width`, `compact`, `icon` y `dismiss` sí se pueden
-publicar antes (el renderer actual los ignora sin romper). Tabla completa:
+El renderer de producción (`1.2.0`, release del 2026-10-24) ya interpreta `{privacyLink}`, `width`, `compact`, `icon`
+y `dismiss`; el primer formulario diseñado en vivo es `efeonce-partner-application` (popup de `/partnership/`).
+**Qué no hacer:** no embebas una versión con `{privacyLink}` en un host que fije un bundle anterior a `1.1.0`: lo
+mostraría tal cual. Tabla completa:
 [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formularios-diseñados-en-canvas-lo-que-el-contrato-admite-task-2044).
 
 ## Publicar la suscripción a Glitch como píldora (TASK-2053/2054)
@@ -387,6 +453,10 @@ publicar antes (el renderer actual los ignora sin romper). Tabla completa:
 Sirve para publicar (o volver a verificar) la versión `inline_pill` del formulario `efeonce-blog-subscription`, la que
 usa la portada del blog. La clave pública no cambia (`6bc62588-a4a0-4214-9501-13b0c2948c81`), así que la portada no
 necesita reconfigurarse al publicar una versión nueva.
+
+Versión publicada desde el 2026-10-31: `fver-d0ecefaa-9bf5-429a-8eb3-2abd3826b67e` (texto de ejemplo «Tu correo»;
+reemplazó a `fver-e6850cc8-4b39-40c7-9428-a148cfdd53bc`). Ese cambio se hizo con el procedimiento
+[Revisar el copy de un formulario publicado](#revisar-el-copy-de-un-formulario-publicado), no con este publicador.
 
 **Antes de empezar:** acceso a PostgreSQL con el perfil `ops` (el script lo aplica; levanta el proxy con `pnpm pg:connect` si corres local) y, para publicar, el release de Greenhouse en
 `main` con el consentimiento por el acto de suscribirse (está desde `40b330175855`, 2026-10-24).

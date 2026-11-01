@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "bde7252e9d73",
+  "key": "bde7252e9d735502959f36bc374ce5520b6815d43c1222e07bb4281e0a2c1bce",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:58:55.616Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v4/01-kickoff.png",
+    "imageSha256": "390964c57df96f6d7a8083bccbf3646ebc5adc8b8e1ebd21a01ae817a8b81db7",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/m/01.png",
+    "maskSha256": "77564b3b6fe81e62b977d3be1afdb9a4809bf078d94d011dffe73f5b643204a5",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/ref-proveedores.png",
+        "sha256": "b6678e02541dc3d5bf0765b1b0e2a224cc2266422e660f4d3f58f0b4d5ab33a8"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked laptop screen content in the foreground: a video call in a 2x2 grid with exactly the four people of image 2, softly out of focus like the rest of the foreground. Keep the laptop frame and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked laptop screen content in the foreground: a video call in a 2x2 grid with exactly the four people of image 2, softly out of focus like the rest of the foreground. Keep the laptop frame and everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.12099609375,
+    "editable": 150088,
+    "soft": 8504,
+    "protected": 1152128
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 38 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 47.719,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.86,
+        "bestError": 1.86,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        0.06,
+        -0.94,
+        -0.58
+      ],
+      "protected": {
+        "pixels": 1152128,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 150088,
+        "maxDelta": 186,
+        "meanDelta": 50.36,
+        "worst": {
+          "x": 219,
+          "y": 1208
+        }
+      },
+      "seam": {
+        "pixels": 8504,
+        "maxDelta": 6,
+        "meanDelta": 1.112,
+        "worst": {
+          "x": 584,
+          "y": 1170
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1152128,
+        "maxDelta": 80,
+        "meanDelta": 3.237,
+        "worst": {
+          "x": 410,
+          "y": 228
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3774,
+        "input_tokens_details": {
+          "image_tokens": 3532,
+          "text_tokens": 242
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 5284
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

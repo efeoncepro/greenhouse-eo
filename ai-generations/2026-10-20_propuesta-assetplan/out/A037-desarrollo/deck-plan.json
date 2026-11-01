@@ -1,0 +1,76 @@
+{
+  "tenderId": "A037-desarrollo",
+  "slides": [
+    {
+      "slideId": "deck-method-staircase",
+      "contentType": "deck.method-staircase",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 159,
+          "bodyTop": 590,
+          "bodyPx": 25,
+          "bodyWidth": 500,
+          "stairX0": "--gl-stair-x0=760px",
+          "stairDx": "--gl-stair-dx=70px",
+          "stairY0": "--gl-stair-y0=798px",
+          "stairDy": "--gl-stair-dy=132px",
+          "levelNamePx": "--gl-level-name-px=76px",
+          "levelTopNamePx": "--gl-level-top-name-px=86px",
+          "levelNumberPx": "--gl-level-number-px=30px",
+          "levelDescriptorPx": "--gl-level-descriptor-px=23px",
+          "notePx": "--gl-note-px=17px",
+          "noteTop": "--gl-note-top=930px",
+          "columnWidth": "--gl-column-width=740px",
+          "slabHeight": "--gl-slab-height=124px"
+        },
+        "voice": {
+          "question": "¿Y si HubSpot no lo trae?",
+          "answer": "medida",
+          "eyebrow": "Desarrollo a medida",
+          "answerLead": "Hecho a"
+        },
+        "body": "Si no viene de fábrica, lo construimos: código versionado, probado y documentado.",
+        "levels": [
+          {
+            "name": "Configuración",
+            "descriptor": "lo nativo, bien hecho"
+          },
+          {
+            "name": "Código propio",
+            "descriptor": "lógica a medida, versionada"
+          },
+          {
+            "name": "Objetos y APIs",
+            "descriptor": "tu modelo de datos"
+          },
+          {
+            "name": "Extensiones",
+            "descriptor": "vistas a medida"
+          },
+          {
+            "name": "Agentes",
+            "descriptor": "con límites claros"
+          }
+        ],
+        "note": "Cada escalón suma capacidad y también control.",
+        "selection": {
+          "label": "TI",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "level": 2
+        }
+      },
+      "template": "MethodStaircase"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "EQ2b-multitud-desenfocada",
+  "formato": "16:9",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "haz": "a soft, cool blue-white glow far behind the crowd, centred, diffused by the haze; plus a large soft frontal fill light near the camera, slightly from the left, that gently lights the front of the distant people",
+  "escena": "SCENE (an empty background plate, a large dark event hall): the camera stands at an adult's eye level, about 1.6 metres high, perfectly level, 85mm lens wide open at f/1.4. THERE IS NOBODY IN THE FOREGROUND OR MIDDLE GROUND: no person, no figure, no object stands within ten metres of the camera, and NOTHING in the whole frame is in sharp focus. Only far away, between twelve and twenty-five metres from the camera, a crowd of about ninety people — women and men of different builds and hairstyles, some holding laptops or tablets, some mid-conversation — stands loosely across the whole width of the frame. Because the camera is at eye level and they are far, THEIR HEADS ALL LINE UP ALONG ONE THIN HORIZONTAL BAND between 62% and 68% of the frame height, small with distance, and their bodies fill the band below down to the floor at about 85% of the frame height. The whole crowd is COMPLETELY OUT OF FOCUS: soft, creamy, dissolved shapes with real lens bokeh, no face or detail readable at all, no logos. They are lit softly from the front in muted cool tones and rimmed by the blue glow behind them, which spreads into thick navy and cobalt (#0375DB) haze. The top 60% of the frame is calm deep-navy haze above their heads, with no heads, objects or lights in it. The bottom 15% is empty dark polished floor. Nothing warm, amber or golden; no text, no logos, no screens with content.",
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep-navy haze above the heads of the crowd, top half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the dark polished floor of the hall in the immediate foreground",
+    "tono": "DEEP navy-black floor, matte, out of focus, catching a faint cool reflection of the haze"
+  }
+}

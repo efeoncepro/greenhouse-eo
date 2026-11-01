@@ -1,0 +1,427 @@
+{
+ "message": "Piezas del canvas aprobado: Gobierno de Santiago, Marca Chile, PabellonToGo y Bresler (operador, 2026-10-30)",
+ "projects": [
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "gobierno-de-santiago-cuidando-a-quienes-cuidan",
+   "client": {
+    "name": "Gobierno de Santiago",
+    "industry": "sector-publico"
+   },
+   "title": "Campaña «Cuidando a quienes cuidan»: redes, video e impresos",
+   "audience": "Personas que cuidan a un familiar con dependencia en la Región Metropolitana, en su mayoría mujeres",
+   "need": "Informar y sensibilizar sobre el rol de las personas cuidadoras y acercarles el programa que las apoya",
+   "line": "brand",
+   "services": [
+    "creative-services"
+   ],
+   "steps": {
+    "challenge": {
+     "title": "Visibilizar a quienes cuidan",
+     "body": "El programa «Cuidando a quienes cuidan» reconoce y apoya a las personas cuidadoras con capacitación, contención psicosocial, información y redes de apoyo. Había que llegar a ellas con un mensaje claro y cercano."
+    },
+    "idea": {
+     "title": "Piezas cercanas y coherentes",
+     "body": "Una línea de piezas que informa sin perder calidez, con enfoque inclusivo y de derechos, igual en redes, video e impresos."
+    },
+    "execution": {
+     "title": "Redes, video, impresos y textos",
+     "body": "Diseñamos las piezas para redes sociales, editamos los videos, preparamos los impresos y escribimos los textos de la campaña para el programa y para el Gobierno de Santiago."
+    }
+   },
+   "hero": {
+    "mediaRef": "afiche"
+   },
+   "chapters": [
+    {
+     "name": "En la calle y en redes",
+     "media": [
+      {
+       "id": "afiche",
+       "kind": "image",
+       "mediaId": 252293,
+       "width": 950,
+       "height": 650,
+       "alt": "Gobierno de Santiago: afiche de la campaña Cuidando a quienes cuidan",
+       "caption": "Afiche"
+      },
+      {
+       "id": "redes",
+       "kind": "image",
+       "mediaId": 252294,
+       "width": 520,
+       "height": 650,
+       "alt": "Gobierno de Santiago: piezas de la campaña en Instagram",
+       "caption": "Piezas en redes"
+      },
+      {
+       "id": "piezas",
+       "kind": "image",
+       "mediaId": 252295,
+       "width": 520,
+       "height": 650,
+       "alt": "Gobierno de Santiago: piezas de la campaña en teléfono y tarjetas"
+      }
+     ]
+    },
+    {
+     "name": "La campaña",
+     "media": [
+      {
+       "id": "pieza-1",
+       "kind": "image",
+       "mediaId": 248335,
+       "width": 1919,
+       "height": 1440,
+       "alt": "Gobierno de Santiago: la campaña, lámina 1 de 4"
+      },
+      {
+       "id": "pieza-2",
+       "kind": "image",
+       "mediaId": 248336,
+       "width": 1919,
+       "height": 1440,
+       "alt": "Gobierno de Santiago: la campaña, lámina 2 de 4"
+      },
+      {
+       "id": "pieza-3",
+       "kind": "image",
+       "mediaId": 248337,
+       "width": 1919,
+       "height": 1440,
+       "alt": "Gobierno de Santiago: la campaña, lámina 3 de 4"
+      },
+      {
+       "id": "pieza-4",
+       "kind": "image",
+       "mediaId": 248338,
+       "width": 1117,
+       "height": 1313,
+       "alt": "Gobierno de Santiago: la campaña, lámina 4 de 4"
+      }
+     ]
+    }
+   ],
+   "clientApproval": {
+    "ref": "Decisión del operador 2026-10-29; publicado en efeoncepro.com/project/gobierno-de-santiago/",
+    "date": "2026-10-29",
+    "scope": [
+     "logo",
+     "pieces"
+    ]
+   },
+   "seo": {
+    "title": "Gobierno de Santiago: Campaña «Cuidando a quienes cuidan»: redes,…",
+    "description": "Informar y sensibilizar sobre el rol de las personas cuidadoras y acercarles el programa que las apoya."
+   },
+   "links": {
+    "canonicalCase": "https://www.behance.net/gallery/229631315/Gobierno-de-Santiago"
+   },
+   "revision": 1
+  },
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "marca-chile-infografias",
+   "client": {
+    "name": "Marca Chile",
+    "industry": "sector-publico"
+   },
+   "title": "Propuesta creativa: dos infografías póster sobre los atributos de Chile",
+   "audience": "Inversionistas, exportadores y público internacional que mira a Chile como destino",
+   "need": "Comunicar de forma visual y sintética los atributos que diferencian a Chile para fortalecer su imagen país",
+   "line": "brand",
+   "services": [
+    "creative-services"
+   ],
+   "steps": {
+    "challenge": {
+     "title": "Atributos país en una sola mirada",
+     "body": "Marca Chile proyecta la identidad y las ventajas competitivas del país hacia el exterior. El encargo fue transmitir atributos diferenciadores de forma visual y sintética."
+    },
+    "idea": {
+     "title": "Infografías con formato de póster",
+     "body": "Dos piezas de lectura inmediata: la primera destaca a Chile como número uno de Latinoamérica en atractivo para invertir en energías renovables."
+    },
+    "execution": {
+     "title": "Íconos claros y paletas de contraste",
+     "body": "Diseñamos las dos infografías con íconos claros y paletas contrastantes que refuerzan el mensaje de innovación y sostenibilidad."
+    }
+   },
+   "hero": {
+    "mediaRef": "metro"
+   },
+   "chapters": [
+    {
+     "name": "En el metro",
+     "media": [
+      {
+       "id": "metro",
+       "kind": "image",
+       "mediaId": 252292,
+       "width": 867,
+       "height": 650,
+       "alt": "Marca Chile: las dos infografías en afiches del metro",
+       "caption": "Afiches en el metro"
+      }
+     ]
+    },
+    {
+     "name": "Las infografías",
+     "media": [
+      {
+       "id": "pieza-1",
+       "kind": "image",
+       "mediaId": 248342,
+       "width": 1920,
+       "height": 1440,
+       "alt": "Marca Chile: las infografías, lámina 1 de 3"
+      },
+      {
+       "id": "pieza-2",
+       "kind": "image",
+       "mediaId": 248343,
+       "width": 1919,
+       "height": 1439,
+       "alt": "Marca Chile: las infografías, lámina 2 de 3"
+      },
+      {
+       "id": "pieza-3",
+       "kind": "image",
+       "mediaId": 248350,
+       "width": 1117,
+       "height": 1313,
+       "alt": "Marca Chile: las infografías, lámina 3 de 3"
+      }
+     ]
+    }
+   ],
+   "clientApproval": {
+    "ref": "Decisión del operador 2026-10-29; publicado en efeoncepro.com/project/marca-chile/",
+    "date": "2026-10-29",
+    "scope": [
+     "logo",
+     "pieces"
+    ]
+   },
+   "seo": {
+    "title": "Marca Chile: Propuesta creativa: dos infografías póster sobre los…",
+    "description": "Comunicar de forma visual y sintética los atributos que diferencian a Chile para fortalecer su imagen país."
+   },
+   "period": {
+    "from": "2025-07",
+    "to": null
+   },
+   "links": {
+    "canonicalCase": "https://www.behance.net/gallery/229637417/Marca-Chile-Infografias"
+   },
+   "revision": 1
+  },
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "pabellontogo-menu-y-redes",
+   "client": {
+    "name": "PabellonToGo",
+    "industry": "gastronomia"
+   },
+   "title": "Carta de menú, packaging y piezas para redes sociales",
+   "audience": "Personas que almuerzan en Santiago y buscan comida casera venezolana y latina a domicilio",
+   "need": "Una marca vibrante y cercana que destaque en redes y en el punto de venta",
+   "line": "brand",
+   "services": [
+    "creative-services"
+   ],
+   "steps": {
+    "challenge": {
+     "title": "Sabor de casa, formato urbano",
+     "body": "Pabellón To Go ofrece almuerzos rápidos con sabores venezolanos y latinos, como pabellón criollo, pastichos y jugos naturales, en Santiago de Chile."
+    },
+    "idea": {
+     "title": "Lo tradicional con códigos modernos",
+     "body": "Una estética vibrante y llamativa que combina lo tradicional con códigos visuales modernos, para destacar en digital y en el local."
+    },
+    "execution": {
+     "title": "Digital e impreso",
+     "body": "Creamos el contenido gráfico para redes sociales y diseñamos las piezas impresas: cartas de menú, packaging y promociones."
+    }
+   },
+   "hero": {
+    "mediaRef": "menu-en-mesa"
+   },
+   "chapters": [
+    {
+     "name": "Menú y redes",
+     "media": [
+      {
+       "id": "menu-en-mesa",
+       "kind": "image",
+       "mediaId": 252296,
+       "width": 520,
+       "height": 650,
+       "alt": "PabellonToGo: carta del menú en la mesa",
+       "caption": "La carta en la mesa"
+      },
+      {
+       "id": "pieza-1",
+       "kind": "image",
+       "mediaId": 246991,
+       "width": 1919,
+       "height": 1440,
+       "alt": "PabellonToGo: menú y redes, lámina 1 de 3"
+      },
+      {
+       "id": "pieza-2",
+       "kind": "image",
+       "mediaId": 246993,
+       "width": 1793,
+       "height": 1345,
+       "alt": "PabellonToGo: menú y redes, lámina 2 de 3"
+      },
+      {
+       "id": "pieza-3",
+       "kind": "image",
+       "mediaId": 246899,
+       "width": 1116,
+       "height": 1312,
+       "alt": "PabellonToGo: menú y redes, lámina 3 de 3"
+      }
+     ]
+    }
+   ],
+   "clientApproval": {
+    "ref": "Decisión del operador 2026-10-29; publicado en efeoncepro.com/project/pabellotogo-design/",
+    "date": "2026-10-29",
+    "scope": [
+     "logo",
+     "pieces"
+    ]
+   },
+   "seo": {
+    "title": "PabellonToGo: Carta de menú, packaging y piezas para redes sociales",
+    "description": "Una marca vibrante y cercana que destaque en redes y en el punto de venta."
+   },
+   "revision": 1
+  },
+  {
+   "schema": "portfolio-entry.v1",
+   "slug": "bresler-sitio-del-concurso",
+   "client": {
+    "name": "Bresler",
+    "industry": "helados"
+   },
+   "title": "Sitio del concurso de verano: diseño y desarrollo de punta a punta",
+   "audience": "Personas de todas las edades que participan en el concurso de Bresler desde el teléfono",
+   "need": "Una plataforma del concurso simple y segura para participar, ver los premios, leer las bases y conocer a los ganadores",
+   "line": "growth",
+   "services": [
+    "creative-services"
+   ],
+   "steps": {
+    "challenge": {
+     "title": "Un flujo simple para todas las edades",
+     "body": "El concurso necesitaba un sitio propio: un formulario con las validaciones que piden las bases oficiales, páginas de premios, bases legales y ganadores, todo con la estética promocional de la campaña."
+    },
+    "idea": {
+     "title": "Una landing que lleva a participar",
+     "body": "Una landing principal con narrativa visual fresca y orientada a conversión, y alrededor un ecosistema de páginas que ordenan la experiencia de forma simple y transparente."
+    },
+    "execution": {
+     "title": "Diseño UX/UI, arquitectura y desarrollo",
+     "body": "Diseñamos y construimos la plataforma completa: arquitectura de información, interfaz, formulario de participación, landing de premios, bases legales pensadas para el teléfono y sección de ganadores, con la puesta en marcha funcional."
+    }
+   },
+   "hero": {
+    "mediaRef": "verano"
+   },
+   "chapters": [
+    {
+     "name": "La campaña de verano",
+     "media": [
+      {
+       "id": "verano",
+       "kind": "image",
+       "mediaId": 252297,
+       "width": 1156,
+       "height": 650,
+       "alt": "Bresler: campaña de verano",
+       "caption": "Campaña de verano"
+      },
+      {
+       "id": "premios",
+       "kind": "image",
+       "mediaId": 252298,
+       "width": 1156,
+       "height": 650,
+       "alt": "Bresler: página de premios del concurso",
+       "caption": "Premios"
+      },
+      {
+       "id": "laptop",
+       "kind": "image",
+       "mediaId": 252299,
+       "width": 812,
+       "height": 650,
+       "alt": "Bresler: el sitio del concurso en un computador portátil",
+       "caption": "El sitio en un portátil"
+      }
+     ]
+    },
+    {
+     "name": "El sitio del concurso",
+     "media": [
+      {
+       "id": "pieza-1",
+       "kind": "image",
+       "mediaId": 248788,
+       "width": 2560,
+       "height": 1433,
+       "alt": "Bresler: el sitio del concurso, lámina 1 de 4"
+      },
+      {
+       "id": "pieza-2",
+       "kind": "image",
+       "mediaId": 248789,
+       "width": 2560,
+       "height": 1440,
+       "alt": "Bresler: el sitio del concurso, lámina 2 de 4"
+      },
+      {
+       "id": "pieza-3",
+       "kind": "image",
+       "mediaId": 248790,
+       "width": 2560,
+       "height": 1440,
+       "alt": "Bresler: el sitio del concurso, lámina 3 de 4"
+      },
+      {
+       "id": "pieza-4",
+       "kind": "image",
+       "mediaId": 248786,
+       "width": 1920,
+       "height": 1440,
+       "alt": "Bresler: el sitio del concurso, lámina 4 de 4"
+      }
+     ]
+    }
+   ],
+   "clientApproval": {
+    "ref": "Decisión del operador 2026-10-29; publicado en efeoncepro.com/project/bresler/",
+    "date": "2026-10-29",
+    "scope": [
+     "logo",
+     "pieces"
+    ]
+   },
+   "seo": {
+    "title": "Bresler: Sitio del concurso de verano: diseño y desarrollo de punta…",
+    "description": "Una plataforma del concurso simple y segura para participar, ver los premios, leer las bases y conocer a los ganadores."
+   },
+   "kind": "website",
+   "period": {
+    "from": "2025-10",
+    "to": null
+   },
+   "revision": 1
+  }
+ ],
+ "update": true
+}

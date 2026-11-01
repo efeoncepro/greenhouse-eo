@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v10-master.wav",
+    "video": "ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v10-story.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v10-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v10-story.mp4"
+      }
+    ],
+    "latencyMs": 555
+  },
+  "mapa": {
+    "durationSec": 14.99,
+    "onsets": [
+      0.05
+    ],
+    "silences": [
+      {
+        "t": 14.46,
+        "tFin": 15
+      }
+    ],
+    "cuts": [
+      4
+    ],
+    "visualEvents": [
+      4
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 0,
+      "medianMs": null,
+      "worstMs": null,
+      "inSync": null
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 0.07,
+      "kind": "golpe",
+      "t": 0.07,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 0.05 s (Δ -20 ms)"
+    }
+  ]
+}

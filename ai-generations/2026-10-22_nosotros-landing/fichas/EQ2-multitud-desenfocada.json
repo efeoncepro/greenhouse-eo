@@ -1,0 +1,18 @@
+{
+  "id": "EQ2-multitud-desenfocada",
+  "formato": "16:9",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "haz": "a soft, cool blue-white glow far behind the crowd, centred, diffused by the haze; plus a large soft frontal fill light near the camera, slightly from the left, that gently lights the front of the distant people",
+  "escena": "SCENE (a background plate for a team portrait, a large dark event hall): the camera stands at an adult's eye level, about 1.6 metres high, perfectly level, with an 85mm lens wide open at f/1.4, focused on an EMPTY plane only two metres away where nobody stands yet. Far behind that plane, between eight and twenty metres away, a crowd of about ninety people — women and men of different builds and hairstyles, some holding laptops or tablets, some mid-conversation, a few turning to each other — stands loosely across the whole width of the frame. Because the camera is at eye level, THE HEADS OF THE CROWD ALL LINE UP ALONG ONE HORIZONTAL BAND between 60% and 68% of the frame height, small with distance, and their bodies fill the band below down to the floor. The whole crowd is COMPLETELY OUT OF FOCUS: soft, creamy, dissolved shapes with real lens bokeh, no face or detail readable at all, no logos. They are lit softly from the front, in muted cool tones, and rimmed by the blue glow behind them, which spreads into thick navy and cobalt (#0375DB) haze. The top 55% of the frame is calm deep-navy haze above their heads, with no heads, objects or lights in it. Nothing warm, amber or golden; no text, no logos, no screens with content.",
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep-navy haze above the heads of the crowd, top half of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the dark polished floor of the hall in the immediate foreground",
+    "tono": "DEEP navy-black floor, matte, out of focus, catching a faint cool reflection of the haze"
+  }
+}

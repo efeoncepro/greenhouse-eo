@@ -1,0 +1,84 @@
+{
+  "tenderId": "A076-caso-ssilva",
+  "slides": [
+    {
+      "slideId": "deck-decision-case",
+      "contentType": "deck.decision-case",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 104,
+          "questionTop": 210,
+          "answerTop": 280,
+          "answerPx": 124,
+          "panelWidth": "--gl-dc-panel-width=1000px",
+          "panelRadius": "--gl-dc-panel-radius=300px",
+          "photoLeft": "--gl-dc-photo-left=660px",
+          "logoGap": "--gl-dc-logo-gap=22px",
+          "logoMaxWidth": "--gl-dc-logo-max-width=200px",
+          "logoMaxHeight": "--gl-dc-logo-max-height=70px",
+          "figuresTop": "--gl-dc-figures-top=470px",
+          "figuresWidth": "--gl-dc-figures-width=760px",
+          "figuresRowGap": "--gl-dc-figures-row-gap=34px",
+          "figuresColumnGap": "--gl-dc-figures-column-gap=50px",
+          "figureRule": "--gl-dc-figure-rule=2px",
+          "figurePadTop": "--gl-dc-figure-pad-top=16px",
+          "figurePx": "--gl-dc-figure-px=104px",
+          "figureWght": "--gl-dc-figure-wght=300",
+          "figureLeading": "--gl-dc-figure-leading=0.95",
+          "figureTracking": "--gl-dc-figure-tracking=-0.04em",
+          "labelPx": "--gl-dc-label-px=22px",
+          "labelGap": "--gl-dc-label-gap=8px",
+          "sourceTop": "--gl-dc-source-top=938px",
+          "sourcePx": "--gl-dc-source-px=16px",
+          "sourceWidth": "--gl-dc-source-width=760px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:base-cine",
+          "alt": "Una corredora de propiedades levanta las llaves de un departamento nuevo con vista a Santiago y la cordillera al atardecer"
+        },
+        "voice": {
+          "question": "¿Qué cambió en su CRM?",
+          "answer": "Velocidad",
+          "eyebrow": "Caso inmobiliario"
+        },
+        "clientLogo": {
+          "src": "asset-ref:file:ssilva-logo-azul-trim",
+          "alt": "SSilva"
+        },
+        "figures": [
+          {
+            "value": "−44 %",
+            "label": "días en el pipeline"
+          },
+          {
+            "value": "+30 %",
+            "label": "tasa de cierre en el CRM"
+          },
+          {
+            "value": "Activo",
+            "label": "lead scoring para ventas"
+          },
+          {
+            "value": "2",
+            "label": "CRM sincronizados"
+          }
+        ],
+        "source": "Fuente: caso publicado de SSilva en efeoncepro.com, marzo de 2025",
+        "selection": {
+          "label": "HubSpot",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionCase"
+    }
+  ]
+}

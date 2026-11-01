@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "use": "brochure",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-case",
+  "voice": {
+    "eyebrow": "Caso de éxito",
+    "question": "¿Qué logró Sky con SEO?",
+    "answer": [
+      "Despegó"
+    ]
+  },
+  "figures": [
+    {
+      "value": "+127 %",
+      "label": "tráfico orgánico",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "Top 3",
+      "label": "en «vuelos baratos»",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "+64 %",
+      "label": "ventas desde orgánico",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "×3",
+      "label": "citas en respuestas IA",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    }
+  ],
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+    "alt": "Sky Airline"
+  },
+  "selected": 2,
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "object",
+    "plateRef": "ai-generations/2026-10-12_brochure-efeonce-360/caso-sky/final-cine.png",
+    "alt": "El A320 de Sky en contraluz al atardecer, rodeado de piezas de sus campañas en profundidad"
+  },
+  "selection": {
+    "target": "object",
+    "label": "SEO",
+    "participantKind": "department"
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "89006665124c",
+  "key": "89006665124c5fb92a72efca6cbe133f8ef24859fef18bff840ba91aa1fdaead",
+  "status": "completed",
+  "createdAt": "2026-10-20T20:25:24.373Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3.png",
+    "imageSha256": "2d82f4cc5a126cb53575e5c5efba19f3dcf053871e9c1d0e5b3f6265d3a5eeec",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-mask-isotipo.png",
+    "maskSha256": "b4a08576bd6ad7288b608291e0ef8bc2f0088eae288776e08da6dedabedf6f9d",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the small white printed logo from the back of the navy softshell jacket. In its place continue the same plain navy technical fabric of the jacket back, in the same deep shadow and soft folds, with nothing printed on it. Do not change anything else.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the small white printed logo from the back of the navy softshell jacket. In its place continue the same plain navy technical fabric of the jacket back, in the same deep shadow and soft folds, with nothing printed on it. Do not change anything else.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.002147129603794643,
+    "editable": 3872,
+    "soft": 68,
+    "protected": 1831068
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1296,
+      "top": 335,
+      "width": 202,
+      "height": 184
+    },
+    "target": {
+      "width": 1072,
+      "height": 976
+    },
+    "aspectError": 0.00048669695003255464,
+    "reason": "la zona con contexto ocupa 2.0 % de la imagen: se genera recortada a 1072x976"
+  },
+  "estimate": {
+    "usd": 0.0483,
+    "basis": "1 × salida 1072x976 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 13.048,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.52,
+        "bestError": 2.52,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.83,
+        0,
+        0.68
+      ],
+      "protected": {
+        "pixels": 1831068,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 3872,
+        "maxDelta": 131,
+        "meanDelta": 13.248,
+        "worst": {
+          "x": 1375,
+          "y": 420
+        }
+      },
+      "seam": {
+        "pixels": 68,
+        "maxDelta": 6,
+        "meanDelta": 1.676,
+        "worst": {
+          "x": 1360,
+          "y": 409
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1831068,
+        "maxDelta": 75,
+        "meanDelta": 0.098,
+        "worst": {
+          "x": 1454,
+          "y": 516
+        }
+      },
+      "outputUsd": 0.0483,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2308,
+        "input_tokens_details": {
+          "image_tokens": 2108,
+          "text_tokens": 200
+        },
+        "output_tokens": 1609,
+        "output_tokens_details": {
+          "image_tokens": 1609,
+          "text_tokens": 0
+        },
+        "total_tokens": 3917
+      },
+      "meta": {
+        "size": "1072x976",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 11.94,
+        "corePixels": 3872,
+        "objectLikeness": null,
+        "residueSuspected": true
+      }
+    ]
+  }
+}

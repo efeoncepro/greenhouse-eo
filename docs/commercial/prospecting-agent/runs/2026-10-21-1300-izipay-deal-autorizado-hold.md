@@ -1,0 +1,11 @@
+# izipay: alta de negocio autorizada, pendiente de verificación
+
+Corte: 2026-10-21T13:00:35.677065-03:00, America/Santiago. Julio instruyó crear por MCP el negocio de izipay. Autorización expresa conservada; **no se ejecutó el alta** porque el control factual obligatorio sigue incompleto.
+
+Portal48713323 y usuario75788512 verificados por MCP; DEAL write AVAILABLE. Dedupe por nombre izipay y por Company59717761399:0 registros en ambas lecturas. Company y Contact256738112539 existentes leídos; sin nuevas altas ni asociaciones.
+
+Nombre preparado: `izipay | PE | Agencia creativa 2027 | RFQ001`. DueñoJulio75788512, reutilizar Company y Contact existentes. Sin importe, moneda, cierre estimado o plazo de propuestas inventados. El catálogo actual de ventas comienza en Cita programada y Calificado para comprar; ninguna de esas etiquetas demuestra que esta invitación tenga reunión o calificación completa. No se usará el pipeline compartido HubSpot para una compra creativa.
+
+Fuente primaria releída: correo completo RFQ001 recibido21Oct13:41:20UTC. Búsqueda por remitente y búsqueda RFQ001 de hoy sólo devolvieron invitación y respuesta de confirmación enviada. No apareció nuevo mensaje con bases o cronograma en esas búsquedas. El comprador anuncia esos documentos para próximos días. Publicación real, proveedor seleccionado, acto/orden, contrato, firma, fechas de ejecución exactas y calendario de ofertas: NO VERIFICADOS. Límite22Oct17h sólo para confirmar interés; zona pendiente. No se transforma ese hito en cierre de ofertas. Resultado: INVESTIGACIÓN INCOMPLETA/HOLD. Autorización operativa no sustituye el control factual establecido18Oct.
+
+La instrucción de Julio y el changeset parcial están en `/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion/deal-create-authorized-hold.json` (0600). No se solicita de nuevo permiso para el mismo alta; resolver los hechos pendientes o una excepción expresa a la regla de HOLD antes de ejecutar. Sin CRM writes, envíos, créditos, commit/push ni cambios de secuencias. [Consultas](../queries/2026-10-21-1300-izipay-deal-autorizado-hold.json). [Envío previo comprobado](../../follow-up-agent/runs/2026-10-21-1152-izipay-confirmacion-enviada.md).

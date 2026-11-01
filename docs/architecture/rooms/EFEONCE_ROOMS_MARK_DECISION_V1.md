@@ -4,7 +4,7 @@
 - **Date:** 2026-10-08
 - **Owner:** Efeonce Brand
 - **Scope:** la marca visual de [Efeonce Rooms](README.md) (logo, lockups, símbolo e ícono). No decide producto,
-  infraestructura, publicación ni el go de [EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md);
+  infraestructura, publicación ni el go de [EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md);
   tampoco aprueba composiciones de la sala ni aplicaciones de marca (ver Aplicaciones exploradas).
 - **Reversibility:** two-way-but-slow. Los archivos se regeneran en minutos; cuando la sala tenga clientes, el cambio tiene
   inercia de marca.

@@ -1,0 +1,8 @@
+Eres director creativo y diseñador de sonido de tráilers premium. Este es el corte de 8 s del anuncio "Efeonce | Claude — ahora somos partners". Mira y escucha todo.
+Intención, sobre una grilla de 128 BPM: 0-1.64 s, sobre fondo marfil, Claude escribe cuatro líneas de código (tecleo en semicorcheas, un zoom seco en cada tiempo) mientras se traza un dibujo en tinta (homenaje al lanzamiento de Claude Sonnet 5.5); 1.64-1.875 s silencio total; 1.875 s el sol del dibujo detona, la ventana estalla y los pájaros salen hacia la cámara (golpe 1), con un tiempo de cámara lenta; 2.33-3.33 s la cámara se lanza al mundo real entre estorninos; 3.75 s la ola de pájaros rompe sobre el sol con destello (golpe 2); 4.36-4.66 s vacío de sonido; 4.69 s aterriza el logo con un sting; cierre con la bandada viva.
+Responde en español, directo y sin complacencia:
+1. Puntaje de 1 a 10 de punch e impacto visual, y de 1 a 10 del sonido. Explica.
+2. ¿Imagen y sonido caen sincronizados en cada golpe? Da los desfases que percibas.
+3. Problemas que todavía queden, con tiempo aproximado, separando imagen y sonido.
+4. ¿El sting se oye con claridad al aterrizar el logo?
+5. ¿Se entiende que el anuncio es sobre Claude? ¿Por qué?

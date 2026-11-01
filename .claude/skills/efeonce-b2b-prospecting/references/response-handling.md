@@ -81,3 +81,11 @@ desde el heartbeat. La revisión documental no verifica que hoy se haya recibido
 
 - Consulta **2026-10-11**, [HubSpot: Unenroll contacts from a sequence](https://knowledge.hubspot.com/sequences/unenroll-from-sequence), actualizado 2026-08-26: condiciones de parada, OOO y reinicio. No certifica la configuración efectiva, la sincronización con Apollo/Outlook ni acceso por API/CLI en nuestro portal.
 - La matriz es método operativo Efeonce; no prescribe tasa, plazo universal ni garantiza conversión. Las decisiones de respuesta comerciales corresponden a Commercial y las del canal a su owner.
+
+
+## Continuidad hacia discovery y caso de negocio
+
+Si la respuesta abre reunión/propuesta o se pide analizar su transcripción, cargar
+[discovery → caso](discovery-to-business-case.md). Conservar marca/iniciativa, fuente declarada,
+reunión enviada/aceptada/realizada y criterios de selección separados; la evidencia posterior confirma
+o refuta hipótesis y condiciona economía. No activar una cadencia, Deal o precio por este avance.

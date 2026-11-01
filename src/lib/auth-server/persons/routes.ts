@@ -64,6 +64,8 @@ import {
   type PasskeyDeps
 } from './passkeys'
 import type { PersonAuthStorePort } from './store/port'
+import type { FirstPartyLoginContext } from '../first-party/protocol'
+import type { LoginAnnouncementDto } from '@/lib/login-announcements/types'
 import type { TotpSecretCipherPort } from './totp-cipher'
 import {
   enforceRateLimit,
@@ -75,6 +77,8 @@ import { startTotpEnrollment, verifyTotp, type TotpDeps } from './totp'
 
 export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   internalLoginEnabled: () => boolean
+  resolveProductContext?: (returnTo: string | null) => Promise<FirstPartyLoginContext | null>
+  loadLoginAnnouncements?: () => Promise<readonly LoginAnnouncementDto[]>
   store: PersonAuthStorePort
   config: AuthServerPersonAuthConfig
   invitations: InvitationAcceptancePort
@@ -166,6 +170,14 @@ const methodNotAllowed = (allow: string): OAuthHttpResponse =>
   jsonResponse(405, { error: 'method_not_allowed' }, { Allow: allow })
 
 export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuthHandler => {
+  const loadAnnouncements = async (): Promise<readonly LoginAnnouncementDto[]> => {
+    try {
+      return await deps.loadLoginAnnouncements?.() ?? []
+    } catch {
+      return []
+    }
+  }
+
   const magicLinkDeps: MagicLinkDeps = {
     store: deps.store,
     config: deps.config,
@@ -280,7 +292,14 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     if (path === PERSON_AUTH_PATHS.login) {
       if (request.method !== 'GET') return methodNotAllowed('GET')
 
+      const [productContext, announcements] = await Promise.all([
+        deps.resolveProductContext?.(sanitizeReturnTo(request.url.searchParams.get('return_to'))),
+        loadAnnouncements()
+      ])
+
       return renderLoginPageResponse(200, {
+        productContext: productContext ?? undefined,
+        announcements,
         returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')),
         internalLoginUrl: corporateLoginUrl(deps, request.url.searchParams.get('return_to'))
       })
@@ -310,6 +329,8 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       if (result.status === 'invalid_email') {
         return wantsHtml
           ? renderLoginPageResponse(400, {
+              productContext: await deps.resolveProductContext?.(sanitizeReturnTo(readField(request, 'return_to'))) ?? undefined,
+              announcements: await loadAnnouncements(),
               returnTo: sanitizeReturnTo(readField(request, 'return_to')),
               internalLoginUrl: corporateLoginUrl(deps, readField(request, 'return_to')),
               error: 'invalid_email'

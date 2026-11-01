@@ -174,6 +174,16 @@ laborales y desinscripción por respuesta. No duplicar firma ni afirmar CCO en u
 Este caso usa registro nativo CRM y conserva el alcance separado de la política CCO para envíos por Outlook;
 no concede autorización general de futuros mensajes ni sustituye el readback de un envío real.
 
+### Excepción expresa al CCO de dos secuencias — 24/10/2026
+
+En [Lucía y Yvette](../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md), Julio pidió CCO
+y la inscripción revisada no ofrecía ese campo. Se conservaron ambas preparadas sin activar hasta recibir:
+**«Activar en HubSpot con registro nativo, autorizando la excepción al CCO»**. La excepción cubre únicamente
+esas dos secuencias y sus dos pasos por persona; conserva firma gráfica, destinatarios y reglas de parada.
+No autoriza afirmar CCO configurado, aplicar la excepción a otro envío o modificar preferencias globales.
+Programado y firma renderizada no equivalen a correo enviado o firma entregada. La regla general de este
+documento permanece vigente para los demás correos.
+
 ### Persistencia de contenido enriquecido — observación del 24/10/2026
 
 En el [caso Disney](../commercial/prospecting-agent/runs/2026-10-24-disney-paola.md), el editor mostró el cuerpo
@@ -185,6 +195,30 @@ Una sugerencia de Viva Insights o un botón deshabilitado no prueba programació
 resultado real antes de otra acción. No repetir el envío por un borrador obsoleto ni sustituir la firma gráfica.
 El InMail se comprueba en su conversación; la actividad EMAIL no cierra por sí sola ese canal.
 
+Los casos [Lucía / Flesan](../commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md) y
+[Yvette / Sigelec](../commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md) añaden evidencia de la misma
+regla: corregir el cuerpo visible que no persistió, releer el borrador completo y después el ID nuevo de
+Enviados, con ambos enlaces de Documents, una firma gráfica y Para/CCO exactos. En Yvette, la excepción
+de atribución de correo autorizó ese destinatario y envío; no modifica esta política ni prueba entrega.
+
+### Aplicación Mass Chile — 26/10/2026
+
+El [borrador de Guillermo](../commercial/prospecting-agent/runs/2026-10-26-mass-chile.md) volvió a mostrar
+texto completo aunque la lectura persistida tenía sólo firma y destinatarios vacíos. Se recuperó el mismo
+borrador, se resolvieron Para/CCO, se insertó el HTML por la UI y se guardó; la lectura independiente completa
+habilitó el envío. Judith tuvo el mismo control previo. Un aviso o atajo de guardado no reemplaza el readback.
+Se comprobaron las copias nuevas de Enviados y las actividades EMAIL SENT por separado, sin duplicación.
+El NDR del corporativo inferido de Yuri se registra como resultado adverso aunque el envío fuera solicitado;
+no se reintenta ni se usa la conexión LinkedIn para validar el correo.
+
+### Delta 2026-10-28 — PDF pesado por link de HubSpot
+
+En la segunda propuesta a Assetplan, el PDF de ~16 MB (el del 20/10 viajó adjunto) se compartió como link de
+documento de HubSpot, que registra vistas, y se adjuntó sólo la cotización. Regla: un PDF pesado va por link de
+HubSpot, la cotización adjunta y la respuesta en el hilo original, con firma gráfica y CCO HubSpot como siempre.
+El readback confirmó Enviados y la actividad EMAIL `SENT` asociada al Deal.
+[Registro del caso](../commercial/CRM_DEAL_REGISTER.md#assetplan--operación-hubspot--reunión-y-propuesta-a-30-horas-28-10-2026).
+
 ## Evidencia, alternativas y límites
 
 El 2026-10-08 se verificó en Enviados el correo a Dianesty sobre diseñador senior: salió desde Outlook con los dos enlaces, pero con cierre simple y sin BCC. El operador pidió esta corrección permanente. El contrato aplica a futuros envíos; no reenvía ni registra retroactivamente ese correo sin mandato específico.
@@ -194,3 +228,12 @@ La decisión inicial de exigir sólo HTML quedó sustituida el mismo 2026-10-08 
 Revisar esta decisión si cambia el remitente, la firma aprobada, la dirección de registro de HubSpot o el soporte HTML del conector. La documentación no demuestra instalación, automatización técnica ni recepción de un nuevo correo.
 
 Evidencia del cierre documental: [cobertura, controles y límites](../audits/commercial/2026-10-08-outlook-signature-bcc.md).
+
+### Contraste de envío y rebote — 30–31/10/2026
+
+[Wequips](../commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md): el NDR posterior al envío
+individual inferido prevalece para esa dirección; no reintentar ni tratar el Contact creado por CCO como
+validación. [Mambrino](../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md): «Comprobar nombres»
+resolvió Para/CCO en el editor; la lectura independiente del borrador confirmó destinatarios, cuerpo,
+links y firma antes de enviar. La copia nueva de Enviados y EMAIL SENT se comprobaron después. Un timeout
+al abrir un deep link requiere recuperar el estado actual, no crear ni enviar otro mensaje.

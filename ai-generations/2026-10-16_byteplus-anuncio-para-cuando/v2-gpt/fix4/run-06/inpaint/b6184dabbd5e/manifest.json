@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "b6184dabbd5e",
+  "key": "b6184dabbd5e6ca5a0379cf86bf2b105c9534c615e48e1fa1aea9d0f88db7235",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.143Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/06-silencio.png",
+    "imageSha256": "b6955c35811f70d27b96982d842f7f82d7c45204df5da1aef117d835400b795e",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/06.png",
+    "maskSha256": "f25d10d170d4b21e03a403695abdbbfe3baa79fd20f7ab9f541d06a46a1601bc",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/ref-proveedores.png",
+        "sha256": "b6678e02541dc3d5bf0765b1b0e2a224cc2266422e660f4d3f58f0b4d5ab33a8"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the laptop screen content: a video call in a 2x2 grid showing exactly the four people of image 2 (the red-haired woman with glasses, the bearded man with glasses, the grey-haired woman with a scarf, the young man in a hoodie and blazer), small and at the same angle and perspective as the screen. Keep the laptop frame, keyboard and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the laptop screen content: a video call in a 2x2 grid showing exactly the four people of image 2 (the red-haired woman with glasses, the bearded man with glasses, the grey-haired woman with a scarf, the young man in a hoodie and blazer), small and at the same angle and perspective as the screen. Keep the laptop frame, keyboard and everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05118637084960938,
+    "editable": 57059,
+    "soft": 10032,
+    "protected": 1243629
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 377,
+      "top": 595,
+      "width": 568,
+      "height": 551
+    },
+    "target": {
+      "width": 1040,
+      "height": 1008
+    },
+    "aspectError": 0.0008655591232724293,
+    "reason": "la zona con contexto ocupa 23.6 % de la imagen: se genera recortada a 1040x1008"
+  },
+  "estimate": {
+    "usd": 0.0516,
+    "basis": "1 × salida 1040x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 65.125,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -3,
+        "dy": -3,
+        "scale": 0.98,
+        "stillError": 10.46,
+        "bestError": 8.08,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1243629,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 57059,
+        "maxDelta": 224,
+        "meanDelta": 73.008,
+        "worst": {
+          "x": 650,
+          "y": 863
+        }
+      },
+      "seam": {
+        "pixels": 10032,
+        "maxDelta": 193,
+        "meanDelta": 20.288,
+        "worst": {
+          "x": 529,
+          "y": 909
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1243629,
+        "maxDelta": 219,
+        "meanDelta": 2.652,
+        "worst": {
+          "x": 703,
+          "y": 663
+        }
+      },
+      "outputUsd": 0.0516,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 2241,
+        "input_tokens_details": {
+          "image_tokens": 2028,
+          "text_tokens": 213
+        },
+        "output_tokens": 1720,
+        "output_tokens_details": {
+          "image_tokens": 1720,
+          "text_tokens": 0
+        },
+        "total_tokens": 3961
+      },
+      "meta": {
+        "size": "1040x1008",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

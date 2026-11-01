@@ -1,6 +1,6 @@
 # Refresh — Inbound marketing y paid media → «Qué es paid media» (borrador V1)
 
-> **Estado:** borrador para revisión del autor. No publicado.
+> **Estado:** **publicado 2026-10-24** (aprobado por Julio Reyes). Ver §9 «Registro de publicación».
 > **URL (se conserva):** https://efeoncepro.com/marketing-digital/inbound-marketing-paid-media/ (post `245605`)
 > **Autor / voz:** Julio Reyes (byline existente) · voz Julio, con doctrina marcada como «En Efeonce…».
 > **Creado:** 2026-10-24 · **Base:** versión publicada el 2024-10-21 (sin cambios desde entonces).

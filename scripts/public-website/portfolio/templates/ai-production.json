@@ -1,0 +1,134 @@
+{
+  "schema": "portfolio-entry.v1",
+  "slug": "COMPLETAR-slug",
+  "client": {
+    "name": "[COMPLETAR: nombre del cliente]",
+    "industry": "retail"
+  },
+  "title": "[COMPLETAR: título del proyecto]",
+  "audience": "[COMPLETAR: para quién era, en una frase]",
+  "need": "[COMPLETAR: qué necesitaba resolver con IA]",
+  "line": "brand",
+  "services": ["creative-services"],
+  "steps": {
+    "challenge": {
+      "title": "[COMPLETAR: el reto]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "idea": {
+      "title": "[COMPLETAR: la idea]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "execution": {
+      "title": "[COMPLETAR: la ejecución]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    }
+  },
+  "clientApproval": {
+    "ref": "[COMPLETAR: dónde quedó la aprobación del cliente]",
+    "date": "2026-01-01",
+    "scope": [
+      "pieces"
+    ]
+  },
+  "seo": {
+    "title": "[COMPLETAR: cliente y título, 65 caracteres o menos]",
+    "description": "[COMPLETAR: qué se hizo, para quién y por qué, 150 caracteres o menos]"
+  },
+  "kind": "ai-production",
+  "hero": {
+    "mediaRef": "final"
+  },
+  "chapters": [
+    {
+      "name": "[COMPLETAR: nombre del personaje o del mundo]",
+      "media": [
+        {
+          "id": "angulo-frente",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 800,
+          "height": 1000,
+          "alt": "[COMPLETAR: el personaje de frente]",
+          "role": "ai",
+          "aiStage": "angle",
+          "label": "De frente"
+        },
+        {
+          "id": "angulo-perfil",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 800,
+          "height": 1000,
+          "alt": "[COMPLETAR: el personaje de perfil]",
+          "role": "ai",
+          "aiStage": "angle",
+          "label": "Perfil"
+        },
+        {
+          "id": "expresion-1",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 800,
+          "height": 1000,
+          "alt": "[COMPLETAR: la expresión]",
+          "role": "ai",
+          "aiStage": "expression",
+          "label": "[COMPLETAR: nombre de la expresión]"
+        },
+        {
+          "id": "pose-1",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 900,
+          "height": 1600,
+          "alt": "[COMPLETAR: la pose]",
+          "role": "ai",
+          "aiStage": "pose",
+          "label": "[COMPLETAR: nombre de la pose]"
+        }
+      ]
+    },
+    {
+      "name": "[COMPLETAR: nombre de la escena]",
+      "media": [
+        {
+          "id": "plate",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 900,
+          "height": 1600,
+          "alt": "[COMPLETAR: la escena tal como salió de la IA]",
+          "role": "ai",
+          "aiStage": "plate",
+          "compareTo": "final"
+        },
+        {
+          "id": "final",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 900,
+          "height": 1600,
+          "alt": "[COMPLETAR: la pieza con la marca compuesta]",
+          "role": "ai",
+          "aiStage": "final"
+        }
+      ]
+    }
+  ],
+  "ai": {
+    "models": [
+      {
+        "stage": "image",
+        "name": "[COMPLETAR: modelo y versión]"
+      }
+    ],
+    "aiDid": [
+      "[COMPLETAR: qué produjo la IA]"
+    ],
+    "teamDid": [
+      "[COMPLETAR: qué hizo el equipo]"
+    ],
+    "fictional": true
+  }
+}

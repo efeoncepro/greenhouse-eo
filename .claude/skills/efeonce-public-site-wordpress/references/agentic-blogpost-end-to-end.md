@@ -8,7 +8,8 @@ and the Glitch Flash post `251941` (§15); case-specific IDs and values are
 evidence, never reusable defaults.
 
 Also load `content-factory-gutenberg.md` for Content Factory commands, block
-recipes, and existing-post refresh rules.
+recipes, and existing-post refresh rules. Refresh of a published post through a
+private review copy: §17; merging two posts: §16.
 
 ## Non-negotiable Invariants
 
@@ -82,6 +83,20 @@ Use the governed native vocabulary, including `core/heading`,
 `core/table`, `core/separator`, and `yoast-seo/table-of-contents`. Use a populated Yoast TOC
 whose links resolve to deterministic heading anchors. Treat `core/freeform` as
 legacy inspection debt, not generated content.
+
+Pullquotes (`efeonce-editorial-blocks` 0.8.0, live 2026-10-25): default to the
+«Destacado» variant for the section's own thesis (no quotation marks, the
+landing phrase as a complete idea in `strong`, `tone` to match the background);
+use `variant: "cita"` only for a real attributed quote with `cite`. 1–2 per
+post, never consecutive. Rules and spec shape: `content-factory-gutenberg.md`
+→ «Blog editorial styles».
+
+Charts (`efeoncepro/chart` «Gráfico Efeonce», 0.9.0, live 2026-10-25): use
+`kind: "chart"` only when a comparison, trend or share is clearer as a figure
+than as a sentence. Title = the conclusion, source always (illustrative data
+marked as such), one highlighted entity, `pie` only for ≤ 8 parts of a total.
+The numbers also ship as an HTML table. Ten kinds and limits:
+`content-factory-gutenberg.md` → «Gráfico Efeonce».
 
 For inline citations and contextual links:
 
@@ -172,7 +187,9 @@ file. Do not open a parallel ad hoc SCP path.
 WordPress may canonicalize emoji in raw content. A confirmed example is
 `🍏` becoming `&#x1f34f;` before the frontend renders `img.emoji[alt="🍏"]`.
 Accept this only after proving the exact byte diff and unchanged structure; do
-not weaken the normal post hash guard.
+not weaken the normal post hash guard. Para comparar el contenido guardado con el
+autorado (QA de fusión, 2026-10-26), normaliza las entidades en los dos lados
+antes de calcular el hash: la diferencia sólo por emojis no es drift.
 
 ## 6. Media Contract
 
@@ -203,6 +220,28 @@ Assign featured and social media deliberately:
 - verify the featured attachment is the intended `primaryImageOfPage` and the
   Open Graph image;
 - verify format, dimensions, aspect ratio, ALT/caption, and anonymous delivery;
+- a new Marketing con Manzanitas post enters the `/blog/` slider and the «Para leer con calma» rail **on its own**
+  (newest posts with image, not Glitch/Novedad; rail = the 4 newest reads ≥ 12 min or podcast), so publishing ships
+  **three uploads**, each with its `alt`, all planned without `--apply` and applied only with the operator's go:
+  1. **cover** = featured + Yoast OG (+ X fallback, schema `primaryImageOfPage`, the square «Te puede interesar»
+     related-posts thumbnail): one JPEG 2400 × 1260 (canvas 1200 × 630) < 300 KB, text inside the central square
+     x 285–915, uploaded with `scripts/public-website/blog-post-cover-apply.php` (dry run → apply, guards, snapshot);
+  2. **slider `hero`** (`_eo_hero_image`): WebP 2:1 2400 × 1200 cropped from the textless plate, with
+     `pnpm public-website:blog-home hero <post> --light "…" --bold "…" --image <webp> --alt "…"`. Without it the
+     slider title falls over the cover's baked-in text;
+  3. **rail card** (`_eo_card_image` / `_eo_card_focus`, live 0.4.5): the plate PNG 2560 × 1440 as is, with
+     `pnpm public-website:blog-home card <post> --image <plate> --alt "…" --focus "84% 30%"`. The featured image
+     never changes for the card (it stays the OG image). A post under 12 minutes skips this upload. `84% 30%` es
+     el foco de una placa con el sujeto a la derecha; si el sujeto cae en otro lugar, recalcúlalo con la fórmula de
+     `blog-home-operation.md` (caso 248398, 2026-10-26: `71% 50%`);
+- sizes, safe zones per surface (cover, slider, card, plate) and OG per platform live in
+  `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`; cover craft in
+  `docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md`; command detail in `blog-home-operation.md`;
+- live QA after the uploads: `og:image` 2400 × 1260 `image/jpeg`, `twitter:card` `summary_large_image` (no
+  `twitter:image`: X falls back to `og:image`), the card and the slider at 1440 and 390,
+  `pnpm public-website:blog-home verify --browser`, and each network's debugger to refresh its cache.
+  `og:image:alt` / `twitter:image:alt` come from `efeonce-editorial-blocks` 0.4.6 (live since 2026-10-24):
+  check there is exactly one of each;
 - preserve source masters and derivative lineage outside the post body.
 
 For direct SVG infographics, load the governed SVG lane in `content-factory-gutenberg.md` and the SEO contract
@@ -315,6 +354,14 @@ critical check, automatically restore `private`, purge again, verify anonymous
 non-disclosure, and report the failure. Do not leave a partially verified post
 public and do not retry until the cause is corrected.
 
+**Coordinación con las sesiones del blog (2026-10-26).** Antes de escribir en el
+sitio, avisa a las cuatro sesiones que trabajan el blog y a la de Analytics, que
+mantiene `scripts/public-website/blog-post-cover-apply.php`. Desde el 2026-10-26
+las cuatro autorizaron **purgar la caché después de republicar contenido** sin
+consultarles, siempre que no tengan un despliegue en curso. Un despliegue de
+plugin sí se les avisa antes. Esa autorización cubre la purga, no la
+publicación: cada publicación sigue necesitando el visto bueno del operador.
+
 ## 11. Live Readback and Cache Verification
 
 After publication, compare authenticated WordPress data and a fresh anonymous
@@ -348,8 +395,13 @@ is asynchronous and remains separate from publication success.
   it to `JobPosting` and `BroadcastEvent` inside `VideoObject`.
 - Search Console URL Inspection API observes the indexed version only; it does
   not run a live test or request indexing.
-- A human may request indexing in the Search Console UI for a small number of
-  critical URLs, without any guarantee of timing or inclusion.
+- Indexing for a small number of critical URLs is requested through the Search
+  Console UI, without any guarantee of timing or inclusion. Agents use
+  `pnpm public-website:gsc-index request <url> [--apply]`: a dedicated Chrome
+  where a person signed in once; dry run by default, `--apply` only when the
+  URL is not on Google or was crawled before its last change, about 10 per
+  day, ledger in `scripts/public-website/gsc-indexing/ledger/`. Manual:
+  `docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md`.
 - Use `0h`, `24h`, and `72h` observations only after the capability described in
   `TASK-1426` exists and has runtime evidence. Until then, do not fabricate an
   automated checkpoint.
@@ -441,6 +493,132 @@ Photo rights: third-party launch images were published with credit and without a
 license by explicit operator decision for this case. That is not a general
 authorization; every future article needs its own rights decision (§1).
 
+## 16. Fusión de dos posts en un pilar (caso 248483 → 248398, 2026-10-26)
+
+Úsalo cuando dos posts compiten por la misma intención y uno absorbe al otro. Los
+IDs son evidencia del caso, no valores por defecto. El detalle del caso vive en
+`docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md` §0–§4 y sus deltas.
+
+1. **Inventario de visuales antes de escribir.** Lista los diagramas, videos,
+   gráficos, destacados y portadas de los dos originales y decide uno por uno.
+   Vuelven los que aportan (en 248398 volvieron el diagrama `Loop-MKT.svg`, media
+   248439, y los dos videos de HubSpot). No vuelven los destacados con cifras sin
+   fuente. Las portadas se rehacen.
+2. **Una sola operación con guardas.** El script del caso (`ai-generations/2026-10-26_loop-marketing/publicacion/merge-publish.php`,
+   one-off) verificó 14 guardas sobre los dos posts antes de tocar nada: estado,
+   slug, `post_modified_gmt`, sha del contenido, título Yoast, rutas y que no
+   hubiera redirecciones previas en el origen ni en el destino.
+3. **Respaldo de los dos posts** en opciones `_gh_post_refresh_<id>_<UTC>` (pilar)
+   y `_gh_post_merge_<id>_<UTC>` (absorbido).
+4. **El absorbido pasa a borrador, nunca a la papelera:** queda recuperable y sale
+   del índice y del sitemap. Su slug se conserva.
+5. **301 plain de Yoast Premium** (`WPSEO_Redirect_Manager`, ver
+   `taxonomy-permalink-migrations.md` §4) desde la ruta del absorbido al pilar,
+   creado **después** de pasarlo a borrador. Luego reindexa los dos con el
+   `Indexable_Builder` de Yoast.
+6. **Lectura de vuelta:** borrador, slug conservado, 301 y metas del pilar.
+7. **Enlaces internos al absorbido:** reescríbelos con
+   `scripts/public-website/blog-post-content-republish.php` (simulación y después
+   `apply`). Si una frase citaba los dos posts, **quita el enlace duplicado** en
+   vez de apuntar dos veces al pilar (caso: inbound 244765, «…en ¿Qué es Loop
+   Marketing? y en cómo ejecutarlo…»). Actualiza también la spec del repo de cada
+   post reescrito.
+8. **QA en vivo de la fusión:** 200 en el pilar; 301 en un solo salto desde la URL
+   vieja, con y sin barra final y conservando `utm_*`; canonical, `og:image` con
+   alt, `summary_large_image` y schema con el titular nuevo; sitemap con `lastmod`
+   del día y sin la URL vieja; Playwright en 1440 y 390 (un H1, 0 desborde, 0
+   imágenes rotas, iframes y gráficos visibles); `blog-home verify --browser`; y
+   `blog-home slider`, que muestra que un post refrescado no entra al slider si su
+   fecha no cambió.
+
+**Trampas de QA que aparecieron en el caso:**
+
+- el hash del contenido guardado difiere sólo por emojis (`🍏` → `&#x1f34f;`):
+  compara normalizando entidades (§5);
+- `apply_filters('the_content')` por wp-cli no resuelve los oEmbed (su caché vive
+  en post meta `_oembed_*`); el navegador real sí. Para una vista previa de
+  servidor, inyecta los iframes a mano;
+- justo después de purgar, la primera lectura anónima puede devolver la versión
+  vieja: repite la lectura o agrega `?nc=<ts>` antes de dar por mala la publicación;
+- Playwright con `waitUntil: 'networkidle'` agota el tiempo con iframes de
+  YouTube: usa `load`;
+- un gráfico Efeonce (por ejemplo «7 de cada 100») figura vacío si la prueba no se
+  detiene sobre él, porque se dibuja cerca del viewport: haz scroll hasta el
+  gráfico y espera antes de capturar.
+
+## 17. Refresh de un post publicado: copia privada → publicación
+
+Úsalo para reescribir un post ya publicado sin tocarlo hasta que la versión nueva
+esté revisada. Casos fuente (2026-10-26): Pipeline 246045 (slug nuevo + 301) y
+Marketing de contenidos 244883 (misma URL). Las reglas de refresh de
+`content-factory-gutenberg.md` siguen aplicando; si el refresh absorbe otro post,
+es una fusión (§16).
+
+1. **Borrador en el repo** `docs/public-site/<TEMA>_REFRESH_DRAFT_V1.md`, con
+   §registro de publicación y rollback. Las notas internas viven sólo ahí: el texto
+   público nunca menciona la versión anterior ni el refresh.
+2. **Coordinación.** Antes de cualquier escritura en el sitio (copia, publicación,
+   portada, hero, tarjeta, papelera), avisa a las sesiones del blog (portada,
+   artículos, Analytics, author plugin, archivo) y espera respuesta. La purga ya
+   está autorizada (§10); la escritura no.
+3. **Copia privada de revisión** con `wp_insert_post`: `post_status=private`,
+   slug `revision-<tema>-v1`, mismo autor, categorías y destacada del original,
+   `_yoast_wpseo_meta-robots-noindex=1` y `_eo_review_copy_of=<id original>`.
+   Copia también `_yoast_wpseo_primary_category`: sin ella el permalink toma otra
+   categoría (en 244883 salió `/marketing-digital/` en vez de `/inbound/`).
+4. **QA visual de la copia.** Sin sesión no se ve: renderiza su `the_content` con
+   WP-CLI e inyéctalo con Playwright en un artículo publicado que ya cargue los
+   scripts de los bloques (se usó `/loop-marketing/que-es-loop-marketing/`, que
+   tiene gráficos y Growth CTA). Trampas:
+   - el Growth CTA sale sin lockup ni negrita del énfasis porque
+     `src/growth-cta/host.js` (efeonce-editorial-blocks) no vuelve a correr:
+     reinyecta `#eo-growth-cta-host-js`;
+   - el gráfico Efeonce sale vacío porque su loader (`#efeoncepro-chart-script-js`,
+     `src/chart/view.js`) carga el engine en diferido observando las figuras que la
+     inyección quitó: agrega `engine.js` a mano junto al loader;
+   - en el render por WP-CLI `data-eo-gcta-mark` sale con `http://` (`plugins_url`
+     sin https): no es bug, en una petición web sale `https://`;
+   - la tarjeta flotante «Next Post» del tema puede tapar capturas.
+5. **Publicación en la misma URL**, con autorización del operador (§10). Patrón
+   versionado: `ai-generations/2026-10-26_marketing-contenidos-leads/publicacion/publish.php`;
+   con cambio de URL, la variante de Pipeline
+   (`ai-generations/2026-10-26_pipeline-hubspot/publicacion/publish.php`: slug
+   nuevo + 301 plain de Yoast, `taxonomy-permalink-migrations.md` §4). Simulación →
+   `apply`, con guardas: estado publicado, slug, `post_modified_gmt` esperado,
+   sha256 del contenido actual, permalink, que la copia sea la copia privada de ese
+   post, y `sameAsReviewed` (lo que se publica es idéntico a la copia revisada).
+   Escribe título, contenido, extracto y metas Yoast (title, descripción, frase
+   clave, tiempo de lectura, OG title y OG description). Respaldo previo en la
+   opción `_gh_post_refresh_<id>_<UTC>`. Conserva fecha, categorías, etiquetas y
+   destacada.
+6. **Emojis:** WordPress guarda `🍏` como `&#x1f34f;`. Toda guarda o readback que
+   compare contenido (`sameAsReviewed`, sha, QA) normaliza esas entidades en los
+   dos lados (§5).
+7. **Después de publicar**, en este orden:
+   - portada con `scripts/public-website/blog-post-cover-apply.php` sin modificar
+     (simulación con `expectedThumb`/`expectedOg` → `apply`), avisando antes a la
+     sesión de Analytics;
+   - hero y tarjeta con `pnpm public-website:blog-home hero|card <id> … --apply`
+     (§6). Escriben en `scripts/public-website/blog-home/ledger/2026-10.jsonl`,
+     compartido entre sesiones: sólo se agregan líneas, nunca se reescribe; se
+     commitea el archivo completo con add+commit en una sola llamada y ruta
+     explícita. Un post que conserva su fecha antigua **no entra hoy** al slider ni
+     al rail aunque tenga hero y tarjeta; la tarjeta exige lectura ≥ 12 min;
+   - copia privada a la papelera (`wp_trash_post`), con guarda de que sigue siendo
+     la copia privada de ese post;
+   - purga de caché WP + `kinsta cache purge --all`;
+   - `pnpm public-website:blog-home verify --browser` (conteo de posts y 8 anchos).
+8. **QA en vivo mínima:** 200; title, descripción, `index, follow`, canonical,
+   `og:url`, `og:title`/`og:description`, `og:image` = portada nueva con alt,
+   `article:modified_time` actualizado (Analytics lo exige antes de pedir
+   indexación), `BlogPosting` con el titular nuevo y `FAQPage`. Playwright 1440 y
+   390: un H1, sin desborde, `<picture>` carga la fuente de cada ancho, gráfico
+   dibujado, CTA con lockup, índice sin anclas rotas, consola sin errores; enlaces
+   con 200. Aplican las trampas de §16 (lectura vieja tras purgar, `load` en vez de
+   `networkidle`, scroll hasta el gráfico).
+9. **Indexación:** `pnpm public-website:gsc-index` lo ejecuta sólo la sesión de
+   Analytics, cuando el operador se lo pide directamente en esa sesión.
+
 ## Definition of Done
 
 - [ ] Final spec, research, claims, rights, CTA, and visible author were approved.
@@ -461,7 +639,11 @@ authorization; every future article needs its own rights decision (§1).
 - [ ] Kinsta cache purge and repeated anonymous/authenticated readback agreed.
 - [ ] Link check found no confirmed broken links; unresolved responses were reviewed.
 - [ ] Callouts, pullquotes and drops were read against their neighbouring paragraphs; no sentence is repeated.
+- [ ] Each pullquote uses the right variant: Destacado for our thesis (bold landing phrase, no quotes), Cita only with a real author in `cite`.
+- [ ] Each chart has a conclusion title, a verifiable source, one highlighted entity and its «Ver los datos» table; it rendered in headless Playwright (desktop and 390 px).
 - [ ] A post created private and published later carries the publication date, read back from WordPress.
+- [ ] En una fusión: visuales de los originales inventariados, absorbido en borrador con 301 de un salto, enlaces internos reescritos sin duplicar y QA de §16 completa.
+- [ ] En un refresh: copia privada con categoría principal revisada, publicada con `sameAsReviewed` y respaldo, enviada a la papelera, y QA de §17 completa.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.
 - [ ] Final URL appears in the correct sitemap with an honest `lastmod`; any GSC observation is reported separately.

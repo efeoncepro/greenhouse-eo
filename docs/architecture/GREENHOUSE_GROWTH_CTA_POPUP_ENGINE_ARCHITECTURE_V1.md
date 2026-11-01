@@ -1030,3 +1030,25 @@ el run `29854833210`; el piloto `/agenda/` sigue aislado y no autoriza promoció
 - **Paridad:** espejo `CtaRenderOpenGrowthFormActionMirror` actualizado; `renderer-contract-parity.test.ts` lo vigila.
   Tests: `src/lib/growth/ctas/__tests__/action-registry.test.ts` (inline idéntico, dialog con y sin encabezado,
   encabezado sin dialog, presentación desconocida, campos extra).
+
+## 31. Delta 2026-10-24 — diálogo en producción: primer consumidor en vivo
+
+- **Release:** el release a `main` del 2026-10-24 llevó el renderer CTA `1.4.0` (diálogo de §30) y el de formularios
+  `1.2.0` (incluye los ganchos de TASK-2045: `ghf:dismiss`, `data-ghf-busy`, consentimiento compacto) a los hosts.
+- **Primer consumidor:** `/partnership/` (WordPress 248003, módulo «cierre»). «Quiero ser partner» es el CTA
+  `partners-become-partner` (`open_growth_form`, `presentation: 'dialog'`, surface
+  `csur-5638aab5-d53c-402a-836b-a0a72ce2c7a4`, `cta-location: partners_close`) con el formulario
+  `efeonce-partner-application` (HubSpot `direct`). Lo monta el lanzador compartido de las landings source-led
+  (`appearance="bare"`); la key vive sólo en los settings del widget, escritos por el publisher desde el archivo 0600.
+  La piel del diálogo usa sólo los tokens `--ghcta-dialog-*`/`--ghf-*` y los ganchos `data-ghcta-dialog-*`/
+  `data-ghf-part`; como el `<dialog>` vive en `<body>`, el host la carga sin scope de landing
+  (`body:has(.gh-partners) …`). Receta del host: skill `efeonce-public-site-wordpress` →
+  `references/source-led-elementor-patterns.md` y `references/landings/partnership.md`.
+- **Verificado en vivo (1440 y 390):** diálogo «Sumémonos», cinco campos + consentimiento compacto, Escape cierra,
+  sin errores de página, `dataLayer` con `greenhouse_cta_viewed` / `greenhouse_cta_clicked` /
+  `greenhouse_cta_form_opened` y `activation_mode: dialog`.
+- **Pendiente:** smoke de envío real (Turnstile + intento HubSpot `succeeded`; crea un registro CRM, requiere OK del
+  operador), DLV de GTM + dimensión GA4 `activation_mode` (preview + confirmación) y GVC formal.
+- **Defecto conocido:** cerrar el diálogo con el primer campo enfocado dispara `gh_form_field_validation_failed` (la
+  validación al perder el foco corre sobre un campo vacío). Infla esa métrica en el diálogo; se corrige en el renderer
+  de formularios (no validar en el blur provocado por el cierre).

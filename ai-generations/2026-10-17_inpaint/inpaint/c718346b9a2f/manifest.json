@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "c718346b9a2f",
+  "key": "c718346b9a2f1acc987d553b01367e72eb26b2d7a5450497577baa7dd77efbda",
+  "status": "completed",
+  "createdAt": "2026-10-17T21:45:08.673Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/18-tambien.png",
+    "imageSha256": "d3f12871e615a0b5f4875f39d9c42f4b6ffdf322e8d6ed5a6da836347a31d120",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/18-mask.png",
+    "maskSha256": "82dbd501797f7dceb74a62a78d8b4da165f289d437d1481bf342d28d12085617",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Two fixes, same light and focus: (1) the man's clasped hands hold NOTHING: remove the pen, show his relaxed fingers; (2) the navy ceramic mug is completely DRY: smooth glossy navy glaze with soft reflections, no droplets on it. Keep the mug's exact shape, size, handle and position, and the wet table around it as it is.",
+    "providerPrompt": "Two fixes, same light and focus: (1) the man's clasped hands hold NOTHING: remove the pen, show his relaxed fingers; (2) the navy ceramic mug is completely DRY: smooth glossy navy glaze with soft reflections, no droplets on it. Keep the mug's exact shape, size, handle and position, and the wet table around it as it is."
+  },
+  "mask": {
+    "touchedFraction": 0.03040008544921875,
+    "editable": 29646,
+    "soft": 10200,
+    "protected": 1270874
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 30 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.774,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.55,
+        "bestError": 3.55,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1270874,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 29646,
+        "maxDelta": 249,
+        "meanDelta": 44.555,
+        "worst": {
+          "x": 748,
+          "y": 1067
+        }
+      },
+      "seam": {
+        "pixels": 10200,
+        "maxDelta": 213,
+        "meanDelta": 10.253,
+        "worst": {
+          "x": 591,
+          "y": 1119
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1270874,
+        "maxDelta": 224,
+        "meanDelta": 6.247,
+        "worst": {
+          "x": 597,
+          "y": 1141
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1397,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 117
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2907
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

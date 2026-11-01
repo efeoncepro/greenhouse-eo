@@ -1,0 +1,15 @@
+{
+  "pieza": "Efeonce — Del prompt al pipeline (ChatGPT Ads + HubSpot)",
+  "duracion_s": 12.0, "fps": 24, "tempo_bpm": 120,
+  "cues": [
+    { "t": 0.375, "hasta": 1.625, "imagen": "Tipeo del prompt", "sonido": "teclas en semicorcheas" },
+    { "t": 2.0, "hasta": 2.75, "imagen": "La respuesta termina", "sonido": "riser cortado en seco" },
+    { "t": 2.75, "hasta": 3.0, "imagen": "Pausa antes del golpe", "sonido": "silencio 2,75-3,0" },
+    { "t": 3.0, "imagen": "Golpe 1: fondo azul y tarjeta Patrocinado", "sonido": "golpe e impacto" },
+    { "t": 4.0, "imagen": "Clic en Ver más", "sonido": "golpe del clic" },
+    { "t": 5.0, "imagen": "Golpe 2: pipeline de HubSpot", "sonido": "golpe e impacto" },
+    { "t": 8.3, "hasta": 8.5, "imagen": "Pausa antes de ChatGPT", "sonido": "silencio 8,3-8,5" },
+    { "t": 8.5, "imagen": "Golpe 3: ChatGPT", "sonido": "golpe e impacto" },
+    { "t": 10.0, "imagen": "Lockup Efeonce | HubSpot", "sonido": "pico del sting" }
+  ]
+}

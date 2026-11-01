@@ -197,7 +197,7 @@ add({
       { label: 'Cobertura', text: 'Enero de 2024 a septiembre de 2026, meses completos' }
     ],
     closing: closing(
-      'Antes de migrar el blog ya había perdido dos tercios de sus visitas. La migración restó otro 44 % en un mes, y en 2026 la caída siguió.',
+      'Antes de migrar ya caía contra el año anterior: −48 % en agosto de 2025. La migración restó otro 44 % en un mes, y en 2026 la caída siguió.',
       'Medir la recuperación contra el mismo mes del año anterior, nunca contra septiembre: enero sube por temporada aunque no se haga nada.'
     ),
     ...footer()

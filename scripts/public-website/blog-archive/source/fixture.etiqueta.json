@@ -1,0 +1,396 @@
+{
+  "view": "etiqueta",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    },
+    {
+      "label": "Etiquetas",
+      "url": "#"
+    }
+  ],
+  "crumb": "inbound",
+  "headCls": "ah ah--f",
+  "gridCls": "ah__g ah__g--f",
+  "gridStyle": null,
+  "eyebrow": "Etiqueta",
+  "eyebrowBar": "background: #cfe4fa;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": true,
+  "h1": "inbound",
+  "h1Cls": "idea ah__t",
+  "h1Style": null,
+  "desc": "Publicaciones marcadas con «inbound», de distintos temas.",
+  "search": null,
+  "suggestions": null,
+  "meta": [
+    {
+      "k": "publicaciones",
+      "v": "11"
+    },
+    {
+      "k": "la última",
+      "v": "26 nov 2024"
+    }
+  ],
+  "hero": {
+    "url": "#",
+    "img": "/_blob/7134fd8c6f379f6b08f6cd7dfd4e5618",
+    "imgCls": "hc__img hc__img--sq",
+    "label": "Lo más reciente",
+    "bar": "background: #8e1b82;",
+    "glitch": false,
+    "plain": true,
+    "kind": "Artículo · HubSpot",
+    "parts": [
+      {
+        "t": "De Excel a HubSpot en 5 Días: Organiza, Automatiza y Escala tus Ventas",
+        "pl": true,
+        "hl": false
+      }
+    ],
+    "min": 9,
+    "date": "26 nov 2024"
+  },
+  "parent": null,
+  "spark": false,
+  "filter": {
+    "segStyle": "--n: 4;",
+    "indStyle": "transform: translateX(0%);",
+    "items": [
+      {
+        "label": "Todo",
+        "count": 11,
+        "url": "#",
+        "cur": "page",
+        "chipCls": "chip is-on live"
+      },
+      {
+        "label": "Artículos",
+        "count": 8,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Guías",
+        "count": 1,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Novedades",
+        "count": 2,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      }
+    ]
+  },
+  "list": {
+    "label": "Publicaciones con la etiqueta inbound",
+    "groups": [
+      {
+        "year": "2024",
+        "caption": "11 publicaciones con esta etiqueta",
+        "rows": [
+          {
+            "url": "#",
+            "date": "24 nov",
+            "parts": [
+              {
+                "t": "Crea un Pipeline de Ventas que Convierte: Guía Paso a Paso",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Guía",
+            "min": 15,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "24 nov",
+            "parts": [
+              {
+                "t": "5 Pasos para transformar tu CRM en el motor de crecimiento de tu Negocio",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Artículo",
+            "min": 6,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "21 oct",
+            "parts": [
+              {
+                "t": "¡Efeonce + Truora: La Alianza que Llevará tu Negocio a Otro Nivel!",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Novedad",
+            "min": 5,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "21 oct",
+            "parts": [
+              {
+                "t": "Qué es paid media y cómo combinarlo con el inbound marketing",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Inbound Marketing · Artículo",
+            "min": 12,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "20 oct",
+            "parts": [
+              {
+                "t": "Efeonce es HubSpot Solutions Partner: Potencia tu Crecimiento",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Novedad",
+            "min": 11,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "17 ago",
+            "parts": [
+              {
+                "t": "HubSpot y el Desafío del Onboarding: Estrategias para un Inicio Exitoso",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Artículo",
+            "min": 21,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "11 ago",
+            "parts": [
+              {
+                "t": "HubSpot: Potenciando Marketing y Ventas para un Crecimiento Sostenible",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "HubSpot · Artículo",
+            "min": 18,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "10 ago",
+            "parts": [
+              {
+                "t": "Topic clusters y contenido pilar: cómo ordenar tu SEO para Google y la IA",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Inbound Marketing · Artículo",
+            "min": 9,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          },
+          {
+            "url": "#",
+            "date": "6 ago",
+            "parts": [
+              {
+                "t": "Growth-Driven Design: Sitios Web que Generan Resultados",
+                "pl": true,
+                "hl": false
+              }
+            ],
+            "glitch": false,
+            "plain": true,
+            "label": "Diseño Web · Artículo",
+            "min": 18,
+            "pd": true,
+            "gd": false,
+            "ed": null,
+            "fl": false
+          }
+        ]
+      }
+    ],
+    "flat": null,
+    "pager": {
+      "note": "Mostrando 1–10 de 11 publicaciones",
+      "label": "Páginas de la etiqueta",
+      "multi": true,
+      "prev": null,
+      "next": "#",
+      "pages": [
+        {
+          "num": true,
+          "gap": false,
+          "n": 1,
+          "url": "#",
+          "cur": "page"
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 2,
+          "url": "#",
+          "cur": null
+        }
+      ]
+    }
+  },
+  "meanwhile": null,
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "Explora por tema.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  },
+  "rootCls": "v3 arc",
+  "gl": null
+}

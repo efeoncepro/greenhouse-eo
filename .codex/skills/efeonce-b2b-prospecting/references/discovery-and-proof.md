@@ -46,3 +46,11 @@ Salida: tesis compartible breve, preguntas prioritarias, prueba mínima por ince
 aceptación/refutación, con claims/unknowns/costo. Preparado no significa enviado, probado ni aceptado.
 
 Elegir el punto de entrada con [situaciones](situation-entry-playbooks.md) cuando haya proveedor actual, equipo saturado, proyecto, transformación o continuidad; Commercial conserva calificación/negociación.
+
+
+## Continuidad hacia discovery y caso de negocio
+
+Si la respuesta abre reunión/propuesta o se pide analizar su transcripción, cargar
+[discovery → caso](discovery-to-business-case.md). Conservar marca/iniciativa, fuente declarada,
+reunión enviada/aceptada/realizada y criterios de selección separados; la evidencia posterior confirma
+o refuta hipótesis y condiciona economía. No activar una cadencia, Deal o precio por este avance.

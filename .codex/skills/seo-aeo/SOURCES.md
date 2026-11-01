@@ -195,7 +195,7 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
 - **Estudio observacional de terceros** (Ahrefs, **1,4
   millones de prompts de ChatGPT**): lo que más separa a una página **citada** de una
   **recuperada-y-no-citada** es la **relevancia semántica del TÍTULO** frente a la sub-pregunta
-  (**0,656** vs **0,484**) y la claridad del slug (**89,8%** vs **81,1%**).
+  (**0,602** citada vs **0,484** no citada; corregido 2026-10-25: el «0,656» es sub-pregunta → citada y no es comparable) y la claridad del slug (**89,8%** vs **81,1%**).
   ⚠️ Y en ese mismo estudio **la cápsula de respuesta NO aparece entre los predictores**.
   → **Uso permitido:** puede orientar hipótesis editoriales sobre títulos en el
   alcance de esa muestra. No demuestra causalidad, no convierte los H2 en una

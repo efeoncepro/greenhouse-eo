@@ -2694,7 +2694,8 @@ const handleAuthGarbageCollection = wrapCronHandler({
       locked: result.locked,
       cutoff: result.cutoff,
       batchSize: result.batchSize,
-      counts: result.counts
+      counts: result.counts,
+      extensions: result.extensions
     }))
 
     return { ...result }

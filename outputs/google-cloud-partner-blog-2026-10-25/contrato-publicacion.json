@@ -1,0 +1,19 @@
+{
+  "manifestId": "efeonce-google-cloud-partner-announcement",
+  "authorId": 1,
+  "categoryId": 116,
+  "formatId": 219,
+  "tagIds": [
+    191,
+    117
+  ],
+  "primaryCategoryId": 116,
+  "slug": "efeonce-partner-google-cloud",
+  "canonical": "https://efeoncepro.com/novedades/efeonce-partner-google-cloud/",
+  "ogTitle": "Efeonce es partner de Google Cloud",
+  "ogDescription": "Una nueva etapa para conectar Google Cloud, Google Workspace y la inteligencia artificial con los proyectos de tu empresa.",
+  "schemaArticleType": "NewsArticle",
+  "focusPhrase": "Efeonce partner de Google Cloud",
+  "bannerActivation": false,
+  "targetStatus": "private"
+}

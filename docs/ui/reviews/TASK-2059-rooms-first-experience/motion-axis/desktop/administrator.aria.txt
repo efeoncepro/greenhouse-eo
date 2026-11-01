@@ -1,0 +1,115 @@
+- link "Ir al contenido":
+  - /url: "#main-content"
+- complementary "Demostración":
+  - text: Demostración
+  - navigation "Vistas de demostración":
+    - link "Cliente":
+      - /url: /demo
+    - link "Operador":
+      - /url: /demo/workspace?persona=operator
+    - link "Administrador":
+      - /url: /demo/workspace?persona=administrator
+- banner:
+  - link "Efeonce Rooms":
+    - /url: /demo
+    - img "Efeonce Rooms"
+  - text: Espacio de trabajo Administrador
+- complementary:
+  - text: A
+  - strong: Administrador
+  - text: Demostración
+  - navigation "Navegación del espacio de trabajo":
+    - 'link "Salas Salas: 1"':
+      - /url: "#rooms"
+    - link "Permisos":
+      - /url: "#permissions"
+    - link "Accesos":
+      - /url: "#access"
+  - paragraph: Tu acceso se limita a las salas y acciones autorizadas.
+- main:
+  - paragraph: Espacio de trabajo
+  - heading "Cada propuesta, en su lugar." [level=1]
+  - paragraph: Consulta las salas disponibles y el alcance de tu acceso antes de entrar a una propuesta.
+  - region "Tus salas":
+    - heading "Tus salas" [level=2]
+    - text: 1 sala disponible
+    - article:
+      - text: Nómada Edición publicada
+      - heading "Un paso más cerca." [level=3]
+      - paragraph: Edición 01 · Creatividad + SEO / AEO
+      - link "Abrir sala":
+        - /url: /demo
+  - region "Notas del equipo":
+    - heading "Notas del equipo" [level=2]
+    - text: Administrador
+    - paragraph: Sólo visibles para el equipo con permiso. No forman parte de la vista del cliente.
+    - paragraph: Confirmar el alcance interno de Nómada antes de preparar la propuesta real. Nota sintética interna.
+  - region "Lo que puedes hacer":
+    - heading "Lo que puedes hacer" [level=2]
+    - text: Administrador
+    - paragraph: Estos permisos se resuelven para esta sala. Las acciones marcadas como pendientes aún no están disponibles en esta primera entrega.
+    - table:
+      - rowgroup:
+        - row "Acción Permiso Disponible":
+          - columnheader "Acción"
+          - columnheader "Permiso"
+          - columnheader "Disponible"
+      - rowgroup:
+        - row "Explorar la sala Permitido Sí":
+          - rowheader "Explorar la sala"
+          - cell "Permitido"
+          - cell "Sí"
+        - row "Consultar evidencias Permitido Sí":
+          - rowheader "Consultar evidencias"
+          - cell "Permitido"
+          - cell "Sí"
+        - row "Ver espacio de operación Permitido Sí":
+          - rowheader "Ver espacio de operación"
+          - cell "Permitido"
+          - cell "Sí"
+        - row "Leer notas internas Permitido Sí":
+          - rowheader "Leer notas internas"
+          - cell "Permitido"
+          - cell "Sí"
+        - row "Editar un borrador No permitido Pendiente":
+          - rowheader "Editar un borrador"
+          - cell "No permitido"
+          - cell "Pendiente"
+        - row "Publicar una edición No permitido Pendiente":
+          - rowheader "Publicar una edición"
+          - cell "No permitido"
+          - cell "Pendiente"
+        - row "Consultar accesos Permitido Sí":
+          - rowheader "Consultar accesos"
+          - cell "Permitido"
+          - cell "Sí"
+        - row "Administrar accesos Permitido Pendiente":
+          - rowheader "Administrar accesos"
+          - cell "Permitido"
+          - cell "Pendiente"
+        - row "Archivar una sala Permitido Pendiente":
+          - rowheader "Archivar una sala"
+          - cell "Permitido"
+          - cell "Pendiente"
+        - row "Crear una sala Permitido Pendiente":
+          - rowheader "Crear una sala"
+          - cell "Permitido"
+          - cell "Pendiente"
+        - row "Abrir un nuevo borrador Permitido Pendiente":
+          - rowheader "Abrir un nuevo borrador"
+          - cell "Permitido"
+          - cell "Pendiente"
+  - region "Accesos de la sala":
+    - heading "Accesos de la sala" [level=2]
+    - paragraph: Personas y ámbitos sintéticos de esta demostración. La invitación y administración de usuarios reales se conectarán en la siguiente etapa.
+    - strong: Cliente de demostración
+    - paragraph: Sala Nómada · edición 01
+    - text: Activo
+    - strong: Operador de demostración
+    - paragraph: Organización Nómada
+    - text: Activo
+    - strong: Administrador de demostración
+    - paragraph: Organización Nómada
+    - text: Activo
+  - paragraph: Muestra sintética · Sin datos de clientes ni resultados comerciales medidos.
+- alert

@@ -1,0 +1,31 @@
+{
+ "id": "S12-paredes-c",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn, transformed: every glass wall and the wall display have become giant glowing screens showing the same campaign of a fictional citrus drink (aluminum can, abstract orange-and-teal wave label, no readable text) in different formats — a tall vertical story, a square post, a wide banner — with splashes and citrus. Wide shot 28mm. GEOGRAPHY (critical, continuity): the camera is at the interior end of ONE single long pale oak table, looking along it toward the floor-to-ceiling window wall with the Andes and the Costanera tower at the far end. The LEFT side wall is an interior wall (no window): it has become a giant glowing screen. The window wall at the far end and the right glass wall also show the campaign. Antonio sits on the RIGHT side of the same table at its far end, perfectly calm, dry and impeccable, with a faint closed-mouth smile, his navy ceramic mug and his laptop in front of him. Paula, completely soaked — dripping wet hair, cream sweater drenched and darkened by water, a slice of orange stuck on her left shoulder, slim gold-rimmed glasses still on top of her head — stands up slowly at her place on the LEFT side of the table, staring around in awe, still holding her kraft paper coffee cup with a black lid. The tabletop and the floor are wet with puddles and orange slices from the wave. Wet floor. Antonio wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, CLOSED, with its embroidered emblem on the left chest exactly as in the references, over a plain white t-shirt. Light: the whole room is now flooded with vivid, saturated orange and teal light pouring from the screens, warm sunlight breaking through the windows, punchy contrast, high energy.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "persona": "antonio"
+  }
+ ],
+ "identidad": [
+  "paula",
+  {
+   "persona": "antonio"
+  }
+ ],
+ "lecho": "sin-lecho"
+}

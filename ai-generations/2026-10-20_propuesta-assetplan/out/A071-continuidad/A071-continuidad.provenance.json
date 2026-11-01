@@ -1,0 +1,15 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "9b879c1b692f7aaad34504b875b74c55e8da8cb732d1d237958fdae8869207e0",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-bullets",
+  "plates": [],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "eyebrow-chip-outline-2026-10-20"
+}

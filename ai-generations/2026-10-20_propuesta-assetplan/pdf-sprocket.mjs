@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import sharp from 'sharp'
 import { PDFDocument, PDFName, PDFString } from 'pdf-lib'
 const R = 'ai-generations/2026-10-20_propuesta-assetplan'
-const keys = ['A01-portada','A02-necesidad','A04-alcance','A035-crm-completo','A036-integraciones','A037-desarrollo','A038-ejecucion','A039-agente-dudas','A0395-enablement-ia','A0396-capacitacion','A05-dia-a-dia','A055-vivelo-sprint','A057-vivelo-consola','A058-primeros-30','A06-ciclo','A059-seguridad','A07-por-que','A075-caso-anam','A076-caso-ssilva','A078-inversion-cotizacion','A08-pasos','A09-contraportada']
+const keys = ['A01-portada','A02-necesidad','A04-alcance','A041-bolsa','A035-crm-completo','A036-integraciones','A037-desarrollo','A038-ejecucion','A039-agente-dudas','A0395-enablement-ia','A0396-capacitacion','A05-dia-a-dia','A051-tiempos','A055-vivelo-sprint','A057-vivelo-consola','A058-primeros-30','A06-ciclo','A059-seguridad','A07-por-que','A071-continuidad','A075-caso-anam','A076-caso-ssilva','A078-inversion-cotizacion','A08-pasos','A09-contraportada']
 // Capas sobre la lámina compuesta: sprocket 3D (autorizado 2026-10-14) y la insignia Gold (readback 2026-10-06).
 const OVERLAYS = {
   'A04-alcance': { suffix: 'sprocket', left: 1410, top: 470, make: () => sharp('ai-generations/2026-10-06_deck-hubspot/png/sprocket-3d-flotando-800.png').resize(380, 380).png().toBuffer() },

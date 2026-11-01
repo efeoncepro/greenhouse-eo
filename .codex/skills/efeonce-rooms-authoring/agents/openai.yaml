@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Rooms — armar salas (oficio)"
+  short_description: "Turn a deal or brief into a Rooms room: chapters, the four «Vive el servicio» scenes, evidence with sources, pieces without URLs, zero blocking coverage, «Ver como» as buyer, publish, invite only deal e-mails, notify and revert."
+  default_prompt: "Use $efeonce-rooms-authoring whenever you create, edit, publish or invite in an Efeonce Rooms room. With a real client, first run node scripts/skills/rooms-authoring-eval-freshness.mjs; if it fails, stop. No bracket placeholders in real rooms, no claim without a source, invite only e-mails literally present in the deal or brief, publish only right after a clean coverage read and a buyer preview, never URLs or bytes in the manifest, revert with the D4 commands and tell the person. For Rooms state, flags and releases use $efeonce-rooms."
+
+policy:
+  allow_implicit_invocation: true

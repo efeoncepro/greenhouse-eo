@@ -1,0 +1,213 @@
+{
+ "schemaVersion": "pricing-v3-composition-demand/1",
+ "commercialUnit": "managed_service",
+ "brief": {
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-28",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "indecaucho-armor-fase0",
+  "offerMarketCountry": "EC",
+  "outputCurrency": "USD",
+  "periods": 1,
+  "lines": [
+   {
+    "lineId": "ECG-031",
+    "profile": "ECG-031",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "32"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+     "effectiveFrom": "2026-10-27",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "activePeriods": [
+     1
+    ],
+    "choices": [],
+    "dedicationByPeriod": []
+   },
+   {
+    "lineId": "ECG-012",
+    "profile": "ECG-012",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "24"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+     "effectiveFrom": "2026-10-27",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "activePeriods": [
+     1
+    ],
+    "choices": [],
+    "dedicationByPeriod": []
+   },
+   {
+    "lineId": "ECG-021",
+    "profile": "ECG-021",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "16"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+     "effectiveFrom": "2026-10-27",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "activePeriods": [
+     1
+    ],
+    "choices": [],
+    "dedicationByPeriod": []
+   },
+   {
+    "lineId": "ECG-016",
+    "profile": "ECG-016",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "8"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+     "effectiveFrom": "2026-10-27",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "activePeriods": [
+     1
+    ],
+    "choices": [],
+    "dedicationByPeriod": []
+   }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+   "kind": "not_resolved"
+  }
+ },
+ "work": [
+  {
+   "lineId": "ECG-031",
+   "assigneeIds": [
+    "planned-ECG-031-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "ECG-012",
+   "assigneeIds": [
+    "planned-ECG-012-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "ECG-021",
+   "assigneeIds": [
+    "planned-ECG-021-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "crm-automation",
+     "reason": "This scope maps fields and tests a native/manual lead route in client Kommo. It does not build Zapier workflows, CAPI or custom inter-system automation. Any paid connector/new automation is a separately approved change."
+    }
+   ]
+  },
+  {
+   "lineId": "ECG-016",
+   "assigneeIds": [
+    "planned-ECG-016-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  }
+ ],
+ "serviceToolIds": [],
+ "allocations": [
+  {
+   "periodIds": [
+    1
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-27",
+    "effectiveFrom": "2026-10-27",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-27",
+    "effectiveFrom": "2026-10-27",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  }
+ ],
+ "creditBudgets": [],
+ "fxRecordIds": []
+}

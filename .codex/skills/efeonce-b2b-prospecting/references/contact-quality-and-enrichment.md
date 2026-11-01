@@ -49,7 +49,12 @@ teléfono, datos personales ni otro candidato. Si el resultado basta, continuar 
 si hace falta una operación de mayor costo, declarar lo obtenido y resolver sólo ese permiso pendiente.
 
 Para trabajo asíncrono, aceptación/request ID no es email obtenido: reconciliar finalización y resultado.
-Guardar dirección exactamente retornada, fuente/estado/fecha/costo. Sin email devuelto, termina ese carril;
+Guardar dirección exactamente retornada, fuente/estado/fecha/costo. Conservar todas las entradas en su
+orden y prioridad, incluso si dos retornan la misma dirección: son evidencias del resultado, no dos personas
+ni dos permisos de envío. Leer el estado normalizado específico (`email_status_cd` cuando exista) junto con
+los veredictos crudos del verificador, sin sustituir uno por otro; conservar costo liquidado y request ID
+en el dossier privado. Consultar el mismo job pendiente hasta su resultado terminal según el contrato del
+provider, sin lanzar otro match para acelerar. Sin email devuelto, termina ese carril;
 no inventarlo ni repetir lookups equivalentes vacíos. Continuar por adyacentes o canal oficial válido.
 
 ## Detener gasto y conservar valor
@@ -75,8 +80,10 @@ email ni atributos independientes. No gastar en variantes equivalentes ni usar e
 
 Si el operador, informado de esa incertidumbre, autoriza expresamente alguna de las acciones (alta, envío
 o secuencia) para esa persona/dirección, ejecutar sólo las autorizadas sin pedir el mismo permiso otra vez.
-Registrar la excepción con fuente/fecha, dirección inferida y calidad pendiente; no etiquetarla `verified`. Usar los campos vigentes
-del portal y una nota que distinga identidad profesional conocida de atribución de correo pendiente.
+Registrar la excepción con fuente/fecha y dirección de atribución inferida; conservar la calidad técnica
+real, favorable, pendiente o adversa, con su proveedor/estado exactos. Una excepción de atribución no
+convierte una dirección técnicamente inválida en apta ni permite etiquetarla como correo atribuido
+`verified`. Usar los campos vigentes del portal y una nota que distinga identidad profesional conocida de atribución de correo pendiente.
 El permiso sólo de envío no se amplía a CRM o secuencia, y la excepción individual no cambia la admisión
 normal de otros contactos. Ausencia de rebote o visualización del brochure tampoco verifica identidad.
 [Aplicación izipay](../../../../docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).
@@ -87,3 +94,69 @@ ni su atribución a Mariana. Julio autorizó expresamente crear el Contact y env
 de conocer la incertidumbre; no autorizó una secuencia. La nota CRM conserva los ejemplos y la excepción;
 la documentación versionada conserva el método y el enlace al caso, sin direcciones reales. La consulta
 Apollo ofrecida quedó sin ejecutar: no atribuirle enriquecimiento ni consumo de créditos a la búsqueda pública.
+
+
+## Inferir una candidata y verificar sólo esa casilla
+
+Si el operador pide investigar un patrón, buscar ejemplos exactos en fuentes oficiales del mismo dominio,
+con nombres y fecha que permitan explicar la relación entre inicial y **primer apellido**, apellido compuesto
+u otra convención observada. No usar automáticamente el último apellido del nombre completo. Dos ejemplos
+coherentes apoyan una hipótesis de formato; no prueban una regla universal ni la titularidad de la candidata.
+Guardar fuentes y ejemplos reales en el dossier CRM privado; versionar sólo el método y ejemplos sintéticos.
+
+Seleccionar una candidata pertinente antes de solicitar una comprobación pagada acotada. La validación de
+Apollo no es un buscador ni un enumerador de casillas: no recorrer variantes, hacer fuerza bruta, repetir
+chequeos equivalentes ni enviar un correo para probar existencia. La autorización del enriquecimiento anterior
+no cubre ese gasto: reutilizar sólo el permiso explícito para esa dirección, proveedor/operación y tope.
+Si es asíncrona, un request aceptado sigue pendiente hasta recuperar el resultado del mismo job.
+
+Un verificador técnico puede devolver `validation_status=validated` y resolver favorablemente la calidad de
+la candidata sin identificar a su titular. Conservar proveedor, estado exacto, fecha y costo, y explicar
+**calidad validada; atribución inferida**. No pedir otra validación técnica para una brecha que sigue siendo
+de atribución. El siguiente paso es atribuir el correo o, si el operador informado lo autoriza expresamente,
+aplicar la excepción individual existente para las acciones nombradas. Esa aprobación no alcanza otras
+personas, variantes, futuras secuencias ni nuevos créditos.
+
+Aplicaciones del 24/10/2026:
+
+- [Lucía / Flesan](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-flesan-lucia.md):
+  waterfall de dos créditos, dos entradas de la misma dirección preservadas por prioridad, `Verified`,
+  ZeroBounce `valid` y dominio no catch-all; identidad y empleo contrastados por separado.
+- [Yvette / Sigelec](../../../../docs/commercial/prospecting-agent/runs/2026-10-24-sigelec-yvette.md):
+  primer resultado `Extrapolated` (0.7) + ZeroBounce `invalid`, consumió un crédito y se descartó.
+  Dos correos oficiales de otras personas apoyaron inicial + primer apellido; una única candidata distinta
+  recibió validación LeadMagic `validated` por un crédito adicional autorizado. La atribución siguió inferida;
+  Julio aprobó expresamente Contact y envío a esa dirección tras conocerlo, sin autorizar secuencia.
+
+## Correo personal publicado y dato adicional no solicitado
+
+Una dirección personal publicada por la propia persona puede acreditar atribución; no la convierte en
+correo corporativo ni certifica SMTP. Si el operador, informado, autoriza expresamente alta y envío a esa
+dirección como excepción individual, reutilizar esa autorización sólo para esa persona y acciones.
+Conservar fuente, naturaleza personal y calidad técnica real en la nota CRM. El permiso de gasto de un
+waterfall no autoriza por sí solo CRM o envío, ni se amplía a datos personales secundarios retornados por
+el proveedor: omitirlos si no son necesarios ni autorizados para el fin del pedido.
+
+Una instrucción posterior de enviar también a una candidata inválida no cambia su veredicto. Registrar
+el mandato puntual y el resultado real; un NDR de destinatario inexistente cierra ese canal sin reintento.
+La existencia de un Contact automático por BCC no verifica la dirección ni autoriza fusionar/borrar
+historia. Aceptación de conexión, email enviado y DM son estados separados; conciliar cada canal.
+
+[Aplicación Mass Chile — 26/10/2026](../../../../docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md):
+excepción personal de Yuri, corporativo inferido rebotado y adyacentes con correo laboral verificado,
+permisos posteriores de alta/envío, sin heredar intención ni ampliar el gasto.
+
+## Continuidad entre personas y resultado adverso — 31/10/2026
+
+«Vamos con ella» conserva el propósito del acercamiento, pero obliga a reconstruir contexto, oferta y
+prueba para la nueva persona. La confirmación de créditos de una persona no autoriza el waterfall de la
+siguiente. Si el provider exige una confirmación específica, pedirla una vez; al recibirla, ejecutar la
+consulta acotada sin volver a pedir permiso. La búsqueda pública o LinkedIn pueden avanzar mientras espera.
+
+[Mambrino / Dayanna](../../../../docs/commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md)
+contrasta una identidad/empleo coherentes y email `Verified`, con duplicados de la misma dirección
+conservados como evidencia, no como dos contactos. Los dos créditos pertenecen a ese resultado, no a una
+tarifa universal. [Wequips / Mayra](../../../../docs/commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md)
+finalizó sin email en waterfall; el envío autorizado después a una candidata inferida rebotó. Un NDR
+posterior cambia el estado operativo: registrar rebote, detener esa ruta y conservar historia; la excepción
+previa no autoriza reintentos, variantes, nuevas validaciones pagadas ni levantar supresiones.

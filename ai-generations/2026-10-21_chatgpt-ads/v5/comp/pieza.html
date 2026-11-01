@@ -1,0 +1,145 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="orbit-motion.css"><script src="orbit-data.js"></script>
+<style>
+@font-face{font-family:Bric;src:url(BricolageGrotesque-Variable.ttf);font-weight:200 800;font-stretch:75% 100%}
+@font-face{font-family:Pop;src:url(Poppins-400.ttf);font-weight:400}
+@font-face{font-family:Pop;src:url(Poppins-500.ttf);font-weight:500}
+@font-face{font-family:Pop;src:url(Poppins-600.ttf);font-weight:600}
+@font-face{font-family:Pop;src:url(Poppins-700.ttf);font-weight:700}
+*{box-sizing:border-box;font-synthesis:none}
+html,body{margin:0;background:#000}
+#root{position:relative;width:1080px;overflow:hidden;background:#020617}
+#bgwrap{position:absolute;inset:0;overflow:hidden}
+#bg{position:absolute;left:0;top:0;width:1080px;transform-origin:50% 50%}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#orbwrap{position:absolute;left:0;top:0;width:1080px;opacity:0}
+#stage{position:absolute;left:0;width:1080px;height:1350px}
+#grp{position:absolute;inset:0;transform-origin:50% 45%}
+.abs{position:absolute}
+.ctr{left:0;width:1080px;text-align:center}
+#hook .n{font-family:Bric;font-weight:780;font-size:150px;letter-spacing:-.04em;line-height:1;color:#fff;text-shadow:0 8px 50px rgba(0,0,40,.45)}
+#hook .s{font-family:Pop;font-weight:500;font-size:40px;line-height:1.3;color:#fff;margin-top:18px;text-shadow:0 2px 20px rgba(0,0,40,.5)}
+#hook .f{font-family:Pop;font-size:26px;color:rgba(255,255,255,.78);margin-top:22px}
+#logo{display:flex;justify-content:center;opacity:0}
+#bar{left:100px;width:880px;height:124px;border-radius:62px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05)),rgba(6,10,36,.38);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4);border:1.5px solid rgba(255,255,255,.55);box-shadow:0 30px 90px rgba(0,0,20,.45),inset 0 1px 0 rgba(255,255,255,.6);display:flex;align-items:center;padding:0 22px 0 40px;font-family:Pop;font-size:32px;color:#fff;white-space:nowrap;opacity:0;transform-origin:50% 50%}
+#bar .ph{color:rgba(255,255,255,.72)}
+#bar .caret{display:inline-block;width:3px;height:38px;background:#fff;vertical-align:-8px;margin-left:3px}
+#send{width:78px;height:78px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+#ans{left:100px;width:880px;padding:28px 38px 24px;border-radius:34px;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03)),rgba(4,8,30,.62);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1.5px solid rgba(255,255,255,.28);box-shadow:0 24px 70px rgba(0,0,20,.4);font-family:Pop;font-size:33px;line-height:1.42;color:#fff;opacity:0}
+#ans .nota{display:block;font-size:26px;color:rgba(255,255,255,.72);margin-top:14px}
+#card{left:100px;width:880px;height:220px;border-radius:40px;background:linear-gradient(180deg,#fff,#f1f4fb);box-shadow:0 50px 120px rgba(0,0,30,.55),0 0 0 1.5px rgba(255,255,255,.9);display:flex;align-items:center;gap:30px;padding:0 36px;opacity:0;transform-origin:50% 50%}
+#card .lbl{position:absolute;left:40px;top:22px;font-family:Pop;font-weight:500;font-size:22px;color:#5f5f6e}
+#card .av{width:118px;height:118px;flex:none;margin-top:26px}
+#card .tx{flex:1;font-family:Pop;margin-top:26px}
+#card .t1{font-weight:700;font-size:42px;color:#0b1220;letter-spacing:-.015em}
+#card .t2{font-size:27px;color:#4b5263;margin-top:2px}
+#card .cta{flex:none;font-family:Pop;font-weight:600;font-size:26px;color:#fff;background:#0b1220;border-radius:999px;padding:18px 30px;margin-top:26px}
+#ball{position:absolute;border-radius:50%;opacity:0}
+#q{font-family:Pop;font-weight:300;font-size:46px;color:#cfe4fa;opacity:0;text-shadow:0 2px 20px rgba(0,0,40,.5)}
+#a{font-family:Bric;font-weight:760;font-size:148px;letter-spacing:-.035em;line-height:1;color:#fff;opacity:0;text-shadow:0 8px 50px rgba(0,0,40,.4)}
+#a span{display:inline-block}
+#svc{font-family:Pop;font-weight:600;font-size:38px;line-height:1.35;color:#fff;opacity:0;text-shadow:0 2px 20px rgba(0,0,40,.5)}
+#cta{display:flex;justify-content:center;opacity:0}
+#cta span{font-family:Pop;font-weight:600;font-size:32px;color:#fff;border:2px solid #fff;border-radius:999px;padding:16px 44px}
+#q .ring{display:inline-block;width:.42em;height:.42em;margin-right:.35em;border:max(1px,.06em) solid #f83902;border-radius:50%;box-sizing:border-box;vertical-align:.08em}
+#lk{display:flex;align-items:center;justify-content:center;gap:42px;opacity:0}
+</style></head><body><div id="root">
+<div id="bgwrap"><img id="bg"></div>
+<div id="orbwrap" class="axis-orbit-animate orb"></div>
+<div id="stage">
+ <div class="abs ctr" id="hook"><div class="n">1.200 millones</div><div class="s">de personas le preguntan a ChatGPT<br>cada semana.</div><div class="f">Fuente: OpenAI, octubre de 2026</div></div>
+ <div id="grp">
+  <div class="abs ctr" id="logo"><img src="chatgpt-logo-blanco.svg" style="height:58px"></div>
+  <div class="abs" id="bar"><svg width="34" height="34" viewBox="0 0 24 24" style="flex:none;margin-right:22px"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span id="btext" style="flex:1;min-width:0;overflow:hidden"></span><svg width="34" height="34" viewBox="0 0 24 24" style="margin-left:16px;margin-right:22px;flex:none"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><div id="send"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke="#0b1220" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  <div class="abs" id="ans"><span id="anstx"></span><span class="nota">Recreación ilustrativa</span></div>
+ </div>
+ <div class="abs" id="card"><div class="lbl">Patrocinado</div>
+  <svg class="av" viewBox="0 0 118 118"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f9b8e"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="118" height="118" rx="30" fill="url(#kg)"/><path d="M38 30v58M38 59l32-29M46 52l26 36" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="84" cy="34" r="7" fill="#fff" opacity=".9"/></svg>
+  <div class="tx"><div class="t1">Kaltis</div><div class="t2">ERP para toda la región</div></div><div class="cta">Ver demo</div></div>
+ <div class="abs ctr" id="q"><span class="ring" aria-hidden="true"></span>¿Dónde está tu próximo cliente?</div>
+ <div class="abs ctr" id="a"><span id="aw"></span></div>
+ <div class="abs ctr" id="svc">Que te encuentren cuando están decidiendo.<br>Y saber cuántas ventas te trae.</div>
+ <div class="abs ctr" id="cta"><span>Conversemos</span></div>
+ <div class="abs ctr" id="lk"><img src="efeonce-negativo.svg" style="width:300px"><span style="width:2px;height:80px;background:rgba(255,255,255,.6)"></span><img src="openai-blanco.svg" style="height:78px"></div>
+</div>
+<div id="ball"></div>
+<div id="flash"></div>
+</div>
+<script>
+const q=new URLSearchParams(location.search),H=+(q.get('h')||1350),ST=H>1350,FMT=ST?'story':'feed'
+if(q.get('sin'))document.head.insertAdjacentHTML('beforeend','<style>#stage,#orbwrap,#ball,#flash{visibility:hidden!important}</style>')
+const root=document.getElementById('root');root.style.height=H+'px'
+const OFF=(H-1350)/2;document.getElementById('stage').style.top=OFF+'px'
+const $=id=>document.getElementById(id)
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t
+const eo=t=>1-Math.pow(1-t,3),eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2
+const back=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+// grilla de 120 BPM
+const T_UI=2.0,T_SEND=4.0,T_CARD=6.0,T_ISO=6.4,T_ORB=6.6,T_FLY=8.625,T_A=9.0,T_END=10.0
+const PROMPT='¿Qué ERP conviene para 5 países?'
+const ANS='Para 5 países, conviene un ERP con multimoneda, facturación local y consolidación en tiempo real.'
+const AW=ANS.split(' ')
+const Y={hook:470,logo:520,barC:612,barT:400,ans:548,card:790,cardIso:530,q:300,a:372,svc:640,cta:775,lk:1010}
+if(ST){Y.q-=110;Y.a-=110;Y.lk+=150}
+for(const k of ['hook','logo','ans','q','a','svc','cta','lk'])$(k).style.top=Y[k]+'px'
+const ORB=window.ORB,OFR=window.OFR
+$('orbwrap').innerHTML=window.ORBSVG[FMT];$('aw').innerHTML=window.ANSWER_HTML
+const period=()=>document.querySelector('#aw [data-axis-part="answer-period"]')
+const fcss=document.createElement('style');document.head.appendChild(fcss)
+const bg=$('bg')
+window.setBgSrc=s=>new Promise(r=>{bg.onload=()=>r();bg.src=s})
+window.setT=function(t){
+ // fondo: deriva, empujón en golpes y bajada de exposición bajo el gancho y el cierre
+ let z=1+0.05*(t/12);for(const [g,a] of [[T_SEND,.035],[T_CARD,.03],[T_A,.025]]){const d=t-g;if(d>=0&&d<0.9)z+=a*(1-eo(d/0.9))}
+ const bh=bg.naturalHeight?1080*bg.naturalHeight/bg.naturalWidth:H;bg.style.height=bh+'px';bg.style.top=((H-bh)/2)+'px'
+ const sh=0
+ bg.style.transform=`scale(${z}) translate(${sh*Math.sin(t*170)}px,${sh*Math.cos(t*150)}px)`
+ const dipHook=1-eio(clamp((t-1.8)/0.5)),dipEnd=eio(clamp((t-(T_FLY-0.1))/0.6))
+ let bloom=0;for(const [g,a] of [[T_SEND,.35],[T_CARD,.18],[T_A,.15]]){const d=t-g;if(d>=0&&d<0.8)bloom=Math.max(bloom,a*Math.pow(1-d/0.8,2))}
+ bg.style.filter=`brightness(${1-0.42*dipHook-0.45*dipEnd+bloom})`
+ const fl=0
+ $('flash').style.opacity=fl
+ // 1 · gancho
+ const hin=clamp((t-0.08)/0.4),hout=eio(clamp((t-1.7)/0.45)),hk=$('hook')
+ hk.style.opacity=eo(hin)*(1-hout);hk.style.transform=`scale(${lerp(1.08,1,eo(hin))*lerp(1,1.4,hout)})`
+ hk.children[1].style.opacity=clamp((t-0.35)/0.3);hk.children[2].style.opacity=clamp((t-0.6)/0.3)
+ // 2 · la pregunta en ChatGPT
+ const uin=eo(clamp((t-(T_UI-0.1))/0.55));$('logo').style.opacity=t<T_SEND?uin:clamp(1-(t-T_SEND)/0.3);$('logo').style.transform=`scale(${lerp(0.86,1,uin)})`
+ const up=eio(clamp((t-T_SEND)/0.6)),pop=t>=T_SEND&&t<T_SEND+0.15?0.94:1
+ const bar=$('bar');bar.style.opacity=uin;bar.style.top=lerp(Y.barC,Y.barT,up)+'px'
+ bar.style.transform=`scale(${lerp(0.86,1,uin)*pop})`
+ const typed=t<T_UI+0.35?0:Math.min(PROMPT.length,Math.floor((t-T_UI-0.35)/1.3*PROMPT.length))
+ $('btext').innerHTML=t>=T_SEND?'<span class="ph">Pregúntale a ChatGPT</span>':(typed?PROMPT.slice(0,typed)+'<span class="caret"></span>':'<span class="ph">Pregúntale a ChatGPT</span>')
+ // 3 · la respuesta
+ const nw=t<T_SEND+0.45?0:Math.min(AW.length,Math.ceil((t-T_SEND-0.45)/1.2*AW.length));$('anstx').textContent=AW.slice(0,nw).join(' ')||' '
+ $('ans').style.opacity=clamp((t-T_SEND-0.3)/0.3)
+ // 4 · el anuncio cae; la interfaz se va y la tarjeta queda sola, al centro
+ const iso=eio(clamp((t-(T_ISO-0.05))/0.7)),g=$('grp');g.style.opacity=1-iso;g.style.transform=`scale(${lerp(1,0.94,iso)})`
+ const c=$('card'),cp=clamp((t-(T_CARD-0.4))/0.4),land=clamp((t-T_CARD)/0.35),cfade=eio(clamp((t-(T_FLY-0.15))/0.35))
+ c.style.opacity=clamp((t-(T_CARD-0.4))/0.12)*(1-cfade)
+ c.style.top=lerp(Y.card,Y.cardIso,iso)+'px'
+ const cy=t<T_CARD?lerp(-300,0,cp*cp):0,cs=(t<T_CARD?lerp(1.08,1,cp):1-0.02*Math.sin(Math.PI*land))*lerp(1,0.86,iso)
+ c.style.transform=`translateY(${cy}px) scale(${cs})`
+ // 5 · la órbita de Efeonce enfoca el anuncio (movimiento del paquete, congelado por cuadro)
+ const ow=$('orbwrap'),om=(t-T_ORB)*1000
+ if(OFR&&ORB){
+  ow.style.opacity=t<T_ORB?0:(1-eio(clamp((t-(T_FLY-0.15))/0.35)))
+  const fi=Math.max(0,Math.min(Object.keys(OFR).length-1,Math.round(om/(1000/24))));fcss.textContent=OFR[fi]
+  // 6 · la única esfera viaja de la órbita al punto de la respuesta
+  const S=ORB[FMT].sphere,sv=ow.querySelector('[data-axis-part="sphere"]'),b=$('ball')
+  const pe=period(),pr=pe.getBoundingClientRect(),dia=pr.width,tx=pr.left+pr.width/2,ty=pr.top+pr.height/2,fp=clamp((t-T_FLY)/(T_A-T_FLY))
+  pe.style.visibility=t>=T_A+0.25?'visible':'hidden'
+  if(t>=T_FLY){if(sv)sv.style.visibility='hidden';const e=eio(fp),arcH=-160*Math.sin(Math.PI*e)
+   const x=lerp(S.x,tx,e),y=lerp(S.y,ty,e)+arcH,d=lerp(S.r*2,dia,e)*(t>=T_A&&t<T_A+0.25?1+0.22*Math.sin(Math.PI*clamp((t-T_A)/0.25)):1)
+   b.style.opacity=t>=T_A+0.25?0:1;b.style.width=b.style.height=d+'px';b.style.left=(x-d/2)+'px';b.style.top=(y-d/2)+'px';b.style.background=S.color;b.style.boxShadow=`0 0 ${30*(1-fp)+10}px ${S.color}`}
+  else{if(sv)sv.style.visibility='visible';b.style.opacity=0}
+ }
+ // 7 · la voz de Efeonce: pregunta y respuesta
+ const qp=clamp((t-(T_FLY+0.1))/0.35);$('q').style.opacity=qp;$('q').style.transform=`translateY(${16*(1-eo(qp))}px)`
+ const ap=eo(clamp((t-(T_A-0.3))/0.35));$('a').style.opacity=ap;$('a').style.transform=`translateY(${18*(1-ap)}px)`
+ // 8 · servicio, CTA y firma (pico del sting en 10,0)
+ const sp=clamp((t-(T_END-0.1))/0.4);$('svc').style.opacity=sp;$('svc').style.transform=`translateY(${18*(1-eo(sp))}px)`
+ const cpp=clamp((t-(T_END+0.25))/0.35);$('cta').style.opacity=cpp;$('cta').style.transform=`scale(${lerp(1.1,1,eo(cpp))})`
+ const lp=clamp((t-(T_END+0.45))/0.45);$('lk').style.opacity=lp;$('lk').style.transform=`scale(${lerp(1.1,1,eo(lp))})`
+}
+</script></body></html>

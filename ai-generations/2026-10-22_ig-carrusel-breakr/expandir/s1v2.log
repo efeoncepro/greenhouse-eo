@@ -1,0 +1,7 @@
+  ⚠ --mask indica dónde editar, pero este comando NO recompone ni verifica la zona protegida. Para una pieza final usa pnpm ai:inpaint image (garantiza delta 0 fuera de la máscara).
+  $ costo estimado ≈ USD 0.045 (1 × 1510 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2-relleno.png (edit) …
+  ✓ 1933KB · gpt-image-2.5-sunburst · 1024x1280 · high
+    usage: in 1443 (img 1280 · txt 163) · out 1510 · total 2953
+done
+✓ ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2.png · contenido original al 82 % desde y=0.180

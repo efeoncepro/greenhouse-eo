@@ -1,0 +1,35 @@
+{
+  "status": "private-ready-for-review",
+  "postId": 252108,
+  "title": "Efeonce es partner de Google Cloud: más posibilidades para conectar tu negocio con la nube y la inteligencia artificial",
+  "url": "https://efeoncepro.com/novedades/efeonce-partner-google-cloud/",
+  "editUrl": "https://efeoncepro.com/wp-admin/post.php?post=252108&action=edit",
+  "author": "Julio Reyes",
+  "categories": [
+    "Novedades Efeonce"
+  ],
+  "format": [
+    "novedad"
+  ],
+  "tags": [
+    "google",
+    "partnership"
+  ],
+  "featuredImage": 252106,
+  "seo": {
+    "_yoast_wpseo_primary_category": "116",
+    "_yoast_wpseo_focuskw": "Efeonce partner de Google Cloud",
+    "_yoast_wpseo_canonical": "https://efeoncepro.com/novedades/efeonce-partner-google-cloud/",
+    "_yoast_wpseo_opengraph-title": "Efeonce es partner de Google Cloud",
+    "_yoast_wpseo_opengraph-description": "Una nueva etapa para conectar Google Cloud, Google Workspace y la inteligencia artificial con los proyectos de tu empresa.",
+    "_yoast_wpseo_opengraph-image": "https://efeoncepro.com/wp-content/uploads/2026/10/efeonce-google-cloud-partner-portada-og.jpg",
+    "_yoast_wpseo_opengraph-image-id": "252106",
+    "_yoast_wpseo_schema_article_type": "NewsArticle",
+    "_yoast_wpseo_meta-robots-noindex": "1",
+    "_greenhouse_editorial_approval": "private-review"
+  },
+  "faqCount": 4,
+  "contentSha256": "ada3346789d766327d60ddc535d8b312d3e3210a4fbc23ae7987ec3a630b6e56",
+  "snapshot": "_gh_google_post_before_252108_20261025_114554",
+  "bannerActive": false
+}

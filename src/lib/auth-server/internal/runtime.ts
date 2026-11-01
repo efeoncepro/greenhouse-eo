@@ -28,6 +28,7 @@ import { createInternalLoginHandler } from './login-http'
 import { PostgresInternalContextStore, PostgresInternalLoginTransactions } from './postgres-store'
 import { getCorporateSessionEvidence, insertCorporateSession } from './postgres-sessions'
 import { createNativeSubjectPort } from './subject-port'
+import { resolveFirstPartyCorporateIdentity } from '../first-party/identity'
 
 export const createRuntimeInternalContexts = ({
   readQuery = query, allowMultiOrganization = internalMultiOrgIssuanceEnabled, now
@@ -131,6 +132,7 @@ export const createInternalAuthRuntime = (deps: {
   personConfig: AuthServerPersonAuthConfig
   personStore: PersonAuthStorePort
   baseSubject: SubjectSessionPort
+  isFirstPartyReturn?: (returnTo: string) => Promise<boolean>
 }) => {
   const { authority, contexts } = createRuntimeInternalContexts()
   const enabled = () => internalAuthEnabled() && deps.personConfig.personAuthEnabled && deps.oauthConfig.oauthEnabled
@@ -195,10 +197,13 @@ export const createInternalAuthRuntime = (deps: {
         correlationId: null,
         details: event.diagnostic ? { diagnostic: event.diagnostic } : {}
       }),
-    completeSession: async identity => {
+    completeSession: async (identity, validatedReturnTo) => {
       if (!enabled()) throw new InternalLoginError('configuration_invalid')
 
-      const enrolled = await resolveEnrolledInternalIdentity({
+      const resolveIdentity = await deps.isFirstPartyReturn?.(validatedReturnTo)
+        ? resolveFirstPartyCorporateIdentity : resolveEnrolledInternalIdentity
+
+      const enrolled = await resolveIdentity({
         ...identity,
         environmentId: deps.oauthConfig.environmentId
       })

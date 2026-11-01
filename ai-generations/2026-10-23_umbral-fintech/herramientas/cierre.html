@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:G;src:url(file:///Library/Fonts/Geist-700.ttf)}
+@font-face{font-family:G5;src:url(file:///Library/Fonts/Geist-500.ttf)}
+@font-face{font-family:G4;src:url(file:///Library/Fonts/Geist-400.ttf)}
+html,body{margin:0;width:1920px;height:1080px;background:#050506;overflow:hidden}
+:root{--amb:#FFA23A;--core:#FFE7B8}
+.stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.haze{position:absolute;left:50%;top:0;width:900px;height:1080px;transform:translateX(-50%);opacity:0;
+ background:radial-gradient(40% 55% at 58% 42%,rgba(255,150,40,.16),rgba(255,150,40,0) 70%);animation:haze 4.5s ease-out forwards}
+@keyframes haze{0%{opacity:0}30%{opacity:1}100%{opacity:.7}}
+.wm{position:relative;display:inline-flex;align-items:flex-end;font-family:G;font-size:230px;letter-spacing:-0.055em;line-height:.8;color:#fff;margin-top:-60px}
+.letters{display:inline-block;clip-path:inset(0 0 0 100%);animation:reveal 1.1s cubic-bezier(.22,.8,.2,1) .75s forwards;
+ text-shadow:0 0 40px rgba(255,170,80,.0)}
+@keyframes reveal{to{clip-path:inset(0 0 0 0)}}
+.bar{display:inline-block;width:.085em;height:.74em;margin-left:.05em;border-radius:.02em;transform-origin:50% 50%;transform:scaleY(0);
+ background:linear-gradient(180deg,var(--core),#fff6e2 45%,var(--core));
+ box-shadow:0 0 .06em .02em var(--amb),0 0 .22em .06em rgba(255,162,58,.75),0 0 .6em .15em rgba(255,140,30,.35);
+ animation:bar .7s cubic-bezier(.3,.9,.2,1) .1s forwards, pulse 1.2s ease-in-out 1.9s 2}
+@keyframes bar{0%{transform:scaleY(0);opacity:0}15%{opacity:1}100%{transform:scaleY(1);opacity:1}}
+@keyframes pulse{50%{filter:brightness(1.25)}}
+.tag{margin-top:70px;font-family:G5;font-size:58px;letter-spacing:-0.02em;color:#fff;opacity:0;transform:translateY(16px);animation:up .7s cubic-bezier(.22,.8,.2,1) 1.9s forwards}
+.sub{margin-top:22px;font-family:G4;font-size:28px;color:rgba(255,255,255,.62);letter-spacing:.01em;opacity:0;animation:up .7s ease-out 2.35s forwards}
+.legal{position:absolute;bottom:56px;width:100%;text-align:center;font-family:G4;font-size:19px;color:rgba(255,255,255,.4);opacity:0;animation:up .6s ease-out 2.6s forwards}
+@keyframes up{to{opacity:1;transform:none}}
+</style></head><body>
+<div class="haze"></div>
+<div class="stage">
+ <div class="wm"><span class="letters">umbra</span><span class="bar"></span></div>
+ <div class="tag">Cruza con lo tuyo.</div>
+ <div class="sub">Tarjeta de prepago desde los 18.</div>
+</div>
+<div class="legal">Umbral es una marca ficticia. Pieza de demostración producida con IA generativa por Efeonce.</div>
+</body></html>

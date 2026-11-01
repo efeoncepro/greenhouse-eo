@@ -1,9 +1,9 @@
 # Public Site WordPress — Inventario Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-10-24 por Claude (inventario focal Nosotros y Partners source-led)
+> **Ultima actualizacion:** 2026-10-24 por Claude (inventario focal Nosotros y Partners source-led; popup Partners en vivo)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime revalidado para Demo 35 (2026-08-22):** WordPress `7.1`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.2.3`, Elementor Pro `4.2.2`, Ohio Extra `3.7.0`. Los conteos agregados de este inventario siguen siendo el snapshot del 2026-06-14.
@@ -96,8 +96,10 @@ La página guarda sólo los widgets y su título; los textos e imágenes salen d
 claves `f###_*` en `_elementor_data`). Header y footer son los de Ohio. La capa del host (`<landing>-source/host.css`)
 neutraliza las colisiones de Ohio y despeja sus rieles fijos (ver
 [Rieles fijos de Ohio](./wordpress-ohio-elementor-layout.md#rieles-fijos-de-ohio-switcher-darklight-y-follow-us)).
-El popup «Quiero ser partner» (Growth CTA en diálogo, TASK-2044/2045) espera el release de los renderers; mientras
-tanto el botón lleva a `/agenda/`.
+El popup «Quiero ser partner» (Growth CTA en diálogo, TASK-2044/2045) está en vivo desde el 2026-10-24: el módulo
+`cierre` usa el lanzador source-led compartido con el CTA `partners-become-partner` (key escrita por el publisher en
+los settings del widget; sin key, el botón lleva a `/agenda/`), y la piel del diálogo carga como capa de página sin
+scope (`body:has(.gh-partners)`) porque el `<dialog>` vive en `<body>`.
 
 ## Fundaciones visuales: color, tipografia y motion
 

@@ -1,0 +1,134 @@
+{
+  "run_at": "2026-10-21T19:26:00-03:00",
+  "timezone": "America/Santiago",
+  "scope": "Auditoría focal de envíos y aperturas; sólo lectura, no radar de nuevas convocatorias",
+  "week_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-21T19:26:00-03:00"
+  },
+  "queries": [
+    {
+      "source": "Local preflight",
+      "query": "MEMORY.md búsqueda focal de secuencias/seguimientos; módulos manual-outreach-follow-up.md y hubspot-follow-up-sequences.md; registros y comprobantes de esta mañana",
+      "result": "Separar programado/enviado/entregado/abierto; no reactivar ni reenviar por falta de aperturas"
+    },
+    {
+      "source": "HubSpot MCP",
+      "query": "get_user_details USER_INFORMATION",
+      "result": "Portal 48713323; identidad de Julio verificada"
+    },
+    {
+      "source": "HubSpot CLI",
+      "query": "sequences list --user-id [ID de Julio] --limit 100 --format json",
+      "pii_redacted": true,
+      "result": "403: endpoint no admite OAuth de usuario; fallback UI"
+    },
+    {
+      "source": "HubSpot CLI help",
+      "query": "sequences list --help; sequences enrollments --help",
+      "result": "Lectura de capacidades; sin enrolar ni mutar"
+    },
+    {
+      "source": "HubSpot MCP properties",
+      "query": "CONTACT keywords tracking_consent,email_tracking,sales_email; definición hs_consent_to_email_tracking",
+      "result": "Estados UNKNOWN,CONSENTED,DENIED,NOT_APPLICABLE; no se modificaron contactos"
+    },
+    {
+      "source": "HubSpot UI",
+      "query": "Settings/data-privacy; solicitud de consentimiento para seguimiento",
+      "url": "https://app.hubspot.com/settings/48713323/data-privacy",
+      "result": "DESACTIVADA valor0"
+    },
+    {
+      "source": "HubSpot UI",
+      "query": "Objects/Activities/email-logging; permiso global y predeterminado de extensión",
+      "url": "https://app.hubspot.com/settings/48713323/objects/activities/email-logging",
+      "result": "Seguimiento permitido valor1; predeterminado de extensión activado; no prueba tracking de cada manual"
+    },
+    {
+      "source": "HubSpot UI",
+      "query": "Sequences Analyze; cinco páginas de plantillas y cuatro de contactos; filtros visibles conservados",
+      "url": "https://app.hubspot.com/sequences/48713323/analyze",
+      "result": "16 contactos,19 filas históricas,10 envíos automáticos,2 contactos con apertura,1 respuesta,1 rebote; nueve en curso,tres programados,seis finalizados,uno en error"
+    },
+    {
+      "source": "HubSpot UI",
+      "query": "Unilever Rendimiento e Inscripciones",
+      "url": "https://app.hubspot.com/sequences/48713323/sequence/317473685/enrollments",
+      "result": "Tres contactos,tres enviados,dos en curso,Denis rebotado20Oct,tres cancelaciones manuales anteriores sin paso"
+    },
+    {
+      "source": "HubSpot UI",
+      "query": "Audit Log/Actividad de seguridad/Subcategorías seguimiento por correo activado y desactivado/últimos30días",
+      "url": "https://app.hubspot.com/settings/48713323/audits",
+      "result": "No se encontraron eventos; no prueba ausencia histórica de cambios"
+    },
+    {
+      "source": "Outlook list_messages",
+      "query": "folder_id=sentitems; filter=sentDateTime ge 2026-10-21T03:00:00Z; order_by=sentDateTime desc; top50; select metadatos",
+      "result": "29 mensajes,has_more=false;14/14IDs del lote manual encontrados; se preservaron sólo metadatos focales",
+      "pii_redacted": true
+    },
+    {
+      "source": "HubSpot MCP get_crm_objects",
+      "query": "EMAIL 14IDs del lote anterior; hs_email_status,hs_email_subject,hs_timestamp,hs_email_direction",
+      "result": "14 devueltos,SENT14,notFound0; sin nuevas actividades"
+    },
+    {
+      "source": "Web primaria",
+      "query": "Lectura manage-email-tracking-consent y email-tracking-consent-guidelines",
+      "urls": [
+        "https://knowledge.hubspot.com/privacy-and-consent/manage-email-tracking-consent",
+        "https://knowledge.hubspot.com/privacy-and-consent/email-tracking-consent-guidelines"
+      ],
+      "result": "Membresía beta distinta de requisito activado; tracking distinto de envío"
+    },
+    {
+      "source": "Web primaria",
+      "query": "Lectura analyze-sequence-enrollment-and-performance-data",
+      "url": "https://knowledge.hubspot.com/sequences/analyze-sequence-enrollment-and-performance-data",
+      "result": "Indicadores de secuencia y pasos; no todo Outlook"
+    },
+    {
+      "source": "Web search",
+      "query": "site:knowledge.hubspot.com log emails BCC address does not track opens clicks",
+      "result": "Documentación primaria de CCO y límites de tracking"
+    },
+    {
+      "source": "Web primaria",
+      "query": "Lectura Log email in your CRM with the BCC or forwarding address y Understand HubSpot email open and click tracking",
+      "urls": [
+        "https://knowledge.hubspot.com/connected-email/log-email-in-your-crm-with-the-bcc-or-forwarding-address",
+        "https://knowledge.hubspot.com/connected-email/understand-hubspot-sales-email-open-and-click-tracking"
+      ],
+      "result": "CCO registra, no añade por sí mismo medición; bloqueo de imágenes puede impedir aperturas"
+    }
+  ],
+  "existing_ids": [
+    "HSP-0015",
+    "HSP-0027",
+    "HSP-0040"
+  ],
+  "new_ids": [],
+  "contractual_control": {
+    "result": "NO_APLICA",
+    "reason": "Auditoría de correo y analítica; no candidata de compra"
+  },
+  "uncertainties": [
+    "Estado histórico de privacidad no probado por consulta sin eventos",
+    "MIME individual no inspeccionado; no certificar píxel de todos los manuales",
+    "SENT no prueba entrega ni bandeja de entrada",
+    "Filtro visible (1)Inscrito por conservado, sin atribuir selección no confirmada"
+  ],
+  "actions": {
+    "external_writes": 0,
+    "sends": 0,
+    "consent_changes": 0,
+    "sequence_changes": 0,
+    "paid_enrichment": 0,
+    "commit": false
+  },
+  "approval": "Sólo investigación autorizada; ninguna nueva autorización inferida",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-sequence-tracking-audit/",
+  "report": "../../follow-up-agent/runs/2026-10-21-1926-auditoria-envios-tracking.md"
+}

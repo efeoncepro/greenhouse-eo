@@ -26,9 +26,9 @@
 - Page tree: 6 containers, one `greenhouse_partners_*` widget each: hero · verdad · ecosistema · banda · como · cierre.
   Repeaters: marquesina (9 logos), servicios (5), partners (10 tiles), pasos (3). `assets/js/partners-landing.js` only
   clones the logo set for the marquee loop.
-- «Quiero ser partner»: the approved popup is a governed Growth Form in a Growth CTA dialog (TASK-2044/2045). Until the
-  renderers (forms 1.1.0, CTA 1.4.0) reach `main`, the button links to `/agenda/` — the previous page's destination.
-  Ready since 2026-10-23: Growth Form `efeonce-partner-application` (form key `eb5c108d-05fc-427b-82b0-4bb161fdbac7`,
+- «Quiero ser partner»: the approved popup is a governed Growth Form in a Growth CTA dialog (TASK-2044/2045), live
+  since 2026-10-24 (see «Popup live» below); without its key the launcher falls back to `/agenda/`.
+  Published 2026-10-23: Growth Form `efeonce-partner-application` (form key `eb5c108d-05fc-427b-82b0-4bb161fdbac7`,
   v2 with HubSpot `direct` to «Lead Gean - Partnership» `4c0066df-…`, smoke 200/200, surface `fhsf-efeonce-partners`;
   `scripts/growth/publish-partner-application-form.ts`) and Growth CTA `partners-become-partner` (`open_growth_form` +
   `presentation: 'dialog'`, WordPress surface `csur-5638aab5-d53c-402a-836b-a0a72ce2c7a4`, key in

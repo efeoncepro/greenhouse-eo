@@ -1,0 +1,9 @@
+Eres un director creativo y diseñador sonoro exigente. Revisa este video de 8 segundos (anuncio de partnership Efeonce con AWS para LinkedIn e Instagram). Grilla prevista a 120 BPM:
+- 0-1,75 s: un diagrama de arquitectura de AWS se arma; cada ícono encaja con un clic; riser al final.
+- 1,75-2,0 s: silencio absoluto mientras la cámara se zambulle en el ícono de Amazon EC2.
+- 2,0 s: golpe 1, fogonazo y entrada a un pasillo de data center; drop de la música.
+- 2-4 s: vuelo acelerando por el pasillo; pulsos de luz en corcheas con clacs.
+- 4,0 s: golpe 2, fogonazo y salida a la órbita, con la Tierra y arcos de luz que convergen en Chile; la música reinicia su drop.
+- 4,6-4,98 s: vacío de la mezcla; sólo sube el sting.
+- 5,0 s: lockup «AHORA SOMOS PARTNERS», logos de Efeonce y AWS y fila de productos, con el pico del sting.
+Responde en español, breve y concreto: 1) ¿tiene alto impacto visual y punch?, 2) ¿imagen y sonido encajan en los golpes?, 3) ¿hay algún tirón, corte o momento que se sienta congelado o que espere cargar?, 4) ¿se lee claro el cierre?, 5) las 3 mejoras más importantes, ordenadas. No inventes tiempos exactos que no puedas oír o ver.

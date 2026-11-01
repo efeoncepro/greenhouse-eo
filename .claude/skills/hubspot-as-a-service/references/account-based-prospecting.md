@@ -63,3 +63,21 @@ en posiciones de plantilla ocupadas: no prueba personas únicas, cobertura funci
 
 Salida: matriz de capability documentada vs verificada, changeset mínimo, mapa por iniciativa y readbacks.
 El estado UI puede quedar pendiente aunque los campos estándar se hayan verificado; no anunciar paridad.
+
+## Readback tras automatización y pedido de alta repetido
+
+La asociación enviada en un create no basta: releer Primary después de la automatización. Si el dominio
+laboral difiere del sitio corporativo, el portal puede crear una Company vacía y reemplazar la principal.
+Reconciliar identidad y asociaciones; cuando la CLI no admite el carril con OAuth, usar UI autenticada
+con el mismo mandato. En el caso observado: tarjeta de la Company correcta → More actions → Establecer
+como principal → Reemplazar como principal → Actualizar; verificar etiqueta Primary y
+`associatedcompanyid` por lectura independiente. No editar ese campo de lectura ni crear una service key.
+
+El reemplazo no fusiona ni elimina la Company vacía; declarar si quedó secundaria. Separar también
+atributos correctos de membresía efectiva: `members-list` con 403 o búsqueda con 400 es verificación
+pendiente, no conjunto vacío ni pertenencia confirmada. Un lifecycle SQL asignado por el portal no es
+calificación humana. Si el operador vuelve a pedir crear a alguien ya registrado, releer identidad,
+email/Primary y devolver la ficha existente antes de cualquier nueva alta.
+
+[Aplicación Mambrino](../../../../docs/commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md):
+contacto, asociación y EMAIL SENT comprobados; secundaria vacía y membresía conservadas como límites.

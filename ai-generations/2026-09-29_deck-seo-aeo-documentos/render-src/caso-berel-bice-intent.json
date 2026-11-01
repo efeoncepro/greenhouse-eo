@@ -1,0 +1,56 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "light",
+  "use": "brochure",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-case",
+  "voice": {
+    "eyebrow": "Caso de éxito",
+    "question": "¿Qué cambió con Berel?",
+    "answer": [
+      "Lo eligen"
+    ]
+  },
+  "figures": [
+    {
+      "value": "+54 %",
+      "label": "tráfico orgánico",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "+120",
+      "label": "páginas de color",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "×2",
+      "label": "citas en respuestas IA",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    },
+    {
+      "value": "+38 %",
+      "label": "búsquedas de la marca",
+      "source": "Google Search Console, GA4 y Efeonce AEO Assessment, 12 meses."
+    }
+  ],
+  "clientLogo": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+    "alt": "Berel"
+  },
+  "selected": 2,
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "object",
+    "plateRef": "ai-generations/2026-10-12_brochure-efeonce-360/caso-berel/final.png",
+    "alt": "Una cubeta Insignia de Berel abierta de la que salen cintas de pintura y los contenidos del blog"
+  },
+  "selection": {
+    "target": "object",
+    "label": "SEO",
+    "participantKind": "department"
+  }
+}

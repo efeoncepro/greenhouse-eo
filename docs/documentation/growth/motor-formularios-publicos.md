@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.4
+> **Version:** 2.6
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-10-24 por Claude (formulario en línea en producción, consentimiento por el acto de suscribirse y suscripción a Glitch, TASK-2053/2054)
+> **Ultima actualizacion:** 2026-10-31 por Claude (píldora que nace abierta y texto de ejemplo «Tu correo» en la suscripción a Glitch)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -261,8 +261,43 @@ una huella del aviso que la persona vio, y HubSpot sólo recibe la suscripción 
 
 **En uso hoy.** Desde el 2026-10-24 la portada del blog (`/blog/`) suscribe a Glitch con la píldora, en la sección de
 Glitch y al pie. Si la portada no tiene un formulario real conectado, no muestra la suscripción (nunca un «¡Listo!» falso).
-Todavía falta comprobar un envío real hecho por una persona (el captcha bloquea al navegador automatizado, como debe), y
-no hay un evento real cargado para la reserva.
+Una suscripción real hecha por una persona ya quedó suscrita en HubSpot (el captcha bloquea al navegador automatizado,
+como debe). No hay un evento real cargado para la reserva.
+
+**Píldora que nace abierta (renderer 1.4.0, 2026-10-31).** Un sitio puede pedir que la píldora aparezca ya abierta, con
+el campo de correo, el botón de envío y el aviso a la vista, en vez del botón que se estira. Sirve para lugares como el
+pie de página, donde no hay espacio para la animación de apertura. Al cargar la página no mueve el foco ni hace saltar la
+pantalla al formulario, y la tecla Esc no la cierra (no tendría sentido convertirla en un botón que la persona nunca
+vio). Enviar, validar el correo, el consentimiento por el acto de suscribirse y las mediciones funcionan igual que en la
+píldora que se abre. Si el sitio no lo pide, nada cambia. El primer uso es la columna de Glitch del pie de página de
+efeoncepro.com. **Todavía no está en producción:** la versión 1.4.0 está en `develop`; producción sirve la 1.2.0, que
+ignora el pedido y muestra el botón de siempre (sin romper nada). Tampoco está en producción la 1.3.0 (logo en el rótulo).
+
+**Texto de ejemplo de Glitch: «Tu correo» (2026-10-31).** El campo de correo de la suscripción a Glitch dice ahora «Tu
+correo» en vez de «Tu correo electrónico», porque el texto largo se cortaba en la columna de 290 px del pie de página. El
+tamaño de letra del campo se mantiene en 16 px a propósito: con menos, el iPhone hace zoom al tocar el campo. Se publicó
+como una versión nueva del formulario (la anterior quedó retirada) y se conservó todo lo demás: textos, aviso (por eso la
+huella del consentimiento no cambia), seguridad y el destino HubSpot. Como es el mismo formulario, también cambió en la
+portada del blog: las siete píldoras de Glitch muestran «Tu correo».
+
+**Reservas de eventos: cómo funcionan hoy y qué va a cambiar.** Todavía no se lanzan eventos reales.
+
+- **Hoy:** la persona deja su correo en la píldora del evento. Greenhouse guarda la reserva, decide si tiene cupo o
+  queda en lista de espera, y envía una copia a un formulario compartido de HubSpot. En HubSpot sólo queda el envío y la
+  propiedad «Último Evento Reservado», que se sobrescribe en cada reserva: no se ve el evento con sus inscritos ni quién
+  quedó confirmado o en espera. Los correos de confirmación y recordatorio están corregidos en local, pero no salen en
+  producción hasta el próximo release. El enlace de la sala es uno solo para todas las personas.
+- **Lo que viene (sin construir):** la sesión es un **webinar de Teams**. Greenhouse sigue a cargo de la reserva, el cupo y
+  la lista de espera. Cuando una persona queda confirmada, Greenhouse la inscribe en el webinar y recibe su **enlace
+  personal**; si alguien cancela, el primero de la espera toma su lugar. Al terminar, Greenhouse lee la asistencia.
+  HubSpot recibe el evento con sus inscritos, cancelados y asistentes en el objeto Eventos de marketing; quien está en
+  espera no se registra ahí.
+- Mientras el conector nativo de Teams con HubSpot siga sin funcionar (caso abierto con el soporte), ese evento en
+  HubSpot lo escribe Greenhouse; si el conector vuelve, lo escribe el conector. Nunca los dos.
+
+El pendiente completo está en el
+[backlog de RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos);
+cómo operarlo, en el [manual para lanzar un evento](../../manual-de-uso/public-site/lanzar-evento-o-webinar.md).
 
 > Detalle técnico: [contrato de runtime](../../architecture/growth-public-forms-runtime-contract.md#formulario-en-línea-y-reserva-por-evento-task-20532054) ·
 > `src/lib/growth/forms/contracts.ts` · `src/lib/growth/forms/readers.ts` · `src/growth-forms-renderer/inline-pill.ts` ·

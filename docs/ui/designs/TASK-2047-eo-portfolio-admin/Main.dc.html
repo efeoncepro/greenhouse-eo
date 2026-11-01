@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Editar proyecto · Portafolio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f0f0f1;color:#1d2327;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;font-size:13px;line-height:1.5}
+a{color:#2271b1}a:hover{color:#135e96}
+.box{background:#fff;border:1px solid #c3c4c7;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+.box-h{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:0 12px;border:0;border-bottom:1px solid #c3c4c7;background:#fff;font:600 14px/1.4 inherit;color:#1d2327;text-align:left;cursor:pointer}
+.lbl{display:block;font-weight:600;margin:0 0 4px}
+.in{box-sizing:border-box;width:100%;min-height:36px;padding:6px 8px;border:1px solid #8c8f94;border-radius:4px;font:inherit;color:#1d2327;background:#fff}
+.help{margin:4px 0 0;color:#50575e;font-size:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border:1px solid #2271b1;border-radius:3px;background:#f6f7f7;color:#2271b1;font:inherit;cursor:pointer;text-decoration:none}
+.btn-p{background:#2271b1;color:#fff}
+.btn-off{border-color:#dcdcde;background:#f6f7f7;color:#757575;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:11px;font-size:12px;font-weight:600}
+.err{color:#b32d2e}
+.side-h{margin:0;padding:10px 12px;border-bottom:1px solid #c3c4c7;font-size:14px;font-weight:600}
+</style>
+</helmet>
+<div style="min-height: 1760px; display: flex; flex-direction: column;">
+  <header style="height: 32px; background: #1d2327; color: #f0f0f1; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px;">
+    <span>Efeonce Group</span>
+    <span>Hola, Ana</span>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; flex: 1 1 auto;">
+    <nav aria-label="Menú principal" style="flex: 0 0 160px; background: #1d2327; color: #f0f0f1; padding: 8px 0;">
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Escritorio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Entradas</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Medios</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Páginas</a>
+      <a href="#" aria-current="page" style="display: block; padding: 8px 12px; color: #fff; background: #2271b1; font-weight: 600; text-decoration: none;">Portafolio</a>
+      <a href="#" style="display: block; padding: 6px 12px 6px 24px; color: #f0f0f1; font-size: 12px; text-decoration: none;">Proyectos</a>
+      <a href="#" style="display: block; padding: 6px 12px 6px 24px; color: #f0f0f1; font-size: 12px; text-decoration: none;">Agregar proyecto</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Apariencia</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Plugins</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Ajustes</a>
+    </nav>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 20px 24px 48px; box-sizing: border-box;">
+      <div style="max-width: 1240px; display: flex; flex-direction: column; gap: 16px;">
+        <a href="Lista.dc.html" style="font-size: 13px;">← Portafolio</a>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <h1 style="margin: 0; font-size: 23px; font-weight: 400;">Un año de campañas en cinco mercados</h1>
+          <span class="chip" style="background: #dcdcde; color: #1d2327;">Borrador</span>
+          <span style="color: #50575e;">Sky Airline · /portafolio/sky-airline-un-ano-de-campanas/</span>
+        </div>
+
+        <div role="alert" class="box" style="padding: 12px 16px; border-color: #d63638; display: flex; flex-direction: column; gap: 6px;">
+          <p style="margin: 0; font-weight: 600;" class="err">No guardamos: hay 2 errores.</p>
+          <a href="#resultados">Resultados · la cifra 2 no tiene fuente.</a>
+          <a href="Piezas.dc.html">Capítulos y piezas · el reel de Black Sky tiene voz y no tiene subtítulos.</a>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+          <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-cliente">
+                <span style="flex: 1 1 auto;">Cliente y contexto</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">Completo</span>
+              </button>
+              <div id="s-cliente" style="padding: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                <div>
+                  <label class="lbl" for="f-cliente">Cliente</label>
+                  <input class="in" id="f-cliente" value="Sky Airline">
+                </div>
+                <div>
+                  <label class="lbl" for="f-industria">Industria</label>
+                  <select class="in" id="f-industria"><option>Aerolínea</option></select>
+                </div>
+                <div style="grid-column: span 2;">
+                  <span class="lbl">Logo</span>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 120px; height: 48px; border: 1px dashed #8c8f94; display: flex; align-items: center; justify-content: center; color: #50575e; font-size: 12px;">[logo de Sky]</div>
+                    <button type="button" class="btn">Cambiar logo</button>
+                    <span class="help" style="margin: 0;">Desde la biblioteca de medios. Se muestra sólo si la aprobación incluye el logo.</span>
+                  </div>
+                </div>
+                <div style="grid-column: span 2;">
+                  <label class="lbl" for="f-titulo">Título del proyecto</label>
+                  <input class="in" id="f-titulo" value="Un año de campañas en cinco mercados">
+                </div>
+                <div>
+                  <label class="lbl" for="f-audiencia">Para quién</label>
+                  <textarea class="in" id="f-audiencia" rows="3" aria-describedby="h-audiencia">Viajeros de cinco mercados, con ofertas que cambian por país</textarea>
+                  <p class="help" id="h-audiencia">A quién le habla el trabajo, en una frase.</p>
+                </div>
+                <div>
+                  <label class="lbl" for="f-necesidad">Qué necesitaba</label>
+                  <textarea class="in" id="f-necesidad" rows="3" aria-describedby="h-necesidad">Lanzar campañas comerciales en días sin descuidar la marca</textarea>
+                  <p class="help" id="h-necesidad">El problema del cliente, no lo que hicimos.</p>
+                </div>
+                <fieldset style="grid-column: span 2; border: 0; padding: 0; margin: 0;">
+                  <legend class="lbl">Línea</legend>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid #8c8f94; border-radius: 18px;"><input type="radio" name="linea"> Growth</label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 2px solid #bb1954; border-radius: 18px; color: #8f1240; font-weight: 600;"><input type="radio" name="linea" checked> Brand</label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid #8c8f94; border-radius: 18px;"><input type="radio" name="linea"> Engine</label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid #8c8f94; border-radius: 18px;"><input type="radio" name="linea"> Voice</label>
+                    <label style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid #8c8f94; border-radius: 18px;"><input type="radio" name="linea"> Revenue</label>
+                  </div>
+                </fieldset>
+                <fieldset style="border: 0; padding: 0; margin: 0;">
+                  <legend class="lbl">Servicios</legend>
+                  <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label><input type="checkbox" checked> Creative Services</label>
+                    <label><input type="checkbox"> Creative Studio</label>
+                    <label><input type="checkbox"> Media &amp; Distribution</label>
+                    <a href="#">Ver los 9 del catálogo</a>
+                  </div>
+                </fieldset>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                  <div style="display: flex; gap: 12px;">
+                    <div style="flex: 1 1 0;">
+                      <label class="lbl" for="f-desde">Desde</label>
+                      <input class="in" id="f-desde" value="2025-09">
+                    </div>
+                    <div style="flex: 1 1 0;">
+                      <label class="lbl" for="f-hasta">Hasta</label>
+                      <input class="in" id="f-hasta" value="2026-09">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="lbl" for="f-mercados">Mercados</label>
+                    <input class="in" id="f-mercados" value="Chile, Perú, Argentina">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">Reto, idea y ejecución</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">3 de 3 completos</span>
+              </button>
+            </section>
+
+            <section class="box" id="resultados">
+              <button type="button" class="box-h" aria-expanded="true" aria-controls="s-resultados">
+                <span style="flex: 1 1 auto;">Resultados</span>
+                <span class="chip err" style="background: #fcf0f1;">1 error</span>
+              </button>
+              <div id="s-resultados" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <p class="help" style="margin: 0;">Toda cifra lleva su fuente. Sin fuente no se guarda. El primer porcentaje activa la órbita de medida de la entrada.</p>
+                <div style="display: grid; grid-template-columns: 96px minmax(0, 2fr) 120px minmax(0, 2fr) 36px; gap: 8px; align-items: start;">
+                  <span class="lbl">Valor</span><span class="lbl">Qué mide</span><span class="lbl">Tipo</span><span class="lbl">Fuente</span><span></span>
+                  <input class="in" aria-label="Valor de la cifra 1" value="88">
+                  <input class="in" aria-label="Qué mide la cifra 1" value="de las piezas, entregadas a tiempo">
+                  <select class="in" aria-label="Tipo de la cifra 1"><option>Porcentaje</option></select>
+                  <input class="in" aria-label="Fuente de la cifra 1" value="Caso «Un año con Sky», 2026">
+                  <button type="button" class="btn" aria-label="Quitar la cifra 1" style="padding: 0;">×</button>
+                  <input class="in" aria-label="Valor de la cifra 2" value="4">
+                  <input class="in" aria-label="Qué mide la cifra 2" value="campañas comerciales en el año">
+                  <select class="in" aria-label="Tipo de la cifra 2"><option>Número</option></select>
+                  <div>
+                    <input class="in" aria-label="Fuente de la cifra 2" aria-invalid="true" aria-describedby="e-fuente-2" value="" style="border-color: #d63638;">
+                    <p class="help err" id="e-fuente-2">Falta la fuente: dónde está registrada esta cifra.</p>
+                  </div>
+                  <button type="button" class="btn" aria-label="Quitar la cifra 2" style="padding: 0;">×</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #f6f7f7; border-radius: 4px;">
+                  <span style="font-size: 20px; font-weight: 600; color: #0e6b64;">88 %</span>
+                  <span style="color: #50575e;">Órbita de medida en la entrada: «de las piezas, entregadas a tiempo».</span>
+                </div>
+                <div><button type="button" class="btn">Agregar resultado</button></div>
+              </div>
+            </section>
+
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">Capítulos y piezas</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px; margin-right: 8px;">4 capítulos · 9 piezas</span>
+                <span class="chip err" style="background: #fcf0f1;">1 error</span>
+              </button>
+            </section>
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">Testimonio y equipo</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">Testimonio · 3 créditos</span>
+              </button>
+            </section>
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">Enlaces</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">Sin caso del blog</span>
+              </button>
+            </section>
+            <section class="box">
+              <button type="button" class="box-h" aria-expanded="false">
+                <span style="flex: 1 1 auto;">SEO</span>
+                <span style="color: #50575e; font-weight: 400; font-size: 12px;">Título y descripción listos</span>
+              </button>
+            </section>
+          </div>
+
+          <aside aria-label="Estado y publicación" style="flex: 1 1 300px; max-width: 360px; display: flex; flex-direction: column; gap: 16px;">
+            <section class="box">
+              <h2 class="side-h">Estado</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <p style="margin: 0;"><strong>Borrador</strong> · revisión 3</p>
+                <p style="margin: 0; color: #50575e;">Último cambio: Ana, 23 oct. — «Agrega Cyber Sky»</p>
+                <div>
+                  <label class="lbl" for="f-mensaje">Qué cambiaste (queda en el historial)</label>
+                  <textarea class="in" id="f-mensaje" rows="2">Suma la cifra de campañas</textarea>
+                </div>
+                <button type="button" class="btn btn-p" style="align-self: flex-start;">Guardar</button>
+              </div>
+            </section>
+
+            <section class="box">
+              <h2 class="side-h">Aprobación del cliente</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                  <label class="lbl" for="f-ref">Referencia</label>
+                  <input class="in" id="f-ref" value="" placeholder="Dónde quedó registrada" aria-describedby="h-ref">
+                  <p class="help" id="h-ref">Un enlace o código del registro de la aprobación; nunca el correo ni el nombre del contacto.</p>
+                </div>
+                <div>
+                  <label class="lbl" for="f-fecha">Fecha</label>
+                  <input class="in" id="f-fecha" type="date">
+                </div>
+                <fieldset style="border: 0; padding: 0; margin: 0;">
+                  <legend class="lbl">Qué aprobó</legend>
+                  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px;">
+                    <label><input type="checkbox"> Logo</label>
+                    <label><input type="checkbox"> Piezas</label>
+                    <label><input type="checkbox"> Cifras</label>
+                    <label><input type="checkbox"> Testimonio</label>
+                  </div>
+                </fieldset>
+              </div>
+            </section>
+
+            <section class="box">
+              <h2 class="side-h">Falta para publicar</h2>
+              <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px;">
+                  <li><a href="#f-ref">Registrar la aprobación del cliente: referencia, fecha y qué aprobó.</a></li>
+                  <li><a href="#resultados">La cifra 2 no tiene fuente.</a></li>
+                  <li><a href="Piezas.dc.html">El reel de Black Sky tiene voz y no tiene subtítulos.</a></li>
+                </ul>
+                <button type="button" class="btn btn-off" aria-disabled="true" aria-describedby="r-publicar" style="align-self: flex-start;">Publicar</button>
+                <p class="help" id="r-publicar" style="margin: 0;">Se habilita cuando no falte nada de esta lista.</p>
+              </div>
+            </section>
+
+            <section class="box">
+              <h2 class="side-h">Historial</h2>
+              <ol style="list-style: none; margin: 0; padding: 0;">
+                <li style="padding: 10px 12px; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>r3</strong> · Ana · 23 oct.</span>
+                  <span style="color: #50575e;">«Agrega Cyber Sky»</span>
+                  <span style="color: #50575e; font-size: 12px;">Vigente</span>
+                </li>
+                <li style="padding: 10px 12px; border-bottom: 1px solid #f0f0f1; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>r2</strong> · Agente · 22 oct.</span>
+                  <span style="color: #50575e;">«Carga desde la entrada de Ohio»</span>
+                  <span style="display: flex; gap: 12px;"><a href="#">Ver</a><a href="Publicado.dc.html">Restaurar</a></span>
+                </li>
+                <li style="padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;">
+                  <span><strong>r1</strong> · Agente · 22 oct.</span>
+                  <span style="color: #50575e;">«Borrador inicial»</span>
+                  <span style="display: flex; gap: 12px;"><a href="#">Ver</a><a href="Publicado.dc.html">Restaurar</a></span>
+                </li>
+              </ol>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

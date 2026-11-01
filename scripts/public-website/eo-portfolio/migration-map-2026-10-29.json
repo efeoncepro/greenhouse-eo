@@ -1,0 +1,187 @@
+{
+  "schema": "eo-portfolio-migration-map.v1",
+  "note": "TASK-2049. Texto de cada proyecto escrito sólo con lo que ya publica su entrada de Ohio (cliente, tarea, descripción, diseño y estrategia). Sin cifras: ninguna entrada trae una con fuente. La aprobación es la decisión del operador del 2026-10-29 sobre los 15 proyectos ya publicados en /project/.",
+  "approval": { "date": "2026-10-29", "scope": ["logo", "pieces"], "refPrefix": "Decisión del operador 2026-10-29; publicado en efeoncepro.com" },
+  "projects": [
+    {
+      "id": 248783, "slug": "bresler-sitio-del-concurso", "industry": "helados", "line": "growth", "kind": "website", "services": ["creative-services"], "keepPeriod": true,
+      "title": "Sitio del concurso de verano: diseño y desarrollo de punta a punta",
+      "audience": "Personas de todas las edades que participan en el concurso de Bresler desde el teléfono",
+      "need": "Una plataforma del concurso simple y segura para participar, ver los premios, leer las bases y conocer a los ganadores",
+      "chapter": "El sitio del concurso",
+      "steps": {
+        "challenge": { "title": "Un flujo simple para todas las edades", "body": "El concurso necesitaba un sitio propio: un formulario con las validaciones que piden las bases oficiales, páginas de premios, bases legales y ganadores, todo con la estética promocional de la campaña." },
+        "idea": { "title": "Una landing que lleva a participar", "body": "Una landing principal con narrativa visual fresca y orientada a conversión, y alrededor un ecosistema de páginas que ordenan la experiencia de forma simple y transparente." },
+        "execution": { "title": "Diseño UX/UI, arquitectura y desarrollo", "body": "Diseñamos y construimos la plataforma completa: arquitectura de información, interfaz, formulario de participación, landing de premios, bases legales pensadas para el teléfono y sección de ganadores, con la puesta en marcha funcional." }
+      }
+    },
+    {
+      "id": 248347, "slug": "marca-chile-infografias", "industry": "sector-publico", "line": "brand", "kind": "campaign", "services": ["creative-services"], "keepPeriod": true,
+      "title": "Propuesta creativa: dos infografías póster sobre los atributos de Chile",
+      "audience": "Inversionistas, exportadores y público internacional que mira a Chile como destino",
+      "need": "Comunicar de forma visual y sintética los atributos que diferencian a Chile para fortalecer su imagen país",
+      "chapter": "Las infografías",
+      "steps": {
+        "challenge": { "title": "Atributos país en una sola mirada", "body": "Marca Chile proyecta la identidad y las ventajas competitivas del país hacia el exterior. El encargo fue transmitir atributos diferenciadores de forma visual y sintética." },
+        "idea": { "title": "Infografías con formato de póster", "body": "Dos piezas de lectura inmediata: la primera destaca a Chile como número uno de Latinoamérica en atractivo para invertir en energías renovables." },
+        "execution": { "title": "Íconos claros y paletas de contraste", "body": "Diseñamos las dos infografías con íconos claros y paletas contrastantes que refuerzan el mensaje de innovación y sostenibilidad." }
+      }
+    },
+    {
+      "id": 248334, "slug": "gobierno-de-santiago-cuidando-a-quienes-cuidan", "industry": "sector-publico", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Campaña «Cuidando a quienes cuidan»: redes, video e impresos",
+      "audience": "Personas que cuidan a un familiar con dependencia en la Región Metropolitana, en su mayoría mujeres",
+      "need": "Informar y sensibilizar sobre el rol de las personas cuidadoras y acercarles el programa que las apoya",
+      "chapter": "La campaña",
+      "steps": {
+        "challenge": { "title": "Visibilizar a quienes cuidan", "body": "El programa «Cuidando a quienes cuidan» reconoce y apoya a las personas cuidadoras con capacitación, contención psicosocial, información y redes de apoyo. Había que llegar a ellas con un mensaje claro y cercano." },
+        "idea": { "title": "Piezas cercanas y coherentes", "body": "Una línea de piezas que informa sin perder calidez, con enfoque inclusivo y de derechos, igual en redes, video e impresos." },
+        "execution": { "title": "Redes, video, impresos y textos", "body": "Diseñamos las piezas para redes sociales, editamos los videos, preparamos los impresos y escribimos los textos de la campaña para el programa y para el Gobierno de Santiago." }
+      }
+    },
+    {
+      "id": 246154, "slug": "sky-airline-fiestas-patrias-peru", "client": "Sky Airline", "industry": "aerolinea", "line": "brand", "kind": "campaign", "services": ["creative-services"], "keepPeriod": true,
+      "title": "Propuesta de campaña para Fiestas Patrias Perú en Meta y TikTok",
+      "audience": "Viajeros peruanos que celebran Fiestas Patrias y siguen a Sky en Meta y TikTok",
+      "need": "Una campaña de Fiestas Patrias que trascendiera lo promocional y conectara con el espíritu y la diversidad del Perú",
+      "chapter": "La propuesta",
+      "steps": {
+        "challenge": { "title": "Más que una promoción", "body": "Para Fiestas Patrias 2025, Sky buscaba una campaña que conectara de verdad con la diversidad del Perú, más allá de la oferta de precios." },
+        "idea": { "title": "Lo que nos hace únicos", "body": "Un insight emocional: celebrar lo que hace único a cada peruano, desde cada región y forma de ser, con el avión como metáfora de unión y orgullo nacional." },
+        "execution": { "title": "Piezas para feed, stories y TikTok", "body": "Diseñamos piezas para Meta (feed y stories) y una idea creativa tipo creator para TikTok, con un lenguaje gráfico moderno y símbolos culturales reinterpretados dentro de la estética de la marca." }
+      }
+    },
+    {
+      "id": 223620, "slug": "eusari-menoplay", "industry": "salud", "line": "growth", "kind": "campaign", "services": ["creative-services", "media-distribution"], "keepPeriod": true,
+      "title": "MenoPlay: identidad, anuncios, video, sitio web y email marketing",
+      "audience": "Mujeres que buscan aliviar los síntomas de la menopausia con un suplemento diario",
+      "need": "Fortalecer la presencia de MenoPlay en el mercado con una comunicación y un diseño integrales",
+      "chapter": "La marca y sus canales",
+      "steps": {
+        "challenge": { "title": "Una marca nueva en una categoría sensible", "body": "Eusari Nutrition creó MenoPlay, una mezcla diaria de diez ingredientes naturales para la menopausia. La marca necesitaba presencia en el mercado y una comunicación a la altura del producto." },
+        "idea": { "title": "Una estrategia integral", "body": "Una sola línea de comunicación y diseño que acompaña a la marca desde su identidad hasta la publicidad y el marketing digital." },
+        "execution": { "title": "De la identidad al email", "body": "Diseñamos la identidad visual, los anuncios para Meta, la edición y animación de los videos promocionales, el sitio web y el email marketing." }
+      }
+    },
+    {
+      "id": 223616, "slug": "fivest-identidad-visual", "industry": "construccion", "line": "brand", "kind": "campaign", "services": ["creative-services"], "keepPeriod": true,
+      "title": "Identidad visual y guía de estilo para paneles acústicos de madera",
+      "audience": "Arquitectos, diseñadores y empresas que buscan revestimientos con diseño y confort acústico",
+      "need": "Una identidad que transmitiera la elegancia y el enfoque sostenible de la marca sin perder coherencia ni funcionalidad",
+      "chapter": "La identidad",
+      "steps": {
+        "challenge": { "title": "Elegancia y sostenibilidad a la vez", "body": "Fivest fabrica paneles acústicos decorativos de madera que combinan diseño y funcionalidad. Cada elemento visual tenía que transmitir esa sofisticación y su enfoque sostenible." },
+        "idea": { "title": "Equilibrio entre sofisticación y función", "body": "Una identidad que equilibra sofisticación, sostenibilidad y funcionalidad: Trirong para títulos, Avenir Next Pro para textos y una paleta de tonos terrosos y verdes." },
+        "execution": { "title": "Guía de estilo y aplicaciones", "body": "Desarrollamos la guía de estilo y la identidad visual, con la dirección de arte que asegura coherencia y reconocimiento en todas sus aplicaciones." }
+      }
+    },
+    {
+      "id": 246155, "slug": "flick-identidad-y-web", "industry": "retail", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Identidad visual, redes sociales, sitio web y anuncios",
+      "audience": "Personas que compran electrodomésticos, artículos para el hogar y productos outdoor",
+      "need": "Consolidar una identidad visual coherente y potenciar la presencia de la marca en el mercado",
+      "chapter": "La marca",
+      "steps": {
+        "challenge": { "title": "Una marca con muchas categorías", "body": "Flick vende electrodomésticos, línea blanca, hogar, mugs y productos outdoor. Necesitaba una identidad que reuniera todo eso y una presencia digital más fuerte." },
+        "idea": { "title": "Una identidad para todos los canales", "body": "Una estrategia de comunicación y diseño que parte de la identidad y se extiende a redes, sitio web y publicidad." },
+        "execution": { "title": "Identidad, redes, web y anuncios", "body": "Desarrollamos la identidad visual, el diseño para redes sociales, el diseño web y los anuncios publicitarios." }
+      }
+    },
+    {
+      "id": 246156, "slug": "ghamadent-identidad-y-web", "industry": "salud", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Identidad profesional, campañas en redes y sitio web para una clínica dental",
+      "audience": "Pacientes que buscan una clínica dental de confianza y quieren agendar en línea",
+      "need": "Una identidad que transmita confianza y una presencia digital que atraiga nuevos pacientes",
+      "chapter": "La clínica",
+      "steps": {
+        "challenge": { "title": "Confianza desde la primera mirada", "body": "Ghamadent es una clínica dental chilena. Necesitaba una imagen profesional que reflejara sus valores y más visibilidad para atraer nuevos pacientes." },
+        "idea": { "title": "Identidad, campañas y sitio", "body": "Una identidad visual profesional como base, campañas en Facebook e Instagram para la visibilidad y un sitio que facilite agendar." },
+        "execution": { "title": "Del logo a las citas en línea", "body": "Creamos la identidad visual, diseñamos el contenido y los anuncios para redes sociales y lanzamos un sitio web responsive con información de los servicios y agenda de citas en línea." }
+      }
+    },
+    {
+      "id": 223623, "slug": "ssilva-campanas-digitales", "industry": "inmobiliaria", "line": "growth", "kind": "campaign", "services": ["creative-services", "media-distribution"],
+      "title": "Campañas digitales en Meta y Google Ads para una inmobiliaria",
+      "audience": "Personas que buscan invertir en una propiedad o encontrar su hogar",
+      "need": "Mejorar el posicionamiento de la inmobiliaria con campañas digitales efectivas",
+      "chapter": "Las campañas",
+      "steps": {
+        "challenge": { "title": "Destacar en el mercado inmobiliario", "body": "SSilva gestiona, desarrolla y vende propiedades. Necesitaba fortalecer su presencia digital frente a una competencia intensa." },
+        "idea": { "title": "Campañas pensadas para cada plataforma", "body": "Una línea de comunicación para anuncios en redes sociales y en Google Ads, con una optimización visual pensada para cada formato." },
+        "execution": { "title": "Piezas para Meta y Google Ads", "body": "Diseñamos los anuncios publicitarios, desarrollamos las piezas para Meta y Google Ads y optimizamos su visual para las campañas digitales." }
+      }
+    },
+    {
+      "id": 223618, "slug": "motogas-redes-y-campanas", "industry": "energia", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Identidad, redes sociales y anuncios para cuatro marcas de gas",
+      "audience": "Hogares que compran gas a domicilio a Don Julio, Rey del Gas, Lipiestación y Lipirecoleta",
+      "need": "Fortalecer la identidad visual y la presencia digital de las cuatro marcas de la empresa",
+      "chapter": "Las marcas",
+      "steps": {
+        "challenge": { "title": "Cuatro marcas, una empresa", "body": "Motogas distribuye gas con cuatro marcas: Don Julio, Rey del Gas, Lipiestación y Lipirecoleta. Cada una necesitaba una comunicación coherente y efectiva con su audiencia." },
+        "idea": { "title": "Una estrategia integral", "body": "Una estrategia de comunicación y diseño común, con contenido y campañas creativas para cada marca en redes sociales." },
+        "execution": { "title": "Identidad, redes y anuncios", "body": "Desarrollamos la identidad visual, el diseño para redes sociales y los anuncios publicitarios de las marcas." }
+      }
+    },
+    {
+      "id": 223615, "slug": "nutribait-redes-sociales", "industry": "alimentos", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Piezas para redes sociales y campañas promocionales",
+      "audience": "Consumidores que cuidan su alimentación y buscan snacks saludables y sin azúcar",
+      "need": "Reforzar el posicionamiento saludable y accesible de la marca e impulsar la distribución de sus productos",
+      "chapter": "Las piezas",
+      "steps": {
+        "challenge": { "title": "Lo saludable, también cercano", "body": "NutriBait distribuye alimentos saludables, snacks funcionales y productos sin azúcar, como Powerful Drink, Nutkao y Crunchy, en retail y venta directa." },
+        "idea": { "title": "Una estética positiva y colorida", "body": "Una identidad visual positiva, colorida y cercana, pensada para conectar con consumidores conscientes del bienestar." },
+        "execution": { "title": "Redes y activación de marca", "body": "Creamos las piezas gráficas para redes sociales, las campañas promocionales y los elementos de activación de marca." }
+      }
+    },
+    {
+      "id": 223617, "slug": "pabellontogo-menu-y-redes", "industry": "gastronomia", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Carta de menú, packaging y piezas para redes sociales",
+      "audience": "Personas que almuerzan en Santiago y buscan comida casera venezolana y latina a domicilio",
+      "need": "Una marca vibrante y cercana que destaque en redes y en el punto de venta",
+      "chapter": "Menú y redes",
+      "steps": {
+        "challenge": { "title": "Sabor de casa, formato urbano", "body": "Pabellón To Go ofrece almuerzos rápidos con sabores venezolanos y latinos, como pabellón criollo, pastichos y jugos naturales, en Santiago de Chile." },
+        "idea": { "title": "Lo tradicional con códigos modernos", "body": "Una estética vibrante y llamativa que combina lo tradicional con códigos visuales modernos, para destacar en digital y en el local." },
+        "execution": { "title": "Digital e impreso", "body": "Creamos el contenido gráfico para redes sociales y diseñamos las piezas impresas: cartas de menú, packaging y promociones." }
+      }
+    },
+    {
+      "id": 223787, "slug": "big-house-menu-y-redes", "industry": "gastronomia", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Carta de menú ilustrada e identidad para redes sociales",
+      "audience": "Público joven y casual que busca comida rápida, sushi y chorrillanas",
+      "need": "Una carta y unas redes que transmitan el estilo urbano, accesible y sabroso del restaurante",
+      "chapter": "Menú y redes",
+      "steps": {
+        "challenge": { "title": "Un menú que se lea rápido", "body": "Big House mezcla cocina rápida con sushi, handrolls y chorrillanas. Necesitaba una carta clara y una presencia en redes acorde a su carácter." },
+        "idea": { "title": "Doodles y colores vibrantes", "body": "Ilustraciones estilo doodle, colores vibrantes y jerarquías visuales que facilitan la lectura y refuerzan el carácter informal del local." },
+        "execution": { "title": "Carta y contenido para redes", "body": "Diseñamos la carta de menú ilustrada y el contenido gráfico para redes sociales, con promociones y platos destacados." }
+      }
+    },
+    {
+      "id": 223841, "slug": "beebot-identidad-y-redes", "industry": "retail", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Identidad visual y piezas para redes sociales de una tienda online",
+      "audience": "Audiencias jóvenes y emprendedoras que compran tecnología, hogar y belleza en línea",
+      "need": "Una identidad vibrante que proyecte cercanía, dinamismo y espíritu emprendedor",
+      "chapter": "La marca",
+      "steps": {
+        "challenge": { "title": "Destacar en fechas de alto ruido", "body": "BeeBot vende tecnología, gadgets, hogar, belleza y emprendimiento, con promociones constantes en fechas como Cyber Days. Necesitaba un estilo propio y reconocible." },
+        "idea": { "title": "Colorida, lúdica y urbana", "body": "Una identidad versátil y reconocible, con un tono cercano y juvenil, que conecta con audiencias jóvenes y emprendedoras." },
+        "execution": { "title": "Identidad y campañas en redes", "body": "Diseñamos la identidad visual y las piezas para Instagram y Facebook, incluidas las campañas promocionales." }
+      }
+    },
+    {
+      "id": 223619, "slug": "dmark-store-redes-sociales", "industry": "alimentos", "line": "brand", "kind": "campaign", "services": ["creative-services"],
+      "title": "Contenido para redes sociales de un e-commerce de alimentos",
+      "audience": "Hogares que compran carnes, frutas y verduras en línea con despacho a domicilio",
+      "need": "Potenciar las categorías de productos y fortalecer la identidad visual del e-commerce",
+      "chapter": "Las piezas",
+      "steps": {
+        "challenge": { "title": "Cada categoría, reconocible", "body": "Dmark Store vende alimentos frescos y congelados, carnes premium, pollos, frutas y verduras con despacho a domicilio. Sus redes tenían que diferenciar cada categoría." },
+        "idea": { "title": "Moderna, cercana y apetitosa", "body": "Una estética con énfasis en claridad visual, dinamismo gráfico y refuerzo de marca." },
+        "execution": { "title": "Promociones, fechas y marcas propias", "body": "Diseñamos el contenido para redes sociales con foco en promociones, fechas especiales, categorías de productos y el branding de sus productos propios." }
+      }
+    }
+  ]
+}

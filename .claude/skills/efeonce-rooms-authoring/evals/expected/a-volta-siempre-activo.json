@@ -1,0 +1,38 @@
+{
+  "caseId": "a-volta-siempre-activo",
+  "about": "Sala esperada como criterio, no como texto literal. Cada clave la verifica score.mjs como chequeo esperado; las cinco métricas binarias deciden el PASS.",
+  "roomDataOrigin": "synthetic",
+  "profiles": { "includes": ["creative", "seo-aeo"] },
+  "chapters": { "min": 4, "max": 8 },
+  "scenes": {
+    "required": ["showcase", "cycle", "answers", "team"],
+    "forbidden": []
+  },
+  "showcase": { "minContexts": 2 },
+  "answers": { "basis": "measured", "capturedAtDate": "2026-10-20", "minQuestions": 3 },
+  "cycleTerms": { "response": "24", "rounds": "(?:2|dos)" },
+  "team": { "minPeople": 3 },
+  "evidence": { "minItems": 2, "minDiagnosticBlocks": 1 },
+  "invitations": {
+    "mustInclude": [
+      "carla.mendez@volta-bikes.example",
+      "tomas.ruiz@volta-bikes.example",
+      "andrea.soto@volta-bikes.example"
+    ]
+  },
+  "forbiddenPatterns": [
+    { "pattern": "https?://", "why": "Ni URLs ni rutas en la sala." },
+    { "pattern": "(?:\\$\\s?\\d|\\bUF\\s?\\d|\\bCLP\\b)", "why": "El deal no declara precio: la sala no lo muestra." },
+    { "pattern": "public/demo|\\.webp\\b", "why": "Las piezas no se nombran por archivo ni ruta." }
+  ],
+  "previewBeforePublish": { "as": "buyer" },
+  "humanCriteria": [
+    "El primer capítulo muestra trabajo o un hallazgo, no una portada vacía.",
+    "showcase usa solo superficies con formato real (feed, story, ooh y, si se usa el KV, web); las notas explican decisiones de construcción.",
+    "answers usa las preguntas de la Radiografía, con sus fuentes y la fecha de captura; ninguna respuesta medida se inventa.",
+    "cycle usa los términos de la propuesta: 24 horas hábiles y dos rondas.",
+    "Precio, fecha del primer entregable y meta numérica quedan fuera o dichos como pendientes en palabras.",
+    "No se invita a Rodrigo Paz ni a logistica@volta-bikes.example.",
+    "El aviso a la persona dice qué se publicó, a quién se invitó, qué quedó fuera y cómo revertir."
+  ]
+}

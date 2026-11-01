@@ -1,5 +1,9 @@
 # Demo 35 Blog Magazine
 
+> **Retired (2026-10-29):** the source page `225984` (`/homedemo35-elementor/`) is in the trash with a Yoast 301 to `/`
+> (`scripts/public-website/retire-ohio-demos.php`, operator request). The work copy `251875` (publish + noindex) was not
+> touched. Everything below is history.
+
 > **Historical (2026-10-24):** `/blog/` (`18456`) no longer comes from Demo 35. Since 2026-10-24 it serves the blog home
 > v3 (`eo-blog-home` + PDR-029 content model): load `references/blog-home-operation.md` and
 > `docs/architecture/public-site/BLOG_HOME_RUNTIME_V1.md` instead. Keep this file only for the protected source `225984`

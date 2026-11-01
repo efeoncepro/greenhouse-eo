@@ -1,5 +1,12 @@
 # Rooms — flujos y estados V1
 
+> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
+> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
+> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
+> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
+> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+
+
 Fecha: 2026-10-07. **Proposed.** [Contrato](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) · [Experiencia](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_V1.md).
 
 ## Contrato de interacción visual

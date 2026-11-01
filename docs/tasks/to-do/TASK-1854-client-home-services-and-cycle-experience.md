@@ -72,7 +72,7 @@ Reglas: BFF hoja, productores como SoT, autorización server-side por objeto, no
 - `docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md`.
 - `docs/context/00_INDEX.md`, `docs/context/10_experiencia-cliente.md` y `docs/context/05_voz-tono-estilo.md`.
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
+- `docs/tasks/to-do/TASK-2063-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
 - Skills: greenhouse-task-planner y greenhouse-documentation-governor; al implementar, skill de dominio y greenhouse-qa-release-auditor.
 - `DESIGN.md`, UI_PLATFORM_AGENT_INVARIANTS.md y UI_FEATURE_AGENT_INVARIANTS.md bajo docs/architecture/agent-invariants; `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`. Invocar greenhouse-ai-design-studio antes de JSX.
 
@@ -80,7 +80,7 @@ Reglas: BFF hoja, productores como SoT, autorización server-side por objeto, no
 
 ### Depends on
 
-TASK-1852/1853 para la base. TASK-1690 bloquea sección SEO; TASK-289 bloquea clasificación de revisiones. TASK-1849 bloquea destino Insights, no el primer fold restante; no enlazar a páginas no habilitadas. TASK-1834 conserva retorno de login.
+TASK-1852/1853 para la base. TASK-1690 bloquea sección SEO; TASK-289 bloquea clasificación de revisiones. TASK-1849 bloquea destino Insights, no el primer fold restante; no enlazar a páginas no habilitadas. TASK-2063 conserva retorno de login.
 
 ### Blocks / Impacts
 
@@ -262,7 +262,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ## Out of Scope
 
-- Readers/backend TASK-1853, login TASK-1834, UI Insights TASK-1849, centro de notificaciones TASK-693, motor de aprobación de assets o scorecard BCS/SLA.
+- Readers/backend TASK-1853, login TASK-2063, UI Insights TASK-1849, centro de notificaciones TASK-693, motor de aprobación de assets o scorecard BCS/SLA.
 - Sin commit/push/deploy, cambios live ni envíos como consecuencia de registrar la task. Subagentes y cambios de rama no autorizados.
 
 ## Detailed Spec
@@ -291,7 +291,7 @@ Slice 1 → Slice 2 → Slice 3. Contrato/negativos antes de habilitación; stag
 
 ### Feature flags / cutover
 
-Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-1834 controla de forma independiente login legacy/nativo/recovery.
+Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-2063 controla de forma independiente login legacy/nativo/recovery.
 
 ### Rollback plan per slice
 
@@ -329,7 +329,7 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 - [ ] Berel ve SEO/contenidos y Sky diseño digital por datos autorizados, sin ramas por nombre de cliente.
 - [ ] Primer fold explica estado del período, frescura y siguiente acción sin una grilla de indicadores vacíos.
 - [ ] Revisión e Insights tienen un destino canónico; enlaces preservan servicio/período y no aparecen si no hay acceso o superficie lista.
-- [ ] Entrada por email/in-app/Teamsbot conserva destino tras login y no cambia organización silenciosamente; TASK-1834 posee la autenticación.
+- [ ] Entrada por email/in-app/Teamsbot conserva destino tras login y no cambia organización silenciosamente; TASK-2063 posee la autenticación.
 - [ ] Hito A distingue UI lista de comunicación entregada; la apertura integrada exige evidencia del primer email e in-app por sus dueñas.
 - [ ] UI ready permanece no hasta mapping, first fold, GVC y design decision log sellados; wireframe/flow TASK-1854 existen y pasan gates focales.
 - [ ] CompositionShell/primitives y copy canónico reutilizados; no lógica de autorización ni datos en browser.

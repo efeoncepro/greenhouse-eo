@@ -1,9 +1,9 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-10-24 por Claude
+> **Ultima actualizacion:** 2026-10-29 por Claude
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
@@ -262,6 +262,10 @@ No es apto como experiencia final del content hub. Opciones recomendadas:
 - No dejar tag cloud publico hasta limpiar tags.
 
 ## Layout Candidato: Demo 35 Blog Magazine
+
+> **Delta 2026-10-29:** la fuente `225984` (`/homedemo35-elementor/`) fue retirada: está en la papelera y su URL
+> redirige con 301 a `/`. La copia de trabajo `251875` no se tocó. Las menciones de abajo a `225984` son
+> históricas. [Evidencia](../../audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md#páginas-retiradas).
 
 El operador eligio `Demo 35: Blog Magazine` (`page_id=225984`,
 `/homedemo35-elementor/`) como fuente visual protegida para la futura página

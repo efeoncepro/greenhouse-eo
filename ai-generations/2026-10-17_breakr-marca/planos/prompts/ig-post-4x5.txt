@@ -1,0 +1,9 @@
+Create the flat, front-on 4:5 social media version of the BREAKR campaign artwork shown on the billboard in image 1. This is the finished ad file itself (not a photo of a screen): straight on, edge to edge, no frame, no screen, no LED texture, no perspective.
+
+Same art direction as image 1, re-composed for 4:5:
+- saturated orange (#F04E12) background with a soft light bloom behind the can;
+- at the top, the white heavy condensed italic wordmark BREAKR (exactly these six letters, B-R-E-A-K-R) with the teal wave swoosh under it, as in image 1;
+- in the centre, the BREAKR can of image 2, photographic, slightly tilted, bursting through a frozen splash of clear water with droplets, and orange slices flying around it;
+- at the bottom, the line "Break the wait." in very dark brown bold italic, exactly this text with the period.
+
+Keep generous margins so nothing touches the edges. Premium beverage advertising photography, crisp, appetizing.

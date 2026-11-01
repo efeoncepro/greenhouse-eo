@@ -95,6 +95,9 @@ collateral vigente es el brochure aprobado el 2026-10-06 (§ «Collateral comerc
   ventas en 7 meses (y cómo termina la frase): sin ella el brochure **no se usa con prospectos**; 5 rutas hacia una
   persona y 23 fuentes sí están en el caso publicado; (2) aprobación escrita del sprocket; (3) lámina de equipo
   HubSpot (nombres, cargos, certificaciones, fotos); (4) plazo estándar de implementación.
+- **Brochure oficial de la agencia** (aprobado 2026-10-16, «Agencia de Marketing 360°», skill `deck-studio`): su tramo
+  Revenue cierra con el caso ANAM como prueba de implementación HubSpot (Customer Agent, rutas hacia una persona). Sus
+  cifras de ANAM tienen el mismo pendiente de autorización antes de enviarlo afuera.
 
 ---
 
@@ -209,6 +212,21 @@ retainer de Managed CRM Ops.
     Esta skill aporta el **dominio**, no el **método**.
 15. **NUNCA** escribas en el portal productivo (48713323) sin el loop **propose → confirmación humana → execute**.
 
+**Marca de partner**
+16. **NUNCA** elijas la variante de la insignia Solutions Partner Gold por su nombre ni por ser la más clara. Las tres
+    variantes oficiales (`dark`, `light`, `orange`, en `public/branding/partners/hubspot/solution-partner/`) se llaman
+    por el color de **su propia placa**, no por el fondo: se elige la que **contrasta** con la superficie. Clara
+    (blanco, papel `#f7f8f6`, crema) → `dark` (u `orange` si la pieza pide acento); oscura (navy `#001a33`,
+    fotografía oscura) → `light` (u `orange`); naranja o acento cálido → nunca `orange`. La placa crema sobre papel
+    se disuelve (corrección del operador, 2026-10-31, landing de Contacto). Resuelve con
+    `getHubSpotSolutionPartnerBadgeForSurface(surface)` (`src/lib/brand-assets/hubspot-solution-partner.ts`) y la
+    tabla del `README.md` de esa carpeta. `@efeoncepro/axis-brand-assets` publica **sólo** la crema
+    (`hubspot-solutions-partner-gold-light`): sirve en superficies oscuras, **no** es el default para papel por ser la
+    única de AXIS. El mismo criterio aplica a cualquier insignia de partner con variantes. Las láminas del compositor
+    lo aplican solas: `partnerBadge` (`src/lib/brand-surfaces/recipes/frame.ts`) toma la insignia que AXIS declara
+    para la superficie de la pieza y no compone si no hay una que contraste (2026-10-31); en AXIS la crema pasa a
+    `surface: 'dark'` desde el próximo release de `axis-brand-assets` (hasta entonces figura como `any`).
+
 ---
 
 ## 3. Protocolo de evidencia
@@ -230,7 +248,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 
 | Cuándo | Módulo |
 |---|---|
-| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing, y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
+| Qué vendes hoy: Hubs, Breeze, seats, créditos, onboarding fees, Loop Marketing (Loop 2026: Taste Profile y 4 Rs, ledger en `SOURCES.md` § Loop Marketing 2026), y **dónde HubSpot no llega** | `modules/01_PRODUCTO_2026.md` |
 | Cómo se gana plata y cómo se sostiene el tier: comisión, deal-based model, puntos, growth markets, deal registration, POI | `modules/02_ECONOMIA_PARTNER.md` |
 | **El motor de libro**: managed ops, la regla de los 60 días, GRR, expansión, QBR | `modules/03_MOTOR_LIBRO.md` |
 | A quién le vendes: ICP, señales de compra, comité, triggers regulatorios | `modules/04_ICP_Y_SENALES.md` |

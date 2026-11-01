@@ -1,0 +1,404 @@
+{
+  "view": "busqueda",
+  "assets": {
+    "glitchNavy": "/_blob/1063184040c6121be1f86602803b0f55",
+    "glitchNeg": "/_blob/72025ed97a7ce0c610ec355f78efed74",
+    "spark": "/_blob/2def96f284c302de0cf9fa4736ed9d18"
+  },
+  "crumbs": [
+    {
+      "label": "Inicio",
+      "url": "#"
+    },
+    {
+      "label": "Blog",
+      "url": "#"
+    }
+  ],
+  "crumb": "Búsqueda",
+  "headCls": "ah ah--f",
+  "gridCls": "ah__g ah__g--f",
+  "gridStyle": null,
+  "eyebrow": "Búsqueda en el blog",
+  "eyebrowBar": "background: #36c8bf;",
+  "isAuthor": false,
+  "author": null,
+  "plainH1": true,
+  "h1": "«Inbound»",
+  "h1Cls": "idea ah__t ah__t--m",
+  "h1Style": null,
+  "desc": null,
+  "search": {
+    "action": "#",
+    "value": "Inbound",
+    "label": "Buscar en el blog"
+  },
+  "suggestions": null,
+  "meta": [
+    {
+      "k": "resultados",
+      "v": "19"
+    }
+  ],
+  "hero": {
+    "url": "#",
+    "img": "/_blob/7abf1bf7a4d059512788fdbc83bac04e",
+    "imgCls": "hc__img hc__img--sq",
+    "label": "Mejor resultado",
+    "bar": "background: #0e8c82;",
+    "glitch": false,
+    "plain": true,
+    "kind": "Artículo · Loop Marketing",
+    "parts": [
+      {
+        "t": "¿Qué es Loop Marketing? El framework que reemplaza al funnel y evoluciona el ",
+        "pl": true,
+        "hl": false
+      },
+      {
+        "t": "inbound",
+        "pl": false,
+        "hl": true
+      }
+    ],
+    "min": 20,
+    "date": "7 sep 2025"
+  },
+  "parent": null,
+  "spark": false,
+  "filter": {
+    "segStyle": "--n: 3;",
+    "indStyle": "transform: translateX(0%);",
+    "items": [
+      {
+        "label": "Todo",
+        "count": 19,
+        "url": "#",
+        "cur": "page",
+        "chipCls": "chip is-on live"
+      },
+      {
+        "label": "Artículos",
+        "count": 16,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      },
+      {
+        "label": "Guías",
+        "count": 3,
+        "url": "#",
+        "cur": null,
+        "chipCls": "chip live"
+      }
+    ]
+  },
+  "list": {
+    "label": "Resultados",
+    "groups": null,
+    "flat": [
+      {
+        "url": "#",
+        "date": "21 oct 2024",
+        "parts": [
+          {
+            "t": "Qué es paid media y cómo combinarlo con el ",
+            "pl": true,
+            "hl": false
+          },
+          {
+            "t": "inbound",
+            "pl": false,
+            "hl": true
+          },
+          {
+            "t": " marketing",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Inbound Marketing · Artículo",
+        "min": 12,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "21 jul 2024",
+        "parts": [
+          {
+            "t": "Qué es el ",
+            "pl": true,
+            "hl": false
+          },
+          {
+            "t": "inbound",
+            "pl": false,
+            "hl": true
+          },
+          {
+            "t": " marketing y cómo funciona en 2026",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Inbound Marketing · Artículo",
+        "min": 12,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "6 feb 2026",
+        "parts": [
+          {
+            "t": "Express en Loop Marketing: POV, voz única, buyer persona y Jobs-to-be-done",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Loop Marketing · Artículo",
+        "min": 23,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "6 feb 2026",
+        "parts": [
+          {
+            "t": "La Ley 21.719 no regula datos: obliga a rediseñar el marketing y el Go-To-Market",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Marketing Digital · Artículo",
+        "min": 21,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "6 feb 2026",
+        "parts": [
+          {
+            "t": "El Protocolo de Comercio Universal (UCP): cuando la IA se convierte en el nuevo punto de venta",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Inteligencia Artificial · Artículo",
+        "min": 15,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "6 feb 2026",
+        "parts": [
+          {
+            "t": "5 pasos para definir a tu cliente ideal: ICP, Buyer Persona, IPP y Jobs to Be Done",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Growth · Artículo",
+        "min": 19,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "18 sep 2025",
+        "parts": [
+          {
+            "t": "Cómo ejecutar Loop Marketing en tu empresa con las innovaciones de HubSpot 2025",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "HubSpot · Guía",
+        "min": 21,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "13 sep 2025",
+        "parts": [
+          {
+            "t": "Cómo aplicar Loop Marketing: estrategia, etapas y conexión con el consumidor actual",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Loop Marketing · Artículo",
+        "min": 20,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      },
+      {
+        "url": "#",
+        "date": "16 mar 2025",
+        "parts": [
+          {
+            "t": "¿Es hora de contratar una agencia de marketing? Guía práctica para elegir la mejor opción",
+            "pl": true,
+            "hl": false
+          }
+        ],
+        "glitch": false,
+        "plain": true,
+        "label": "Marketing Digital · Guía",
+        "min": 20,
+        "pd": true,
+        "gd": false,
+        "ed": null,
+        "fl": false
+      }
+    ],
+    "pager": {
+      "note": "Mostrando 1–10 de 19 resultados",
+      "label": "Páginas de resultados",
+      "multi": true,
+      "prev": null,
+      "next": "#",
+      "pages": [
+        {
+          "num": true,
+          "gap": false,
+          "n": 1,
+          "url": "#",
+          "cur": "page"
+        },
+        {
+          "num": true,
+          "gap": false,
+          "n": 2,
+          "url": "#",
+          "cur": null
+        }
+      ]
+    }
+  },
+  "meanwhile": null,
+  "topics": {
+    "eyebrow": "Explora por tema",
+    "title": "¿No era esto? Busca por tema.",
+    "all": 44,
+    "allUrl": "#",
+    "items": [
+      {
+        "url": "#",
+        "name": "HubSpot",
+        "count": "12 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Glitch",
+        "count": "10 publicaciones",
+        "style": "--acc: #6ec207;",
+        "barStyle": "background: #6ec207;"
+      },
+      {
+        "url": "#",
+        "name": "Inbound Marketing",
+        "count": "10 publicaciones",
+        "style": "--acc: #e86bd0;",
+        "barStyle": "background: #e86bd0;"
+      },
+      {
+        "url": "#",
+        "name": "Marketing Digital",
+        "count": "6 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Loop Marketing",
+        "count": "5 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "AEO",
+        "count": "4 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Inteligencia Artificial",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Diseño",
+        "count": "2 publicaciones",
+        "style": "--acc: #ff6500;",
+        "barStyle": "background: #ff6500;"
+      },
+      {
+        "url": "#",
+        "name": "SEO",
+        "count": "2 publicaciones",
+        "style": "--acc: #0375db;",
+        "barStyle": "background: #0375db;"
+      },
+      {
+        "url": "#",
+        "name": "Novedades Efeonce",
+        "count": "2 publicaciones",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      },
+      {
+        "url": "#",
+        "name": "Growth",
+        "count": "1 publicación",
+        "style": "--acc: #36c8bf;",
+        "barStyle": "background: #36c8bf;"
+      }
+    ]
+  },
+  "rootCls": "v3 arc",
+  "gl": null
+}

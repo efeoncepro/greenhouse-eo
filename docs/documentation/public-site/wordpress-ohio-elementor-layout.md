@@ -1,9 +1,9 @@
 # Public Site WordPress — Layout Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-10-24 por Claude (Opus 5.5) (rieles fijos de Ohio; Nosotros y Partners source-led)
+> **Ultima actualizacion:** 2026-10-24 por Claude (Opus 5.5) (rieles fijos de Ohio; Nosotros y Partners source-led; popup Partners)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
@@ -822,7 +822,9 @@ Verificado en vivo a 1280, 1440, 1710, 1920 y 390 px. Commits greenhouse-eo `7b5
 runtime `b5f7a25`, `4a2bfd2`, `f5d730e`. Backups de deploy en Kinsta `/tmp/eo-nosotros-widgets-before-*.tar`.
 
 **Partners** (`/partnership/`, page_id 248003, source-led desde 2026-10-23) usa el mismo `.wrap` de 1320 px y tiene
-el mismo choque con el switcher entre 1181 y ~1320 px; queda pendiente por decisión del operador (2026-10-24).
+el mismo choque con el switcher entre 1181 y ~1320 px; queda pendiente por decisión del operador (2026-10-24). Desde el 2026-10-24 su «Quiero ser partner» abre el
+diálogo gobernado del Growth CTA; el lanzador lleva ancho explícito (209 px, el del botón del canvas) porque con
+`fit-content` colapsa a 0 por la contención del renderer.
 
 ## Hero About us (page_id 249770)
 

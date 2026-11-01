@@ -1,0 +1,100 @@
+{
+  "taskId": "TASK-2059",
+  "scenario": "rooms-first-experience",
+  "reviewedAt": "2026-10-25",
+  "reviewer": "rooms_qa independent plus root Product Design IAB review",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-2059-rooms-first-experience/final-desktop.png",
+    "mobile": "docs/ui/reviews/TASK-2059-rooms-first-experience/final-mobile.png",
+    "dossier": "docs/ui/reviews/TASK-2059-rooms-first-experience/product-design-audit.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.75,
+      "rationale": "The hero has one dominant concept and one primary action; article and workspace headings separate the three tasks clearly.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Photography keeps its full source composition; the revised dark gallery uses available height and the tablet landscape fits both edges.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Spacing, editorial dividers and section numbering give a consistent reading rhythm across the paper surface.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.25,
+      "rationale": "The reading column is comfortable; the mobile evidence panel repeats several title layers before the factual metadata. Next action: consolidate the fragment/title introduction on mobile without removing context or source metadata.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": "Compactar introduccion de fragmento y titulos en radiografia movil sin eliminar contexto ni fuentes."
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "Navy proposal, paper reading surface and dark gallery make context changes clear; restrained backdrop separates inspection from the proposal.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.75,
+      "rationale": "Work is presented as photography, reading columns and divided rows instead of stacked card containers or invented dashboard metrics.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.75,
+      "rationale": "The campaign photography creates a distinct focal point and the large typographic concept remains recognizable on mobile.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.5,
+      "rationale": "Bricolage heading and Poppins body are actually loaded; article copy remains legible, with deliberate hierarchy and wrapping at 200% text.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.5,
+      "rationale": "Navy, paper and teal distinguish hierarchy; DOM text passes automated contrast, and gallery captions were independently measured at 9.82:1. Embedded raster lettering has a separate unverified pixel-contrast limitation.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Directional arrows and close icons have narrow, clear roles, with accessible names and adequate interaction targets.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "Headers and tabs wrap, editorial content reflows, and all three photo formats fit the inspector across the four widths. The 1024 landscape defect was corrected and rechecked.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Action feedback is visible without distracting from the proposal; focus restoration and reduced-motion flows remain usable.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "The implementation matches the task's dominant creative stage, full editorial reading, contextual radiography and separate operation workspace. This is contract fidelity, not a claim of pixel identity with an unavailable approved canvas.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.75,
+      "rationale": "The room centers actual campaign work and contextual decisions; the operator view uses compact room rows and explicit capabilities rather than decorative KPI cards.",
+      "evidence": "docs/ui/reviews/TASK-2059-rooms-first-experience/independent-review.md",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass",
+  "operatorVisualAcceptance": "pending",
+  "claim": "Local candidate; contract fidelity, not pixel identity against an approved canvas"
+}

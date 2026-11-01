@@ -1,0 +1,91 @@
+{
+  "run_at": "2026-10-21T11:52:03.112521-03:00",
+  "timezone": "America/Santiago",
+  "scope": "Ejecución focal de correo revisado y aprobado; no corrida de descubrimiento del radar",
+  "calendar_week_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-21T11:52:03.112521-03:00"
+  },
+  "queries": [
+    {
+      "query": "from:[correo laboral de Iris redactado] received>=2026-10-21",
+      "source": "Outlook search_messages",
+      "country": "Perú",
+      "service": "Agencia creativa / contenidos / audiovisual",
+      "result": "Invitación primaria RFQ001 íntegra, sin nuevo cambio contractual",
+      "pii_redacted": true
+    },
+    {
+      "query": "to:[correo laboral de Iris redactado] received>=2026-10-21",
+      "source": "Outlook search_messages",
+      "country": "Perú",
+      "service": "Agencia creativa",
+      "result": "Un envío inicial de presentación; no confirmación previa duplicada",
+      "pii_redacted": true
+    },
+    {
+      "query": "Identidad HubSpot USER_INFORMATION",
+      "source": "HubSpot MCP",
+      "result": "Portal48713323, usuario75788512 verificados"
+    },
+    {
+      "query": "HubSpot Documents resumen357058081 y357361299; crear enlaces para destinataria autorizada",
+      "source": "HubSpot UI",
+      "result": "Dos enlaces nuevos, sin exigir correo para ver, descarga habilitada; originales completos"
+    },
+    {
+      "query": "Outlook drafts orden lastModifiedDateTime desc top5",
+      "source": "Outlook list_messages",
+      "result": "Borrador de izipay: destinataria única, CC vacío, CCO correcto, cuerpo con espacios y firma gráfica; otros borradores no modificados"
+    },
+    {
+      "query": "Adjuntos del borrador objetivo y copia enviada; metadata_only",
+      "source": "Outlook list_attachments",
+      "result": "Dos PDF no inline con nombres y tamaños verificados; imagen inline del hilo citada separadamente"
+    },
+    {
+      "query": "Outlook sentitems sentDateTime ge 2026-10-21T14:49:00Z top10",
+      "source": "Outlook list_messages",
+      "result": "Confirmación enviada21Oct11:49:59Chile, sólo Iris, sinCC, CCOHubSpot"
+    },
+    {
+      "query": "hubspot activities list --contact [Contact de Compras izipay] --activity-type EMAIL --limit 5 --format json",
+      "source": "HubSpot Agent CLI",
+      "result": "Primera lectura aún sin actividad; segunda lectura EMAIL119215175851 SENT asociado al Contact256738112539"
+    },
+    {
+      "query": "EMAIL119215175851: status, dirección, asunto, remitente y destinatario",
+      "source": "HubSpot MCP get_crm_objects",
+      "result": "SENT, EMAIL, remitenteJulio y destinatariaIris confirmados; no se infieren campos omitidos"
+    }
+  ],
+  "coverage_20_cells": "No reevaluadas en este envío focal; no se declara cobertura nueva",
+  "contract_control": {
+    "result": "INVITACION_RESPONDIDA_EXPEDIENTE_INCOMPLETO_HOLD_PARA_POSTULACION",
+    "primary_source": "Invitación privada RFQ001 de Compras recibida 21/10 y releída antes del envío; evidencia privada buyer-replies.json / send-outlook-readback.json",
+    "last_checked_at": "2026-10-21T14:47:00Z",
+    "publication_at": "NO_VERIFICADO; recepción no equivale a publicación",
+    "first_seen_at": "2026-10-21T13:41:20Z",
+    "awardee": "NO_VERIFICADO",
+    "award_act_or_order": "NO_VERIFICADO",
+    "contract_existence_status": "NO_VERIFICADO",
+    "signature_at": "NO_VERIFICADO",
+    "execution_start_end": "NO_VERIFICADO; año 2027 general",
+    "document_read": "Correo completo del comprador; no se recibió documento contractual decisivo",
+    "participation_stage": "Confirmación de interés; admisión como proveedor extranjero pendiente",
+    "interest_deadline_at": "2026-10-22T17:00:00; zona no indicada por comprador",
+    "registration_invitation": "Invitación recibida; condiciones de inscripción no recibidas",
+    "offer_deadline_at": "NO_VERIFICADO; calendario prometido para próximos días",
+    "blocker": "Faltan brief, bases, criterios, calendario de ofertas y expediente contractual; no se recomienda postular ni se crea Deal",
+    "authorization_limit": "Respuesta documental expresamente autorizada; no oferta, contrato ni admisión confirmada"
+  },
+  "blocks": [
+    "Primer intento de selector de archivos agotó espera; resuelto con selector soportado, sin cambiar permisos del navegador"
+  ],
+  "approval": "Aprobación expresa de Julio: enviar sólo a Iris, sin CC, firma gráfica, adjuntos y CCO; brochure creativo como enlace y sumar360completo",
+  "sends": 1,
+  "new_deals": 0,
+  "paid_credits": 0,
+  "crm": "Registro nativo por CCO verificado, sin actividad duplicada manual",
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion"
+}

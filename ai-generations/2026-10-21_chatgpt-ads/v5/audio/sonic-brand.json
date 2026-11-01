@@ -1,0 +1,950 @@
+{
+  "schema": "axis.efeonce-sonic-brand.v1",
+  "title": "Identidad sonora de Efeonce — Tres puntos que se vuelven uno",
+  "status": "recommended",
+  "since": "2026-09-26",
+  "canonical": false,
+  "decidedBy": "Operador (Julio Reyes), 2026-09-26: «vamos con tu recomendación»",
+  "source": "greenhouse-eo · ai-generations/2026-09-26_branding-sonoro (motor, rondas y kit)",
+  "page": "/references/sonic-brand/",
+  "guide": "docs/agent-composition/sonic-brand.md",
+  "media": {
+    "base": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1",
+    "web": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/",
+    "masters": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/"
+  },
+  "motif": {
+    "name": "Tres puntos que se vuelven uno",
+    "key": "La mayor (la tonalidad del motion V1.1)",
+    "notes": [
+      "E5",
+      "E5",
+      "E5",
+      "A5"
+    ],
+    "noteNames": "Mi · Mi · Mi → La",
+    "midi": [
+      76,
+      76,
+      76,
+      81
+    ],
+    "dotSpacingMs": 140,
+    "pauseMs": 370,
+    "resolution": "La con el único golpe de la pieza (impacto grave + campana); el acorde de La mayor florece debajo."
+  },
+  "grammar": [
+    {
+      "element": "Anillo",
+      "means": "la pregunta",
+      "sound": "Un acorde abierto de quinta (La–Mi), tenue y sin resolver."
+    },
+    {
+      "element": "Tres ventanas",
+      "means": "lo que se piensa",
+      "sound": "Tres notas breves en Mi, a 140 ms una de otra, sin golpe."
+    },
+    {
+      "element": "Esfera",
+      "means": "la respuesta",
+      "sound": "La, 370 ms después, con el único golpe de la pieza."
+    },
+    {
+      "element": "Halo",
+      "means": "la luz",
+      "sound": "El acorde de La florece y se apaga con una cola corta; nunca un colchón de reverberación."
+    }
+  ],
+  "registers": [
+    {
+      "key": "fondo",
+      "name": "Fondo",
+      "bpm": 96,
+      "character": "Sereno y minimalista: mazos, campana y colchón.",
+      "harmony": "La · Re/La · Fa♯m7 · Mi sus4 — la esfera responde siempre La mientras la armonía cambia: el contexto cambia, la respuesta no.",
+      "uses": "Debajo de una locución, webinars, videos explicativos, cierres y aperturas del logo.",
+      "origin": "Síntesis propia, determinística, sin muestras ni modelos de terceros."
+    },
+    {
+      "key": "energia",
+      "name": "Energía",
+      "bpm": 120,
+      "character": "Rock: tres golpes apagados de guitarra en Mi y el acorde abierto con bombo, platillo y bajo.",
+      "harmony": "La misma armonía; a 120 BPM la pausa son tres semicorcheas (375 ms), la del logo.",
+      "uses": "Lanzamientos, piezas de redes con ritmo, arranque de eventos.",
+      "origin": "Maqueta propia re-grabada con Stable Audio 2.5 (audio-to-audio, intensidad 0,7) y la esfera propia montada encima."
+    }
+  ],
+  "lines": [
+    {
+      "key": "growth",
+      "slogan": "Growth",
+      "tokenLines": [
+        "growth"
+      ],
+      "timbre": "Campana",
+      "why": "La esfera del motion aprobado: la base del sistema.",
+      "accents": [
+        {
+          "tokenLine": "growth",
+          "accentOnDark": "#36c8bf",
+          "accentOnLight": "#0e8c82"
+        }
+      ]
+    },
+    {
+      "key": "brand",
+      "slogan": "Brand",
+      "tokenLines": [
+        "brand"
+      ],
+      "timbre": "Marimba",
+      "why": "Madera tocada: la voz de Plastilina, el oficio creativo.",
+      "accents": [
+        {
+          "tokenLine": "brand",
+          "accentOnDark": "#ff6500",
+          "accentOnLight": "#bb1954"
+        }
+      ]
+    },
+    {
+      "key": "engine",
+      "slogan": "Engine",
+      "tokenLines": [
+        "engine"
+      ],
+      "timbre": "FM sintético",
+      "why": "Preciso, de máquina bien afinada.",
+      "accents": [
+        {
+          "tokenLine": "engine",
+          "accentOnDark": "#0375db",
+          "accentOnLight": "#0375db"
+        }
+      ]
+    },
+    {
+      "key": "voice",
+      "slogan": "Voice",
+      "tokenLines": [
+        "voice"
+      ],
+      "timbre": "Eco",
+      "why": "La nota se repite de lado a lado, cada vez más lejos: el mensaje que se propaga.",
+      "accents": [
+        {
+          "tokenLine": "voice",
+          "accentOnDark": "#f83902",
+          "accentOnLight": "#f83902"
+        }
+      ]
+    },
+    {
+      "key": "revenue",
+      "slogan": "Revenue",
+      "tokenLines": [
+        "revenue-hubspot",
+        "revenue-salesforce"
+      ],
+      "timbre": "Campana grave",
+      "why": "Una octava abajo: peso y estructura.",
+      "accents": [
+        {
+          "tokenLine": "revenue-hubspot",
+          "accentOnDark": "#e86bd0",
+          "accentOnLight": "#8e1b82"
+        },
+        {
+          "tokenLine": "revenue-salesforce",
+          "accentOnDark": "#2fb8ff",
+          "accentOnLight": "#00739e"
+        }
+      ]
+    }
+  ],
+  "voice": {
+    "name": "Brian",
+    "voiceId": "nPczCjzI2devNBz1zQrb",
+    "voiceLabel": "Brian – Deep, Resonant and Comforting (voz de fábrica)",
+    "engine": "ElevenLabs v3",
+    "text": "Empower your <Línea>.",
+    "language": "Inglés, nunca traducido (igual que el eslogan visual).",
+    "timing": "La palabra final del eslogan cae con la esfera, como el acento cierra en la gráfica.",
+    "pacing": "Pausa «Empower» → «your» igualada a 0,14 s en las cinco líneas, recortando sólo el silencio."
+  },
+  "usage": [
+    {
+      "context": "Cierre de un video de marca",
+      "piece": "Reveal; con Brian si el video no cierra con locución",
+      "register": "fondo",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "motion-reveal-16x9",
+        "motion-reveal-brian-16x9"
+      ]
+    },
+    {
+      "context": "Inicio de un video o presentación",
+      "piece": "Apertura",
+      "register": "fondo",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "motion-apertura-16x9"
+      ]
+    },
+    {
+      "context": "Reels, cortinillas, cierres de menos de 2 s",
+      "piece": "Sting",
+      "register": "fondo",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "motion-sting-9x16"
+      ]
+    },
+    {
+      "context": "Video con locución, webinar, explicativo",
+      "piece": "Pieza larga de fondo, unos 15 dB debajo de la voz",
+      "register": "fondo",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "long-fondo"
+      ]
+    },
+    {
+      "context": "Lanzamiento, redes con ritmo, arranque de evento",
+      "piece": "Pieza larga de energía o cierre de energía",
+      "register": "energia",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "long-energia",
+        "close-energia"
+      ]
+    },
+    {
+      "context": "Pieza de una línea de servicio",
+      "piece": "Logo sonoro o etiqueta con el timbre de esa línea",
+      "register": "según contexto",
+      "loudness": "−14 LUFS",
+      "assets": [
+        "logo-growth",
+        "tag-growth"
+      ]
+    },
+    {
+      "context": "Glitch (magazine y podcast)",
+      "piece": "No usa este kit: Glitch tiene su diseño sonoro propio, sólo de Glitch (/references/glitch/#sonido)",
+      "register": "propio de Glitch",
+      "loudness": "—",
+      "assets": []
+    },
+    {
+      "context": "Pantalla de recepción",
+      "piece": "Sin sonido, como define la línea gráfica",
+      "register": "ninguno",
+      "loudness": "—",
+      "assets": []
+    },
+    {
+      "context": "Piezas de clientes · interfaz de Greenhouse",
+      "piece": "No se usa: es la marca Efeonce",
+      "register": "ninguno",
+      "loudness": "—",
+      "assets": []
+    }
+  ],
+  "rules": {
+    "always": [
+      "La melodía es Mi, Mi, Mi → La, con su pausa. No se cambia ni se acorta.",
+      "La línea de servicio cambia sólo el timbre de la esfera.",
+      "Un solo golpe por pieza: el de la esfera.",
+      "El eslogan va en inglés, nunca traducido, y su palabra final cae con la esfera.",
+      "Se nivela por destino: −14 LUFS en video y redes, −16 en podcast, pico en −1 dBFS.",
+      "Se usan los archivos del kit (SHA-256 en el JSON), no versiones regeneradas."
+    ],
+    "never": [
+      "Cambiar de registro dentro de una misma pieza.",
+      "Poner el registro de energía debajo de una locución.",
+      "Comprimir el golpe para que el archivo suene más fuerte.",
+      "Usar el sistema en piezas de clientes o en la interfaz de Greenhouse.",
+      "Sonorizar la pantalla de recepción.",
+      "Otra voz para el eslogan que no sea la de Brian."
+    ]
+  },
+  "spec": {
+    "Formato": "WAV 48 kHz, 24 bits (masters) · MP3 224 kbps y MP4 H.264 (web)",
+    "Volumen": "−14 LUFS video y redes · −16 LUFS podcast · pico −1 dBFS. Los logos Brand, Voice y Revenue quedan cerca de −15: el golpe toca el techo de pico y no se comprime.",
+    "Motion": "Sting, reveal y apertura V1.1 sin tocar la imagen; la esfera sonora cae con el golpe de encaje (sting 0,58 s · reveal 1,87 s · apertura 1,15 s). Se extienden 1 s con el cuadro final para oír la cola.",
+    "Masters": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/ · 01-logo-sonoro · 02-etiqueta-voz · 03-motion · 04-piezas-largas · 05-cierre-energia · 06-voz-sola · copia para el equipo en OneDrive: 13- Branding › Identidad Sonora Efeonce › v1"
+  },
+  "assets": [
+    {
+      "id": "logo-growth",
+      "kind": "audio",
+      "title": "Logo sonoro · Growth",
+      "register": "base",
+      "line": "growth",
+      "voice": false,
+      "use": "Logo sonoro de la línea Growth (esfera: campana).",
+      "web": "efeonce-logo-sonoro-growth.mp3",
+      "master": "01-logo-sonoro/efeonce-logo-sonoro-growth.wav",
+      "durationSec": 2.9,
+      "lufs": -14.3,
+      "truePeakDbfs": -1.1,
+      "sha256": "452579258dfade363eaff1f089f8fce2f9ea8dfec5f687c448904064860411a0",
+      "bytes": 835302,
+      "webSha256": "84b5dce3ba39a2498634600b597dc650a4376a9eb97caf516b9e3372e7dcf26b",
+      "piece": "logo",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-growth.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-logo-sonoro-growth.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "logo-brand",
+      "kind": "audio",
+      "title": "Logo sonoro · Brand",
+      "register": "base",
+      "line": "brand",
+      "voice": false,
+      "use": "Logo sonoro de la línea Brand (esfera: marimba).",
+      "web": "efeonce-logo-sonoro-brand.mp3",
+      "master": "01-logo-sonoro/efeonce-logo-sonoro-brand.wav",
+      "durationSec": 2.9,
+      "lufs": -15.1,
+      "truePeakDbfs": -1,
+      "sha256": "e123e8f1ef8be93da786244c30999d9ab4b2a2c1579ff4d3f09c00dfb3378548",
+      "bytes": 835302,
+      "webSha256": "0a887e4c41fad02216551648b387e5f44987e26a188623bb07f47d5ef00e4ccf",
+      "piece": "logo",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-brand.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-logo-sonoro-brand.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "logo-engine",
+      "kind": "audio",
+      "title": "Logo sonoro · Engine",
+      "register": "base",
+      "line": "engine",
+      "voice": false,
+      "use": "Logo sonoro de la línea Engine (esfera: fm).",
+      "web": "efeonce-logo-sonoro-engine.mp3",
+      "master": "01-logo-sonoro/efeonce-logo-sonoro-engine.wav",
+      "durationSec": 2.9,
+      "lufs": -14,
+      "truePeakDbfs": -1.7,
+      "sha256": "a16885b3d421a5b0bd131804b2eb9eedcf75cc98c170f242928cc15be6ac10ba",
+      "bytes": 835302,
+      "webSha256": "7cd6c22bd35444d12d84cb0662c50f44f23e4a0d09bcfa4a8af2bf6343db06b3",
+      "piece": "logo",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-engine.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-logo-sonoro-engine.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "logo-voice",
+      "kind": "audio",
+      "title": "Logo sonoro · Voice",
+      "register": "base",
+      "line": "voice",
+      "voice": false,
+      "use": "Logo sonoro de la línea Voice (esfera: eco).",
+      "web": "efeonce-logo-sonoro-voice.mp3",
+      "master": "01-logo-sonoro/efeonce-logo-sonoro-voice.wav",
+      "durationSec": 2.9,
+      "lufs": -15.1,
+      "truePeakDbfs": -1,
+      "sha256": "25ea81ab103e3c817d5955874461984ba833c236b742f0e7a8b7cbc22b0d4781",
+      "bytes": 835302,
+      "webSha256": "c40b9ce922a2b807eee84209d28706aa8cf13327f193e1d3fb99d38277eaeb72",
+      "piece": "logo",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-voice.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-logo-sonoro-voice.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "logo-revenue",
+      "kind": "audio",
+      "title": "Logo sonoro · Revenue",
+      "register": "base",
+      "line": "revenue",
+      "voice": false,
+      "use": "Logo sonoro de la línea Revenue (esfera: campana grave).",
+      "web": "efeonce-logo-sonoro-revenue.mp3",
+      "master": "01-logo-sonoro/efeonce-logo-sonoro-revenue.wav",
+      "durationSec": 2.9,
+      "lufs": -15.3,
+      "truePeakDbfs": -1,
+      "sha256": "d2ed22ff16ea43a0affd801244cb592362d34b1c9cb95ee45318eafe2e04ee59",
+      "bytes": 835302,
+      "webSha256": "414ddfab5429da062e8593a28f1f1f86f278f4c0570f5296b6e254cb8d69cb20",
+      "piece": "logo",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/01-logo-sonoro/efeonce-logo-sonoro-revenue.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-logo-sonoro-revenue.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "tag-growth",
+      "kind": "audio",
+      "title": "Empower your Growth",
+      "register": "base",
+      "line": "growth",
+      "voice": true,
+      "use": "Cierre con el eslogan de Growth: la esfera cae en la palabra final.",
+      "web": "efeonce-etiqueta-growth-brian.mp3",
+      "master": "02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav",
+      "durationSec": 3.14,
+      "lufs": -13.9,
+      "truePeakDbfs": -1.8,
+      "sha256": "70281f8ed8a121a78c990b7ce866a89c41abe3440992806b57d3c56a43f5b8cd",
+      "bytes": 904422,
+      "webSha256": "0fd700cb9b0f363a1b88f2d7cd1f91d9f67916fb6efe351b72733f1bdc7abd28",
+      "piece": "tag",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-growth-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-etiqueta-growth-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "tag-brand",
+      "kind": "audio",
+      "title": "Empower your Brand",
+      "register": "base",
+      "line": "brand",
+      "voice": true,
+      "use": "Cierre con el eslogan de Brand: la esfera cae en la palabra final.",
+      "web": "efeonce-etiqueta-brand-brian.mp3",
+      "master": "02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav",
+      "durationSec": 3.18,
+      "lufs": -14,
+      "truePeakDbfs": -2.4,
+      "sha256": "00febc7e207346863d79640b5ec8de12e6b204b21c868e2ba5f227fb3fa8b3ff",
+      "bytes": 915942,
+      "webSha256": "76d999011ecf9ffaeb76405002134d8d9141fb873c8f5e82fea2119efbf6ef0b",
+      "piece": "tag",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-brand-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-etiqueta-brand-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "tag-engine",
+      "kind": "audio",
+      "title": "Empower your Engine",
+      "register": "base",
+      "line": "engine",
+      "voice": true,
+      "use": "Cierre con el eslogan de Engine: la esfera cae en la palabra final.",
+      "web": "efeonce-etiqueta-engine-brian.mp3",
+      "master": "02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav",
+      "durationSec": 3.2,
+      "lufs": -13.9,
+      "truePeakDbfs": -2.6,
+      "sha256": "b2bb11ce283f4e125187a1bc89dae8e334ad275a32febc3b74fef5f2350cd46f",
+      "bytes": 921702,
+      "webSha256": "264f9af546d2fa0dbb186817a2fb1e27d9a1f7ccdb3f979d5e7b901c70d77a4e",
+      "piece": "tag",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-engine-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-etiqueta-engine-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "tag-voice",
+      "kind": "audio",
+      "title": "Empower your Voice",
+      "register": "base",
+      "line": "voice",
+      "voice": true,
+      "use": "Cierre con el eslogan de Voice: la esfera cae en la palabra final.",
+      "web": "efeonce-etiqueta-voice-brian.mp3",
+      "master": "02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav",
+      "durationSec": 3.22,
+      "lufs": -14,
+      "truePeakDbfs": -2.1,
+      "sha256": "e86ff55d3c99049b4751004bd45a70ff24dad1add3b03a268b1d8c15b61f5d99",
+      "bytes": 927462,
+      "webSha256": "cf8743b7b255734babb19222b301b5d91d18eb0c902bc765b52e75b880fb78c8",
+      "piece": "tag",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-voice-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-etiqueta-voice-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "tag-revenue",
+      "kind": "audio",
+      "title": "Empower your Revenue",
+      "register": "base",
+      "line": "revenue",
+      "voice": true,
+      "use": "Cierre con el eslogan de Revenue: la esfera cae en la palabra final.",
+      "web": "efeonce-etiqueta-revenue-brian.mp3",
+      "master": "02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav",
+      "durationSec": 3.16,
+      "lufs": -13.9,
+      "truePeakDbfs": -1.8,
+      "sha256": "39e47f46aca9a460d2e69b9e2c0983c6d7c2eff8e99d3bb2986106136dff82d0",
+      "bytes": 910182,
+      "webSha256": "0df86af2f6e4067be61a12022fe38cf47de0941f3617ce8cdb9ac47f9b290bd6",
+      "piece": "tag",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/02-etiqueta-voz/efeonce-etiqueta-revenue-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-etiqueta-revenue-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "motion-sting-audio",
+      "kind": "audio",
+      "title": "Sting · audio",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cortinillas, reels y cierres de menos de 2 s.",
+      "web": null,
+      "master": "03-motion/efeonce-sting.wav",
+      "durationSec": 2.2,
+      "lufs": -14,
+      "truePeakDbfs": -1,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "bytes": 633702,
+      "piece": "sting",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-sting.wav",
+      "webUrl": null,
+      "posterUrl": null
+    },
+    {
+      "id": "motion-sting-16x9",
+      "kind": "video",
+      "title": "Sting · 16:9",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cortinillas, reels y cierres de menos de 2 s.",
+      "web": "efeonce-sting_16x9.mp4",
+      "master": "03-motion/efeonce-sting_16x9.mp4",
+      "durationSec": 2.2,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "92b4af986f2267ba844453b6fb51e82f67e5a1a1b3829ed2166a1e50d9618a44",
+      "bytes": 406859,
+      "webSha256": "5f4275a7b96161baed8d298faa6ef489ef7af6816660dc06f97b2c60341f8e8f",
+      "format": "16x9",
+      "poster": "efeonce-sting_16x9.webp",
+      "piece": "sting",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-sting_16x9.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-sting_16x9.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-sting_16x9.webp"
+    },
+    {
+      "id": "motion-sting-9x16",
+      "kind": "video",
+      "title": "Sting · 9:16",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cortinillas, reels y cierres de menos de 2 s.",
+      "web": "efeonce-sting_9x16.mp4",
+      "master": "03-motion/efeonce-sting_9x16.mp4",
+      "durationSec": 2.2,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "ce3cd062beb526b6dff4c2655d75463508c16c4d4f10e53c42fe78038eaa85c1",
+      "bytes": 430172,
+      "webSha256": "8a80404156a9eebd953b6432fb2d308a561261b7843090359f533da48bf27e5b",
+      "format": "9x16",
+      "poster": "efeonce-sting_9x16.webp",
+      "piece": "sting",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-sting_9x16.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-sting_9x16.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-sting_9x16.webp"
+    },
+    {
+      "id": "motion-reveal-audio",
+      "kind": "audio",
+      "title": "Reveal · audio",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cierre de un video de marca.",
+      "web": null,
+      "master": "03-motion/efeonce-reveal.wav",
+      "durationSec": 4.6,
+      "lufs": -13.8,
+      "truePeakDbfs": -1,
+      "sha256": "0b3a0e309e813a3adb22e7573863e13ea18cbc1d3e0d2354287ab1320162558c",
+      "bytes": 1324902,
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal.wav",
+      "webUrl": null,
+      "posterUrl": null
+    },
+    {
+      "id": "motion-reveal-16x9",
+      "kind": "video",
+      "title": "Reveal · 16:9",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cierre de un video de marca.",
+      "web": "efeonce-reveal_16x9.mp4",
+      "master": "03-motion/efeonce-reveal_16x9.mp4",
+      "durationSec": 4.6,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "54538d9bde673aada7a005827b5c2e483581199aaaf8ae77c36f6d0c114a9a9e",
+      "bytes": 598144,
+      "webSha256": "bce7842fb1a9f4d8820537209cdf3ee9eda1a0ade0c73d0d9c2657fb010c0da0",
+      "format": "16x9",
+      "poster": "efeonce-reveal_16x9.webp",
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal_16x9.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal_16x9.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal_16x9.webp"
+    },
+    {
+      "id": "motion-reveal-9x16",
+      "kind": "video",
+      "title": "Reveal · 9:16",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Cierre de un video de marca.",
+      "web": "efeonce-reveal_9x16.mp4",
+      "master": "03-motion/efeonce-reveal_9x16.mp4",
+      "durationSec": 4.6,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "2ded7357f5aed345fcd649f8121533734f27adba3f4f4a3b9205853580d182f5",
+      "bytes": 651018,
+      "webSha256": "2212dfbe9f876f02ed9043664ab19aeb42c46385b164b6ebd27947dc3092ba69",
+      "format": "9x16",
+      "poster": "efeonce-reveal_9x16.webp",
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal_9x16.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal_9x16.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal_9x16.webp"
+    },
+    {
+      "id": "motion-reveal-brian-audio",
+      "kind": "audio",
+      "title": "Reveal con Brian · audio",
+      "register": "fondo",
+      "line": null,
+      "voice": true,
+      "use": "Cierre de un video que no termina con locución.",
+      "web": null,
+      "master": "03-motion/efeonce-reveal-brian.wav",
+      "durationSec": 4.6,
+      "lufs": -14,
+      "truePeakDbfs": -2.2,
+      "sha256": "698bce23091bfbb7a9f7077620fedbf21cda9cbe8189cd4cc7c483f8b45db4c9",
+      "bytes": 1324902,
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal-brian.wav",
+      "webUrl": null,
+      "posterUrl": null
+    },
+    {
+      "id": "motion-reveal-brian-16x9",
+      "kind": "video",
+      "title": "Reveal con Brian · 16:9",
+      "register": "fondo",
+      "line": null,
+      "voice": true,
+      "use": "Cierre de un video que no termina con locución.",
+      "web": "efeonce-reveal-brian_16x9.mp4",
+      "master": "03-motion/efeonce-reveal-brian_16x9.mp4",
+      "durationSec": 4.6,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "87f8a7308231d21b47bd4d9a545b8f31ad044dab80186f63e8177b91765aa765",
+      "bytes": 598544,
+      "webSha256": "1ebc6a95471e4e98b1c8b6bb963c20f190d66d9a6b8447f9f0c2be50f9f5afa0",
+      "format": "16x9",
+      "poster": "efeonce-reveal-brian_16x9.webp",
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal-brian_16x9.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal-brian_16x9.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal-brian_16x9.webp"
+    },
+    {
+      "id": "motion-reveal-brian-9x16",
+      "kind": "video",
+      "title": "Reveal con Brian · 9:16",
+      "register": "fondo",
+      "line": null,
+      "voice": true,
+      "use": "Cierre de un video que no termina con locución.",
+      "web": "efeonce-reveal-brian_9x16.mp4",
+      "master": "03-motion/efeonce-reveal-brian_9x16.mp4",
+      "durationSec": 4.6,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "baababb3cd9f848bf29eff084b483f9398524ec7d6f8fadae492678a871db67d",
+      "bytes": 651418,
+      "webSha256": "cef1041585c9095a7c182a7272c76d67035385b367fd64d65c85ff6ee563f684",
+      "format": "9x16",
+      "poster": "efeonce-reveal-brian_9x16.webp",
+      "piece": "reveal",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-reveal-brian_9x16.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal-brian_9x16.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-reveal-brian_9x16.webp"
+    },
+    {
+      "id": "motion-apertura-audio",
+      "kind": "audio",
+      "title": "Apertura · audio",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Inicio de un video o presentación; termina abierta.",
+      "web": null,
+      "master": "03-motion/efeonce-apertura.wav",
+      "durationSec": 3.4,
+      "lufs": -14,
+      "truePeakDbfs": -1.4,
+      "sha256": "6bd3fdae5f351ff509d393d6f47755406abbb83cdaeeb4fc6c9098501656b9dd",
+      "bytes": 979302,
+      "piece": "apertura",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-apertura.wav",
+      "webUrl": null,
+      "posterUrl": null
+    },
+    {
+      "id": "motion-apertura-16x9",
+      "kind": "video",
+      "title": "Apertura · 16:9",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Inicio de un video o presentación; termina abierta.",
+      "web": "efeonce-apertura_16x9.mp4",
+      "master": "03-motion/efeonce-apertura_16x9.mp4",
+      "durationSec": 3.4,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "d344e10a7a12c8cbab1741d8b54262d79d73f6c9bbd261663c2101e8d916a948",
+      "bytes": 572473,
+      "webSha256": "934e249936434769505225a70a6104378d1b95488904916a2bdaf3e5aa266399",
+      "format": "16x9",
+      "poster": "efeonce-apertura_16x9.webp",
+      "piece": "apertura",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-apertura_16x9.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-apertura_16x9.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-apertura_16x9.webp"
+    },
+    {
+      "id": "motion-apertura-9x16",
+      "kind": "video",
+      "title": "Apertura · 9:16",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Inicio de un video o presentación; termina abierta.",
+      "web": "efeonce-apertura_9x16.mp4",
+      "master": "03-motion/efeonce-apertura_9x16.mp4",
+      "durationSec": 3.4,
+      "lufs": null,
+      "truePeakDbfs": null,
+      "sha256": "633a1822c8713d30358b5fee73ebea2b1f069227c36d61d671ca7247029b77c6",
+      "bytes": 597891,
+      "webSha256": "c713a625782660818d9d5ecc3bda53ea52ebb73cf227661c9701d7954a8cb280",
+      "format": "9x16",
+      "poster": "efeonce-apertura_9x16.webp",
+      "piece": "apertura",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/03-motion/efeonce-apertura_9x16.mp4",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-apertura_9x16.mp4",
+      "posterUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-apertura_9x16.webp"
+    },
+    {
+      "id": "long-fondo",
+      "kind": "audio",
+      "title": "Pieza larga de fondo",
+      "register": "fondo",
+      "line": null,
+      "voice": false,
+      "use": "Debajo de una locución, webinars y videos explicativos, unos 15 dB bajo la voz.",
+      "web": "efeonce-pieza-larga-fondo.mp3",
+      "master": "04-piezas-largas/efeonce-pieza-larga-fondo.wav",
+      "durationSec": 40.5,
+      "lufs": -13.9,
+      "truePeakDbfs": -1,
+      "sha256": "a15e07b75a39ebc73cbb7e8f59f24ab956457848da61ca6e0f9bbb7813847717",
+      "bytes": 11664102,
+      "webSha256": "0751dd81480d94208aad6c61d32affdf4d0f8d4bb71367f7d8cac06acd5eb9c6",
+      "piece": "long",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-pieza-larga-fondo.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "long-fondo-brian",
+      "kind": "audio",
+      "title": "Pieza larga de fondo con Brian",
+      "register": "fondo",
+      "line": null,
+      "voice": true,
+      "use": "Debajo de una locución, webinars y videos explicativos, unos 15 dB bajo la voz. Cierra con «Empower your Growth».",
+      "web": "efeonce-pieza-larga-fondo-brian.mp3",
+      "master": "04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav",
+      "durationSec": 40.5,
+      "lufs": -13.9,
+      "truePeakDbfs": -1,
+      "sha256": "78e73adbdb4d401c3d2a53389b1a32dead18a4781d76b75e142d634d02c3e9e1",
+      "bytes": 11664102,
+      "webSha256": "1480bebe2110114a3f23ba5ecfa45ae3a1f740540169b283175772568e97ba27",
+      "piece": "long",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-fondo-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-pieza-larga-fondo-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "long-energia",
+      "kind": "audio",
+      "title": "Pieza larga de energía",
+      "register": "energia",
+      "line": null,
+      "voice": false,
+      "use": "Lanzamientos, redes con ritmo y arranque de eventos.",
+      "web": "efeonce-pieza-larga-energia.mp3",
+      "master": "04-piezas-largas/efeonce-pieza-larga-energia.wav",
+      "durationSec": 37,
+      "lufs": -13.9,
+      "truePeakDbfs": -1,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "bytes": 10656102,
+      "webSha256": "49e31313b85402fdd1e6ea001609bee934d23020f5b94ff2b34901df4835419e",
+      "piece": "long",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-pieza-larga-energia.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "long-energia-brian",
+      "kind": "audio",
+      "title": "Pieza larga de energía con Brian",
+      "register": "energia",
+      "line": null,
+      "voice": true,
+      "use": "Lanzamientos, redes con ritmo y arranque de eventos. Cierra con «Empower your Growth».",
+      "web": "efeonce-pieza-larga-energia-brian.mp3",
+      "master": "04-piezas-largas/efeonce-pieza-larga-energia-brian.wav",
+      "durationSec": 37,
+      "lufs": -13.9,
+      "truePeakDbfs": -1,
+      "sha256": "48c4ad72422e302f860ff760e24c1c477dcd19a5bb8e64bfa120dead20ecdcca",
+      "bytes": 10656102,
+      "webSha256": "29c65521a85c2ed29c8b2293dae6e41e8acc583d9fbfb5a8916ac87c7367f129",
+      "piece": "long",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/04-piezas-largas/efeonce-pieza-larga-energia-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-pieza-larga-energia-brian.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "close-energia",
+      "kind": "audio",
+      "title": "Cierre de energía",
+      "register": "energia",
+      "line": null,
+      "voice": false,
+      "use": "Remate de cualquier pieza del registro de energía.",
+      "web": "efeonce-cierre-energia.mp3",
+      "master": "05-cierre-energia/efeonce-cierre-energia.wav",
+      "durationSec": 5.1,
+      "lufs": -14.1,
+      "truePeakDbfs": -1,
+      "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+      "bytes": 1468902,
+      "webSha256": "0fbc2dbcbec3d4d820d924c9a8cecda58ad4df835e1776efbe3ae9b9d929c9f3",
+      "piece": "close",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-cierre-energia.mp3",
+      "posterUrl": null
+    },
+    {
+      "id": "close-energia-brian",
+      "kind": "audio",
+      "title": "Cierre de energía con Brian",
+      "register": "energia",
+      "line": null,
+      "voice": true,
+      "use": "El mismo remate, con el eslogan.",
+      "web": "efeonce-cierre-energia-brian.mp3",
+      "master": "05-cierre-energia/efeonce-cierre-energia-brian.wav",
+      "durationSec": 5.1,
+      "lufs": -14.1,
+      "truePeakDbfs": -1,
+      "sha256": "3ea91c9a5b75d851b0fd553209e3fce7521d163f7c25457e63455974166c636b",
+      "bytes": 1468902,
+      "webSha256": "00da38de78207c74ef0537f66427488e25043fd4543f87f8f783725415816fc9",
+      "piece": "close",
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/05-cierre-energia/efeonce-cierre-energia-brian.wav",
+      "webUrl": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/web/efeonce-cierre-energia-brian.mp3",
+      "posterUrl": null
+    }
+  ],
+  "voiceStems": [
+    {
+      "line": "growth",
+      "master": "06-voz-sola/efeonce-voz-brian-empower-your-growth.wav",
+      "sha256": "c249897ed137f9616ecb182971fd172376c29568de367a88eafea3c744738dd9",
+      "durationSec": 1.41,
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-growth.wav"
+    },
+    {
+      "line": "brand",
+      "master": "06-voz-sola/efeonce-voz-brian-empower-your-brand.wav",
+      "sha256": "c8b48ae56608aee3cb3f6c9d0f3bcbbbd61e2aecb26102cdcb1cd61d80d006d3",
+      "durationSec": 1.53,
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-brand.wav"
+    },
+    {
+      "line": "engine",
+      "master": "06-voz-sola/efeonce-voz-brian-empower-your-engine.wav",
+      "sha256": "69c2eb36c0329fe0fec34d8c5db385d7efa0c34f4d0e888123c3d911a739be66",
+      "durationSec": 1.43,
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-engine.wav"
+    },
+    {
+      "line": "voice",
+      "master": "06-voz-sola/efeonce-voz-brian-empower-your-voice.wav",
+      "sha256": "fef03e6dfca5d286aefcaab5a712c2c65d0ed828c4b784efd7e93e9f63e9b165",
+      "durationSec": 1.51,
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-voice.wav"
+    },
+    {
+      "line": "revenue",
+      "master": "06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav",
+      "sha256": "d95d6a24b97c4e6e08797492fec1d9f50ca02a51687f1ee284130712381c1327",
+      "durationSec": 1.53,
+      "url": "https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/masters/06-voz-sola/efeonce-voz-brian-empower-your-revenue.wav"
+    }
+  ],
+  "family": [
+    {
+      "key": "glitch",
+      "name": "Glitch",
+      "what": "El magazine semanal de Efeonce (marketing, tecnología y creatividad + IA).",
+      "idea": "El mismo ADN, con un bug: el motivo Mi · Mi · Mi → La hace fallar la tercera nota, que se rompe en bytes y se rearma como la manzana, el único golpe grave. Es diseño sonoro amarrado al motion de Glitch. Además tiene música propia, aprobada el 2026-09-27: el tema B (una banda irreverente a 150 BPM, amarrada al motion) y una cama post-punk bajo las noticias.",
+      "status": "aprobada",
+      "exclusive": "Sólo de Glitch. No se usa en piezas de Efeonce, de su familia ni de clientes, y no se mezcla con este kit.",
+      "page": "https://axis.efeonce.org/references/glitch/#sonido",
+      "json": "/references/glitch.json → sound",
+      "music": {
+        "page": "/references/glitch/#musica",
+        "json": "/references/glitch.json → music"
+      }
+    }
+  ],
+  "pending": [
+    {
+      "topic": "Licencias",
+      "detail": "fal marca «Commercial use» Stable Audio 2.5 y la voz ElevenLabs v3 (esta última con «Commercial use rights included»). Pregunta abierta para legal: si el umbral de USD 1 millón de facturación anual de la licencia comunitaria de Stability aplica cuando el modelo se usa vía fal; afecta sólo al registro de energía."
+    },
+    {
+      "topic": "Prueba de reconocimiento",
+      "detail": "Sin logo, antes de cualquier pauta, como la pendiente de la órbita."
+    },
+    {
+      "topic": "Tokens",
+      "detail": "Al canonizar: los valores pasan a @efeoncepro/axis-tokens y el sonido de los masters V1.1 del bucket se reemplaza."
+    }
+  ],
+  "agentPrompt": "Para sonorizar una pieza de marca Efeonce:\n1. Lee /references/sonic-brand.json. Estado «recommended»: es la versión aprobada para usar, todavía no canon.\n2. Elige el registro por contexto (sonicUsage): fondo debajo de una voz; energía para ritmo. Nunca los dos en una pieza.\n3. Elige la línea de servicio de la pieza: su logo sonoro o su etiqueta con Brian. La melodía no cambia; sólo el timbre de la esfera.\n4. Usa el archivo del kit por su URL y comprueba su sha256. Nunca regeneres el logo, la voz ni la esfera con un modelo.\n5. Sincroniza al picture: la esfera cae con el golpe visual (motion V1.1) o con la palabra final del eslogan.\n6. Nivela al destino (−14 LUFS video/redes, −16 podcast, pico −1 dBFS) sin comprimir el golpe.\nSi una frase nueva necesita a Brian, se genera por su ID de voz (voice.voiceId), nunca por nombre, y el operador la aprueba antes de usarla.\nNunca: piezas de clientes, interfaz de Greenhouse ni pantalla de recepción. Glitch no usa este kit: su sonido es propio y sólo de Glitch (/references/glitch.json → sound)."
+}

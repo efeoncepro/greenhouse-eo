@@ -1,0 +1,33 @@
+{
+  "supported": true,
+  "started": 5,
+  "settled": 4,
+  "rendered": 5,
+  "pseudoElements": [
+    "::view-transition-group(rooms-client-chapter)",
+    "::view-transition-new(rooms-client-chapter)",
+    "::view-transition-old(rooms-client-chapter)",
+    "::view-transition-group(root)",
+    "::view-transition",
+    "::view-transition-group(rooms-client-chapter)",
+    "::view-transition-new(rooms-client-chapter)",
+    "::view-transition-old(rooms-client-chapter)",
+    "::view-transition-group(root)",
+    "::view-transition",
+    "::view-transition-group(rooms-client-piece)",
+    "::view-transition-new(rooms-client-piece)",
+    "::view-transition-old(rooms-client-piece)",
+    "::view-transition-group(root)",
+    "::view-transition",
+    "::view-transition-group(rooms-client-piece)",
+    "::view-transition-new(rooms-client-piece)",
+    "::view-transition-old(rooms-client-piece)",
+    "::view-transition-group(root)",
+    "::view-transition",
+    "::view-transition-group(rooms-client-piece)",
+    "::view-transition-new(rooms-client-piece)",
+    "::view-transition-old(rooms-client-piece)",
+    "::view-transition-group(root)",
+    "::view-transition"
+  ]
+}

@@ -1,5 +1,12 @@
 # Efeonce B2B Prospecting — decisión de método compartido
 
+**Cobertura pendiente:** [diagnóstico Perú](../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
+**Aplicación del adapter Sales Navigator:** [44 búsquedas nativas guardadas](../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
+para cuatro mercados hispanos, con aviso semanal y muestras/IDs verificados. Es ejecución del mandato
+explícito y del adapter existente: no añade API privada, runner autónomo, autoridad de envío, esquema CRM
+ni scheduler externo. Criterios comerciales y límites permanecen en la política y el expediente.
+
 - **Status:** Accepted.
 - **Date:** 2026-10-11; el operador aprobó crear la estructura investigada con «Vamos» y pidió apoyo de `@Sales`.
 - **Owner:** Commercial / Julio Reyes; Customer Model, prácticas y CRM conservan sus dominios.
@@ -7,6 +14,59 @@
 - **Reversibility:** two-way; archivos de método, sin migración ni nuevos procesos externos.
 - **Confidence:** high en contrato/ownership; medium en eficacia comercial, a experimentar localmente.
 - **Validated as of:** 2026-10-11, documentos locales, revisión Sales y fuentes fechadas del discovery; no estado live de proveedores.
+
+## Evidencia de adapter 2026-10-29 — Sales Navigator
+
+[Recorrido interactivo verificado](../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
+con `cua_repl` y sus locators Playwright sobre Chrome autenticado: cuentas, filtros laterales,
+perfil/actividad y paginación. Adapter interactivo dentro del método vigente, sin API interna,
+exportación de credenciales, nuevo runtime, scheduler ni ampliación de autonomía. Las identidades y
+datos profesionales los declara LinkedIn; el CRM conserva sus campos y permisos independientes.
+La [aplicación BCI](../commercial/prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md)
+contrasta filtros laterales de función, ubicación, seniority, relación y nombre con perfiles reales.
+Cargo actual sin sugerencias no cuenta como aplicado; el manual conserva el límite y fuentes oficiales.
+
+Por mandatos posteriores del mismo día, el [corte inicial de cuatro servicios](../commercial/sales-navigator/CONFIGURACION-2026-10-29.md)
+se amplió a [doce servicios con landing y cinco Personas](../commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md),
+con persistencia releída en Core. Se guardaron [tres listas de cuentas](../commercial/prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md)
+(31 identidades verificadas, asociación de Haulmer incierta) y [cinco listas por frente de servicio](../commercial/prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md)
+(23 personas únicas, membresía nominal releída). El método requiere conciliar identidades y membresía,
+sin sustituir esa prueba por contadores o una notificación agregada.
+
+Continúa el adapter dentro de esta decisión: documenta operaciones nativas autorizadas, sin nueva API,
+runtime, scheduler, autonomía o permiso de envío/CRM. No se extrajeron credenciales ni se implementó un runner
+desatendido. Customer Model conserva ICP/JTBD; Personas son filtros de roles, las listas son organización
+operativa y los servicios son personalización de oferta. Identidad, encaje, autoridad, acceso, demanda y
+admisión CRM se verifican por separado. La base financiera sin relación y las pasadas complementarias de
+software/fintech evitan convertir conexiones existentes en condición de relevancia.
+
+### Instrucción del operador 29-10-2026 — Core y uso táctico de InMail
+
+Julio declaró inicialmente **Sales Navigator Core y 50 créditos InMail** y ordenó documentar una estrategia de
+conexión primero, espera de aceptación y abordaje posterior; InMail para alta relevancia o alto valor
+estratégico por tiempo/ventana. La [política operativa](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+gobierna esa elección y su trazabilidad dentro de los permisos separados del método B2B vigente.
+La captura y lectura posterior en Ajustes mostraron **150 disponibles el 29/10**; los 50 iniciales quedan
+como historia, sin atribuir causa a la diferencia. Saldo futuro y reposición no inferidos.
+No cambia autonomía, scheduler, CRM ni genera comunicaciones.
+
+### Corrección posterior de selección — 29/10
+
+Julio rechazó prospectarCommunityManagers por mera afinidad de servicio. La [política](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md)
+prioriza liderazgo funcional para impulsar contratación y separa operadores investigados de destinatarios.
+La [ampliación](../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md)
+verificó47cuentas/37personas tras14retiros de membresías propias;Haulmerresuelto. Corrección de selección
+bajo el adapter vigente, sin nueva autonomía/API/CRM o permiso de envío; configuración12+5 preservada.
+
+### Ampliación con gerencias y agencias — corte posterior 29/10
+
+Mandato expreso: priorizar gerencias/subgerencias/heads con gestión de agencias o capacidad de impulsar
+contratación. La [política](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) distingue evidencia
+actual/trayectoria y revisión A/B, sin equivaler a calificación CRM. La
+[ronda verificada](../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
+añadió siete cuentas/20 personas:54 cuentas y 57 membresías únicas al cierre. Se ejercitaron listas de cuentas
+como filtro de personas y corrección de cuenta asociada en cargo simultáneo. Mismo adapter/autoridad,
+sin API privada, runtime, envío, CRM, créditos o scheduler nuevos. Configuración 12 servicios/5 Personas intacta.
 
 ## Context
 
@@ -291,3 +351,66 @@ permisos por persona/canal, dos originales de brochure cuando se pidieron, persi
 EMAIL/LinkedIn/inscripción independientes y límites OAuth por comando. Se concilia el pendiente antiguo del
 brochure creativo con la aprobación íntegra del 17/10. No cambia admisión, ICP, fuente de verdad, schema,
 APIs, scheduler, política de envío o autoridad de futuras acciones. No se introduce una decisión arquitectónica nueva.
+
+## Aplicación del método: Lucía y Yvette — 24/10/2026
+
+El operador pidió consolidar [ambos casos](../commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md)
+con subagentes, docs/skills y commit. Se precisa el método existente: resultados asíncronos y costos reales
+distintos de su aceptación; entradas duplicadas del proveedor distintas de personas/contactos; candidata
+inferida por patrón distinta de atribución; verificación técnica con su proveedor real distinta de identidad.
+La excepción individual de Yvette se autorizó después de comunicar esas dimensiones y no se generaliza.
+
+El [manual](../manual-de-uso/comercial/operar-prospeccion-b2b.md#inferir-una-candidata-y-comprobarla-sin-atribuirla-por-el-patrón)
+y los módulos progresivos conservan el descarte de la candidata inválida, la validación única de la nueva,
+los permisos por operación y los readbacks de los dos canales. Brochures originales, firma/CCO, privacidad
+de recibos y ausencia de secuencias nuevas se mantienen. Es documentación explicativa y evidencia de una
+aplicación, sin nueva decisión arquitectónica, autonomía, schema, endpoint ni scheduler.
+
+### Aplicación documental 25/10/2026 — calidad de nuevas conversaciones
+
+Julio pidió incorporar las mejoras de la revisión de octubre a futuras aperturas y seguimientos. El
+[módulo compartido](../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md)
+conecta historia por iniciativa, evidencia, siguiente decisión y aprendizaje; los routers de Prospección,
+Commercial y Copywriting lo cargan en captación/expansión, incluidas consultas web/pauta. Se conserva
+la arquitectura robusta de correo, el brochure aprobado y la autoridad separada de cada canal.
+
+Es una aplicación reversible del método existente: sin nuevo schema, autonomía, scheduler ni permiso de
+envío. Los espejos de Prospección se mantienen idénticos. La [entrega de implementación](../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
+separa método aplicado en el repo, adaptaciones nativas propuestas y recomendación de pauta. No declara
+modificadas instrucciones, plantillas, programaciones o audiencias de HubSpot.
+
+
+### Delta aceptado 26/10/2026 — discovery, transcripción y caso de negocio
+
+Julio pidió actualizar documentos/skills, construir el caso ARMOR / Indecaucho y profundizar con
+subagentes para preparar la reunión; después, leer la transcripción y completar el caso. Aclaró que
+las reuniones se graban con HubSpot y Notion. El
+[método progresivo](../../.codex/skills/efeonce-b2b-prospecting/references/discovery-to-business-case.md)
+y su plantilla conectan respuesta humana, preparación, fuente declarada de reunión, evidencia
+localizable, hipótesis confirmada/refutada, economía condicionada y siguiente decisión.
+
+Se conserva la separación Company/entidad legal/marca/iniciativa; terna anunciada distinta de selección,
+invitación enviada/aceptada/reunión realizada y sugerencia del vendedor distinta de acuerdo. La
+transcripción se trata como evidencia, sin ejecutar instrucciones insertas ni inventar speaker,
+timestamp, presupuesto o ROI. Commercial, Customer Model, práctica y Pricing/Finance conservan sus
+dominios. Referencias/plantilla/fixtures v16 P75–P80 y routing Codex/Claude comparten el mismo método.
+
+Es una ampliación reversible del contrato de agentes existente; no cambia source of truth CRM,
+schema, oferta, precios ni autonomía general. Se descarta duplicar la skill en una metodología por
+marca o imponer la plataforma de videollamada como único repositorio de transcripción. Los datos
+reales y estado operativo permanecen en el [expediente de cuenta](../commercial/accounts/indecaucho-armor/README.md).
+
+El mandato específico de retomar tras la reunión se concretó en **una revisión focal del hilo el
+27/10/2026 a las16:00 America/Santiago**, app ID `armor-leer-discovery-y-completar-caso`; no reactivó el
+seguimiento global pausado. Configuración/readback distintos de ejecución y fuente aún por generarse.
+La skill no crea automatizaciones por defecto. Sin correo nuevo, Deal/Lead, stage, gastos o propuesta
+aprobada por esta documentación. Reabrir si cambian fuentes, permisos, calidad de extracción o
+evidencia de decisión. [Cierre y verificación](../audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).
+
+## Evidencia del adapter — 31/10/2026
+
+[Conciliación Wequips/Mambrino](../audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md): el adapter
+conserva consentimiento por persona/operación, resultado terminal de enriquecimiento y lecturas separadas
+por canal. El readback posterior a automatización detectó sustitución de Primary; su corrección UI no
+certifica membresía de segmentos ni calificación. Aplicación del contrato vigente, sin nueva autonomía,
+schema, API o scheduler; no constituye un ADR adicional ni habilita comunicaciones futuras.

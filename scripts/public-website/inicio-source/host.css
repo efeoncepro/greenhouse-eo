@@ -1,0 +1,249 @@
+/* Host layer: what the canvas got from its own document (its `.page` wrapper and body) and the WordPress theme does not give. */
+/* Ohio gives body line-height 1.6, 16.4px and -0.01em tracking; the canvas sets 16px/1.6 on its wrapper (now each module root). */
+.gh-inicio{--accent:#36c8bf;font-size:16px;letter-spacing:normal;width:100%;overflow-x:clip;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;min-height:0}
+.gh-inicio *,.gh-inicio *::before,.gh-inicio *::after{box-sizing:border-box} /* the canvas' own reset (`.page *`) */
+.gh-inicio section{margin:0}
+/* Ohio skins headings, paragraphs, lists and buttons globally; the canvas sets what it needs. */
+.gh-inicio :is(h1,h2,h3,h4,h5,h6){font-family:inherit;color:inherit;text-transform:none;letter-spacing:inherit;margin:0;font-weight:inherit;line-height:inherit;font-size:revert}
+.gh-inicio :is(p,ul,ol,li,figure,figcaption,blockquote){font-family:inherit;color:inherit;letter-spacing:inherit}
+.gh-inicio :is(ul,ol){list-style:none}
+body .gh-inicio :is(ul,ol) > li{margin:0}
+.gh-inicio li::before{content:none}
+.gh-inicio a{box-shadow:none}
+.gh-inicio button{text-transform:none;letter-spacing:normal;height:auto;box-shadow:none;margin:0;background:none;border:0;cursor:pointer}
+.gh-inicio img,.gh-inicio video{max-width:100%}
+.gh-inicio code{background:none;padding:0;font-family:inherit;color:inherit;font-size:inherit}
+/* Editor switch «Animaciones» off. */
+.gh-inicio[data-motion="no"] *{animation:none !important;transition:none !important}
+
+/* States the canvas swapped in its runtime: every variant is editable markup and inicio-landing.js shows one. */
+.gh-inicio .gh-st:not(.on){display:none}
+.gh-inicio .gh-view:not(.on),.gh-inicio .gh-chart:not(.on){display:none}
+.gh-inicio .gh-k{display:none}
+.gh-inicio [data-gh-cmp-table="0"] .gh-k[data-gh-k="0"],.gh-inicio [data-gh-cmp-table="1"] .gh-k[data-gh-k="1"],.gh-inicio [data-gh-cmp-table="2"] .gh-k[data-gh-k="2"]{display:inline}
+.gh-inicio .gh-yt{display:none}
+.gh-inicio .you.s0 .gh-yt[data-gh-ystate="0"],.gh-inicio .you.s1 .gh-yt[data-gh-ystate="1"],.gh-inicio .you.s2 .gh-yt[data-gh-ystate="2"]{display:inline}
+/* The FAQ panel mirrors the open answer only when the script runs; without it the list keeps every answer. */
+.gh-inicio [data-gh-faq]:not([data-gh-ready]) .faq-a{grid-template-rows:1fr}
+/* Before the script measures the sticky scenes they read as normal sections. */
+.gh-inicio [data-gh-aeo]:not([data-gh-ready]) .aeo2-sticky{position:relative}
+
+/* The site's global navigation floats over the hero (72px): keep the hero copy below it. */
+@media (min-width:901px){.gh-inicio .hero{padding-top:clamp(150px,11vw,176px)}}
+/* «Agenda una reunión»: governed Growth CTA (open_meeting_scheduler, the global menu's discovery meeting) painted as
+   the canvas' primary button. The renderer owns the action, the dialog and telemetry; the host only skins the launcher. */
+.gh-inicio .meet-cta{display:flex;margin-top:22px}
+.gh-inicio .meet-cta greenhouse-cta{display:flex;width:min(100%,320px);--gh-cta-reserve:52px} /* the renderer contains its inline size: it needs an explicit width */
+.gh-inicio .meet-cta greenhouse-cta .ghc-card{display:flex!important;gap:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;animation:none!important}
+.gh-inicio .meet-cta greenhouse-cta :is(.ghc-content,.ghc-dismiss){display:none!important}
+.gh-inicio .meet-cta greenhouse-cta .ghc-actions{width:100%;margin:0!important;padding:0!important}
+.gh-inicio .meet-cta greenhouse-cta .ghc-primary{width:100%}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback){display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:16px 26px;border:0;border-radius:14px;font-family:'Poppins',system-ui,sans-serif;font-size:16px;font-weight:600;line-height:1;letter-spacing:0;text-transform:none;white-space:nowrap;text-decoration:none!important;color:#ffffff!important;background:#0e8c82!important;box-shadow:none!important;cursor:pointer;transition:background-color .3s,transform .5s cubic-bezier(.2,0,0,1)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback)::after{content:"→";font-size:18px;line-height:1;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):hover{background:#0b7a71!important;transform:translateY(-2px)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):hover::after{transform:translateX(4px)}
+.gh-inicio .meet-cta :is(greenhouse-cta .ghc-primary,.gh-inicio-meeting-fallback):focus-visible{outline:2px solid #091951;outline-offset:3px}
+
+/* ---------- Mobile and tablet pass (2026-10-29): same story as desktop, told for the thumb ---------- */
+/* Single-column grids must be able to shrink below their content (320px overflowed in agenda and respaldo). */
+.gh-inicio :is(.cta-grid,.trust,.method-grid,.faq,.hero-grid,.scene-grid,.aeo2-grid)>*{min-width:0}
+.gh-inicio .hero.idle .line-pill.on .fill{animation-play-state:paused}
+.gh-inicio .h-touch,.gh-inicio .sk-live{display:none}
+.gh-inicio .m-desc{display:none}
+.gh-inicio .mail-a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(9,25,81,.3)}
+/* Testimonials share one cell: switching quotes no longer changes the section height. */
+.gh-inicio .trust>div>div:has(>.qbox){display:grid;justify-items:start}
+.gh-inicio .trust .qbox{grid-area:2/1;width:100%}
+.gh-inicio .trust .qbox.gh-st:not(.on){display:block;visibility:hidden}
+.gh-inicio .trust .q-tabs{grid-row:3}
+.gh-inicio .trust .q-link{grid-row:4}
+.gh-inicio .fan{container-type:inline-size}
+
+/* Touch screens: no sticky hover; the Sparks answer to a tap with a legend under the copy. */
+@media (hover:none){
+.gh-inicio .marquee:hover .mq-track,.gh-inicio .ribbon:hover .rb-track{animation-play-state:running}
+.gh-inicio .logo-item:hover{filter:grayscale(1) brightness(.35);opacity:.85;transform:none}
+.gh-inicio .h-fine{display:none}
+.gh-inicio .h-touch{display:inline}
+.gh-inicio .sk .sk-tip{display:none}
+.gh-inicio .cst:has(.sk-btn:hover) .sk-btn:not(:hover) img{opacity:var(--op)}
+.gh-inicio .sk.tap .sk-btn img{transform:scale(1.14) rotate(-4deg);filter:drop-shadow(0 26px 26px rgba(9,25,81,.3));opacity:1}
+.gh-inicio .sk-live{display:flex;flex-direction:column;gap:3px;max-width:320px;min-height:64px;margin:14px auto 0;padding:12px 16px;border-radius:14px;background:var(--ink);color:#fff;text-align:left;opacity:0;transform:translateY(8px) scale(.96);transition:opacity .25s var(--e-std),transform .55s var(--spring-pop)}
+.gh-inicio .sk-live.on{opacity:1;transform:none}
+.gh-inicio .sk-live b{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
+.gh-inicio .sk-live b i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.gh-inicio .sk-live small{font-size:13px;line-height:1.4;color:var(--muted)}
+}
+@media (prefers-reduced-motion:reduce){.gh-inicio .ribbon{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.gh-inicio .ad{scroll-snap-align:start}}
+
+@media (max-width:900px){
+/* Hero: nav is 72px; the first fold holds the answer and the CTA. */
+.gh-inicio .hero{padding-top:96px}
+.gh-inicio .lines{gap:4px;flex-wrap:nowrap}
+.gh-inicio .line-pill{white-space:nowrap;min-height:44px;padding:12px 2px 10px;font-size:12px}
+.gh-inicio .ctas .btn{justify-content:center;min-height:52px}
+.gh-inicio .lens{margin-bottom:64px;touch-action:pan-y}
+/* Motor: problem → stage → solution, told in order instead of swapping off screen. */
+.gh-inicio #motor .scene-sticky{padding-block:72px 96px}
+.gh-inicio #motor .swap-copy{display:contents}
+.gh-inicio #motor .copy-state{position:relative;inset:auto}
+.gh-inicio #motor .copy-state.a{order:1;opacity:1;transform:none;pointer-events:auto}
+.gh-inicio #motor .stage{order:2;margin:40px auto 24px}
+.gh-inicio #motor .copy-state.b{order:3;margin-top:24px;opacity:1;transform:none;pointer-events:auto}
+.gh-inicio #motor[data-gh-ready]:not(.solved) .copy-state.b{opacity:0;transform:translateY(24px)}
+/* Lines: 44px targets and an open/close chevron. */
+.gh-inicio .tags .tag-a{min-height:44px;padding:10px 14px}
+.gh-inicio .acc-tab .n{display:inline-flex;align-items:center;gap:14px}
+.gh-inicio .acc-tab .n::after{content:"";width:9px;height:9px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .5s var(--spring)}
+.gh-inicio .acc.open .acc-tab .n::after{transform:translateY(2px) rotate(-135deg)}
+/* AEO: a normal section whose stage follows the scroll; rows are laid out by the script at their real height. */
+.gh-inicio .aeo2{height:auto!important}
+.gh-inicio .aeo2-sticky{position:relative!important;height:auto!important;padding-block:80px}
+.gh-inicio .stp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:18px 0 0;overflow:visible}
+.gh-inicio .stp-track{display:block;left:0;right:0;top:0;bottom:auto;width:auto;height:2px}
+.gh-inicio .stp-fill{transform-origin:0 50%;transform:scaleX(var(--f))}
+.gh-inicio .stp-sph{display:block;left:9px;top:1px;transform:translateX(var(--sx0,0px))}
+.gh-inicio .stp-b b{font-size:16px}
+.gh-inicio .stp-b small{font-size:12px}
+.gh-inicio .cmp-box{min-height:172px}
+.gh-inicio .cmp-q{font-size:20px;right:64px}
+.gh-inicio .row{height:auto;transform:translateY(var(--ty,calc(var(--rk) * 84px)))}
+.gh-inicio .rv{height:auto;min-height:56px;padding-block:10px;font-size:14px;display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:12px;row-gap:6px;align-items:center}
+.gh-inicio .rv :is(.src,.ok){grid-column:2;margin-left:0;justify-self:start}
+.gh-inicio .rv .ok:empty{display:none}
+/* Sparks at mid height sit behind the copy on phones. */
+.gh-inicio .sk.gh-mid{display:none}
+/* Respaldo: the comparator block closer to the testimonials; partner cards a little lower. */
+.gh-inicio #respaldo>.wrap:last-child{margin-top:80px!important}
+.gh-inicio .fan-card{height:76px}
+.gh-inicio .fan .fan-card{transition-delay:calc(var(--i) * 45ms)}
+.gh-inicio .fan.gh-stack .fan-card{transform:translate(calc((1 - var(--c)) * (100% + 10px)),calc((1 - var(--r)) * (100% + 10px))) rotate(calc((var(--i) - 4) * 4deg))!important}
+}
+
+@media (max-width:699px){
+/* Hero: smaller lens, the answer as the dominant moment. */
+.gh-inicio .lens{width:min(64vw,300px);margin-bottom:58px}
+.gh-inicio .q{margin-top:18px}
+.gh-inicio .answer{font-size:clamp(52px,19vw,84px)}
+.gh-inicio .ctas .btn{flex:1 1 100%}
+/* Motor chips: half the stage wide, text wraps. */
+.gh-inicio .chipx{width:calc(50% - 6px);margin:-32px 0 0 calc(-25% + 3px);padding:10px}
+.gh-inicio #motor:not(.solved) .chipx{padding-right:28px}
+.gh-inicio .chipx :is(.t,.s){display:grid;height:auto}
+.gh-inicio .chipx :is(.t,.s) span{position:relative;grid-area:1/1;white-space:normal}
+.gh-inicio .chipx .t{font-size:12px;line-height:1.25}
+.gh-inicio .chipx .s{font-size:11px;line-height:1.3;margin-top:3px}
+/* Lines: the open card ends with its person rising from the line's glow (same images as the hero). */
+.gh-inicio .acc-photo{display:block;height:min(58vw,240px);margin:20px -22px -26px;overflow:hidden}
+.gh-inicio .acc-photo::before{right:auto;left:50%;bottom:-35%;width:92%;transform:translateX(-50%)}
+.gh-inicio .acc-photo img{right:auto;left:50%;bottom:-10%;height:125%;transform:translateX(-50%)}
+/* Method: the four stations as a rail under the ring; the description breathes outside the circle. */
+.gh-inicio .method-sticky{padding-block:72px 48px}
+.gh-inicio .mstage{width:min(84vw,400px);margin:40px auto 128px}
+.gh-inicio .mcore{inset:17%}
+.gh-inicio .mcore h3{font-size:clamp(22px,6.6vw,30px)}
+.gh-inicio .mcore p{display:none}
+.gh-inicio .mstep{width:50%;min-height:44px;font-size:12px;margin:0!important;right:auto;text-align:left;cursor:pointer}
+.gh-inicio .mstep b{font-size:15px}
+.gh-inicio .mstep.s0,.gh-inicio .mstep.s2{left:0;right:auto;text-align:left}
+.gh-inicio .mstep.s1,.gh-inicio .mstep.s3{left:50%;right:auto;padding-left:12px;text-align:left}
+.gh-inicio .mstep.s0,.gh-inicio .mstep.s1{top:calc(100% + 24px)}
+.gh-inicio .mstep.s2,.gh-inicio .mstep.s3{display:block;top:calc(100% + 76px)}
+.gh-inicio .m-desc{display:block;max-width:34ch;min-height:5em;margin:0 auto;text-align:center;font-size:15px;color:rgba(255,255,255,.74)}
+}
+
+@media (max-width:520px){
+/* One rhythm and one h2 scale on phones. */
+.gh-inicio .sec{padding-block:72px}
+.gh-inicio .h2{font-size:clamp(34px,10.6vw,44px);line-height:1.02}
+.gh-inicio .h2 .nowrap{white-space:normal}
+.gh-inicio section[id]{scroll-margin-top:24px}
+.gh-inicio .copy{min-height:44px;padding:10px 14px!important;font-size:13px}
+.gh-inicio #agenda .cta-card{padding:24px}
+/* Comparator: full-width toggle and two readable columns. */
+.gh-inicio #respaldo .seg{display:grid;width:100%;grid-auto-columns:minmax(0,1fr)}
+.gh-inicio #respaldo .seg button{min-height:48px;padding:6px 8px;white-space:normal;line-height:1.15;font-size:13px}
+.gh-inicio .cmp-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gh-inicio .cmp-row .lab{grid-column:1/-1;padding-bottom:0!important}
+.gh-inicio .cmp-row.head>div:first-child{display:none}
+.gh-inicio .trust .q-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+.gh-inicio .trust .q-tab{padding:8px 12px 8px 8px;gap:10px;min-width:0}
+.gh-inicio .trust .q-tab .av{width:32px;height:32px}
+/* AEO: the question gets the width, the engines scroll in one row. */
+.gh-inicio .cmp-q{right:24px;font-size:19px}
+.gh-inicio .cmp-box{padding-bottom:64px}
+.gh-inicio .eng{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-26px;padding:2px 26px;scroll-snap-type:x proximity;-webkit-mask-image:linear-gradient(90deg,transparent,#000 18px,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(90deg,transparent,#000 18px,#000 calc(100% - 18px),transparent)}
+.gh-inicio .eng::-webkit-scrollbar{display:none}
+.gh-inicio .eng-b{flex:none;min-height:44px;scroll-snap-align:start}
+.gh-inicio .stp-b b{font-size:15px}
+/* Greenhouse: KPI values fit their cell; toggle full width. */
+.gh-inicio .dash-body{padding:14px;gap:12px}
+.gh-inicio .kpis{gap:10px}
+.gh-inicio .kpi{padding:14px}
+.gh-inicio .kpi .v{font-size:clamp(26px,8vw,38px);white-space:nowrap}
+.gh-inicio #greenhouse .seg{display:grid;width:100%}
+.gh-inicio #greenhouse .seg button{min-height:44px;padding-inline:8px;white-space:normal}
+.gh-inicio .proj li{flex-wrap:wrap}
+/* Agents: the copy sets the height, Sparks frame it above and below. */
+.gh-inicio .cst{height:auto;padding:150px 0 200px}
+.gh-inicio .cst-core{position:relative;left:auto;top:auto;transform:none;margin-inline:auto}
+.gh-inicio .sk.low{top:70px}
+.gh-inicio .sk:not(.low){top:calc(100% - 95px)}
+.gh-inicio .cst-hint{max-width:32ch;text-align:left}
+.gh-inicio .cst-hint img{width:32px;height:32px}
+}
+
+@media (max-width:360px){
+.gh-inicio .chip{font-size:12px;padding:6px 12px}
+.gh-inicio .q{font-size:20px}
+.gh-inicio .line-pill{font-size:11.5px}
+}
+
+/* Tablet: two columns like desktop where it fits. */
+@media (min-width:700px) and (max-width:900px){
+.gh-inicio .hero-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+.gh-inicio .lens{order:0;width:100%;margin-bottom:64px}
+.gh-inicio .chipx{width:200px;margin:-36px 0 0 -100px}
+.gh-inicio .chipx .t{font-size:13px}
+.gh-inicio .chipx .s{font-size:11.5px}
+.gh-inicio .acc-body{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+.gh-inicio .acc-photo{display:block;min-height:340px}
+.gh-inicio .acc-photo img{height:104%;bottom:-26px;right:-22px}
+.gh-inicio .mstage{width:min(54%,420px);margin:110px auto 130px}
+.gh-inicio .mstep{width:140px;cursor:pointer}
+.gh-inicio .mstep.s0,.gh-inicio .mstep.s2{left:50%;margin-left:-70px;text-align:center}
+.gh-inicio .mstep.s2{display:block;top:105%}
+.gh-inicio .mstep.s1{left:calc(100% + 16px);right:auto;top:50%;margin:-22px 0 0;text-align:left}
+.gh-inicio .mstep.s3{right:calc(100% + 16px);left:auto;top:50%;margin:-22px 0 0;text-align:right}
+}
+@media (min-width:521px) and (max-width:900px){
+.gh-inicio .cmp-q{font-size:26px}
+.gh-inicio .cmp-box{min-height:140px}
+.gh-inicio .cst{height:clamp(820px,100vw + 140px,1080px)}
+.gh-inicio .cst-core{width:min(560px,74%)}
+.gh-inicio .works{--s:.86}
+}
+@media (min-width:640px) and (max-width:900px){
+.gh-inicio .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.gh-inicio .kpi .v{font-size:30px}
+}
+/* Small desktop 901–1180: method labels and the open fan stay on screen. */
+@media (min-width:901px) and (max-width:1180px){
+.gh-inicio .method-grid{gap:24px;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)}
+.gh-inicio .mstage{width:min(calc(100% - 300px),440px)}
+.gh-inicio .mcore{inset:14%}
+.gh-inicio .mcore h3{font-size:24px}
+.gh-inicio .mstep{width:140px}
+.gh-inicio .mstep.s0,.gh-inicio .mstep.s2{margin-left:-70px}
+.gh-inicio .mstep.s1{left:calc(100% + 10px)}
+.gh-inicio .mstep.s3{right:calc(100% + 10px)}
+.gh-inicio .fan-card{width:min(226px,31cqw);margin-left:calc(min(226px,31cqw) / -2)}
+.gh-inicio :is(.fan:hover,.fan.spread) .fan-card{transform:translate(calc((var(--c) - 1) * min(238px,33cqw)),calc((var(--r) - 1) * 132px)) rotate(0deg)}
+}
+
+/* Ohio pins its Dark/Light switch (left) and «Follow Us» (right) at 1.5vw + 56px from each edge from 1181px up. The
+   canvas' .wrap (1240px, 20px gutters) clears them from ~1400px; below that the copy would run under them. */
+@media (min-width:1181px){
+.gh-inicio{--gh-rail:calc(1.5vw + 88px)}
+.gh-inicio .wrap{padding-left:max(20px,calc(var(--gh-rail) - max(0px,(100vw - 1240px) / 2)));padding-right:max(20px,calc(var(--gh-rail) - max(0px,(100vw - 1240px) / 2)))}
+}

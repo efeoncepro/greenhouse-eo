@@ -95,7 +95,7 @@ const TABLET_CSS = `
 /* 5 · riel */
 .v3t .hs ~ section .w > h2.idea{zoom:.72}
 .v3t .rail{padding:16px 40px 24px;scroll-padding-inline:40px}
-.v3t .card{zoom:.82}
+.v3t .rc{zoom:.82}
 /* 1 · órbita */
 .v3t #t-temas{padding:96px 0 88px!important}
 .v3t .stage{width:auto;height:auto;max-width:1100px;padding:0 40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:24px;row-gap:4px}

@@ -427,13 +427,117 @@ export const getAuthPersonSignals = async (deps: AuthPersonSignalDeps = {}): Pro
   }
 }
 
+/** TASK-1833: active-key age is observed from the registry, never inferred from KMS creation time. */
+export const AUTH_KEYS_ROTATION_OVERDUE_SIGNAL_ID = 'auth.keys.rotation_overdue'
+export const AUTH_ROTATION_WARNING_DAYS = 80
+
+type ActiveKeyAgeRow = { activated_at: Date | string }
+
+export const getAuthKeyRotationOverdueSignal = async (deps: {
+  loadActiveKeys?: () => Promise<ActiveKeyAgeRow[]>; now?: () => Date
+} = {}): Promise<ReliabilitySignal> => {
+  const now = (deps.now ?? (() => new Date()))()
+
+  const base = { signalId: AUTH_KEYS_ROTATION_OVERDUE_SIGNAL_ID, moduleKey: 'identity' as const,
+    kind: 'data_quality' as const, source: 'getAuthKeyRotationOverdueSignal', label: 'Antigüedad de la llave de firma activa', observedAt: now.toISOString() }
+
+  try {
+    const rows = await (deps.loadActiveKeys ?? (() => query<ActiveKeyAgeRow>(
+      `SELECT activated_at FROM greenhouse_auth.signing_keys WHERE state='active'`
+    )))()
+
+    const activated = rows.length === 1 ? new Date(rows[0].activated_at).getTime() : NaN
+    const ageDays = (now.getTime() - activated) / 86_400_000
+
+    if (!Number.isFinite(ageDays) || ageDays < 0) return { ...base, severity: 'error',
+      summary: 'No existe una única llave activa con fecha de activación válida.', evidence: [] }
+
+    return { ...base, severity: ageDays > AUTH_ROTATION_WARNING_DAYS ? 'warning' : 'ok',
+      summary: ageDays > AUTH_ROTATION_WARNING_DAYS
+        ? 'La llave activa supera 80 días; verificar y ejecutar la rotación gobernada.'
+        : 'La llave activa permanece dentro de la ventana de rotación de 80 días.',
+      evidence: [{ kind: 'metric', label: 'active_key_age_days', value: ageDays.toFixed(2) },
+        { kind: 'sql', label: 'Fuente', value: 'greenhouse_auth.signing_keys; estado active' }] }
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_auth_key_rotation', component: 'auth-server' } })
+
+    return { ...base, severity: 'error', summary: 'No se pudo verificar la antigüedad de la llave activa.', evidence: [] }
+  }
+}
+
+const FIRST_PARTY_SIGNAL_DEFINITIONS = {
+  first_party_replay: { signalId: 'auth.first_party.code_reuse_detected', label: 'Reuso de código first-party', severity: 'error' },
+  otp_rate_limited: { signalId: 'auth.invitation_otp.rate_limited', label: 'Invitaciones OTP limitadas por abuso', severity: 'warning' },
+  otp_delivery_failed: { signalId: 'auth.invitation_otp.delivery_failed', label: 'Entrega de invitaciones OTP fallida', severity: 'error' },
+  otp_unavailable: { signalId: 'auth.invitation_otp.unavailable', label: 'Verificación de invitaciones OTP no disponible', severity: 'error' }
+} as const
+
+type FirstPartySignalKey = keyof typeof FIRST_PARTY_SIGNAL_DEFINITIONS
+type FirstPartyAbuseRow = { signal_key: FirstPartySignalKey; events: number; clients: number }
+
+/** SQL projects only aggregates. Codes, proofs, email, invitation URL and opaque recipient IDs never leave the ledger. */
+const FIRST_PARTY_ABUSE_SQL = `
+  SELECT signal_key, count(*)::int AS events, count(DISTINCT client_id)::int AS clients
+  FROM (
+    SELECT client_id, CASE
+      WHEN details->>'flowClass'='first_party_sign_in' AND details->>'reason'='first_party_code_reuse'
+        THEN 'first_party_replay'
+      WHEN details->>'surface'='invitation_email_otp' AND details->>'outcome'='rate_limited'
+        THEN 'otp_rate_limited'
+      WHEN details->>'surface'='invitation_email_otp' AND details->>'outcome'='delivery_failed'
+        THEN 'otp_delivery_failed'
+      WHEN details->>'surface'='invitation_email_otp' AND details->>'outcome'='unavailable'
+        THEN 'otp_unavailable'
+      END AS signal_key
+    FROM greenhouse_auth.oauth_audit_events
+    WHERE occurred_at >= now() - INTERVAL '24 hours' AND outcome='rejected'
+      AND event_type IN ('token','authorize')
+  ) AS classified
+  WHERE signal_key IS NOT NULL
+  GROUP BY signal_key
+`
+
+export const getAuthFirstPartyAbuseSignals = async (deps: {
+  loadRows?: () => Promise<FirstPartyAbuseRow[]>
+} = {}): Promise<ReliabilitySignal[]> => {
+  const observedAt = new Date().toISOString()
+  const definitions = Object.entries(FIRST_PARTY_SIGNAL_DEFINITIONS)
+
+  try {
+    const rows = await (deps.loadRows ?? (() => query<FirstPartyAbuseRow>(FIRST_PARTY_ABUSE_SQL)))()
+    const byKey = new Map(rows.map(row => [row.signal_key, row]))
+
+    return definitions.map(([key, definition]) => {
+      const row = byKey.get(key as FirstPartySignalKey)
+      const events = row?.events ?? 0
+      const clients = row?.clients ?? 0
+
+      if (!Number.isInteger(events) || events < 0 || !Number.isInteger(clients) || clients < 0) throw new Error('auth_signal_invalid_aggregate')
+
+      return { signalId: definition.signalId, moduleKey: 'identity', kind: 'incident', source: 'getAuthFirstPartyAbuseSignals',
+        label: definition.label, observedAt, severity: events > 0 ? definition.severity : 'ok',
+        summary: events > 0 ? `${events} evento(s) registrado(s) en 24 h; revisar el carril y su cliente.` : 'Sin eventos registrados de esta categoría en 24 h.',
+        evidence: [{ kind: 'metric', label: 'events_24h', value: String(events) },
+          { kind: 'metric', label: 'clients_24h', value: String(clients) }] }
+    })
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_auth_first_party', component: 'auth-server' } })
+
+    return definitions.map(([, definition]) => ({ signalId: definition.signalId, moduleKey: 'identity', kind: 'incident',
+      source: 'getAuthFirstPartyAbuseSignals', label: definition.label, observedAt, severity: 'error',
+      summary: 'No se pudo verificar el ledger de eventos first-party/OTP.', evidence: [] }))
+  }
+}
+
 export const getAuthServerSignals = async (): Promise<ReliabilitySignal[]> => {
-  const [jwks, lifecycle, abuse, person] = await Promise.all([
+  const [jwks, lifecycle, abuse, person, rotation, firstParty] = await Promise.all([
     getAuthIssuerJwksSignal(),
     getAuthSigningKeysLifecycleSignal(),
     getAuthOAuthAbuseSignals(),
-    getAuthPersonSignals()
+    getAuthPersonSignals(),
+    getAuthKeyRotationOverdueSignal(),
+    getAuthFirstPartyAbuseSignals()
   ])
 
-  return [jwks, lifecycle, ...abuse, ...person]
+  return [jwks, lifecycle, ...abuse, ...person, rotation, ...firstParty]
 }

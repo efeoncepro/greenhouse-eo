@@ -10,6 +10,25 @@ Canonical sources:
 - `docs/manual-de-uso/public-site/operar-paginas-miscelaneas.md`
 - `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
 
+## Blog archive v3 — live since 2026-10-24 (TASK-2055)
+
+Search, category, tag and author views of the blog are served by the **«Archivo del blog»** template of `eo-blog-home`
+(`EOBH_Archive`, `template_include` behind `eo_blog_archive_enabled` = `0|preview|1`, now `1`), with data from
+`EO_Archive_Adapter` (`eoba_data`, `efeonce-editorial-blocks`). Contract: `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`;
+manual: `docs/manual-de-uso/public-site/operar-archivo-del-blog.md`. The Ohio baseline below still applies to the **404**
+and to date/format archives.
+
+- Change the look only through `scripts/public-website/blog-archive/` (bind → build → equivalence, PHP parity, pixel gate
+  ≤ 1 %, overflow 320–1920, axe); never edit `assets/generated/archive*`.
+- Operate with `pnpm public-website:blog-home archive <0|preview|1>` and `topic-descriptions <file.json>` (plan unless
+  `--apply`, operator's go). Preview URLs (`?eoba_preview=<token>`) bypass the Kinsta cache.
+- Indexing: topic indexable only with a description and ≥ 4 posts; tag, search, empty topic and `?formato=` noindex;
+  non-editorial authors (service accounts, 0 posts) are a real 404.
+- **Lesson (2026-10-24):** Ohio prints a 108 px `#content > .header-cap` on archive views that `/blog/` does not have;
+  the local preview (shell of `/blog/`) cannot show it — always run the gate against production in preview mode.
+- **Lesson:** right after `archive 1 --apply` some views keep Ohio for a minute (Kinsta purge propagating, `MISS` still
+  served by the old edge); re-read before concluding anything.
+
 ## Live baseline — 2026-08-31
 
 - 404 → parent `ohio/404.php`.

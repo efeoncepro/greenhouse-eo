@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#F0EEE6}
+#c{width:1248px;height:1664px;position:relative;overflow:hidden;background:#F0EEE6;font-family:Poppins}
+#cam{position:absolute;inset:0;transform-origin:624px 680px}
+#prompt{position:absolute;left:194px;top:250px;width:860px;font-size:30px;line-height:1.35;color:#3d3a33}
+#code{position:absolute;left:194px;top:330px;width:900px;font-family:'IBM Plex Mono',monospace;font-size:27px;line-height:1.6;color:#2b2925;white-space:pre}
+#code .c{color:#9a958a}#code .k{color:#B5563B}
+#cur{display:inline-block;width:14px;height:31px;background:#D97757;vertical-align:-6px;margin-left:2px}
+#win{position:absolute;left:194px;top:600px;width:860px;height:605px;border-radius:14px;overflow:hidden;background:#F3F1EA;
+ box-shadow:0 18px 50px rgba(60,50,30,.18),0 0 0 1.5px rgba(60,50,30,.18)}
+.capa{position:absolute;inset:0;background:url(tinta-ventana.png) center/100% 100% no-repeat}
+</style></head><body><div id="c"><div id="cam">
+<div id="prompt">Haz que miles de partes se muevan como una sola.</div>
+<div id="code"></div>
+<div id="win"><div class="capa" id="dunas"></div><div class="capa" id="cielo"></div><div class="capa" id="sol"></div></div>
+</div></div>
+<script>
+// Grilla de 128 BPM: tiempo = 0,46875 s, semicorchea = 0,1171875 s. Fuente: audio-cues-escapa.json
+const B=0.46875, S=B/4, T_VOLAR=1.640625, T_GOLPE=1.875
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), easeOut=t=>1-Math.pow(1-t,3)
+const LINEAS=[
+ {txt:'// tu negocio, conectado',cls:'c',t0:0.0,t1:B},
+ {txt:'const bandada = crearBandada({ partes: 10000 })',cls:'',t0:B,t1:2*B},
+ {txt:'bandada.seguir(contexto)',cls:'',t0:2*B,t1:3*B},
+ {txt:'bandada.volar()',cls:'',t0:3*B,t1:T_VOLAR}]
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+const pinta=(l,n)=>{let s=esc(l.txt.slice(0,n));if(l.cls)return `<span class="${l.cls}">${s}</span>`;
+ return s.replace(/^const/,'<span class="k">const</span>')}
+const paso=(t,t0,t1)=>{if(t<=t0)return 0;if(t>=t1)return 1;return Math.floor((t-t0)/S+1e-6)*S/(t1-t0)}
+window.setT=function(t){const tt=Math.min(t,T_GOLPE)
+ // Código: cada línea cierra en su tiempo
+ let html='';let activa=0
+ LINEAS.forEach((l,i)=>{const p=clamp((tt-l.t0)/(l.t1-l.t0));const n=Math.round(p*l.txt.length);if(tt>=l.t0){html+=(i?'\n':'')+pinta(l,n);activa=i}})
+ const blink=(Math.floor(tt/(B/2))%2===0)||tt<T_VOLAR?1:0
+ document.getElementById('code').innerHTML=html+`<span id="cur" style="opacity:${blink}"></span>`
+ // Zoom seco en cada tiempo
+ const zs=[[B,1.09],[2*B,1.19],[3*B,1.30],[T_VOLAR,1.42]];let z=1,prev=1,kick=0
+ for(const [tb,zt] of zs){if(tt>=tb){const d=tt-tb,k=easeOut(clamp(d/0.05));z=prev+(zt-prev)*k;prev=zt;kick=Math.max(kick,Math.exp(-d*28))}}
+ const zo=z*(1+0.025*kick),sx=10*kick*Math.sin(tt*90),sy=8*kick*Math.cos(tt*73)
+ document.getElementById('cam').style.transform=`translate(${sx}px,${sy}px) scale(${zo})`
+ // Dunas: de abajo hacia arriba en semicorcheas
+ const pd=paso(tt,0,1.2); const topD=100-(100-41.8)*pd
+ document.getElementById('dunas').style.clipPath=`inset(${topD}% 0 0 0)`
+ // Sol: se estampa en el segundo tiempo
+ const ps=clamp((tt-2*B)/0.12); const sc=ps<1?(0.2+1.0*easeOut(ps)+0.15*Math.sin(ps*Math.PI)):1
+ const sol=document.getElementById('sol');sol.style.opacity=tt>=2*B?1:0
+ sol.style.clipPath='circle(5.2% at 49.9% 41.5%)';sol.style.transformOrigin='49.9% 41.5%';sol.style.transform=`scale(${sc})`
+ // Cielo y pájaros: de izquierda a derecha en semicorcheas
+ const pc=paso(tt,2*B,T_VOLAR); document.getElementById('cielo').style.clipPath=`inset(0 ${100-100*pc}% 58.2% 0)`
+}
+setT(0)
+</script></body></html>

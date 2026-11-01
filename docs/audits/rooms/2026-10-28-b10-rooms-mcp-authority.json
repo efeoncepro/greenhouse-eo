@@ -1,0 +1,92 @@
+{
+  "status": "passed",
+  "mode": "chromium-browser-redirect-and-http",
+  "issuer": "real-first-party-protocol-and-postgresql-local",
+  "rooms": "real-auth-http-business-api-and-postgresql-local",
+  "checks": [
+    "zero-context-denied",
+    "one-context-selected",
+    "multiple-contexts-explicit",
+    "role-isolation",
+    "published-reads",
+    "cross-tenant-denial",
+    "local-logout",
+    "issuer-revocation"
+  ],
+  "mcpChecks": [
+    "rooms-and-issuer-http-only-sessions-present",
+    "rooms-sign-in-still-requires-new-mcp-consent",
+    "real-read-consent-form",
+    "no-mcp-code-before-consent",
+    "silent-read-denied-until-explicit-consent",
+    "write-requires-step-up-before-read-consent",
+    "write-denial-does-not-issue-code",
+    "explicit-browser-consent-issues-one-mcp-code",
+    "mcp-code-exchange-succeeds",
+    "local-issuer-jwks-available",
+    "signed-token-bound-to-same-subject-mcp-client-audience-and-read-only",
+    "mcp-code-replay-denied",
+    "write-still-requires-step-up-after-read-consent",
+    "write-after-read-consent-issues-no-additional-code",
+    "same-browser-context-and-unchanged-sessions-throughout-mcp-flow",
+    "rooms-session-remains-usable-after-mcp-consent"
+  ],
+  "relyingParties": 2,
+  "observedAt": "2026-10-29T01:12:45.151074+00:00",
+  "source": {
+    "issuerLaunchCommit": "8d027f747f0f967d7964eac0b5d0188990fd59a5",
+    "hashes": {
+      "scripts/auth-server/first-party-local-server.ts": "828354246a685b32b74d37b3646dc81aa0500999e28cfd5b2637ba61d15a69b0",
+      "scripts/qa/verify-auth-first-party-local-pg.py": "95e02453d58c5017353b1b745e25313540ff6f87fe79ef1e6c91ceeb94f9c879",
+      "scripts/auth-server/external-access-local-projection.sql": "65d4dcdfeedea85097c73e4c91fa819c9f10b3496dc947bca1e7f882b1e76ce1"
+    },
+    "roomsCommit": "e0edf1e6c94a887c40c5e9615f05ce4ac2c81c08",
+    "roomsDatabaseEphemeral": true,
+    "roomsDatabasePort": 49443
+  },
+  "roomsSourceChanged": false,
+  "mcpCheckCount": 16,
+  "roomsCheckGroups": 8,
+  "actualMcpStore": "PostgresOAuthStore",
+  "actualGrantsReader": "createExternalAccessGrantsPort -> resolveExternalAccess -> ephemeral PostgreSQL",
+  "harnessStaticLimitation": "Local B10: PostgreSQL identity and Rooms, in-memory MCP consent/grant store; issuer step-up denial, not gateway tool dispatch or human MFA.",
+  "staticLabelIsStale": true,
+  "postgresReadback": {
+    "activeConsentCount": 1,
+    "activeConsentScopes": [
+      "efeonce.mcp.read"
+    ],
+    "codeCount": 1,
+    "consumedCodeCount": 1,
+    "codeGrantVersions": [
+      7
+    ],
+    "accessTokenCount": 1,
+    "accessTokensReadOnly": true,
+    "refreshTokenCount": 1,
+    "refreshTokensReadOnly": true,
+    "denialResolutionLogCount": 0,
+    "activeBindings": 1,
+    "linkedMemberships": 1
+  },
+  "cleanup": {
+    "issuerAndRoomsDatabases": "both ephemeral; stopped and removed",
+    "portsFree": [
+      19334,
+      19335,
+      49443
+    ],
+    "existingRoomsPg55432": "stopped"
+  },
+  "limitations": [
+    "Synthetic external organization/binding/membership/capability data",
+    "Projected authority SQL and NULL-context columns, not full production migrations/constraints/triggers or multi-organization context",
+    "Consent presentation fixture",
+    "No binding revocation browser retest; existing browser harness only revokes issuer session",
+    "No gateway dispatch or real gateway binding reader in this run",
+    "No human MFA, Microsoft, HTTPS/TLS, staging or production verification"
+  ],
+  "realEmailsSent": 0,
+  "productionTouched": false,
+  "fullSuiteRepeated": false
+}

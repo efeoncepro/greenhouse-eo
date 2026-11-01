@@ -1,0 +1,207 @@
+{
+  "observedAt": "2026-10-25T22:29:43.649952+00:00",
+  "projectId": "prj_9iaZv8FXdhvtC68r30OS3H4o3iJo",
+  "teamId": "team_gmNiF4YCHmc1wqsHUTCvqjmN",
+  "id": "waf_xnHzIPY46vCD",
+  "version": 2,
+  "firewallEnabled": true,
+  "logHeaders": null,
+  "rules": [
+    {
+      "id": "rule_rooms_invitation_write_8yvVch",
+      "name": "rooms-invitation-write",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "POST"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/start"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "POST"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/verify"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "POST"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/resend"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "POST"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/logout"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "action": "rate_limit",
+            "algo": "fixed_window",
+            "keys": [
+              "ip"
+            ],
+            "limit": 120,
+            "window": 60
+          }
+        }
+      }
+    },
+    {
+      "id": "rule_rooms_invitation_read_96A4HY",
+      "name": "rooms-invitation-read",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "GET"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/session"
+            }
+          ]
+        },
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "GET"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/invitations/transaction"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "action": "rate_limit",
+            "algo": "fixed_window",
+            "keys": [
+              "ip"
+            ],
+            "limit": 240,
+            "window": 60
+          }
+        }
+      }
+    },
+    {
+      "id": "rule_rooms_login_q0Ei6n",
+      "name": "rooms-login",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "GET"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/login"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "action": "rate_limit",
+            "algo": "fixed_window",
+            "keys": [
+              "ip"
+            ],
+            "limit": 30,
+            "window": 60
+          }
+        }
+      }
+    },
+    {
+      "id": "rule_rooms_invitation_authority_odxNrj",
+      "name": "rooms-invitation-authority",
+      "active": true,
+      "conditionGroup": [
+        {
+          "conditions": [
+            {
+              "op": "eq",
+              "type": "method",
+              "value": "POST"
+            },
+            {
+              "op": "eq",
+              "type": "path",
+              "value": "/api/internal/auth/invitation-authority/resolve"
+            }
+          ]
+        }
+      ],
+      "action": {
+        "mitigate": {
+          "action": "rate_limit",
+          "rateLimit": {
+            "action": "rate_limit",
+            "algo": "fixed_window",
+            "keys": [
+              "ip"
+            ],
+            "limit": 240,
+            "window": 60
+          }
+        }
+      }
+    }
+  ]
+}

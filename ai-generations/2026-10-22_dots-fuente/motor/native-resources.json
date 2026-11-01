@@ -1,0 +1,1762 @@
+{
+  "schemaVersion": 4,
+  "revision": "335b9daa1c583b96f112d1e9143338b6b2de374c2779d695efc75f76c157424e",
+  "geometryRevision": "7f2e673cd9cff752c137d3d858bc4ddb530dda34fe9c2e1fb23a94b2831adf1d",
+  "files": [
+    {
+      "path": "fitted/balanced/capsule.orbitfaces",
+      "size": 25892,
+      "sha256": "8e2e3469e72581102dac0843decee2240902f9a9a27361e386887eb3701c2bb3"
+    },
+    {
+      "path": "fitted/balanced/circle.orbitfaces",
+      "size": 25892,
+      "sha256": "2e4ed4682c6cf55204792e89162d8e164b2fdeead79766f9f49d1ddeba9e3630"
+    },
+    {
+      "path": "fitted/balanced/circle_two_ears.orbitfaces",
+      "size": 25892,
+      "sha256": "deb48f746bf395240caa0d627e14b8751cb34f72c0149d4491dc79cc962b310e"
+    },
+    {
+      "path": "fitted/balanced/four_lobed_butterfly.orbitfaces",
+      "size": 25892,
+      "sha256": "b81fcea789bc350e2ac3fab5430da9ecca8fa5817ea0a8a31faee144bb370e0a"
+    },
+    {
+      "path": "fitted/balanced/heart.orbitfaces",
+      "size": 25892,
+      "sha256": "247623cb53fe1551df73fa70c0997902521f5b1bf0155eb723fa64b40ce0b55e"
+    },
+    {
+      "path": "fitted/balanced/rounded_cube.orbitfaces",
+      "size": 25892,
+      "sha256": "71819b62f1bfe9c6404a5df040f946dffbaac6c1230ff7bd5f7314ca722231fc"
+    },
+    {
+      "path": "fitted/balanced/rounded_diamond.orbitfaces",
+      "size": 25892,
+      "sha256": "e90d01fdf139b81618b53fb797c9dda8850781aa7e8617a755641b47927d5e14"
+    },
+    {
+      "path": "fitted/balanced/rounded_head_two_ears.orbitfaces",
+      "size": 3466,
+      "sha256": "27e4887ffa88ab2f41e21b6c8169e6fc97203935e2730f360eb9b254f5cc1068"
+    },
+    {
+      "path": "fitted/balanced/rounded_triangle.orbitfaces",
+      "size": 25892,
+      "sha256": "fae62705f8d56b8adbba1ee9994d9e20ada7a2b6647662768be1370df0609ff9"
+    },
+    {
+      "path": "fitted/balanced/six_lobed_flower.orbitfaces",
+      "size": 25892,
+      "sha256": "0c0795e0e7471cc6e001555483fde8cd77d06ced5d79e4c2aa705984fbae3b16"
+    },
+    {
+      "path": "fitted/balanced/twelve_scalloped_rosette.orbitfaces",
+      "size": 25892,
+      "sha256": "9975005fd9ce7b49395ac468540424a077213624da0aa7d759d94fdb7c185769"
+    },
+    {
+      "path": "fitted/compact/capsule.orbitfaces",
+      "size": 25892,
+      "sha256": "f7342f3e97eed9faea175645ef22f04a46c3682deadb5ac2a014c7dc1c5b8268"
+    },
+    {
+      "path": "fitted/compact/circle.orbitfaces",
+      "size": 25892,
+      "sha256": "a95c3bc3f8b6aa3201c8d3120624c757ae2f39166f4c8a45a37e6900225878dc"
+    },
+    {
+      "path": "fitted/compact/circle_two_ears.orbitfaces",
+      "size": 25892,
+      "sha256": "113f8102f529c995eb435014ed0ed0a26ba0d8554d0458aa5e5a27847de26711"
+    },
+    {
+      "path": "fitted/compact/four_lobed_butterfly.orbitfaces",
+      "size": 25892,
+      "sha256": "287bb5f44dfadbcbb214cb066c255ff578485e7a4e051a14bf257148672fce05"
+    },
+    {
+      "path": "fitted/compact/heart.orbitfaces",
+      "size": 25892,
+      "sha256": "2ac7467e17872eb4b4341a98db336609eb301cc0c1f0faadc82e4e3a6148633c"
+    },
+    {
+      "path": "fitted/compact/rounded_cube.orbitfaces",
+      "size": 25892,
+      "sha256": "1511dae497dda75395a4b31e9a66318a2f508842d26930c6b7944f15f02c92c6"
+    },
+    {
+      "path": "fitted/compact/rounded_diamond.orbitfaces",
+      "size": 25892,
+      "sha256": "ab66178ad269da7f6d18f040bc93940811814427ab63dcea0e502034413a1b13"
+    },
+    {
+      "path": "fitted/compact/rounded_head_two_ears.orbitfaces",
+      "size": 3466,
+      "sha256": "da45c7ff9d2fcf11634dae8cf8408d52c93205fccff30d7474dfeb69c353de12"
+    },
+    {
+      "path": "fitted/compact/rounded_triangle.orbitfaces",
+      "size": 25892,
+      "sha256": "e2ad30a1aebf8f91321fa90e3498d5762fcde4e5eb0606ee4577d3654a5e5ee9"
+    },
+    {
+      "path": "fitted/compact/six_lobed_flower.orbitfaces",
+      "size": 25892,
+      "sha256": "075c2c7124630551405cb7c0d05b6ac3025400773efe4bcf668588cb881175bf"
+    },
+    {
+      "path": "fitted/compact/twelve_scalloped_rosette.orbitfaces",
+      "size": 25892,
+      "sha256": "c4c86592bfbcd50f0a06849c076547fa7ea3d0180c9bf646e8bdda1c472700e9"
+    },
+    {
+      "path": "meshes/balanced/authored-accessories-bow-0-0.orbitmesh",
+      "size": 80265,
+      "sha256": "3b6baa8408fb27b661d477bf69095f14a12c3b27253472b9582d04856efb2736"
+    },
+    {
+      "path": "meshes/balanced/authored-beanie.orbitmesh",
+      "size": 40007,
+      "sha256": "949fd082e282583f296003270751b61b57392edfba288b4fcf52f957b6851a68"
+    },
+    {
+      "path": "meshes/balanced/authored-beret.orbitmesh",
+      "size": 57250,
+      "sha256": "4347d9fd3ff3712c790e294cf95702aeafce8b8d5ab6456e0bbfc8db7e6cf4dd"
+    },
+    {
+      "path": "meshes/balanced/authored-crown.orbitmesh",
+      "size": 98350,
+      "sha256": "5080f5b62774ab9033c8261dffc3ded88dafbc2f5f6b19edfa282b8657ca4d52"
+    },
+    {
+      "path": "meshes/balanced/authored-eyewear-round_sunglasses-0-0.orbitmesh",
+      "size": 53751,
+      "sha256": "0e193e13ec0a074cb67cfddf6db0596587b88ab3ded971e545a247339354aa91"
+    },
+    {
+      "path": "meshes/balanced/authored-eyewear-separate_trapezoid_lenses-0-0.orbitmesh",
+      "size": 20036,
+      "sha256": "53f41444d1be22067edf855800660a4531ba991a68b0bf2c494e3a226863c057"
+    },
+    {
+      "path": "meshes/balanced/authored-eyewear-separate_trapezoid_lenses-0-1.orbitmesh",
+      "size": 20247,
+      "sha256": "2c6e8a48355b3cbe380c70969c6e16240427c699100fb921fbad697b3bda8ef9"
+    },
+    {
+      "path": "meshes/balanced/authored-hat.orbitmesh",
+      "size": 45995,
+      "sha256": "657e6665ca49b197282540a5511513ecabc2581bf5f7acd69935601af14c1ad4"
+    },
+    {
+      "path": "meshes/balanced/capsule.orbitmesh",
+      "size": 21857,
+      "sha256": "74e161de9d8331bd84d2a215aeb60aa77e991136d380e52a5afb2d5b18e8c333"
+    },
+    {
+      "path": "meshes/balanced/circle.orbitmesh",
+      "size": 22538,
+      "sha256": "dd34bdec4254f9de65649d4fecb342283bfc87523c23c5917e6ac99216b550ad"
+    },
+    {
+      "path": "meshes/balanced/circle_two_ears.orbitmesh",
+      "size": 59239,
+      "sha256": "3084e5d376fb46a4481a38819b3cf85b08c530a8e19ea258944015ee111d8949"
+    },
+    {
+      "path": "meshes/balanced/eyes-crescent_inset-0-0.orbitmesh",
+      "size": 174,
+      "sha256": "404018da5364331b749b4e8366a52504f077648efd42607a4cee31dc573c8250"
+    },
+    {
+      "path": "meshes/balanced/eyes-crescent_inset-3-0.orbitmesh",
+      "size": 172,
+      "sha256": "c269845765ccb1b7898c5a47d1b4d1f32fa3ef5655644defa28d67fd04564972"
+    },
+    {
+      "path": "meshes/balanced/eyes-dots-0-0.orbitmesh",
+      "size": 4027,
+      "sha256": "e45dd8c918ea11df5b0204ffaa82ec96f709936a27f3e9131ade1bed2c2ef2f3"
+    },
+    {
+      "path": "meshes/balanced/eyes-dots-0-1.orbitmesh",
+      "size": 3975,
+      "sha256": "a08014246e4c7ad5dc8bb41ad39a1665072c9e15bd9e8d47e1e41f7b3ad55fdf"
+    },
+    {
+      "path": "meshes/balanced/eyes-double_highlights-0-0.orbitmesh",
+      "size": 6893,
+      "sha256": "57615746e3e1a4953ae2c8d0dd1ef2dde74a47a1083500f255b87477ad720db7"
+    },
+    {
+      "path": "meshes/balanced/eyes-double_highlights-1-0.orbitmesh",
+      "size": 5601,
+      "sha256": "11d6463a6ca267fbfe962839876520156a7425503bba94836dfe9e0bfe878a1a"
+    },
+    {
+      "path": "meshes/balanced/eyes-double_highlights-2-0.orbitmesh",
+      "size": 6871,
+      "sha256": "502756ce405918bc311f46ba7f4e3024f2c1ed8482eb93d8933a17e52e6576c6"
+    },
+    {
+      "path": "meshes/balanced/eyes-double_highlights-3-0.orbitmesh",
+      "size": 5813,
+      "sha256": "e4dfb50487cd503a669c1203b27a2d00f3f53e842360feaedf31b71e58874523"
+    },
+    {
+      "path": "meshes/balanced/eyes-highlight_capsules-0-0.orbitmesh",
+      "size": 6514,
+      "sha256": "49a758441719c793c77dfdf5305b346ad0f43864370cfb190c49b5df9d89abc5"
+    },
+    {
+      "path": "meshes/balanced/eyes-highlight_capsules-0-1.orbitmesh",
+      "size": 6378,
+      "sha256": "7e04c2c51890892e87d10ca0eae86af52b918d9287661411d62dd390b2e4ebc8"
+    },
+    {
+      "path": "meshes/balanced/eyes-highlight_capsules-1-0.orbitmesh",
+      "size": 3859,
+      "sha256": "f2e3107bc03ac490090a8276611d8ed53723a7be74b9fa6fb1d4b7bd1e54ec05"
+    },
+    {
+      "path": "meshes/balanced/eyes-highlight_capsules-1-1.orbitmesh",
+      "size": 3901,
+      "sha256": "3a4fefb6daf28887b29108b32f2be03e1d84e1b7eb5cd78ddf481f1f5fea8324"
+    },
+    {
+      "path": "meshes/balanced/eyes-oval-0-0.orbitmesh",
+      "size": 5261,
+      "sha256": "a91d4bd82f91e1466c72f4b14e75d19ccdc794bce3d0c53154187798ef65af02"
+    },
+    {
+      "path": "meshes/balanced/eyes-oval-0-1.orbitmesh",
+      "size": 5230,
+      "sha256": "41d8ba5ac06a0ba50e8809276f38517721b371f1c4144c4d3212fed5be1263e7"
+    },
+    {
+      "path": "meshes/balanced/eyes-round_inset-0-0.orbitmesh",
+      "size": 175,
+      "sha256": "10e3ddd4e1b1299cd5062c49714849db7b585229b08ac49756b80693067042ea"
+    },
+    {
+      "path": "meshes/balanced/eyes-round_inset-2-0.orbitmesh",
+      "size": 6254,
+      "sha256": "378dddab31eba2b4518b8c1de53a3c0132b8cc18144374ef13647cd2c5e5767e"
+    },
+    {
+      "path": "meshes/balanced/eyes-round_inset-3-0.orbitmesh",
+      "size": 173,
+      "sha256": "5d5727d801e705368bd409edce219d1c4105a7a11b6812f626f0742901500900"
+    },
+    {
+      "path": "meshes/balanced/eyes-round_inset-5-0.orbitmesh",
+      "size": 6223,
+      "sha256": "479eac4b7df3011fb8f1490a391e84b2eac1018bc6a64ec89eba46a9eb962403"
+    },
+    {
+      "path": "meshes/balanced/eyes-sleepy_lids-0-0.orbitmesh",
+      "size": 6039,
+      "sha256": "0e6d8b6f0c696dff69dd65d82f41399e860da76948aa862786f7e1da3700251f"
+    },
+    {
+      "path": "meshes/balanced/eyes-sleepy_lids-1-0.orbitmesh",
+      "size": 10033,
+      "sha256": "2b9cbe07b74c88d5e048959104e38f86f3790d671f566df27f8659ffd920a13d"
+    },
+    {
+      "path": "meshes/balanced/eyes-sleepy_lids-2-0.orbitmesh",
+      "size": 6036,
+      "sha256": "6114f069375f4dede59147671334028e08ca264fc76d8f593a82581fa75eb724"
+    },
+    {
+      "path": "meshes/balanced/eyes-sleepy_lids-3-0.orbitmesh",
+      "size": 9822,
+      "sha256": "73b3fc50c4b7d095473c273d24b0b27d2c5eb0b988062e8e1aad07f185c5ff79"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-0-0.orbitmesh",
+      "size": 6466,
+      "sha256": "8d0075dc9ee1bf7e7d742ef05607750dffd6009c9d8c1645d8d44262864d1e67"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-1-0.orbitmesh",
+      "size": 7479,
+      "sha256": "22d16733f5ad42cffd03cadc5b52b1f1de33dd975a7bd3eb3d9e2a63b20ddb12"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-1-1.orbitmesh",
+      "size": 4244,
+      "sha256": "a84f04ad3c49980002a5dcd6bb55e87912b4008b70e4f4edff77e23c4baefb5b"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-2-0.orbitmesh",
+      "size": 6404,
+      "sha256": "5e0b20bf07679dd83a90acb6b4c288007a32e728253a44bb678fe23d2815a594"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-3-0.orbitmesh",
+      "size": 7500,
+      "sha256": "bb674a5b657e56daa034773b952279bfca35d2f9f82ba98dc2284306502bbdf1"
+    },
+    {
+      "path": "meshes/balanced/eyes-sparkle_capsules-3-1.orbitmesh",
+      "size": 4167,
+      "sha256": "082124354fcad2716c8d5c70720e836f2e30fd3f4348496ce217f1c3e86a87c2"
+    },
+    {
+      "path": "meshes/balanced/eyes-swept_lids-0-0.orbitmesh",
+      "size": 9828,
+      "sha256": "fa3dac1f09cc14e04ea19802f9eda6a981b1f8e6cf3a5bb381bf9c0764a83d6c"
+    },
+    {
+      "path": "meshes/balanced/eyes-swept_lids-0-1.orbitmesh",
+      "size": 9620,
+      "sha256": "36be8d538ac2d5d317233a495b237ceec25828cf7a766e7e54e7b97739404d85"
+    },
+    {
+      "path": "meshes/balanced/eyewear-classic_sunglasses-0-0.orbitmesh",
+      "size": 41248,
+      "sha256": "6430984374dbe5347bd95d0b23bdc106484d33a18622bfe175d841309814e63c"
+    },
+    {
+      "path": "meshes/balanced/eyewear-monocle-0-0.orbitmesh",
+      "size": 49016,
+      "sha256": "35d9b76b7f63242f00a197028ddfbaae65eedea5fabb2b76d7258ee82d1c7218"
+    },
+    {
+      "path": "meshes/balanced/eyewear-round_sunglasses-0-0.orbitmesh",
+      "size": 51629,
+      "sha256": "df539ad3ab7d81d2e7a72f4041d258d2880ddd2b7408070004007e4f0d3a31ea"
+    },
+    {
+      "path": "meshes/balanced/eyewear-separate_trapezoid_lenses-0-0.orbitmesh",
+      "size": 9648,
+      "sha256": "3f6c76f84d8e5abe53d03d09e928088887fa9018d04effd582d27fdffa0f9ae1"
+    },
+    {
+      "path": "meshes/balanced/eyewear-separate_trapezoid_lenses-0-1.orbitmesh",
+      "size": 9507,
+      "sha256": "3b4fd0d8e474feb4ae3766ffc50caa73ff2c448491f925712ab7654d58584aaa"
+    },
+    {
+      "path": "meshes/balanced/eyewear-tall_oval_frames-0-0.orbitmesh",
+      "size": 29466,
+      "sha256": "b0d7eefb6fbaae387ae6f894b182e0344ec07ede2f00a9f26a40042f12b12ade"
+    },
+    {
+      "path": "meshes/balanced/eyewear-tall_oval_frames-0-1.orbitmesh",
+      "size": 29151,
+      "sha256": "2ce34e941a488018ebd1e9c6a5117ee9fdc58cfb5de76f72f1e125b7ad5f9d03"
+    },
+    {
+      "path": "meshes/balanced/four_lobed_butterfly.orbitmesh",
+      "size": 26234,
+      "sha256": "1b273d8711eef922baf0b7cf2b6b650dd9456460fb72d6f408f586b3ad1a09c3"
+    },
+    {
+      "path": "meshes/balanced/heart.orbitmesh",
+      "size": 53599,
+      "sha256": "3224e1ae7b6b8f01deb28fbd3fa785b02f756bba82e9a84220675223fefe1b6d"
+    },
+    {
+      "path": "meshes/balanced/rounded_cube.orbitmesh",
+      "size": 56397,
+      "sha256": "b0cfb522160ffd4af97ddfb29ad515f727e7e08a79e2772d9d3e36ee59c24f7e"
+    },
+    {
+      "path": "meshes/balanced/rounded_diamond.orbitmesh",
+      "size": 46724,
+      "sha256": "f019e0e2d9291524902080f7b4a671ffcf96d14d1812a4fa65002949e3f01af3"
+    },
+    {
+      "path": "meshes/balanced/rounded_head_two_ears.orbitmesh",
+      "size": 73276,
+      "sha256": "258aed7bff3ce8533985261d5cc28066d115358b061d0e58f4fe516d5c6a325b"
+    },
+    {
+      "path": "meshes/balanced/rounded_triangle.orbitmesh",
+      "size": 51510,
+      "sha256": "0229b12cd1a2def382e06e4fd4f78bedd2a10e14bd3ee59f42d2a4ce474a5fc2"
+    },
+    {
+      "path": "meshes/balanced/six_lobed_flower.orbitmesh",
+      "size": 48542,
+      "sha256": "2cd7ce76776ed9524ca351bbd7297311a6fb3394c44b6db060a8bc4de3aff0a1"
+    },
+    {
+      "path": "meshes/balanced/twelve_scalloped_rosette.orbitmesh",
+      "size": 49511,
+      "sha256": "c41d4c2865d33231709c3ae289027893f370c5b176422dbe3a6fb53136bca64c"
+    },
+    {
+      "path": "meshes/compact/authored-accessories-bow-0-0.orbitmesh",
+      "size": 26336,
+      "sha256": "97a3f9fe63c92b44229a3dae4118d429d05e3a9f8ff67e485e3cfe7304db9819"
+    },
+    {
+      "path": "meshes/compact/authored-beanie.orbitmesh",
+      "size": 15038,
+      "sha256": "1bf081a2de3f0f3fedddce937303dfab4f3a8e76231514525aab7bc65ecca978"
+    },
+    {
+      "path": "meshes/compact/authored-beret.orbitmesh",
+      "size": 21186,
+      "sha256": "3eb502b6c6086e1bbd5ea66783eb2c4331f4aec071ac4657f11675476e40e2a8"
+    },
+    {
+      "path": "meshes/compact/authored-crown.orbitmesh",
+      "size": 52887,
+      "sha256": "f9a8a4a8da44993c5308dabde62b6b954e91b8d612bb70014e00c7a67e83ac58"
+    },
+    {
+      "path": "meshes/compact/authored-eyewear-round_sunglasses-0-0.orbitmesh",
+      "size": 27629,
+      "sha256": "36c37b46f2d2f7ea02a1c3830d80e34a1dff41bab2acf72f113649da1e1ead81"
+    },
+    {
+      "path": "meshes/compact/authored-eyewear-separate_trapezoid_lenses-0-0.orbitmesh",
+      "size": 8742,
+      "sha256": "13e688a6c4fa50535ca7b0acbde171dd7031e2d8d6255b48e5662db30d13391e"
+    },
+    {
+      "path": "meshes/compact/authored-eyewear-separate_trapezoid_lenses-0-1.orbitmesh",
+      "size": 8723,
+      "sha256": "248fd73a6d69669d40de80f9e320f06f032fad478c36f306f47ede8adfc090b5"
+    },
+    {
+      "path": "meshes/compact/authored-hat.orbitmesh",
+      "size": 15960,
+      "sha256": "0e954352c65a23a92da3451fa6db4e5e1f85a0aef89465209f636a7344d83667"
+    },
+    {
+      "path": "meshes/compact/capsule.orbitmesh",
+      "size": 10643,
+      "sha256": "e832dc4ac75edcaa96bb52d09bef1f6e63a17af719870550d423f55d970ad93b"
+    },
+    {
+      "path": "meshes/compact/circle.orbitmesh",
+      "size": 10613,
+      "sha256": "ba17c240507bbec284f6bde0512d3281b359bd1c0cd9b96a93f51c47eee9aa30"
+    },
+    {
+      "path": "meshes/compact/circle_two_ears.orbitmesh",
+      "size": 30481,
+      "sha256": "5165775a7fe5e76957c59438e5115aab8278433d352bd0f0733f0520024a3cc0"
+    },
+    {
+      "path": "meshes/compact/eyes-crescent_inset-0-0.orbitmesh",
+      "size": 174,
+      "sha256": "404018da5364331b749b4e8366a52504f077648efd42607a4cee31dc573c8250"
+    },
+    {
+      "path": "meshes/compact/eyes-crescent_inset-3-0.orbitmesh",
+      "size": 172,
+      "sha256": "c269845765ccb1b7898c5a47d1b4d1f32fa3ef5655644defa28d67fd04564972"
+    },
+    {
+      "path": "meshes/compact/eyes-dots-0-0.orbitmesh",
+      "size": 2947,
+      "sha256": "286c0c098ea3e6accc33fb84319386b2a394378e1ca8c0b21c9fd4131768c512"
+    },
+    {
+      "path": "meshes/compact/eyes-dots-0-1.orbitmesh",
+      "size": 2920,
+      "sha256": "aae6dacedff0f9ec3f0575ee329b00b6bca6ca8673bdbf29acf3ee73b7b90c75"
+    },
+    {
+      "path": "meshes/compact/eyes-double_highlights-0-0.orbitmesh",
+      "size": 4937,
+      "sha256": "f2c8ee37a9a3c442d11431c4cfed95ceb2cd26661333a23a0b5cec0e620be0ef"
+    },
+    {
+      "path": "meshes/compact/eyes-double_highlights-1-0.orbitmesh",
+      "size": 4018,
+      "sha256": "8ed73909a26c22a4bdf2d78e0678bc55d08f765ef02e6358f3f8d4cb356eeeba"
+    },
+    {
+      "path": "meshes/compact/eyes-double_highlights-2-0.orbitmesh",
+      "size": 4918,
+      "sha256": "f7fa293c56d34566420f623497fa85f60b626d459994c59f55d285e0893d7a58"
+    },
+    {
+      "path": "meshes/compact/eyes-double_highlights-3-0.orbitmesh",
+      "size": 4163,
+      "sha256": "0fad8598fc89b92cd04e160c1ba0e27032acfdbfa16efbc336ea91bd91cbfc5a"
+    },
+    {
+      "path": "meshes/compact/eyes-highlight_capsules-0-0.orbitmesh",
+      "size": 4485,
+      "sha256": "fd3395ee865ed908661ca607c08c5c7efc86795f6ea00f505a76d7cf66285019"
+    },
+    {
+      "path": "meshes/compact/eyes-highlight_capsules-0-1.orbitmesh",
+      "size": 4480,
+      "sha256": "947fbba7de4997e3af306de310145bfa5c56ed8260461bbb91c24d549c1c7128"
+    },
+    {
+      "path": "meshes/compact/eyes-highlight_capsules-1-0.orbitmesh",
+      "size": 2769,
+      "sha256": "8e9b4280f8bf17b532a400796fb3434af114abf7fe79726421bc508d63406078"
+    },
+    {
+      "path": "meshes/compact/eyes-highlight_capsules-1-1.orbitmesh",
+      "size": 2761,
+      "sha256": "5c03f544208bc346b3f11e4a7a271fb8a223316654a72a54e426ab7a0ab7762e"
+    },
+    {
+      "path": "meshes/compact/eyes-oval-0-0.orbitmesh",
+      "size": 3818,
+      "sha256": "5e116b9d2f418ba789bd132fa3ba63c4efa32790eb036a3e7679eff5646a7e1d"
+    },
+    {
+      "path": "meshes/compact/eyes-oval-0-1.orbitmesh",
+      "size": 3737,
+      "sha256": "ac48db57d027338f16a218fc24c917f15f9ccf24d29055f7381d18d50d1d715e"
+    },
+    {
+      "path": "meshes/compact/eyes-round_inset-0-0.orbitmesh",
+      "size": 175,
+      "sha256": "10e3ddd4e1b1299cd5062c49714849db7b585229b08ac49756b80693067042ea"
+    },
+    {
+      "path": "meshes/compact/eyes-round_inset-2-0.orbitmesh",
+      "size": 4549,
+      "sha256": "6d6e556ae021588cd2cf59339f71f811875e5bb410d4b53221dce94b08c36997"
+    },
+    {
+      "path": "meshes/compact/eyes-round_inset-3-0.orbitmesh",
+      "size": 173,
+      "sha256": "5d5727d801e705368bd409edce219d1c4105a7a11b6812f626f0742901500900"
+    },
+    {
+      "path": "meshes/compact/eyes-round_inset-5-0.orbitmesh",
+      "size": 4550,
+      "sha256": "c13835d08c1189b6de1cc62b7e5ff9dd652d1e8b21e954da3670a038641c3183"
+    },
+    {
+      "path": "meshes/compact/eyes-sleepy_lids-0-0.orbitmesh",
+      "size": 4244,
+      "sha256": "dbe89d7e60a4d5d2440c5882a73b64b89a7f4454b7b00fbd1cf94ba9b8ede597"
+    },
+    {
+      "path": "meshes/compact/eyes-sleepy_lids-1-0.orbitmesh",
+      "size": 6563,
+      "sha256": "8e4ed8d4381a8dcd5664886470169542d0e42786d39e679bb532581af82ccf2c"
+    },
+    {
+      "path": "meshes/compact/eyes-sleepy_lids-2-0.orbitmesh",
+      "size": 4227,
+      "sha256": "160e7ef8c06b42eed753b95be3b38d94b0ad4c65e90ba0efeba7a9581c4af04d"
+    },
+    {
+      "path": "meshes/compact/eyes-sleepy_lids-3-0.orbitmesh",
+      "size": 6483,
+      "sha256": "beab84df276ccd00393ca2679afa8bce898e16606b8f857ceaa48e4e8fb8dcd8"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-0-0.orbitmesh",
+      "size": 4578,
+      "sha256": "6ac1438cf9d01d3057081a615f9dfc26943bd6cc4b01ccbfc6b8ed159af62c11"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-1-0.orbitmesh",
+      "size": 5024,
+      "sha256": "43875050bf8c6eea0e15584ba6b1f13af269615b1866d56c13663e1deb973f80"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-1-1.orbitmesh",
+      "size": 2206,
+      "sha256": "03dd70dfe3952edccbc9c66cebe1246a9da2922e93812c39013dd073b8ecce07"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-2-0.orbitmesh",
+      "size": 4500,
+      "sha256": "a39797799a6e8d3d9eb124ce6bff7ad66a1e912fcc3acf283419dba1a4f35a52"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-3-0.orbitmesh",
+      "size": 5096,
+      "sha256": "6f0dc698a105b856cfca9e9b6621be20833557274f9e3aed8e96a44d267aaaf0"
+    },
+    {
+      "path": "meshes/compact/eyes-sparkle_capsules-3-1.orbitmesh",
+      "size": 2064,
+      "sha256": "1177a1299232b109b871be664242d560e3362a3f381c1987805f0bd1c101f70e"
+    },
+    {
+      "path": "meshes/compact/eyes-swept_lids-0-0.orbitmesh",
+      "size": 6794,
+      "sha256": "ce03998fda39abe612a597c928ec5665cda8d3b4d3d4ae0cfe753b21908418c2"
+    },
+    {
+      "path": "meshes/compact/eyes-swept_lids-0-1.orbitmesh",
+      "size": 6704,
+      "sha256": "f176a50cc4bf5ecbd8257ab37f95838b3115eb281bf5177f3f30fba9cfd461d8"
+    },
+    {
+      "path": "meshes/compact/eyewear-classic_sunglasses-0-0.orbitmesh",
+      "size": 19475,
+      "sha256": "0b2b0877b3c9147c3069a0d1daa4d6c9dd619c33e7ed0b894b5c79ceaabfde40"
+    },
+    {
+      "path": "meshes/compact/eyewear-monocle-0-0.orbitmesh",
+      "size": 27322,
+      "sha256": "d35d824bb6b7311e044535ae5911c36fe735b57bf54316d7a0cc40323c31e3c3"
+    },
+    {
+      "path": "meshes/compact/eyewear-round_sunglasses-0-0.orbitmesh",
+      "size": 27437,
+      "sha256": "9bf3028139092da623b3af73c564508b7f82ed38c3b806a3a27b3ca70f808d84"
+    },
+    {
+      "path": "meshes/compact/eyewear-separate_trapezoid_lenses-0-0.orbitmesh",
+      "size": 6376,
+      "sha256": "4d1e54b87b070b9c566838b115bc8ae3f0c0bc3d44e64c9e33f470bfccac05ea"
+    },
+    {
+      "path": "meshes/compact/eyewear-separate_trapezoid_lenses-0-1.orbitmesh",
+      "size": 6373,
+      "sha256": "226154b12dda759b36d14fb5dc334647b437b1a350235885a8f18c515687f6aa"
+    },
+    {
+      "path": "meshes/compact/eyewear-tall_oval_frames-0-0.orbitmesh",
+      "size": 17298,
+      "sha256": "c863002ecdefe68f47d644d7b39ff4c27c215df1f6ada68156a5b0c79565adaf"
+    },
+    {
+      "path": "meshes/compact/eyewear-tall_oval_frames-0-1.orbitmesh",
+      "size": 17316,
+      "sha256": "2b7b7352a289e08e34ff9d5db128fb36928a7f8d96914f8dc47609c3c5763bb5"
+    },
+    {
+      "path": "meshes/compact/four_lobed_butterfly.orbitmesh",
+      "size": 13137,
+      "sha256": "8c03898141e8b925e80fad945e478fdb4987a1e445dd6847865a4e53ec4cf225"
+    },
+    {
+      "path": "meshes/compact/heart.orbitmesh",
+      "size": 29360,
+      "sha256": "862a524c38ce4d55bd6d3c68dd437d03479aa2d1fd8665f9e12714dae47d14be"
+    },
+    {
+      "path": "meshes/compact/rounded_cube.orbitmesh",
+      "size": 29919,
+      "sha256": "8f00eb5853444afe2f622e961414c8a4298b2b4834186d904fc07740ba757c0a"
+    },
+    {
+      "path": "meshes/compact/rounded_diamond.orbitmesh",
+      "size": 26410,
+      "sha256": "e67c3f3764b3471487e8e91207b1fe32f09891043eb5445a16987422cd5a1c12"
+    },
+    {
+      "path": "meshes/compact/rounded_head_two_ears.orbitmesh",
+      "size": 37399,
+      "sha256": "be5bfd4e8f894b7822ad21c4a5264adfebc241dcb3d6ce7bb44b7eae8ff3a44c"
+    },
+    {
+      "path": "meshes/compact/rounded_triangle.orbitmesh",
+      "size": 29039,
+      "sha256": "01d1dae8239931695a714e911b5d0239aac904eca87967dd825bd60fba987ebe"
+    },
+    {
+      "path": "meshes/compact/six_lobed_flower.orbitmesh",
+      "size": 27274,
+      "sha256": "196a4374bbfc3947fe0d384bf3fae879b0e5a17152361e6716da281b2952c25f"
+    },
+    {
+      "path": "meshes/compact/twelve_scalloped_rosette.orbitmesh",
+      "size": 27793,
+      "sha256": "6304732a35e5f7431d6dfcca2ac9bdf9d3ca7be0bdf238b63f4908260eb02532"
+    },
+    {
+      "path": "preset-fits/0194ce0c960180c73d20e9ca8c07ae49dbe98046f4947666e214965f77fa962b.orbitfit",
+      "sha256": "ee63a71f96819e60fd8ff99d53bd42b5d74920a6591ab523460fbe89a0b5367e",
+      "size": 4978
+    },
+    {
+      "path": "preset-fits/022ff04c71dd4b19fcb70ffba1aae2a777dfdff56cba547479bf91f8eda46865.orbitfit",
+      "sha256": "9bb7c4db39da14a2d7907a8dee5df6522b91226db3028b606f7e76d6b4c717fd",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/0280bd41bb83e7710478b33ca048529e9620b5d843883d9915e658edf9b5d1a3.orbitfit",
+      "sha256": "bad74be1edf7a481ba632dd734d0dea0eaf87f5f71896ea99498d8d05ab35a8f",
+      "size": 2813
+    },
+    {
+      "path": "preset-fits/04c574b6fd922c18f171618413626121b8915e4826db8a379881629c38cabc8a.orbitfit",
+      "sha256": "d6e68a10fcff5ed20f86127483f5da3f78ea9ad02e9a221795f6c74441d75e48",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/05b23b2829b6574ce0b3c6d2e7e7bd1692c670ef503c7ed0a34757dcd7740bdc.orbitfit",
+      "sha256": "047c5710692083f511f2b656d0a6cf2002bc63f707d020265accc65cc9d63495",
+      "size": 1952
+    },
+    {
+      "path": "preset-fits/061115639dd0c8609b83253284c79d72bdecab755bf8675d3528af77ae1a3af4.orbitfit",
+      "sha256": "13df9f3399c301c21299c9eb4bf066fda00e4bb56a276b93b058b20daefbaa54",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/081c20f731412458af0dab027ba40ff101d7db3ba847f9bbed2bb47a576174ca.orbitfit",
+      "sha256": "3444e1ff32ca64d5f647cc7e857fac949bccfee056d975849be64864e2d532d2",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/0b4e454c6943df688b0384a199689a8ddcc70ce631b14cc4ff922a16b6209515.orbitfit",
+      "sha256": "d51e65674a90cf787d35ec61a8fdaa97bc23c86965e5ec21a88a1f4daafd7bac",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/0fc99d508bd7825a24c7be5573366ec3dc4c05631582e29682b517f5269353fd.orbitfit",
+      "sha256": "2dbf35576116a04529e8426cc54dd4d5cbe8fe407d09a8bf4fb143dc3bbd75c8",
+      "size": 2663
+    },
+    {
+      "path": "preset-fits/1052f730f5f430b22bc67eab4258123ffde51b10ad6603d56cf1ee0cb2ec7fb8.orbitfit",
+      "sha256": "d3eb514d77b89cb8d436e104456651afa1ed8909682470ad53592f046016a6f6",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/1137aaf1a51fc522188ecb285bb4012d26d41402b9c1266ecd966431935a2f0e.orbitfit",
+      "sha256": "e53b38df18eda1dd99e4b37248633e79ed495847f82ddcf59954018514f2818d",
+      "size": 4890
+    },
+    {
+      "path": "preset-fits/11951e587f0832f290ebb651718cc578701d66890772c6235649840ea5ca9bcd.orbitfit",
+      "sha256": "ae968f6ea369f9d0aebb8739e41d2ceb49b4831507ddb791b6d53ab9da3a09bd",
+      "size": 22711
+    },
+    {
+      "path": "preset-fits/123a991c775621bc2066f178ae9519390f317937958205bbc0a89510a6f2f547.orbitfit",
+      "sha256": "8c6a213698b9bb18d88c7f7251383d92617d51e0bfcf0b44651137bc775ff4ca",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/1248acd1495bde229cad75ae591443fc2720aafa27b648a4b8c18c442262117c.orbitfit",
+      "sha256": "ba7bd5dc44276c8dc0570ffe3b5100779600555e64cc0a0b71b12d6565923520",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/13c4ededdb6662e1326a841a2180c62b56fe573f5bbdc6fe7cef2c889ed3082e.orbitfit",
+      "sha256": "33676079c4e6b36874c7854690270203c84fe12e00f18b61ca8a3e238a1de058",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/142a18c02b451d64401206bd7e67d37afda35ed436892db264de7cc937aa94fe.orbitfit",
+      "sha256": "baacbe22ea11d2553b14ad2ded276c5ffde77dc438c0643b8d2c0c416b39e2e4",
+      "size": 2055
+    },
+    {
+      "path": "preset-fits/15dd59211596b3f50cdda6c2ffb6703b748f5c6279cf8c6c27a690c0d292b686.orbitfit",
+      "sha256": "8d7e4f346cf1071ca0ad7bd7ca56411bc3162ebff31da9f4ed73cdf6500e0a8e",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/169d60484f051cd93f905f76e031034fcccd88d3841d29e6e3eb459fe87095a5.orbitfit",
+      "sha256": "2e5c78bcedd55270d61173c80452a1c5eadaa33b84602f5e3cdf52ccd25af866",
+      "size": 2722
+    },
+    {
+      "path": "preset-fits/16d815a0a638f341ead88ed4204618acd035cc76e78787a7e8c56059b5ba3849.orbitfit",
+      "sha256": "2790dafe6a7f53edddf914a550b3b39250916d35668e6745f3a483e9d8d5d145",
+      "size": 1906
+    },
+    {
+      "path": "preset-fits/1a26d505b2bf76a76a3e57fdd11369772359df37db977a92ec149ed0d3dc3530.orbitfit",
+      "sha256": "e62297c529e20a20833e612e058d75b7ff84258f54cd3e8b76d40517b6353119",
+      "size": 707
+    },
+    {
+      "path": "preset-fits/1b7494722b83e05d7bd28ac289ab284e544a14faac2f9e82534a02f4b95c4a13.orbitfit",
+      "sha256": "0cc7e30c31e0f7b766bf7e210d7dbe14d0f843c167557bcb397887807ac72589",
+      "size": 5105
+    },
+    {
+      "path": "preset-fits/1c087fff01c05caa4290383924467ebe6606c009332d7bcb4dcc65a1c1bf5c9b.orbitfit",
+      "sha256": "7889957598443573685620619cce79e7889f3193fda260b9788b7e9e79f6152d",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/1c41f38d9435f8a33dc1e893e6ee0907e20a88402baefb8ebeffceaae0b8941f.orbitfit",
+      "sha256": "2433ea04673c2b615f5fc93738c8620774eae664c5daa9f7d5733df5072dc303",
+      "size": 4764
+    },
+    {
+      "path": "preset-fits/1e5602f360ba53763c37ec833102ff15915f3353315437dc649747eaf5bc7f3d.orbitfit",
+      "sha256": "99309a88d50b74ed3f760946a109ec010d396ea749d118ca1b3815ef53f243c4",
+      "size": 4831
+    },
+    {
+      "path": "preset-fits/1f8d8c6633c7c9243f9590e01ef2de4146c3efc7f4593491863e26c585566bfd.orbitfit",
+      "sha256": "5adac6689ef6cd69606d8dff9fec762d7f1e29ea4c04b0a23cea673ce54e1914",
+      "size": 4783
+    },
+    {
+      "path": "preset-fits/2134b052b4641e1df50ad6fcb404e497c4b39e6fbf0460bbeedfbcce56cee775.orbitfit",
+      "sha256": "253431f628c56718e6ffa4ea606f90806ffab9e832ba94072f5dfa7d08a6c892",
+      "size": 2124
+    },
+    {
+      "path": "preset-fits/2178771d1718bd0f9470a5b71a37a72ec272cdc385ebe0090f9cbe95eda105ff.orbitfit",
+      "sha256": "81cb7a66958a5aca4f71298455333b986d5eb1e0be965e935cd3258c614c6c9b",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/22ed8b0218232f478d93b3ddc1e18608c52d6c3aecfe091529973d5ca32c1bcc.orbitfit",
+      "sha256": "2cf77134550b3ae1153cd6ba515e75a991bb23d03d66e414bf88c3e2cedb4896",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/258e5e2505fe7e0c9f918c84745ca2d6b778e9a983daa5483e087af4220d2b08.orbitfit",
+      "sha256": "88262a3ddec2732ca21970e3c817769ea3c831ce0eb904b2ff0d7045e70fa2c2",
+      "size": 2093
+    },
+    {
+      "path": "preset-fits/25fcb65623f4979cef48e21dc1764f6115c2bd476773d5bee20bfab5e0e02681.orbitfit",
+      "sha256": "f713954af03fa5418e609e0764de31b556b8e939753b0cfbfbe6e4c2e7c12caa",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/2646b9db090629d3232cc39c34b758be96a9e38f72101ed4f00df2dfb07ca4e9.orbitfit",
+      "sha256": "b40aa869ff0c2a1e1e899cf5dd32e12fcfd74254812fd7db11a76319e2998c8a",
+      "size": 2814
+    },
+    {
+      "path": "preset-fits/26647ae886efe201f97b3b64c8076d38844c7e601f95cd4c72206339deb385b2.orbitfit",
+      "sha256": "9b189e9453b4dbf16d80bc0714505f046541f9410fe31652c07b320a7f501c56",
+      "size": 2722
+    },
+    {
+      "path": "preset-fits/279020847ab2bd34eb97f75239906d802d1dfa3dfffbdfe78ffdd45a8f2cf06f.orbitfit",
+      "sha256": "ec6600fbe27bde6497d3fad2170c60cb8ac27623d56e0cefb6a2f574a140c0b9",
+      "size": 4886
+    },
+    {
+      "path": "preset-fits/291bb4738704e07bab2d00dfb48ba9427941b7f07232d0b0f77a493b9a1ef45c.orbitfit",
+      "sha256": "567d4272babe406ba65a0f0a3824b16cb5c58c099c4f4ce4a18dd833efca60ea",
+      "size": 4764
+    },
+    {
+      "path": "preset-fits/292044be03d87d53db72a780559d94c729160c83ab43c7ae8fde197440133515.orbitfit",
+      "sha256": "45c9db37f51a24f663833f6a769c2c29d3cef48ae0cc63435241bd1120906cb7",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/29594dc98504b6b02d712f23a4af9a5dc73281705a6ebd65f4e543537ad80fa7.orbitfit",
+      "sha256": "12d8bdf113755faf89055bf94a0553f9de1e12304287b380e0714c79d7e1861c",
+      "size": 4504
+    },
+    {
+      "path": "preset-fits/296e0a8b1396e7d6f381f79ac03769b305ee4c33929d3eb507601709491c027a.orbitfit",
+      "sha256": "c0bfbbddf1cfa74308b8a4a63e9133237a5e81e8c58c925094fdf9770f20f886",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/2abe5349f1d8590498822145cf2c9ca7e10b462b8d6cbb6b53125ee445f3382a.orbitfit",
+      "sha256": "98167de444e3eeaca461c093c32d8b6b45404df1bef3da55d6376e12e2c049b5",
+      "size": 2113
+    },
+    {
+      "path": "preset-fits/2af2c926497c05dd5cebc3b45b9b6134ab46b12f463221143c2d2b55ff801e08.orbitfit",
+      "sha256": "acef46ba67de3a5944a0b480784c176134a33b04d1592691547e5baf840d7aa7",
+      "size": 5404
+    },
+    {
+      "path": "preset-fits/2bd83ae012c1bc9e7161812626c7c740720a6d13240b695ca600861d48795b4b.orbitfit",
+      "sha256": "c9235ec13673e59d20c025848bf7399c0a8997a9d6bbcf791388897266964cac",
+      "size": 2778
+    },
+    {
+      "path": "preset-fits/2c852c5f2030d27e37db7a99880b40c74818dcdc989f74f3c9b189084b061a01.orbitfit",
+      "sha256": "d01484180bcaca3826ae320a8831b77ed3852d6e95e1a698bef0e3d389b8e5e2",
+      "size": 4908
+    },
+    {
+      "path": "preset-fits/2dff0c19858d6accaff64e01eb6b273d58f892aec0cd213159c85c405ade30f5.orbitfit",
+      "sha256": "9e288e43d96224a40efd20765381687ba2eaec49f4dc682eb477a8253390e648",
+      "size": 2042
+    },
+    {
+      "path": "preset-fits/2f70384838e8ab84eaf9e8b1391ff95bbad41d5f774688b5b9206fdab01ad2b9.orbitfit",
+      "sha256": "3b2bdd5ac7f451cb154aa1c718a1c82608070f74f3d71ef4695d1d7045b3e726",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/30d56ba0f8a95874b86fe70308daa3a74594f52a1a48fed2cfeeea439ca00230.orbitfit",
+      "sha256": "e5101dfb56e67641ddf9605e0211bb56badcb15c537baec6cd87f20c503da755",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/33cc27a8be81055825d8f5e36e9ad3439ffc965b1d491209cac93d21a824a932.orbitfit",
+      "sha256": "f0b5bfb14fdd1865b114bc5f266f981f50016a4c8f1095076baabde28ba3e3b6",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/352fa9e586f8905b825c02cfce00dd655eb3fe65c5979c435bdf8d29f4223c4a.orbitfit",
+      "sha256": "1edfcb6db955710783a8c10423437efb8065f5e6baddffbdbd35938ba7962313",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/3788b83887a66fdf402fd679d917be9e0f330b5a896348a128529fd50a11d835.orbitfit",
+      "sha256": "01a76e7980e9b3483d6538c5ef7f4493c4b52fc2b3c6b8791434601941fd049e",
+      "size": 4890
+    },
+    {
+      "path": "preset-fits/37c5358b06433eef2cf3ea1aa3c8c5f2a0d34d508f7080dedac640ff3ce3f267.orbitfit",
+      "sha256": "427f533dffd76db15a7cad043f3a0d7750ba14b9c21c57c24aec0b0dd044b805",
+      "size": 2721
+    },
+    {
+      "path": "preset-fits/38830481018aeed843e594be535537cb5812f1dbcb666c34288ab8eda288eea2.orbitfit",
+      "sha256": "46262c398a7fc05a005003d5d051837ba94510568a858735979199852e4ca5c3",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/38f3201e36f59d2360ccfd8a9a7ab00c4ae616b637e1d00e95bacaf0c9a213f2.orbitfit",
+      "sha256": "7f51b3ff630ea133647b075f6635e6db3cb815354df8c52d55bc7c1f302cdf8a",
+      "size": 5404
+    },
+    {
+      "path": "preset-fits/3c14b3527dcb6fc99d13f65a2eba2d26700b63ed0fdb91aa2c67156d8e920f8b.orbitfit",
+      "sha256": "086b175b22cffab00291ecdd67656a439dbb95c12e3f9ede034f2898a24006d9",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/3ce8cda36b0cdd601e4781e0531d2db7db261fa330446bcf62b94cd17de5b399.orbitfit",
+      "sha256": "bda5e28aaf07add3826df13f12f2119eeda043bb7cb1d3d541d8bbfa15ed516a",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/3cf6c3a6ef9276198d966bce6717b8a3b8054bade7ca27b70069c06d2e68a46d.orbitfit",
+      "sha256": "f5bd43723aa415eaff5431ca0566b7eae945f468626a624f788c9116f3217501",
+      "size": 2778
+    },
+    {
+      "path": "preset-fits/3d9419a12a2131c0ce740d34f41f24dc9557fe28db5f575e5f0d2550ad8d7b3b.orbitfit",
+      "sha256": "8641f29570c4549b770fc2d7070ebd4854f414f223d40c47950cfc6f865aa89e",
+      "size": 2055
+    },
+    {
+      "path": "preset-fits/3dda3d2a444f6fa849d1bbad7dbb604025081efc8ca8920d45c20ace424641e8.orbitfit",
+      "sha256": "9aeeb177b5c9a335e04dcdaa6b1133ad7ec5f1ac0de9b8e1e0e6b9721ffc1653",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/3e37ce730b9f32ceb767c69875d39ad03c86d2d2dc7144f3bec92157b56ff412.orbitfit",
+      "sha256": "63a934d6b54a11f796e6d726ae1d4f6dcf09b17b6dc55b7bd17d06fee322ce17",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/3f3e025d1c7972bcc6ac95546f6f906511d60453ec65e65522a38d984f9857fd.orbitfit",
+      "sha256": "28ee2215fd09d3bac8e297ca09bb307dbec0812761ad7883f02540d687bbc64f",
+      "size": 2170
+    },
+    {
+      "path": "preset-fits/4047116b744d004105877a6aa65be9248b93e2e4edb4536c4452230478a4e3b7.orbitfit",
+      "sha256": "8fa37889878c51ad013ca845ebd52f294ae98f2d27ce8dd9dab690f8adc9ab7d",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/406671447969f84b1f19947f6862794d3f52245d7872ed5e75e77e10140bd8cb.orbitfit",
+      "sha256": "a949dd2221fc66d1cfc2806c376e75e9f5060453ed7c49f26fbdd09aedbf0480",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/4077a2a6e5157147fe86fb974fd3792237be03a2e1edb735a83c0fac91fdc383.orbitfit",
+      "sha256": "3ca91db3f8af4e34a388c22c42b17ac4559c230178f3946c8f46e2bc240d70cd",
+      "size": 1952
+    },
+    {
+      "path": "preset-fits/42dd3da9e3cdf23a265aba495f8a29ea11b61ec875fecf97f07b77fe6bae56ba.orbitfit",
+      "sha256": "3da7c0ca6bb53ad05cbf3787ffa3fd9b3d410a271921f970ec275f9a0a126095",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/439b90f4188fb1be76f70d709e0004983447032ac6983d69d7f83469ccc89c8b.orbitfit",
+      "sha256": "a650a8240414fe8d9f2c01cc574b19ff4900d131de00d5b17050e3af95d60715",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/439ebc54b638655fc621fb657036bda1a30519e7ae4b2f20c1e029d0d1d661cd.orbitfit",
+      "sha256": "d548aec3f3ad2f22c1f668f3b91f4955ab16ae0076e984febdc9a6b5447ff589",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/488a7a5b15f9f246e9dc282ab3cb91f729e90960fe0504a7f1e822ed93f6ba0d.orbitfit",
+      "sha256": "0d4ab8420bdc310bee62cc3e8698d147b7b41b7792cb147829f3108d51b8ee66",
+      "size": 4775
+    },
+    {
+      "path": "preset-fits/49bcd716ff766126730c423a9622abca99fd6d72054500aed67bac1b68a3abda.orbitfit",
+      "sha256": "e092ea629af086f0856b5d6cf1cbf4480b54125798d2e5f6585dcedd81cce3c8",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/4aeb1be5d76353c8491d66d8086f53552ee5bc0ceef484118e88464177229e1e.orbitfit",
+      "sha256": "0711707d22f129ce2ad2ba6eb56fde0e737ada575fce92d269a36ce775f715e0",
+      "size": 2722
+    },
+    {
+      "path": "preset-fits/4aff09b000fd7334f765fa67c489e340601f8fac9e81de7bc2a95887f35276c2.orbitfit",
+      "sha256": "7db763e3915657354fd28b7cfb967f06f717463f3919a9d2b09fff45bc04f350",
+      "size": 4775
+    },
+    {
+      "path": "preset-fits/4c6250ab84079e71538b5b61811a7e066f3c94f4094decbf068ff8e1f313e5a7.orbitfit",
+      "sha256": "3610f770ff5bdf7ce9dd353c73fe9ab83087ea3d1ba48a64a2a859b9ebf0f0d9",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/4c9d001034fc3cce4e6a31095219ac71fed34a7ebda5abcae1022e029bde0a17.orbitfit",
+      "sha256": "c261cb793cd72f2ef30ca32c759e9e791a6de05a998910247bb6b9b2a07f2589",
+      "size": 2722
+    },
+    {
+      "path": "preset-fits/4d64da5d456ce22f14633715ec9400467efc2a94069fbfe2aa6114184f60b99a.orbitfit",
+      "sha256": "65dcfec1f7ef79c6e0f359e8ec015da5138d5280cfff9bdca7e6f349bf83511d",
+      "size": 4683
+    },
+    {
+      "path": "preset-fits/4dcb85062b88d884a3c1c57c98889099522f1ef18ea93e7c67ec7bde99fd6ccd.orbitfit",
+      "sha256": "36f2874a51ad3b881d8025a1b040effe9c8e416cd13bab328f862d08eafc9d0f",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/4f35042d3b87d2511a6719fa7922614337dfa2e3cecda766d3e41744eabf2875.orbitfit",
+      "sha256": "3e2e756ab24cfa2b2f097a2e85134cb04d30ce25ad08cbc4f4c9de0299ee121d",
+      "size": 4775
+    },
+    {
+      "path": "preset-fits/50426c756a09d16fe256a750c5f515009383f7a28f581e1056628a8a2112988c.orbitfit",
+      "sha256": "ebe7871969f9e2a65650d4c853e10549c30f76a50c4b6fa7b6d8e233cb8f8011",
+      "size": 4983
+    },
+    {
+      "path": "preset-fits/53e0c28d424ff2bf03ea691b3cc9667b6aee9e2776febd64325976d6018d95e7.orbitfit",
+      "sha256": "68b59dfbed96af5a705d0539cff51110f71ee7bd5b8950302ac84d53a20072ba",
+      "size": 5105
+    },
+    {
+      "path": "preset-fits/54d7087ec3bd498eb0ad0c8ee8a37370c1f36578aaae3e12d0b5bdbb83692baf.orbitfit",
+      "sha256": "ae25bd82fbd73c016224ef1006e0b99da3dca4d5bdd38130b1b58bd07d5ab337",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/56ba3bf212a9621eaef042c9e0373668727a5c6ca781de314086e9089c10ec38.orbitfit",
+      "sha256": "07fd2da6dcf06571a325cc68b23537525fb30dff13baf2d2228dc7103e8008c0",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/57277e6f3288d029116b13371deb55b2700d22b8472b9c3f2c09301716673964.orbitfit",
+      "sha256": "2bfc4c85dd291a5d48faab7c5fed08c2dd18cf37f748479abc01d311b58a29ec",
+      "size": 4978
+    },
+    {
+      "path": "preset-fits/5a271fb9309bc1361659bb43430ba77614d9fcaa941761c3ed70da5c3552f48b.orbitfit",
+      "sha256": "5a8648ad2fa3ee8b6cf26e6ad3ae043f7cb92e23710742f905c8001ff3a8d473",
+      "size": 4831
+    },
+    {
+      "path": "preset-fits/5a86babb9f18f1b3f85b9baaf9bb88fd8ee649bd5c7812fe242b62f3c8cecb9f.orbitfit",
+      "sha256": "0f8edfdffbe75dc887be2151c362be9210f8268c9e8fabcab0b2cbc74c9a3b0f",
+      "size": 2093
+    },
+    {
+      "path": "preset-fits/5f59a03cf8fce5a33e96f60885cd651cc6eca3926008020dc281c9489638135b.orbitfit",
+      "sha256": "d566ad492b3e6a68db62aff7c71698bbb2ea1db8e5d5796e42fbd564645b8031",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/60bc3747c190882f3c7e1ef571c66273ab9f315bc73438049b3053930a7ad95b.orbitfit",
+      "sha256": "f8298f7e19f244f6030485eb0f8df5dd1b7c6ce940fe2e31a6f2fcc12f7a4660",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/615c82be3a4db47c5097bf1c91d4eb7b052230e8dbf9512c4773f36070c337e1.orbitfit",
+      "sha256": "8f59b8ab656db602ad9e5d91f11a55e757c68a431ec784aeea62d6e990554d3d",
+      "size": 4982
+    },
+    {
+      "path": "preset-fits/62ff65d0324cd735e43063d53cc168a9d14ada27d956b676e49575f75d5f6628.orbitfit",
+      "sha256": "410c74b3c5fa73a6dcbf93e6c2c518529365182ad7f80baa71fbf38f07acd566",
+      "size": 2814
+    },
+    {
+      "path": "preset-fits/634c4567bab4a9a8d3414f3b69f9dc1f1085804223251bb60a3b746ea46f185d.orbitfit",
+      "sha256": "48acf66b24291f4facf6de319df7556a0d217d20e33ddfe29711ea445e394019",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/636d4cc4d6587a509d26c3838a536f741c6eed5041dd2df7087b8e5cace56474.orbitfit",
+      "sha256": "c3328ed3b84ad5448c30b59fe8fbdbb0e419674e19ac398123908bdd28a6b211",
+      "size": 4771
+    },
+    {
+      "path": "preset-fits/6422c628b7526e152a7ad102e3c349d8e5fb531430948d66ccd45ebbfd034e99.orbitfit",
+      "sha256": "be652f651dec53c60a53fe3fadc727bb37b0b9c57b2cd6a5df44fbe611016367",
+      "size": 2701
+    },
+    {
+      "path": "preset-fits/67f2a4f7e6ec509a44ecef378b6978f4d493cb7f43a3e2eedbacc5520aa08be1.orbitfit",
+      "sha256": "a7cefe4d7ec02e8ce427d6be0149c516c5cdfa041e9830a9991d966f30cae240",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/694a7af528e78c092390925d54013e34cfe1302f5f8d2e784e26ed5a701aadc6.orbitfit",
+      "sha256": "7b4bb50a05765f61753e54e0e8302b981d98d65e8daddda9505f8644f24debfa",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/6a8cc3409fa41751107fc263833271bb891380c29392b78406c3bbae1a0549fc.orbitfit",
+      "sha256": "63d54792528d17362a71c5b83e99fca1dd6f185ab3c1d8f89fea3139768b3d57",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/6ab57a8435df03692604228bb2556b3113aea0af19779d178481291aa78d58db.orbitfit",
+      "sha256": "44795a535eb2f4e1f616ae4da7b1f907eda04b7ac516918e043f0f5ba1e4d3d8",
+      "size": 2055
+    },
+    {
+      "path": "preset-fits/6cbf9ab4edf7647e273d7e42e21cd12061c06744aed57917320c3ee8bbf7fc95.orbitfit",
+      "sha256": "5d081b9524589e64309b8cf54dfbb15459ac6ed98045b09cc3e9e7aa5937e23a",
+      "size": 2606
+    },
+    {
+      "path": "preset-fits/6e62bfc0e5c5e63701b2ecb98c3b8b0e1d4ef9a9e6e22482d1279ed98d34cde3.orbitfit",
+      "sha256": "96d66221b199da4c624e8a9393267decbcc2652234c31029b8273f740fb51e47",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/6e9dea3ccbf84c78831f365866b6557c9da76f96d8b0db71a753c929394504aa.orbitfit",
+      "sha256": "3997daa9b7cc8b77f051bef9165537c655ef9f1e23c577948e836dc0303fa7f8",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/6f5817a49afda0bfdd43233f5242163765a57fcf244522b72f5861886660b67c.orbitfit",
+      "sha256": "a2676a5ab4b48193b0fe98f822dcd8b2a7f7a887ff5fa72556c4de10ff8370a5",
+      "size": 5235
+    },
+    {
+      "path": "preset-fits/720408b4e56a4d0157df48920f0a0b8a33c15eb469e491eed7ee1864936aa09e.orbitfit",
+      "sha256": "53d776594a26494ab1da9f1e2c95f0038b024821dade47c7b83a6baf1b316d6f",
+      "size": 4771
+    },
+    {
+      "path": "preset-fits/744b570fd60c6b56f127560fde7151bea452001b6a892dc39466a9ee157400e4.orbitfit",
+      "sha256": "24686b9d248f55c538fbc9919fc9909993e273a87a18ba9e1f21cbf595dd05fa",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/74f3bc604c9f0c721f382e8a3ce9da43b7f110bea76f0007249e96a4c7e550d1.orbitfit",
+      "sha256": "e85ef5090e5dd8f1cd5c3254485d2b58d98606e8bf441512360b1e2b12b2d415",
+      "size": 2663
+    },
+    {
+      "path": "preset-fits/768f96e4a3748da0da9246ad5270314f2efb1ceaebc763b04611432543954ea8.orbitfit",
+      "sha256": "93ab6e591a9dc0f290ad1097c3dafc0b3266eaa97bc7855eb6aeb9862bdb2e7a",
+      "size": 876
+    },
+    {
+      "path": "preset-fits/76bbaada8ba0165717304bffa7e6e298669a107dd9588d1d6455295bfe28b0d5.orbitfit",
+      "sha256": "318c3033617f4b5846764a88b2353d410c1c06d0d0b54da813d4af0ca7f32cdd",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/78b8864f9e9f249d7a33ae3be3f5664ddf3903dfdf7dc6c8d331163e2e2cf70f.orbitfit",
+      "sha256": "99de2db5e763ba88b8cc90864b2177c7545d6358f6fb79be7201af1a47632b8d",
+      "size": 876
+    },
+    {
+      "path": "preset-fits/78dbed4d7d3550a42b77a4fc3190ca01888fbe3302ad70a7f941c1c08e9d44b6.orbitfit",
+      "sha256": "66cff646485ca399c2618fe09893b9f39b026846bc5481e8bf2762dfe10d6f44",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/79159463ae4764cff30b03a782f31e95d124a390382bdff53efd468ac6db47d7.orbitfit",
+      "sha256": "e785284767745e1f9d0d3ef85b6c88d30f49871277c58e84beee88cd837573f0",
+      "size": 2093
+    },
+    {
+      "path": "preset-fits/797fd31e5dea47c04a72a2d41efa855756491e029a44a6c2254d7f1bc61e2a1d.orbitfit",
+      "sha256": "3398ac4d474d7ee4d12b5cd0500aaf24289108ac139644a8cadb371c9fa4d37a",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/79c3c7678b69a71a659cf1c59040ccdac229d35efa1f8df188901440b030770d.orbitfit",
+      "sha256": "5446557b52fb4f82e88f19a86c1fc42cbb879d91507d0e8a3eb4501e07b5fb9c",
+      "size": 2113
+    },
+    {
+      "path": "preset-fits/7a8b5a78d61cd5e38335633c7c186e7eeae142d5f7f18751fb1efb74cfd1541f.orbitfit",
+      "sha256": "2a5d560acd28aaefeb49794ddbe1cbecdd01628b56bda463fd4e5cf2d5c0526a",
+      "size": 2514
+    },
+    {
+      "path": "preset-fits/7bcdc8be5dfbad9b5a86d2323194a6e5b280fb64b44ebb6c1c8b8e274cf3098a.orbitfit",
+      "sha256": "085807576475e5abb20ff89004ef287455d26751672097c065952b18b7ce4505",
+      "size": 4886
+    },
+    {
+      "path": "preset-fits/7d2f13e295871edcf37968b772eafda2cbd5ccd73e226754130541cabcec6b2c.orbitfit",
+      "sha256": "3ac9570e041ee2e8f3e7bfb690e4cb981e902f0b1a4811662d39f9a51c778a38",
+      "size": 2606
+    },
+    {
+      "path": "preset-fits/7db199856998ef9e79113122e8f4f922fbede6742bc94d60a9570379c286f0ca.orbitfit",
+      "sha256": "9ed194a7b94bd82ec94db5a8fb2390f59fb4c03a0eed28b192e272b175a215fa",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/7ddc5262d98a600f81ed4e0adac9dde217a9cfd75aea3d8d90c09a39caef387d.orbitfit",
+      "sha256": "cad00965027ce5ad2a4d27d074a117b3e73065a115a6b22c35897b75c58ccb14",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/7eb02cdc784c3ca1b5169395bb4f5b7e68c4018d2be06f10f90fdfae614570a1.orbitfit",
+      "sha256": "7f755e01c844a197880740c8ce6a587c32c4ca19749b562ae10c17aad5f51001",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/80110dbfda909b781ab4c0629e183b897c9112414cea1b05e9eb619bad7c1c17.orbitfit",
+      "sha256": "01a141b767f97458344e467503c3b89af97e6a60b9326df71b29560f7f199be1",
+      "size": 2514
+    },
+    {
+      "path": "preset-fits/80864e1504258bb1ae51eea90b6a3c6fb907ff7f097d7b5e7331c58159ccd994.orbitfit",
+      "sha256": "7fb432ddab6b7189b1974bbfbd512bcba62fe211c47fa3b7288e6812d27442c1",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/80a94f05302b8194e78dccfe17bc20b9196f0c4d0fd3c54eafb78843eb196300.orbitfit",
+      "sha256": "1ff6041ef868c6d8f6b61c95dff0fee9deb9a5b60080b49c195e8a959260ecbb",
+      "size": 713
+    },
+    {
+      "path": "preset-fits/81b238c47043be57eaa5d7d3173f27bcc522520adce4b7257f787c67bb1490f1.orbitfit",
+      "sha256": "dca82c07f107d88f4c6e490e55681ebd5870d19da97056d9554c9c8398f8f0e2",
+      "size": 2778
+    },
+    {
+      "path": "preset-fits/81c3872742a9ebf27ce052846cf654814df11de94ad59f73d1cbff057a3c45ac.orbitfit",
+      "sha256": "69f678ce58cae49045d59004274abe8267e8c8cdadc5927ed999eb640a6b683e",
+      "size": 4983
+    },
+    {
+      "path": "preset-fits/82baaf2540bb47939b09616625433e920be07bc0db3b3def3ab0278192e4a508.orbitfit",
+      "sha256": "4affc7fd8828dc56bf7bad885693d3649ee0ec912d401cd4be0605db511a2416",
+      "size": 4856
+    },
+    {
+      "path": "preset-fits/82cf55fafde0d1b0d1cab981d1c00431d6456523a85f63df097db64ed0a9a3b4.orbitfit",
+      "sha256": "c9ac9ad3d782702b4516fa1805e2b8a217864ad02b4120f3b02c16fd0abf5255",
+      "size": 2793
+    },
+    {
+      "path": "preset-fits/85e718d6b5360f031e9051b7e9b1096b86f02dc613e7b7e5592000a697e74909.orbitfit",
+      "sha256": "1a3cd3e26c6b326448e62f7b992ff6465bf473fdf12772022463b0cbdec8806d",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/89afc830876fb5970c9bca78ca0f460a03e10ed23248e04fefb76bad97689cb3.orbitfit",
+      "sha256": "7bf7ee9b929a18bb79398e573defb54cb73dd7ea448fed6209e3b4c6365ff463",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/8a47cccfd4b03473b056471cc04738af01b09fd5d4b731f56461e78deb10df39.orbitfit",
+      "sha256": "ad81e7245ef48799c9c71ebe74bde72c8e76d66fe16760c2ad9f90f5811ffc64",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/8a866ddafaf51a5a3c91f51fbbff62ea5189654e9c57d22db0b89cdb382f7f9f.orbitfit",
+      "sha256": "08eed178d9772270e18653d93843da5d718a2d5ff449010dc2bca505ba82e7e9",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/8bee5ae54c039e305b6c74584f05013271f49728a6308622645da51e45ffc6d4.orbitfit",
+      "sha256": "50539d0d3861ba3206ed39f7817dd9109b490120f7572132f3c453128e10b0d9",
+      "size": 2721
+    },
+    {
+      "path": "preset-fits/8bf02a2e38f868fec65f2599416093d25058901af5f292516146d3bf56ad80ac.orbitfit",
+      "sha256": "b80425e5d5b19fa76cc14eac847e30b179e04ae72efe0ae0712d78ffaebac4c0",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/8da84e026c016cc99b2a468fbb99f0f17260d0324480f51e624404d37b7455b1.orbitfit",
+      "sha256": "2027ebf394a29eda227952931db71f733d25984b61efc0cf94eeabcaf47a353c",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/8eae789776f2395fdc73e7db8bc134b52ed24ab7a53b7b606507d684aa086862.orbitfit",
+      "sha256": "afd37c202e52c087e94f2c1923c7e6af8abd4bd0f7decf9c41577d459fa59cf2",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/8f402f20082095b428fdbc57df6819414cf5a83edec9bfbcae5acbd83a822ce1.orbitfit",
+      "sha256": "402eccdab704915c44abd80f2fe46832494f0ad671c0c23c6e816561d9066e73",
+      "size": 1998
+    },
+    {
+      "path": "preset-fits/8fabd6a875434b3bda4c241c89f3305efe2028bd5ce97aed1c76f8d4d119c446.orbitfit",
+      "sha256": "11a52686b739a7decd224ec38b010cfb8c67014999823038ed5c39e58e25cc06",
+      "size": 2650
+    },
+    {
+      "path": "preset-fits/9610e9e6acb14ccedc57ecc399b07eada1d22af8dbaf60fc5416742412097a1c.orbitfit",
+      "sha256": "068fe0d6439ced6f9b4ef054be358e044b709775df3d30806d05c83276729aba",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/9716dc7f65ba7f622182abee645079c51e59329e7cc0b2b6db37853741830218.orbitfit",
+      "sha256": "fd292ea732e199ee92022db04e76c3332b2b6796dfa796ff639e42b714ee459f",
+      "size": 2055
+    },
+    {
+      "path": "preset-fits/98454419e5527e4407dc9287d03fe4fc1cd816732f915905b23b787eaf4a7e40.orbitfit",
+      "sha256": "81d55377566f68b6e257e61a2bd18dc77497efa971ebbc039d4c007e0c0df0e4",
+      "size": 4775
+    },
+    {
+      "path": "preset-fits/98ac529798a49b42019561f5ce6e769966ba824313168ebc861d0e7f652988e6.orbitfit",
+      "sha256": "87d7cdf33b91165a7e9e13d4cf7c0a539738a9c770cb66effa9fe6cc866a0660",
+      "size": 2602
+    },
+    {
+      "path": "preset-fits/99830a41ca2e0263299d456dfde5243aecd56db0c88d3542eb5f784a75dd6252.orbitfit",
+      "sha256": "974037c3c471a63e407c20bf505de23de48decc65da497c5c137d9190c120c19",
+      "size": 2170
+    },
+    {
+      "path": "preset-fits/99defe4bdd7456b8a1faab08222c3f94334eae1d33ad7b75e85ed204d963c911.orbitfit",
+      "sha256": "181b9dd037563d2b4f809d3bcff02b2f7a15e9bd497263215952f3ada30203c5",
+      "size": 2663
+    },
+    {
+      "path": "preset-fits/9b3bf2e86395805444009c30187d00d95ba64f891b362f0a2561208a9ea22349.orbitfit",
+      "sha256": "3f197c08a7b233a6c1a765a51809a34aade187bf314bc243cf8ac2d197335630",
+      "size": 4982
+    },
+    {
+      "path": "preset-fits/9ba6b978f1860dd26d132807c2ea5e524ac17b7fd45960feafce7e8def3d633e.orbitfit",
+      "sha256": "709037871226b81520144161603f4c259dd700f264589254fbd9c2af7ebc92ad",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/9f2c39f70d7273707909754dcd30e386c369bbbeab836c6c4c9004c90ac81e7d.orbitfit",
+      "sha256": "61bc3d4a31ef9fbe1de90d946c0adcb55b55f2966030485b9d9ce86de9136571",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/a1a25ee176a47554886b453fc714417e13b7447ee1247da2a4c366a9aa222ed9.orbitfit",
+      "sha256": "7918f2121dabf845d188debeea06c783ecc5b9c17743353f79fb266c5c69539a",
+      "size": 707
+    },
+    {
+      "path": "preset-fits/a37b853d941634a260b550624747ac2723ecb3ed0fb8f03c06ccfab017ff2c91.orbitfit",
+      "sha256": "9aea769a35e970742beb288c1e7c9a48f69e0af2b4ea5c4b713ce57f20e6ce37",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/a37c034afb2790c56db8e96084b163957abe47f83ac358f9c64f3d9bb3125029.orbitfit",
+      "sha256": "c50c76ec2b66dac737a98c299a9964df095d13ea6a521e071e62fc497aeb535e",
+      "size": 2170
+    },
+    {
+      "path": "preset-fits/a42c307c3e39072f92891066febeee0d59f67dae8540f61c773949fc63b61f75.orbitfit",
+      "sha256": "2a4a01cfc3d8bb8771a1e075c621d4a8bafa9a44cac0f9998f1c954e54b0828d",
+      "size": 2721
+    },
+    {
+      "path": "preset-fits/a57c1a5f0ab394100e414c0fe65f776a5edad863e8928dccbc17424361e6dcb4.orbitfit",
+      "sha256": "ecdf2dd02adeea5c6a48cf4f763b80e6b260fe3121f13cad4aa44866d85d9758",
+      "size": 876
+    },
+    {
+      "path": "preset-fits/a66f9ec5b70f3449c7cd45d36aee226b17a9bb28140a78e1e32d645a083dc949.orbitfit",
+      "sha256": "28b4f72e2d0412e47b528c9a93e8fb85880c6202047ffac97ee87e106ca12dad",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/a6cceeb88956c32db84e743ad85be13e9c97778796e888482996a6fde7236cf5.orbitfit",
+      "sha256": "ae1d42e84500b06930dec1339cad15194c14813c63fd24332c1a59c83b535a54",
+      "size": 2732
+    },
+    {
+      "path": "preset-fits/a7c6191b68b24fa7c7a684525bba10e7539ab28be517e6405e5383e610f490db.orbitfit",
+      "sha256": "c8eac4490ae7072fbc5c79fa68498d4fbc1afcd53812746e9fad579706adc4aa",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/a81846f6c8ade61bb54e552b2e8ba4384309972088144204c4e5fa3aa4cf3412.orbitfit",
+      "sha256": "950b623b5002489b574bdbbc169d24b04e2339112836212f62ef5bddd3210ffd",
+      "size": 4890
+    },
+    {
+      "path": "preset-fits/a9ebc2ddc3802ab65bc9e6ccb9983a696e2ebd217eca80dd0a4bdb77d1d34c1d.orbitfit",
+      "sha256": "adefe7cc9efe79cb83a209e362267a970f58d8c2204e0ce1b60ae837b1b292af",
+      "size": 36777
+    },
+    {
+      "path": "preset-fits/ac39a09835ae21e4abf202e00782cc67085cb0a0f253a5e9016d7517bbd0987e.orbitfit",
+      "sha256": "3842a63868c77e49a2d32c3d2ac6f986edadb574901854da7f3905730f51bd8b",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/ad21c4b63aab9155f170d7af062b5c535af0f960875b18c0152d604f6df4964e.orbitfit",
+      "sha256": "dd6d29122dd70d491ccb4ede9990e51392f86181974ce02bc9c02fe70ecff6b9",
+      "size": 5312
+    },
+    {
+      "path": "preset-fits/ad78ad93c529052438f86ba2e28119ff73954d41ecc6733457e76a19f327a0d6.orbitfit",
+      "sha256": "faa45ac2b29909ddcb708a181e969e3f0014ecfff8315667ddaad115567f339d",
+      "size": 4783
+    },
+    {
+      "path": "preset-fits/ad99f302f83983064cb96d37e5ffa07cbc03da843886cd78808467a20d98a156.orbitfit",
+      "sha256": "0817f6c75ed15935ab3cf5783a21b386656408317727c5935704423019bea2e4",
+      "size": 2721
+    },
+    {
+      "path": "preset-fits/b0dedc67ba0cae5402a50693d5101c99cc5aff34df96a24d3bf6d1f2dd7a07ce.orbitfit",
+      "sha256": "2cb6958ec966bd4a54a7ba061f3ef23ce793c4fc26b74a82307c06d42c677b7c",
+      "size": 876
+    },
+    {
+      "path": "preset-fits/b18f42741f695e49faca6e07809b5e6d5ad1afff86b2cae5a9711f756fe1ef3b.orbitfit",
+      "sha256": "d888b0f34d9320f3c0f959cf3b1e73a2d4015272df6618df2ba3324b85c00e12",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/b33af513a07bfbcb90742aee4a74e8e095ba9372db14c0ae97fc3e1a4e814ce1.orbitfit",
+      "sha256": "304439aa2351c08d7b981d2ba717a8798d541aa65ceb7b62bf27d1df65ab6c3e",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/b4e48fd7073eeacec30a080cbcfd8c3715dcab27a0e08880b9c110529adf9cd2.orbitfit",
+      "sha256": "88882db0bb82f123710987debab4c3d6d832cf775a5c92c4f2ff616a3484919c",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/b637810078219c6943f07bc8618cb0be89a944304c30e5efb1006f911abd847d.orbitfit",
+      "sha256": "720ea9c4c6b3c9c86e2b1420d328b3eccf64c468d91f5a71290f0d02cd315c11",
+      "size": 2113
+    },
+    {
+      "path": "preset-fits/b7d5259fdfc9918f4456bb351ac50531aee607f8220800201e786ed2ca83f036.orbitfit",
+      "sha256": "01e92b180583f820919aac4ab4c090ca280263d39e68cfbd6f45d6c7440abb10",
+      "size": 5312
+    },
+    {
+      "path": "preset-fits/b803b5d84d4f2f6101c42275959b8a8dc1d550fb2c1391e1d5890fdc14fe498d.orbitfit",
+      "sha256": "0f44f9eed805d7e47807cf09d3673152a1d8cb5c75737f9bcab002cf9963eb4c",
+      "size": 3288
+    },
+    {
+      "path": "preset-fits/b80abb76cfea52524e3c9fb03e4f281c92438b2a082f5694996c096dcc99e90c.orbitfit",
+      "sha256": "aea1d960401bbabb3887105bf05940561908c285544c9c4def3875a1b132c61f",
+      "size": 4908
+    },
+    {
+      "path": "preset-fits/b91d7ef25ebfdfd5bc520ac07353dd99520844abc766e01da5ccd6477dc2d22c.orbitfit",
+      "sha256": "3440c660ec17cc9219d772b5f1fe1e69719515550e9add06caeb57f04c785661",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/bb67d18d48962032106444047d8e173c56effd27c7adf0feff52ac8ece1ec14f.orbitfit",
+      "sha256": "755513075bbb563856d3ee022c18332cc06b338845c2be8263c52617979995e4",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/bc119b8b38d845a3387e0e84256a9d1a003736f0a0588c87f774b77e76e624af.orbitfit",
+      "sha256": "d711e327edb541c80c5baf8eabc4e8214da649305b2da8d3679b31c0e78302e7",
+      "size": 2205
+    },
+    {
+      "path": "preset-fits/bc668d928cc241ff36b748276036db9d4043e5521806839dc4aa8cce76dce533.orbitfit",
+      "sha256": "d181872bb80fa7ad2fda8dadc22d2838e130f5e8ee8736c5d01de9bc9962c4d5",
+      "size": 2701
+    },
+    {
+      "path": "preset-fits/bcd4c7b0bb50ffd6c1e542d51f33ba6ac81e6cb56940a3105ab5cae6bc9c2d08.orbitfit",
+      "sha256": "70a373618cd0c3d6628dd32f4cabefeffc102d68f1a0bce873036ec9f18a78e1",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/bcd967775e8c5265c4576ca6f251aad96db3f12fc2496a462f51d709926de331.orbitfit",
+      "sha256": "8f821dd9fc6afb47bb91463862b9978cae8cbc64727cc2aa9bdd3961cf75b6f8",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/bd8ce43a8262ca282becbb607404d9ba9975a565a82a433fb81a197876499fab.orbitfit",
+      "sha256": "dc4a0c5f2aa2b8183ff3285d20f8115afca0c51172ae6d09316ac8b0a53c49e8",
+      "size": 4771
+    },
+    {
+      "path": "preset-fits/bda91c3e1de4d98eb3715773b63f2059f3b44411e35729b5acf3e04c3868f09f.orbitfit",
+      "sha256": "cb98c938fddbb5ea94e267e0b30373bba5222c29d2b391c2f40c048a12073f44",
+      "size": 2701
+    },
+    {
+      "path": "preset-fits/bfccaaf006b23b6dd178d9bdef4726fe5de0144820fae753b60df15f58833fd9.orbitfit",
+      "sha256": "75aa2394e1815affd580f60671494f4ae87d6f16618af916cb2615c9111ffc4d",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/c0503635e93b55f77875a4d447f7d72fea73059dc9a7e29f9b3c57639630c522.orbitfit",
+      "sha256": "537f889ff838dc00351a57e61bf485697e4712a4e0e7b47dc46a7fbb4dd798ed",
+      "size": 2170
+    },
+    {
+      "path": "preset-fits/c4d5777dc0aebe5daab8702fac0ac90d4d4b55c285417522ba33f5e3bb8aff6e.orbitfit",
+      "sha256": "7c420f767f0e40f2d105b60ac1dc4fce3b29423a9f9e7794a9c494e5909f7ddc",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/c5dcd37634d655b93eb23923c7cdf207a28c84215ff4ec20ccd6377ef035a8f5.orbitfit",
+      "sha256": "2b636477e7175f371b9064e7e83635a7a9fc82deb554751aa72cf7025aa90e08",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/c6205d3e714af7442accbfca68f1f1050d4955d3dd6491778c0005b6c8f53f16.orbitfit",
+      "sha256": "abfce2686fdb1c1675cc755a9052bd0ccb18e630ac5b4b6da6e710689ba4c506",
+      "size": 4683
+    },
+    {
+      "path": "preset-fits/ca4622b3c7fc74ba0e4ef1242eacb5be194a2a8a60ee9292d48b86cccf56270e.orbitfit",
+      "sha256": "965d0bf28e180804d724599ec841469746aff96ac67a635cff33ec25fd05319e",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/cc4e05f3e4d8e4e67c745253a855e9b002e00a0e3ac55b3dacf4d83b943483f5.orbitfit",
+      "sha256": "147affe5bfd55a258d6b67b847040a120ad857b15c051d18b039c21f0aa9b498",
+      "size": 4886
+    },
+    {
+      "path": "preset-fits/ccd54a8af1460a8b92d72f4c1941877490af99a6d3a056b30d903a898a66a5c7.orbitfit",
+      "sha256": "3867156209843eec4eac463bcffa676fb01acd776dea80dd4f7c58791e686c82",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/cd5362e683aeaab9df9631bb311a62b56ec1d7d83622ae910af1b1445225da8d.orbitfit",
+      "sha256": "26f0ccbd0955a506a3b498a341c25adbadbdf7c1abf0ba4fe9cbb85a4425113c",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/cf0d3a22917f00e857978739e51e3be149369e4113dbbc59ca5a6a2e158d2186.orbitfit",
+      "sha256": "b9366a747b8a4a2d8d4d61690638ce87c6bdb8170152215bc6776b7b8b77e1ca",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/d0deeef56162f2ee65151229fdb36b3e15e3dc7d00983ace66ca350ce0834808.orbitfit",
+      "sha256": "c607881c0e5c8158e479cdd91eaf6f74576af73becb28d81460f2ce088eb5318",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/d1bcdc38bf5738e1b3715ad846996b8ad12c2edbf8993adc4f671b1d97522f68.orbitfit",
+      "sha256": "524f43e2a761d55ca08e9447bb7eafaad024e7a1f2c5a528210963042b545ae7",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/d1f91954c9bf712c5d0b19108e02655345857b6d2b409d62f306eae4973bd32d.orbitfit",
+      "sha256": "ff14f88be76f256b0553915d19757e958a23e44c5a778cf4788991f5fd4ac889",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/d94805ae5f811649de23340505002c84c1a99efef3f58f71c3e45c839a8ac091.orbitfit",
+      "sha256": "495eed8cfe587eef54a644d9fe35f066393d7d32bd4130509883a2c638ef2c63",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/de13ff61bba5bfcd4112a5e508dd93c561d2724a2efb436763e51bae3c168a96.orbitfit",
+      "sha256": "925b148b9ab6642b765d9699f47698c1d30d9224a9b9dc5c17eca5ae4bff25e1",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/de23e63f8540a49ee7ec4bf51c5648e8e953e373fa78034e495b7fdec297a925.orbitfit",
+      "sha256": "af166beaecf3e84fd5a2e68f31c29b7191a6b09e6010e404cd01fe77540309d9",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/de7de69b62d50806dfdfdedf1dea2b0f782993d1c88d59e9e99164f1a928e775.orbitfit",
+      "sha256": "f8491f43118d7ad71bd27c7dcd61ea4c90efd0d935c28acb5c65b76676095408",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/df0f6af1708b5b5fd7f66772323a400458c8f89afd3a25272992c0f84f7e9d34.orbitfit",
+      "sha256": "301b4ddb6ead7415e4f792ca7deb6a3c7029eb5ff728dac29545035f00a3be3c",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/e03151d5100235809bcb52a1c0bd4683106ebb92aaa4bdb1562a89c197350ce7.orbitfit",
+      "sha256": "11e297fe638dd285511ddaa4fe0584f173534cd32f175dfd6739eb4800225747",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/e0ba87374750027f5da46c318eb5d06e2b3f9e8db533086bfa69861b068b947e.orbitfit",
+      "sha256": "f13d827e55d6a0a38b6a4172e944863dff4af2e678f90c8c4b8c341803f608d0",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/e256ca36808ae1a2dcd94a9bf8c599f760fc94e41ea8df64f0165ea6bae8ab72.orbitfit",
+      "sha256": "05df4caa3e706557321dc2bfc61c56cfc1aebed386b0ae85e40306ba6c724aba",
+      "size": 5235
+    },
+    {
+      "path": "preset-fits/e2c3d58a319e2901c7656dc881650c31673ccf94845c0e81b3f9a353ed9e21b7.orbitfit",
+      "sha256": "58858393170d828be6d76aed59a5c5aadbd564bd0394aea1d07a0167dfd9961e",
+      "size": 4809
+    },
+    {
+      "path": "preset-fits/e3a540af64e80496612e2b35dd0a99bbc4956c2ed2f833149c3da739b1a28f98.orbitfit",
+      "sha256": "01cb72550a8b77a3668169707647877b6fc04e9747738d2d4da6e653eef1b61a",
+      "size": 1906
+    },
+    {
+      "path": "preset-fits/e3bb274d4cff8b5e5fa890aca4a45f17374fb70012fa2f78912dc49cb01b5b39.orbitfit",
+      "sha256": "f1129f5585b3b0f65a029887afb8382dd0068beb4d4d8341323a3c309c126a2f",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/e3d66c146bac666c0d99e2a5a6fc48e92f935401539c15fd089ef31b3b5f31f2.orbitfit",
+      "sha256": "207fd547ba55682591edd5d04481e8c88d65072f33a2c392af1318ae2afdb518",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/e68881fae3ec69d1f0cacb9382657f279c72982f18c10efb7628802184011d7e.orbitfit",
+      "sha256": "8b2e2c036100545df39564f1f4eac6f5c868bcfff6aae62383ddc9eda539c48c",
+      "size": 2036
+    },
+    {
+      "path": "preset-fits/e6e213f8fef49181e7658d5e6355f3522e5b71f3cc900c21a81a214cf3cf2afa.orbitfit",
+      "sha256": "566c6ceaca0a7f20d7b77fa93f64075a604daf308b96f42f4d3649c21919faad",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/e7c22af8a1f09d66e0784b405876d96a93cd2465b23a3c232ae814e62c0d1467.orbitfit",
+      "sha256": "108ab56fd66fee17b059c7db606ff0870a4ff39275799bfd405b6e4d4a8da03d",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/e9fda92baf5ea5d0a6dca38ad48f02dbedb94b9342a613eb787f169836a21f0d.orbitfit",
+      "sha256": "63dada95cc3c403446364ccf33f4898d2a2c1f16c47ddcd07d19ac4ca84786d6",
+      "size": 2644
+    },
+    {
+      "path": "preset-fits/ecfc270be521e61054c2e666507fd8554ece25a6d625398cacf693438156c535.orbitfit",
+      "sha256": "0b313f54e7ef0b8350bac6298411c433c0657d8b8480f7490f7c6e91cff91fa0",
+      "size": 4771
+    },
+    {
+      "path": "preset-fits/ed14dce6edef184e6b3f30c31b0c98f3c374dd595e4199930073a9d26f9c1c35.orbitfit",
+      "sha256": "8591276d63bc0c3a1c98abf49e11adbac045fed98f8a46f3c55a033abbae880f",
+      "size": 784
+    },
+    {
+      "path": "preset-fits/ee24ec396f2f7d3858cd4eff2f7feea3335049f38fccf5d82f01d7ce27d57316.orbitfit",
+      "sha256": "07b01d7c769700b0308dad08bef4a6722d285efedf45687c294ce259a303518e",
+      "size": 1998
+    },
+    {
+      "path": "preset-fits/ef7b07a6441d950e782157945e453a1fc5d74639683d0e9ea39dd1ec4404ad87.orbitfit",
+      "sha256": "5c7ac024f047771690a85745fd92e1b7df511703d902b6cd277aa168c069f208",
+      "size": 1956
+    },
+    {
+      "path": "preset-fits/f12626641e1c016b91b1cbef153580a7df39b43115b5a9b93056389e0dda5b22.orbitfit",
+      "sha256": "8b7c6bea380f5e9dad8a709ff4aa363c453cf35035829f3ca216e51cd1331999",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/f1bdb67e350b02154469eadb884b8fb7cfdca7a550370ed4f195c9f23220cbfe.orbitfit",
+      "sha256": "1e141f512ccd422669621d71e1c63da56ffdf6be078b271083e2567a6bbd40f0",
+      "size": 200
+    },
+    {
+      "path": "preset-fits/f2e5ca52b998a9ddca614e3114660c842841c9130808546c5dda89ba3bfcd56f.orbitfit",
+      "sha256": "d362213564a1fd0b65fd7a6ee374891e42314b1f8133826ad2b0f47b15d637c0",
+      "size": 4890
+    },
+    {
+      "path": "preset-fits/f2e84d56bb5ddf0f714493b01babda212086b1e28d8248d08c0679490bd0cbf5.orbitfit",
+      "sha256": "d38ed552d10a5630c4376d67dd4eda53cab59dd07e2e14335be254a6f7fd551a",
+      "size": 4886
+    },
+    {
+      "path": "preset-fits/f5e24fce8be7c1625618fda796f2d05e76d919282f5569a3f2d7de31f13e1c26.orbitfit",
+      "sha256": "facd943fcbe45bedbf929274f6098a4ab0b9d9cb1726e48494ff8c487440f8a4",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/f7327309eeedbf1699af113bc80a7ac32c022b376f07bcfd4fab19087d57af58.orbitfit",
+      "sha256": "8b0dd68a84e0fe05c99cb511cae84ca78d364038808586142f40502f923e9983",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/f75537284fc89f82d4d2f6c43817c7ecec4d964f320027f9f89446280bc8813f.orbitfit",
+      "sha256": "01fb55a9f202cfa0dba27285e272fe5878ab18057cc6b6fbd99b9f6ad815f151",
+      "size": 2113
+    },
+    {
+      "path": "preset-fits/f7e469708069d69118d6fce73a8cb813a01b92ac054e5efcb26c5cccb5536bad.orbitfit",
+      "sha256": "f89015cdc29ca832cf2a3d6252c146d6129b90629926ad88e5c44bd24dceb7fa",
+      "size": 2663
+    },
+    {
+      "path": "preset-fits/f83d23cc5be934a03cd43b556d637c6328b3af29310fb376e82780cad501b874.orbitfit",
+      "sha256": "71df4468f076044d830eb0d689748f32cf028d3a449cfeabac97ec040a5760f4",
+      "size": 665
+    },
+    {
+      "path": "preset-fits/f8cd04260603792c24983b72a0048cd9708b6653c5a89112c2992c929aa23a7d.orbitfit",
+      "sha256": "17ecc3128694bd6e626e2e488cf26d84bab64748e5d5b95c2eb026fc4ff7aa7a",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/f8df0f9884ea0a68ead8a6ef563495520ca10458e033e85d40100cd7309a3e12.orbitfit",
+      "sha256": "bb3ade07910410f2fab78c2a52d211bfaf9cbd988ec932b4eb9034cee19d030a",
+      "size": 4856
+    },
+    {
+      "path": "preset-fits/fabae816f15986a1a749c6200039df3810737ed7331f5dd7fa2812c6065ddb3a.orbitfit",
+      "sha256": "fe24a849093bdfd732717c365486d15f222c41d909b6dd51cae3fbf1d6d4a3ca",
+      "size": 2778
+    },
+    {
+      "path": "preset-fits/fde9d97f1be6ccac9901be53b505c526278db11af35a57cff3e3ac65f838d665.orbitfit",
+      "sha256": "cca5106b5b8ac26ed7e17ef8d997f5f0ecf617faf16575e96e9b8be6feda89b7",
+      "size": 1864
+    },
+    {
+      "path": "preset-fits/fe48cf38dfe41844d3c644f35720aa2f2c30e7db636de865e89179be1abd366b.orbitfit",
+      "sha256": "6bdd0ad690d1e1ba2b15fb5a7d2b945424205fdab5ed4111e83715a227431a6c",
+      "size": 2185
+    },
+    {
+      "path": "preset-fits/ff14dacd0c8ac010cfca492e9e8a7b10dc3ebcff6d8e8aa1afc15f8af3a9c256.orbitfit",
+      "sha256": "739053e07ce86610fe2d0a3f9c0658409c4e327e871fead499de0a08db091d22",
+      "size": 577
+    },
+    {
+      "path": "preset-fits/ff9a0ac01354db98b390d986de8f629796d83365daaffd492024585d798c0323.orbitfit",
+      "sha256": "bcc9685ced44172e530b621348b1a81fa13995edba3741e67f9b781cffe08c73",
+      "size": 669
+    },
+    {
+      "path": "preset-fits/ffbd72767b47d09fdfa9915489ea8bcaaf2da802422ed80ddf470b006531f4d1.orbitfit",
+      "sha256": "b42c8f0420ae69cbd4350eb35bd9c72fabe1bdd0320b6c0bfd7f14beab06ae7d",
+      "size": 1994
+    },
+    {
+      "path": "reference-characters.json",
+      "size": 161299,
+      "sha256": "382613ab8776a97bfeea61b90d189e60cdd83a16b4ca11ae4865d0f36b14d62c"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+[
+ {
+  "id": "f1",
+  "base": "b-gigante.png",
+  "eyebrow": "Así se hace un comercial con IA · Ep. 1",
+  "head": "Esta lata no cabía.",
+  "left": 65,
+  "width": 860,
+  "can": [
+   0,
+   420,
+   700,
+   1500
+  ]
+ },
+ {
+  "id": "f2",
+  "base": "b-chica.png",
+  "eyebrow": "Versión 1",
+  "head": "Primero salió así.",
+  "left": 65,
+  "width": 860,
+  "can": [
+   330,
+   740,
+   680,
+   1235
+  ]
+ },
+ {
+  "id": "f3",
+  "base": "b-gigante.png",
+  "eyebrow": "Versión 3",
+  "head": "Después, así.",
+  "left": 65,
+  "width": 860,
+  "can": [
+   0,
+   420,
+   700,
+   1500
+  ]
+ },
+ {
+  "id": "f4",
+  "base": "b-justa.png",
+  "eyebrow": "La IA no sabe cuánto mide una lata",
+  "head": "Hay que decírselo.",
+  "left": 65,
+  "width": 860,
+  "can": [
+   220,
+   712,
+   600,
+   1312
+  ],
+  "measure": true
+ },
+ {
+  "id": "f5",
+  "base": "b-justa.png",
+  "eyebrow": "Versión 6",
+  "head": "Ahora sí.",
+  "left": 65,
+  "width": 860,
+  "can": [
+   220,
+   712,
+   600,
+   1312
+  ]
+ },
+ {
+  "id": "f6",
+  "base": "b-antes.png",
+  "eyebrow": "Ep. 2 · 25 de noviembre",
+  "head": "Ella todavía no sabe lo que viene.",
+  "left": 540,
+  "width": 385,
+  "can": [
+   60,
+   300,
+   520,
+   1100
+  ]
+ }
+]

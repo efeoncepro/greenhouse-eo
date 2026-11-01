@@ -3,7 +3,8 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG, EFEONCE_LOGOTYPE_SVG } from './efeonce-isotipo.generated'
+import { LOGIN_CONTROLLER_SCRIPT } from '../../persons/login-controller.generated'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { createAuthServerStyles } from '../../../../../scripts/auth-server/styles'
 import { buildAuthFontAssets } from '../../../../../scripts/auth-server/generate-font-assets'
@@ -28,6 +29,8 @@ describe('auth-server brand assets', () => {
    */
   it('login controller artifact matches its build-time sources', async () => {
     await generateLoginController(true)
+    // The issuer must not download the complete AXIS catalog to position one lens.
+    expect(Buffer.byteLength(LOGIN_CONTROLLER_SCRIPT)).toBeLessThan(40000)
   })
   it('bundled fonts and notices match the canonical local assets', () => {
     const generated = buildAuthFontAssets(process.cwd())
@@ -45,6 +48,10 @@ describe('auth-server brand assets', () => {
     expect(EFEONCE_ISOTIPO_SVG).toBe(sanitizeBrandSvg(source))
   })
 
+  it('the V4 positive logotype matches public/branding/logo-full.svg', () => {
+    expect(EFEONCE_LOGOTYPE_SVG).toBe(sanitizeBrandSvg(readFileSync(join(process.cwd(), 'public/branding/logo-full.svg'), 'utf8')))
+  })
+
   it('the bundled logotype matches public/branding/logo-negative.svg', () => {
     const source = readFileSync(join(process.cwd(), 'public/branding/logo-negative.svg'), 'utf8')
 
@@ -57,7 +64,7 @@ describe('auth-server brand assets', () => {
    * escapaba de un selector `svg path`.
    */
   it('brand assets carry no inline style block and color every shape via currentColor', () => {
-    for (const svg of [EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG]) {
+    for (const svg of [EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG, EFEONCE_LOGOTYPE_SVG]) {
       expect(svg).not.toContain('<style')
       expect(svg).not.toContain('cls-')
       expect([...svg.matchAll(/<(path|circle|ellipse|polygon|rect)\b/gu)].length).toBe(

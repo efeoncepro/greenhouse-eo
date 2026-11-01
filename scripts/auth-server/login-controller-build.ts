@@ -4,17 +4,29 @@ import { resolve } from 'node:path'
 
 import { build } from 'esbuild'
 
+import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
+
+import { ORBIT_ACCENT_END_DEG } from '../../src/components/greenhouse/motion/orbit-geometry'
+
 export async function generateLoginController(check = false) {
   const root = process.cwd()
+  // Resolve only the four scalar values at build time; never ship the complete AXIS catalog.
+  const anatomy = { ringAirRatio: efeonceGraphicLine.orbit.ringAirRatio, zoom: efeonceGraphicLine.lens.zoom, sphereRadiusScale: efeonceGraphicLine.lens.anatomy.sphereRadiusPx / efeonceGraphicLine.orbit.baseWidthPx, endDeg: ORBIT_ACCENT_END_DEG }
 
   const result = await build({
     stdin: {
-      contents: `import {installLoginController} from './src/lib/auth-server/persons/login-controller';
+      contents: `import {installLoginController,installLoginCarousel,installLoginLenses} from './src/lib/auth-server/persons/login-controller';
+      import {AUTH_LOGIN_V4_COPY} from './src/lib/copy/auth-server-login-v4';
+      import {LOGIN_CAROUSEL_INTERVAL_MS} from './src/views/login/login-constants';
       import {AUTH_LOGIN_COPY} from './src/lib/copy/auth-server-login';
       installLoginController(document.querySelector('[data-capture="id-passkey"]'), AUTH_LOGIN_COPY,
         {fetch:window.fetch.bind(window),credentials:navigator.credentials,
         supported:typeof window.PublicKeyCredential==='function'&&typeof navigator.credentials?.get==='function',
-        navigate:url=>window.location.assign(url)});`,
+        navigate:url=>window.location.assign(url)});
+      const startCarousel = () => { installLoginLenses(document,${JSON.stringify(anatomy)}); installLoginCarousel(document.querySelector('[data-login-carousel]'),AUTH_LOGIN_V4_COPY,
+        {reducedMotion:window.matchMedia('(prefers-reduced-motion: reduce)').matches,intervalMs:LOGIN_CAROUSEL_INTERVAL_MS}); };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',startCarousel,{once:true});
+      else startCarousel();`,
       resolveDir: root,
       loader: 'ts'
     },

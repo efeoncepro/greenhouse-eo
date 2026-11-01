@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "f649277cdcffc9ad00b1181c3644ff3ebccc3517d93d4348e7489e68fa39ec0b",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:sgs-logo-sobre-oscuro",
+      "path": "ai-generations/2026-10-19_propuesta-sgs-contactabilidad/logos-cliente/sgs-logo-sobre-oscuro.svg",
+      "sha256": "bd0e672ac40e90828e0195a2dd51325aa6276ac01f1d70af28601eafa41836c8"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

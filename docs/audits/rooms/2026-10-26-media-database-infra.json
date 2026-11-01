@@ -1,0 +1,144 @@
+{
+  "at": "2026-10-26T17:46:08.482Z",
+  "status": "applied_and_verified",
+  "instance": "efeonce-group:us-east4:greenhouse-pg-dev",
+  "database": "rooms_production",
+  "tables": 25,
+  "migrationsApplied": [],
+  "migrations": [
+    "1792962301842_rooms-foundation",
+    "1792963858690_rooms-content-v2",
+    "1792964148932_rooms-oidc-consumer",
+    "1792964574644_rooms-invitations",
+    "1792964731337_rooms-invitation-issuer-binding",
+    "1792968329622_rooms-private-image-media",
+    "1793022282668_rooms-media-storage-generations"
+  ],
+  "contentPreserved": true,
+  "contentBefore": {
+    "rooms": 0,
+    "drafts": 0,
+    "editions": 0,
+    "edition_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "workerRole": {
+    "rolname": "rooms_media_worker",
+    "rolcanlogin": true,
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "rolreplication": false,
+    "rolbypassrls": false,
+    "rolinherit": false,
+    "rolconnlimit": 2,
+    "memberships": 0
+  },
+  "workerConnection": "PASS",
+  "negativeAclChecks": 6,
+  "grants": [
+    {
+      "table_name": "asset_versions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "table_name": "assets",
+      "privilege_type": "SELECT"
+    },
+    {
+      "table_name": "audit",
+      "privilege_type": "INSERT"
+    },
+    {
+      "table_name": "media_jobs",
+      "privilege_type": "SELECT"
+    },
+    {
+      "table_name": "media_renditions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "table_name": "media_renditions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "table_name": "outbox",
+      "privilege_type": "INSERT"
+    },
+    {
+      "table_name": "rooms",
+      "privilege_type": "SELECT"
+    },
+    {
+      "table_name": "upload_sessions",
+      "privilege_type": "SELECT"
+    }
+  ],
+  "updateColumns": [
+    {
+      "table_name": "asset_versions",
+      "column_name": "metadata"
+    },
+    {
+      "table_name": "asset_versions",
+      "column_name": "problem_code"
+    },
+    {
+      "table_name": "asset_versions",
+      "column_name": "state"
+    },
+    {
+      "table_name": "media_jobs",
+      "column_name": "attempts"
+    },
+    {
+      "table_name": "media_jobs",
+      "column_name": "lease_expires_at"
+    },
+    {
+      "table_name": "media_jobs",
+      "column_name": "lease_token"
+    },
+    {
+      "table_name": "media_jobs",
+      "column_name": "state"
+    },
+    {
+      "table_name": "rooms",
+      "column_name": "revision"
+    },
+    {
+      "table_name": "rooms",
+      "column_name": "updated_at"
+    },
+    {
+      "table_name": "upload_sessions",
+      "column_name": "receiving_nonce"
+    },
+    {
+      "table_name": "upload_sessions",
+      "column_name": "state"
+    }
+  ],
+  "secretVersion": "projects/efeonce-group/secrets/rooms-production-postgres-media-worker-password/versions/1",
+  "newPasswordInitialized": false,
+  "passwordsInSql": false,
+  "flagsChanged": false,
+  "publicConnectResidual": "Other databases retain inherited PUBLIC CONNECT/TEMP; no shared/global ACL change in this rollout.",
+  "rolloutBaselineMigrations": 5,
+  "appliedInThisInfrastructureBlock": [
+    "1792968329622_rooms-private-image-media",
+    "1793022282668_rooms-media-storage-generations"
+  ],
+  "workerRoleCreatedInThisBlock": true,
+  "passwordInitializationInThisBlock": "Cloud SQL users.update once for newly-created role; never sent in SQL or rotated during readback",
+  "reconciliation": "Final readback rerun after correcting queue probe column; no repeated migrations or password initialization",
+  "resilience": {
+    "backupEnabled": true,
+    "pointInTimeRecoveryEnabled": true,
+    "latestAutomatedBackup": {
+      "id": "1792998000000",
+      "status": "SUCCESSFUL",
+      "completedAt": "2026-10-26T08:48:41.600Z"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+Edit image 1, a still from a commercial film shot at dusk in Mexico City.
+
+The giant billboard is a real LED video screen, switched on, photographed with a cinema camera from the street. Right now it looks like a perfect printed poster. Make it read as a physical LED screen, WITHOUT changing what it shows:
+
+- Keep the artwork on the screen exactly: the same layout, the word BREAKR, the teal wave, the can and its label, the orange slices and the line "Break the wait." in the same place, size and spelling. Do not redraw, restyle or move any of it.
+- Emissive light: the screen is clearly the brightest thing in the street; the brightest whites and highlights clip softly and bloom a little into the dark frame around the screen; the orange is luminous and slightly oversaturated, as a camera sees an LED at night.
+- Panel structure: at this distance you can barely make out the grid of LED cabinets, a very faint pattern of tiles with tiny differences in brightness and colour, and the thin black edge of the panel.
+- Camera: the screen has the same slight softness, noise and grain as the rest of the frame; a very faint moiré in the fine detail; a slight drop in brightness toward the far edge of the screen.
+- Light spill: its orange glow lights the facade around it, the tree tops and, faintly, the wet street.
+
+Keep EVERYTHING else exactly: the people, their phones, the traffic light trails, the Angel of Independence, the buildings, the sky, the framing and the camera. Photographic, real, nothing looks generated.

@@ -1,0 +1,41 @@
+{
+  "pieza": "Efeonce — La pregunta v3 (ChatGPT Ads)",
+  "duracion_s": 15.0,
+  "fps": 24,
+  "tempo_bpm": 120,
+  "cues": [
+    {
+      "t": 0.625,
+      "hasta": 3.125,
+      "imagen": "Se escribe la pregunta",
+      "sonido": "teclas en semicorcheas"
+    },
+    {
+      "t": 3.75,
+      "hasta": 4.0,
+      "imagen": "Pausa antes del envío",
+      "sonido": "silencio 3,75-4,0"
+    },
+    {
+      "t": 4.0,
+      "imagen": "Golpe 1: se envía; la seda explota",
+      "sonido": "golpe e impacto"
+    },
+    {
+      "t": 8.0,
+      "imagen": "Golpe 2: aterriza la losa Patrocinado",
+      "sonido": "golpe e impacto"
+    },
+    {
+      "t": 11.75,
+      "hasta": 12.0,
+      "imagen": "Pausa antes del cierre",
+      "sonido": "vacío de la mezcla; sube el sting"
+    },
+    {
+      "t": 12.0,
+      "imagen": "Cierre: titular y lockup Efeonce | OpenAI",
+      "sonido": "pico del sting"
+    }
+  ]
+}

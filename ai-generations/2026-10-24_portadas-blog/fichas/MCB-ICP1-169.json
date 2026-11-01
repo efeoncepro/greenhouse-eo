@@ -1,0 +1,43 @@
+{
+  "id": "MCB-ICP1-169",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "manzanitas",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "linea": "growth",
+  "identidad": [
+    {
+      "persona": "hum",
+      "vista": "45-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce"
+    }
+  ],
+  "nota": "Elenco ficticio (Hum, personaje de la línea growth) en Marketing con Manzanitas: precedente del operador del 2026-10-18 (fotos del menú: el elenco, nunca Julio). Sin nombre en pantalla.",
+  "llave": {
+    "fuente": "the row of three glowing glass cards she keeps on the table in front of her",
+    "lado": "below and slightly toward frame-left of her face",
+    "tamano": "three thin glass cards, each about 9 cm by 6 cm",
+    "distancia": "about 50 cm below her face, as she leans over the table"
+  },
+  "fondo": "a row of large cold white-azure practical lights very far behind her, melted into round bokeh, all of them to the right of 72 % of the frame width",
+  "fenomeno": {
+    "que": "many thin glass cards on the table: she has swept most of them aside into a dull, cloudy heap; only three remain in front of her, aligned and glowing: what is left after discarding",
+    "esServicio": "ICP B2B: definir el cliente ideal para decidir a qué cuentas no perseguir"
+  },
+  "escena": "SCENE (cinematic still, Hollywood drama, a vast dark Efeonce strategy room at night with a faint haze only far behind her, far behind her on the right, softly out of focus, the tall dark glass wall and the ceiling grid of the room recede into the darkness, giving the room its scale, a cool frame, natural warm-neutral skin): a MEDIUM-WIDE shot of Hum, wearing the EFEONCE BOMBER JACKET of the corporate uniform over a plain dark top, STANDING behind the far end of a long review table of matte oiled walnut with no reflections, about six metres long; she leans slightly forward over the table, her face about 50 cm above the three glowing cards; the camera at the near end of the table, at her chest height, about six metres from her, 85mm f/2.8; the table runs away from the lens diagonally toward the right of the frame, so its far end, where she stands, is in the right quarter of the frame. Her near shoulder is at about 78 % of the frame width and her face at about 86 %; between the left edge of the frame and her body there is a wide band of empty darkness. MOMENT, caught at the exact instant: on the table directly in front of her, low in the frame and never higher than her waist, lie about twenty thin plain glass cards, each about 9 cm by 6 cm. ONE short neat row of exactly THREE cards lies directly under her face, at about 82 % to 90 % of the frame width, parallel to the table edge, a finger's width apart: ONE on the left, ONE in the middle, ONE on the right; these three glow cold white with a faint azure tint and are the only key light, lighting her face from below and slightly from frame-left; their light is self-contained and does NOT rise above them as a beam. All the other cards have been swept aside toward FRAME-LEFT (her right-hand side), at about 66 % to 76 % of the frame width, into a loose overlapping heap, askew and partly stacked, as if pushed away with the side of a hand: they are dull, cloudy, frosted and unlit, their edges catching only a faint grey glint of the spill, so the heap is clearly visible and clearly larger than the row. With the fingertips of her RIGHT hand she is pushing one more card away from the row toward the heap: its trailing edge, still nearest the row, keeps a faint glow; the rest of it has already gone dull and cloudy like the heap. Her LEFT hand rests flat and still on the table to the right of the row, empty. The cards are plain, blank glass with NO text, NO numbers, NO pips, NO suits, NO dots, NO symbols, NO marks, NO avatars or faces, NO checkmark and NO chip; they are not playing cards, dominoes or tiles; there is no device. She looks straight into the lens with a serene, analytical calm and a contained closed-mouth smile. At the near-left corner of the middle glowing card, on its darker glass bevel rather than on its bright face, sits ONE tiny point of saturated teal-green light (#36C8BF), clearly greener than the white-azure glow around it and smaller than any bokeh disc: the only accent in the frame; it lights nothing around it. Near the lens the tabletop fills the whole width of the bottom of the frame; the left 60 % of the visible tabletop is bare, empty dark walnut. Above the bare tabletop, the LEFT 64% of the frame is calm, deep dark space: no light and no objects, no bokeh, no beams. No laptops, no papers, no mugs, no plants, no monitors, no lamps. Enormous contrast, no readable text anywhere, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near edge of the matte oiled walnut review table, spanning the whole width of the bottom of the frame, only a few centimetres in front of the lens, in deep shadow, outside every light, with no reflections",
+    "tono": "DARK walnut in deep shadow, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark room above the bare walnut tabletop, empty all the way to her shoulder",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -2,7 +2,8 @@
 
 Expediente del encargo de Julio del 23-10-2026: auditar el Blog SKY a partir de las reuniones con SKY, revisar
 lo que se había avanzado el 15-10, armar el informe de entrega con el renderer A4 premium y preparar los correos.
-Estado al 23-10-2026: **informe generado y revisado; correos redactados; nada enviado a SKY.**
+Estado al 31-10-2026: **informe enviado el 23-10 a Pilar y Natalia; accesos entregados; los 9 artículos de Perú
+restaurados; kickoff el 02-11.** Insumos del deck: [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md).
 
 ## Qué pidió SKY (reuniones)
 
@@ -32,6 +33,7 @@ de la empresa Sky Airlines (`30825221458`).
 | Correo formal a Nicolá, Pilar y Natalia | [correos/02-entrega-auditoria.md](correos/02-entrega-auditoria.md) | Borrador con el PDF adjunto |
 | Perú: demanda e intención por destino | [PERU_PRIMER_LOTE.md](PERU_PRIMER_LOTE.md) | Base del lote (Semrush PE) |
 | Lote inicial: 15 nuevos + 25 optimizaciones | [LOTE_INICIAL_PARA_APROBACION.md](LOTE_INICIAL_PARA_APROBACION.md) | Propuesta para aprobar con Natalia; reemplaza a `PERU_TITULOS_PARA_APROBACION.md` |
+| Insumos del kickoff 02-11 (estado al 31-10, expectativa a corregir, decisiones) | [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md) | Para la sesión que arma el deck |
 | Página ejecutiva (borrador previo) | Artifact privado «Auditoría Blog SKY» | Superada por el PDF |
 
 ## Decisiones tomadas en el caso
@@ -47,6 +49,10 @@ de la empresa Sky Airlines (`30825221458`).
   sobre la portada navy. Pendiente reemplazar el logo de la organización.
 - **OneDrive:** la carpeta «Sky - Efeonce - General» parece compartida con SKY; el PDF se dejó en la carpeta interna
   para no exponerlo antes del envío.
+- **Corrección posterior al envío (31-10):** el cierre de la lámina de tendencia del PDF entregado dice «antes de migrar
+  el blog ya había perdido dos tercios de sus visitas». Compara enero (pico) contra septiembre, un error de
+  estacionalidad. El generador y el plan ya dicen «−48 % en agosto de 2025 contra el año anterior». El PDF enviado
+  no se re-renderizó ni se reenvió: corregirlo de palabra en el kickoff, y en el deck en la lámina 6.
 - **Renderer:** el informe obligó a sumar capacidades al catálogo A4 premium (hallazgos, escenarios, etiqueta de
   producto, etapas en tendencia, guarda del pie). Commit `001683d83` y `BASELINE_DELTAS.md` (ab).
 
@@ -54,11 +60,11 @@ de la empresa Sky Airlines (`30825221458`).
 
 | Pendiente | Dueño | Condición de cierre |
 | --- | --- | --- |
-| Revisar y enviar el correo formal con el PDF (Outlook web, firma gráfica, CCO HubSpot) | Julio | Copia en Enviados con adjunto y CCO |
-| Restaurar los 9 artículos de Perú y saber quién los retiró | Natalia / Leandro / agencia anterior | Las 9 URL responden 200 o redirigen a equivalente |
+| ~~Revisar y enviar el correo formal con el PDF~~ | Julio | Enviado el 23-10 a Pilar y Natalia (Nicolá no iba) |
+| Saber quién retiró los 9 artículos de Perú (restaurados al 31-10: 8 en 200, `viajar-a-peru` → `/viajar-a-peru-2/`) | Natalia / SKY | Respuesta registrada |
 | Exportar el Search Console de `www.skyairline.com` (historia previa; vence nov-2026 a ene-2027) | SKY (acceso) + Efeonce | Export guardado en el expediente |
 | Revisar acciones manuales y problemas de seguridad en GSC | Efeonce | Captura fechada en la auditoría |
-| Acceso de administrador a WordPress (Julio, Valentina, correo de marketing) | Leandro / SKY | Acceso comprobado |
+| Comprobar el acceso de administrador a WordPress (entregado el 27-10 a Julio, Valentina y `mkt@`; cambiar las claves enviadas por correo) | Efeonce | Ingreso comprobado y claves cambiadas |
 | Reemplazar el logo de SKY de la organización en Greenhouse por el oficial | Efeonce | Logo oficial adjunto |
 | Copiar el PDF a «04 Entregables» del canal compartido | Julio | Sólo después del envío |
 | Validar con SKY los escenarios nov–ene | Julio en el kickoff 02-11 | Acuerdo registrado en Notion |

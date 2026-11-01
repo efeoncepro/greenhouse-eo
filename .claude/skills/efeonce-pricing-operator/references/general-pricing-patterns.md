@@ -121,8 +121,8 @@ lanzamiento. Ningún escenario costeó un lanzamiento sin ese componente. La dec
 
 ## Patrón medido: descuento de entrada en lugar de bajar la base (operación CRM gestionada)
 
-Medido el 2026-10-20 con Assetplan (Chile, inmobiliaria): operación gestionada de HubSpot, propuesta enviada ese día,
-resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro cliente.
+Medido el 2026-10-20 con Assetplan (Chile, inmobiliaria): operación gestionada de HubSpot, propuesta enviada ese día;
+reajustada y reenviada el 2026-10-28 tras la reunión de discovery; resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro cliente.
 [Caso y readback](../../../../docs/commercial/prospecting-agent/runs/2026-10-20-1221-assetplan-deal.md#propuesta-enviada--20102026).
 
 **El pedido.** Unas 25 h/mes ajustables para mantener al día un canal de dudas y solicitudes comerciales y apoyar
@@ -161,6 +161,51 @@ ajustable, incluida; total meses 1–4, 30 UF neto + IVA. La cotización de 4 p�
 **CRM.** Monto del Deal = proyección de 12 meses (4 × 30 + 8 × 40 = 440 UF, cargado como CLF); fecha de cierre =
 vigencia de la cotización, no cierre pactado. Ambos los aprobó el operador; no escribir un fee mensual como monto
 total ni una fecha inventada.
+
+**Cuando el cliente sube la bolsa: escalar en proporción (28/10).** En la reunión de discovery la clienta pidió
+30 h/mes. Se escaló la cotización completa en proporción, sin reabrir el descuento: 25 → 30 h, lista 40 → 48 UF,
+entrada 30 → 36 UF + IVA los meses 1–4 (25 %). Así se conservan el precio por hora (1,2 UF/h neto de entrada) y el
+descuento de entrada que la clienta ya había visto; renegociar el porcentaje habría abierto una segunda negociación
+sobre algo que no pidió. El monto del Deal se recalculó con la misma regla de proyección de 12 meses: 4 × 36 + 8 × 48
+= 528 UF. La fecha de cierre siguió a la nueva vigencia (30/11/2026). Ambos cambios los aprobó el operador.
+
+**Reemisión con el renderer local** (`scripts/documents/render-cotizacion-a4.mjs`). El campo `version` del JSON es
+la versión del **esquema** (1 o 2), no la de la cotización: la versión del documento va en `reference` (por ejemplo,
+`…-v3`). La carpeta de salida debe estar vacía porque el renderer no sobrescribe: renderizar en una carpeta nueva y
+reemplazar el PDF después. La versión anterior se conserva como respaldo.
+
+## Patrón medido: fase 0 bonificada y medios del cliente fuera del fee (piloto de performance)
+
+Medido el 2026-10-28 con ARMOR EPPS / Indecaucho: piloto de 90 días de LinkedIn Ads + Google Ads en Ecuador, Colombia y
+Perú, cotización emitida ese día, resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni
+referencia para otro cliente. Expedientes:
+[fase 0](../../../../docs/commercial/accounts/indecaucho-armor/pricing-v3-2026-10-28-fase0/README.md) y
+[cotización](../../../../docs/commercial/accounts/indecaucho-armor/cotizacion-2026-10-28/README.md).
+
+**Fase 0 valorizada y bonificada.** El operador pidió: «La fase 0 valorizala pero a la vez bonificala».
+`managed-service-core` no tiene fila `setup` y no imprime una cortesía con valor de referencia, así que la fase 0 se
+costeó como **cotización V3 propia**: demanda de un período con las líneas de preparación de la medición del escenario
+base (ECG-031 32 h, ECG-012 24 h, ECG-021 16 h, ECG-016 8 h, todo CL). Resultado: neto US$3.090, margen 59,4 %, igual a
+la diferencia entre el escenario base y el A. En el deck se muestra «valorizada en US$3.090, bonificada». En la
+cotización del piloto va como fila de texto en `conditions`, porque su brief no tiene una clave para eso; se declara
+que la cifra sale del artefacto aparte, no de la cotización del piloto.
+
+**Medios detallados sin tocar el fee.** La inversión en medios del cliente se declaró en `brief.thirdPartyCosts[]`:
+`settlement: "client_direct"`, `category: "media"`, `periodIds [1,2,3]`, `evidence.status: estimated`, seis filas (USD
+por mes, LinkedIn / Google): EC 2.050 / 200, CO 2.100 / 450, PE 1.050 / 150. El documento las imprime en el bloque
+«Pagado directamente por el cliente», fuera de todo total. El fee quedó en US$9.260 (3.280 + 2 × 2.990), escenario D:
+Trafficker Digital Semi-senior CO + Data Analyst CL al 20 %, margen 59,1 %.
+
+**Precio a un champion: por partes, sin el gran total.** El operador: «En la inversión si le dices el monto total la
+asustas y si no desglosas la inversión también». En el correo de envío la inversión va por partes (fase 0 valorizada y
+bonificada; fee por mes; medios como techo mensual por país, pagados directo por el cliente), sin sumar. El deck
+conserva el total en su propia lámina «Inversión total y condiciones».
+
+**`buyer.taxId` sin dato.** El brief lo exige y el operador no quiso «RUC por confirmar» en la cotización («mejor no
+poner eso»): se usó el país («Ecuador»). No inventar un número ni dejar una nota de pendiente en el documento.
+
+**Condiciones.** Fee mensual anticipado por bloque de 30 días; vigencia 30 días; impuestos «Por confirmar» hasta saber
+qué entidad factura. Son las condiciones sugeridas del costeo de la cuenta, usadas en la versión enviada.
 
 ## Fuentes consultadas (2026-07-26)
 

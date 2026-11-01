@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Tiempos de respuesta",
+    "question": "¿Cuándo me responden?",
+    "answer": [
+      "A tiempo"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "Urgente · ≤ 1 h",
+      "desc": "Bloqueo operativo definido en conjunto: primera respuesta en una hora hábil y plan en el día."
+    },
+    {
+      "title": "Importante · ≤ 4 h",
+      "desc": "Primera respuesta en cuatro horas hábiles; los ajustes acotados, resueltos en 24 h hábiles."
+    },
+    {
+      "title": "Relevante · ≤ 24 h",
+      "desc": "Primera respuesta en un día hábil; se resuelve en 48 a 72 h hábiles o entra al sprint."
+    },
+    {
+      "title": "En tu Slack",
+      "desc": "Por Slack Connect en tu canal de solicitudes de CRM, en horario hábil de Chile."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Assetplan",
+    "participantKind": "department"
+  }
+}

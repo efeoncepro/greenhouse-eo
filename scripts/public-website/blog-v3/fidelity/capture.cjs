@@ -23,6 +23,10 @@ const { BOARDS } = require('./sections.cjs')
 const { boardPage, SRC } = require('./page.cjs')
 
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+
+// «Para leer con calma» v2 images and logos (lib/rail-v2.cjs).
+Object.assign(assets, require('../lib/rail-v2.cjs').RAIL_ASSETS)
+
 const byId = Object.fromEntries(Object.values(assets).map(a => [a.id, a.file]))
 const TYPES = { svg: 'image/svg+xml', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg' }
 

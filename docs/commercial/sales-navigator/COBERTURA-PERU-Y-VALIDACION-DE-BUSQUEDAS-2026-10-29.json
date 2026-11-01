@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-29",
+  "timezone": "America/Santiago",
+  "plan": "Sales Navigator Core",
+  "method": "Read-only UI comparison in temporary search copies; stable main result counts, not notification/alert counters.",
+  "savedSearchUnderReview": {
+    "name": "Efeonce | PE | Personas | CRM RevOps Lifecycle",
+    "id": "1991166001",
+    "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991166001"
+  },
+  "queries": [
+    {
+      "step": 1,
+      "count": 58,
+      "companyHQ": "Perú",
+      "personGeography": null,
+      "industries": "original ten categories",
+      "titleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+      "companyHeadcount": "51+",
+      "savedVariant": true
+    },
+    {
+      "step": 2,
+      "count": 81,
+      "companyHQ": "Perú",
+      "personGeography": null,
+      "industries": null,
+      "titleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+      "companyHeadcount": "51+",
+      "savedVariant": false
+    },
+    {
+      "step": 3,
+      "count": 106,
+      "companyHQ": null,
+      "personGeography": "Perú",
+      "industries": null,
+      "titleBoolean": "(gerente OR subgerente OR head OR director) AND (CRM OR RevOps OR \"Marketing Operations\" OR \"Experiencia de Cliente\" OR CX OR lifecycle)",
+      "companyHeadcount": "51+",
+      "savedVariant": false
+    },
+    {
+      "step": 4,
+      "count": 868,
+      "companyHQ": null,
+      "personGeography": "Perú",
+      "industries": null,
+      "titleBoolean": "(gerente OR subgerente OR head OR director OR manager OR jefe OR chief) AND (CRM OR RevOps OR CX OR lifecycle OR customer OR fidelización OR retención) NOT \"community manager\"",
+      "companyHeadcount": "51+",
+      "savedVariant": false
+    }
+  ],
+  "independentControl": {
+    "name": "Efeonce | PE | Personas | Growth y Medios",
+    "id": "1991165857",
+    "count": 789,
+    "url": "https://www.linkedin.com/sales/search/people?savedSearchId=1991165857",
+    "interpretation": "Different service query, not a denominator or an additive population."
+  },
+  "observedCards": [
+    {
+      "step": 3,
+      "name": "Sandro Denegri",
+      "company": "Mibanco",
+      "role": "Chief Data Officer - Head of Data, Analytics & CRM",
+      "limitation": "Search-card observation, no buying authority confirmed."
+    },
+    {
+      "step": 3,
+      "name": "Jahir Rosales Zapata",
+      "company": "Atlantic City Casino & Sports",
+      "role": "SubGerente de Growth & CRM",
+      "limitation": "Career About self-report mentions teams/agencies and budgets/P&L. Not verified current agency contract or available budget; casino outside original sector scope, no ICP admission."
+    },
+    {
+      "step": 3,
+      "name": "Jaime Di Negro",
+      "company": "Limagas",
+      "role": "Gerente Comercial y Experiencia de Cliente",
+      "limitation": "Functional leadership candidate, no procurement authority confirmed."
+    },
+    {
+      "step": 4,
+      "name": "Christian Romero Córdova",
+      "company": "Financiera ProEmpresa",
+      "role": "Jefe de Marketing, Sostenibilidad y Experiencia al Cliente",
+      "limitation": "Jefatura requires responsibility review; not admitted by title alone."
+    },
+    {
+      "step": 4,
+      "name": "Franco Viale Leyva",
+      "company": "Impulse",
+      "role": "Head of Growth & Customer Experience",
+      "limitation": "Agency/provider; not automatically a direct-client ICP. Separate B2B2B evaluation."
+    },
+    {
+      "step": 4,
+      "name": "Julio Cortez Segura",
+      "company": "Touring y Automóvil Club del Perú",
+      "role": "Jefe de Experiencia y Fidelización del Cliente",
+      "limitation": "Functional leadership candidate, not qualified buyer."
+    },
+    {
+      "step": 4,
+      "name": "Macarena Poblete",
+      "company": "Cineplanet",
+      "role": "Head of Marketing, Customer Experience and B2B",
+      "limitation": "Functional leadership candidate, not qualified buyer."
+    }
+  ],
+  "interpretationLimits": [
+    "58 describes one CRM query, not all Peru or a market census.",
+    "Step 1 to 2 isolates removal of industries. Step 2 to 3 swaps HQ for person geography: populations are not nested and the net difference does not measure excluded relevant buyers.",
+    "Step 3 to 4 changes both leadership and service vocabulary; do not assign the entire increase to one term. Expanded terms do not form a strictly nested Boolean superset either.",
+    "Counts overlap and are not additive. No denominator of all relevant buyers, recall percentage or completeness is established.",
+    "868 is discovery volume, not qualified buyers, optimal precision or validated replacement.",
+    "Persistence of 44 native searches was verified; 100 prior card observations assessed sample relevance, not market coverage. Coverage validation remains partial."
+  ],
+  "savedStateChanged": false,
+  "actionsNotPerformed": [
+    "save or replace diagnostic variants",
+    "delete saved searches",
+    "add list members",
+    "outreach or connection requests",
+    "InMail",
+    "CRM writes"
+  ],
+  "nextOwner": "Commercial / Julio Reyes with prospecting agent",
+  "nextStep": "Review coverage of all 20 people searches with controlled contrasts and known-role controls before proposing native replacements; retain commercial buyer gate.",
+  "sources": [
+    {
+      "type": "local ignored UI evidence",
+      "path": ".captures/sales-nav-saved-searches-2026-10-29/peru-coverage/diagnostico.json"
+    },
+    {
+      "type": "official filter definitions",
+      "url": "https://www.linkedin.com/help/sales-navigator/answer/a1452817",
+      "checkedOn": "2026-10-29"
+    }
+  ]
+}

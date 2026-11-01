@@ -1,0 +1,98 @@
+{
+  "observedAt": "2026-10-26T20:02:46.204841-03:00",
+  "scope": "Local isolated design integration; no production activation",
+  "runtimeBranch": "codex/rooms-design-integration",
+  "sourceBase": "e4b2e890cd0bd27823a1760e6c06f90330dadf3d",
+  "localResources": {
+    "application": "http://127.0.0.1:3216",
+    "fixtureLauncher": "http://127.0.0.1:19338",
+    "databaseHost": "127.0.0.1",
+    "databasePort": 55433,
+    "migrations": 8,
+    "stateDirectory": ".local/design-integration",
+    "storage": "separate local media",
+    "identity": "synthetic fixture issuer; not Efeonce ID conformance"
+  },
+  "browserApiCheck": {
+    "at": "2026-10-26T23:01:54.179Z",
+    "status": "PASS",
+    "environment": "isolated_local_fixture",
+    "checks": [
+      "operator_cannot_publish",
+      "canonical_internal_session",
+      "workspace_tenant_scope",
+      "other_organization_denied",
+      "stale_revision_conflict",
+      "same_intention_replayed",
+      "local_transfer_only",
+      "local_worker_renditions_ready",
+      "coverage_publicable",
+      "audience_preview",
+      "immutable_edition_published",
+      "published_reader",
+      "private_rendition",
+      "rendition_bytes",
+      "guest_published_image_only",
+      "guest_no_draft_workspace_other_tenant",
+      "guest_cookie_http_only",
+      "anonymous_denied"
+    ],
+    "imageBytes": 122,
+    "productionTouched": false,
+    "emailsSent": 0,
+    "newUiAccepted": false
+  },
+  "tests": {
+    "firstVerify": {
+      "passed": 248,
+      "skipped": 0,
+      "lint": true,
+      "types": true,
+      "build": true
+    },
+    "playwright": {
+      "passed": 53,
+      "skipped": 3,
+      "failed": 0,
+      "uiAcceptance": false
+    },
+    "finalVerify": {
+      "passed": 250,
+      "failed": 0,
+      "skipped": 0,
+      "lint": true,
+      "types": true,
+      "build": true
+    },
+    "browserApiCheckCount": 18,
+    "fixtureProtocolRegression": "PASS: callback includes iss; full browser login, strict PKCE/nonce/claims and canonical consumer unchanged",
+    "fetchBindingRegression": "PASS: native browser fetch receiver retained for JSON and PUT"
+  },
+  "boundaries": {
+    "authPrsMerged": false,
+    "productionFlagsChanged": false,
+    "cloudMutations": false,
+    "emailsSent": 0,
+    "uiJsxCssChanged": false,
+    "pushOrDeployment": false
+  },
+  "limits": [
+    "Local storage does not prove a new GCS/CORS transfer",
+    "Guest is an explicit offline session fixture, not an OTP email",
+    "New Claude Design UI has not been connected or accepted",
+    "Cloud restore with coordinator migration8 remains a separate pending check"
+  ],
+  "runtimeCommit": "2cddc98afa1c58724207f20292733e3548fc204e",
+  "authPrs": {
+    "263": {
+      "state": "OPEN",
+      "mergedAt": null,
+      "head": "5e1fc255472427ae245a3a3548ee28fff794f7f6"
+    },
+    "264": {
+      "state": "OPEN",
+      "mergedAt": null,
+      "head": "aabd6d78d1d73ead4956cce15abc1efd7208472c"
+    }
+  }
+}

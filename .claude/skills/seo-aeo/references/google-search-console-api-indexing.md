@@ -119,3 +119,24 @@ y verificada, el flujo `0h/24h/72h` es contrato propuesto, no evidencia runtime.
 - [Solicitar a Google que vuelva a rastrear URLs](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl)
 - [Retiro del sitemap ping](https://developers.google.com/search/blog/2023/06/sitemaps-lastmod-ping)
 - [Uso permitido de Indexing API](https://developers.google.com/search/apis/indexing-api/v3/using-api)
+
+## Solicitar indexación por la interfaz (runner, 2026-10-26)
+
+La única vía para pedir indexación de una página normal es el botón «Solicitar indexación» de la interfaz
+(cupo de unas 10 por día y propiedad). Para que un agente lo haga sin tocar credenciales existe
+`pnpm public-website:gsc-index` (`scripts/public-website/gsc-request-indexing.mjs`):
+
+- `launch` abre un Chrome real con perfil propio (`~/.efeonce/gsc-chrome-profile`) y puerto CDP sólo en
+  `127.0.0.1:9333`; una **persona** inicia sesión ahí una vez. Sin sesión, Search Console cae en
+  `/search-console/about` (no en `accounts.google.com`): el runner lo detecta y deja abierta la pantalla de Google.
+- `request <url…>` inspecciona por la barra «Inspecciona cualquier URL» (la URL directa `inspect?id=` responde 404)
+  y compara «Último rastreo» con `article:modified_time`/`dateModified` de la página. Por defecto sólo inspecciona;
+  `--apply` pide sólo si la URL no está en Google o se rastreó antes del cambio; `--force` pide siempre.
+- Se detiene ante captcha, cuenta sin acceso, cupo agotado o falta de confirmación; registra cada URL en
+  `scripts/public-website/gsc-indexing/ledger/AAAA-MM.jsonl` y no pasa de 10 solicitudes confirmadas por día.
+- No repite una URL con solicitud confirmada en las últimas 24 horas (`already-requested`; `--force` la pide igual).
+- La confirmación se lee del texto **visible** (`innerText`), no con un locator: el primer nodo con «Se ha solicitado
+  la indexación» puede estar oculto, y esperarlo dio `timeout` en la primera solicitud real (2026-10-26) con la
+  solicitud ya hecha. Tras pedirla, «Último rastreo» pasa al minuto de la prueba en vivo de Google.
+
+Manual: `docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md`.

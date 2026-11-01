@@ -1,0 +1,44 @@
+{
+  "id": "VOX3-contraportada",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "deck-portada",
+  "desde": "BR3h",
+  "linea": "voice",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "espalda"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa",
+      "puesta": "espalda-mujer"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, the LAST FRAME OF A FILM, a vast dark studio at night with a polished dark concrete floor): she is seen FROM BEHIND, walking away from the camera on the RIGHT half of the frame, her body centered at about 72% of the frame width, full body, wearing the NAVY EFEONCE SOFTSHELL JACKET with its back print visible, exactly as in Image 4; Image 5 shows only the rocket that sits inside that O, not a separate mark, dark trousers and light sneakers, no watch, no lanyard, her long dark wavy hair falling on her shoulders. Her face is never visible: the back of her head faces the camera squarely; no cheek, nose, ear or profile shows. REALISTIC ADULT PROPORTIONS: camera about four meters behind her at hip height, 85mm. Far ahead of her, standing vertically on the floor, rises ONE colossal perfect ring of saturated red-orange light (#F83902), seen straight on, its center at about 75% of the frame width, spanning from about 59% to 92% of the frame width, its top just below the top edge of the frame, with ONE small blazing white sphere at its top; she walks toward the center of the ring. The ring is the only light source and it is AHEAD of her: it draws only a thin red-orange rim on the outer edge of her hair, shoulders and arms; her back, the jacket and its print face away from the ring and stay in deep navy shadow, the print only softly legible, never orange, never brown, never maroon; nothing lights her from the camera side. The ring draws a long glossy red-orange reflection on the wet-looking floor between her and the ring. Fine haze fills the air: close around the ring it catches the red-orange light and fades to dark before about half of the frame width; beyond the ring's reach, high in the far hall on the right, the haze is a faint, dim cool azure-blue (#0375DB), the night of the hall, never a light source. The LEFT 45% of the frame is calm, deep dark navy-black studio space with only faint haze: no light, no orange glow, no reflection, no objects. Only the ring, the haze close around it, its reflection on the floor and the thin rim on her are red-orange; the rest of the hall, the upper sky and the left 45% stay cool, deep navy, nothing else warm, amber or golden. No robots, no mascots, no logos of any other brand, no readable text, no screens.",
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "plano general de contraportada: el piso pulido llega limpio al borde inferior y la firma va en la columna izquierda con el texto, no sobre un lecho; un objeto junto al lente rompe la escala (BR3h v2)",
+  "llave": {
+    "fuente": "the colossal upright ring of saturated red-orange light (#F83902) on the floor",
+    "lado": "directly ahead of her, as a backlight that rims only the outer edge of her hair and shoulders; nothing lights her from the camera side",
+    "tamano": "the ring is about ten meters across",
+    "distancia": "about fifteen meters beyond her"
+  },
+  "fondo": "an endless dark hall dissolving into haze around the ring, no practical lights",
+  "fenomeno": {
+    "que": "she walks toward one colossal ring of red-orange light, the Efeonce orbit in the colour of Voice",
+    "esServicio": "cierre de propuesta Voice (medios y distribución): el horizonte al que el cliente camina con Efeonce, en la luz de la línea que lleva su inversión a donde rinde"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark navy-black studio space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

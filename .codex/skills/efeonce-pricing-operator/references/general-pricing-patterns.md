@@ -1,210 +1,217 @@
 # General Pricing Patterns
 
-Esta referencia es un mapa de decisión agnóstico a la línea de negocio, no un tarifario. Los números, pisos,
-monedas, impuestos y precios vigentes viven en Finance, el catálogo comercial y el contrato aprobado.
+Mapa agnóstico a la línea de negocio. No es tarifario: precios, pisos, monedas, impuestos y reconocimiento viven
+en Finance, catálogo y contrato aprobado.
 
-## 1. Separar la arquitectura antes de elegir precio
+## Capas que no se deben mezclar
 
-No mezclar estas capas:
+Oferta/product service, delivery model, engagement, operating mode, métrica de valor, unidad de cobro, revenue stream,
+economics y contrato son decisiones distintas. Staff augmentation significa que el cliente dirige el trabajo; managed
+squad/service significa que el proveedor opera más del sistema de entrega.
 
-| Capa | Pregunta | Ejemplos |
+## Delivery y mecanismo
+
+| Delivery | Compra | Mecanismos frecuentes |
 |---|---|---|
-| Offer / product service | ¿Qué compra el cliente? | diagnóstico, web, agente, contenido, plataforma |
-| Delivery model | ¿Quién entrega y responde? | advisory, implementation, productized service, staff augmentation, managed squad, managed service |
-| Engagement | ¿Con qué duración y cadencia? | sprint, proyecto, retainer, ongoing, on-demand |
-| Operating mode | ¿Quién opera cada lane? | Efeonce, marca de producto, ecosistema, proveedor |
-| Value metric | ¿Qué representa el valor? | scope, capacidad, workspace, asset, transacción, outcome |
-| Billing unit | ¿Qué se factura? | fee, milestone, mes, seat, unidad, crédito, consumo |
-| Revenue stream | ¿Cómo se cobra y renueva? | activation, implementation, recurring, usage, IP, pass-through |
-| Economics | ¿Qué consume margen y cash? | labor, bench, providers, compute, support, rework, DSO |
-| Contract | ¿Qué se promete y protege? | SLA, acceptance, exclusions, change order, rights, liability |
+| Advisory / discovery | criterio, análisis, roadmap | fixed fee, day rate, T&M gobernado |
+| Implementation | capacidad configurada/desplegada | fixed fee, milestone, change order |
+| Productized service | paquete repetible | fixed price, tiers, add-ons |
+| Staff augmentation | especialistas/roles | rate, seat, capacity + term |
+| Managed squad | equipo/capacidad/cadencia | fee mensual de capacidad |
+| Managed service | función continua/SLA | recurrente, unidad, híbrido |
+| Platform-enabled service | servicio amplificado por software/IP | base + servicio + usage/credits |
 
-Un cambio de delivery model no crea automáticamente un producto nuevo. Staff augmentation mantiene la dirección
-del trabajo en el cliente; un managed squad o managed service transfiere más responsabilidad operativa al proveedor.
+Mecanismos: T&M, rate card, fixed fee, milestone, productized package, retainer de acceso/capacidad/servicio,
+capacity, subscription, unit/usage, outcome, credits y hybrid. Regla: T&M para incertidumbre real; fixed fee para
+scope definible; capacity para capacidad reservada; managed service para operación; outcome sólo con medición,
+causalidad e influencia suficientes.
 
-## 2. Seleccionar el modelo de delivery
+## Packaging y revenue
 
-| Modelo | Compra el cliente | Forma comercial habitual | Usarlo cuando |
-|---|---|---|---|
-| Advisory | criterio, decisiones y roadmap | fase fija, day rate o retainer | el problema es ambiguo |
-| Discovery / assessment | entendimiento estructurado | paquete fijo o T&M gobernado | falta información para estimar |
-| Implementation | capacidad configurada/desplegada | fee fijo, milestones + change orders | scope y aceptación son definibles |
-| Productized service | paquete repetible y nombrado | precio fijo, tiers y add-ons | el problema se repite |
-| Staff augmentation | especialistas o roles | rate/seat/capacity + mínimo | el cliente dirige prioridades |
-| Managed squad | equipo, capacidad y cadencia gobernadas | fee mensual de capacidad | el proveedor opera el sistema de entrega |
-| Managed service | función continua y SLA | fee mensual, por unidad o híbrido | la operación es estable y medible |
-| Platform-enabled service | servicio amplificado por software, datos o IP | base + servicio + uso/créditos | la tecnología mejora repetibilidad o economics |
-| Training / support | enablement, acceso o respuesta | workshop, tier, pack o retainer | el valor es transferencia o asistencia |
+Usar `segmento → valor → métrica → packaging → economics → validación` y `wedge → core → expansion`.
 
-## 3. Elegir el mecanismo de pricing
+- Métrica explicable, medible y creciente con el valor.
+- Cost-to-serve es piso; valor percibido y willingness-to-pay son hipótesis de techo.
+- Hasta tres tiers salvo evidencia; fences sólo por valor, capacidad, riesgo, SLA, governance, rights o compromiso.
+- Separar activation/discovery, implementation, recurring governance/operation/support/capacity, usage/overage,
+  provider pass-through, IP/licensing, rights, change orders y performance.
+- No usar horas, piezas, prompts o tokens como unidad pública principal cuando sólo son inputs internos.
 
-| Mecanismo | Fórmula conceptual | Mejor encaje | Riesgo a controlar |
-|---|---|---|---|
-| T&M | horas × rate + materiales | incertidumbre real de scope/duración | ceiling, presupuesto y eficiencia |
-| Rate card | días/horas × rol | advisory o augmentation | commoditización |
-| Fixed fee | precio por scope aceptable | entrega definida | scope creep y estimation error |
-| Milestone | fee por gate aceptado | implementación | aceptación y cash-flow |
-| Productized package | alcance estándar × precio | trabajo repetible | excepciones destruyen margen |
-| Retainer | fee por acceso, capacidad o servicio | soporte/advisory/recurring | ambigüedad de unused capacity |
-| Capacity | capacidad reservada × periodo | squads y expertos residentes | expectativa de output ilimitado |
-| Subscription | fee recurrente por acceso/operación | plataforma o servicio estable | churn y soporte subestimado |
-| Unit / usage | unidad gobernada × precio | eventos, assets, seats, transacciones | volatilidad y bill shock |
-| Outcome / value | fee vinculado a resultado verificable | resultado medible y controlable | atribución y dependencias |
-| Credits / bundle | unidades consumidas desde ledger | mix variable repetible | equivalencia ambigua |
-| Hybrid | base + capacidad/uso/overage/outcome | mayoría de servicios complejos | complejidad contractual |
-
-Regla: T&M sirve para incertidumbre que no se puede reducir todavía; fixed fee para scope definible; capacity para
-capacidad reservada; managed service para operación; outcome sólo cuando existe medición, causalidad e influencia
-suficiente. Para servicios técnicos complejos, el default robusto suele ser:
+Default robusto para servicios complejos:
 
 ```text
-discovery pagado
-→ implementación de precio fijo
-→ capacidad o managed service recurrente
-→ guardrail de uso/overage
-→ componente de performance selectivo
+discovery pagado → implementación fija → capacidad/managed recurrente → guardrail de uso → performance selectivo
 ```
 
-## 4. Diseñar valor, packaging y fences
+## Capacity, usage y economics
 
-Usar la secuencia `segmento → valor → métrica → packaging → economics → validación`.
-
-- Elegir una métrica que crezca con el valor, sea explicable y pueda medirse.
-- Usar costo-to-serve como piso, no como única narrativa de precio.
-- Usar valor percibido, alternativas desplazadas, riesgo evitado y willingness-to-pay como techo/hipótesis.
-- Diseñar `wedge → core → expansion`; máximo tres tiers salvo evidencia clara.
-- Diferenciar tiers sólo por valor, capacidad, riesgo, SLA, governance, rights o compromiso; no por features
-  artificiales.
-- Una oferta debe registrar: target/trigger, output, incluidos, excluidos, dependencias, workflow, aceptación,
-  tiempo, tiers/add-ons, capacidad, change rule, piso de margen y prueba de repetibilidad.
-- Los descuentos deben tener fence: term, volumen, segmento, bundle, pago anticipado o compromiso de capacidad.
-
-No usar horas, piezas, artículos, prompts o tokens como unidad pública principal cuando sólo son inputs internos de
-capacidad/costo y commoditizan el resultado. Pueden existir como variables internas, límites u overage gobernado.
-
-## 5. Arquitectura de revenue e híbridos
-
-Separar explícitamente:
+Una oferta de capacity declara roles, seniority, mínimo, término, asignación, intake, governance, output sin scope
+ilimitado, rollover/expiry/overage, continuidad, ramp notice, dependencias y SLA. El retainer debe decir si compra
+acceso, capacidad o servicio, y qué ocurre con unused capacity.
 
 ```text
-activation / discovery
-+ implementation / migration
-+ recurring governance / operation / support / reserved capacity
-+ usage / overage / credits
-+ provider pass-through
-+ IP / licensing / rights
-+ change orders
-+ optional performance component
+utilization = billable hours / available working hours
+realization = service revenue / standard-rate value delivered
+contribution margin = net revenue - loaded labor - providers - infra - support - rework - reserves
 ```
 
-No esconder labor, provider cost o infraestructura dentro de una unidad de uso. El pass-through debe declarar costo,
-markup, FX, impuestos, mínimos, cambios de proveedor y si afecta margen. La base recurrente debe comprar una
-obligación real: gobernanza, acceso, operación, soporte, telemetría o capacidad reservada.
+Usage requiere meter, estimate, preview, cap, alert, overage/stop-loss y dispute path. Credits requieren grants,
+ledger append-only, expiración, refund/rollover, orden de consumo y policy no-negative. En IA incluir observabilidad,
+evaluación, revisión humana, seguridad, soporte de incidentes, compliance, retries, fallback y provider volatility.
 
-## 6. Capacity, retainers y economics de servicios
-
-Una oferta de capacity debe especificar roles/seniority, capacidad comprometida, término mínimo, asignación,
-intake/priorización, governance, expectativas de output sin scope ilimitado, rollover/expiry/overage, continuidad,
-ramp notice, dependencias del cliente y SLA/cadencia.
-
-Un retainer debe decir si compra:
-
-1. acceso/priority;
-2. capacidad reservada; o
-3. un servicio recurrente definido.
-
-Definir por adelantado qué ocurre con la capacidad no utilizada: expira, rollover, convierte a créditos o es el
-precio de reservarla.
+## Governance
 
 ```text
-Billable utilization = billable hours / available working hours
-Realization = recognized or billed service revenue / standard-rate value delivered
-Contribution margin = net revenue - loaded labor - providers - infrastructure - support - rework - reserves
+list price → discount aprobado → credits/promos → refunds/concessions = net revenue
+net revenue − loaded cost − pass-through − infra − support/QA/retries/reserves/FX = contribution margin
 ```
 
-No combinar utilization y realization: alta utilización con baja realización puede indicar descuentos, write-offs o
-scope leakage; alta realización con baja utilización puede indicar buen precio pero demanda insuficiente.
+Registrar descuento, motivo, aprobador, vigencia, margen y renovación. Definir pisos base/downside/p95. Versionar
+rate cards, tiers, credits, limits, provider/model, FX, effective date y contrato; usar quote snapshots y grandfathering
+aprobado. Mostrar precio total, mínimos, overage, impuestos, renovación, cancelación y reembolso.
 
-## 7. Usage, credits y agentes/IA
+## Patrón medido: proyecto creativo de una vez con desglose exigido
 
-Toda unidad variable necesita `meter → estimate → preview → limit/cap → alert → overage/stop-loss → dispute path`.
-Para créditos definir grants pagados/promocionales, ledger append-only, expiración, refund/rollover, orden de
-consumo, no-negative policy, auditoría y contrato. Un crédito no es automáticamente dinero, hora, token, pieza ni
-derecho.
+Medido el 2026-10-12 en una licitación privada (Sika Mexicana, Wherex N.º 1164: un «lanzamiento tipo» de campaña con
+canasta definida por el comprador y «propuesta económica desglosada»). Estado del caso: paquete terminado, no
+presentado, resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro
+cliente.
 
-En agentes/IA incluir en cost-to-serve observabilidad, evaluación, revisión humana, seguridad, soporte de incidentes,
-compliance, retries, fallback y sustitución/rebenchmark de provider/modelo; no costear sólo tokens. Un precio variable
-debe proteger contra abuso, fraude, provider volatility y bill shock.
+**Forma.** En el Cotizador V3 va como `creative-managed-service`, `managed_service`, `on_demand`, `periods: 1`
+([tabla por tipo de negocio](cotizador-v3-agent-workflow.md#21-tabla-por-tipo-de-negocio); ejemplo
+`fixed-scope-project`). No existe una oferta de proyectos.
 
-## 8. Waterfall, governance y versionado
+**Tres escenarios y el piso, juntos.** Al operador se le lleva el rango, no un número:
 
-```text
-list price
-→ approved discount
-→ credits/promotions
-→ refunds/concessions
-= net revenue
+| Escenario | Caso (neto) |
+| --- | --- |
+| A · en la moneda del comprador | MXN 63.700 (costo 32.191,88; margen sobre trabajo propio 50,26 %) |
+| B · en USD | USD 3.320 |
+| C · con 25 % más de horas (sensibilidad de la estimación) | MXN 76.700 |
+| Piso de la oferta (45 %) | ≈ MXN 57.650 |
 
-net revenue
-− loaded human cost
-− unrecovered pass-through
-− infrastructure
-− support/QA/retries/reserves/FX
-= contribution margin
-```
+Cada moneda es su propia cotización; no se convierte a mano.
 
-Registrar siempre precio lista, precio propuesto, descuento absoluto/porcentual, motivo, aprobador, vigencia,
-impacto en margen y efecto en renovación. Definir pisos base/downside/p95 por oferta, cuenta y provider; una excepción
-requiere razón, owner, compensación y fecha de expiración.
+**Los supuestos del agente se marcan como supuestos.** En el caso: 134 h (Lead 28, diseño 44 + 36, contenido 14,
+cuenta 12), USD 60 de producción con IA, talento en Chile, FX de política USD→MXN 19,25 (política, no mercado) y
+tratamiento «exportación sin IVA». Operations y Finance no los validaron. Las horas son estimadas y así se informan.
 
-Versionar rate cards, tiers, credits, limits, provider/model, FX, effective date y contrato asociado. Una modificación
-de catálogo no reescribe cotizaciones históricas: usar snapshots y grandfathering aprobado.
+**El resultado es una simulación** (`requires_review`, `binding: false`), no una Quote. **El precio final lo decide
+el operador**: fijó MXN 64.000 por lanzamiento tipo; el agente había recomendado 70.000. Entre 64.000 y el piso hay
+≈ MXN 6.350, que un desvío cercano al 10 % de las horas consume. El margen a 64.000 (≈ 49,7 %) lo calculó el agente a
+mano: el camino correcto es declarar el precio como `agreed_total` y volver a cotizar
+([3.9](cotizador-v3-agent-workflow.md#39-el-precio-acordado)); mientras no se haga, esa cifra se cita como cálculo
+del agente, no del cotizador.
 
-La salida comercial debe hacer transparente precio total, mínimos, overage, credits, impuestos, renovación,
-cancelación, reembolso y dependencias. Evitar dark patterns o ambigüedad deliberada.
+**El desglose no sale del cotizador.** El motor costea por rol y su documento imprime un fee o «1 proyecto». Un
+desglose por componente o por entregable es un **reparto manual** del total aprobado:
 
-## 9. Pricing Integrity Pack mínimo
+- se declara como reparto manual en el expediente y lo confirma el operador;
+- va en un documento de la plantilla A4 versión 2 con las líneas digitadas (precio aprobado fuera de V3), no en
+  `compose document`; el generador sólo comprueba que sumen;
+- no es rate card: de una línea no se deriva un precio por pieza, y si cambia la canasta se vuelve a costear.
 
-```yaml
-offer_id: TBD
-delivery_model: TBD
-engagement: TBD
-value_metric: TBD
-billing_unit: TBD
-minimum_commitment: TBD
-included: []
-excluded: []
-cost_drivers: []
-provider_pass_through: []
-margin_floor: TBD
-discount_band: TBD
-renewal_trigger: TBD
-expansion_trigger: TBD
-effective_from: TBD
-status: hypothesis_only
-finance_review: pending
-commercial_review: pending
-legal_review: pending
-operations_review: pending
-```
+En el caso, mismo total: evolución gráfica 16.000 · conceptualización y Master Graphic 14.000 · redes 11.000 · reel
+14.000 · punto de venta e impresos 9.000. Cómo se diseña ese desglose en la práctica creativa (por componente de
+valor, no por pieza) lo manda `creative-practice`, `modules/04_PRICING.md` §7 (b.1).
 
-El pack debe incluir matriz de oferta/delivery/engagement, decisión de métrica, revenue architecture, escenarios de
-cost-to-serve y margen, reglas de descuento/aprobación, política de quote/version, plan de validación, owners,
-confidence y verdict: `hypothesis_only`, `approved_for_validation`, `commercially_approved`, `blocked_by_finance`,
-`blocked_by_legal`, `scale_constrained` o `superseded`.
+**Riesgo a avisar: un componente como pago único.** Si una línea (aquí, la evolución gráfica) se presenta como pago
+único, los encargos siguientes quedan en el total menos esa línea (48.000), bajo el piso calculado para un
+lanzamiento. Ningún escenario costeó un lanzamiento sin ese componente. La decisión es del operador.
 
-## 10. Fuentes de investigación
+## Patrón medido: descuento de entrada en lugar de bajar la base (operación CRM gestionada)
 
-Investigación externa consultada el 2026-07-26; los benchmarks y reglas regulatorias deben revalidarse antes de una
-decisión. Estas fuentes informan patrones, no sustituyen Finance/Legal ni el contrato:
+Medido el 2026-10-20 con Assetplan (Chile, inmobiliaria): operación gestionada de HubSpot, propuesta enviada ese día;
+reajustada y reenviada el 2026-10-28 tras la reunión de discovery; resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro cliente.
+[Caso y readback](../../../../docs/commercial/prospecting-agent/runs/2026-10-20-1221-assetplan-deal.md#propuesta-enviada--20102026).
 
-- [FAR Part 16: fixed-price contracts](https://www.acquisition.gov/far/subpart-16.2) y [T&M contracts](https://www.acquisition.gov/far/subpart-16.6).
-- [Google Cloud professional services marketplace](https://cloud.google.com/blog/topics/partners/purchase-professional-services-on-google-cloud-marketplace/).
-- [Service products and productization, Journal of Business Research](https://www.sciencedirect.com/science/article/pii/S0148296321005919).
-- [Bain B2B Elements of Value](https://media.bain.com/b2b-eov/) y [HBR summary](https://hbr.org/2018/03/the-b2b-elements-of-value).
-- [Stripe usage-based billing and credits](https://stripe.com/blog/introducing-credits-for-usage-based-billing).
-- [SPI Professional Services Maturity Benchmark](https://spiresearch.com/the-18th-annual-professional-services-maturity-benchmark-report-is-out-now/).
-- [IFRS 15 Revenue from Contracts with Customers](https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2024/issued/part-a/ifrs-15-revenue-from-contracts-with-customers.pdf?bypass=on).
-- [FinOps FOCUS specification](https://focus.finops.org/focus-specification/v1-3/).
-- [NIST AI RMF Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/) para gobernanza, medición y gestión de riesgo en ofertas de IA.
-- [FTC Dark Patterns report](https://www.ftc.gov/system/files/ftc_gov/pdf/P214800%20Dark%20Patterns%20Report%209.14.2022%20-%20FINAL.pdf?date=2026-06-10).
+**El pedido.** Unas 25 h/mes ajustables para mantener al día un canal de dudas y solicitudes comerciales y apoyar
+proyectos; 90 usuarios de HubSpot; atención en horario de Chile (lunes a jueves 09:30–18:30, viernes hasta las 16:00);
+acceso Partner. La responsable de CRM del cliente conserva estrategia y lineamientos.
+
+**Forma.** Managed service mensual con bolsa de capacidad (fee, no tarifa por hora pública). El catálogo V3 no tiene
+una oferta de operación CRM: el precio salió del carril de escenario del workbook (`pricing:workbook`), sin
+reclasificarlo como creatividad o SEO. Cotización base: 40 UF + IVA/mes por 25 h.
+
+**La pregunta del operador.** Julio pidió un 25 % de descuento los primeros cuatro meses y preguntó si el precio era
+caro y convenía bajarlo. La recomendación fue **no bajar la base**:
+
+| Palanca | Qué se ofreció |
+|---|---|
+| Precio de lista | 40 UF + IVA/mes, explícito en la propuesta como ancla |
+| Descuento de entrada | −10 UF/mes los meses 1–4 → 30 UF + IVA (35,70 UF con IVA); 40 UF + IVA (47,60) desde el mes 5 |
+| Riesgo del comprador | Primer mes sin permanencia |
+| Flexibilidad | Bolsa ajustable desde el mes 2, con 15 días de aviso |
+| Plazo | Inicial de 4 meses (el del descuento); después, mes a mes |
+| Vigencia | 15 días (hasta el 04/11/2026) |
+
+Por qué: un descuento temporal y nombrado se retira solo al mes 5; una base rebajada queda como el precio de
+referencia del cliente y de la renovación. El riesgo de entrada se reduce con permanencia y flexibilidad, no con precio.
+El operador aprobó («Si hazlo»).
+
+**Economics estimados.** Costo ≈ USD 822/mes (≈ 18–19 UF); margen ≈ 52–55 % a 40 UF y ≈ 37–40 % a 30 UF. La
+recomendación los ubicó sobre el piso de margen de la práctica. Son estimaciones del escenario (costos
+históricos/objetivo y horas compartidas), no margen comprobado: verificar el piso vigente con Finance antes de usarlo
+en otro caso. Revisar la dedicación real al cierre del mes 4, cuando termina el descuento.
+
+**Cómo se presentó.** En la propuesta, la receta de cotización en vivo (`content-pricing` live) con líneas:
+Operación HubSpot 25 h, 40 UF/mes; Descuento inicial, −10 UF/mes; Primer mes sin permanencia, incluido; Bolsa
+ajustable, incluida; total meses 1–4, 30 UF neto + IVA. La cotización de 4 páginas va como PDF aparte.
+
+**CRM.** Monto del Deal = proyección de 12 meses (4 × 30 + 8 × 40 = 440 UF, cargado como CLF); fecha de cierre =
+vigencia de la cotización, no cierre pactado. Ambos los aprobó el operador; no escribir un fee mensual como monto
+total ni una fecha inventada.
+
+**Cuando el cliente sube la bolsa: escalar en proporción (28/10).** En la reunión de discovery la clienta pidió
+30 h/mes. Se escaló la cotización completa en proporción, sin reabrir el descuento: 25 → 30 h, lista 40 → 48 UF,
+entrada 30 → 36 UF + IVA los meses 1–4 (25 %). Así se conservan el precio por hora (1,2 UF/h neto de entrada) y el
+descuento de entrada que la clienta ya había visto; renegociar el porcentaje habría abierto una segunda negociación
+sobre algo que no pidió. El monto del Deal se recalculó con la misma regla de proyección de 12 meses: 4 × 36 + 8 × 48
+= 528 UF. La fecha de cierre siguió a la nueva vigencia (30/11/2026). Ambos cambios los aprobó el operador.
+
+**Reemisión con el renderer local** (`scripts/documents/render-cotizacion-a4.mjs`). El campo `version` del JSON es
+la versión del **esquema** (1 o 2), no la de la cotización: la versión del documento va en `reference` (por ejemplo,
+`…-v3`). La carpeta de salida debe estar vacía porque el renderer no sobrescribe: renderizar en una carpeta nueva y
+reemplazar el PDF después. La versión anterior se conserva como respaldo.
+
+## Patrón medido: fase 0 bonificada y medios del cliente fuera del fee (piloto de performance)
+
+Medido el 2026-10-28 con ARMOR EPPS / Indecaucho: piloto de 90 días de LinkedIn Ads + Google Ads en Ecuador, Colombia y
+Perú, cotización emitida ese día, resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni
+referencia para otro cliente. Expedientes:
+[fase 0](../../../../docs/commercial/accounts/indecaucho-armor/pricing-v3-2026-10-28-fase0/README.md) y
+[cotización](../../../../docs/commercial/accounts/indecaucho-armor/cotizacion-2026-10-28/README.md).
+
+**Fase 0 valorizada y bonificada.** El operador pidió: «La fase 0 valorizala pero a la vez bonificala».
+`managed-service-core` no tiene fila `setup` y no imprime una cortesía con valor de referencia, así que la fase 0 se
+costeó como **cotización V3 propia**: demanda de un período con las líneas de preparación de la medición del escenario
+base (ECG-031 32 h, ECG-012 24 h, ECG-021 16 h, ECG-016 8 h, todo CL). Resultado: neto US$3.090, margen 59,4 %, igual a
+la diferencia entre el escenario base y el A. En el deck se muestra «valorizada en US$3.090, bonificada». En la
+cotización del piloto va como fila de texto en `conditions`, porque su brief no tiene una clave para eso; se declara
+que la cifra sale del artefacto aparte, no de la cotización del piloto.
+
+**Medios detallados sin tocar el fee.** La inversión en medios del cliente se declaró en `brief.thirdPartyCosts[]`:
+`settlement: "client_direct"`, `category: "media"`, `periodIds [1,2,3]`, `evidence.status: estimated`, seis filas (USD
+por mes, LinkedIn / Google): EC 2.050 / 200, CO 2.100 / 450, PE 1.050 / 150. El documento las imprime en el bloque
+«Pagado directamente por el cliente», fuera de todo total. El fee quedó en US$9.260 (3.280 + 2 × 2.990), escenario D:
+Trafficker Digital Semi-senior CO + Data Analyst CL al 20 %, margen 59,1 %.
+
+**Precio a un champion: por partes, sin el gran total.** El operador: «En la inversión si le dices el monto total la
+asustas y si no desglosas la inversión también». En el correo de envío la inversión va por partes (fase 0 valorizada y
+bonificada; fee por mes; medios como techo mensual por país, pagados directo por el cliente), sin sumar. El deck
+conserva el total en su propia lámina «Inversión total y condiciones».
+
+**`buyer.taxId` sin dato.** El brief lo exige y el operador no quiso «RUC por confirmar» en la cotización («mejor no
+poner eso»): se usó el país («Ecuador»). No inventar un número ni dejar una nota de pendiente en el documento.
+
+**Condiciones.** Fee mensual anticipado por bloque de 30 días; vigencia 30 días; impuestos «Por confirmar» hasta saber
+qué entidad factura. Son las condiciones sugeridas del costeo de la cuenta, usadas en la versión enviada.
+
+## Fuentes consultadas (2026-07-26)
+
+[FAR fixed-price](https://www.acquisition.gov/far/subpart-16.2), [FAR T&M](https://www.acquisition.gov/far/subpart-16.6),
+[Google Cloud professional services](https://cloud.google.com/blog/topics/partners/purchase-professional-services-on-google-cloud-marketplace/),
+[Bain B2B Elements of Value](https://media.bain.com/b2b-eov/),
+[Stripe credits](https://stripe.com/blog/introducing-credits-for-usage-based-billing),
+[IFRS 15](https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2024/issued/part-a/ifrs-15-revenue-from-contracts-with-customers.pdf?bypass=on),
+[FinOps FOCUS](https://focus.finops.org/focus-specification/v1-3/) y [NIST AI RMF](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/).

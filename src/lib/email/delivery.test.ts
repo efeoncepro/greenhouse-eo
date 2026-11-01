@@ -61,6 +61,49 @@ describe('email delivery layer', () => {
     })
   })
 
+  it('persists no Rooms invitation code or URL while retaining safe challenge correlation', async () => {
+    const result = await sendEmail({
+      emailType: 'auth_server_rooms_invitation_otp', domain: 'identity',
+      recipients: [{ email: 'synthetic@example.test' }],
+      context: { invitationUrl: `https://rooms.example.test/invite#token=${'a'.repeat(43)}`, roomLabel: 'Synthetic',
+        code: '918273', expiresInMinutes: 10 },
+      persistence: { mode: 'token_sensitive', safeContext: { locale: 'es', timeLimitMinutes: 10 } },
+      sourceEntity: 'auth_server_rooms_invitation', sourceEventId: 'ea52cc41-0a92-43c1-9be8-111111111111'
+    })
+
+    expect(result.status).toBe('sent')
+    expect(result.dispatchOutcome).toBe('accepted')
+    const resendClient = mockGetResendClient.mock.results[0]?.value
+
+    expect(resendClient.emails.send).toHaveBeenCalledWith(expect.objectContaining({
+      from: 'Efeonce <acceso@mail.efeoncepro.com>', to: 'synthetic@example.test'
+    }))
+    expect(resendClient.emails.send).toHaveBeenCalledTimes(1)
+    const persisted = JSON.stringify(mockRunGreenhousePostgresQuery.mock.calls)
+
+    expect(persisted).not.toContain('918273')
+    expect(persisted).not.toContain('a'.repeat(43))
+    expect(persisted).toContain('ea52cc41-0a92-43c1-9be8-111111111111')
+    expect(persisted).toContain('token_sensitive')
+  })
+
+  it.each([
+    { emailType: 'auth_server_magic_link' as const,
+      context: { magicLinkUrl: 'https://auth.example.test/m/synthetic-only', expiresInMinutes: 10 },
+      expectedFrom: 'no-reply@efeoncepro.com' },
+    { emailType: 'external_access_invitation' as const,
+      context: { acceptanceUrl: 'https://auth.example.test/i/synthetic-only', issuerHost: 'auth.example.test' },
+      expectedFrom: 'Efeonce <greenhouse@efeoncepro.com>' }
+  ])('keeps the existing sender for $emailType', async ({ emailType, context, expectedFrom }) => {
+    const result = await sendEmail({ emailType, domain: 'identity', recipients: [{ email: 'synthetic@example.test' }], context })
+
+    expect(result.status).toBe('sent')
+    const resendClient = mockGetResendClient.mock.results[0]?.value
+
+    expect(resendClient.emails.send).toHaveBeenCalledWith(expect.objectContaining({ from: expectedFrom }))
+    expect(resendClient.emails.send.mock.calls[0][0].from).not.toBe('Efeonce <acceso@mail.efeoncepro.com>')
+  })
+
   it('sends a templated email and records delivery rows', async () => {
     const bearer = 'implicit-sensitive-bearer'
 

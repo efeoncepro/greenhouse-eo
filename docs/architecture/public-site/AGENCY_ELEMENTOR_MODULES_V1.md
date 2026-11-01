@@ -1,5 +1,13 @@
 # Agency Elementor Modules V1
 
+> **Delta 2026-10-29 — Supersedido como home.** Desde el 2026-10-29 01:25 UTC el cuerpo de `251731` es la landing
+> compilada `inicio` (doce widgets `greenhouse_inicio_*`, rediseño «La órbita × Pingback»); los 17 módulos
+> `greenhouse_agency_*` ya no sirven la portada. Contrato vigente:
+> [HOME_INICIO_ELEMENTOR_MODULES_V1.md](HOME_INICIO_ELEMENTOR_MODULES_V1.md). La página anterior `2791` (`/home-2/`)
+> y las demás homes antiguas pasaron a la papelera con 301 → `/` el 2026-10-29
+> ([audit](../../audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md)). El resto de este documento es
+> histórico: describe la home del 2026-08-30 al 2026-10-28 y su rollback ya no aplica.
+
 ## Identidad y estado vigente
 
 Por instrucción explícita del operador, `page_on_front=251731`: esta página sirve ahora

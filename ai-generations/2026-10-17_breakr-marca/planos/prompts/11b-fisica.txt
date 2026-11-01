@@ -1,0 +1,9 @@
+Edit image 1, a still from a commercial film. It is the instant right after the previous shot: a wave of water carrying a big can of BREAKR rushed along the meeting table toward Paula, and now it crashes into her.
+
+Fix the can, with real physics, as a high-speed cinema camera would freeze it (1/2000 s):
+- The can arrives WITH the wave, between the camera and Paula, so it is close to the camera and BIG in frame: about as tall as Paula's whole head and neck, much bigger than now. It is the BREAKR can of image 2: same label, BREAKR spelled exactly B-R-E-A-K-R reading bottom to top, ORANGE BREAK beside it.
+- It has just bounced off the crest of the wave and is tumbling upward next to her, at the left of her head (where the small can is now), tilted about 40 degrees, with a slight motion blur along its path.
+- Water clings to it and streams off it in ribbons and droplets trailing behind its motion; the splash around it belongs to the same wave that is hitting Paula, all moving in the same direction (from the camera toward her and upward).
+- Remove the small can that is now at the top left.
+
+Keep EVERYTHING else exactly as in image 1: Paula's face, eyes, identity, expression with eyes shut, hair, sweater, the cup in her hand and her raised hand, the water hitting her, the orange slices, the table, the office, the light, the framing and the camera. Photographic, real, nothing looks generated.

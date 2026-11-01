@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1835)
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Documentacion tecnica:** [PATTERNS.md § Runtime sin React — shell «Efeonce ID»](../../architecture/ui-platform/PATTERNS.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 > **Manual de uso:** [Revisar y diagnosticar las pantallas de Efeonce ID](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md)
@@ -13,8 +13,8 @@
 
 ## La idea central
 
-`auth.efeonce.org` es el unico lugar donde alguien de fuera de Efeonce escribe su correo, decide si
-autoriza una aplicacion y confirma su identidad. Es la primera pantalla —y a veces la unica— que esa
+`auth.efeonce.org` centraliza la autenticación de identidad y el consentimiento delegado para aplicaciones.
+El OTP de una invitación guest se introduce en Rooms y no crea sesión global de identidad. Es la primera pantalla —y a veces la unica— que esa
 persona ve de Efeonce.
 
 Este documento describe **lo que se ve y por que se ve asi**. El comportamiento del acceso (que dura
@@ -27,7 +27,19 @@ sin framework de interfaz y con una politica de seguridad de contenido muy cerra
 Efeonce porque los colores, la tipografia y el logotipo **se generan desde la misma fuente de verdad
 de marca** del portal, no porque se hayan copiado a mano.
 
-## El marco comun
+## Corte de interfaz — 2026-10-26
+
+Login V4 ya está servido en `/login`; `/login/rooms` toma el contexto sólo del registro/transacción
+confiable. El canary acotado validó el recorrido real con Microsoft/MFA, pero Auth first-party/OTP quedó
+OFF y el ensayo cerrado. Eso no acredita aceptación visual de una nueva dirección ni el feed de novedades del issuer.
+Puede continuar nueva UI en harness/entorno aislado; su publicación y activación necesitan decisiones
+separadas. PR #263/#264 siguen abiertas y retenidas; no desplegar para revisar una pantalla.
+[Estado operativo](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
+El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
+septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
+
+## El marco anterior (baseline TASK-1835)
 
 Todas las pantallas comparten el mismo marco:
 
@@ -66,8 +78,8 @@ lo que no es.
 
 > ⚠️ **Hoy nadie puede crear una passkey.** El servidor tiene el camino para darlas de alta, pero
 > **ninguna pantalla lo ofrece**. El boton «Entrar con mi passkey» solo le sirve a quien ya tenga
-> una credencial registrada por otra via. En la practica, **toda entrada de una persona nueva sera
-> por enlace de correo**. Lo cierra `TASK-1842`, que a su vez esta bloqueada por `TASK-1834`.
+> una credencial registrada por otra via. En la practica, **una persona externa nueva sin passkey necesita
+> el carril de correo**. Lo cierra `TASK-1842`, que a su vez esta bloqueada por `TASK-1834`.
 
 Al pie de la tarjeta hay una linea fina: «Te escribimos solo al correo con el que te invitaron». Es
 la unica pista sobre a quien le llega el enlace, y es deliberadamente vaga.
@@ -195,7 +207,7 @@ hacia la persona.
 
 | Hueco | Consecuencia practica | Quien lo cierra |
 | --- | --- | --- |
-| **No hay pantalla para crear una passkey** | Nadie puede registrar su primera credencial. Toda entrada nueva sera por enlace de correo, y el boton de passkey solo sirve a quien ya tenga una. | `TASK-1842` (bloqueada por `TASK-1834`) |
+| **No hay pantalla para crear una passkey** | Nadie puede registrar su primera credencial. Una persona externa sin credencial necesita el carril de correo, y el boton de passkey solo sirve a quien ya tenga una. | `TASK-1842` (bloqueada por `TASK-1834`) |
 | **No hay pantalla de dispositivos** | La persona no puede ver ni retirar sus credenciales registradas. | `TASK-1842` |
 
 > Detalle tecnico: plantillas en [`src/lib/auth-server/persons/pages.ts`](../../../src/lib/auth-server/persons/pages.ts),

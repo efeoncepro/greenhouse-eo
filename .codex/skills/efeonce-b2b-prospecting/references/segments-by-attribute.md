@@ -6,6 +6,20 @@ activa: no crece sola y no se cruza con los demás segmentos.
 
 Procedimiento, sintaxis e IDs del portal: [segmentación HubSpot](../../hubspot-as-a-service/references/prospecting-segmentation.md).
 
+## Listas nativas de Sales Navigator frente a segmentos CRM
+
+El criterio de atributos gobierna segmentos CRM activos; no prohíbe una shortlist manual nativa que el
+operador pidió. Sales Navigator organiza cuentas por mercado/sector y personas por frente funcional del
+servicio, con procedencia/corte en dossier. No trasladar listas de IDs como definición de un segmento activo.
+Una cohorte «Finanzas CL» puede incluir profesionales regionales: no certifica país de la persona, autoridad
+presupuestaria ni demanda. Afinidad funcional no es calificación ni permiso de outreach.
+
+Para crear/guardar, leer [listas nativas y readback](sales-navigator-operations.md): selección en bloque
+persistente, nombres seleccionados antes del write, membresía personalizada separada de «Guardado» y lectura
+nominal después de recargar. Contar únicos/membresías/contadores UI por separado; diferencias quedan abiertas.
+No renombrar o fusionar listas preexistentes sin mandato. Guardar personas en Sales Navigator no crea Contact/
+Lead en HubSpot ni necesita el correo exigido para esas altas CRM.
+
 ## Reglas
 
 - **La industria es de la empresa.** Se clasifica una vez en Company y los contactos la heredan por su empresa

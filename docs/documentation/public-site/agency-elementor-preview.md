@@ -1,5 +1,9 @@
 # Home editable en Elementor
 
+> **Delta 2026-10-29:** este documento describe la home anterior (módulos `greenhouse_agency_*`). Desde el
+> 2026-10-29 la portada `251731` es la home «La órbita»: ver [home-efeonce-la-orbita.md](home-efeonce-la-orbita.md).
+> El respaldo `2791` (`/home-2/`) pasó a la papelera con 301 a `/`.
+
 La [Home de Efeonce](https://efeoncepro.com/) usa el cuerpo del diseño de Claude Design adaptado
 mediante las revisiones del operador, con header y footer Ohio del sitio. La página `251731` fue
 promovida desde la preview el 2026-08-30; la anterior `2791` conserva su diseño en `/home-2/`, con noindex.

@@ -144,7 +144,7 @@ describe('authorGutenbergDraft — embed caption, table stripes, buttons', () =>
     expect(gutenberg(draft).postContent).toContain(
       [
         String.raw`<!-- wp:embed {"url":"https://www.youtube.com/watch?v=abc123\u0026t=10s","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->`,
-        '<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">https://www.youtube.com/watch?v=abc123&amp;t=10s</div><figcaption class="wp-element-caption">Fuente: <a href="https://www.anthropic.com/news">Anthropic</a></figcaption></figure>',
+        '<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">\nhttps://www.youtube.com/watch?v=abc123&amp;t=10s\n</div><figcaption class="wp-element-caption">Fuente: <a href="https://www.anthropic.com/news">Anthropic</a></figcaption></figure>',
         '<!-- /wp:embed -->'
       ].join('\n')
     )
@@ -159,7 +159,7 @@ describe('authorGutenbergDraft — embed caption, table stripes, buttons', () =>
     expect(gutenberg(draft).postContent).toContain(
       [
         '<!-- wp:embed {"url":"https://www.youtube.com/watch?v=VIDEO_ID","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->',
-        '<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">https://www.youtube.com/watch?v=VIDEO_ID</div></figure>',
+        '<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">\nhttps://www.youtube.com/watch?v=VIDEO_ID\n</div></figure>',
         '<!-- /wp:embed -->'
       ].join('\n')
     )
@@ -192,6 +192,17 @@ describe('authorGutenbergDraft — embed caption, table stripes, buttons', () =>
     )
 
     expect(gutenberg(draft).postContent).toContain('<!-- wp:table {"className":"is-style-stripes"} -->\n<figure class="wp-block-table is-style-stripes"><table>')
+    expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
+  })
+
+  it('renders the «Tabla Efeonce» style on the comment and the figure', () => {
+    const draft = authorGutenbergDraft(
+      specWith([{ kind: 'table', headers: ['Campo', 'Ejemplo'], rows: [['Tamaño', '200 a 2.000']], style: 'efeonce' }])
+    )
+
+    expect(gutenberg(draft).postContent).toContain(
+      '<!-- wp:table {"className":"is-style-efeonce-tabla"} -->\n<figure class="wp-block-table is-style-efeonce-tabla"><table>'
+    )
     expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
   })
 

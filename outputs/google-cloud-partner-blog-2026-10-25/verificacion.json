@@ -1,0 +1,21 @@
+{
+  "postId": 252108,
+  "checks": {
+    "private": true,
+    "owned": true,
+    "humanAuthor": true,
+    "category": true,
+    "format": true,
+    "cover": true,
+    "opening": true,
+    "notInBanner": true,
+    "noindex": true,
+    "noDistributor": true,
+    "noBodyH1": true,
+    "faqFour": true,
+    "articleSchema": true
+  },
+  "status": "pass",
+  "contentSha256": "ada3346789d766327d60ddc535d8b312d3e3210a4fbc23ae7987ec3a630b6e56",
+  "bodyWords": 1152
+}

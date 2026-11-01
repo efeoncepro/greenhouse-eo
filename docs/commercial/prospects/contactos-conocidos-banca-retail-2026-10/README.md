@@ -1,5 +1,14 @@
 # Contactos conocidos — BCI, BICE, Cencosud e Itaú
 
+**BCI · 29/10:** [shortlist investigada en Sales Navigator](BCI-SALES-NAVIGATOR-2026-10-29.md), filtros
+laterales y seis perfiles verificados; Renzo confirmado como CPO Digital Solutions. Sin outreach ni CRM.
+El corte del 11/10 que sigue conserva su fecha; HubSpot requiere reconexión para revalidar el historial.
+
+**Continuación posterior del 29/10:** Banco Bci guardado y nominalmente verificado en la lista de banca;
+[cartera financiera y estados](../servicios-financieros-chile-2026-10/README.md). Las 23 personas guardadas
+por servicio pertenecen a las cinco cuentas de esa ronda; no deben atribuirse a esta shortlist BCI.
+[Configuración y evidencia general](../../sales-navigator/README.md).
+
 Corte y readback: **2026-10-11**, portal HubSpot **48713323**, owner Julio **75788512**.
 Julio autorizó incorporar sus contactos conocidos para explorar servicios de agencia y excluir reclutadores.
 **12 contactos incorporados a la base: 10 nuevos y 2 existentes reutilizados** (María Teresa y Pamela).

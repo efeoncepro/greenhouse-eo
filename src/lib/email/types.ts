@@ -10,6 +10,7 @@ export type EmailType =
   | 'verify_email'
   | 'magic_link'
   | 'auth_server_magic_link'
+  | 'auth_server_rooms_invitation_otp'
   | 'external_access_invitation'
   | 'payroll_export'
   | 'payroll_receipt'
@@ -75,6 +76,7 @@ export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
   'verify_email',
   'magic_link',
   'auth_server_magic_link',
+  'auth_server_rooms_invitation_otp',
   'external_access_invitation',
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
@@ -95,6 +97,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   password_reset: 'critical',
   magic_link: 'critical',
   auth_server_magic_link: 'critical',
+  auth_server_rooms_invitation_otp: 'critical',
   external_access_invitation: 'critical',
   verify_email: 'critical',
   invitation: 'transactional',
@@ -288,6 +291,7 @@ export const CANDIDATE_REPLY_TO_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<Em
   'hiring_talent_pool_verification'
 ])
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
+  'auth_server_rooms_invitation_otp',
   'ai_visibility_grader_report',
   // TASK-1848 — Efeonce Insights es un producto de Efeonce: el informe lo firma la agencia.
   'insights_edition_delivery',

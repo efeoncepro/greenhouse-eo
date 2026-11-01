@@ -1,0 +1,330 @@
+{
+  "date": "2026-10-29",
+  "actor": "Julio Reyes",
+  "plan": "Sales Navigator Core",
+  "status": "saved_reloaded_and_named_membership_read_back",
+  "authorization": "También guardar en listas basadas en nuestros servicios y determinar nombres/categorías.",
+  "lists": [
+    {
+      "key": "web",
+      "name": "Efeonce | Finanzas CL | Web, Producto y Experiencia",
+      "description": "Desarrollo Web, Web Experience 360, producto digital, UX, ecommerce y medición. Owners y validadores técnicos de experiencia e implementación. El rol no prueba necesidad de rediseño ni presupuesto. Product Design conserva su scope; evitar dos ofertas por la misma capacidad.",
+      "url": "https://www.linkedin.com/sales/lists/people/7521636078219526144",
+      "count": 3,
+      "members": [
+        {
+          "name": "Patricio Saavedra Valenzuela",
+          "company": "Haulmer",
+          "profile": "/sales/lead/ACwAABX4OpABzmko2iUF0PCdvxyQjI0IjSSMvtI,NAME_SEARCH,CwG3",
+          "role": "Product Manager",
+          "degree": "2º grado",
+          "location": "Concepción, Bio Bio, Chile",
+          "listKey": "web",
+          "listName": "Efeonce | Finanzas CL | Web, Producto y Experiencia",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Sebastián Ignacio de la Fuente Benítez",
+          "company": "Haulmer",
+          "profile": "/sales/lead/ACwAAAfdA-8BAWRCSTB9Wg8u2vIEB7gqnLbw2LU,NAME_SEARCH,M5Dn",
+          "role": "Product Manager",
+          "degree": "2º grado",
+          "location": "Chile",
+          "listKey": "web",
+          "listName": "Efeonce | Finanzas CL | Web, Producto y Experiencia",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Sebastián Mejías",
+          "company": "Haulmer",
+          "role": "Design System Lead | UI Lead",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAABBMBhcBrqw09O0AtjhoaQciJy8S3ay2Mr8,NAME_SEARCH,PVNn",
+          "listKey": "web",
+          "listName": "Efeonce | Finanzas CL | Web, Producto y Experiencia",
+          "saveAcknowledged": true
+        }
+      ],
+      "membershipVerified": true
+    },
+    {
+      "key": "search",
+      "name": "Efeonce | Finanzas CL | SEO-AEO, Contenidos y Social",
+      "description": "SEO, Efeonce | AEO, contenido editorial y redes sociales. Incluye owners y operadores de orgánico, contenido, comunidad y Social Search en cuentas financieras con operación/sede Chile. Rol observado; necesidad, autoridad y presupuesto por validar. Sin restricción de primer grado.",
+      "url": "https://www.linkedin.com/sales/lists/people/7521636011433635841",
+      "count": 3,
+      "members": [
+        {
+          "name": "Javier Llakowski",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAABhPZsEBFUoT-F-nx5ZOZKVOdAcOX5FOE3k,NAME_SEARCH,xUT5",
+          "role": "SEO Analyst (IC) | Owner LATAM",
+          "degree": "2º grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile",
+          "listKey": "search",
+          "listName": "Efeonce | Finanzas CL | SEO-AEO, Contenidos y Social",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Tania Salgado",
+          "role": "Community Manager",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAACytiPcBVYEjDuaymuaiP5_20CHxqRIvjT0,NAME_SEARCH,94oo",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto",
+          "listKey": "search",
+          "listName": "Efeonce | Finanzas CL | SEO-AEO, Contenidos y Social",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Cristina P.",
+          "role": "Community Manager | Content Writer",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAABZwUlYBhj6UlFtpbxFybyRAM9fhyv-ku8I,NAME_SEARCH,FCv7",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto",
+          "listKey": "search",
+          "listName": "Efeonce | Finanzas CL | SEO-AEO, Contenidos y Social",
+          "saveAcknowledged": true
+        }
+      ],
+      "membershipVerified": true
+    },
+    {
+      "key": "brand",
+      "name": "Efeonce | Finanzas CL | Marca, Creatividad e Influencia",
+      "description": "Agencia Creativa, Producción Creativa a Escala, audiovisual, influencers y UGC. Responsables de marca, campañas, contenido creativo, producción y creadores. La pertenencia expresa afinidad funcional, no demanda activa ni autoridad económica. Derechos y alcance por iniciativa.",
+      "url": "https://www.linkedin.com/sales/lists/people/7521636034506563584",
+      "count": 4,
+      "members": [
+        {
+          "name": "Francisca Solar",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAAD2xyXgB2UlCLl8UCrkhxMWoq22FphklyWw,NAME_SEARCH,U4NT",
+          "role": "Brand Lead",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile",
+          "listKey": "brand",
+          "listName": "Efeonce | Finanzas CL | Marca, Creatividad e Influencia",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Sebastián Sandoval",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAtbSWAB9DYSsLFO03sycFYptqxRQ00rcmA,NAME_SEARCH,gEwe",
+          "role": "Brand Lead | Líder de marca",
+          "degree": "1er y miembro de LinkedIn Premium",
+          "location": "Chile",
+          "listKey": "brand",
+          "listName": "Efeonce | Finanzas CL | Marca, Creatividad e Influencia",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Francisco Castro Moraga",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAAAp82zYBcbjvsGWk7FpRUIvB89-Z8M5iHKs,NAME_SEARCH,jNCx",
+          "role": "Brand Manager",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile",
+          "listKey": "brand",
+          "listName": "Efeonce | Finanzas CL | Marca, Creatividad e Influencia",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Andrea Malatesta",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAAAwDwZUBIqxdgP9TGVguZYPd1nWMLWxxoZQ,NAME_SEARCH,RaCu",
+          "role": "Marketing Brand Manager",
+          "degree": "2º grado",
+          "location": "Chile",
+          "listKey": "brand",
+          "listName": "Efeonce | Finanzas CL | Marca, Creatividad e Influencia",
+          "saveAcknowledged": true
+        }
+      ],
+      "membershipVerified": true
+    },
+    {
+      "key": "growth",
+      "name": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+      "description": "Performance Marketing, Agencia de Medios e Inbound/Loop. Sponsors y responsables de marketing, growth, adquisición, producto comercial y revenue en cuentas financieras. Validar problema, inversión y señal. Ubicación de la persona puede ser regional; no presupone scope Chile.",
+      "url": "https://www.linkedin.com/sales/lists/people/7521636056379809792",
+      "count": 9,
+      "members": [
+        {
+          "name": "Benjamín de Amesti B",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAACJMPmgBzFtDDnIqEhbYor133iPqufrMhpI,NAME_SEARCH,iI9x",
+          "role": "Head of Growth",
+          "degree": "2º grado",
+          "location": "Chile",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Cristian Alvear González",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAABx-LbEBT98iFS7ykLLJNUurRfSKi-xXMPY,NAME_SEARCH,SEPD",
+          "role": "Head Growth Marketing & New Business",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Paulina Guianatti Vladilo",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAACIZ0AcBVLEWHnDfvHH6-o1INRmZZPTCd9M,NAME_SEARCH,XgBJ",
+          "role": "Head of Marketing",
+          "degree": "1er grado",
+          "location": "Chile",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Andrea Rivera",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAAAnnwMIBmcLC5iASBEzTGjo1W3fmWVE23OM,NAME_SEARCH,EZ8G",
+          "role": "Head of Growth",
+          "degree": "1er grado",
+          "location": "Chile",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Cecilia Sánchez del Río",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAABbQ1bMBuhICXJ186u2_bMcfef42AkJaNy4,NAME_SEARCH,kKUw",
+          "role": "Marketing Lead",
+          "degree": "1er grado",
+          "location": "Miguel Hidalgo, CDMX, Ciudad de México, México",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Leonardo Castillo",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAACS8joEBrGjP1SX5d8qjmmKtawP7C3d-mJc,NAME_SEARCH,jclU",
+          "role": "Product Marketing & Business Development",
+          "degree": "2º y miembro de LinkedIn Premium",
+          "location": "Área metropolitana de Ciudad de México",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Matías Guerrero Irarrázaval",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAAB0BkHsBsg332slPkBffe-evSumgUaGYuyI,NAME_SEARCH,ljrz",
+          "role": "Growth Strategist",
+          "degree": "1er y miembro de LinkedIn Premium",
+          "location": "Chile",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Nathalie Moreau Caniuñir",
+          "role": "Marketing Manager",
+          "degree": "1er grado",
+          "profile": "/sales/lead/ACwAACbD_BIBYPld4sKYpbBkG47kuzn1O6yRy70,NAME_SEARCH,50KO",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Enrique Alvarez",
+          "role": "Chief Revenue Officer",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAAAUpo5wBihekxYKw9dl4u1Kg67GdgWv7XLw,NAME_SEARCH,HrVJ",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto",
+          "listKey": "growth",
+          "listName": "Efeonce | Finanzas CL | Growth, Medios e Inbound",
+          "saveAcknowledged": true
+        }
+      ],
+      "membershipVerified": true
+    },
+    {
+      "key": "crm",
+      "name": "Efeonce | Finanzas CL | CRM, RevOps y Lifecycle",
+      "description": "HubSpot, CRM, marketing/revenue operations, lifecycle, automatización, servicio y experiencia de cliente. Provider-fit por validar: HubSpot-first, Salesforce-first, híbrido o no-fit. No asumir tecnología instalada ni reemplazar core financiero. Sin contacto o gasto autorizados por guardar.",
+      "url": "https://www.linkedin.com/sales/lists/people/7521636092668833793",
+      "count": 4,
+      "members": [
+        {
+          "name": "Vivian Andrea Rozo",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAACPGDBgBz1j7mRu23zKrqC26rBT4vgdzS9U,NAME_SEARCH,wKzK",
+          "role": "Regional Growth CRM Manager",
+          "degree": "1er grado",
+          "location": "Bogotá, Distrito Capital, Colombia",
+          "listKey": "crm",
+          "listName": "Efeonce | Finanzas CL | CRM, RevOps y Lifecycle",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Yicell Viur",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAt4n4gB-wGlaifE9rvOCuo7TS6wuqjAGqk,NAME_SEARCH,JPIH",
+          "role": "Marketing Lifecycle Manager",
+          "degree": "2º grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile",
+          "listKey": "crm",
+          "listName": "Efeonce | Finanzas CL | CRM, RevOps y Lifecycle",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Teofilo Ayerza",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAtzmlUBmo068v1i85Ej-U7TRXXq0T03xCA,NAME_SEARCH,Ul2e",
+          "role": "Head of Marketing Operations",
+          "degree": "2º y miembro de LinkedIn Premium",
+          "location": "Área metropolitana de Santiago",
+          "listKey": "crm",
+          "listName": "Efeonce | Finanzas CL | CRM, RevOps y Lifecycle",
+          "saveAcknowledged": true
+        },
+        {
+          "name": "Elías Alegría Pavez",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAABdr4U8BQQKcf1m_IkjNnaY2QtZH8HwpA8E,NAME_SEARCH,RiHI",
+          "role": "Head of Engagement",
+          "degree": "2º grado",
+          "location": "Peñaflor, Región Metropolitana de Santiago, Chile",
+          "listKey": "crm",
+          "listName": "Efeonce | Finanzas CL | CRM, RevOps y Lifecycle",
+          "saveAcknowledged": true
+        }
+      ],
+      "membershipVerified": true
+    }
+  ],
+  "uniquePeople": 23,
+  "totalMemberships": 23,
+  "preservedExistingLists": [
+    "Growth",
+    "Brand",
+    "Lista de posibles clientes de Julio",
+    "Contactos y mensajes InMail aceptados recientemente",
+    "Posibles clientes recomendados"
+  ],
+  "messagesSent": 0,
+  "connectionRequests": 0,
+  "inMailCreditsConsumed": 0,
+  "crmWrites": false,
+  "timezone": "America/Santiago",
+  "evidencePhase": "subsequent_lead_lists_after_accounts_and_first_20_cards",
+  "saveAcknowledgmentsVerified": 23,
+  "listsWithExactNamedReadback": 5,
+  "profilePathSourceOrigin": "https://www.linkedin.com",
+  "qualificationNote": "Datos profesionales declarados en UI; membresía guardada verificada. No acredita necesidad, presupuesto, autoridad económica, interés humano ni consentimiento para comunicación."
+}

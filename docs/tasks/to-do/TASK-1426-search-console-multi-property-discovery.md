@@ -1,5 +1,16 @@
 # TASK-1426 — Search Console Multi-Property Analytics, URL Inspection & Post-Publish Discovery
 
+## Delta 2026-10-26 — Solicitar indexación por la interfaz ya tiene runner local
+
+- `pnpm public-website:gsc-index` (`scripts/public-website/gsc-request-indexing.mjs`) inspecciona URLs y pide la
+  indexación por el botón de la interfaz de Search Console, desde un Chrome dedicado donde una persona inició sesión.
+  Es herramienta local de operador/agente, **no** runtime de Greenhouse ni la API: no cambia el alcance de esta task
+  (URL Inspection read-only por API, multi-property y checkpoints post-publicación) ni la regla de que el botón
+  humano queda fuera de la API programática general.
+- Su registro (`scripts/public-website/gsc-indexing/ledger/AAAA-MM.jsonl`: veredicto, último rastreo, fecha de
+  modificación y resultado por URL) sirve como evidencia manual de un checkpoint `0h` mientras esta task no exista.
+  Manual: `docs/manual-de-uso/public-site/solicitar-indexacion-search-console.md`. — por trabajo de la sesión del blog
+
 ## Delta 2026-10-03 — Search Console de imágenes, video, noticias y Discover para la propiedad web
 
 - El inventario de tarjetas de Efeonce Insights aprobado el 2026-10-03 (canvas `9q7nThMhdphN5j8f3K3cbB`) marca

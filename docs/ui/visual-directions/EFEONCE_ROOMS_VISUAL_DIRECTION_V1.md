@@ -1,5 +1,58 @@
 # Rooms — dirección visual V1
 
+> Continuidad26Oct: referencia del diseño/scaffold anterior, no aceptación de la interfaz de Claude Design.
+> Codex conserva backend; Claude Design posee la nueva UI y su validación. Los requisitos de AXIS,
+> View Transitions, reduced-motion, fallback y accesibilidad siguen siendo obligaciones a verificar.
+> Integración/estado actual: [dossier Rooms](../../architecture/rooms/README.md) y
+> [contrato backend](../../documentation/rooms/backend-api-for-claude-design.md). No activar flags ni repetir canary por este documento.
+
+## Aprobación 2026-10-29 — canvas «la sala es una órbita»
+
+El operador aprobó completo el canvas de Claude Design «Efeonce Rooms — UI»
+(artifact `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`, 14 pantallas):
+«Todo lo que hiciste está aprobado». **Esto aprueba la composición, no píxeles implementados.** La aceptación
+de cada superficie implementada sigue exigiendo GVC desktop/móvil y el scorecard de §6.
+
+**Dirección aprobada.** Refina el escenario editorial de §1: la sala es un plano continuo con cámara y los
+capítulos viven alrededor de una órbita. El arco del anillo mide el recorrido **real** del comprador. Cambiar
+de capítulo es un salto orbital de dos fases (lift y land) y el mapa es alejar la cámara. La pieza sigue
+siendo protagonista dentro de cada capítulo y nunca lleva órbita encima. No es la galería 3D descartada:
+el plano es 2D, la navegación es por clic o teclado y nada secuestra el scroll.
+
+| Pantalla del canvas | Superficie | Task dueña |
+|---|---|---|
+| Invitación (escritorio + móvil) | Entrada con enlace o código de 6 caracteres; estados enlace, código, vencido, revocado e intentos | TASK-2068 |
+| Sala | Mundo-cámara con 5 capítulos, barra de capítulos y mapa | TASK-2059 |
+| Explorar pieza | Adaptaciones en un marco que cambia de proporción; capas Vista limpia, En contexto y Detalle; pestañas Fundamento, Evidencia y Preguntar | TASK-2059 / TASK-2071 |
+| Radiografía | Artículo en papel con fragmentos y un hilo hacia la evidencia | TASK-2059 |
+| Móvil | La pieza primero; el mapa en una hoja inferior | TASK-2059 / TASK-2068 |
+| Estados | Cargando, error de red, sin acceso y pieza procesando | TASK-2059 / TASK-2068 |
+| Autoría y Ediciones | Inventario, cobertura, «Ver como» y comparador de ediciones | TASK-2071 |
+| Consola, Audiencia | Presentación con reloj, «En el aire» y avance de audiencia | por crear (Fase 3) |
+| Señales, Video | Actividad agregada y animatic | por crear (Fase 4) |
+| Sala en vivo | Cursores y preguntas en vivo | adelantada: requiere ADR y backend en tiempo real |
+
+**Reglas que el operador corrigió durante la ronda (obligatorias en la implementación):**
+
+- La órbita es una forma canónica: anillo, arco de 50° arriba a la izquierda (entre 200° y 250°) con la
+  esfera en la punta, y halo. Se dibuja una vez con los tiempos de marca (anillo 0–500 ms, arco 400–1400,
+  esfera 1400–1700 con overshoot, halo 1200–2000) y queda quieta. **Nunca es loader ni se llena con lo que
+  el usuario escribe.** La espera la dicen el texto y el botón.
+- El halo se construye con el token `efeonceGraphicLine.orbit`: degradado radial `userSpaceOnUse` de radio
+  `haloRadiusRatio` (1,86) × anillo, paradas 0,13 → 0,03 (al 60 %) → 0, color `halo` sobre `dark`. Un
+  `radial-gradient` CSS en un div redondo no es halo.
+- El fondo se mueve por profundidad (parallax por capas) y grano. Nada de imágenes flotantes o desenfocadas.
+- Un gesto fuerte por vista: en la invitación, «Entra.» gigante rodeado por la órbita. Logo del cliente y
+  quién invita (foto y nombre) visibles.
+- El lockup Efeonce | Rooms necesita aire: en la consola no va comprimido junto a la miniatura.
+- Estados con la forma y el texto, nunca con colores de semáforo. Movimiento reducido = cortes directos.
+
+Fixture visual: cliente ficticio **volta** (e-bikes, campaña «Llega antes»), generado con GPT Image 2.5
+Sunburst; originales en `ai-generations/2026-10-29_rooms-volta/` (ignorado por git en Greenhouse). Reemplaza
+el arte Nómada de la demo anterior, rechazado por el operador. Al implementar se copia como fixture sintética
+rotulada del repo runtime. Orden y alcance de implementación: TASK-2079 (base visual) y luego las tasks de la tabla.
+
+
 Fecha: 2026-10-07. **Design system La órbita decidido por el operador; composición y aprobación visual pendientes.** Modo: repo-native-benchmark. [Experiencia](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_V1.md) · [Wireframes](../wireframes/rooms-v1.md) · [Motion](../motion/rooms-v1.md).
 
 ## 1. Referencias y selección de dirección
@@ -77,3 +130,17 @@ Pendiente: capturas desktop/móvil, grabación de interacciones, contraste, tecl
 La [definición de perfiles](../../architecture/rooms/EFEONCE_ROOMS_EXPERIENCE_PROFILES_V1.md) añade lectura editorial a ancho útil y radiografía bajo demanda: seleccionar fragmento revela decisión/evidencia, con referencia de origen persistente. Desktop puede dividir el plano; móvil usa panel legible y retorno al bloque. Planes y hallazgos conservan jerarquía editorial, sin convertir la sala en un dashboard de tarjetas. Las visualizaciones ofrecen valores/unidades y alternativa tabular; colores de estado no sustituyen etiquetas.
 
 El instrumento usa Bricolage/Poppins de La órbita aunque reutilice el contrato funcional X-ray; jamás importa su tipografía histórica por defecto. La pieza cliente conserva su identidad. Una sala combinada mantiene el mismo marco al pasar de argumento a artículo, radiografía o video. QA exige ambos perfiles y la transición entre ellos.
+
+## Aprobación 2026-10-31 — el umbral
+
+El operador aprobó («Bien, aprobadas») la fila «El lado de Efeonce — lo que hicieron tus agentes» del canvas
+`https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`: `Actividad.dc.html`, `CrearSala.dc.html` y `ActividadMovil.dc.html`.
+
+- **Gesto propio de la administración:** el umbral. Una línea vertical separa «tu mesa» (papel) de una banda oscura
+  «Ya salió de tu mesa». Lo que un agente publica, invita o da cruza esa línea con un hilo; deshacer lo recoge y deja
+  su huella; un tope o un rechazo choca contra la línea. No usa la órbita: aquí lo que se mide es el cruce al cliente.
+- **Tipografía:** Bricolage para decir, con la regla de pesos en texto de varias líneas («Lo que hicieron **tus
+  agentes.**», «Pídeselo a **tu agente.**»); Poppins para explicar y operar.
+- **Agentes primero:** «Crear sala» ofrece primero pedírselo al agente y después el formulario manual.
+- Contratos: [wireframe](../wireframes/TASK-2085-rooms-agent-activity-surface.md) y
+  [motion](../motion/TASK-2085-rooms-agent-activity-surface-motion.md).

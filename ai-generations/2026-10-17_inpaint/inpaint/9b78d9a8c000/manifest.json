@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9b78d9a8c000",
+  "key": "9b78d9a8c000aef47d24874ee58ea40bafe1bf7365c28052213c2cb1984d36e1",
+  "status": "completed",
+  "createdAt": "2026-10-17T20:39:40.075Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/11b-ola-golpea-v6.png",
+    "imageSha256": "aa38cdbbbaac83904a729bb2a332e16054624a4d5b4bb7698352ad436be4de0c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/11b-texto-mask3.png",
+    "maskSha256": "da6c90e088f491e3b1bb49b1585431db19754c5f1a638adafb643e7067156e29",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "On the orange can, the small white text printed along the can, parallel to the big word BREAKR and reading in the same direction (bottom to top), says exactly ORANGE BREAK, complete, all eleven letters with a space (O-R-A-N-G-E B-R-E-A-K), small widely spaced bold capitals, ending before the top of the can, as on the reference can. Same tilt, droplets and light.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nOn the orange can, the small white text printed along the can, parallel to the big word BREAKR and reading in the same direction (bottom to top), says exactly ORANGE BREAK, complete, all eleven letters with a space (O-R-A-N-G-E B-R-E-A-K), small widely spaced bold capitals, ending before the top of the can, as on the reference can. Same tilt, droplets and light.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.002153778076171875,
+    "editable": 1415,
+    "soft": 1408,
+    "protected": 1307897
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 169,
+      "top": 245,
+      "width": 193,
+      "height": 252
+    },
+    "target": {
+      "width": 896,
+      "height": 1168
+    },
+    "aspectError": 0.0016298185941041818,
+    "reason": "la zona con contexto ocupa 3.7 % de la imagen: se genera recortada a 896x1168"
+  },
+  "estimate": {
+    "usd": 0.0406,
+    "basis": "1 × salida 896x1168 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 35.631,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -1,
+        "dy": -1,
+        "scale": 1,
+        "stillError": 18.85,
+        "bestError": 15.95,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1307897,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1415,
+        "maxDelta": 226,
+        "meanDelta": 55.449,
+        "worst": {
+          "x": 259,
+          "y": 355
+        }
+      },
+      "seam": {
+        "pixels": 1408,
+        "maxDelta": 191,
+        "meanDelta": 15.715,
+        "worst": {
+          "x": 289,
+          "y": 409
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1307897,
+        "maxDelta": 226,
+        "meanDelta": 0.787,
+        "worst": {
+          "x": 314,
+          "y": 433
+        }
+      },
+      "outputUsd": 0.0406,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 2752,
+        "input_tokens_details": {
+          "image_tokens": 2541,
+          "text_tokens": 211
+        },
+        "output_tokens": 1353,
+        "output_tokens_details": {
+          "image_tokens": 1353,
+          "text_tokens": 0
+        },
+        "total_tokens": 4105
+      },
+      "meta": {
+        "size": "896x1168",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

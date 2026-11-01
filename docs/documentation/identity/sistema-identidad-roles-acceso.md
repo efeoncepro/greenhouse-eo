@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.11
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: quien puede encargar, revisar y emitir informes de Efeonce Insights)
+> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -64,7 +64,7 @@ Un cliente tambien puede usar Greenhouse desde su asistente de IA, sin abrir el 
 
 Todo queda auditado y cualquier revocacion cierra el acceso en el siguiente chequeo del gateway. El grant revocable por organizacion y por persona ya existe (`greenhouse_core.external_capability_grants`, TASK-1631, 4 de septiembre de 2026); el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832).
 
-**El login del portal cliente no cambia:** los roles Cliente Ejecutivo, Manager y Especialista y su forma de entrar siguen igual. Unificar ambas puertas en una sola identidad es un paso posterior (TASK-1834).
+**El login del portal cliente no cambia:** los roles Cliente Ejecutivo, Manager y Especialista y su forma de entrar siguen igual. Unificar el login del portal con el issuer es posterior (TASK-2063); TASK-1834 entrega la foundation first-party y Rooms fue el primer consumidor acotado.
 
 > **Detalle:** [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md) (que es y como se comporta) y [Operar el binding de identidad externa](../../manual-de-uso/identity/operar-binding-identidad-externa.md) (paso a paso por API; en este slice no hay pantalla).
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Auth / Efeonce ID (living skill)"
+  short_description: "Operate and extend the native authorization server auth.efeonce.org (Cloud Run auth-server): first-party login, Login V4, invitation email OTP, RP registration, keys, flags, release and the Rooms canary. Program ledger with what is live, OFF and pending."
+  default_prompt: "Use $efeonce-auth before touching services/auth-server/**, src/lib/auth-server/**, scripts/auth-server/**, Auth flags or any EPIC-044 task (1833, 1834, 2063, 2064, 2067). Read references/program-ledger.md first. Turning an Auth flag ON is a production mutation. At closure update the ledger and mirror .claude/ <-> .codex/."
+
+policy:
+  allow_implicit_invocation: true

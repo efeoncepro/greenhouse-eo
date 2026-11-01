@@ -1,0 +1,13 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 public-website:wpcli /Users/jreye/Documents/greenhouse-eo
+> tsx scripts/public-website/wpcli-remote.ts -- --eval-file outputs/google-cloud-partner-blog-2026-10-25/publicar-post.php --input-file outputs/google-cloud-partner-blog-2026-10-25/publicar-config.json --wp-user 12
+
+{
+    "status": "publish",
+    "postId": 252108,
+    "url": "https://efeoncepro.com/novedades/efeonce-partner-google-cloud/",
+    "contentSha256": "ada3346789d766327d60ddc535d8b312d3e3210a4fbc23ae7987ec3a630b6e56",
+    "snapshot": "_gh_google_publish_before_252108_20261025",
+    "noindex": "2",
+    "bannerActive": false
+}

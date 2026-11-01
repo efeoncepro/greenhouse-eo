@@ -1,0 +1,22 @@
+{
+ "id": "S11-empapada",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn. Wide-angle 24mm, high-speed photography at 1/8000 s: a massive frozen arc of sparkling water, ice and orange slices erupts out of the open laptop on the table and crashes across the oak table onto Paula, wearing her cream fine-knit sweater over a white collared shirt, who is soaked mid-reaction, eyes squeezed shut, mouth open in shock, still holding her paper coffee cup; one fictional aluminum citrus drink can (abstract orange-and-teal wave label, no readable text) flies through the frame. Light: the whole room is now flooded with vivid, saturated orange and teal light pouring from the screens, warm sunlight breaking through the windows, punchy contrast, high energy. Dynamic diagonal composition, comic and spectacular.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "identidad": [
+  "paula"
+ ],
+ "lecho": "sin-lecho"
+}

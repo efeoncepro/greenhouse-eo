@@ -1,0 +1,11 @@
+{
+  "schema": "rooms-authoring-eval-run.v1",
+  "source": "fixture",
+  "caseId": "b-raiz-protector-solar",
+  "organizationId": "org-eval-local",
+  "roomId": "sala-raiz-2027",
+  "editionId": "ed-1",
+  "agentClientId": "claude-code",
+  "startedAt": "2026-10-30T14:00:00.000Z",
+  "capturedAt": "2026-10-30T14:07:00.000Z"
+}

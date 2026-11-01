@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a726b483ce6e",
+  "key": "a726b483ce6eb4219a424f9e3fa9b8723a8358c865aae7c10c2cc38490a30a4e",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:13:18.790Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates/S06-silencio.png",
+    "imageSha256": "99ee08c6ef8ac638e8936a8077a7d266223199c080f30c4c4bab6e101a037a15",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-tech/masks/S06.png",
+    "maskSha256": "ba812e4e522130badbff926984985c7c41b51b99baf80ef41712fa57751a3307",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the laptop inside the marked zone with an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly, open, its screen showing the same four-person video call grid. Keep the keyboard visible and the mug untouched. Photorealistic.",
+    "providerPrompt": "Replace only the laptop inside the marked zone with an ultra-thin current-generation premium laptop in space-grey anodized aluminum unibody, razor-thin lid, minimal edge-to-edge display bezels, precise machined edges, plain unbranded lid without stickers, matching the scene's light, perspective and scale exactly, open, its screen showing the same four-person video call grid. Keep the keyboard visible and the mug untouched. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.07737197875976562,
+    "editable": 81693,
+    "soft": 19720,
+    "protected": 1209307
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 43 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 50.954,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.31,
+        "bestError": 3.31,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1209307,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 81693,
+        "maxDelta": 199,
+        "meanDelta": 60.061,
+        "worst": {
+          "x": 542,
+          "y": 862
+        }
+      },
+      "seam": {
+        "pixels": 19720,
+        "maxDelta": 193,
+        "meanDelta": 13.227,
+        "worst": {
+          "x": 556,
+          "y": 818
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1209307,
+        "maxDelta": 184,
+        "meanDelta": 4.938,
+        "worst": {
+          "x": 699,
+          "y": 29
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1411,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 131
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2921
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

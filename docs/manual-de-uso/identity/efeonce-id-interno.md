@@ -28,8 +28,10 @@ para enrolamiento, permisos, revocación y rollback. No resolver errores creando
    de usuario). Microsoft por sí solo no se interpreta como segundo factor nativo en esta versión.
 
 La visibilidad del botón y su inicio de Microsoft se verificaron en el host público a 1440 y 390 px tras
-`21aa12608`. La nueva prueba humana completa desde `/login` directo hasta la confirmación de sesión
-sigue pendiente; el canary MCP anterior entró desde OAuth. La ruta local `/start` usada en pruebas era
+`21aa12608`. Ese corte histórico no incluía la nueva prueba humana directa; el canary MCP anterior entró desde OAuth.
+El 26 de octubre, el canary conjunto Rooms sí acreditó Microsoft/MFA y emisión/consumo first-party, sin ampliar
+la cohorte ni los permisos MCP. Quedó cerrado y first-party/OTP volvió a OFF. No generalizar esa evidencia
+a todos los clientes ni repetir el correo del canary. [Estado vigente](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26). La ruta local `/start` usada en pruebas era
 un helper temporal de verificación, no una pantalla del producto ni una URL para usuarios.
 
 Si el botón falta, soporte debe comprobar el flag interno y la revisión servida antes de pedirte

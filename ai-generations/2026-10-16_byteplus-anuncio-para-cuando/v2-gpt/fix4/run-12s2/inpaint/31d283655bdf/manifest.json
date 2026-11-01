@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "31d283655bdf",
+  "key": "31d283655bdf35b7368f03fd687b536918c5358d9fcf4746c05968c2a18c90ff",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:41:11.576Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/regen12/1/S12-paredes-c.png",
+    "imageSha256": "7861ec6b9ef493cc0a128b84589ece9760c3fd26658155fae456de05fcde43e2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/12s.png",
+    "maskSha256": "8cf8ae4f8a8165729fd5bef4a2fa7b6eb2b2d784cac30bffc451810b8e5f2099",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked screen content: the glowing wall screens show EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text) with orange slices and splashing water, in the same layout, perspective and glow as before. No words or letters. Keep the woman, her hair and everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked screen content: the glowing wall screens show EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text) with orange slices and splashing water, in the same layout, perspective and glow as before. No words or letters. Keep the woman, her hair and everything outside the zones unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.10687255859375,
+    "editable": 127279,
+    "soft": 12801,
+    "protected": 1170640
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 58 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 73.046,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.75,
+        "bestError": 2.75,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.25,
+        -1.47,
+        -1.85
+      ],
+      "protected": {
+        "pixels": 1170640,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 127279,
+        "maxDelta": 254,
+        "meanDelta": 79.306,
+        "worst": {
+          "x": 46,
+          "y": 131
+        }
+      },
+      "seam": {
+        "pixels": 12801,
+        "maxDelta": 242,
+        "meanDelta": 10.806,
+        "worst": {
+          "x": 76,
+          "y": 513
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1170640,
+        "maxDelta": 196,
+        "meanDelta": 5.501,
+        "worst": {
+          "x": 368,
+          "y": 165
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4327,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 262
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 5837
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

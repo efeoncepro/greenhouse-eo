@@ -4,7 +4,7 @@
  * no es Labs) NO lo reciben. Un grep de `use_improved_etv` no prueba esto; el payload real sí.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const providerMock = vi.fn()
 
@@ -19,6 +19,19 @@ vi.mock('@/lib/observability/capture', () => ({
 }))
 
 import { collectProspectMarketEvidence } from '../collect'
+
+// These fixtures run under the default `legacy` selector, valid only before the provider cutoff
+// (ETV_PROVIDER_CUTOFF_ISO, 2026-11-01). Pin the clock so the verdict does not flip when the wall
+// clock crosses it, as it did on 2026-11-01; post-cutoff behavior is covered by the policy tests.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-10-15T12:00:00.000Z'))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 
 const okResponse = () => ({ ok: true, httpStatus: 200, cost: 0.01, tasks: [{ status_code: 20000, result: [{ items: [] }] }] })
 

@@ -1,9 +1,9 @@
 # Public Site y Content Factory end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 2.0
+> **Version:** 2.1
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-07-15, despues del primer blogpost agentic publicado end to end
+> **Ultima actualizacion:** 2026-10-26 por Claude (solicitud de indexacion con el runner de Search Console)
 > **Modulo:** Public Site / WordPress / Astro / Content Factory
 > **Rutas/scripts principales:** `/admin/public-site`, `GET /api/admin/public-site/binding`, `pnpm public-website:*`, `docs/operations/public-site-*`
 > **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
@@ -82,6 +82,12 @@ DB agregada:
 - Aprueba la version final y la transicion a publico con una instruccion explicita.
 - Verifica layout/cache/SEO/HubSpot despues de cambios.
 - Conserva la decision sobre tesis, claims, fuentes, limites y criterio creativo aunque el agente ejecute la operacion.
+- Inicia una vez la sesion de Google en el Chrome dedicado para que un agente pueda pedirle a Google que rastree una
+  pagina recien publicada o cambiada. El agente solo la pide si Google no vio el ultimo cambio, con un tope de unas 10
+  por dia, y nunca escribe credenciales.
+
+> Detalle tecnico: [solicitar indexacion en Search Console](../../manual-de-uso/public-site/solicitar-indexacion-search-console.md)
+> y `scripts/public-website/gsc-request-indexing.mjs`.
 
 ## Fronteras importantes
 

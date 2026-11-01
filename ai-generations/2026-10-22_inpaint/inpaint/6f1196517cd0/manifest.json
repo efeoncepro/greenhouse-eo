@@ -1,0 +1,215 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "6f1196517cd0",
+  "key": "6f1196517cd056f00203098549090bd8ed9b63e247dddbef27fe38a432b2af22",
+  "status": "completed",
+  "createdAt": "2026-10-22T17:17:13.930Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/11a-ola-llega.png",
+    "imageSha256": "8580bf9b6d8d4849861eac01d957a0f03fd777ec2d293e0e8dba19d67041eff6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/mascara-11a-canon.png",
+    "maskSha256": "f7710d25e91b264fb880ede265582d8ba8d1b8112facd5a26c95275023913b39",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Edit only the marked zone of image 1. This is one frame from a real-time live-action film shot at 24 fps with a 180-degree shutter (1/48 s): fast water is motion-blurred.\n\nReplace the big radial splash, the upright can and all the floating droplets with this moment, the instant after the can and the water burst out of the laptop screen (the screen faces the woman; we see the back of the lid at the bottom centre):\n- A single low, fast tongue of water, about as wide as the laptop, pours over the TOP EDGE of the laptop lid and has already landed on the wooden table on her side. It races in ONE straight line up the frame, away from the camera, from the top edge of the lid toward the woman's chest. Its leading edge is about one fifth of the way to her: a white, aerated, foaming front a few centimetres high, with a clear refracting body behind it and thin sheets at its sides. Everything in the water is motion-blurred along that line (streaks pointing from the laptop toward her). The wood behind the water is darker and glossy where it is wet; the rest of the table is dry.\n- The BREAKR can from image 2 is inside the front of the water, low over the table, tumbling forward and tilted toward her, slightly motion-blurred along the same line; its orange body, teal band and white BREAKR lettering stay recognisable. A few orange slices are carried in the water.\n- Nothing else: no splash crown, no droplets hanging in the air, no spray beside her hands or near the man, no water on the camera side of the laptop, no water coming from the left or right, no glow or light under the can.\n- Where the splash used to cover her cream knit sweater and the background, restore them exactly as they would be: dry cream sweater, the office and glass partition behind her, the dark screen on the right wall.\nKeep the woman's face, hair, hands and cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zone of image 1. This is one frame from a real-time live-action film shot at 24 fps with a 180-degree shutter (1/48 s): fast water is motion-blurred.\n\nReplace the big radial splash, the upright can and all the floating droplets with this moment, the instant after the can and the water burst out of the laptop screen (the screen faces the woman; we see the back of the lid at the bottom centre):\n- A single low, fast tongue of water, about as wide as the laptop, pours over the TOP EDGE of the laptop lid and has already landed on the wooden table on her side. It races in ONE straight line up the frame, away from the camera, from the top edge of the lid toward the woman's chest. Its leading edge is about one fifth of the way to her: a white, aerated, foaming front a few centimetres high, with a clear refracting body behind it and thin sheets at its sides. Everything in the water is motion-blurred along that line (streaks pointing from the laptop toward her). The wood behind the water is darker and glossy where it is wet; the rest of the table is dry.\n- The BREAKR can from image 2 is inside the front of the water, low over the table, tumbling forward and tilted toward her, slightly motion-blurred along the same line; its orange body, teal band and white BREAKR lettering stay recognisable. A few orange slices are carried in the water.\n- Nothing else: no splash crown, no droplets hanging in the air, no spray beside her hands or near the man, no water on the camera side of the laptop, no water coming from the left or right, no glow or light under the can.\n- Where the splash used to cover her cream knit sweater and the background, restore them exactly as they would be: dry cream sweater, the office and glass partition behind her, the dark screen on the right wall.\nKeep the woman's face, hair, hands and cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.34850387573242186,
+    "editable": 397269,
+    "soft": 59522,
+    "protected": 853929
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0906,
+    "basis": "2 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 50.662,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.16,
+        "bestError": 6.16,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 853929,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 397269,
+        "maxDelta": 252,
+        "meanDelta": 55.27,
+        "worst": {
+          "x": 620,
+          "y": 682
+        }
+      },
+      "seam": {
+        "pixels": 59522,
+        "maxDelta": 187,
+        "meanDelta": 19.91,
+        "worst": {
+          "x": 398,
+          "y": 850
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 853929,
+        "maxDelta": 211,
+        "meanDelta": 11.969,
+        "worst": {
+          "x": 862,
+          "y": 774
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3350,
+        "input_tokens_details": {
+          "image_tokens": 2785,
+          "text_tokens": 565
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4860
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 49.941,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.42,
+        "bestError": 6.42,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 853929,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 397269,
+        "maxDelta": 252,
+        "meanDelta": 54.981,
+        "worst": {
+          "x": 338,
+          "y": 813
+        }
+      },
+      "seam": {
+        "pixels": 59522,
+        "maxDelta": 228,
+        "meanDelta": 16.306,
+        "worst": {
+          "x": 527,
+          "y": 794
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 853929,
+        "maxDelta": 210,
+        "meanDelta": 9.174,
+        "worst": {
+          "x": 888,
+          "y": 764
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3350,
+        "input_tokens_details": {
+          "image_tokens": 2785,
+          "text_tokens": 565
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4860
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

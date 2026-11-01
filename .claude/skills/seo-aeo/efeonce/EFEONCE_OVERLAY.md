@@ -103,6 +103,13 @@
   búsqueda dicha como la diría una persona. Canon:
   [estrategia de love brand §8.2–§8.3](../../../../docs/strategy/EFEONCE_LOVE_BRAND_AND_COMMUNITY_STRATEGY_V1.md) +
   [PDR-020, delta 2026-10-22](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md).
+- **`Person` del autor en efeoncepro.com (verificado en producción 2026-10-24, TASK-2057).** El nodo lo emite
+  **Yoast**; el lector `EO_Author_Profile` (`efeonce-editorial-blocks`) alimenta con los mismos datos la ficha, el
+  byline y la cabecera de `/author/`: `jobTitle` = Yoast Premium `wpseo_user_schema.jobTitle`, foto de One User Avatar
+  (nunca Gravatar), `knowsAbout` = categorías con posts. Las **redes visibles son el `sameAs`**, en el mismo orden;
+  nunca divergen. `wpseo_schema_person` sólo reescribe `worksFor` al `@id` `#organization`. Tras cambiar foto o cargo,
+  **reconstruir el indexable de autor de Yoast** y purgar, o `/author/` sigue con el `og:image` viejo. Operación:
+  `efeonce-public-site-wordpress` → `references/blog-home-operation.md` (delta «Author card + byline»).
 - **NUNCA** exponer la marca/nomenclatura del portal interno (Greenhouse, "EO",
   Nexa, etc.) en copy SEO público salvo decisión GTM explícita.
 - **NUNCA** publicar salida del AI Content Factory sin pasar information gain +

@@ -2,7 +2,9 @@
 
 ## Estado vigente para agentes
 
-[Rooms](docs/architecture/rooms/README.md): creativo/SEO-AEO; sin go.
+[Rooms: estado y próximos pasos](docs/architecture/rooms/README.md).
+
+[Auth: estado vivo y correcciones retenidas en PR](.codex/skills/efeonce-auth/references/program-ledger.md).
 
 [Factory](docs/services/factory/README.md): On-Demand.
 
@@ -24,7 +26,7 @@ CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 Next.js 16/MUI 7/Vuexy/TS · `Handoff.md` · historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Prospección: permisos y evidencia](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[B2B: permisos y Primary](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
 [CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
 [Outlook](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica siempre.
 [Customer Agent: llamadas](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).
@@ -160,13 +162,13 @@ Footer: [estado](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 4. `docs/context/00_INDEX.md` si el trabajo afecta producto, negocio, marca, GTM, onboarding, HubSpot, métricas o experiencia cliente.
 5. Lo que indique ese router (§`Contexto por dominio`).
 
-No leer snapshots completos de arranque. Buscar en ellos por keyword solo para investigación histórica.
+Snapshots: buscar por keyword para historia; no cargarlos al arrancar.
 
 ## Identidad y alcance del repo
 
-- Este repo es el `starter-kit` Greenhouse; `full-version` es referencia visual/funcional, no source of truth ni producto activo. Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
+- Repo activo: Greenhouse `starter-kit`; `full-version` sólo referencia visual/funcional. Greenhouse es plataforma/subproducto de Efeonce; `EO` abrevia el repo, nunca el producto.
 - El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Cada provider conserva policy y contratos; los manifiestos Greenhouse de tools/skills son SSOT (TASK-1780/1804).
-- Greenhouse, `auth.efeonce.org` y MCP aíslan cookies, sesiones y audiencias, pero resuelven un `identity_profile` y Account 360 con bindings auditados. Cada producto entra en su contexto: un first-party puede reutilizar sesión con assurance; MCP y terceros conservan consentimiento por cliente/scope y step-up. No nace otra identidad.
+- Greenhouse, Auth y MCP separan cookies/sesiones/audiencias y comparten `identity_profile`/Account 360 mediante bindings auditados. First-party reutiliza sesión con assurance en su contexto; MCP/terceros exigen consentimiento por cliente/scope y step-up. Sin identidad paralela.
 - EPIC-044: emisor `auth.efeonce.org`, OAuth/sesiones y gateway multi-issuer. SSO no concede MCP; grants, `gv` y tokens se revalidan antes del dispatch. TASK-1844 gobierna v2 interna ([manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md)). Canary TASK-1832 retirado; TASK-1841 separa el piloto real. Nuevas corridas: [runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md). Contratos: [entrada/consentimiento](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) y [autoridad interna](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
 - MCP: cargar `efeonce-mcp-platform` + skill del provider antes de cambiar OAuth. Superficies hospedadas pueden compartir DCR/familia; observación read-only, negativos por timestamp + DCR run-owned + familia revocada.
 - Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?), ejes ortogonales atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765` el de desenlaces en seis; `HIRING_PIPELINE_STAGES` (cinco) es el subconjunto escribible por un cambio de etapa —`closed` no está: cerrar exige declarar el desenlace— y `TERMINAL_APPLICATION_STAGES` es la fuente única de lo terminal. **Un contract de enum se aplica DESPUÉS del release que retira sus escritores, nunca antes**, y la alcanzabilidad de un valor se deriva del contrato de la superficie desplegada, jamás del conteo de filas (`ISSUE-161`). El contract de etapas está escrito y **pendiente de aplicar** al 2026-08-23.

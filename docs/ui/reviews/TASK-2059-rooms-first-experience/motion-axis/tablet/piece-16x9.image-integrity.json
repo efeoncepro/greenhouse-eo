@@ -1,0 +1,19 @@
+{
+  "source": {
+    "width": 972,
+    "height": 547,
+    "objectFit": "contain"
+  },
+  "geometry": {
+    "x": 39,
+    "y": 113.55058288574219,
+    "width": 946,
+    "height": 532.4062652587891
+  },
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "expectedRatio": 1.7777777777777777,
+  "note": "The loaded photograph is fully contained; source integer dimensions may differ slightly from the nominal print ratio."
+}

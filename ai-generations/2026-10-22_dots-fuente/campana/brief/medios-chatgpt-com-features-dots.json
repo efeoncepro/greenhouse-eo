@@ -1,0 +1,1039 @@
+{
+  "url": "https://chatgpt.com/features/dots",
+  "dom": {
+    "title": "Dots: agentes siempre activos diseñados para encargarse de todo | ChatGPT",
+    "iframes": [
+      "https://player.vimeo.com/video/1231177365?h=bc1cde7d20&amp%3Bbadge=0&amp%3Bautopause=0&amp%3Bplayer_id=0&amp%3Bapp_id=58479&controls=0&keyboard=0&background=0&autoplay=0&autopause=0&muted=1&loop=1"
+    ],
+    "videos": [
+      "https://videos.ctfassets.net/8su2tbn87fck/4UPWCoqlRwOBjH2d2KylTT/1f87a3308cb8974bf6f736652869c64d/dots-intro-updated-light-500x380-srgb.mp4"
+    ],
+    "posters": [],
+    "imgs": [
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6bOZMmGgntTC2XvtbGgBxZ/5ed7a3900b567a83f4f31707f97108d4/dots-o-icon-updated.svg",
+        "alt": "",
+        "w": 81
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+        "alt": "",
+        "w": 253
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/PulStHeDuz5begF06sEwk/c2080ae53243122046ba61074a5f0bd2/dots-o-updated.svg",
+        "alt": "",
+        "w": 81
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/50i8QJ5a9eoNSc9ZtS9ya/b072f59b9ab0cba2d56dd06b25d6cd3a/bento_context_desktop.png?w=1600&q=80&fm=webp",
+        "alt": "Ayuda a los dots a conocerte",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/vm9beTwJGGdS6sYJr5hPY/2e10b211c0ebb1fa0ab260cf07b1a585/background-yellow.webp",
+        "alt": "",
+        "w": 1340
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2kwlbZWY4IB07wLuIZZlgf/79d5b1eda84c514c0084eeffc2f7353a/conn-calendar.webp",
+        "alt": "",
+        "w": 128
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/53qzxIW4wHksFjIXH2jpb4/7de0561232db88bf043ac17c8698ab44/conn-google-drive.svg",
+        "alt": "",
+        "w": 22
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3WZhL2oaoVSoRRK7hxpQWD/af515eb8c145b0861eef099f4edb51f3/conn-github.svg",
+        "alt": "",
+        "w": 21
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/5ty2cS5qgMN6q9jJLh3D33/316b6c90e11748a187f3a3216394dcc1/conn-chart.svg",
+        "alt": "",
+        "w": 21
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4NUuskZIIhfZgMFr6I2u39/4a2f5e67f9210a3d89f56c3f7239b336/conn-arrow.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7iW1Ac2P89g0yxH0FCHmoU/384d62f2cae13009f732695045a89d50/conn-mascot-shadow.svg",
+        "alt": "",
+        "w": 80
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/01IljkfRcE66E5J65CNKzg/c69de85bc24233ede69d1464e8c1a5ed/conn-mascot.webp",
+        "alt": "",
+        "w": 512
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/koe4nuXekXUfuUGqiAPCS/d8985552b4a8b25fd758373a7e3e4953/bento_goal_desktop.png?w=1600&q=80&fm=webp",
+        "alt": "Dale un objetivo y deja que se ponga en marcha",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4XaAlD355j66DehZ5G8m2u/c3544856fd3697dd57c7f40668b188f7/background-coral.webp",
+        "alt": "",
+        "w": 1340
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/krYbiRGRNkGVOZPZZsJEy/82d79193eed2c47539cef97bf2b45f41/task-mobile-close.svg",
+        "alt": "",
+        "w": 9
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/5qJEsZAhqGiIsT4vBWdj5l/17e32c5fdca7747f70bb50063c34dd71/task-analysis.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/5vpH4v768iirixvfo4gIBl/a9d22876e7efe625709aaff13115a288/task-figures.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1O872C7ocBcJSfVPVrbipg/975a3263cc009547f482dbf4e5e25c54/task-investigate.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3uqs5gN4p8Xjn3rxlxZx3e/70a8d769f0fbb48ec76234522d47bcca/task-shadow.svg",
+        "alt": "",
+        "w": 80
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7DwH3EwJpdUOfkR6NIyE6G/aefceca53ad0e19b084a3b704834dba3/task-coral.webp",
+        "alt": "",
+        "w": 512
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2UenoB4icVfK7r35auO4LN/4290e725bda7808afa06c15fb933d686/task-cursor.svg",
+        "alt": "",
+        "w": 42
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7sLw60Ad3BnEVY3R6FgEWo/d58e8a18574623a85f77b5739013ef55/task-mobile-cursor.svg",
+        "alt": "",
+        "w": 33
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/byC4pIbhVixyfSwo7NBMs/64d3250c7e3553755536b97556bcd08a/task-revise.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/291oHna084AnrSjthpCEkF/875b031429914286c6ee64b4fd4a355c/task-flag.svg",
+        "alt": "",
+        "w": 41
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4TAsXhe1ixhz65QXIhrKH/fa63f1864044e825ffee5807ac836386/4079-17313.png?w=1600&q=80&fm=webp",
+        "alt": "Felipe comparte una presentación para la reunión del consejo, recibe comentarios y devuelve la presentación actualizada.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6BlQ03SKVgagwBLcirGu5W/1ad6f98dc76b49b35f86ca716aa83ddf/background-blue.webp",
+        "alt": "",
+        "w": 1340
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4ndZLycQ7APQ5VYIe8Y7fs/2f5d3572db42dde5288fbbdd5a417cab/phone-pdf.svg",
+        "alt": "",
+        "w": 20
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7Bc3g5GB4bqFyUlvMfdqr1/fdf769ad4ea1fa870abc3a0747d1b61a/phone-menu.svg",
+        "alt": "",
+        "w": 16
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6kMMqU0LxkrHiWLndxcBxA/1c71b3d39e26f1f58ec68a5218371e5b/phone.svg",
+        "alt": "",
+        "w": 24
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/66OJaUa6aI1cVRDGoTtwOD/abfa54ac67a6c5cf10baf9fcf3dcf064/phone-felipe.webp",
+        "alt": "",
+        "w": 256
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/qHg42T5d8zuxVEdYKF8zq/e29a03d544b0108ed168ad81e3add142/bento_work_desktop.png?w=1600&q=80&fm=webp",
+        "alt": "Lleva los dots al trabajo",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6dZafg0p5yh5U4nZjUClrL/47e475d75a62d5940fc6f1b7953fbbc6/background-pink.webp",
+        "alt": "",
+        "w": 1340
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2eejxNPvYAcrfWPh9xFD1z/662e67a1656e6500214a98e62d7935e5/slack-chevron.svg",
+        "alt": "",
+        "w": 20
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/exEYeZZy45Mz5C5jha0jG/082b904f9752ae491cb57aac5a1595f4/slack-huddle.svg",
+        "alt": "",
+        "w": 18
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3UpFV0dCAPKvyh2I8I9HRC/b97bf99ae45c49bfd6517463865e1821/slack-note.svg",
+        "alt": "",
+        "w": 17
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1DaY6SaVHtZa0O8F0ceSzM/833241001246d1d68ac6009d70a7c758/slack-dot.svg",
+        "alt": "",
+        "w": 3
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1DaY6SaVHtZa0O8F0ceSzM/833241001246d1d68ac6009d70a7c758/slack-dot.svg",
+        "alt": "",
+        "w": 3
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1DaY6SaVHtZa0O8F0ceSzM/833241001246d1d68ac6009d70a7c758/slack-dot.svg",
+        "alt": "",
+        "w": 3
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3AuXvHiHCdx67xzI74Qqzv/87f1cadc1b835aff415d5f9d0bb86632/slack-close.svg",
+        "alt": "",
+        "w": 24
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6hUI4dCoiVLgHf3klgtoSN/be2ca2305817ceb05d2e7c4c23c84694/slack-trevor.webp",
+        "alt": "",
+        "w": 171
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/JyJg7DG0Va0E1CpAfgHOs/5307b48417c36048a97d41405e0ac5b9/slack-jojo.webp",
+        "alt": "",
+        "w": 256
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/36gII9e2twsDB9bfkiazIE/4533f1c0eeed3874437a09ee76c0ea96/slack-cellular.svg",
+        "alt": "",
+        "w": 7
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2ObV4PfmqvAP5e2i2cTeWv/1a6257a587701b45a4834b418f57f699/slack-wifi.svg",
+        "alt": "",
+        "w": 6
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/uiEWWERSEoXJ13h406lq8/d250a10eefb749ea144a4c6c0cb7b09c/slack-battery.svg",
+        "alt": "",
+        "w": 10
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2osB994PJkmXEm4YZWwkC4/edbdd1a06f0935cef5fe464873f92654/slack-video.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3fNUnk24QujYYXf1aPERWu/ef0c041a3625405d24ddf7cf7f1260c9/work-mobile-cellular.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4icJYpE4rtlx5SpGbdVbBo/2ca49dbbeca99c0ff46d971ce2ca6fe7/work-mobile-wifi.svg",
+        "alt": "",
+        "w": 4
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/zNUyKrAKcKEw9tvsz7e91/bff8ff902c9a4d44f8f7c2f312a34305/work-mobile-battery.svg",
+        "alt": "",
+        "w": 7
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2osB994PJkmXEm4YZWwkC4/edbdd1a06f0935cef5fe464873f92654/slack-video.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/33olU5wly2tSkTZG80SinQ/f7e92e903cf6df320d30e64c9730ed62/work-mobile-back.svg",
+        "alt": "",
+        "w": 3
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1yzPscqgJD2CR5kXvdmm4Q/f583412a79a277a3b85dae1ea7309aa9/work-mobile-download.svg",
+        "alt": "",
+        "w": 4
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2CDnlup3cabog2Ow2uZEbT/9c3dfa0cc48f88ba01096e1d69413965/work-mobile-share.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6M9Ozv5zglCuxmpAjvZmwt/f74de2e36ce041c6e8ad1b61c70d471d/work-mobile-play.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3v8OSrI0g62u82shauAg3R/fba1a7bf569adf595a36e147d3930e4a/work-mobile-undo.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3iWEZ1Zr5ISvUjCWJJfVyy/8e142b3f3acf7237acaa19510e375754/work-mobile-redo.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7oS0iFJLYwG60wXcTgol28/d336e7632eba305b5e053e993d21c599/work-mobile-expand.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2lMo24PZw8BzwlXML7bNZM/6a3f507261b37666bfe1fe08c30abe06/work-mobile-ticks.svg",
+        "alt": "",
+        "w": 79
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bUznKA91OwTqLaNG2SyQJ/decbf57a0b04c1f0438f70a3e1a04050/work-mobile-camera.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/wGRMdS5f2jTezdLlEpB3o/dfc8f426f3d826fc2cb2f9e0b2210318/work-mobile-speaker.svg",
+        "alt": "",
+        "w": 5
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7cY1YM58mKXSgxLlhX9JNc/13b59798a36c47a2af3c259be4dcf410/work-mobile-microphone.svg",
+        "alt": "",
+        "w": 4
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3gecrSIgTlxMpKlyUe75Dg/97c2505e1344d66ebe5a2afbdf8c6fb0/work-mobile-clip-one.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2osB994PJkmXEm4YZWwkC4/edbdd1a06f0935cef5fe464873f92654/slack-video.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3la3XRGaOXiNcojDsvGB6u/ab9530b835f47fd59e8525bb149471b3/work-mobile-clip-three.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4Q0fwHiTe5WbJwXoT1mpLQ/f3d8edcad194b8287f60d5b87899bb7f/work-mobile-clip-four.webp",
+        "alt": "",
+        "w": 640
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/6ZyJlzu9gBBN7Wps7DFMQv/bc4bb81b8d0ed00c140ba33b0c6b8f2a/work-mobile-audio-wave.svg",
+        "alt": "",
+        "w": 77
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1lmCJqcw2XYNj0HGglO4jT/89d4d6144ecfbf419f7f518a2e655000/work-mobile-voice-wave.svg",
+        "alt": "",
+        "w": 77
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1M08dPImSQolGO9dLrlj4y/9c0ee1a1e6340c962b4dd628acadc132/work-mobile-playhead.svg",
+        "alt": "",
+        "w": 0
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2BbMaHBPOJbXjclEvr06lo/9a25230e4197b120b7d85b251d07bcc6/work-mobile-playhead-tip.svg",
+        "alt": "",
+        "w": 3
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7HTUHvXdI3Kai0r3ep0yKc/547411806a082ad3bff4fed18c83b3a6/4079-19896.png?w=1600&q=80&fm=webp",
+        "alt": "Felipe revisa los resultados del producto y los ingresos mientras actualiza una presentación para inversores.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2FlIHHbj9R6qmFVEEE6O3k/fcd04ef0e70971224334da2563071e7f/4079-20100.png?w=1600&q=80&fm=webp",
+        "alt": "Alfred contrasta una solicitud de propuesta de un cliente con los detalles del producto y prepara un plan de evaluación.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2HokIgyhpqwi4hRGh15CFw/f2e1f3b15fd4ea8d62245e9d6e67bfd9/4079-19587.png?w=1600&q=80&fm=webp",
+        "alt": "Todd hace seguimiento de la migración de una API, con dos pull requests que superan las pruebas y un cambio incompatible que revisar.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2hwJCxoqhgGSVNtU7SCh37/f77711b585825d8a8538d30db5a80b96/4079-22526.png?w=1600&q=80&fm=webp",
+        "alt": "Jojo convierte los comentarios de los clientes en una mejora probada del editor de vídeo.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2uwRp65jmCcvxD4yhgJgcr/970d792ba412cd5a454dfd3146da8ca0/4079-26650.png?w=1600&q=80&fm=webp",
+        "alt": "Iggy redacta notas del programa y publicaciones para redes sociales a partir de una transcripción para su revisión.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+        "alt": "",
+        "w": 253
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7bABBCqcN7npYogSgYypTn/99530f860f3bf1dc0fab6715eb6f3c6c/dots-reaction-check.png",
+        "alt": "",
+        "w": 80
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+        "alt": "",
+        "w": 253
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7bABBCqcN7npYogSgYypTn/99530f860f3bf1dc0fab6715eb6f3c6c/dots-reaction-check.png",
+        "alt": "",
+        "w": 80
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+        "alt": "",
+        "w": 253
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+        "alt": "",
+        "w": 359
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/2q4eWEx7X4T6OTAITzoRzN/d1d1d8da8d5e1a49622698a3be4fcd9f/heart.png",
+        "alt": "",
+        "w": 150
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+        "alt": "",
+        "w": 359
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+        "alt": "",
+        "w": 359
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+        "alt": "",
+        "w": 359
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+        "alt": "",
+        "w": 359
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/PulStHeDuz5begF06sEwk/c2080ae53243122046ba61074a5f0bd2/dots-o-updated.svg",
+        "alt": "",
+        "w": 81
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/5c6KF403NZydjgJI4JRL6V/a51c63d6e728559d5c6069fa3169e0ff/poster-felipe.webp",
+        "alt": "",
+        "w": 236
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+        "alt": "",
+        "w": 253
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/7CWQv0rfN2pMgFb84Q2bC3/f58361d25e71dbaaf21aa91ff1ffa459/poster-iggy.webp",
+        "alt": "",
+        "w": 265
+      },
+      {
+        "src": "https://images.ctfassets.net/8su2tbn87fck/4YflfkDn7xUsAN4No5LsNf/92ae64f016cfc1efc70745c73029ce6c/poster-todd.webp",
+        "alt": "",
+        "w": 276
+      }
+    ],
+    "links": [
+      "https://chatgpt.com/es-ES/features/dots/",
+      "https://chatgpt.com/es-ES/features/dots/#dots-top",
+      "https://chatgpt.com/es-ES/features/dots/#how-it-works",
+      "https://chatgpt.com/es-ES/features/dots/#use-cases",
+      "https://chatgpt.com/es-ES/features/dots/#get-dot",
+      "https://www.chatgpt.com/auth/login?next=%2Fdots",
+      "https://chatgpt.com/es-ES/features/dots/#how-it-works",
+      "https://chatgpt.com/es-ES/features/dots/#use-cases",
+      "https://chatgpt.com/es-ES/features/dots/#get-dot",
+      "https://www.chatgpt.com/auth/login?next=%2Fdots",
+      "https://chat.openai.com/app/dots",
+      "https://openai.com/es-ES/index/how-we-build-safety-security-and-privacy-into-dots/",
+      "https://help.openai.com/en/articles/20001530",
+      "https://www.chatgpt.com/auth/login?next=%2Fdots",
+      "https://chat.openai.com/app/dots",
+      "https://www.chatgpt.com/auth/login?next=%2Fdots",
+      "https://chat.openai.com/app/dots",
+      "https://x.com/chatgpt",
+      "https://www.youtube.com/OpenAI",
+      "https://www.linkedin.com/company/openai/",
+      "https://www.instagram.com/chatgpt/",
+      "https://www.tiktok.com/@chatgpt"
+    ],
+    "text": "Acerca de nosotros\nFunciones\nAprender\nCodex\nBusiness\nPrecios\nDescargar\nIniciar sesión\nRegistrarse gratis\nDots\nCómo funciona\nCasos de uso\nDisponibilidad\nCrea tu dot\nTe presentamos los dots\n\nAgentes con capacidades extraordinarias, siempre activos y diseñados para encargarse de todo, con la tecnología de GPT-6 Astra.\n\nCrea tu dot\nDescarga ChatGPT para macOS\nReproducir\nEmpieza con dots\n\nPiensa en tu dot como una extensión de ti. Aprende cómo trabajas, detecta lo que necesita atención y usa su propio ordenador para hacer avanzar tus proyectos.\n\nGoogle Calendar\nAyuda para organizar y coordinar\nGoogle Drive\nDrive, Documentos, Hojas de cálculo o Presentaciones\nGitHub\nClasificar pull requests, incidencias, CI y publi...\nGráficos\nCrear, editar y corregir diagramas\nTu dot trabaja a tu manera\n\nTu dot parte del contexto de tu memoria de ChatGPT. Usa Codex y tus herramientas conectadas para encargarse de las tareas. Tú eliges a qué aplicaciones puede acceder, en qué debe centrarse y cómo te gusta que se hagan las cosas.\n\nEn curso\nRepetir el análisis\nAnálisis de nuevos datos\nActualizar figuras\nActualización de las figuras del artículo\nInvestigar resultados inesperados\nEjecución programada\nRevisión de nuevos hallazgos\nProgramado\nRevisar la explicación\nActualizar el texto de apoyo\nSeñalar hallazgos para su revisión\nPreparar cambios para su revisión\nPon una responsabilidad en sus manos\n\nDelega un gran proyecto o una tarea más pequeña para quitarte trabajo de encima. Tu dot toma la iniciativa para determinar los próximos pasos y sigue avanzando entre conversaciones. Te presenta el trabajo para que lo revises y las decisiones que requieren tu criterio.\n\nTu presentación para la reunión del consejo está lista. El uso del producto sigue creciendo y los ingresos han aumentado un 51 % interanual.\n\nVale, está bien salvo por una cosa: cámbialo para que la experiencia del consumidor vaya primero y después entren las cifras de crecimiento.\n\nTu presentación ya está actualizada.\n\nBoard_Meeting_Deck\nDe Felipe\nFelipe\nTú tienes el control\n\nConsulta en qué está trabajando tu dot, revisa los detalles y dale tu opinión. Cambia de rumbo o ponlo en pausa cuando quieras.\n\n#proj-editor-migration\nTrevor Hall\n09:03\n\nLas tasas de error se mantienen estables.\n\nJojo\nAGENTE\nAhora mismo\n\n¡Hola, equipo! Ya están los últimos resultados, listos para revisar. No haré ninguna actualización hasta que se aprueben.\n\n11:30\nNovedades del proyecto\n30 fps · 02:43\nLleva tu dot al trabajo\n\nTu dot puede ayudarte dondequiera que trabajes. Tú gestionas sus permisos y decides cuándo puede actuar por su cuenta o necesita tu aprobación.\n\nContacta con ventas\nPara los días en los que no paras\n\nLos dots te ayudan a hacer más espacio en tu vida para lo que importa. Descubre qué puede suponer eso para tu trabajo.\n\nExplorar\n\nLleva tus proyectos hasta el final\n\nEres responsable de finanzas y estás preparando una actualización para inversores. Tu dot hace seguimiento del uso del producto y de los ingresos, señala los cambios y actualiza tu presentación. Con tu visto bueno, comparte las últimas cifras con tu equipo y actualiza los materiales relacionados para que todo concuerde.\n\nProtege tu atención\n\nPara un responsable de ventas, cerrar un acuerdo con una gran empresa implica gestionar muchos detalles técnicos. Tu dot contrasta los requisitos del cliente con los correos y la documentación del producto, señala qué hay que probar y prepara un plan de evaluación actualizado para revisar.\n\nUne todas las piezas\n\nComo ingeniero, necesitas migrar los servicios de tu empresa que dependen de una API antes de que deje de funcionar. Tu dot identifica las dependencias, prepara código y pruebas para que los ingenieros los revisen y hace seguimiento de las llamadas restantes hasta que llegan a cero.\n\nHaz que todo siga avanzando\n\nEres desarrollador y estás creando una aplicación. Tu dot revisa los comentarios de los clientes en busca de peticiones y luego define, desarrolla y prueba mejoras. Puedes seguir desarrollando la próxima gran función mientras esas pequeñas correcciones avanzan.\n\nAutomatiza tus flujos de trabajo\n\nSi creas contenido, tu dot aprende tu estilo y conoce a tu audiencia, encuentra momentos de entrevistas para crear clips y redacta notas del programa y publicaciones para redes sociales que tú apruebas. Aplica tus cambios a todos los materiales y aprende qué conecta con tu audiencia para mejorar la siguiente tanda.\n\nDe tu lado, bajo tu control\n\nLos dots funcionan con GPT-6 Astra, nuestro modelo más alineado, con protecciones de seguridad y privacidad activadas por defecto.\n\nLearn more\nProtecciones integradas\n\nLos dots amplían las protecciones de ChatGPT con medidas que ayudan a defenderse de instrucciones maliciosas y a detectar comportamientos potencialmente dañinos.\n\nTus límites\n\nLos dots trabajan en sus propios ordenadores en la nube. Elige qué aplicaciones conectar, gestiona sus permisos y decide si quieres conectar tu ordenador. Configura reglas personalizadas para permitir acciones concretas, exigir aprobación o bloquearlas.\n\nComprobaciones que importan\n\nLas acciones que puedan afectar a tus cuentas o compartir información pasan por una revisión automática para comprobar que cumplen tus instrucciones, las reglas personalizadas y los requisitos de seguridad. Algunas necesitan tu aprobación. Pasos como cambiar tu contraseña siguen en tus manos.\n\nUn día con tu dot\n\nDesde tu primera reunión hasta la cena a domicilio, descubre cómo encaja tu dot en tu día.\n\nHe actualizado tu presentación con las posibles causas de la caída de clientes recurrentes. He señalado lo que aún tenemos que averiguar y añadido algunas opciones para que las valores.\n\n1\n2\n:\n3\n0\n\nEn el trabajo\n\nBorda tu próxima presentación\n\nLas ventas suben, pero cada vez menos clientes vuelven a comprar. Tu dot contrasta las cifras con los comentarios de los clientes, investiga qué ha cambiado y actualiza tu presentación para la dirección. A medida que llegan nuevas cifras, lo mantiene todo al día.\n\nJ"
+  },
+  "medios": [
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/PulStHeDuz5begF06sEwk/c2080ae53243122046ba61074a5f0bd2/dots-o-updated.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "501"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7bABBCqcN7npYogSgYypTn/99530f860f3bf1dc0fab6715eb6f3c6c/dots-reaction-check.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "4476"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2q4eWEx7X4T6OTAITzoRzN/d1d1d8da8d5e1a49622698a3be4fcd9f/heart.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "16727"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7CWQv0rfN2pMgFb84Q2bC3/f58361d25e71dbaaf21aa91ff1ffa459/poster-iggy.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "13308"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1kV9mVs6c09GY7Fd6Kqe0Y/4cd80b14db0c087697481458a833005e/poster-alfred.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "13326"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/5c6KF403NZydjgJI4JRL6V/a51c63d6e728559d5c6069fa3169e0ff/poster-felipe.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "10500"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4YflfkDn7xUsAN4No5LsNf/92ae64f016cfc1efc70745c73029ce6c/poster-todd.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "12382"
+    },
+    {
+      "u": "https://chatgpt.com/cdn/assets/sprites-core-635c4587.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://chatgpt.com/cdn/assets/sprites-external-e813c99f.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/50i8QJ5a9eoNSc9ZtS9ya/b072f59b9ab0cba2d56dd06b25d6cd3a/bento_context_desktop.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "30726"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/koe4nuXekXUfuUGqiAPCS/d8985552b4a8b25fd758373a7e3e4953/bento_goal_desktop.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "38806"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4TAsXhe1ixhz65QXIhrKH/fa63f1864044e825ffee5807ac836386/4079-17313.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "45086"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7HTUHvXdI3Kai0r3ep0yKc/547411806a082ad3bff4fed18c83b3a6/4079-19896.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "57258"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/qHg42T5d8zuxVEdYKF8zq/e29a03d544b0108ed168ad81e3add142/bento_work_desktop.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "41710"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2HokIgyhpqwi4hRGh15CFw/f2e1f3b15fd4ea8d62245e9d6e67bfd9/4079-19587.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "46384"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2FlIHHbj9R6qmFVEEE6O3k/fcd04ef0e70971224334da2563071e7f/4079-20100.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "41180"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2uwRp65jmCcvxD4yhgJgcr/970d792ba412cd5a454dfd3146da8ca0/4079-26650.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "70372"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2hwJCxoqhgGSVNtU7SCh37/f77711b585825d8a8538d30db5a80b96/4079-22526.png?w=1600&q=80&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "58888"
+    },
+    {
+      "u": "https://chatgpt.com/cdn/assets/favicon-l4nq08hd.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://videos.ctfassets.net/8su2tbn87fck/4UPWCoqlRwOBjH2d2KylTT/1f87a3308cb8974bf6f736652869c64d/dots-intro-updated-light-500x380-srgb.mp4",
+      "ct": "video/mp4",
+      "status": 206,
+      "len": "356920"
+    },
+    {
+      "u": "https://chatgpt.com/cdn/assets/noise-watercolor-m3j88gni.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "33578"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206457710-eb21b0670a819d91949620fc76c6dc46e0c5725b66da0f441ac42ab522f87794-d?mw=80&q=85",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "674"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206457710-eb21b0670a819d91949620fc76c6dc46e0c5725b66da0f441ac42ab522f87794-d?mw=2000&mh=1128&q=70",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "11539"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MTAyMi03NzIxNw/avf/e652de55-5330-43a2-9028-a56667fe4487.mp4?pathsig=8c953e4f~GNW0SnSaV4i0v4rEhTUggWxUTji3Hxk4jx6tzrBHbI0&r=dXM%3D&range=1022-77217",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "76196"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MTEyNS0xOTY0NTU2/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~cNES-MPIHjxT-JWnEmpVfmaVtU5JvuAZYBmSLWT6mSI&r=dXMtY2VudHJhbDE%3D&range=1125-1964556",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "1963432"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9NzcyMTgtMTUzMjI1/avf/e652de55-5330-43a2-9028-a56667fe4487.mp4?pathsig=8c953e4f~zKgeFszJaFgWS2QJkVF2kNC6gtA4J7GkznQvSB5hCRM&r=dXM%3D&range=77218-153225",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "76008"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MTk2NDU1Ny00MjI0NTcx/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~IYaxAFLaDEpncPfnB9ujLGD1qReatKfggfRDHnjePBI&r=dXMtY2VudHJhbDE%3D&range=1964557-4224571",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "2260015"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MTUzMjI2LTIyOTIzNQ/avf/e652de55-5330-43a2-9028-a56667fe4487.mp4?pathsig=8c953e4f~kW6RlDC07jKEuaC_xkIot3I14bg02amVXqKE2-0vnyY&r=dXM%3D&range=153226-229235",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "76010"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9NDIyNDU3Mi02ODg5NjM5/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~a37wL7pRnDRgMpH99ofW8Hxv5eSElc5tyHJhew3-NIg&r=dXMtY2VudHJhbDE%3D&range=4224572-6889639",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "2665068"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MjI5MjM2LTMwNTMxNQ/avf/e652de55-5330-43a2-9028-a56667fe4487.mp4?pathsig=8c953e4f~PS4QUcWRBh2F9-yqs2mQ6kmj0rh6meO9D_k9ED3WwR0&r=dXM%3D&range=229236-305315",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "76080"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9Njg4OTY0MC04NjU1ODYw/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~BbFqLlmQ1N7tOHvw5aItsrTefuSr-26g4UEA1R6MeeI&r=dXMtY2VudHJhbDE%3D&range=6889640-8655860",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "1766221"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3bteESGMSTTcp2Ld2Aq8SP/7fbef2aa8b198257987d0445eb4938c8/alfred-profile.png",
+      "ct": "image/png",
+      "status": 200,
+      "len": "67965"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6bOZMmGgntTC2XvtbGgBxZ/5ed7a3900b567a83f4f31707f97108d4/dots-o-icon-updated.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "501"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/vm9beTwJGGdS6sYJr5hPY/2e10b211c0ebb1fa0ab260cf07b1a585/background-yellow.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "8540"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2kwlbZWY4IB07wLuIZZlgf/79d5b1eda84c514c0084eeffc2f7353a/conn-calendar.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "4534"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/53qzxIW4wHksFjIXH2jpb4/7de0561232db88bf043ac17c8698ab44/conn-google-drive.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3WZhL2oaoVSoRRK7hxpQWD/af515eb8c145b0861eef099f4edb51f3/conn-github.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/5ty2cS5qgMN6q9jJLh3D33/316b6c90e11748a187f3a3216394dcc1/conn-chart.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "708"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4NUuskZIIhfZgMFr6I2u39/4a2f5e67f9210a3d89f56c3f7239b336/conn-arrow.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7iW1Ac2P89g0yxH0FCHmoU/384d62f2cae13009f732695045a89d50/conn-mascot-shadow.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "885"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/01IljkfRcE66E5J65CNKzg/c69de85bc24233ede69d1464e8c1a5ed/conn-mascot.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "18632"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4yIp3aOhQZoke1HaxLa4XT/35f9475e6e493a73f60ba7101131aef3/conn-phone-mask.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "468"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4XaAlD355j66DehZ5G8m2u/c3544856fd3697dd57c7f40668b188f7/background-coral.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "11864"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/krYbiRGRNkGVOZPZZsJEy/82d79193eed2c47539cef97bf2b45f41/task-mobile-close.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "803"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/5qJEsZAhqGiIsT4vBWdj5l/17e32c5fdca7747f70bb50063c34dd71/task-analysis.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/5vpH4v768iirixvfo4gIBl/a9d22876e7efe625709aaff13115a288/task-figures.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1O872C7ocBcJSfVPVrbipg/975a3263cc009547f482dbf4e5e25c54/task-investigate.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3uqs5gN4p8Xjn3rxlxZx3e/70a8d769f0fbb48ec76234522d47bcca/task-shadow.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "924"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7DwH3EwJpdUOfkR6NIyE6G/aefceca53ad0e19b084a3b704834dba3/task-coral.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "22738"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2UenoB4icVfK7r35auO4LN/4290e725bda7808afa06c15fb933d686/task-cursor.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7sLw60Ad3BnEVY3R6FgEWo/d58e8a18574623a85f77b5739013ef55/task-mobile-cursor.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/byC4pIbhVixyfSwo7NBMs/64d3250c7e3553755536b97556bcd08a/task-revise.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/291oHna084AnrSjthpCEkF/875b031429914286c6ee64b4fd4a355c/task-flag.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6BlQ03SKVgagwBLcirGu5W/1ad6f98dc76b49b35f86ca716aa83ddf/background-blue.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "13074"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4ndZLycQ7APQ5VYIe8Y7fs/2f5d3572db42dde5288fbbdd5a417cab/phone-pdf.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7Bc3g5GB4bqFyUlvMfdqr1/fdf769ad4ea1fa870abc3a0747d1b61a/phone-menu.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "702"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6kMMqU0LxkrHiWLndxcBxA/1c71b3d39e26f1f58ec68a5218371e5b/phone.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/66OJaUa6aI1cVRDGoTtwOD/abfa54ac67a6c5cf10baf9fcf3dcf064/phone-felipe.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "6430"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6dZafg0p5yh5U4nZjUClrL/47e475d75a62d5940fc6f1b7953fbbc6/background-pink.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "8330"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2eejxNPvYAcrfWPh9xFD1z/662e67a1656e6500214a98e62d7935e5/slack-chevron.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "531"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/exEYeZZy45Mz5C5jha0jG/082b904f9752ae491cb57aac5a1595f4/slack-huddle.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3UpFV0dCAPKvyh2I8I9HRC/b97bf99ae45c49bfd6517463865e1821/slack-note.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1DaY6SaVHtZa0O8F0ceSzM/833241001246d1d68ac6009d70a7c758/slack-dot.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "275"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3AuXvHiHCdx67xzI74Qqzv/87f1cadc1b835aff415d5f9d0bb86632/slack-close.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "505"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6hUI4dCoiVLgHf3klgtoSN/be2ca2305817ceb05d2e7c4c23c84694/slack-trevor.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "11334"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/JyJg7DG0Va0E1CpAfgHOs/5307b48417c36048a97d41405e0ac5b9/slack-jojo.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "7452"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/36gII9e2twsDB9bfkiazIE/4533f1c0eeed3874437a09ee76c0ea96/slack-cellular.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2ObV4PfmqvAP5e2i2cTeWv/1a6257a587701b45a4834b418f57f699/slack-wifi.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/uiEWWERSEoXJ13h406lq8/d250a10eefb749ea144a4c6c0cb7b09c/slack-battery.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "635"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2osB994PJkmXEm4YZWwkC4/edbdd1a06f0935cef5fe464873f92654/slack-video.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "23736"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3fNUnk24QujYYXf1aPERWu/ef0c041a3625405d24ddf7cf7f1260c9/work-mobile-cellular.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4icJYpE4rtlx5SpGbdVbBo/2ca49dbbeca99c0ff46d971ce2ca6fe7/work-mobile-wifi.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/zNUyKrAKcKEw9tvsz7e91/bff8ff902c9a4d44f8f7c2f312a34305/work-mobile-battery.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "642"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/33olU5wly2tSkTZG80SinQ/f7e92e903cf6df320d30e64c9730ed62/work-mobile-back.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "670"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1yzPscqgJD2CR5kXvdmm4Q/f583412a79a277a3b85dae1ea7309aa9/work-mobile-download.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2CDnlup3cabog2Ow2uZEbT/9c3dfa0cc48f88ba01096e1d69413965/work-mobile-share.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "884"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6M9Ozv5zglCuxmpAjvZmwt/f74de2e36ce041c6e8ad1b61c70d471d/work-mobile-play.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "449"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3v8OSrI0g62u82shauAg3R/fba1a7bf569adf595a36e147d3930e4a/work-mobile-undo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "653"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3iWEZ1Zr5ISvUjCWJJfVyy/8e142b3f3acf7237acaa19510e375754/work-mobile-redo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "649"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7oS0iFJLYwG60wXcTgol28/d336e7632eba305b5e053e993d21c599/work-mobile-expand.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "744"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2lMo24PZw8BzwlXML7bNZM/6a3f507261b37666bfe1fe08c30abe06/work-mobile-ticks.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3bUznKA91OwTqLaNG2SyQJ/decbf57a0b04c1f0438f70a3e1a04050/work-mobile-camera.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "966"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/wGRMdS5f2jTezdLlEpB3o/dfc8f426f3d826fc2cb2f9e0b2210318/work-mobile-speaker.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/7cY1YM58mKXSgxLlhX9JNc/13b59798a36c47a2af3c259be4dcf410/work-mobile-microphone.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3gecrSIgTlxMpKlyUe75Dg/97c2505e1344d66ebe5a2afbdf8c6fb0/work-mobile-clip-one.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "13186"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/3la3XRGaOXiNcojDsvGB6u/ab9530b835f47fd59e8525bb149471b3/work-mobile-clip-three.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "18002"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/4Q0fwHiTe5WbJwXoT1mpLQ/f3d8edcad194b8287f60d5b87899bb7f/work-mobile-clip-four.webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "23298"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/6ZyJlzu9gBBN7Wps7DFMQv/bc4bb81b8d0ed00c140ba33b0c6b8f2a/work-mobile-audio-wave.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1M08dPImSQolGO9dLrlj4y/9c0ee1a1e6340c962b4dd628acadc132/work-mobile-playhead.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "274"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/2BbMaHBPOJbXjclEvr06lo/9a25230e4197b120b7d85b251d07bcc6/work-mobile-playhead-tip.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "448"
+    },
+    {
+      "u": "https://images.ctfassets.net/8su2tbn87fck/1lmCJqcw2XYNj0HGglO4jT/89d4d6144ecfbf419f7f518a2e655000/work-mobile-voice-wave.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707613~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013%2F%2A~hmac=77e57b890c3a34df775a83504840692279fd06bc4737f8ce1c25a2643955d27b/310ce484-e12b-4202-80a4-23e299a5ab98/psid=9ab1a38bb8a0ef0a47479917c64b939e0f597f251792704013/v2/range/prot/cmFuZ2U9MzA1MzE2LTM4MTI3MQ/avf/e652de55-5330-43a2-9028-a56667fe4487.mp4?pathsig=8c953e4f~DpY-lhWohiuGS46Y0fPNOLfkKtsZsgoESvx9qOALIRo&r=dXM%3D&range=305316-381271",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "75956"
+    }
+  ]
+}

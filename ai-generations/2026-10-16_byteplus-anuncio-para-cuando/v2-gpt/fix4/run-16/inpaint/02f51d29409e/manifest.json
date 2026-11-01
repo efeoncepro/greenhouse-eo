@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "02f51d29409e",
+  "key": "02f51d29409e024448b1b8671725a32ee8f31b7b9d79bbc7c6fdac37878c2211",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.213Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/16-vocera.png",
+    "imageSha256": "22ad33679c0e425b7601b03e230c75bd12e9bcff5f3ad52e0533874a8b0a5920",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/16.png",
+    "maskSha256": "1f2e38cb6917289ae8b394d744d57d5b6bb7e7686318208bd6c44d891a348e7c",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked can: EXACTLY the beverage can of image 2 (standard 355 ml can proportions, same aluminum and orange-and-teal wave label, no text), held by the same hand in the same pose, facing the camera. Keep her fingers natural and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked can: EXACTLY the beverage can of image 2 (standard 355 ml can proportions, same aluminum and orange-and-teal wave label, no text), held by the same hand in the same pose, facing the camera. Keep her fingers natural and everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.06838288483796297,
+    "editable": 99599,
+    "soft": 13840,
+    "protected": 1545441
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1152,
+      "height": 1440
+    },
+    "target": {
+      "width": 1152,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 34 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0501,
+    "basis": "1 × salida 1152x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 76.759,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.63,
+        "bestError": 2.63,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1545441,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 99599,
+        "maxDelta": 253,
+        "meanDelta": 86.443,
+        "worst": {
+          "x": 248,
+          "y": 457
+        }
+      },
+      "seam": {
+        "pixels": 13840,
+        "maxDelta": 167,
+        "meanDelta": 7.068,
+        "worst": {
+          "x": 127,
+          "y": 478
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1545441,
+        "maxDelta": 165,
+        "meanDelta": 7.221,
+        "worst": {
+          "x": 923,
+          "y": 451
+        }
+      },
+      "outputUsd": 0.0501,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3201,
+        "input_tokens_details": {
+          "image_tokens": 3010,
+          "text_tokens": 191
+        },
+        "output_tokens": 1669,
+        "output_tokens_details": {
+          "image_tokens": 1669,
+          "text_tokens": 0
+        },
+        "total_tokens": 4870
+      },
+      "meta": {
+        "size": "1152x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

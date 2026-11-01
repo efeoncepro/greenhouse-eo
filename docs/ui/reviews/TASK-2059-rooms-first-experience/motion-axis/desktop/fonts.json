@@ -1,0 +1,28 @@
+{
+  "heading": "\"Bricolage Grotesque\", sans-serif",
+  "body": "Poppins, sans-serif",
+  "faces": [
+    {
+      "family": "Poppins",
+      "status": "loaded",
+      "weight": "400"
+    },
+    {
+      "family": "Poppins",
+      "status": "loaded",
+      "weight": "500"
+    },
+    {
+      "family": "Poppins",
+      "status": "loaded",
+      "weight": "600"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "status": "loaded",
+      "weight": "200 800"
+    }
+  ],
+  "headingReady": true,
+  "bodyReady": true
+}

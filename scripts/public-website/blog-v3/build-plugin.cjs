@@ -75,6 +75,10 @@ fs.mkdirSync(OUT, { recursive: true })
 fs.mkdirSync(IMG, { recursive: true })
 
 const assets = JSON.parse(fs.readFileSync(path.join(SRC, 'assets.json'), 'utf8'))
+
+// «Para leer con calma» v2 images and logos (lib/rail-v2.cjs).
+Object.assign(assets, require('./lib/rail-v2.cjs').RAIL_ASSETS)
+
 const manifest = {}
 let fontsHref = ''
 

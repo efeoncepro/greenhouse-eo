@@ -1,0 +1,795 @@
+# Efeonce Rooms — ledger del programa
+
+> Estado vivo. La entrada más reciente va arriba. Cada hecho dice su fuente: `vivo` (readback),
+> `doc` (lo afirma un documento) o `local` (check en el workspace).
+> Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
+> sin reescribir la evidencia histórica ni repetir el canary cerrado.
+
+## Estado vigente (2026-10-31, cierre del día)
+
+- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve `main@a2d72c0` = `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`
+  (PR #5, TASK-2082 + TASK-2083), sobre PR #4 `6f99a6f` (UI aprobada + «Vive el servicio»). `/rooms` 200,
+  `/auth/error` 200 y `/api/auth/session` sin sesión 401. Alias **manual**: tras cada deploy,
+  `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`.
+- `rooms_production`: migraciones 9–18 `vivo` (14:16 UTC, con ensayo en clon y respaldo lógico, ya borrado); la 19
+  `doc` (sesión de acceso).
+- Flags Production (`vivo`, valores releídos): `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`,
+  `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED`, `ROOMS_MEDIA_DISPATCH_ENABLED` = `true`;
+  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`.
+- Efeonce ID (`vivo`): `auth-server-00169-4pq` con first-party y OTP ON; fuente durable en variables de repo GitHub.
+  Detalle y rollback en el ledger de `efeonce-auth`.
+- Acceso del operador: restaurado con SQL autorizado hasta 2027-10-31 (`vivo`) y adoptado por el bootstrap de
+  TASK-2082 como administrador hasta 2027-11-01 (`doc`). Todo acceso vence en máximo un año y se renueva.
+- Decisiones: ADR de escenas, de acceso interno durable y del carril de agentes, los tres **Accepted**. El carril de
+  agentes no tiene código.
+- Recibos: [activación](../../../../docs/audits/rooms/2026-10-31-production-activation.md) ·
+  [migraciones aplicadas](../../../../docs/audits/rooms/2026-10-31-production-migrations-applied.md) ·
+  [ensayo](../../../../docs/audits/rooms/2026-10-31-production-migration-rehearsal.md) ·
+  [acceso durable](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md).
+- Lo que sigue, en orden:
+  1. Primer login real del operador con la versión nueva.
+  2. Carril de agentes: tasks según el orden del ADR; primero en Rooms: actor, aviso, «Actividad de agentes» con
+     reversa, cuotas y guard de clasificación.
+  3. Task nueva de EPIC-044: delegación interactiva para la audiencia de Rooms (canje RFC 8693, `act`, D10).
+     TASK-1917 no la cubre. Bloqueada por la retención de Efeonce ID.
+  4. Verificador del bearer en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+  5. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
+  6. Skill de oficio + eval antes del primer cliente real.
+  7. Rediseño agentes-primero del canvas de administración
+     ([canvas](https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL), fila «El lado de Efeonce — administrar salas»).
+  8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
+     datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
+
+## 2026-11-01 — Nombre del espacio de trabajo EN PRODUCCIÓN
+
+- Operador: «Autorizo». `vivo`:
+  - ensayo en clon PASS (427/427; diff de rollback sólo marcas `\restrict` de pg_dump);
+  - migración `1793267000000_rooms-organization-profile` aplicada con `ROOMS_EXPECT_PENDING=1 pnpm db:migrate-production --apply`: respaldo `rooms-production-20261101T024624Z.dump`, 25 migraciones, 52 tablas, hashes y conteos intactos;
+  - [PR #10](https://github.com/efeoncepro/efeonce-rooms/pull/10) en `main@449a0cd`, deploy `efeonce-rooms-r00l7k48n` + `vercel alias set`;
+  - `org-2df565fb-…` nombrada «Efeonce» con `pnpm access:production rename-organization … --agent claude-code --apply` (recibo atribuido al agente por CLI, como el principal `rooms-pilot-julio-20261025`); relectura `current: "Efeonce"`.
+- Contrato: `organization.rename` (members.manage, clase `author`); `profile.get.organizationName`; encabezado de `/rooms` y actividad de sala + selector de espacio con fallback genérico. Sin ver con sesión real.
+- Deuda vista: `REVIEWED_MIGRATIONS` de la integración local no incluye 1793262–1793267 (`integration:up` fallaría en preflight). La rama `claude/rooms-media-import` trae 1793266, ya aplicada en la PG local.
+
+## 2026-11-01 — Casa agentes primero (TASK-2085) y redirección a Efeonce ID EN PRODUCCIÓN
+
+- TASK-2085 en `main@21b10a9` (PR #8). PR #9 en `main@97588d3`: el proxy responde 307 a `/login?returnTo=…` en `/rooms` y `/rooms/:id/actividad` cuando no hay ninguna cookie de sesión de Rooms; conserva sólo `?accion=`; `homeGate` sigue siendo la autoridad. Deploy `efeonce-rooms-nveyuogvr` + `vercel alias set`; readback: `/rooms` → 307 → `/login` → 302 a `auth.efeonce.org/oauth/authorize`.
+- Antes, `src/app/rooms/loading.tsx` se mostraba antes de que la página decidiera y `redirect()` viajaba por RSC (200 + parpadeo). Lección: una redirección que debe ser 307 en un segmento con `loading.tsx` va en el proxy.
+- El nombre del espacio se resolvió en la entrada de arriba. El login V4 de Efeonce ID en producción carece del panel de novedades (`71aff5f70`, sólo en ramas locales de Codex); depende de levantar la retención de Auth.
+
+## 2026-10-31 — Renovación automática al entrar EN PRODUCCIÓN
+
+- «Corrige el bug, y luego despliegas». `vivo`: migración 20 aplicada (20 migraciones, hashes y conteos intactos);
+  [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) → `main@aae04cd` → `dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N`,
+  alias reasignado; dueño con `auto_renew=true`; 6 triggers `member_manager_gap_*`; health 1 titular sin señales;
+  `rooms.access_requests` vacía (no hay evidencia de que el bug del reloj haya ocurrido). Respaldo lógico borrado.
+
+## 2026-10-31 — Renovación automática al entrar (local, PR #6 sin merge)
+
+- Decisión del operador: «quiero que mi acceso se renueve solo». ADR con delta «renovación automática al entrar».
+- `local`: `efeonce-rooms` `claude/rooms-owner-auto-renew` (`ce7eff1` + `50f8bcd`),
+  [PR #6](https://github.com/efeoncepro/efeonce-rooms/pull/6) sin merge. Migración 20 `1793261000000_rooms-member-auto-renew`
+  (`auto_renew`, evento `members.autoRenewed`, guarda acotada a reducciones), `src/server/access/renewal.ts` en el
+  callback (renueva a 366 días si quedan menos de 335), marca para los administradores actuales.
+- verify 387/387; ensayo en clon PASS. Su suite encontró un bug real ya en producción: `recordAccessRequest` usaba dos
+  `clock_timestamp()` y podía violar el CHECK de 7 días (identity_unbound → unavailable). Corregido en `50f8bcd`.
+- Producción: pendiente de autorización (migración 20, merge, alias, health).
+
+## 2026-10-31 — Acceso interno durable y /auth/error EN PRODUCCIÓN
+
+- Autorización: «Avanza todo end-to-end» y «Despliega». Recibo
+  [`2026-10-31-durable-access-production.md`](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md).
+- `vivo`:
+  - `rooms_production`: migración 19 aplicada (19 migraciones, 49 tablas; hashes y conteos intactos). Ensayo PASS antes.
+  - Dueño `rooms-pilot-julio-20261025` adoptado por bootstrap (`--adopt`): `members.manage` hasta 2027-11-01T17:10Z;
+    `pnpm access:production health` = 1 titular, sin señales. Organización `org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
+  - [PR #5](https://github.com/efeoncepro/efeonce-rooms/pull/5) → `main@a2d72c0` → `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`
+    READY; alias `efeonce-rooms.vercel.app` reasignado. Anterior: `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`.
+  - Sin sesión: `/auth/error` 200 con código; callback fallido 303 a la página; JSON intacto con `Accept: application/json`;
+    `/login` 302 a Efeonce ID; `/api/v1/members` `unauthenticated`.
+- Respaldo lógico de la migración borrado tras verificar el deploy.
+- Lecciones:
+  - el clasificador del modo automático bloqueó la migración con la primera autorización y la dejó pasar con la
+    instrucción directa («Despliega»): pedir la orden explícita del paso productivo;
+  - `rooms_migrator` tiene tope de conexiones: no abrir una consulta propia mientras corre el ensayo o la migración;
+  - el clon del ensayo debe correr en UTC (`run_on` sin zona).
+- Falta: primer login humano del dueño con la versión nueva y un segundo administrador interno.
+
+## 2026-10-31 — Carril de agentes Accepted; titular de /auth/error con contraste de pesos
+
+- ADR [Carril de agentes](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Accepted**
+  (`4d8d6553c`): «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar». La enmienda a TASK-2082 se
+  retiró: `members.*` queda en el MCP local y la CLI como está. Las columnas de actor van en la task del carril.
+- TASK-2083: revisión del operador («Bricolaje en párrafos es muy denso… debe jugar con sus contrastes en pesos»).
+  Titular en dos pesos (introducción `--room-weight-light`, idea principal `--room-weight-bold`), sin cambiar copy ni
+  tamaño; «Efeonce ID» con espacio duro. `local`, sin push; GVC OK en 1440/1280/390.
+
+## 2026-10-31 — ADR de acceso interno Accepted; TASK-2082 implementada en local
+
+- Aprobación del operador: «Aprobar ADR» (2026-10-31). Autoriza código local; **no** push, deploy, migración de
+  producción ni flags.
+- `local`, `efeonce-rooms` rama `claude/rooms-durable-internal-access` `510ab42` (sobre `adb1db0`, sin push).
+  `LC_ALL=en_US.UTF-8 pnpm verify` con PG local y `ROOMS_RUNTIME_PROFILE=local`: 385/385, 0 omitidas, build OK;
+  GVC `rooms-access-issue` (con código) OK en 1440/1280/390. Contenido:
+  - migración 19 `1793260000000_rooms-internal-access.sql`: capacidad `members.manage` (sólo organización, CHECK),
+    `rooms.access_requests`, `rooms.access_events` (append-only), función `rooms.member_manager_coverage` y triggers
+    diferidos anti-bloqueo (salida de emergencia `SET LOCAL rooms.allow_member_manager_gap='on'`); permisos por columna
+    para `rooms_runtime`. Aplicada en la PG local del repo (55432); **no** en `rooms_production`;
+  - `src/server/access/{service,requests,bootstrap}.ts`: `members.grantInternal|renewInternal|revokeInternal`,
+    `members.list`, solicitud de acceso (código Crockford de 8, 7 días) desde `identity_unbound`, bootstrap y health;
+  - API `/api/v1/members`, SDK `members()`, CLI `pnpm rooms members`, MCP (`members.list` en `read`; comandos sólo en
+    el toolset `members`, nunca en `all`), `pnpm access:bootstrap-owner|health|production`;
+  - `/auth/error` muestra el código de solicitud en `identity_unbound`.
+- Decisiones de implementación (ADR, «Delta de implementación»): techo de 366 días desde ahora (no la vigencia del
+  actor, o el último administrador no podría renovarse); los actores sintéticos nunca reciben `members.manage`.
+- Lecciones:
+  - las suites V4/multimedia necesitan `ROOMS_DATABASE_URL`, `ROOMS_MIGRATION_DATABASE_URL` **y**
+    `ROOMS_RUNTIME_PROFILE=local`; sin el perfil fallan con `configuration` en `canonicalDraft` (no es una regresión);
+  - una regla de base nueva que bloquea escrituras rompe pruebas que simulan revocaciones con SQL: limitar el trigger
+    a filas que de verdad sostienen la capacidad (aquí, sólo principals que tienen `members.manage`).
+- Para producción, en orden y con autorización explícita: (1) `pnpm db:rehearse-production`; (2)
+  `pnpm db:migrate-production --apply`; (3) `pnpm access:production bootstrap-owner … --issuer https://auth.efeonce.org`
+  en seco, que debe proponer **adoptar** `rooms-pilot-julio-20261025`, y luego `--apply`; (4) merge y deploy;
+  (5) `pnpm access:production health`. Hasta entonces el acceso del dueño sigue en las filas restauradas a mano
+  (hasta 2027-10-31).
+
+## 2026-10-31 — Acceso interno durable (ADR Proposed) y página de error del login (local)
+
+- Origen: el primer login real del dueño cayó en `identity_unbound` (canary de 2 h vencido) y el navegador mostró JSON.
+- ADR [Acceso interno durable y gobernado](../../../../docs/architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md)
+  **Proposed**: opción (a). Rooms conserva su autoridad; Efeonce ID sigue siendo sólo identidad (la ADR Accepted de
+  Auth ya omite roles y organización). Se descartó (b), derivar administradores de la autoridad interna de Efeonce ID:
+  exige claims o S2S nuevos (autorización clase D10) y acopla permisos de Rooms a roles ajenos. Contenido: capacidad
+  de organización `members.manage`, `members.grantInternal|renewInternal|revokeInternal` + `members.list` con paridad,
+  solicitud de acceso desde `identity_unbound`, `pnpm access:bootstrap-owner` (credencial de base, sólo con cero
+  titulares) y guarda del último administrador (comando + trigger diferido + aviso a 30 días + señales).
+- [TASK-2082](../../../../docs/tasks/in-progress/TASK-2082-rooms-durable-internal-access.md) `to-do`: sin código hasta aprobar el ADR.
+  Mientras tanto, el acceso del dueño depende de las filas restauradas a mano (vigentes hasta 2027-10-31).
+- [TASK-2083](../../../../docs/tasks/in-progress/TASK-2083-rooms-access-issue-page.md) `in-progress`, `local`:
+  `efeonce-rooms` rama `claude/rooms-durable-internal-access` `adb1db0` (desde `origin/main` `6f99a6f`, sin push).
+  `/login` y `/auth/callback` redirigen 303 a `/auth/error?reason=…&ref=…` (lista cerrada + UUID); con
+  `Accept: application/json` sigue el JSON. Log `rooms.auth.browser_error` con código y `correlationId`.
+  `LC_ALL=en_US.UTF-8 pnpm verify`: 378 pruebas, 354 pasan, 0 fallan, 24 omitidas (lanes que exigen
+  `ROOMS_DATABASE_URL` explícito y toolchain multimedia). GVC `rooms-access-issue` OK en 1440/1280/390.
+  `UI ready: no` hasta la mirada del operador.
+- Lecciones:
+  - el `next dev` de 3210 (de otra sesión) sirvió la página nueva con un módulo de copy viejo en SSR («Cannot read
+    properties of undefined») tras cambiar de rama; el build de producción estaba bien. Para GVC de una página nueva,
+    usar `next start` propio del build (`-p 3231`) en vez del dev ajeno;
+  - GVC marca `/auth/*` como «ruta de login capturada»: un escenario que captura una página de auth a propósito
+    declara `quality.allowLogin: true`;
+  - el rubro enterprise mide el primer `<p>` como cuerpo: una palabra decorativa gigante va en `<span>`.
+- Sin push, sin deploy, sin flags. El checkout `efeonce-rooms` quedó en la rama nueva; `tsconfig.json` sigue
+  modificado por otra sesión y no se commiteó.
+
+## 2026-10-31 — TASK-2084 en producción (expand)
+
+- Operador: «Ok» al rollout. Recibo [`2026-10-31-agent-lane-attribution-production.md`](../../../../docs/audits/rooms/2026-10-31-agent-lane-attribution-production.md).
+- `vivo`:
+  - ensayo PASS;
+  - migraciones `1793262`–`1793265` aplicadas (24 migraciones, 51 tablas);
+  - [PR #7](https://github.com/efeoncepro/efeonce-rooms/pull/7) mergeado a `main@d7d6f6b` y desplegado en
+    `dpl_8xUkT1AduZ4eiD7SM4x8Dktm2exC`, con el alias reasignado;
+  - filas históricas con `channel` NULL (sin reescribir), 0 filas de agentes, señales del carril en `ok`;
+  - respaldo lógico borrado.
+- Falta:
+  - la primera acción real por navegador y como agente (MCP stdio);
+  - el slice 6 (contract);
+  - la reversa de invitación de punta a punta.
+
+## 2026-10-31 — TASK-2084 code complete en local (atribución, avisos, reversas, cuotas)
+
+- Operador: «Apruebo el plan». `efeonce-rooms` rama `claude/rooms-agent-attribution` (desde `main@aae04cd`), sin push.
+  Slices 1–5: `f0499bf`, `31b9a27`, `c64665a`, `872f17e`, `aced4e5`.
+- `local`: `pnpm verify` OK; tests 406/406 sin skips con `ROOMS_DATABASE_URL` y `ROOMS_RUNTIME_PROFILE=local`.
+- Migraciones expand 1793262–1793265, aplicadas solo en la PG local.
+- Rollout pendiente, con autorización:
+  1. `pnpm db:rehearse-production` y respaldo;
+  2. aplicar las 4 migraciones;
+  3. merge a main, deploy y `vercel alias set`;
+  4. verificación en vivo;
+  5. después, slice 6 (contract).
+- Lecciones:
+  - en plpgsql, un `CASE` que lee `NEW.<columna>` de otra tabla falla al planificarse aunque esa rama no se tome:
+    usar `IF` separados;
+  - el permiso `editions.publish` solo se evalúa sobre un borrador, así que republicar autoriza contra el borrador
+    construido desde la edición de origen.
+
+## 2026-10-31 — Tasks del carril de agentes creadas (TASK-2084..2091)
+
+- El operador pidió crearlas («Ok crealas»). Las 8 están en `to-do`, con `task:lint` en 0/0. Siguiente ID: TASK-2092.
+- Ya, sin depender de Efeonce ID:
+  - 2084: atribución, aviso, reversa, cuotas, guard D2 y comando de republicación si hace falta;
+  - 2085: pantalla «Actividad de agentes» (`UI ready: no`, el slice 1 es el canvas);
+  - 2090: medios gobernados;
+  - 2091: skill de oficio + eval.
+- MCP remoto: 2086 (EPIC-044, bloqueada por la retención) → 2087 → 2088.
+- Fuentes: 2089 (canary bloqueado por 2086; `resolveXrayAuthority` rechaza hoy los tokens `sister_platform_oauth`).
+- Primera a tomar: TASK-2084.
+
+## 2026-10-31 — ADR del carril de agentes ACCEPTED: agentes ciudadanos de primera clase
+
+- Operador: «Los agentes son ciudadanos de primera clase, pueden dar acceso y publicar» y «avancemos con todo».
+- El ADR se reescribió:
+  - fuera la propuesta y confirmación humana;
+  - los agentes ejecutan `release` y `access` directo, con la autoridad de la persona;
+  - seguridad por identidad del gateway + token delegado, scopes con step-up, actor registrado, aviso a la persona,
+    reversa, cuotas y eval.
+- La enmienda a TASK-2082 queda retirada: `members.*` sigue en el MCP local y su gate de merge se resuelve sin
+  quitar operaciones.
+
+## 2026-10-31 — ADR del carril de agentes (Proposed, superado por la entrada de arriba)
+
+- El operador fijó que las salas las arman y administran agentes; la interfaz revisa y aprueba.
+  [ADR](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) **Proposed**, sin código.
+- `local` (verificado en código): la CLI y el MCP local solo autentican con cookie copiada (`--session-file`), y con
+  ella ejecutan `editions.publish`, `access.grant` e invitaciones. `resolvePrincipal` ignora `Authorization`. El
+  emisor tiene una sola audiencia y no hace canje. Sin propuestas ni registro de actor.
+- Decisión propuesta:
+  - D0 cierra la cookie (`channel=cli` sin `release`/`access`);
+  - propuestas confirmadas con presencia fresca ligada al hash;
+  - token delegado + identidad del gateway;
+  - clases de scope generadas del catálogo; `read.client` apagada.
+- Revisión adversarial: 24 hallazgos incorporados.
+- Enmienda TASK-2082 si se acepta: `members.grant/renewInternal` solo como propuesta.
+- Depende de una task nueva de EPIC-044 (TASK-1917 no cubre agentes interactivos ni una segunda audiencia).
+
+## 2026-10-31 — PR #4 en producción y activación completa (Rooms + Efeonce ID)
+
+- Autorizaciones: «Sí, mergea»; después «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo».
+  Recibo [`2026-10-31-production-activation.md`](../../../../docs/audits/rooms/2026-10-31-production-activation.md).
+- `vivo`:
+  - `main@6f99a6f` → `dpl_3ZjW…`; después redeploy con flags, `dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`.
+  - Trampa: `efeonce-rooms.vercel.app` es un **alias manual** y no sigue a producción. Después de cada deploy hay que
+    hacer `vercel alias set <deploy> efeonce-rooms.vercel.app`.
+- `vivo`:
+  - Rooms Production: `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED` y
+    `ROOMS_LIVE_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false`.
+  - Efeonce ID `auth-server-00169-4pq` al 100 %, con first-party y OTP en `true` y secretos HMAC y de autoridad
+    montados.
+  - Trampa: el tráfico está fijado por revisión; `update-traffic` es explícito.
+  - Email type `auth_server_rooms_invitation_otp` en `enabled=true`.
+- `vivo`: el recorrido HTTP sin sesión llega hasta `auth.efeonce.org/login` con `first_party_request`. Faltan:
+  - el login humano con Microsoft y MFA;
+  - una invitación con correo real;
+  - medir la sala en vivo en Vercel.
+- Respaldo lógico de la migración borrado después de verificar el deploy.
+- Primer login humano: `identity_unbound`. El acceso del canary (2 h) había vencido el 26-10. Restaurado con SQL
+  administrativo autorizado: administrador `rooms-pilot-julio-20261025` y permiso de organización
+  `rooms-owner-julio-20261031`, ambos hasta 2027-10-31. Lección: Rooms no hereda el rol de administrador de Efeonce y
+  no tiene un comando de acceso interno durable; falta construirlo. El callback muestra JSON crudo.
+- Durable («Sí, fíjalos»): las variables de repo GitHub `AUTH_SERVER_FIRST_PARTY_ENABLED` y
+  `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` están en `true`, así que el próximo deploy gobernado reproduce el estado.
+  Se corrigió `rooms-config-drift.py`, que buscaba `ROOMS_INVITATION_AUTHORITY_TOKEN_REF` en lugar de `..._SECRET_REF`;
+  contra 00169 da `true`. TASK-1833 sigue abierta: ningún cliente real sin una autorización nueva.
+
+## 2026-10-31 — Migraciones 9–18 aplicadas en `rooms_production` (sin merge)
+
+- Autorización del operador: «Sí, aplica». Recibo
+  [`2026-10-31-production-migrations-applied.md`](../../../../docs/audits/rooms/2026-10-31-production-migrations-applied.md).
+- `vivo`:
+  - antes de aplicar: ensayo repetido (PASS), respaldo automático de hoy y PITR de 7 días;
+  - corrida en seco con 10 pendientes exactas;
+  - respaldo lógico propio y privado en `.local/production-backups/` (rollback real; PITR de la instancia compartida no sirve);
+  - aplicado con `pnpm db:migrate-production --apply` (`efeonce-rooms` `bbca0f8`).
+- `vivo`, verificación: 18 migraciones y 47 tablas; hash de ediciones y filas de las 26 tablas previas intactos;
+  `rooms_runtime` lee las tablas nuevas con su credencial de producción.
+- Sin cambios: deployment `main@e4b2e890` y flags `ROOMS_*` en OFF.
+- Siguiente: merge de PR #4 (= deploy), con su autorización, y verificar el commit activo y el dominio. Después, borrar
+  el respaldo lógico (tiene datos de producción).
+
+## 2026-10-31 — Interfaz aceptada por el operador; `UI ready: yes` en TASK-2059/2068/2071
+
+- Aceptación humana: «Todas están aprobadas» (operador, 2026-10-31), sobre las pantallas en local de la rama
+  `claude/rooms-approved-ui` (`de1de34`).
+- `UI ready: yes` en 2059, 2068 y 2071; `task:lint` con controles de readiness sin hallazgos. Se tildaron solo los
+  criterios que la evidencia respalda. Quedan sin tildar, con su motivo:
+  - el orden «docs antes del JSX»;
+  - GVC en 1024 px y con zoom al 200 %.
+- No es una autorización de producción. Para el merge de PR #4 faltan:
+  1. autorización expresa para aplicar las 10 migraciones (repetir `pnpm db:rehearse-production`, confirmar respaldo, aplicar y verificar);
+  2. autorización del merge (= deploy) con los flags en OFF y verificación del commit activo.
+
+## 2026-10-31 — Riesgos de UI verificados y corregidos (`de1de34`, en PR #4)
+
+- Corregidos:
+  - en el teléfono, `#capitulo-N` ahora lleva al capítulo (antes la pila no lo leía);
+  - la deriva de «Respuestas» y la órbita del equipo descansan a los ~5 s y vuelven a moverse con cada interacción;
+    el tráfico y la barra del story terminan antes de 5 s (WCAG 2.2.2);
+  - el error de subida tiene su propio mensaje;
+  - «Qué cambió» se enlaza desde la sala (barra en escritorio, mapa en el teléfono) y desde el aviso de publicación;
+  - la primera edición muestra su propio estado (verificado en la respuesta del servidor en la integración);
+  - los textos de estados de invitación y del enlace para saltar al contenido salen del copy.
+- Descartado: «el enlace al 01 corta la cámara» (la cámara escucha `hashchange`).
+- `local`: `pnpm verify` 377/377; GVC sin hallazgos en sala, sala móvil, las cuatro escenas, autoría, autoría de
+  escenas, «Qué cambió» e invitación.
+- Lecciones:
+  - con el panel del navegador oculto, React 19 no revela los bloques de streaming porque espera
+    `requestAnimationFrame`; la página parece trabada en «Cargando…», aunque el HTML del servidor está completo;
+  - `pnpm integration:up` necesita `LC_ALL=en_US.UTF-8`; sin eso, el PostgreSQL local no arranca.
+
+## 2026-10-31 — Ensayo de migraciones en clon de producción PASS + docs de UI rehechos desde el canvas
+
+- **Ensayo de migraciones (gate 2 del ADR cloud).** Autorizado por el operador. Recibo
+  [`2026-10-31-production-migration-rehearsal.md`](../../../../docs/audits/rooms/2026-10-31-production-migration-rehearsal.md).
+  - `rooms_production` solo se leyó (`pg_dump` por proxy; conteos idénticos antes y después).
+  - Clon PostgreSQL 16 desechable, con los permisos de producción. Migraciones 8 → 18 y tablas 26 → 47, con contenido
+    y hash de ediciones intactos y el rol runtime OK.
+  - Rollback en el clon con reaplicación OK. Suite 377/377 contra el clon.
+  - Script `efeonce-rooms` `17438b6`: `pnpm db:rehearse-production`. El clon y los respaldos se borran solos.
+  - Observación: el rollback deja dos CHECK equivalentes con otro nombre (`grants`, `invitations`). El rollback de
+    producción sigue siendo restaurar desde respaldo, nunca `down`.
+- **Docs de UI.** Wireframe, flow y motion de TASK-2059, 2068 y 2071 reescritos desde el canvas aprobado y el código
+  (cada wireframe trae su tabla «Diferencias con el canvas»); `task:lint` sin hallazgos; `UI ready` sigue en `no`.
+- **Riesgos que el subagente reportó leyendo el código, sin verificar en navegador:**
+  - en móvil, `#capitulo-N` no lleva al capítulo;
+  - la deriva de «Respuestas», la ruta y las barras de story no tienen pausa además de movimiento reducido (WCAG 2.2.2);
+  - `AUTHORING_COPY.uploadError` sin cablear;
+  - no hay enlace a «Qué cambió» desde la sala ni desde el aviso de publicación;
+  - textos fijos en estados de invitación.
+
+  Su «el enlace al 01 corta la cámara» es dudoso: la cámara sí escucha `hashchange`.
+- Siguiente para el merge:
+  1. repetir el ensayo y aplicar las migraciones con autorización expresa;
+  2. aceptación humana de la interfaz.
+
+## 2026-10-31 — Rama de la UI aprobada subida; PR #4 en borrador (sin merge)
+
+- Autorización del operador («Hazlo») para corregir los hallazgos, verificar y subir la rama con un PR, **sin merge**.
+- Revisión previa con tres subagentes (estado de release, código, gobierno). Sin exposición de datos. Hallazgos corregidos
+  en `efeonce-rooms` `717c478`:
+  - pregunta repetida en el stream en vivo (cursor en milisegundos contra `created_at` en microsegundos);
+  - el fundamento del autor no llegaba a la pestaña Fundamento;
+  - «reabrir» ofrecido con un borrador abierto;
+  - error 500 con un id de escena malformado.
+- `local`: `pnpm verify` 377/377; consulta de preguntas ejercitada contra PG real (caso del borde en microsegundos).
+- `vivo`: `origin/claude/rooms-approved-ui` (21 commits sobre `origin/main` `e4b2e890`, 0 detrás) y
+  [PR #4](https://github.com/efeoncepro/efeonce-rooms/pull/4) **draft** hacia `main`. Vercel crea un Preview con SSO;
+  Preview solo tiene `NPM_RC`, así que únicamente funcionan las páginas `/demo/*`. Producción no cambia.
+- Gates para el merge (= producción):
+  1. ensayar en un clon de `rooms_production` las 10 migraciones nuevas, con restore y rollback, y aplicarlas antes del deploy;
+  2. aceptación humana de la interfaz;
+  3. antes de `ROOMS_LIVE_ENABLED`: medir streams y pool, y registrar el flag en el ledger;
+  4. primer cliente: liberar la retención de Auth (PR 263/264) y nueva autorización.
+
+## 2026-10-31 — Autoría de escenas desde la mesa + ADR del contrato
+
+- ADR [«Vive el servicio»: escenas como contenido de la sala](../../../../docs/architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md)
+  **Accepted** el 2026-10-31 por el operador («Apruebo el ADR»); registrado en el dossier y en `DECISIONS_INDEX`.
+  No autoriza push, deploy ni flags.
+- `efeonce-rooms` `claude/rooms-approved-ui` `95d3ac2`: escenas en el inventario de la mesa, «Añadir escena» (4 tipos,
+  valores editables, capítulo de escenas), escenario a 1440 × 900 desde el borrador sin guardar (mismo resolutor que
+  la sala), editor por tipo y guardado completo con `content.upsertBlock`. Cobertura nueva `scene_placeholder`:
+  una sala real no publica marcadores entre corchetes. Sin push, sin deploy, flags OFF.
+- `local`: `pnpm verify` 376/376 + lint + typecheck + build; GVC PASS `rooms-authoring-scenes` y `rooms-authoring`
+  (1440/1280/390, 0 hallazgos).
+- Contra la integración (3216, admin fixture, sala sintética Lumbre): crear escena (revisión 44→45), editar y guardar
+  (→46) y abrir `/authoring/vista-previa/vive/:blockId` con la rendition del borrador. Datos sintéticos, locales.
+- Lección: el `next dev` de 3210 quedó con una página sin hidratar tras varias recargas completas de Fast Refresh
+  (bloque Suspense deshidratado, sin errores). Reiniciar el servidor lo resolvió; no era el código.
+- Falta: aceptación humana de la interfaz, ediciones de escenas en «Qué cambió» con detalle propio.
+
+## 2026-10-31 — «Vive el servicio» implementado local (canvas fila 6)
+
+- Corrección de propósito del operador: Rooms es una **demo inmersiva del servicio**, no una herramienta de
+  presentación. Consola, audiencia y señales pasan detrás de las escenas de demostración.
+- `efeonce-rooms` `claude/rooms-approved-ui` `5e4a73b`: bloques de escena `showcase` / `cycle` / `answers` / `team`
+  en manifiestos V3/V4 (`src/domain/scene-contracts.ts`), creados con `content.upsertBlock` (API/CLI/MCP), con reglas
+  de cobertura y lector que resuelve formatos a renditions privadas de la edición. Rutas a pantalla completa:
+  `/rooms/:roomId/editions/:editionId/vive/:blockId`, `/rooms/:roomId/authoring/vista-previa/vive/:blockId?as=` y
+  `/demo/vive/:blockId`. La sala muestra un capítulo de escenas como mosaico de entradas. Sin push, sin deploy, flags OFF.
+- `local`: `pnpm verify` 375/375 sin skips + lint + typecheck + build; GVC PASS `rooms-service-showcase`,
+  `rooms-service-cycle`, `rooms-service-answers`, `rooms-service-team` (1440/1280/390, 0 hallazgos).
+- Las escenas no escriben en la API: son simulación del servicio. Plazos y rondas reales los declara el autor; la demo
+  volta los deja entre corchetes.
+- Falta: autoría de escenas desde la mesa (hoy solo por comando), ADR del contrato de escenas, recorrido contra la
+  integración con una sala real, aceptación humana.
+
+## 2026-10-31 — Autoría y ediciones del canvas implementadas local (TASK-2071)
+
+- `efeonce-rooms` `claude/rooms-approved-ui`: mesa de autoría `/rooms/:roomId/authoring` (inventario, cobertura,
+  escenario con «Ver como», propiedades, publicar), vista previa por rol y «Qué cambió» `/editions/:editionId/cambios`.
+  Demos sintéticas `/demo/autoria` y `/demo/ediciones`. Sin push, sin deploy, flags OFF.
+- `local`: GVC PASS `rooms-authoring` (1440/1280/390) y `rooms-edition-changes` (1440/390).
+- Contra backend real (integración 3216, admin interno): renombrar persistió (revisión 36→37), se publicó la edición 6
+  de la sala sintética Lumbre y «Qué cambió» mostró el cambio. Esa publicación quedó en la base de la integración
+  (sintética, local).
+- `58287fb`: «Añadir imagen» y reabrir borrador tras publicar, probados en la integración (subida, worker, pieza nueva).
+- Falta: adaptaciones y medios V4 en la mesa, aceptación humana.
+
+## 2026-10-30 — Invitación, sala y sala en vivo del canvas implementadas local
+
+- `efeonce-rooms` `claude/rooms-approved-ui`: `3f11167` (sala en vivo, migración 18), `c133299` (invitación y sala
+  contra el backend real, demos sintéticas `/demo/sala` y `/demo/invitacion`), `32640ee` (nombres por tipo,
+  inventario de migraciones 14–18 en la integración). Sin push, sin deploy, flags `ROOMS_*` OFF.
+- ADR sala en vivo `Accepted` por el operador. Flag nuevo `ROOMS_LIVE_ENABLED` (OFF; registrar al pedir activación).
+- `local`: 371/371 tests sin skips; lint, tipos y build en verde. GVC PASS: `rooms-invitation-stage` (1440/1280/390/320),
+  `rooms-orbit-room` (1440/1280), `rooms-orbit-room-mobile` (390/320), `rooms-live-room` (1440).
+- Contra backend real (integración 3216): sala del fixture, `/invite` vacío/inválido/malformado y prueba de dos
+  personas con el stream. No probado: invitación con correo real (la integración no entrega correo), Vercel
+  streaming/pool, medios V4 en la sala nueva, aceptación humana.
+- Pendientes de pantallas: autoría y ediciones (TASK-2071), consola/audiencia (Fase 3), señales y video (Fase 4).
+
+## 2026-10-30 — Base visual La órbita (TASK-2079) implementada local
+
+- `local`: `src/domain/orbit-geometry.ts` (+test), `src/components/orbit/**` (Orbit, CameraWorld, IrisReveal, DepthLayers/Grain,
+  motion.ts), `src/styles/orbit.css`, laboratorio `/demo/base`. Valores desde `efeonceGraphicLine`/`axisMotion`.
+- `local`: GVC `rooms-orbit-foundation` OK en 1440/390/320; dossier `docs/ui/reviews/TASK-2079-rooms-orbit-foundation/`.
+  Trampa: la regla global `svg { max-inline-size: 100% }` colapsa SVG dentro de contenedores de ancho 0 (mundo de la cámara).
+- Sin push; falta revisión humana.
+
+## 2026-10-30 — Backend de la UI aprobada: comparar, «Ver como», reloj, señales, subtítulos; ADR sala en vivo
+
+- `local`: migración17 (`presentation_sessions.started_at/ended_at`, `rooms.viewer_activity_daily`); `editions.compare`,
+  `preview?as=`, `durationMs` por escena, `signals.read` (interno, agregado, alimentado por `progress.mark`) y
+  `captions` WebVTT en medios V4. Presupuesto del esquema MCP de lectura a 18 KB (medido 15,2 KB).
+- `local`: verify 357/357, 0 skip. Sin push/deploy/flags. Backend de TASK-2080 completo salvo cierre de contrato.
+- `doc`: ADR `EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md` **Proposed** (SSE same-origin + estado efímero en PG,
+  sin proveedor); TASK-2081 espera su aprobación antes de código.
+
+## 2026-10-30 — Backend de la UI aprobada: tarjeta, estados, perfiles, adaptaciones y autores
+
+- `local`: `b7e08aa` migración15 (perfil de miembros, perfil sellado del invitado, historial inmutable de tokens
+  reemplazados), tarjeta previa en start/transaction, estados 410 `invitation_revoked|expired|superseded` y
+  `code_expired` (resend abre transacción nueva; límite de 10 min intacto), `profile.update/get`.
+- `local`: `d3c6c24` adaptaciones por pieza + `rationale` en bloques V3/V4, helper único `blockAssetRefIds` en
+  proyección/entrega/anclas/tours/cobertura; migración16 nombre visible del invitado en su sesión; `author` en preguntas.
+- `local`: verify 352/352, 0 skip (PG18, `ROOMS_DATABASE_URL`, `ROOMS_RUNTIME_PROFILE=local`). Sin push/deploy/flags.
+  Pendiente TASK-2080: comparar ediciones, vista por rol, reloj/avance de presentación, señales y subtítulos.
+
+## 2026-10-30 — Backend de la UI aprobada: capítulos y recorrido
+
+- Operador: «quiero todo lo que está en el canvas»; tarjeta previa completa y estados de invitación distintos
+  aprobados. Alcance en TASK-2080 (todo salvo tiempo real) y TASK-2081 (sala en vivo, ADR primero).
+- `local`: rama `claude/rooms-approved-ui` desde `de38af5`. `31c1a83` capítulos V3/V4 (cobertura, `content.arrange`,
+  proyección `content.chapters`); `e37b152` migración14 `rooms.viewer_progress`, `progress.mark` y reader
+  `.../progress` en API/SDK/CLI; MCP lee, `progress.mark` excluido. 44 tablas.
+- `local`: suite 343/343, 0 skip, con PG18 del repo, `ROOMS_DATABASE_URL` y `ROOMS_RUNTIME_PROFILE=local` (sin ese
+  perfil los 13 tests multimedia fallan por configuración, no por código); lint/types/build PASS. Sin push/deploy.
+
+## 2026-10-30 — Canvas de UI aprobado; implementación planificada
+
+- `doc`: el operador aprobó entero el canvas Claude Design «la sala es una órbita» (14 pantallas,
+  artifact `https://claude.ai/code/artifact/6562987e-d882-44ba-a929-a6ab7863771d`). Registro y reglas de
+  órbita/halo en [dirección visual](../../../../docs/ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md).
+  Aprueba composición, no píxeles implementados; fixture ficticia volta reemplaza Nómada.
+- `local` (lectura de `3c7bcb5`, sin ejecutar): faltan capítulos sobre bloques, recorrido por persona, tarjeta
+  previa a la entrada (start/transaction solo dan state/expiresAt/retryAt/deliveryStatus/entryGate),
+  estados vencida/revocada (todo es `invalid_invitation`), agrupación de adaptaciones (un asset por bloque),
+  nombres de autor, diff de ediciones, señales agregadas, vista por rol y `startedAt` de presentación.
+  El código de invitación es de 6 dígitos; el ejemplo alfanumérico del canvas se corrige en la UI.
+- Nuevas tasks: [TASK-2079](../../../../docs/tasks/in-progress/TASK-2079-rooms-orbit-foundation.md) base visual
+  (UI ready=yes, sin backend) y [TASK-2080](../../../../docs/tasks/in-progress/TASK-2080-rooms-approved-ui-backend-contract.md)
+  contrato backend (dueño Codex; slices 3–4 esperan dos decisiones de privacidad del operador).
+  TASK-2059/2068 vuelven a UI ready=no hasta rehacer wireframes desde el canvas; deltas en 2059/2068/2071.
+- Sin código, push, deploy, flags, correo ni canary en este corte.
+
+## 2026-10-29 — Backend local completado y verificado para integrar diseño
+
+- `local`: runtime `codex/rooms-design-integration@3c7bcb5`, limpio, sin push/deploy.13migraciones/
+  43tablas;337testsPASS0skip,lint/negativo/types/build y empaquetado aislado del worker de imágenes PASS.
+- Colaboración/presentación, derechos guest explícitos en edición inicial, referencias de sesión sin
+  identidad interna, importación X-ray/metadata y CRMpending, V4 mixto imagen+PDF/audio/video local y MCPstdio construidos.
+  Puertos externos OFF; no confundir metadata preparada con entrega CRM o federación remota.
+- V4 valida cobertura: ref no excluida sin bloque visible queda pending. Ambos endpoints y proyección
+  niegan contenido excluido/huérfano; preguntas sólo temporizan audio/video dentro de duración medida.
+- Chrome18checks de imágenes+23delbackend nuevo PASS. PDF1página desde SDK real, supervisor, publicación
+  y bytes privados; notas/consola/tenant/replay/revocación. No aceptación de la nueva UI.
+- Restore13PG16/18:43tablas,23objetos/14bindings/12guestreceipts,0guestinternalizado; ACL/hashes/
+  snapshots/fencing/revocación. Empty13→8→13 y cinco guards poblados PASS. Dos motores usan fuentes idénticas/estables;
+  recibos HEAD8702dirty se contrastaron por hash contra commit final3c7bcb5. No cloud/PITR/MFA/correo.
+- Bootstrap13y`up --multimedia` verificados: conserva salas/borradores, reconcilia sólo3fixtures,
+  storage propio y procesamiento secuencial. Entorno/PGs detenidos y temporales retirados al cerrar.
+- Multimedia sigue sólo local; Linux/cloud sin certificar(Docker ausente). Auth retenido en PR,
+  sin mutaciones de producción ni otro canary. Integración/aceptación Claude y rollout siguen separados.
+  [Recibo completo](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.md),
+  [manual](../../../../docs/manual-de-uso/rooms/operar-backend-local.md).
+- Procedencia: commit exacto `3c7bcb50392bea9d408adf602c6da00583b87798`;
+  [resultado estructurado](../../../../docs/audits/rooms/2026-10-29-backend-local-completion.json),
+  [recovery PG16](../../../../docs/audits/rooms/2026-10-29-backend-recovery-pg16.json) y
+  [PG18](../../../../docs/audits/rooms/2026-10-29-backend-recovery-pg18.json).
+  Las suites comparten colas y se ejecutan en serie contra su base dedicada; cada restore usa
+  base/storage propios. Los 18+23 checks Chrome/API no certifican aceptación visual ni un nuevo login.
+- Continuidad documental posterior: HEAD runtime `de38af5e73ac4e653923c3e892ebba5eafb3139b`
+  sólo actualiza `AGENTS.md`; el código y la atribución de las pruebas siguen en `3c7bcb5`.
+  Ese commit documental no es retest, publicación ni activación.
+
+## 2026-10-29 UTC — UI y operación pendientes tras canary cerrado
+
+> Snapshot anterior a la ampliación local de la entrada superior; sus pendientes no describen el candidato3c7bcb5.
+
+- `local/vivo` (recibos fechados): [dossier coordinado](../../../../docs/audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
+  El canary del 26-10 probó una sala, imagen física privada, correo único
+  recibido, guest y revocación; terminó con acceso humano OFF. El Git local
+  Rooms `main=origin/main=e4b2e89` incluye backend GCS, worker y dispatch
+  condicionado; ese ref no prueba por sí solo el deployment activo.
+- `local` (sesión Rooms): Claude Design aún no había entregado la UI nueva.
+  B18 guest sin sesión interna/SSO dio 51 checks; dos adapters RP dieron
+  35 checks reportados con issuer QA, sin servidor Auth completo ni HTTPS.
+  Faltan integrar UI y probar crear → cargar/procesar → adjuntar → publicar →
+  invitado con conflicto, revocación y aislamiento; también recovery de ocho
+  migraciones y límites/carga. PDF/audio/video, presentación/notas, actividad,
+  MCP y CRM permanecen en EPIC-052. Auth mantiene el release retenido.
+
+## 2026-10-28 — Retest dos RP contra fuentes Auth ca97eecd1:35PASS
+
+- `local`: Rooms `8750750` intacto y issuerQA con fuentes de `ca97eecd1`,35checksPASS/Chrome/PG
+  efímero. Checkout Auth avanzó sólo dos docs a0ab888728; hashes/ausencia de diff fuente comprobados.
+- Login legítimo, cookies/callbacks en ambos sentidos, preservación de transacción y logout aislado
+  mantienen resultados. Se ejecuta el issuerQA, **no services/auth-server/server.ts completo**;
+  RP2 es mismo consumer, sin HTTPS/MFA/productos completos ni rollout.
+- Bases temporales retiradas, puertos libres; sincorreo/canary/push/flags/deploy ni cambio de fuentes.
+  [Recibo y procedencia](../../../../docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md).
+
+## 2026-10-28 — Dos adapters RP con Auth real:35checksPASS
+
+- `local`: Rooms `8750750`, Auth `e7b127647`; dos createAuthHttp/createAuthService en hosts distintos,
+  dos registros reales del issuer, navegador y PG efímero. Cookies/callbacks rechazados en ambos
+  sentidos, original no consumido/funcional y logout cruzado sin revocar dueño; SSO legítimo coexiste.
+- 35checks,lint/typesPASS; clave cifrado compartida deliberadamente sóloQA. RP2 es arnés del mismo
+  consumer, no segundo producto completo: sin HTTPS/MFA/entitlements/rollout; UI Claude aún pendiente.
+- Bases temporales retiradas/puertos libres, commit local limpio; sincorreo/push/flags/deploy/canary.
+  [Prueba y límites](../../../../docs/audits/rooms/2026-10-28-two-rp-auth-adapters.md).
+
+## 2026-10-28 — Aislamiento RP en servicios/persistencia:3casosPASS
+
+- `local`: Rooms `e0edf1e` intacto;3pruebas focales existentes,0fallos/0skip sobre PG18 efímero y
+  issuer HTTP sintético: sesión/callback con otro clientId y guest crossRP/issuer/origin rechazados.
+- Cluster retirado/puerto libre; no B10/B18 browser ni correo/canary/push/deploy repetidos.
+  No acredita dos aplicaciones RP completas: ese criterio sigue abierto.
+  [Recibo y comando](../../../../docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md).
+
+## 2026-10-28 — B10 browser con reader de autoridad real
+
+- `local`: Rooms `e0edf1e` intacto + Auth `8d027f747` con `--mcp-pg --mcp-authority`; dos bases
+  efímeras,16checksMCP+8gruposRoomsPASS. Reader real externo sobre binding/membership sintéticos;
+  SQL:1bindinggv7,1membership,1consentread,1código consumidov7 y1access/1refresh sólo read.
+- Arnes sin nueva aserción JWTgv ni revocación browser de binding; consentimiento/contexto y datos
+  son fixtures. Sin dispatch gateway, MFA humana, TLS ni rollout; no cierra B15/B20.
+- Bases temporales retiradas/puertos libres; fuentes Rooms limpias, sincorreo/push/flags/deploy.
+  [Evidencia y límites](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md).
+
+## 2026-10-28 — B10 browser repetido con MCP PostgreSQL
+
+- `local`: mismo Rooms `e0edf1e`, sin cambios de fuentes.16checksMCP+8gruposRoomsPASS contra issuer
+  `--mcp-pg`: PostgresOAuthStore real y dos bases efímeras. SQL independiente:1consentread,1código
+  consumido,1access+1refresh con scopes sólo read. Cookies sin renovar, consentimiento y step-up intactos.
+- El rótulo estático «memoria» del arnés anterior no describe este modo: fuente/flags/SQL lo refutan.
+  Grants bound sintéticos y proyección NULL-context; sin dispatch gateway/MFA ni migración1836 completa.
+- Bases temporales retiradas, procesos detenidos; sincorreo/push/flags/deploy. [Recibo y límites](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md).
+
+## 2026-10-28 — B10 local: Rooms no concede consentimiento MCP
+
+- `local`: Rooms `codex/rooms-design-integration@e0edf1e`, issuer Auth con fuentes idénticas a
+  `1136ac273`. Un BrowserContext y cookies sin renovar: read exige aprobación explícita, write403
+  por step-up antes/después; código real de un uso, token ES256 verificado con scope sólo read.
+- 16comprobacionesMCP +8gruposRoomsPASS;lint/typesPASS. PG real de identidad/Rooms; store MCP y
+  grantsPort sintéticos. No prueba dispatch gateway, persistencia MCP PG ni MFA; no cierra B15/B20.
+- Procesos19334/19335/55432 detenidos; sincorreo/push/main/flags/deploy. Nueva UI pendiente de
+  Claude Design; contrato productivo Auth sin cambios. [Prueba](../../../../docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md).
+
+## 2026-10-28 — B18 local: invitación guest no crea sesión interna ni SSO
+
+- `local`: runtime `codex/rooms-design-integration@3b1b7b2`; arnés UI de invitaciones ampliado con
+  control antes/después del OTP: cookie guest HttpOnly, sin cookies issuer/interna, sesión interna401;
+  authorize `prompt=none` devuelve `login_required`, sin código ni Set-Cookie.51checksPASS,lint/typesPASS.
+- Issuer real + PG efímero de Auth `31ffef1d1`; buzón RAM, cero correo real. Modo `--guest-sso-only`
+  acotado; cuatro capturas privadas con axe/layout limpios, sin aceptación de nueva UI ni suite general repetida.
+- Next3210/issuer19336/PG55432 detenidos; sin push/main/flags/cloud ni nuevo canary. Ningún cambio
+  necesario en contrato Auth. Claude Design aún debe entregar su interfaz para conectar/aceptar.
+  [Resultado](../../../../docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md).
+
+## 2026-10-26 — Entorno local y conectores preparados para Claude Design
+
+- `local`: rama `codex/rooms-design-integration`, commit `2cddc98a`, sin push/deploy. Next3216,
+  PG propio55433 y issuer fixture19338;8migraciones, dos organizaciones, admin/operator y guest RoomA.
+  Medios/caché/credenciales propios; child-env allowlist, guardhosted/cloud y estados privados0600.
+- `local`: `src/client` tipado, readers/commands con CAS/idempotencia, errores/abort/timeout y PUT seguro.
+  Bundle browser sin runtime server/fixtures.250testsPASS0skip,lint/types/build; Playwright53PASS/3skip.
+ 18checksAPIbrowserPASS: upload→worker→attach→publish→guestimagen, denegaciones, conflicto y replay.
+- `local`: up idempotente/stop con puertos libres+PG detenido/up inmediato conservan datos. Entorno running.
+  Login fixture sigue PKCE/nonce/iss/claims del consumer real; guest es fixture offline, sin OTP/correo.
+- La nueva UI aún no está conectada ni aceptada; no nuevo canary GCS/ID, no restorecloud8. AuthPR263/264
+  siguen abiertas y retenidas; producción/main e4b2e890 y flags remotos no cambiados.
+  [Manual](../../../../docs/manual-de-uso/rooms/integrar-claude-design-local.md),
+  [prueba](../../../../docs/audits/rooms/2026-10-26-local-design-integration.json).
+
+## 2026-10-26 — Contrato para integrar Claude Design y documentación sincronizados
+
+- `doc`: dossier, ADRs, manuales y contrato frontend distinguen corte ejecutado de roadmap V1 e historia.
+  [Estado vigente](../../../../docs/architecture/rooms/README.md) y [readback conjunto](../../../../docs/audits/rooms/2026-10-26-docs-skills-state-readback.json).
+- Backend disponible: lifecycle/ediciones V1/V2/V3, `can`, API/CLI, invitación tokenizada, imágenes privadas
+  GCS y worker automático. Eso no cierra todo EPIC-052 ni sustituye aceptación visual.
+- Pendiente para la nueva UI: entorno aislado con datos/permisos, conectores de pantallas al API same-origin,
+  recorrido cargar→procesar→adjuntar→publicar→leer y negativas de acceso/conflicto/revocación.
+  [Contrato y owners](../../../../docs/documentation/rooms/backend-api-for-claude-design.md).
+- Claude Design conserva interfaz; Codex backend. Auth PR263/264 permanecen abiertas sin merge/deploy
+  por decisión humana. Acceso general/flags humanos y ampliación de cohorte requieren otra decisión.
+- Canary real único ya recibido/verificado/cerrado; no enviar otro correo. El entorno nuevo aún no está
+  aprovisionado y el perfil WIF Production no se amplía a Preview. Sin nueva activación ni prueba de aplicación.
+
+## 2026-10-26 — Disparo automático de medios verificado; interfaz Claude Design
+
+- `vivo`: Rooms main `e4b2e890` (PR3), despliegue promovido `dpl_7JmMF7ZPBzR56wff83UyL4yFsXoS`.
+- `vivo`: Scheduler `rooms-media-dispatch` cada minuto, SA OIDC dedicada y audience fijo. Cola vacía200
+  sin ejecutar Job; demanda sintética en sala archivada202 → `rooms-media-worker-4r9nz` SUCCESS.
+  Guard de archivo rechaza antes de storage; cero objetos/derivados, cola vacía y ack liberado.
+- `vivo`: ocho migraciones/26 tablas, salas y publicaciones conservadas. Lease singleton10min y nonce
+  cercado. Worker timeout240s/retries0, imagen `sha256:d49995de3ee7e5fa71ec7fabe0e8bb04d8ac3b4bbd2ef125a8331311d1d121f2`.
+- `vivo`: flag de máquina ON; first-party/invitaciones/medios web OFF. Cero correos nuevos, no repetir canary.
+- `local`: verify234/234,9focales,lint/types/build y CI Linux PASS. Playwright53PASS/3skip (no aceptación visual). Bootstrap `b2f90fa` local preservado.
+- Auth: corrección queda en PR263/264 por decisión expresa del operador; sin merge ni despliegue.
+- Diseño y consumidor bajo Claude Design; activación general no acreditada.
+  [Evidencia](../../../../docs/audits/rooms/2026-10-26-automatic-media-dispatch.json) y [manual](../../../../docs/manual-de-uso/rooms/operar-worker-medios.md).
+
+## 2026-10-26 — Canary real de Auth y una imagen completado; flags OFF
+
+Alcance humano: una sala sintética, una imagen y un correo autorizado.
+[Prueba y límites](../../../../docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md).
+
+- Microsoft/MFA personal y seis canjes first-party reales durante renovaciones. La sala fue accesible;
+  el listado global quedó denegado. Edición y reapertura sólo en la sala, sin extender su expiración.
+- PNG físico de 3.010.606 bytes por PUT GCS y verificación SHA. Job `rooms-media-worker-nzxrg` produjo
+  dos WebP. Preview de 304.540 bytes, 1122×1402; SHA de SQL, bytes y ETag coincidentes. GET/HEAD200,
+  Range206, condicional304 y no-store. Edición V2 original conservada.
+- Un correo recibido en Outlook: código correcto200, incorrecto400, replay404; invitado sala/imagen200,
+  borrador/otro espacio404. Revocación401 para sala/imagen y404 para enlace. Un challenge y un consumo.
+- Invitación revocada y sala archivada; sesiones y pestañas de prueba cerradas. El archivo pertenece
+  a la demo sintética, sin contenido de clientes. No existe scheduler ni worker continuo.
+- Final: Rooms main `a87852e`, deployment `dpl_GACNzAvGSQVcjcMCCvjWj9BooizV`, flags de acceso e
+  invitaciones false y media ausente/OFF. Auth `00168-vzb`, 100%, first-party/OTP OFF y correo OFF.
+- Auth conserva la corrección a Resend producción v1 y Sentry production, sin nueva imagen ni full
+  release. El default staging del workflow requiere una corrección separada.
+- Bootstrap `b2f90fa` en rama local `codex/rooms-real-image-canary`, sin push ni cambio de main.
+  Lint/typecheck PASS; no se repitió la full suite. Consumidor Claude Design y disparo del Job pendientes.
+
+## 2026-10-26 — Infraestructura de medios aplicada; bloque acotado terminado
+
+Usuario autoriza infraestructura/migraciones/worker con subagentes, excluyendo Efeonce ID, correo y UI.
+Runtime permanece main a87852e; no hubo nuevo push ni redeploy Vercel.
+
+- Bucket `efeonce-rooms-production-media`, Standard US-EAST4: acceso uniforme, prevención pública,
+  soft-delete7d y CORS exclusivo del origin de Rooms. Anónimo403 y preflight origen ajeno denegado.
+  Roles de objetos mínimos por prefijo; app signBlob sólo sobre sí misma. Worker SA sin claves y
+  secretAccessor sólo sobre su secreto. [Storage/IAM](../../../../docs/audits/rooms/2026-10-26-media-storage-infra.json).
+- Cloud SQL Rooms pasa de5 a7 migraciones y de19 a25 tablas, sin salas ni ediciones preexistentes.
+  Rol `rooms_media_worker` sin privilegios altos/membresías, límite2 conexiones, UPDATE sólo columnas
+  necesarias; conexión y6 negativasACL PASS. Backup automático SUCCESS y PITR habilitado.
+  [DB](../../../../docs/audits/rooms/2026-10-26-media-database-infra.json).
+- Job `rooms-media-worker` us-east4, imagen digest c588d012…913133: CPU1/RAM1Gi, timeout240s,
+  reintentos0, una tarea/paralelismo1. Una ejecución `rooms-media-worker-sqbt9` completó con
+  `{processed:false}`: identidad/secreto/SQL comprobados con cola vacía, cero imágenes reales procesadas.
+  Sin scheduler ni loop. [Worker](../../../../docs/audits/rooms/2026-10-26-media-worker-deployment.json).
+- Tres variables GCS preparadas en el proyecto Vercel Production para el próximo deploy; no se
+  reconstruyó la aplicación. First-party=false, invitations=false, media ausente/defaultOFF.
+  El flag media=true existe únicamente dentro del Job privado.
+  [Configuración](../../../../docs/audits/rooms/2026-10-26-media-vercel-configuration.json).
+- Verificación nueva: lint del script operacional y typecheck global PASS; no repetir suite225 ya
+  pasada ni rediseñar interfaz. Un build y una ejecución del Job, sin consumo continuo de cómputo.
+- Próximo bloque separado: canary conjunto Auth/Rooms con el único correo autorizado, transferencia
+  física GCS y procesamiento de imagen; conectar consumidor frontend y definir disparo del Job antes
+  de activar medios. No declarar integración completa por infraestructura ni por la cola vacía.
+
+## 2026-10-26 — Backend integrado en main por autorización humana
+
+Pedido: «Sería al main de rooms cierto?» → «Ok, hazlo». [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2)
+fusionado a main en `a87852e345c331d6f4b3ca8e3137bf1fb2120e35`. Release preparado desde main con los
+commits backend de2070/2072; se excluyeron los doce paths visuales del scaffold2071. Se conserva sólo su
+contrato TypeScript de DTO. No hay diff de JSX, estilos ni copy visible frente a20f9fe9.
+
+- Verificación del candidato95609d5:225/225 tests,lint/types/build PASS; navegador53PASS y3 omisiones
+  intencionales de API repetida entre viewports; CI DockerLinux/decoder y preview Vercel SUCCESS.
+- Main ahora ejecuta también el gate CI del worker. Runtime checkout main limpio tras ff.
+- Readback Vercel Production previo: first-party=false, invitations=false, media ausente/defaultOFF;
+  perfil cloud-production configurado, storage/bucket de medios sin configurar. No se cambiaron variables.
+- Despliegue y smoke posteriores: ver [recibo de release](../../../../docs/audits/rooms/2026-10-26-production-backend-release.json).
+- Siguen pendientes recursos/IAM/CORS, migraciones cloud6/7, worker desplegado y canary Auth/medios.
+  La interfaz publicada conserva placeholder de medios: Claude Design debe conectar uploads.getTransfer
+  y lectura privada antes de activar medios. No se envió correo ni se desplegó Auth/Greenhouse.
+
+## 2026-10-26 — Codex backend; Claude Design interfaz
+
+Instrucción humana: «El diseño lo haré con Claude Design, prefiero que tu tomes backend». La pausa de
+aceptación visual2059 se conserva; Codex no modifica JSX/layout/motion. Backend sobre rama
+`task/2072-cloud-media-backend`, base7ca5fd3. Main publicado20f9fe9 permanece sin cambios por esta entrega.
+
+- TASK-2072: GCS privado por port, PUTV4efímero<=5min fuera de receipts, complete verifica bytes/generación
+  fueraSQL y revalida autoridad/CAS; lecturaSHA antesGET/HEAD/Range/304, sin originaldownload.
+- Worker compilado con submanifest/lock mínimo y prodsmoke aislado sin tsx/Next/React/AXIS; perfil
+  CloudRunJob+Compute metadata de SA/rol/secret separados, sin simular Vercel ni ADC de operador.
+- Runtime225/225testsPASS0skip, lint/types/build. RecoveryPG16fresh7migraciones yPG18aisladoPASS:
+  2tenants/6rooms,25tablas,18objetos/12bindings,ACL/hashes/generación/down-up/corrupción/revocación.
+- CLI soporta sesión existente en archivo0600 con Cookie+Origin, valida destino directo y no copia
+  credenciales aGCS. Su login/obtención de sesión y OIDC productivo conservan canary propio.
+- [Contrato para Claude Design](../../../../docs/documentation/rooms/backend-api-for-claude-design.md).
+- Publicado backend en commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1), draft contra rama rescatada; CI Linux Docker/decoder SUCCESS y preview Vercel SUCCESS. Main conserva20f9fe9.
+- Pendientes reales: bucket/IAM/CORS, rol/SA/secret/worker cloud, migracióncloud y canary.
+  Código/fakesSDK y recursos preparados no acreditan esos resultados. Ningún flag/correo activado. CLI+ADC renovados y verificados; bucket/SA/secret worker not_found, lectura Job no concluyente.
+
+## Corte 2026-10-25 ~22:55 UTC — Codex se queda sin uso
+
+Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md).
+
+### Runtime publicado
+
+- **`efeonce-rooms@20f9fe9`**: Vercel Production `dpl_7o71umG3uuNgz8RguhPPGksA69ad`, Ready (`vivo`). Región `gru1`.
+- **18 env `ROOMS_*`** sólo en Production, OFF según los docs (`doc`; valores no releídos). Entre ellas:
+  - `ROOMS_FIRST_PARTY_AUTH_ENABLED`
+  - `ROOMS_INVITATIONS_ENABLED`
+- **DB `rooms_production`** en `greenhouse-pg-dev`: 19 tablas y 5 migraciones aplicadas. WIF `rooms-vercel/production` ACTIVE, SA sin claves, 6 secretos `rooms-production-*` y WAF `waf_JssfW9nWmJeU` v2 con 4 reglas.
+- **Demo sintética:** `https://efeonce-rooms.vercel.app/demo` (vistas Cliente, Operador y Administrador).
+
+### Avance del epic
+
+- **Done local:** R02 (falta aceptación humana).
+- **Parciales:** R01, R03, R04, R06 y R13 (CLI sin MCP).
+- **Sólo WIP:** R05, R07 y R08.
+- **No iniciadas:** R09–R12, R14 y R15.
+- Los 21 criterios de salida siguen sin tildar.
+
+### Tasks
+
+| Task | Estado |
+|---|---|
+| 2058, 2060, 2062, 2065 | complete (cierres locales). |
+| 2061 | complete, con contradicción interna entre `:181` y `:292`. |
+| 2059 | **No aceptada** (2026-10-25): Julio busca «algo más inmersivo» y pidió frenar. Revisar la dirección de experiencia con maqueta antes de construir más. |
+| 2066 | Invitaciones: correo real único, respuestas indistinguibles y canary. |
+| 2068 | Media protegida, BFCache, GVC, aceptación humana y manual. |
+| 2069 | Cloud: 2/12 criterios tildados y canary pendiente. |
+| 2070 / 2071 | WIP rescatado en rama local `task/2070-2071-private-media` (abajo). |
+
+### WIP de medios — rescatado en rama
+
+- **Rescate 2026-10-25 (Claude):** el WIP quedó commiteado en la rama local `task/2070-2071-private-media` de `efeonce-rooms` (`c0facfd` backend, `2626921` UI; sin push). Se corrigió el TS2322 y los tests de medios entraron a `pnpm test`: `pnpm verify` PASS con 205/205 tests (incluye 9 de persistencia en la PG local) y build OK. `main` sigue en `20f9fe9` (candidato del canary).
+- **Avance 2026-10-25 (Claude, rama `task/2070-2071-private-media`, commit `7ca5fd3`):** limpieza `sweepMedia` (expira subidas vencidas con auditoría/outbox, borra temporales y objetos sin referencia tras un margen, nunca renditions ni fuentes vivas), worker `--sweep`/`--loop` con parada limpia, el hijo decodificador hereda el loader del worker (ya no fuerza `tsx`) y la migración trae un bloque DO de verificación (probado en la PG local). `pnpm verify` PASS con 207/207 y build OK. Faltan: adapter GCS, empaquetado desplegable del worker, ensayo de restore y GVC.
+- Para cerrar siguen faltando: adapter GCS, empaquetado desplegable del worker, ensayo down/up/restore, GVC y aceptación humana. También confirmar `sharp` como dependencia directa. Flag `ROOMS_MEDIA_ENABLED` (ya existe en `src/server/media/config.ts`, default OFF) registrado en el ledger de flags.
+
+### Estado previo al rescate (sin commitear, ~1.950 líneas)
+
+- **Implementado en local:**
+  - V3 opt-in.
+  - Tablas `assets`, `asset_versions`, `upload_sessions`, `media_jobs`, `media_renditions` y `edition_assets`.
+  - Worker con `sharp` en proceso hijo.
+  - Transporte GET/HEAD/Range privado (8 pruebas PASS según Codex).
+  - UI de autoría e inspector.
+- **Checks `local`:**
+  - `pnpm typecheck` **FALLA** con TS2322 en `src/app/rooms/[roomId]/edit/page.tsx` (`schemaVersion` 2 no asignable a 1).
+  - Lint PASS.
+  - `pnpm test` 178/178, pero no incluye `tests/media-*`.
+  - Medios sin DB: 18/18.
+- **Lo que Codex iba a hacer:** procesamiento de imágenes y prueba cargar → publicar → abrir como invitado.
+- **Para cerrar:**
+  - Typecheck, sumar los tests de medios al script y `pnpm build`.
+  - Bloque DO en la migración.
+  - Ensayo down/up y restore.
+  - Limpieza de cuarentena.
+  - Adapter GCS.
+  - Worker desplegable sin `tsx`.
+  - Flag `ROOMS_MEDIA_ENABLED`.
+  - GVC 1440/1024/390/320 y aceptación humana.
+- **Pendiente de confirmar:** `sharp` pasa a dependencia directa, y el plan pedía liberación previa.
+
+### Secuencia pendiente
+
+1. Llevar el WIP a una rama, corregirlo y verificarlo.
+2. Promover Auth (skill `efeonce-auth`).
+3. `ROOMS_*` ON con readback.
+4. Bootstrap de la sala sintética.
+5. Un único canary con correo a `jreyes@efeoncepro.com`.
+6. R05 cloud (GCS + worker).
+7. R07–R12.
+8. R14/R15, incluido el DNS `rooms.efeonce.org`.
+
+### Riesgos abiertos
+
+- Commits directos a `main`: 18 en ~1h40 sin PR ni CI, y cada push es producción.
+- `rooms_runtime` con `CONNECT`/`TEMP` heredado sobre otras bases de la instancia compartida.
+- El ADR de producto sigue `Proposed`.
+- Evidencias en `/tmp` (efímeras).
+- Flags `ROOMS_*` fuera del gate de flags de Greenhouse.
+
+### Lecciones
+
+- «Tests verdes» puede no cubrir lo nuevo: el glob de `pnpm test` dejaba fuera `tests/media-*` (y luego `tests/live-*`). Al sumar un archivo de test, confirmar que el script lo recoge: la cuenta de tests debe subir.
+- La integración local valida un inventario exacto de migraciones (`REVIEWED_MIGRATIONS`): cada migración nueva se agrega ahí tras revisarla, o `integration:up` falla en preflight sin decir por qué.
+- Un cierre «local» (DB local) no acredita el runtime cloud: decir siempre contra qué base se probó.

@@ -1,0 +1,7 @@
+Redraw this exact scene, with the same composition, horizon height and sun position, as a minimal, elegant ink line drawing on warm ivory paper (#F0EEE6), in the style of a fine generative pen plotter drawing:
+- background: flat warm ivory, completely empty sky, no gradient, no stars;
+- dunes: drawn only with thin, confident black ink contour lines following the same dune shapes, with fine vertical hatching strokes on the shaded slopes, and tiny scattered dots of sand; no fills, no shading, no color;
+- horizon: one thin, straight black ink line across the full width;
+- sun: a perfect, flat, solid terracotta-coral disc (#D97757) at the exact same position, half sunk below the horizon line, with a crisp edge and no glow;
+- birds: the big flock does NOT exist yet; instead, only about thirty small, simple black ink strokes of birds scattered loosely and calmly across the sky, each a tiny curved stroke.
+Clean, graphic, quiet and precise, lots of empty ivory space. Absolutely no photographic elements, no navy, no texture other than the ink lines. No text, no logos, no letters, no signature.

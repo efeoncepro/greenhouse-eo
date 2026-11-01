@@ -31,7 +31,7 @@
 
 ## Summary
 
-Implementa un mecanismo común de habilitación por organización/persona/servicio, reutilizable para clientes sin reglas por nombre de cuenta. Su primera cohorte de conciliación y certificación es Berel (SEO y marketing de contenidos) y Sky (diseño digital) mediante servicios, fuentes, personas, módulos y acciones verificadas. Incluye destinatarios, preferencias y disponibilidad de email/in-app/Teamsbot. Consume el contrato de entrada de TASK-1834 sin implementar otro login.
+Implementa un mecanismo común de habilitación por organización/persona/servicio, reutilizable para clientes sin reglas por nombre de cuenta. Su primera cohorte de conciliación y certificación es Berel (SEO y marketing de contenidos) y Sky (diseño digital) mediante servicios, fuentes, personas, módulos y acciones verificadas. Incluye destinatarios, preferencias y disponibilidad de email/in-app/Teamsbot. Consume el contrato de entrada de TASK-2063 sin implementar otro login.
 
 ## Why This Task Exists
 
@@ -65,18 +65,18 @@ Reglas: BFF hoja, productores como SoT, autorización server-side por objeto, no
 - `docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md`.
 - `docs/context/00_INDEX.md`, `docs/context/10_experiencia-cliente.md` y `docs/context/05_voz-tono-estilo.md`.
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
-- `docs/tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
+- `docs/tasks/to-do/TASK-2063-greenhouse-customer-login-convergence-native-issuer.md` para entrada/retorno; no adquirir su ownership.
 - Skills: greenhouse-task-planner y greenhouse-documentation-governor; al implementar, skill de dominio y greenhouse-qa-release-auditor.
 
 ## Dependencies & Impact
 
 ### Depends on
 
-TASK-1834 es dependencia de contrato y condicional de rollout: el login nativo espera sus gates, la habilitación con login vigente verificado puede avanzar. TASK-1687 bloquea exponer el destino roto de Sky. TASK-1845/1848 y TASK-690/693 coordinan Insights/canales; no bloquean el inventario. TASK-1012/1839 sólo cuando falte provisión o invitación.
+TASK-2063 es dependencia de contrato y condicional de rollout: el login nativo espera sus gates, la habilitación con login vigente verificado puede avanzar. TASK-1687 bloquea exponer el destino roto de Sky. TASK-1845/1848 y TASK-690/693 coordinan Insights/canales; no bloquean el inventario. TASK-1012/1839 sólo cuando falte provisión o invitación.
 
 ### Blocks / Impacts
 
-TASK-1853/1854/1855/1856; TASK-1834 como consumer de matriz/cohorte y casos de retorno. Ninguna dependencia recíproca bloquea el desarrollo de ambos programas.
+TASK-1853/1854/1855/1856; TASK-2063 como consumer de matriz/cohorte y casos de retorno. Ninguna dependencia recíproca bloquea el desarrollo de ambos programas.
 
 ### Files owned
 
@@ -235,7 +235,7 @@ ni canal por inferencia.
 
 ## Out of Scope
 
-- Login/OIDC/callback/selector de organización (TASK-1834); provisión de identidades (TASK-1839); migración del catálogo de Sky (TASK-1687); cascada general TASK-828/829; ampliación contractual, envío de mensajes o sustitución de Notion/Drupal.
+- Login/OIDC/callback/selector de organización (TASK-2063); provisión de identidades (TASK-1839); migración del catálogo de Sky (TASK-1687); cascada general TASK-828/829; ampliación contractual, envío de mensajes o sustitución de Notion/Drupal.
 - Sin commit/push/deploy, cambios live ni envíos como consecuencia de registrar la task. Durante la implementación inicial no se autorizaron subagentes. El 2026-09-09 el operador sí autorizó tres subagentes read-only para consolidar el discovery documental; cambios de rama y worktrees permanecen fuera.
 
 ## Detailed Spec
@@ -262,7 +262,7 @@ Slice 1 → Slice 2 → Slice 3. Contrato/negativos antes de habilitación; stag
 
 ### Feature flags / cutover
 
-Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-1834 controla de forma independiente login legacy/nativo/recovery.
+Rollout por cohorte/módulo existente; no inventar nombres de flags activos. Toda capacidad nueva comienza deshabilitada o sólo lectura hasta evidencias. Si se necesita flag nueva, declararla en ledger antes del apply. TASK-2063 controla de forma independiente login legacy/nativo/recovery.
 
 ### Rollback plan per slice
 
@@ -294,8 +294,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 ## Acceptance Criteria
 
 - [x] Matriz y manifiesto separan SEO/contenidos Berel y diseño digital Sky; documentan registros/términos ausentes. AEO preservado. [QA y matriz](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
-- [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-1834.
-- [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-1834 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
+- [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-2063.
+- [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-2063 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
 - [x] Preview/apply concurrente y replay conservan un efecto; preserva asignación ajena y receipt inmutable. Compensación canónica el mismo día y rechazo por cambios posteriores: 14 ensayos PostgreSQL local en QA.
 - [x] Preferencias explícitas declaradas para las seis personas con la política `client_service_default_v1` (ruta `portal-users/notification-preferences`; cadencia por evento; Teams sólo reporte/feedback vía Insights). Login y entrega por canal siguen pendientes.
 - [ ] Login y entrega por canal pendientes para seis personas elegidas. Las tres de Berel ya existen (invitación diferida, sin correo; entrega bloqueada por el operador hasta tener interfaces) y requieren entrega + activación; las tres de Sky están activas pero sin login observado. Destinos Teams (chats grupales) registrados `ready` en ambas organizaciones; preferencias y cadencia siguen sin declarar. El usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.

@@ -1,0 +1,185 @@
+{
+  "verifiedAt": "2026-10-26T19:00:11.052537+00:00",
+  "status": "controlled_canary_passed_and_disabled",
+  "scope": {
+    "syntheticRooms": 1,
+    "physicalImages": 1,
+    "authorizedRecipientCount": 1,
+    "emailDispatches": 1,
+    "customers": 0,
+    "uiChanges": false,
+    "fullGreenhouseRelease": false,
+    "newAuthImageBuild": false,
+    "newWorkerImageBuild": false
+  },
+  "runtimeMain": "a87852e345c331d6f4b3ca8e3137bf1fb2120e35",
+  "operatorTooling": {
+    "localCommit": "b2f90fa",
+    "branch": "codex/rooms-real-image-canary",
+    "publishedToMain": false,
+    "change": "pilot room-only content.edit and editions.reopen; no expiry extension"
+  },
+  "identity": {
+    "microsoftSignInAndMfa": "human approved; browser session active",
+    "firstPartyCodes": {
+      "issued": 6,
+      "consumed": 6
+    },
+    "roomScopedHttpRead": 200,
+    "workspaceList": "denied as designed; no workspace grant"
+  },
+  "media": {
+    "source": "existing synthetic Rooms demo PNG; physical GCS transfer",
+    "sourceBytes": 3010606,
+    "sourceSha256": "72fa2bbe31bc8d2a752d3eee64e6f98472bb8f8137b1bc92ab2b840817d5b891",
+    "asset": {
+      "state": "ready",
+      "source_generation_pinned": true,
+      "source_checksum_matches": true
+    },
+    "renditions": [
+      {
+        "profile": "preview",
+        "generation_pinned": true,
+        "bytes": 304540,
+        "width": 1122,
+        "height": 1402,
+        "checksum_matches": true
+      },
+      {
+        "profile": "thumbnail",
+        "generation_pinned": true,
+        "bytes": 52250,
+        "width": 384,
+        "height": 480,
+        "checksum_matches": true
+      }
+    ],
+    "previewSha256": "df72da46de53914815489398172e4840881bcb3f78e6ec4016d0b9fad75e0a1a",
+    "headStatus": 200,
+    "conditionalStatus": 304,
+    "workerExecution": "rooms-media-worker-nzxrg",
+    "workerExecutionResult": "SUCCESS; processed actual source to two renditions",
+    "workerDigestUnchanged": true,
+    "originalV2EditionRetained": true
+  },
+  "email": {
+    "providerAccepted": true,
+    "receivedInAuthorizedOutlookMailboxAt": "2026-10-26T18:46:49Z",
+    "singleCombinedLinkAndCode": true,
+    "connectorPresentationSoftWrapNormalized": true,
+    "senderDomain": "mail.efeoncepro.com",
+    "clickTracking": false,
+    "openTracking": false,
+    "deliveryRows": {
+      "total": 1,
+      "accepted": 1,
+      "failed": 0
+    },
+    "challenges": {
+      "total": 1
+    },
+    "proofConsumptionCount": 1,
+    "credentialsPrinted": false
+  },
+  "guestHttp": {
+    "startStatus": 200,
+    "wrongCodeStatus": 400,
+    "verifyStatus": 200,
+    "ownRoomStatus": 200,
+    "schema": "rooms.room.v3",
+    "guestCookiePresent": true,
+    "credentialsPrinted": false,
+    "imageStatus": 200,
+    "imageBytes": 304540,
+    "checksumMatches": true,
+    "etagMatches": true,
+    "privateNoStore": true,
+    "rangeStatus": 206,
+    "draftStatus": 404,
+    "crossTenantStatus": 404,
+    "replayedCodeStatus": 404,
+    "revokedRoomStatus": 401,
+    "revokedImageStatus": 401,
+    "revokedLinkStatus": 404
+  },
+  "cleanup": {
+    "invitationRevoked": true,
+    "roomArchived": true,
+    "roomRevision": 14,
+    "guestTestCookiesAndResponsesCleared": true,
+    "roomsBrowserSessionLoggedOut": true,
+    "temporaryBrowserTabsClosed": true,
+    "schedulerAdded": false,
+    "imageObjectsRetainedWithImmutableEditions": true
+  },
+  "finalAuth": {
+    "revision": "auth-server-00168-vzb",
+    "trafficPercent": 100,
+    "imageDigest": "gcr.io/efeonce-group/auth-server@sha256:122e2acbed9961741c3c71307f0c9fc616a213f02f59f1ea00a990056e1a8987",
+    "firstParty": "false",
+    "otp": "false",
+    "sentryEnvironment": "production",
+    "resendSecretRef": {
+      "key": "1",
+      "name": "greenhouse-resend-api-key-production"
+    },
+    "otpMountAbsent": true,
+    "authorityMountAbsent": true,
+    "checks": [
+      {
+        "path": "/healthz",
+        "status": 200
+      },
+      {
+        "path": "/readyz",
+        "status": 200
+      },
+      {
+        "path": "/.well-known/oauth-authorization-server",
+        "status": 200
+      }
+    ]
+  },
+  "finalRooms": {
+    "deploymentId": "dpl_GACNzAvGSQVcjcMCCvjWj9BooizV",
+    "url": "efeonce-rooms-bqpds3btf-efeonce-7670142f.vercel.app",
+    "sha": "a87852e345c331d6f4b3ca8e3137bf1fb2120e35",
+    "flags": {
+      "ROOMS_FIRST_PARTY_AUTH_ENABLED": "false",
+      "ROOMS_INVITATIONS_ENABLED": "false",
+      "ROOMS_MEDIA_ENABLED": "absent_defaults_off"
+    },
+    "gcsProjectConfigurationPrepared": true,
+    "checks": [
+      {
+        "path": "/demo",
+        "status": 200
+      },
+      {
+        "path": "/invite",
+        "status": 200
+      },
+      {
+        "path": "/login",
+        "status": 503
+      },
+      {
+        "path": "/api/v1/rooms",
+        "status": 401
+      }
+    ]
+  },
+  "emailTypeEnabled": false,
+  "checks": {
+    "runtimeTypecheck": "PASS",
+    "bootstrapLint": "PASS",
+    "priorFullSuiteRepeated": false
+  },
+  "limitations": [
+    "Guest flow verified by real HTTP client using received email; no new guest UI design acceptance",
+    "Frontend direct-upload/private-viewer integration and automatic worker trigger remain separate",
+    "No general customer rollout or full assurance/pentest closure claimed",
+    "Auth workflow default staging still needs its own correction; live config now uses production Resend and Sentry"
+  ]
+}

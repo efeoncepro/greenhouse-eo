@@ -4,6 +4,8 @@
 
 **Versión 0.1 · 22 de octubre de 2026 · Borrador para revisión**
 
+> **Nota 29/10/2026.** Este archivo describe el borrador 0.1 del 22/10 y no es la versión entregada. La técnica final es el deck del lienzo Claude Design ([artifact](https://claude.ai/artifact/FTkrgJDZZ77cNpsetLqd4q), versión 74): 41 láminas + Anexo A, exportado a PDF de 42 páginas, con otro orden por capítulos (01 Las ideas 3–10, 02 El alcance 11–22, 03 Equipo y operación 23–31, 04 Respaldo 32–38, 05 Inversión 39–40, contraportada 41, Anexo A en la página 42). La versión cliente no lleva códigos de fuente ([E01]–[E08], [P01], [P02]), cajas de pendiente ni sellos de borrador, y se retiraron los anexos B y C de fuentes internas. Las referencias de este archivo a «28 láminas/bloques», números de lámina, «borrador» o páginas PDF por incorporar quedan superadas; la económica final está en [oferta-economica.md](oferta-economica.md) y [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json). Estado del caso en el [README](README.md).
+
 Esta propuesta plantea el servicio y dos conceptos creativos de trabajo. Las demostraciones descritas son propuestas para su evaluación: no son campañas ejecutadas ni piezas aprobadas para publicación. La asignación nominal del equipo y las condiciones finales se validarán antes de emitir la oferta.
 
 <!-- COMIENZO_NARRATIVA_DECK -->

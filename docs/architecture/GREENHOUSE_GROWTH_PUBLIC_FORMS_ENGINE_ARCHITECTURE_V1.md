@@ -57,6 +57,15 @@ verificación y formulario de un evento real: pendientes.
 
 Contrato de host y tabla de tokens: [runtime contract §Formulario en línea](growth-public-forms-runtime-contract.md#formulario-en-línea-y-reserva-por-evento-task-20532054).
 
+**Delta 2026-10-24 (tarde) — módulo de eventos: webinar de Teams (diseño, no implementado).** La sesión de un evento
+es un webinar de Teams y Greenhouse sigue siendo dueño de la reserva, el cupo y la lista de espera. El diseño objetivo
+(inscripción en el webinar por Microsoft Graph con `joinWebUrl` personal, ledger de transiciones con cancelación y
+promoción, asistencia desde el informe del webinar y Eventos de marketing de HubSpot con una sola fuente por evento) no
+tiene código todavía. Límites actuales y diseño:
+[runtime contract §Delta 2026-10-24](growth-public-forms-runtime-contract.md#delta-2026-10-24--límites-actuales-y-diseño-objetivo-webinar-de-teams);
+pendiente canónico:
+[RESEARCH-013 §Backlog](../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+
 ## Delta 2026-10-15 — renderer: `radio` como tarjetas en toda variante, enlace de privacidad legible e íconos SVG de etiqueta (§19)
 
 Commit `ab622e958` en `src/growth-forms-renderer/**` (tests 83/83 del renderer y 167/167 del dominio forms):

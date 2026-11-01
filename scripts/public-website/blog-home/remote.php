@@ -160,6 +160,42 @@ switch ( $op ) {
 		$out( $plan + array( 'applied' => true ) );
 		break;
 
+	case 'line':
+		// The service line of one post when its category does not say it (`_eo_line`); `off` returns it to its topic.
+		$id   = $find( $in['post'] ?? '' );
+		$raw  = strtolower( trim( (string) ( $in['line'] ?? '' ) ) );
+		$line = 'off' === $raw ? '' : EO_CM_Util::line_key( $raw );
+		if ( 'off' !== $raw && '' === $line ) { WP_CLI::error( 'Unknown line. Valid: ' . implode( ', ', array_keys( EO_CM_Util::LINES ) ) . ', off' ); }
+		$plan = array( 'op' => 'line', 'post' => $id, 'title' => get_the_title( $id ), 'url' => get_permalink( $id ), 'before' => (string) get_post_meta( $id, EO_CM_Util::LINE_META, true ), 'after' => $line );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( '' === $line ) { delete_post_meta( $id, EO_CM_Util::LINE_META ); } else { update_post_meta( $id, EO_CM_Util::LINE_META, $line ); }
+		clean_post_cache( $id );
+		if ( (string) get_post_meta( $id, EO_CM_Util::LINE_META, true ) !== $line || get_permalink( $id ) !== $plan['url'] ) { WP_CLI::error( 'Readback failed.' ); }
+		$finish( 'line' );
+		// The article changes color too: purge its page, not only /blog/.
+		$kinsta = isset( $GLOBALS['kinsta_cache']->kinsta_cache_purge ) ? $GLOBALS['kinsta_cache']->kinsta_cache_purge : null;
+		if ( $kinsta && method_exists( $kinsta, 'initiate_purge' ) ) { $kinsta->initiate_purge( $id ); }
+		$out( $plan + array( 'applied' => true ) );
+		break;
+
+	case 'client':
+	case 'reviewed':
+		// Rail cards (TASK-2051 v2): the client of a case (`_eo_client`, its logo on the card) and the editor's «última
+		// revisión» (`_eo_reviewed_at`, the «Actualizado» badge for 30 days). `off` clears it.
+		$id    = $find( $in['post'] ?? '' );
+		$raw   = trim( (string) ( $in['value'] ?? '' ) );
+		$key   = 'client' === $op ? EO_Home_Pins::CLIENT_META : EO_Home_Pins::REVIEWED_META;
+		$value = 'off' === $raw ? '' : ( 'client' === $op ? EO_Home_Pins::sanitize_client( $raw ) : EO_Home_Pins::sanitize_day( $raw ) );
+		if ( 'off' !== $raw && '' === $value ) { WP_CLI::error( 'client' === $op ? 'Unknown client. Valid: ' . implode( ', ', array_keys( EO_Home_Adapter::RAIL_CLIENTS ) ) . ', off' : 'Expected AAAA-MM-DD or off.' ); }
+		$plan = array( 'op' => $op, 'post' => $id, 'title' => get_the_title( $id ), 'before' => (string) get_post_meta( $id, $key, true ), 'after' => $value );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( '' === $value ) { delete_post_meta( $id, $key ); } else { update_post_meta( $id, $key, $value ); }
+		clean_post_cache( $id );
+		if ( (string) get_post_meta( $id, $key, true ) !== $value ) { WP_CLI::error( 'Readback failed.' ); }
+		$finish( $op );
+		$out( $plan + array( 'applied' => true ) );
+		break;
+
 	case 'hero':
 		$id     = $find( $in['post'] ?? '' );
 		$keys   = array( '_eo_hero_light', '_eo_hero_bold', '_eo_hero_image' );
@@ -189,6 +225,41 @@ switch ( $op ) {
 			if ( (string) get_post_meta( $id, $key, true ) !== (string) ( $value ?? '' ) ) { WP_CLI::error( 'Readback failed: ' . $key ); }
 		}
 		$finish( 'hero' );
+		$out( array_merge( $plan, array( 'after' => $after, 'applied' => true ) ) );
+		break;
+
+	case 'card':
+		// The rail card's own image (`_eo_card_image`; the featured image stays the OG image) and its focal point
+		// (`_eo_card_focus`, «70% 30%»): the portrait card crops a 16:9 cover at the center otherwise.
+		$id     = $find( $in['post'] ?? '', ! empty( $in['resource'] ) ? EO_Resource_Registry::TYPE : 'post' );
+		$keys   = array( EO_Home_Pins::CARD_IMAGE_META, EO_Home_Pins::CARD_FOCUS_META );
+		$before = $snapshot( $id, $keys );
+		$after  = ! empty( $in['clear'] ) ? array_fill_keys( $keys, null ) : array();
+		if ( isset( $in['focus'] ) ) {
+			$focus = 'off' === trim( (string) $in['focus'] ) ? '' : EO_Home_Pins::sanitize_focus( $in['focus'] );
+			if ( 'off' !== trim( (string) $in['focus'] ) && '' === $focus ) { WP_CLI::error( 'Expected --focus "x% y%" (0–100) or off.' ); }
+			$after[ EO_Home_Pins::CARD_FOCUS_META ] = $focus;
+		}
+		if ( isset( $in['attachment'] ) ) {
+			$att = (int) $in['attachment'];
+			if ( ! wp_attachment_is_image( $att ) ) { WP_CLI::error( "#{$att} is not an image attachment." ); }
+			$after[ EO_Home_Pins::CARD_IMAGE_META ] = $att;
+		}
+		$wants_image = ! empty( $in['image_file'] );
+		if ( $wants_image && empty( $in['alt'] ) ) { WP_CLI::error( 'An imported image needs --alt.' ); }
+		if ( ! $after && ! $wants_image ) { WP_CLI::error( 'Nothing to change: pass --attachment, --image, --focus or --clear.' ); }
+		$plan = array( 'op' => 'card', 'post' => $id, 'title' => get_the_title( $id ), 'featured_image' => (int) get_post_thumbnail_id( $id ), 'before' => $before, 'after' => $after + ( $wants_image ? array( EO_Home_Pins::CARD_IMAGE_META => '(imagen importada)' ) : array() ) );
+		if ( ! $apply ) { $out( $plan + array( 'applied' => false ) ); break; }
+		if ( $wants_image ) { $after[ EO_Home_Pins::CARD_IMAGE_META ] = $import( (string) $in['alt'] ); }
+		foreach ( $after as $key => $value ) {
+			if ( null === $value || '' === $value || 0 === $value ) { delete_post_meta( $id, $key ); } else { update_post_meta( $id, $key, $value ); }
+		}
+		clean_post_cache( $id );
+		foreach ( $after as $key => $value ) {
+			if ( (string) get_post_meta( $id, $key, true ) !== (string) ( $value ?: '' ) ) { WP_CLI::error( 'Readback failed: ' . $key ); }
+		}
+		if ( (int) get_post_thumbnail_id( $id ) !== $plan['featured_image'] ) { WP_CLI::error( 'The featured image changed: it must stay the OG image.' ); }
+		$finish( 'card' );
 		$out( array_merge( $plan, array( 'after' => $after, 'applied' => true ) ) );
 		break;
 
@@ -298,6 +369,54 @@ switch ( $op ) {
 			update_option( 'eo_blog_glitch_form_surface', $after['surface'], false );
 		}
 		$finish( $op );
+		$out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => true ) );
+		break;
+
+	case 'archive':
+		// «Archivo del blog» (TASK-2055): eo_blog_archive_enabled '0' (Ohio), 'preview' (only ?eoba_preview=<token>), '1'.
+		$want = (string) ( $in['value'] ?? '' );
+		if ( ! in_array( $want, array( '0', 'preview', '1' ), true ) ) { WP_CLI::error( 'archive needs 0, preview or 1.' ); }
+		if ( ! class_exists( 'EOBH_Archive' ) || ! class_exists( 'EO_Archive_Adapter' ) ) { WP_CLI::error( 'EOBH_Archive or EO_Archive_Adapter is missing: deploy eo-blog-home and the content model first.' ); }
+		$before = array( 'value' => (string) get_option( 'eo_blog_archive_enabled', '0' ), 'token' => '' !== (string) get_option( 'eo_blog_archive_preview_token', '' ) );
+		if ( ! $apply ) { $out( array( 'op' => 'archive', 'before' => $before, 'after' => array( 'value' => $want ), 'applied' => false ) ); break; }
+		if ( 'preview' === $want && '' === (string) get_option( 'eo_blog_archive_preview_token', '' ) ) {
+			update_option( 'eo_blog_archive_preview_token', wp_generate_password( 20, false ), false );
+		}
+		update_option( 'eo_blog_archive_enabled', $want, true );
+		if ( (string) get_option( 'eo_blog_archive_enabled' ) !== $want ) { WP_CLI::error( 'Readback failed.' ); }
+		// Public archives change only when the template goes on for everyone or back off: then the whole page cache goes.
+		if ( '1' === $want || '1' === $before['value'] ) {
+			WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );
+			WP_CLI::runcommand( 'kinsta cache purge --all', array( 'return' => true ) );
+		}
+		$token = (string) get_option( 'eo_blog_archive_preview_token', '' );
+		$out( array( 'op' => 'archive', 'before' => $before, 'after' => array( 'value' => $want ), 'applied' => true, 'preview' => 'preview' === $want ? array( 'query' => 'eoba_preview=' . $token, 'example' => home_url( '/category/hubspot/?eoba_preview=' . $token ) ) : null ) );
+		break;
+
+	case 'topic-descriptions':
+		// Category descriptions (TASK-2055): the text under a topic's title and its meta description; with ≥ 4 posts the
+		// topic becomes indexable. `descriptions`: { slug: text }. `before` holds the previous texts (the rollback).
+		$want = (array) ( $in['descriptions'] ?? array() );
+		if ( ! $want ) { WP_CLI::error( 'topic-descriptions needs { "descriptions": { "slug": "text" } }.' ); }
+		$before = array();
+		foreach ( $want as $slug => $text ) {
+			$term = get_term_by( 'slug', (string) $slug, 'category' );
+			if ( ! $term ) { WP_CLI::error( "No category «{$slug}»." ); }
+			if ( mb_strlen( (string) $text ) > 200 ) { WP_CLI::error( "Description of «{$slug}» is longer than 200 characters." ); }
+			$before[ $slug ] = (string) $term->description;
+		}
+		if ( ! $apply ) { $out( array( 'op' => $op, 'before' => $before, 'after' => $want, 'applied' => false ) ); break; }
+		$after = array();
+		foreach ( $want as $slug => $text ) {
+			$term = get_term_by( 'slug', (string) $slug, 'category' );
+			$r    = wp_update_term( (int) $term->term_id, 'category', array( 'description' => (string) $text ) );
+			if ( is_wp_error( $r ) ) { WP_CLI::error( $r->get_error_message() ); }
+			clean_term_cache( (int) $term->term_id, 'category' );
+			$after[ $slug ] = (string) get_term( (int) $term->term_id, 'category' )->description;
+			if ( $after[ $slug ] !== (string) $text ) { WP_CLI::error( "Readback failed for «{$slug}»." ); }
+		}
+		WP_CLI::runcommand( 'cache flush', array( 'return' => true ) );
+		WP_CLI::runcommand( 'kinsta cache purge --all', array( 'return' => true ) );
 		$out( array( 'op' => $op, 'before' => $before, 'after' => $after, 'applied' => true ) );
 		break;
 

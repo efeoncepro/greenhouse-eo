@@ -242,6 +242,8 @@ para habilitar reenvíos. La eliminación de una regla o secreto exige un plan p
 ## Documentación y estado de cierre
 
 - [Referencia técnica LinkedIn](../reference/measurement-gtm-ga4/11-linkedin-insight-tag-conversions-api.md).
+- [Mapa de acceso a las APIs de LinkedIn](../reference/linkedin-api-access-map.md) (2026-10-31): requisitos,
+  productos, niveles, roles, almacenamiento y ruta sugerida para Advertising, Lead Sync y Community Management.
 - [Preparar medición LinkedIn](../manual-de-uso/growth/preparar-medicion-linkedin.md).
 - [Superficie funcional](../documentation/growth/linkedin-ads-measurement.md).
 - [Políticas comunes](GREENHOUSE_GROWTH_MEASUREMENT_POLICY_DECISION_V1.md).

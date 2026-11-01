@@ -1,0 +1,534 @@
+{
+  "summary": {
+    "dryRun": true,
+    "real": 15,
+    "documentsEmpty": 15,
+    "linksClear": 3,
+    "oldSlugsDelete": 71,
+    "demoCorpusAtoms": 137
+  },
+  "plan": [
+    {
+      "id": 223615,
+      "slug": "social-media-nutribait",
+      "elementorRows": 1,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        ""
+      ]
+    },
+    {
+      "id": 223616,
+      "slug": "fivest-branding",
+      "elementorRows": 1,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/222440157/Fivest-Branding"
+      ]
+    },
+    {
+      "id": 223617,
+      "slug": "pabellotogo-design",
+      "elementorRows": 2,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        ""
+      ]
+    },
+    {
+      "id": 223618,
+      "slug": "motogas-social-media",
+      "elementorRows": 2,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/222429493/Moto-Gas-Social-Media"
+      ]
+    },
+    {
+      "id": 223619,
+      "slug": "dmark-social-media",
+      "elementorRows": 2,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        ""
+      ]
+    },
+    {
+      "id": 223620,
+      "slug": "lifestyle-app-elementor",
+      "elementorRows": 1,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/222414309/Eusari"
+      ]
+    },
+    {
+      "id": 223623,
+      "slug": "ssilva-campaign",
+      "elementorRows": 3,
+      "atoms": 32,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/222434415/SSilva"
+      ]
+    },
+    {
+      "id": 223787,
+      "slug": "bighouse-design",
+      "elementorRows": 2,
+      "atoms": 134,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        ""
+      ]
+    },
+    {
+      "id": 223841,
+      "slug": "beebot-social-media",
+      "elementorRows": 2,
+      "atoms": 134,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        ""
+      ]
+    },
+    {
+      "id": 246154,
+      "slug": "sky-airlines-propuesta",
+      "elementorRows": 2,
+      "atoms": 32,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/226058723/Sky-Airlines-Campana-Digital"
+      ]
+    },
+    {
+      "id": 246155,
+      "slug": "flick-identity",
+      "elementorRows": 2,
+      "atoms": 32,
+      "emptyDocument": "empty",
+      "clearLink": "clear",
+      "projectLink": [
+        "https://1.envato.market/5Q25j"
+      ]
+    },
+    {
+      "id": 246156,
+      "slug": "ghamadent-design",
+      "elementorRows": 2,
+      "atoms": 32,
+      "emptyDocument": "empty",
+      "clearLink": "clear",
+      "projectLink": [
+        "https://1.envato.market/5Q25j"
+      ]
+    },
+    {
+      "id": 248334,
+      "slug": "gobierno-de-santiago",
+      "elementorRows": 2,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/229631315/Gobierno-de-Santiago"
+      ]
+    },
+    {
+      "id": 248347,
+      "slug": "marca-chile",
+      "elementorRows": 2,
+      "atoms": 31,
+      "emptyDocument": "empty",
+      "clearLink": "keep",
+      "projectLink": [
+        "https://www.behance.net/gallery/229637417/Marca-Chile-Infografias"
+      ]
+    },
+    {
+      "id": 248783,
+      "slug": "bresler",
+      "elementorRows": 2,
+      "atoms": 32,
+      "emptyDocument": "empty",
+      "clearLink": "clear",
+      "projectLink": [
+        "https://1.envato.market/5Q25j"
+      ]
+    }
+  ],
+  "oldSlugs": [
+    {
+      "meta_id": "2441",
+      "post_id": "19291",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "2765",
+      "post_id": "19292",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "3087",
+      "post_id": "19293",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "3411",
+      "post_id": "19294",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "3741",
+      "post_id": "19295",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "4076",
+      "post_id": "19296",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "4401",
+      "post_id": "19297",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "4726",
+      "post_id": "19298",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "5051",
+      "post_id": "19299",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "5354",
+      "post_id": "19300",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "5752",
+      "post_id": "46140",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "5909",
+      "post_id": "46142",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6066",
+      "post_id": "46143",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6223",
+      "post_id": "46145",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6380",
+      "post_id": "46166",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6538",
+      "post_id": "46172",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6539",
+      "post_id": "46172",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "6696",
+      "post_id": "46173",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6697",
+      "post_id": "46173",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "6854",
+      "post_id": "46174",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "6855",
+      "post_id": "46174",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "7012",
+      "post_id": "46175",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "7013",
+      "post_id": "46175",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "7170",
+      "post_id": "88994",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "7176",
+      "post_id": "88994",
+      "meta_value": "about-ver5"
+    },
+    {
+      "meta_id": "7390",
+      "post_id": "18271",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "7736",
+      "post_id": "18272",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "8094",
+      "post_id": "18273",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "8901",
+      "post_id": "18276",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "8966",
+      "post_id": "18276",
+      "meta_value": "unique-bowls-from-the-south-pacific"
+    },
+    {
+      "meta_id": "9262",
+      "post_id": "20660",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "9551",
+      "post_id": "46202",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "9552",
+      "post_id": "46202",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "9553",
+      "post_id": "46202",
+      "meta_value": "contact-ver5"
+    },
+    {
+      "meta_id": "9712",
+      "post_id": "46219",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "9713",
+      "post_id": "46219",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "9714",
+      "post_id": "46219",
+      "meta_value": "contact-ver5"
+    },
+    {
+      "meta_id": "9716",
+      "post_id": "46219",
+      "meta_value": "hamburger-menu-standard"
+    },
+    {
+      "meta_id": "9884",
+      "post_id": "46220",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "9885",
+      "post_id": "46220",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "9886",
+      "post_id": "46220",
+      "meta_value": "contact-ver5"
+    },
+    {
+      "meta_id": "9888",
+      "post_id": "46220",
+      "meta_value": "hamburger-menu-standard"
+    },
+    {
+      "meta_id": "10122",
+      "post_id": "75369",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "10418",
+      "post_id": "88947",
+      "meta_value": "about-ver1"
+    },
+    {
+      "meta_id": "10419",
+      "post_id": "88947",
+      "meta_value": "contact-ver1"
+    },
+    {
+      "meta_id": "10420",
+      "post_id": "88947",
+      "meta_value": "contact-ver5"
+    },
+    {
+      "meta_id": "59341",
+      "post_id": "223617",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "59643",
+      "post_id": "223618",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "59946",
+      "post_id": "223619",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "60250",
+      "post_id": "223620",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "60554",
+      "post_id": "223623",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "60993",
+      "post_id": "223615",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "61298",
+      "post_id": "223616",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "184477",
+      "post_id": "223840",
+      "meta_value": "spacing-it-easier-to-get-things-done-elementor"
+    },
+    {
+      "meta_id": "186408",
+      "post_id": "246154",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "186777",
+      "post_id": "246155",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "187130",
+      "post_id": "223617",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "187481",
+      "post_id": "223618",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "187833",
+      "post_id": "223619",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "188186",
+      "post_id": "246156",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "188539",
+      "post_id": "223623",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "189908",
+      "post_id": "246154",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "190236",
+      "post_id": "246155",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "190540",
+      "post_id": "246156",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "190868",
+      "post_id": "223623",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "267447",
+      "post_id": "248334",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "267751",
+      "post_id": "248334",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "269600",
+      "post_id": "248347",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "269904",
+      "post_id": "248347",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "300000",
+      "post_id": "248783",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    },
+    {
+      "meta_id": "300351",
+      "post_id": "248783",
+      "meta_value": "spacing-it-easier-to-get-things-done"
+    }
+  ]
+}

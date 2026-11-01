@@ -1,0 +1,66 @@
+{
+  "base": "https://efeonce-rooms.vercel.app",
+  "route": "/demo",
+  "bypassUsed": false,
+  "expectedPromotedDeployment": "dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc",
+  "expectedSha": "bd4b802acbbe1db1b0089c9dc0d558c67c41d111",
+  "checks": [
+    {
+      "path": "/api/demo/room?persona=client",
+      "status": 200
+    },
+    {
+      "path": "/api/demo/workspace?persona=operator",
+      "status": 200
+    },
+    {
+      "path": "/api/demo/workspace?persona=administrator",
+      "status": 200
+    },
+    {
+      "path": "/api/demo/workspace?persona=client",
+      "status": 403
+    },
+    {
+      "path": "/api/v1/rooms/test-forged?organizationId=test-forged&persona=administrator",
+      "status": 401
+    }
+  ],
+  "views": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "status": 200,
+      "noRedirect": true,
+      "logoLoaded": true,
+      "source": {
+        "width": 799,
+        "height": 998,
+        "fit": "contain"
+      },
+      "focusRestored": true,
+      "runtimeErrors": []
+    },
+    {
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": 200,
+      "noRedirect": true,
+      "logoLoaded": true,
+      "source": {
+        "width": 370,
+        "height": 463,
+        "fit": "contain"
+      },
+      "focusRestored": true,
+      "runtimeErrors": []
+    }
+  ],
+  "claim": "Public synthetic experience verified. Efeonce ID and durable cloud writes remain fail closed."
+}

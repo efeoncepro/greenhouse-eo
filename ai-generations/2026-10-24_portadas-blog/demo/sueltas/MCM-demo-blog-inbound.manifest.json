@@ -1,0 +1,168 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "MCM-demo-blog-inbound",
+  "input": {
+    "artifactId": "MCM-demo-blog-inbound",
+    "slides": [
+      {
+        "slideId": "s01-blog-banner-escena",
+        "contentType": "mcm.blog.banner",
+        "slots": {
+          "theme": {
+            "line": "revenue-hubspot",
+            "tone": "navy",
+            "masthead": "manzanitas-logo-negative-revenue-hubspot",
+            "signature": "efeonce-logo-negative",
+            "sphereGap": "-0.02"
+          },
+          "voice": {
+            "question": "¿Qué es el inbound marketing en 2026?",
+            "answer": "Ayudar"
+          },
+          "photo": {
+            "src": "asset-ref:photo:s01-blog-banner-escena",
+            "alt": "Nexa revisa tarjetas de evidencia sobre una mesa con luz cálida"
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "manzanitas-stills",
+    "version": "0.1",
+    "registryHash": "ca715ebeb6f1f13b817acc25ab0f16bda959940c3642614ba048120c8caf1eb7",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "s01-blog-banner-escena",
+      "contentType": "mcm.blog.banner",
+      "slots": {
+        "theme": {
+          "line": "revenue-hubspot",
+          "tone": "navy",
+          "masthead": "manzanitas-logo-negative-revenue-hubspot",
+          "signature": "efeonce-logo-negative",
+          "sphereGap": "-0.02"
+        },
+        "voice": {
+          "question": "¿Qué es el inbound marketing en 2026?",
+          "answer": "Ayudar"
+        },
+        "photo": {
+          "src": "asset-ref:photo:s01-blog-banner-escena",
+          "alt": "Nexa revisa tarjetas de evidencia sobre una mesa con luz cálida"
+        }
+      },
+      "template": "BlogBanner",
+      "contractHash": "cf4c4584c365a958e1c0f432d15d097b28a314a56dfe224684851067e3ee6121",
+      "templateHash": "dad4350274308776f4cf241d87e634c71bc108cd471c566e2dc73ef1dd263a04"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "6ef69b9a8eef2412bc83be59cd5540f515441ebb855493e3a38cd2fbded48c40"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "200 800",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    }
+  ],
+  "validators": [
+    {
+      "name": "manzanitas.catalog-membership",
+      "version": "1.0.0",
+      "result": "pass",
+      "violations": []
+    },
+    {
+      "name": "manzanitas.piece-approval",
+      "version": "1.0.0",
+      "result": "pass",
+      "violations": []
+    },
+    {
+      "name": "manzanitas.single-line",
+      "version": "1.0.0",
+      "result": "pass",
+      "violations": []
+    }
+  ]
+}

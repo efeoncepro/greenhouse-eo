@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_chatgpt-ads/v2/audio/mezcla-master.wav",
+    "video": "ai-generations/2026-10-21_chatgpt-ads/v2/export/efeonce-chatgpt-ads-v2-story.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v2/audio/mezcla-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v2/export/efeonce-chatgpt-ads-v2-story.mp4"
+      }
+    ],
+    "latencyMs": 334
+  },
+  "mapa": {
+    "durationSec": 7.99,
+    "onsets": [
+      2,
+      4
+    ],
+    "silences": [
+      {
+        "t": 1.76,
+        "tFin": 2
+      },
+      {
+        "t": 3.87,
+        "tFin": 4
+      },
+      {
+        "t": 7.04,
+        "tFin": 8
+      }
+    ],
+    "cuts": [
+      2,
+      3.958333
+    ],
+    "visualEvents": [
+      1.75,
+      2,
+      4,
+      5.791667
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 2,
+      "medianMs": 0,
+      "worstMs": 0,
+      "inSync": true
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 1.75,
+      "kind": "silencio",
+      "t": 1.75,
+      "tFin": 2,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 1.75–2.00 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 2,
+      "kind": "golpe",
+      "t": 2,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 2.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 5,
+      "kind": "pico",
+      "t": 5,
+      "estado": "confirmado",
+      "medido": "pico de ±0,5 s en 5.00 s (-3.0 dBFS)"
+    }
+  ]
+}

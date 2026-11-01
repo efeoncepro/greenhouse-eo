@@ -1,9 +1,9 @@
 # Componer piezas de Marketing con Manzanitas — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-28 por Claude
-> **Ultima actualizacion:** 2026-10-22 por Claude (1.5: dónde se publica cada pieza ahora que Marketing con Manzanitas es una familia de canales, PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: el vestuario del equipo lo decide la línea de la pieza; 1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
+> **Ultima actualizacion:** 2026-10-24 por Claude (1.6: las tres imágenes de un artículo nuevo del blog, en «Otras piezas del registro») · 2026-10-22 por Claude (1.5: dónde se publica cada pieza ahora que Marketing con Manzanitas es una familia de canales, PDR-020 rev 2.0) · 2026-09-29 por Claude (TASK-1939) (1.4: el vestuario del equipo lo decide la línea de la pieza; 1.3: las diez decisiones resueltas; el texto de cierre que cambia con el contexto y su extensión normalizada; las personas del equipo en las fotos, con su roster y su vestuario; los íconos `republicar` y `enviar`; AXIS `v0.3.29`. 1.2: componer con el comando `pnpm manzanitas:compose`, decisiones del operador del 2026-09-29 y regla del eslogan de los cierres)
 > **Modulo:** Creative · Marketing con Manzanitas (registro complementario de «La órbita»)
 > **Ruta en portal:** no aplica — las piezas se componen en el taller local con `pnpm manzanitas:compose` (catálogo `manzanitas` del Artifact Composer, TASK-1939) o en el canvas de la línea con los componentes del DS «Efeonce — La órbita»; la validación y los gráficos desde datos están en AXIS (`pnpm manzanitas:resolve`, `axis-graphic-line/charts`); la ruta productiva (API, worker y MCP) llega con TASK-1921
 > **Documentacion tecnica:** [ADR del registro](../../architecture/MANZANITAS_REGISTER_DECISION_V1.md) · [Norma del registro](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
@@ -298,16 +298,16 @@ Componer no es publicar: publicar requiere la autorización del operador, y este
 | Pieza | Formato | Cómo va |
 |---|---|---|
 | **Story** | una sola pieza, Escena o Pizarra (nunca las dos) | con foto, la voz en la banda alta y la firma centrada sobre la mesa, dentro de la zona segura de AXIS (el 87 %: nada importante en el 13 % de arriba ni de abajo; decisión del 2026-09-29); sin «Desliza»; el eslogan sólo en la story de cierre, debajo del logo. La story de cierre siempre lleva su voz, con un texto de cierre propio de la pieza y la misma extensión que la contraportada (44, 10 y 56 caracteres; decisión del 2026-09-29) |
-| **Portada de blog y banner** | una sola pieza, Escena o Pizarra | la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz en el lado oscuro; la firma puede ir abajo a la izquierda, cerrando la columna del texto; sin eslogan |
+| **Portada de blog y banner** | una sola pieza, Escena o Pizarra | la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630); la voz en el lado oscuro; la firma puede ir abajo a la izquierda, cerrando la columna del texto; sin eslogan. La **portada de un artículo** usa la variante centrada (texto y cara dentro del cuadrado central x 285–915, sin firma; JPEG 2400 × 1260 de menos de 300 KB). Un artículo nuevo lleva además dos imágenes sin texto que salen de la misma foto: el **plate** (PNG 16:9, 2560 × 1440) como foto de la tarjeta del rail «Para leer con calma», y la **imagen del slider** (WebP 2:1, 2400 × 1200) como `hero`, porque los dos pintan su propio texto encima. Cómo se hacen: [Producir la portada de un artículo del blog](./producir-portada-de-articulo-del-blog.md) · márgenes por superficie: [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) |
 | **Miniatura de YouTube** | Escena 16:9 | el logo abajo a la izquierda; sin eslogan (el eslogan va en el cierre del video) |
 | **Cierre de YouTube** | Pizarra 16:9 | el logo de Efeonce de 260 px con el eslogan **debajo** (regla del 2026-09-29; el cierre del canvas v39 lo tenía encima y quedó superado); con ese logo el eslogan queda en unos 14–15 px, así que la palabra de la línea va en blanco |
 | **Portada del pódcast** | 1:1 | la cabecera del programa en grande (420 px), porque la portada se ve a 160 px; sin eslogan |
 
 **Dónde se publica (desde 2026-10-22).** Marketing con Manzanitas es una familia de canales: **blog, newsletter
 quincenal en el LinkedIn de Julio y YouTube**. Para YouTube, prepara **dos miniaturas** de cada video para la prueba
-A/B y cierra con la pieza «Cierre de YouTube». El newsletter de LinkedIn todavía no tiene pieza en el registro: no la
-improvises, pídela al operador. Instagram ya no lleva carruseles de temas de servicio, y la story no tiene hoy un
-canal asignado. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
+A/B y cierra con la pieza «Cierre de YouTube». Cada edición del newsletter de LinkedIn lleva su portada de 1920 × 1080, compuesta como la miniatura de YouTube y con
+la voz dentro del 80 % central (norma §5.7, desde el 2026-10-22). Instagram ya no lleva carruseles de temas de
+servicio; la story va en las stories de Instagram, como máximo una por semana, con enlace al blog o a Glitch. Detalle: [delta 2026-10-22 de la norma](../../operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
 [sistema de canales](../../documentation/social/sistema-de-canales-y-love-brand.md).
 
 ## Qué significan los estados y las señales

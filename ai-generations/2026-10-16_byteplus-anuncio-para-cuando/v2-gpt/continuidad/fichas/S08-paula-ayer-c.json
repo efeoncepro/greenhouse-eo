@@ -1,0 +1,22 @@
+{
+ "id": "S08-paula-ayer-c",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn, out of focus behind her. GEOGRAPHY (critical, continuity): reverse shot from Antonio's side of ONE single long pale oak meeting table, looking toward Paula, who sits across the same table. Behind her there is NO window, NO mountains and NO skyline: only the interior of the room — a floor-to-ceiling glass partition with thin black frames and a glass door, through it a softly out-of-focus open-plan office, and a thin dark wall display on the right. Foreground: only a small, natural over-the-shoulder edge of Antonio at the right border — the back of his shoulder in the deep navy bomber jacket and a little of his short dark hair, out of focus, correctly scaled and connected (head on neck on shoulder), occupying at most the right eighth of the frame; no other foreground laptops. On the table in front of Paula: her own open ultra-thin space-grey aluminum laptop, angled to the side so it does not hide her, and her kraft-brown paper coffee cup with a matte black lid, sitting naturally on the table. Paula in medium close-up, 85mm f/2.8: slim gold-rimmed metal reading glasses on top of her head, one eyebrow raised, half-laughing in disbelief, head tilted, hands open on the table, asking an almost sarcastic question toward Antonio. Light: soft, flat, cool overcast daylight from the windows under a flat grey sky, neutral and slightly grey, muted colors, calm and corporate — a modern office on a dull day, never fluorescent, never dirty.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "identidad": [
+  "paula"
+ ],
+ "lecho": "sin-lecho"
+}

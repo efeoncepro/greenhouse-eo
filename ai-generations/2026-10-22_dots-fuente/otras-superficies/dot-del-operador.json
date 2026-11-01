@@ -1,0 +1,35 @@
+{
+  "fuente": "~/.codex/.codex-global-state.json -> electron-persisted-atom-state/cloud-aeon-sidebar-cache-v1 (caché local de la app ChatGPT/Codex 26.1016); se copiaron sólo campos de apariencia, sin IDs de cuenta, tokens ni URLs firmadas",
+  "perfiles_en_cache": 6,
+  "perfiles_distintos": 1,
+  "display_name": "Friday",
+  "avatar_type": "rendered-interactive",
+  "color": "yellow",
+  "aeon_kind": "orbit",
+  "status": "active",
+  "created_at": "2026-10-01T01:34:04.229858Z",
+  "updated_at": "2026-10-07T16:09:53.034753Z",
+  "is_paused": false,
+  "appearance": {
+    "schemaVersion": 3,
+    "shape": "rounded_triangle",
+    "color": "yellow",
+    "eyes": "sleepy_lids",
+    "eyewear": "tall_oval_frames",
+    "accessories": [
+      "bow"
+    ],
+    "accessoryColors": {},
+    "depth": 0.5,
+    "hereCharacter": {
+      "id": "alfred",
+      "name": "Alfred"
+    }
+  },
+  "snapshot": {
+    "width": 512,
+    "height": 512,
+    "content_sha256": "9971c1b06cd9d23d31a77b5699afa566bbfce61423088baa6b5e8e80d6f4def0"
+  },
+  "resource_bundle_id": "5bfa47035315294c5575ccd12d80d0ef58935317ba6becfb6e088ba9d6fe8584"
+}

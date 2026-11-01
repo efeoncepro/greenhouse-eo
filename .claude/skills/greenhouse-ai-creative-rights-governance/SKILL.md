@@ -17,6 +17,12 @@ rights policy is immutable per asset; promotion only makes a route available and
 signed URL, provider payload, prompt, client content, stack trace, or raw upstream prose may cross the safe
 evidence boundary.
 
+To show AI-produced work as a public case, use the `ai-production` kind of the site portfolio (`eo-portfolio` 0.8.0,
+`pnpm public-website:portfolio -- new <slug> --kind ai-production`): the `ai` block declares the models per stage,
+what the AI did and what the team did, and the «Producido con IA» badge always shows — there is no field to hide it.
+Asset clearance and the client's approval scope still decide what can be published. Manual:
+`docs/manual-de-uso/public-site/operar-portafolio-por-cli.md`.
+
 For **OmniHuman 2.0 / BytePlus Vision AI**, load the canonical skill's dated OmniHuman routing and the
 [API manual](../../../docs/manual-de-uso/creative-studio/omnihuman-2-api.md) with its
 [research evidence](../../../docs/audits/creative-studio/OMNIHUMAN_2_API_RESEARCH_2026-10-15.md).

@@ -1,5 +1,20 @@
 # Operar prospección B2B con agentes
 
+**Cobertura pendiente:** [diagnóstico Perú](../../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
+**Sales Navigator multimer­cado:** [44 búsquedas guardadas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)
+(24 cuentas/20 personas) para Chile, México, Colombia y Perú. Sector por cuenta, frente por persona;
+validación por muestra y mercado, sin primer grado obligatorio. Avisos semanales nativos autorizados;
+los resultados requieren gate comprador y no generan lista comercial, contacto o CRM automáticamente.
+
+**Último corte:** [gerencias, agencias y contratación](../../commercial/prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md)
+registra 54 cuentas/57 personas. Priorizar gestión específica de agencias/proveedores o presupuesto de área;
+separar responsabilidad actual de trayectoria y liderazgo potencial de autoridad contractual confirmada.
+La [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) gobierna revisión A/B.
+Las cifras de cortes anteriores que siguen conservan su fase histórica.
+
+**Gate comprador vigente:** Julio excluyóCommunityManagers y ejecución pura como prospectos por afinidad de servicio. Priorizar liderazgo funcional con posibilidad de impulsar contratación; operadores/validadores quedan en investigación. Ver [política](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md) y [resultado corregido47cuentas/37personas](../../commercial/prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md). Los cortes previos que siguen son históricos.
+
 Nombres de Deal/Lead: [convención vigente Efeonce](../../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
 aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas autorizadas la adoptan.
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
@@ -11,11 +26,34 @@ Canon: [skill](../../../.codex/skills/efeonce-b2b-prospecting/SKILL.md),
 
 ## Antes de empezar
 
+Sales Navigator: [recorrido verificado en Chrome con Playwright](prospectar-sales-navigator-con-agentes.md)
+con sesión abierta del operador: filtros de cuentas → empleados/Personas → perfil/actividad → listas.
+El manual distingue investigación, configuración autorizada, guardado/readback y comunicación; documenta
+Core, 150 InMail observados el 29/10 (50 fue el antecedente inicial) y uso táctico según la
+[política de canal](../../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md).
+
+Para cualquier nueva apertura, respuesta inbound, reactivación o seguimiento comercial, aplicar
+[conversaciones útiles](../../../.codex/skills/efeonce-b2b-prospecting/references/conversation-quality-and-review.md).
+La [implementación de octubre](../../commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md)
+distingue método local aplicado, cambios nativos preparados y evaluación de pauta; no autoriza envíos.
+
 Definir cuenta/persona/señal o micro-ICP, mercado, servicio, historia y resultado pedido. Identificar las
 acciones autorizadas y presupuesto si hay créditos. Una aprobación anterior cubre exactamente su alcance;
 no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/radar no aprueba lotes futuros.
 
 ## Recorrido
+
+Para Sales Navigator, definir primero las cuentas por industria/sede/tamaño y comprobar la entidad exacta;
+usar keywords para ampliar taxonomías como fintech clasificada en software. Conservar una base sin relación
+y añadir la pasada de primer grado sólo para acceso. Inventariar un filtro no prueba haber aplicado todas
+sus opciones; el control CRM bloqueado en Core no se resuelve reconectando HubSpot.
+
+El [modelo de servicios e ICP](../../commercial/sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md) cubre las doce
+landings verificadas y cinco Personas por rol. Elegir frente por problema/ownership, no por coincidencia
+literal con SEO. Organizar cuentas por sector/cohorte y personas por servicio; mantener el buying group y la
+tesis de cuenta compartidos entre listas. Guardar una persona en Sales Navigator no requiere email y no
+equivale a crear Contact/Lead CRM, contactar ni consumir InMail. Si el mandato incluye guardar, comprobar
+perfil/Cargo actual, destino exacto y membresía nominal tras recarga; conciliar intentos ambiguos antes de repetir.
 
 1. Invocar `$efeonce-b2b-prospecting` o pedir investigación/registro/recuperación de cuenta. Cargar sólo módulos
    pertinentes; resolver entidad y leer expediente/hilo vigente. Si el pedido nombra Sales, cargar su índice
@@ -40,6 +78,20 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    antes de repetir. Si sólo se autorizó investigar, entregar propuesta y no escribir.
 7. Entregar action pack a Commercial/seguimiento: estado observado, owner, próximo paso/fecha, fuentes y brechas.
    Mantener HSP e historial privados en radar existente; no cambiar scheduler ni crear otro.
+
+## Si HubSpot avisa que vieron las credenciales
+
+Aplicar [visitas a documentos](../../../.codex/skills/efeonce-b2b-prospecting/references/document-engagement-signals.md):
+recuperar aviso Outlook y detalle **Documentos → Visitantes → Detalles**; comparar sesiones, páginas,
+tiempos y atribución. Separar evento/aviso/consulta, usando vista previa interna para interpretar páginas.
+Releer hilo, último envío, proceso, respuestas y cadencia; recomendar espera o un contacto útil sin revelar
+el tracking. El mismo día/próximo hábil puede ser oportuno en el caso, nunca obligación ni permiso automático.
+
+«Redacta» deja borrador con firma gráfica/CCO; «envíalo» sobre ese texto autoriza ese envío único.
+Comprobar guardado, nueva copia en Enviados e ingestión EMAIL por separado. Registrar el delta en expediente,
+REGISTRO y state existentes; no renovar inventario global ni crear secuencia por una visita.
+[Indecaucho26/10](../../commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
+distingue exploración rápida, recomendación, autorización y envío/registro; admisión y respuesta pendientes.
 
 ## Radar: primera puerta y aviso temprano
 
@@ -132,6 +184,13 @@ si el mandato exige seguir hasta respuesta. Seleccionar **Enviar más tarde**, c
 los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer contacto, Programado y fecha.
 No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
 se distingue del CCO de Outlook. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+
+Si Julio exige CCO y la UI no permite guardarlo, completar textos, documentos, firma y propuesta de calendario
+antes de resolver la limitación; conservar las secuencias sin inscribir. Una autorización posterior expresa
+de registro nativo con excepción al CCO se reutiliza sólo para el lote identificado, sin nueva confirmación ni
+regla global. [Aplicación Lucía/Yvette](../../commercial/follow-up-agent/runs/2026-10-24-lucia-yvette-secuencias.md).
+Tras Programado, reabrir Editar para leer todos los pasos/horas y salir sin guardar. Si falla el reader CLI,
+conciliar UI y campos de inscripción del Contact; no repetir Iniciar por un error de decodificación.
 
 Brochure por defecto para presentar Efeonce completa: el oficial «Agencia de Marketing 360°» (2026-10-16);
 el de una línea cuando la necesidad corresponda, como Marketing de Contenidos para contenidos/UGC.
@@ -254,3 +313,97 @@ cuerpos y enlaces individuales viven en CRM/Outlook. Cada persona conserva su pr
 
 La auditoría del 24/10 confirmó las cinco actividades EMAIL `SENT`, incluida Huelquén, antes pendiente de
 readback. No amplía permisos de envío, créditos, inscripciones, cambios de lifecycle o automatizaciones.
+
+## Inferir una candidata y comprobarla sin atribuirla por el patrón
+
+Aplicación fechada: [Lucía / Flesan y Yvette / Sigelec](../../commercial/prospecting-agent/runs/2026-10-24-lucia-yvette-prospeccion.md).
+El recorrido de Yvette se ejecutó a petición expresa del operador; no sustituye la admisión general ni
+autoriza búsquedas de variantes por defecto.
+
+1. Buscar ejemplos exactos publicados por la empresa o fuentes primarias que vinculen persona y dirección.
+   Separar dominios de grupo, marcas y entidades; anotar fuente y fecha. Los buzones generales no prueban
+   una convención de direcciones individuales.
+2. Si el operador pidió inferir, formular una candidata sustentada en esos ejemplos y en el nombre público
+   de la persona. Comprobar qué apellido usa la convención: no tomar automáticamente el último apellido de
+   un resultado enriquecido. Un patrón consistente sigue siendo inferencia, no atribución comprobada.
+3. No reutilizar una candidata anterior con veredicto `invalid` ni revalidarla por haber obtenido otra.
+   En Yvette, el waterfall retornó una dirección extrapolada que se descartó; el patrón sustentó una distinta.
+4. Para la candidata seleccionada, verificar herramienta, campos y costo actuales; obtener aprobación
+   específica antes del gasto. Una validación de una dirección no es un buscador ni autoriza enumerar
+   variantes. Conservar request/record ID en el expediente privado y recuperar el resultado asíncrono.
+5. Registrar el estado normalizado y el proveedor que realmente respondió. `validated` de LeadMagic
+   acredita la comprobación técnica declarada; no se rebautiza como verificación de ZeroBounce ni como
+   confirmación de titular. `not_validated` no significa por sí solo `invalid`.
+6. Si la atribución sigue inferida, informar esa incertidumbre y resolver la autorización individual para
+   alta y envío. En Yvette se aprobaron ambos expresamente después de conocer el resultado; no una secuencia.
+   La nota conserva **atribución inferida / calidad técnica validada**, sin degradar el resultado técnico a
+   pendiente ni presentar la identidad como confirmada. El permiso de validación solo no cubre estas escrituras.
+7. Tras la autorización, deduplicar y crear/reutilizar Contact con Primary Company, campos y nota de evidencia.
+   Generar los enlaces de los originales de Documents después del alta para evitar un Contact automático
+   previo al gate. Leer propiedades y membresías efectivas; lifecycle no prueba calificación.
+8. Comprobar el borrador persistido, ambos enlaces, Para y CCO, cuerpo y firma gráfica; enviar una vez y
+   leer la copia nueva de Enviados y el EMAIL `SENT` asociado por separado. No repetir el InMail ya enviado.
+
+Lucía siguió el carril de dirección laboral aportada y verificada por el proveedor, con identidad/empleo
+contrastados. El waterfall devolvió dos entradas de la misma dirección: se conservaron posiciones y estados,
+sin contarlas como dos personas o dos contactos. En ambos casos, costo real, LinkedIn, email y registro CRM
+conservan recibos separados; `SENT` no acredita entrega, lectura ni respuesta.
+
+## De discovery al caso de negocio
+
+Cargar [método](../../../.codex/skills/efeonce-b2b-prospecting/references/discovery-to-business-case.md)
+y [plantilla](../../../.codex/skills/efeonce-b2b-prospecting/templates/discovery-business-case.md) cuando
+una respuesta abre reunión/propuesta o se pide preparar/analizar discovery. Mantener expediente único:
+
+1. Conciliar entidad, marca, iniciativa y canal real del comprador; conservar historia sin cambiar
+   alias/CRM automáticamente. Una futura terna no es selección efectiva.
+2. Preparar hipótesis, preguntas que cambian alcance y agenda proporcional. Verificar fecha, zonas,
+   asistentes y estado de invitación. Correo autorizado exige firma gráfica/CCO y readback separado del evento.
+3. Tras la reunión, recuperar la transcripción de la **fuente declarada por el operador**. Identificar
+   reunión, cobertura, versión y speakers/timestamps existentes; si faltan, citar bloque y declarar el límite.
+   Un resumen automático o un error en otro proveedor no sustituye ni bloquea toda la fuente disponible.
+4. Extraer problema, estado actual, objetivo, alcance, responsabilidades, buying group, criterios,
+   contratación, presupuesto/moneda/período y acuerdos, distinguiendo voz del comprador de sugerencias propias.
+5. Actualizar v0 a v1 con evidencia, hipótesis refutadas, brechas/owner y próximo paso. Sin baseline,
+   tasas o contribución, mantener economía condicionada y plan de medición; costeo/precio pasan a Pricing.
+6. Leer el resultado e índices/state; mantener raw y accesos privados. Programar lectura futura sólo
+   con mandato y sin duplicar seguimiento; no enviar propuesta, crear Deal ni cambiar etapas por analizar.
+
+[ARMOR / Indecaucho](../../commercial/accounts/indecaucho-armor/README.md) conserva la aplicación del
+26/10: guía de reunión27/10, caso previo y revisión posterior HubSpot/Notion focal autorizada.
+
+## Correo personal público y varios canales de una cuenta
+
+[Mass Chile — 26/10/2026](../../commercial/prospecting-agent/runs/2026-10-26-mass-chile.md)
+aplica los gates existentes sin ampliar su permiso general:
+
+1. Separar dirección personal publicada, candidata corporativa inferida y correo corporativo verificado.
+   La primera acredita procedencia; la segunda conserva su veredicto adverso; ninguna hereda la calidad de otra.
+2. Reutilizar la excepción informada de alta/envío sólo para esa persona y dirección. El waterfall de
+   adyacentes necesita alcance propio; recuperar el resultado terminal y no repetir el gasto cuando después
+   se autoriza CRM/envío. Ignorar datos personales secundarios no necesarios.
+3. Crear/reusar los contactos elegibles antes de sus enlaces Documents. Personalizar por función y
+   atribuir la señal a quien la publicó, sin inventar solicitudes de colegas ni relaciones jerárquicas.
+4. Leer el borrador guardado con todos sus destinatarios y contenido. Si sólo conserva la firma, recuperar
+   ese mismo borrador y corregir por la UI; releer antes de enviar y luego verificar Enviados/CRM por separado.
+5. Registrar un NDR de casilla inexistente y cerrar esa dirección, sin repetir el envío, fusionar registros
+   automáticos o detener colegas por inferencia. Comprobar el DM por su hilo y no repetirlo al corregir email.
+
+## Continuar con otra persona y cerrar los canales
+
+1. Reusar el propósito autorizado, investigar la nueva señal y elegir oferta/material pertinentes. No
+   trasladar una migración obsequiada a otra cuenta ni afirmar experiencia sectorial no acreditada.
+2. Mantener el consentimiento de créditos por persona/operación. Recibida la autorización pendiente,
+   continuar sin otra confirmación del mismo alcance; recuperar el resultado asíncrono del mismo request.
+3. Dedupe y alta sólo con email elegible. Releer Primary tras automatización: dominio del correo y sitio
+   distintos pueden producir una empresa vacía. Usar la [guía de captura](../hubspot/llenar-propiedades-comerciales.md)
+   y verificar el resultado; no fusionar/eliminar como efecto silencioso.
+4. En Outlook, resolver Para/CCO como destinatarios, releer el borrador persistido con firma gráfica y
+   comprobar después el nuevo ID de Enviados y EMAIL CRM. En LinkedIn, verificar la conversación por separado.
+5. Registrar NDR si llega: el envío inicial no prevalece sobre un rebote posterior. No reintentar esa
+   dirección ni usar la ausencia de otro rebote como verificación. Actualizar dossier y notas de canal.
+6. Ante «créala también» después de un alta, releer la ficha existente y compartir su enlace; no duplicar.
+
+Casos: [Wequips, rebote de candidata inferida](../../commercial/prospecting-agent/runs/2026-10-30-wequips-mayra.md)
+y [Mambrino, email verificado y dos canales](../../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md).
+Son aplicaciones de permisos vigentes, no autorización de secuencias, nuevos destinatarios o seguimiento.

@@ -1,0 +1,23 @@
+{
+  "pieza": "Efeonce — Ese anuncio puede ser el tuyo (ChatGPT Ads, v6)",
+  "duracion_s": 12.5,
+  "fps": 24,
+  "tempo_bpm": 120,
+  "cues": [
+    {
+      "t": 4.0,
+      "imagen": "Se envía; la seda explota",
+      "sonido": "golpe: entra la banda"
+    },
+    {
+      "t": 6.0,
+      "imagen": "Aterriza el anuncio de Kaltis",
+      "sonido": "golpe de la banda"
+    },
+    {
+      "t": 10.25,
+      "imagen": "La esfera aterriza como punto del titular",
+      "sonido": "golpe: la banda entra con el acorde final sostenido"
+    }
+  ]
+}

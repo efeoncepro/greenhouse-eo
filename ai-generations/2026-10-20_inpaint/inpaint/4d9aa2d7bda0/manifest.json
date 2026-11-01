@@ -1,0 +1,152 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "4d9aa2d7bda0",
+  "key": "4d9aa2d7bda08412dd78c200438b47661c99aba8e5795b5423d0ce0c573ab672",
+  "status": "completed",
+  "createdAt": "2026-10-20T20:04:04.415Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h.png",
+    "imageSha256": "51ddd0f0cf7f8d5cd93997cf6df00ba5ceb3a4379acbc4cd0ecfba83e30163c2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-mask-tarima.png",
+    "maskSha256": "e8bc092cffa819078e1be80d163e1dae047647e0643c9473a8b5d2ff610444bd",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the dark rectangular stage riser block in the lower-right corner completely. In its place, continue the same dark polished floor of the hall: near-black, softly out of focus near the lens, with the faint cool blue reflection streaks of the ring continuing naturally across it. No objects, no edges, no step.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the dark rectangular stage riser block in the lower-right corner completely. In its place, continue the same dark polished floor of the hall: near-black, softly out of focus near the lens, with the faint cool blue reflection streaks of the ring continuing naturally across it. No objects, no edges, no step.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05970219203404018,
+    "editable": 109158,
+    "soft": 396,
+    "protected": 1725454
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1232,
+      "top": 514,
+      "width": 560,
+      "height": 510
+    },
+    "target": {
+      "width": 1072,
+      "height": 976
+    },
+    "aspectError": 0.0002926543751829212,
+    "reason": "la zona con contexto ocupa 15.5 % de la imagen: se genera recortada a 1072x976"
+  },
+  "estimate": {
+    "usd": 0.0483,
+    "basis": "1 × salida 1072x976 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 72.403,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.88,
+        "bestError": 2.88,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -4.38,
+        -3.96,
+        -1.56
+      ],
+      "protected": {
+        "pixels": 1725454,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 109158,
+        "maxDelta": 252,
+        "meanDelta": 72.654,
+        "worst": {
+          "x": 1555,
+          "y": 852
+        }
+      },
+      "seam": {
+        "pixels": 396,
+        "maxDelta": 17,
+        "meanDelta": 3.328,
+        "worst": {
+          "x": 1555,
+          "y": 738
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1725454,
+        "maxDelta": 131,
+        "meanDelta": 0.685,
+        "worst": {
+          "x": 1238,
+          "y": 854
+        }
+      },
+      "outputUsd": 0.0483,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2321,
+        "input_tokens_details": {
+          "image_tokens": 2108,
+          "text_tokens": 213
+        },
+        "output_tokens": 1609,
+        "output_tokens_details": {
+          "image_tokens": 1609,
+          "text_tokens": 0
+        },
+        "total_tokens": 3930
+      },
+      "meta": {
+        "size": "1072x976",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ],
+  "erase": {
+    "fill": "model",
+    "layers": [],
+    "shadow": null,
+    "erasure": [
+      {
+        "changeInCore": 53.94,
+        "corePixels": 109158,
+        "objectLikeness": null,
+        "residueSuspected": false
+      }
+    ]
+  }
+}

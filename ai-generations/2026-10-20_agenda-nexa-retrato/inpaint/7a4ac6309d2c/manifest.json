@@ -1,0 +1,59 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "7a4ac6309d2c",
+  "key": "7a4ac6309d2c786c19a92dbb466e405aa2ff5f8e092d06eefa1a11fa7f0c7278",
+  "status": "dry-run",
+  "createdAt": "2026-10-20T16:23:33.408Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-15_contacto-nexa-piel/contacto-nexa-hero-rostro-canonico-v3.png",
+    "imageSha256": "900412b67fb0491e02f9b0ac4ff50cbf047e9b8659fa9d1e93dbf73d0510bead",
+    "mask": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/78136994-0196-469a-a92f-abf69e5515f4/scratchpad/nexa-agenda/mask-linea.png",
+    "maskSha256": "1371a847eeac4a99a74aefd78f13f63076f9f78d39317a0e39c0eaf085d70f47",
+    "maskConvention": "white-editable",
+    "width": 1672,
+    "height": 1055,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Remove the thin glowing yellow-green light line and its small glowing dot from the background. Rebuild only the smooth deep navy blue studio wall behind it, with the same soft gradient and fine grain. Do not change the woman, her hair, her hand, her hoodie or anything else.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nRemove the thin glowing yellow-green light line and its small glowing dot from the background. Rebuild only the smooth deep navy blue studio wall behind it, with the same soft gradient and fine grain. Do not change the woman, her hair, her hand, her hoodie or anything else.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.017229982539286606,
+    "editable": 30393,
+    "soft": 0,
+    "protected": 1733567
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1672,
+      "height": 1055
+    },
+    "target": {
+      "width": 1680,
+      "height": 1056
+    },
+    "aspectError": 0.0038185511171293083,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0102,
+    "basis": "1 × salida 1680x1056 medium (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": []
+}

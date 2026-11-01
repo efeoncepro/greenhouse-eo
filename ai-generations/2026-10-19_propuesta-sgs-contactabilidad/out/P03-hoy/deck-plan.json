@@ -1,0 +1,80 @@
+{
+  "tenderId": "P03-hoy",
+  "slides": [
+    {
+      "slideId": "deck-content-bullets",
+      "contentType": "deck.content-bullets",
+      "slots": {
+        "frame": {
+          "line": "revenue-salesforce",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "questionPx": "--gl-cb-question-px=40px",
+          "questionLeading": "--gl-cb-question-leading=1.2",
+          "answerLeading": "--gl-cb-answer-leading=1",
+          "answerTracking": "--gl-cb-answer-tracking=-0.04em",
+          "answerInset": "--gl-cb-answer-inset=-4px",
+          "listTop": "--gl-cb-list-top=520px",
+          "listWidth": "--gl-cb-list-width=1640px",
+          "rowGap": "--gl-cb-row-gap=56px",
+          "columnGap": "--gl-cb-column-gap=110px",
+          "rule": "--gl-cb-rule=2px",
+          "padTop": "--gl-cb-pad-top=18px",
+          "numberPx": "--gl-cb-number-px=84px",
+          "numberWght": "--gl-cb-number-wght=300",
+          "numberTracking": "--gl-cb-number-tracking=-0.03em",
+          "numberRaise": "--gl-cb-number-raise=10px",
+          "numberGap": "--gl-cb-number-gap=34px",
+          "titlePx": "--gl-cb-title-px=32px",
+          "descPx": "--gl-cb-desc-px=24px",
+          "descGap": "--gl-cb-desc-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-cb-progress-1-of-5-revenue-salesforce"
+        },
+        "voice": {
+          "question": "¿Qué queda en Salesforce?",
+          "answer": "Muy poco",
+          "eyebrow": "Cómo están hoy"
+        },
+        "items": [
+          {
+            "number": "01",
+            "title": "Reuniones",
+            "desc": "Se registran solas cuando el ejecutivo agenda con el cliente."
+          },
+          {
+            "number": "02",
+            "title": "Correo",
+            "desc": "Tiene seguimiento, aunque falta confirmar que esté activo para todo el equipo."
+          },
+          {
+            "number": "03",
+            "title": "Llamadas y negocios",
+            "desc": "Se anotan a mano: compiten con el tiempo de venta y el historial queda incompleto."
+          },
+          {
+            "number": "04",
+            "title": "WhatsApp",
+            "desc": "No queda registro: hoy no se sabe cuántas veces se contactó a un cliente ni por qué canal."
+          }
+        ],
+        "selection": {
+          "label": "Comercial",
+          "anchor": "bottom-start",
+          "participantKind": "department",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 4
+        }
+      },
+      "template": "ContentBullets"
+    }
+  ]
+}

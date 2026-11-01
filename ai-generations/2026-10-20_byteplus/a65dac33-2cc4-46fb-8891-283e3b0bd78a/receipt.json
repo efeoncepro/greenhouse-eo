@@ -1,0 +1,12 @@
+{
+  "provider": "byteplus",
+  "model": "dola-seedream-5-0-pro-260628",
+  "requestId": "021792492365832373615d827d98655cdf28f8c9eebc817218863",
+  "usage": {
+    "input_images": 0,
+    "generated_images": 1,
+    "output_tokens": 6144,
+    "total_tokens": 6144
+  },
+  "estimatedUsd": 0.0405
+}

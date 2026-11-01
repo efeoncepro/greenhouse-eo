@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "7a2f4bb29cc7",
+  "key": "7a2f4bb29cc77e8f7ee8974521502e3e95a1f9ee71ed519c1d60aa4329f7c1c5",
+  "status": "completed",
+  "createdAt": "2026-10-19T22:38:04.389Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_google-partner-freeze/objetos-gigi-final.png",
+    "imageSha256": "e3dd18f59db95ee5169622200bfcc76c6e6ccdcca177597f5d6d8198c0088610",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_google-partner-freeze/mask-pantallas.png",
+    "maskSha256": "d185c53cd396c18e2796696cb9c9d0ff908a2ad3b58a5dc0a6dbd9460c4dcb88",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1920,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Turn both device screens ON, as they would look in a real high-speed studio photograph.\nLAPTOP screen (large zone, left): a bright, backlit premium display glowing with intense light, as if the rainbow mascot just burst out of it: a luminous deep-blue to violet field with a soft radiant gradient (blue #4285F4, hints of red, yellow and green at the edges) brightest near the right edge where the mascot emerges, light spilling and blooming over the bezel. Behind the glow, faint out-of-focus interface shapes (a centred rounded prompt bar and a few soft rounded cards) that are unreadable because of defocus and bloom. Real display finish: fine pixel texture, subtle glass glare with a diagonal reflection of the explosion, slight vignetting toward the corners, true black bezel edge preserved.\nPHONE screen (small zone, right): a lit modern smartphone screen showing an out-of-focus productivity app: a white and light-grey interface with soft rounded cards and a blue accent bar at the top, a small calendar-like grid, all unreadable because of angle and shallow depth of field; realistic glass reflections and a soft highlight across the glass; screen brightness consistent with the scene.\nNo legible text, no letters, no numbers, no logos, no brand marks, no watermark. Keep the screen edges, bezels and perspective of each device exactly aligned to the zone.\nDo not change the framing, scale or position of anything in the image.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nTurn both device screens ON, as they would look in a real high-speed studio photograph.\nLAPTOP screen (large zone, left): a bright, backlit premium display glowing with intense light, as if the rainbow mascot just burst out of it: a luminous deep-blue to violet field with a soft radiant gradient (blue #4285F4, hints of red, yellow and green at the edges) brightest near the right edge where the mascot emerges, light spilling and blooming over the bezel. Behind the glow, faint out-of-focus interface shapes (a centred rounded prompt bar and a few soft rounded cards) that are unreadable because of defocus and bloom. Real display finish: fine pixel texture, subtle glass glare with a diagonal reflection of the explosion, slight vignetting toward the corners, true black bezel edge preserved.\nPHONE screen (small zone, right): a lit modern smartphone screen showing an out-of-focus productivity app: a white and light-grey interface with soft rounded cards and a blue accent bar at the top, a small calendar-like grid, all unreadable because of angle and shallow depth of field; realistic glass reflections and a soft highlight across the glass; screen brightness consistent with the scene.\nNo legible text, no letters, no numbers, no logos, no brand marks, no watermark. Keep the screen edges, bezels and perspective of each device exactly aligned to the zone.\nDo not change the framing, scale or position of anything in the image.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.03281928168402778,
+    "editable": 86063,
+    "soft": 10725,
+    "protected": 2852332
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1920
+    },
+    "target": {
+      "width": 1536,
+      "height": 1920
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 65 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0677,
+    "basis": "1 × salida 1536x1920 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 150.692,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.92,
+        "bestError": 2.92,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        38.48,
+        44.44,
+        57
+      ],
+      "protected": {
+        "pixels": 2852332,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 86063,
+        "maxDelta": 231,
+        "meanDelta": 161.888,
+        "worst": {
+          "x": 515,
+          "y": 540
+        }
+      },
+      "seam": {
+        "pixels": 10725,
+        "maxDelta": 213,
+        "meanDelta": 60.851,
+        "worst": {
+          "x": 1260,
+          "y": 652
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2852332,
+        "maxDelta": 255,
+        "meanDelta": 7.046,
+        "worst": {
+          "x": 788,
+          "y": 1050
+        }
+      },
+      "outputUsd": 0.0677,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3455,
+        "input_tokens_details": {
+          "image_tokens": 3010,
+          "text_tokens": 445
+        },
+        "output_tokens": 2257,
+        "output_tokens_details": {
+          "image_tokens": 2257,
+          "text_tokens": 0
+        },
+        "total_tokens": 5712
+      },
+      "meta": {
+        "size": "1536x1920",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

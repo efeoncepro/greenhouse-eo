@@ -4,11 +4,19 @@ Estas tres variantes son los SVG oficiales entregados por el operador para la
 identidad de Efeonce como HubSpot Solutions Partner. Se conservan sin
 recolorear, recortar ni redibujar.
 
-| Variante | Uso recomendado | Asset |
+Cada variante se llama por el color de **su propia placa**, no por el fondo donde va. Se elige la que
+**contrasta con la superficie**: una placa crema sobre papel claro se disuelve (corrección del operador,
+2026-10-31, landing de Contacto).
+
+| Superficie | Variante | Asset |
 |---|---|---|
-| `dark` | Fondos claros cuando se necesita el badge con fondo verde petróleo. | `badge-dark-spp-hubspot.svg` |
-| `light` | Fondos claros cuando se necesita el badge crema con tipografía oscura. | `badge-light-spp-hubspot.svg` |
-| `orange` | Fondos de acento o composiciones donde el naranja es la superficie principal. | `badge-orange-spp-hubspot.svg` |
+| Clara (blanco, papel `#f7f8f6`, crema) | `dark` (placa verde petróleo); `orange` si la pieza pide acento | `badge-dark-spp-hubspot.svg` |
+| Oscura (navy, `#001a33`, fotografía oscura) | `light` (placa crema); `orange` si la pieza pide acento | `badge-light-spp-hubspot.svg` |
+| Naranja o de acento cálido | `dark` o `light` según luminancia; **nunca** `orange` | — |
+
+`getHubSpotSolutionPartnerBadgeForSurface(surface)` en `src/lib/brand-assets/hubspot-solution-partner.ts`
+resuelve esta tabla; úsala en vez de elegir a ojo. `@efeoncepro/axis-brand-assets` publica hoy sólo la
+variante crema (`hubspot-solutions-partner-gold-light`): sirve para superficies oscuras, no para papel.
 
 ## Contrato de uso
 

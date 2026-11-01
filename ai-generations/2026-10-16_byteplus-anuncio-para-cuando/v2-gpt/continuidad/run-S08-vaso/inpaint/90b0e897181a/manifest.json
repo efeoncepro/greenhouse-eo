@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "90b0e897181a",
+  "key": "90b0e897181a884662a86089de4dcf072a31f1055f47fe6c4d13329057771623",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:23:21.228Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S08.png",
+    "imageSha256": "66ceeddbe8b3cf42f9f93e25ff194556d0af5bcce857e8cd75c4e3c2cbe7d7c3",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/masks/S08-vaso.png",
+    "maskSha256": "2e5b283f4c0ba6942fafa4882bbe2bbd924bbc375bcff38b6d8897cd30903af5",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/ref-vaso-paula.png",
+        "sha256": "06beb4bec2815b989f096da0fef98e2186a80defa7d11e991c70418f9408b92e"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the object in the marked zone with the woman's takeaway coffee: a kraft-brown paper cup with a matte black plastic lid, exactly like image 2, standing upright on the table, same scale as a real cup at that distance, matching the scene light and shadows. Keep everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the object in the marked zone with the woman's takeaway coffee: a kraft-brown paper cup with a matte black plastic lid, exactly like image 2, standing upright on the table, same scale as a real cup at that distance, matching the scene light and shadows. Keep everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.02900238037109375,
+    "editable": 30418,
+    "soft": 7596,
+    "protected": 1272706
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 649,
+      "top": 754,
+      "width": 375,
+      "height": 496
+    },
+    "target": {
+      "width": 896,
+      "height": 1184
+    },
+    "aspectError": 0.0009360599078340906,
+    "reason": "la zona con contexto ocupa 14.2 % de la imagen: se genera recortada a 896x1184"
+  },
+  "estimate": {
+    "usd": 0.0397,
+    "basis": "1 × salida 896x1184 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.996,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.82,
+        "bestError": 2.82,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1272706,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 30418,
+        "maxDelta": 207,
+        "meanDelta": 45.074,
+        "worst": {
+          "x": 878,
+          "y": 953
+        }
+      },
+      "seam": {
+        "pixels": 7596,
+        "maxDelta": 182,
+        "meanDelta": 9.651,
+        "worst": {
+          "x": 782,
+          "y": 1029
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1272706,
+        "maxDelta": 93,
+        "meanDelta": 0.905,
+        "worst": {
+          "x": 751,
+          "y": 1021
+        }
+      },
+      "outputUsd": 0.0397,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1450,
+        "input_tokens_details": {
+          "image_tokens": 1257,
+          "text_tokens": 193
+        },
+        "output_tokens": 1323,
+        "output_tokens_details": {
+          "image_tokens": 1323,
+          "text_tokens": 0
+        },
+        "total_tokens": 2773
+      },
+      "meta": {
+        "size": "896x1184",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

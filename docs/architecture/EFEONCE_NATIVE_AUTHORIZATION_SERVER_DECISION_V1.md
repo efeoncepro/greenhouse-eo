@@ -12,6 +12,47 @@
 > **Supersedes:** la sección `Proposed decision` + `Slice 0 recommendation` (WorkOS staging de gasto cero) de [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md). **Siguen vigentes** de ese ADR: `Invariants`, `Required binding design`, `Slice 0 binding design proposal`, `Slice 0 gateway authorization-context contract`, `Slice 0 convergence contract`.
 > **Program:** [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 
+## Secuencia vigente first-party — 2026-10-25
+
+[Decisión aceptada](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md): TASK-1834 entrega la foundation OIDC; Rooms es primer consumer (TASK-2065). TASK-2064 adopta el login V4 de Greenhouse en Auth y TASK-2063 conserva su migración posterior. Las referencias históricas a Greenhouse como primer consumer no gobiernan la ejecución actual.
+
+### Aseguramiento propio aprobado — 2026-10-25
+
+Julio instruyó: «Pentest contratado? No. Hazlo tu. No le pagaré a nadie mas».
+La evaluación ofensiva de TASK-1833 la ejecutan los agentes disponibles sobre entornos propios aislados,
+con casos reproducibles, revisión separada, correcciones y retest. Esta decisión sustituye las referencias
+históricas de este ADR a contratación externa y pareo obligatorio de proveedores. Se mantienen los gates
+de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
+No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
+
+## Control de despliegue preparado en PR, sin integración — 2026-10-26
+
+`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. **Estado: LOCAL+PR,
+retenido por el operador; no es todavía el contrato efectivo del YAML remoto.** PR #263 HEAD `5e1fc2554`
+y PR #264 HEAD `aabd6d78d` siguen abiertas, sin merge ni despliegue. El remoto todavía permite pushes de
+`develop` al servicio único. El control preparado usará sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
+productivo desde `main`. Al integrarse, todas las vías seleccionarían el Environment `production` y un único lock del
+servicio, sin cancelar un despliegue activo. Este contrato propuesto sustituiría las referencias históricas de este
+ADR a staging sobre el mismo servicio una vez integrado; no declarar esa sustitución aplicada hoy.
+
+En el control preparado, el SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
+el workflow preparado identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
+dividido o reemplazar código vivo no promovido por un target anterior o divergente. Publicar un fix del
+control no promueve el runtime servido desde `develop`: ese caso queda bloqueado antes de build/deploy,
+con error explícito. El release amplio y la activación first-party/OTP siguen siendo decisiones separadas.
+
+El runtime vivo conserva Resend production v1 y Sentry `production`. El drift preparado verificará ambos
+y el deploy preparado retirará los montajes OTP con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
+del disparador de `develop` exige actualizar también su YAML remoto: GitHub evalúa el workflow de la rama
+que recibe el push. Las PR estrechas de control se publican por separado sobre cada base, sin incorporar
+el historial local ni código runtime/UI. Preparar o fusionar esas PR no acredita un deploy: comprobar
+checks, ausencia de build cuando el guard bloquee y revisión con tráfico después de una publicación autorizada.
+Antes de la futura integración de PR #264, proteger de forma gobernada los deploys artifact/commercial/ico/ops
+que coinciden con el nuevo path de test `src/lib/**`; ninguna protección temporal se aplicó ahora.
+Seguimiento CI26Oct: PR #263 y #264 CI completo y Vercel PASS; ambas siguen abiertas por retención humana. La retención no bloquea nueva UI aislada; no autoriza el release #262 ni activación.
+Estado vivo: [readback del 26 de octubre 17:38:40 Chile](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
+Secuencia y retención: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+
 ## Contrato vigente de acceso interno y federación
 
 Corte consolidado: [construcción, verificaciones y pendientes](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
@@ -498,3 +539,58 @@ el registro efectivo usa la intersección soportada y el endpoint continúa rech
 Esto corrige el bloqueo observado de Claude hospedado sin ampliar autoridad ni scope, dentro de la ejecución
 y certificación aprobadas de TASK-1844. Contrato, fuente y prueba de rechazo/emisión:
 [OAuth contract](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#compatibilidad-cimd-comprobada-en-task-1844--2026-09-08).
+
+## Architecture Decision 2026-10-28 — mantenimiento aislado de llaves (TASK-1833)
+
+- **Status:** `Accepted` para implementación local por decisión de Julio del 2026-10-29 («sigamos tus recomendaciones» tras recomendar el Job aislado). Rollout cloud y release retenidos.
+- **Owner:** Platform / Identity para la llave y el command; Ops para deploy, señales y recuperación.
+- **Scope:** rotación y retiro de la llave KMS `auth-server-es256`, registry `greenhouse_auth.signing_keys`, un Cloud Run Job dedicado y su invocación programada. No cambia el issuer HTTP ni los flujos OAuth.
+- **Reversibility:** `two-way-but-slow`; pausar la automatización es inmediato, pero una llave ya activada exige conservar el solapamiento y verificar consumidores antes del retiro.
+- **Confidence / validated as of:** `medium` para la frontera propuesta. Código, runbook y documentación de Cloud Run Jobs contrastados el 2026-10-28; costo tarifario modelado y billing export existente leído a nivel proyecto en CLP. Costo incremental del Job, IAM efectivo y operación cloud aún no medidos.
+
+### Context
+
+La CLI actual crea una versión KMS antes de registrarla en PostgreSQL; si se pierde la respuesta de creación,
+no existe una operación durable que permita reintentar sin riesgo de crear otra versión. La llave v2 está
+`active` y v1 `retiring` según el readback SQL del 28-10; ninguna de esas observaciones autoriza retirar v1.
+El plan histórico de TASK-1833 apunta a Scheduler → `ops-worker`, cuya identidad compartida ampliaría sus
+privilegios administrativos. La [propuesta detallada](../tasks/plans/TASK-1833-key-rotation-proposal.md)
+define el estado recuperable, los límites de IAM y las pruebas antes de construirlo.
+
+### Decisión aceptada para implementación local
+
+Crear `auth-key-maintenance` como **Job de una tarea**, con identidad de runtime y rol PostgreSQL dedicados.
+Un Scheduler separado invocaría sólo `jobs.run` con OAuth para Google APIs, sin overrides ni parámetros que
+seleccionen otra llave. El tick diario haría conciliación; iniciaría una rotación sólo cuando la última
+operación verificada tenga 90 días. Nacería con flag OFF, dry-run ON y Scheduler PAUSED. La exclusión,
+fencing y recuperación de resultados inciertos pertenecerían a un ledger durable en PostgreSQL, no al
+Scheduler ni a la exclusividad de una ejecución Cloud Run. La
+[guía oficial Scheduler → Jobs API](https://docs.cloud.google.com/run/docs/execute/jobs-on-schedule)
+usa OAuth para esa invocación; la [configuración de Jobs](https://docs.cloud.google.com/run/docs/create-jobs)
+permite una tarea y cero reintentos, opciones a fijar y verificar antes del apply. La creación KMS
+incierta detendría nuevas
+creaciones hasta reconciliación auditada. El retiro exigiría prueba de firma nueva, JWKS de ambos `kid`,
+solapamiento y verificación de consumidores; no retiraría automáticamente llaves históricas.
+
+Esta decisión acepta una excepción adicional de build unit en
+[GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md](GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md)
+y reemplaza el carril Scheduler → `ops-worker` de TASK-1833. El candidato local usa
+`services/auth-key-maintenance`, ledger de operaciones y una CLI de baseline; no hay IAM, Job,
+Scheduler, migración aplicada ni rotación cloud por esta aceptación. El Job no automatiza retiro,
+disable ni destroy de versiones: primero exige ensayo del issuer, consumidores, cachés y política
+de conservación. Sin una baseline verificada y la llave anterior retirada, no crea otra versión.
+
+### Alternativas y consecuencias
+
+- Conservar sólo la CLI manual evita un deployable nuevo, pero deja la recuperación de un create incierto al operador.
+- Usar `ops-worker` reutiliza su deploy, pero amplía los permisos de su identidad compartida sobre la llave del emisor.
+- El Job aislado acota permisos y blast radius a cambio de imagen, control plane, ledger, señales y costo operativo propios. El [modelo tarifario preliminar](../tasks/plans/TASK-1833-key-rotation-proposal.md#modelo-preliminar-de-costo-sin-recursos-creados) estima ≈ USD 0,04–0,18/mes de cómputo bruto diario bajo supuestos, más Scheduler y versiones HSM; no equivale a facturación observada. Conservar versiones HSM deshabilitadas hace crecer el costo, por lo que su plazo requiere decisión explícita antes de aceptar.
+
+### Contrato y reapertura
+
+`greenhouse_auth.signing_keys` sigue siendo la autoridad de emisión, KMS conserva la clave
+privada y la CLI reutiliza el command; el Job es sólo otro adapter. Registrar el Job en el release control
+plane, aplicar migración/grants con pruebas, ensayar recuperación y comprobar el SHA/estado de ejecución
+son gates previos a habilitar Scheduler. Los [runbooks](../operations/runbooks/auth-server-key-rotation.md)
+siguen rigiendo la operación manual actual. Reabrir ante un nuevo issuer, TTL/caché distinto, permisos más
+amplios, fallo de reconciliación o costo medido que invalide la cadencia.

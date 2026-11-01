@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "name": "panel-aeo-b2b-cl-2026-10",
+  "market": "CL",
+  "locale": "es-CL",
+  "queries": [
+    "¿Qué es AEO y en qué se diferencia del SEO?",
+    "¿Cómo eligen ChatGPT y Google qué fuentes citar en sus respuestas?",
+    "¿Sigue sirviendo el SEO ahora que Google responde con inteligencia artificial?",
+    "¿Qué tengo que cambiar en el sitio web de mi empresa para aparecer en las respuestas de ChatGPT?",
+    "¿Qué conviene priorizar en una empresa B2B en Chile: SEO o AEO?",
+    "¿Cuál es la diferencia entre SEO, AEO y GEO?",
+    "¿Qué agencias en Chile trabajan AEO o posicionamiento en inteligencia artificial para empresas B2B?",
+    "¿Qué herramientas sirven para medir si mi marca aparece en ChatGPT, Gemini y Perplexity?",
+    "¿Cómo puede empezar con AEO un equipo de marketing pequeño?",
+    "¿Qué hace Efeonce en AEO y posicionamiento en IA?"
+  ],
+  "target": "efeoncepro.com",
+  "maxOutputTokens": 1500,
+  "lanes": [
+    { "id": "chatgpt-consumer", "preset": "chatgpt-scraper", "surface": "consumer", "estimatedCostUsdPerTask": 0.004 },
+    { "id": "gemini-consumer", "preset": "gemini-scraper", "surface": "consumer", "estimatedCostUsdPerTask": 0.004 },
+    { "id": "perplexity-api", "preset": "perplexity-response", "surface": "api", "model": "sonar", "webSearch": true, "estimatedCostUsdPerTask": 0.012 }
+  ]
+}

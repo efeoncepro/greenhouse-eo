@@ -1,0 +1,390 @@
+{
+  "date": "2026-10-29",
+  "actor": "Julio Reyes",
+  "plan": "Sales Navigator Core",
+  "authorization": "Prospectar cuentas/personas y crear o guardar empresas en listas de Sales Navigator.",
+  "status": "three_lists_created_31_named_members_verified_one_additional_saved_account_membership_inconsistent",
+  "lists": [
+    {
+      "name": "Efeonce | Chile | Banca | 2026-10",
+      "url": "https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632464428240896",
+      "members": [
+        {
+          "name": "Banco Bci",
+          "url": "https://www.linkedin.com/sales/company/162666"
+        },
+        {
+          "name": "Banco BICE",
+          "url": "https://www.linkedin.com/sales/company/88559"
+        },
+        {
+          "name": "Banco de Chile",
+          "url": "https://www.linkedin.com/sales/company/162624"
+        },
+        {
+          "name": "Banco Falabella Chile",
+          "url": "https://www.linkedin.com/sales/company/311443"
+        },
+        {
+          "name": "Banco Internacional",
+          "url": "https://www.linkedin.com/sales/company/67132"
+        },
+        {
+          "name": "Banco Ripley Chile",
+          "url": "https://www.linkedin.com/sales/company/11694487"
+        },
+        {
+          "name": "BancoEstado",
+          "url": "https://www.linkedin.com/sales/company/21298"
+        },
+        {
+          "name": "Coopeuch",
+          "url": "https://www.linkedin.com/sales/company/339190"
+        },
+        {
+          "name": "Itaú Chile",
+          "url": "https://www.linkedin.com/sales/company/315013"
+        },
+        {
+          "name": "Santander Chile",
+          "url": "https://www.linkedin.com/sales/company/999307"
+        }
+      ],
+      "counterObserved": 10,
+      "visibleMembersVerified": 10
+    },
+    {
+      "name": "Efeonce | Chile | Seguros e Inversiones | 2026-10",
+      "url": "https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632789671071745",
+      "members": [
+        {
+          "name": "AFP HABITAT",
+          "url": "https://www.linkedin.com/sales/company/139571"
+        },
+        {
+          "name": "Banchile Inversiones",
+          "url": "https://www.linkedin.com/sales/company/88558"
+        },
+        {
+          "name": "Bci Seguros",
+          "url": "https://www.linkedin.com/sales/company/843155"
+        },
+        {
+          "name": "BICE VIDA",
+          "url": "https://www.linkedin.com/sales/company/1313519"
+        },
+        {
+          "name": "BTG Pactual Chile",
+          "url": "https://www.linkedin.com/sales/company/18926134"
+        },
+        {
+          "name": "Consorcio",
+          "url": "https://www.linkedin.com/sales/company/35825"
+        },
+        {
+          "name": "LarrainVial",
+          "url": "https://www.linkedin.com/sales/company/36194"
+        },
+        {
+          "name": "MetLife Chile",
+          "url": "https://www.linkedin.com/sales/company/11403906"
+        },
+        {
+          "name": "Seguros Falabella",
+          "url": "https://www.linkedin.com/sales/company/3588511"
+        },
+        {
+          "name": "SURA Investments",
+          "url": "https://www.linkedin.com/sales/company/2494435"
+        }
+      ],
+      "counterObserved": 10,
+      "visibleMembersVerified": 10
+    },
+    {
+      "name": "Efeonce | Chile | Fintech y Pagos | 2026-10",
+      "url": "https://www.linkedin.com/sales/accounts/dashboard?listGroup=CUSTOM_LISTS&listId=7521632742405529601",
+      "members": [
+        {
+          "name": "Buda.com",
+          "url": "https://www.linkedin.com/sales/company/9294718"
+        },
+        {
+          "name": "Fintual",
+          "url": "https://www.linkedin.com/sales/company/10663263"
+        },
+        {
+          "name": "Galgo",
+          "url": "https://www.linkedin.com/sales/company/35676944"
+        },
+        {
+          "name": "Global66",
+          "url": "https://www.linkedin.com/sales/company/33241859"
+        },
+        {
+          "name": "Klap",
+          "url": "https://www.linkedin.com/sales/company/1080358"
+        },
+        {
+          "name": "MACHBANK",
+          "url": "https://www.linkedin.com/sales/company/24789601"
+        },
+        {
+          "name": "Maxxa",
+          "url": "https://www.linkedin.com/sales/company/15217929"
+        },
+        {
+          "name": "QuePlan.cl 🔍",
+          "url": "https://www.linkedin.com/sales/company/16170658"
+        },
+        {
+          "name": "Tenpo",
+          "url": "https://www.linkedin.com/sales/company/39770849"
+        },
+        {
+          "name": "Transbank S.A.",
+          "url": "https://www.linkedin.com/sales/company/47954"
+        },
+        {
+          "name": "Transtecnia",
+          "url": "https://www.linkedin.com/sales/company/8387437"
+        }
+      ],
+      "counterObserved": 12,
+      "visibleMembersVerified": 11,
+      "pendingMembership": [
+        {
+          "name": "Haulmer",
+          "url": "https://www.linkedin.com/sales/company/27017963",
+          "status": "save_acknowledged_one_custom_list_but_not_rendered_in_dashboard_and_zero_in_list_search"
+        }
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "company": "Global66",
+      "resultCount": 15,
+      "people": [
+        {
+          "name": "Benjamín de Amesti B",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAACJMPmgBzFtDDnIqEhbYor133iPqufrMhpI,NAME_SEARCH,iI9x",
+          "role": "Head of Growth",
+          "degree": "2º grado",
+          "location": "Chile"
+        },
+        {
+          "name": "Francisca Solar",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAAD2xyXgB2UlCLl8UCrkhxMWoq22FphklyWw,NAME_SEARCH,U4NT",
+          "role": "Brand Lead",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile"
+        },
+        {
+          "name": "Vivian Andrea Rozo",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAACPGDBgBz1j7mRu23zKrqC26rBT4vgdzS9U,NAME_SEARCH,wKzK",
+          "role": "Regional Growth CRM Manager",
+          "degree": "1er grado",
+          "location": "Bogotá, Distrito Capital, Colombia"
+        },
+        {
+          "name": "Javier Llakowski",
+          "company": "Global66",
+          "profile": "/sales/lead/ACwAABhPZsEBFUoT-F-nx5ZOZKVOdAcOX5FOE3k,NAME_SEARCH,xUT5",
+          "role": "SEO Analyst (IC) | Owner LATAM",
+          "degree": "2º grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile"
+        }
+      ]
+    },
+    {
+      "company": "Tenpo",
+      "resultCount": 23,
+      "people": [
+        {
+          "name": "Yicell Viur",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAt4n4gB-wGlaifE9rvOCuo7TS6wuqjAGqk,NAME_SEARCH,JPIH",
+          "role": "Marketing Lifecycle Manager",
+          "degree": "2º grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile"
+        },
+        {
+          "name": "Sebastián Sandoval",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAtbSWAB9DYSsLFO03sycFYptqxRQ00rcmA,NAME_SEARCH,gEwe",
+          "role": "Brand Lead | Líder de marca",
+          "degree": "1er y miembro de LinkedIn Premium",
+          "location": "Chile"
+        },
+        {
+          "name": "Cristian Alvear González",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAABx-LbEBT98iFS7ykLLJNUurRfSKi-xXMPY,NAME_SEARCH,SEPD",
+          "role": "Head Growth Marketing & New Business",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile"
+        },
+        {
+          "name": "Teofilo Ayerza",
+          "company": "Tenpo",
+          "profile": "/sales/lead/ACwAAAtzmlUBmo068v1i85Ej-U7TRXXq0T03xCA,NAME_SEARCH,Ul2e",
+          "role": "Head of Marketing Operations",
+          "degree": "2º y miembro de LinkedIn Premium",
+          "location": "Área metropolitana de Santiago"
+        }
+      ]
+    },
+    {
+      "company": "MACHBANK",
+      "resultCount": 18,
+      "people": [
+        {
+          "name": "Francisco Castro Moraga",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAAAp82zYBcbjvsGWk7FpRUIvB89-Z8M5iHKs,NAME_SEARCH,jNCx",
+          "role": "Brand Manager",
+          "degree": "1er grado",
+          "location": "Gran Santiago, Región Metropolitana de Santiago, Chile"
+        },
+        {
+          "name": "Paulina Guianatti Vladilo",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAACIZ0AcBVLEWHnDfvHH6-o1INRmZZPTCd9M,NAME_SEARCH,XgBJ",
+          "role": "Head of Marketing",
+          "degree": "1er grado",
+          "location": "Chile"
+        },
+        {
+          "name": "Elías Alegría Pavez",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAABdr4U8BQQKcf1m_IkjNnaY2QtZH8HwpA8E,NAME_SEARCH,RiHI",
+          "role": "Head of Engagement",
+          "degree": "2º grado",
+          "location": "Peñaflor, Región Metropolitana de Santiago, Chile"
+        },
+        {
+          "name": "Andrea Rivera",
+          "company": "MACHBANK",
+          "profile": "/sales/lead/ACwAAAnnwMIBmcLC5iASBEzTGjo1W3fmWVE23OM,NAME_SEARCH,EZ8G",
+          "role": "Head of Growth",
+          "degree": "1er grado",
+          "location": "Chile"
+        }
+      ]
+    },
+    {
+      "company": "Fintual",
+      "resultCount": 10,
+      "people": [
+        {
+          "name": "Cecilia Sánchez del Río",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAABbQ1bMBuhICXJ186u2_bMcfef42AkJaNy4,NAME_SEARCH,kKUw",
+          "role": "Marketing Lead",
+          "degree": "1er grado",
+          "location": "Miguel Hidalgo, CDMX, Ciudad de México, México"
+        },
+        {
+          "name": "Andrea Malatesta",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAAAwDwZUBIqxdgP9TGVguZYPd1nWMLWxxoZQ,NAME_SEARCH,RaCu",
+          "role": "Marketing Brand Manager",
+          "degree": "2º grado",
+          "location": "Chile"
+        },
+        {
+          "name": "Leonardo Castillo",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAACS8joEBrGjP1SX5d8qjmmKtawP7C3d-mJc,NAME_SEARCH,jclU",
+          "role": "Product Marketing & Business Development",
+          "degree": "2º y miembro de LinkedIn Premium",
+          "location": "Área metropolitana de Ciudad de México"
+        },
+        {
+          "name": "Matías Guerrero Irarrázaval",
+          "company": "Fintual",
+          "profile": "/sales/lead/ACwAAB0BkHsBsg332slPkBffe-evSumgUaGYuyI,NAME_SEARCH,ljrz",
+          "role": "Growth Strategist",
+          "degree": "1er y miembro de LinkedIn Premium",
+          "location": "Chile"
+        }
+      ]
+    },
+    {
+      "company": "Haulmer",
+      "resultCount": 4,
+      "people": [
+        {
+          "name": "Nathalie Moreau Caniuñir",
+          "role": "Marketing Manager",
+          "degree": "1er grado",
+          "profile": "/sales/lead/ACwAACbD_BIBYPld4sKYpbBkG47kuzn1O6yRy70,NAME_SEARCH,50KO",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto"
+        },
+        {
+          "name": "Enrique Alvarez",
+          "role": "Chief Revenue Officer",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAAAUpo5wBihekxYKw9dl4u1Kg67GdgWv7XLw,NAME_SEARCH,HrVJ",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto"
+        },
+        {
+          "name": "Tania Salgado",
+          "role": "Community Manager",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAACytiPcBVYEjDuaymuaiP5_20CHxqRIvjT0,NAME_SEARCH,94oo",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto"
+        },
+        {
+          "name": "Cristina P.",
+          "role": "Community Manager | Content Writer",
+          "degree": "2º grado",
+          "profile": "/sales/lead/ACwAABZwUlYBhj6UlFtpbxFybyRAM9fhyv-ku8I,NAME_SEARCH,FCv7",
+          "company": "Haulmer",
+          "evidence": "Tarjeta del explorador de relaciones; perfil completo no abierto"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "country": "Chile",
+    "headquartersFilter": true,
+    "companyHeadcountBands": "51+",
+    "relationshipFilter": false,
+    "peopleFunction": "Marketing",
+    "peopleGeographyFilter": false,
+    "peopleSeniorityFilter": false
+  },
+  "coverage": {
+    "financialSearchResultCount": 295,
+    "financialPagesReviewed": 3,
+    "softwareFintechPassResultCount": 3,
+    "softwareAdded": [
+      "Haulmer",
+      "Transtecnia"
+    ],
+    "softwareNotSelected": [
+      "Ionix Latam · Soluciones Digitales"
+    ]
+  },
+  "actions": {
+    "accountListWrites": true,
+    "leadListWrites": false,
+    "messagesSent": 0,
+    "connectionRequests": 0,
+    "inMailCreditsConsumed": 0,
+    "crmWrites": false
+  },
+  "note": "Personas son interlocutores candidatos según tarjetas profesionales; no presupuesto, autoridad o demanda confirmados. Perfiles completos no auditados en esta ronda.",
+  "evidencePhase": "accounts_saved_and_first_20_contact_cards_before_lead_lists",
+  "subsequentLeadLists": "LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.json",
+  "counterTotalObserved": 32,
+  "namedMembershipsVerified": 31
+}

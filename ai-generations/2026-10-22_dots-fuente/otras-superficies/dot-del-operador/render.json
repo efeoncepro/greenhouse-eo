@@ -1,0 +1,39 @@
+{
+  "selectHere": true,
+  "seleccion": [
+    [
+      0,
+      "rounded_triangle",
+      true
+    ],
+    [
+      1,
+      "yellow",
+      true
+    ],
+    [
+      2,
+      "sleepy_lids",
+      true
+    ],
+    [
+      3,
+      "tall_oval_frames",
+      true
+    ],
+    [
+      4,
+      "bow",
+      true
+    ]
+  ],
+  "igualAlPresetAlfred": true,
+  "error": "",
+  "reaccion": 0,
+  "consola": [
+    "warning: [.WebGL-0x12c001c7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x12c001c7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x12c001c7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+    "warning: [.WebGL-0x12c001c7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+}

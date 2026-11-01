@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15-master.wav",
+    "video": "ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v7-feed.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v7-feed.mp4"
+      }
+    ],
+    "latencyMs": 477
+  },
+  "mapa": {
+    "durationSec": 14.99,
+    "onsets": [
+      0.5,
+      0.89,
+      1,
+      1.26,
+      1.38,
+      1.5,
+      1.76,
+      1.89,
+      2,
+      2.26,
+      2.38,
+      2.5,
+      2.76,
+      2.89,
+      3,
+      3.26,
+      3.39,
+      3.5,
+      3.76,
+      3.88,
+      4,
+      4.5,
+      4.89,
+      5,
+      5.26,
+      5.38,
+      5.5,
+      5.76,
+      5.89,
+      6,
+      6.26,
+      6.5,
+      10.26
+    ],
+    "silences": [
+      {
+        "t": 0,
+        "tFin": 0.48
+      },
+      {
+        "t": 13.26,
+        "tFin": 15
+      }
+    ],
+    "cuts": [],
+    "visualEvents": [
+      4.041667
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 1,
+      "medianMs": -42,
+      "worstMs": -42,
+      "inSync": true
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 6,
+      "kind": "golpe",
+      "t": 6,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 6.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 10.25,
+      "kind": "golpe",
+      "t": 10.25,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 10.26 s (Δ +10 ms)"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+  ⚠ Sunburst edita sin máscara (por instrucción, la imagen entera); el pipeline recompone sólo la zona. Pide en el prompt que no cambie el encuadre.
+  ◫ la máscara no viaja: se envía la zona marcada en magenta como guía de posición (imagen 2)
+  · openai edita por instrucción: la máscara no viaja, sólo recompone.
+  ✂ recorte 543x526 en (0, 633) → 1040x1008 · la zona con contexto ocupa 21.6 % de la imagen: se genera recortada a 1040x1008
+  $ costo estimado ≈ USD 0.052 · 1 × salida 1040x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    · color corregido en el anillo (15148 px): desplazamiento RGB -3.6 / -5.4 / -5.6
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 200/255 · salida USD 0.0516
+    ⚠ el modelo REENCUADRÓ (≈ -3 px, -3 px, escala 0.98): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/run-08/inpaint/ff44d14d5b92/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+exit=3

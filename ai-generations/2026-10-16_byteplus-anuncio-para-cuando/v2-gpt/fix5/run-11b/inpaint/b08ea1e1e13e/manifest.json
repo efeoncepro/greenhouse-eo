@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "b08ea1e1e13e",
+  "key": "b08ea1e1e13ebb69a237b3c02a5d52e6d81f3c2b83dd973f80b8a32aa7e98341",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:58:55.616Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/11b.png",
+    "imageSha256": "a2cf7d2026d99703bf55bfb1e2406137bcfc7de1eee6ad8a228d69e6e0d2b9c5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/m/11b.png",
+    "maskSha256": "1f0a173057e0bfdd508492954a134f3f2530cee083d9f1441e67df0dc8b9941a",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Two edits only. Upper zone: the can flying in the air is EXACTLY the tall slim beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), rotating, intact, wet with droplets. Bottom-right zone: just the out-of-focus grey back of an empty office chair and the wet table edge, nothing beige. Keep everything outside the zones unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nTwo edits only. Upper zone: the can flying in the air is EXACTLY the tall slim beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), rotating, intact, wet with droplets. Bottom-right zone: just the out-of-focus grey back of an empty office chair and the wet table edge, nothing beige. Keep everything outside the zones unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05005340576171875,
+    "editable": 53872,
+    "soft": 11734,
+    "protected": 1245114
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 37.498,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.6,
+        "bestError": 2.6,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.28,
+        -1.05,
+        -0.05
+      ],
+      "protected": {
+        "pixels": 1245114,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 53872,
+        "maxDelta": 245,
+        "meanDelta": 44.308,
+        "worst": {
+          "x": 317,
+          "y": 166
+        }
+      },
+      "seam": {
+        "pixels": 11734,
+        "maxDelta": 205,
+        "meanDelta": 6.235,
+        "worst": {
+          "x": 328,
+          "y": 132
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1245114,
+        "maxDelta": 178,
+        "meanDelta": 5.186,
+        "worst": {
+          "x": 322,
+          "y": 122
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4334,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 269
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 5844
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

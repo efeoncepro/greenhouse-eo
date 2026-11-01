@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.068 (1 × 2257 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-19_google-partner-freeze/r5-cine/acabado2-feed.png (edit) …
+  ✓ 3178KB · gpt-image-2.5-sunburst · 1536x1920 · high
+    usage: in 1847 (img 1505 · txt 342) · out 2257 · total 4104
+done

@@ -10,7 +10,7 @@
   "recipe": "content-service-lanes",
   "voice": {
     "eyebrow": "Alcance del servicio",
-    "question": "¿Qué cubren las 25 horas?",
+    "question": "¿Qué cubren las 30 horas?",
     "answer": [
       "La operación"
     ]

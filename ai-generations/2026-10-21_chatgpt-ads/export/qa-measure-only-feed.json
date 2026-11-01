@@ -1,0 +1,124 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-10-21_chatgpt-ads/audio/mezcla-master.wav",
+    "video": "ai-generations/2026-10-21_chatgpt-ads/export/efeonce-chatgpt-ads-feed.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/audio/mezcla-master.wav"
+      },
+      {
+        "path": "ai-generations/2026-10-21_chatgpt-ads/export/efeonce-chatgpt-ads-feed.mp4"
+      }
+    ],
+    "latencyMs": 472
+  },
+  "mapa": {
+    "durationSec": 11.99,
+    "onsets": [
+      0.13,
+      3,
+      4,
+      5,
+      7,
+      8.5
+    ],
+    "silences": [
+      {
+        "t": 2.76,
+        "tFin": 3
+      },
+      {
+        "t": 8.29,
+        "tFin": 8.5
+      },
+      {
+        "t": 11.56,
+        "tFin": 11.76
+      },
+      {
+        "t": 11.79,
+        "tFin": 12
+      }
+    ],
+    "cuts": [
+      7,
+      7.25,
+      7.5,
+      7.75,
+      8,
+      8.5
+    ],
+    "visualEvents": [
+      5.458333,
+      5.958333,
+      7,
+      7.25,
+      7.5,
+      7.75,
+      8,
+      8.5,
+      9.5
+    ],
+    "frozen": [],
+    "sync": {
+      "pairs": 2,
+      "medianMs": 0,
+      "worstMs": 0,
+      "inSync": true
+    }
+  },
+  "cuesMedidos": [
+    {
+      "cue": 2.75,
+      "kind": "silencio",
+      "t": 2.75,
+      "tFin": 3,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 2.75–3.00 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 3,
+      "kind": "golpe",
+      "t": 3,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 3.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 4,
+      "kind": "golpe",
+      "t": 4,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 4.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 5,
+      "kind": "golpe",
+      "t": 5,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 5.00 s (Δ +0 ms)"
+    },
+    {
+      "cue": 8.3,
+      "kind": "silencio",
+      "t": 8.3,
+      "tFin": 8.5,
+      "estado": "confirmado",
+      "medido": "RMS máx. −inf dB en 8.30–8.50 s (silencio ≤ -50 dB)"
+    },
+    {
+      "cue": 8.5,
+      "kind": "golpe",
+      "t": 8.5,
+      "estado": "confirmado",
+      "medido": "ataque más cercano en 8.50 s (Δ +0 ms)"
+    },
+    {
+      "cue": 10,
+      "kind": "pico",
+      "t": 10,
+      "estado": "confirmado",
+      "medido": "pico de ±0,5 s en 10.00 s (-2.9 dBFS)"
+    }
+  ]
+}

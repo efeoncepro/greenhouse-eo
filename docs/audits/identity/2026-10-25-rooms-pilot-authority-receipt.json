@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "purpose": "rooms_authorized_synthetic_room_canary_identity_bootstrap",
+  "observedAt": "2026-10-25T22:21:45.883Z",
+  "status": "verified_snapshot_redacted",
+  "privateReceiptSha256": "6cee855f31056407cbe18c92a52b89383eb701e4e4dbe6dd31ba83b217f1fc10",
+  "publicationPolicy": "Public evidence excludes personal identifiers and identity or employment linkage. Full operator receipt is local, ignored and mode 0600. No secrets or authentication tokens were present. Prior committed versions remain in Git history; this change does not claim historical erasure.",
+  "verified": {
+    "identityEligible": true,
+    "canonicalReaderMatched": true,
+    "organizationEligible": true,
+    "membershipEffective": true,
+    "legalRelationshipEffective": true
+  },
+  "mutations": {
+    "identityLinks": false,
+    "grants": false,
+    "sessions": false,
+    "email": false
+  },
+  "privateReceiptRequiredForBootstrap": true
+}

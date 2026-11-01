@@ -27,6 +27,16 @@ federation and its runtime; it does not restate the craft.
 client implements it yet, so the handshake lane is correct TODAY. Read
 `mcp-craft/protocol-radar.md`, and verify against the source when the decision is expensive.
 
+## Rooms: stdio local y federación remota
+
+Para Rooms cargar `efeonce-rooms` y su ledger. El adapter stdio local de TASK-2078 ya consume el HTTP
+canónico con sesión existente0600 y toolsets explícitos (read por defecto); no es un provider desplegado
+en mcp.efeonce.org ni inicia OAuth. Sus exclusiones incluyen OTP/login, descriptores y bytes binarios.
+No agregar Rooms a discovery/scopes/manifests del gateway ni conceder consentimiento delegado por la
+existencia de ese adapter. Federación remota conserva su contrato, autoridad y release propios.
+[ADR local](../../../docs/architecture/rooms/EFEONCE_ROOMS_LOCAL_STDIO_MCP_DECISION_V1.md) y
+[manual](../../../docs/manual-de-uso/rooms/operar-backend-local.md) contienen operación/evidencia.
+
 ## First reads
 
 Read, in order:

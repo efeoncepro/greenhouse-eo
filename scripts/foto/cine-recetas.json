@@ -415,6 +415,26 @@
       "porque": "Contraportada de propuesta en la línea Revenue-HubSpot: el último cuadro de una película. Nexa camina por un piso pulido hacia un anillo enorme de luz de Efeonce en el horizonte, envuelto en bruma. La órbita lleva su anatomía completa: hilo tenue azul y blanco frío (#0375DB), un arco corto rosado (#E86BD0) arriba a la izquierda y la esfera en la punta del arco; sin partículas. Es la regla del acento como puntuación (2026-10-06) aplicada a la órbita: arco y esfera, nunca la esfera sola. Reemplaza a BR3 en las propuestas `revenue-hubspot`. Propuesta Assetplan, lámina A09 (`close-proposal`, layout `horizon`); aprobada por el operador el 2026-10-20 («Me quedo con esta»), entre la v2 y la v3.",
       "ojo": "Tres rechazos antes: BR3 recoloreada (se notaba en la esfera y luego quedó rosada entera), la v1 (aro grueso con la esfera suelta arriba: «se ve súper artificial la órbita con ese punto rosado allí») y la v2 (Nexa grande, se leía como retrato). El modelo inventó un isotipo corrido al hombro: se borró con `ai:inpaint erase` y se compuso el logotipo oficial con `foto:isotipo --marca logotipo --sin-limpiar --acabado` (con la limpieza, los hombros quedaban cuadrados contra la bruma); es receta de luz y escena, no de bordado. La escena se corrió 32 px a la derecha con espejo del borde oscuro para dejar ≥ 90 px entre el eslogan y el halo. Sin lecho (`sinLechoPorque`): el piso llega limpio al borde. Cadena completa en el LEEME de la corrida.",
       "isotipoPintado": true
+    },
+    {
+      "id": "MCB-AEO1-169",
+      "ficha": "ai-generations/2026-10-24_portadas-blog/fichas/MCB-AEO1-169.json",
+      "plate": "ai-generations/2026-10-24_portadas-blog/plates/MCB-AEO1-169.png",
+      "formato": "16:9",
+      "alcance": "manzanitas",
+      "protagonista": "Sin persona: un objeto. Un cajón de fichero contemporáneo (fresno teñido negro mate) sobre una mesa negra, con una sola ficha en blanco levantada bajo un foco frío",
+      "porque": "Portada de blog de Marketing con Manzanitas sin persona, para cuando la persona no porta la idea (registro cine, delta 2026-10-25). El fenómeno es el servicio: de cientos de fichas, el motor elige y cita una. El cajón está lejos y chico, descrito con fracciones («un octavo del ancho, entero en el tercio derecho, la tapa a media altura»), y el 64 % izquierdo queda en oscuridad calma para el texto. El azul de la línea vive en el borde del foco, no como punto suelto. Línea `engine`. Artículo «SEO y AEO» (post 248463); aprobada por el operador el 2026-10-25 («Ok dale»), v5.",
+      "ojo": "El modelo ignora los porcentajes de un objeto: la v2 dejó el cajón en el 57 % y la v3 y la v4 empeoraron (casebook, falla 59). Mide en la portada compuesta el aire entre el texto y el objeto. Sin `luz-motivada`: la llave es un foco fuera de cuadro. La escena neutraliza los bloques de cara con «There is no face anywhere in this frame». Fichero contemporáneo y fichas blanco frío: el roble con fichas crema se leía antiguo. Lleva lecho (el canto de la mesa en sombra, cámara baja). Tarjeta: plate sin los 380 px de arriba y `--focus \"75% 50%\"`."
+    },
+    {
+      "id": "MCB-LOOP1-169",
+      "ficha": "ai-generations/2026-10-26_loop-marketing/portada/fichas/MCB-LOOP1-169.json",
+      "plate": "ai-generations/2026-10-26_loop-marketing/portada/plates/MCB-LOOP1-169.png",
+      "formato": "16:9",
+      "alcance": "manzanitas",
+      "protagonista": "Sin persona: un fenómeno. La estela de un péndulo con LED en larga exposición que dibuja el símbolo del infinito sobre una mesa negra, con pasadas tenues que convergen en una figura nítida",
+      "porque": "Portada de blog de Marketing con Manzanitas sin persona y sin vidrio. Larga exposición real (no neón ni gráfico): la figura nítida y sus pasadas tenues dicen que el loop aprende en cada vuelta. La estela es entera azure-white; el acento magenta queda sólo en la esfera del texto. Cámara alta en picado, figura chica y lejos en el tercio derecho, `lecho: \"sin-lecho\"` con su razón. Línea `revenue-hubspot`. Pilar «Qué es Loop Marketing» (post 248398); aprobada por el operador el 2026-10-26 («El loop quedó muy achatado, pero bueno vamos»), v2.",
+      "ojo": "Salió achatada aun en picado a unos 30° (casebook, falla 61): si la rehaces, cámara más alta o figura en un plano vertical frente al lente, y mide la relación alto/ancho de los lazos. Se pidió un veinteavo del ancho y salió unas 2,5 veces más grande (falla 60). Se pidieron exactamente dos pasadas tenues y salieron 5 a 7, aceptadas como el decaimiento del péndulo (falla 62). El hilo llega al borde superior. Tarjeta: plate sin los 200 px de arriba y `--focus \"71% 50%\"`; `hero`: recorte x 0–2080 · y 150–1190."
     }
   ]
 }

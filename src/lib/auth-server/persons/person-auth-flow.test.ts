@@ -13,6 +13,7 @@ import { createInMemoryTotpCipher } from './totp-cipher'
 import { createPersonSubjectPort } from './subject-port'
 import type { PersonSessionRecord } from './types'
 import { headersFromRecord, type OAuthHttpRequest } from '../oauth/http'
+import type { LoginAnnouncementDto } from '@/lib/login-announcements/types'
 
 /**
  * Flujo completo de la autenticación de personas (TASK-1830) contra el router REAL, con el store en
@@ -46,7 +47,7 @@ type Harness = {
 }
 
 const buildHarness = (
-  options: { linkActive?: boolean; knownEmail?: boolean; internalLoginEnabled?: boolean; supersededOnAccept?: string[] } = {}
+  options: { linkActive?: boolean; knownEmail?: boolean; internalLoginEnabled?: boolean; supersededOnAccept?: string[]; loadAnnouncements?: () => Promise<readonly LoginAnnouncementDto[]> } = {}
 ): Harness => {
   const supersededOnAccept = options.supersededOnAccept ?? []
   const store = new InMemoryPersonAuthStore()
@@ -104,6 +105,7 @@ const buildHarness = (
 
   const handler = createPersonAuthHandler({
     internalLoginEnabled: () => options.internalLoginEnabled ?? false,
+    loadLoginAnnouncements: options.loadAnnouncements,
     store,
     config,
     directory,
@@ -661,6 +663,29 @@ describe('rate limit — bloqueo progresivo', () => {
 })
 
 describe('ergonomía del navegador', () => {
+  it('renders published editorial data through the real login route without changing sign-in methods', async () => {
+    const loadAnnouncements = vi.fn(async (): Promise<readonly LoginAnnouncementDto[]> => [{
+      id: 'published-1', kind: 'text', serviceLine: 'engine', tabLabel: 'Engine', kicker: 'Publicado',
+      title: 'Una noticia publicada', body: null, cta: null,
+      image: { path: '/images/login/announcement-ai-visibility-report.webp', alt: 'Foto aprobada' },
+      lens: { x: 50, y: 30, radiusRatio: 0.24 }
+    }])
+
+    const page = await buildHarness({ loadAnnouncements }).handler(request('GET', '/login'))
+
+    expect(loadAnnouncements).toHaveBeenCalledOnce()
+    expect(page?.body).toContain('Una noticia publicada')
+    expect(page?.body).toContain('/auth/magic-link/request')
+    expect(page?.body).not.toContain('type="password"')
+  })
+
+  it('keeps login available when the editorial source rejects', async () => {
+    const page = await buildHarness({ loadAnnouncements: async () => { throw new Error('offline') } }).handler(request('GET', '/login'))
+
+    expect(page?.status).toBe(200)
+    expect(page?.body).toContain('/images/login/stage-default.webp')
+  })
+
   it('el GET del enlace sólo pinta un formulario: un escáner de correo no consume nada', async () => {
     const harness = buildHarness()
 

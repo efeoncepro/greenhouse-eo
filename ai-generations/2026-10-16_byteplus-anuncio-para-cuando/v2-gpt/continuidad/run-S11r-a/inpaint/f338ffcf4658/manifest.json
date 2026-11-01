@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f338ffcf4658",
+  "key": "f338ffcf46580b41aa25d2ec69fa1b2e99fbc048076a7db42a95ce89cdfb47e6",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:22:20.072Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates/S11r-a-ola-llega.png",
+    "imageSha256": "b2c231c20923dea3a6939590e815fe61251cc0ec41484a661c9086e4ffcb27d3",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/masks/S11r-a-final.png",
+    "maskSha256": "c028be22764200b8efed75d807f268af9307ba6b3b2bb4dbfeafa885a75522a0",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace ONLY the marked background behind the woman. There are NO windows and NO mountains or city skyline behind her: this is the interior side of the same modern meeting room. Behind her: a floor-to-ceiling glass partition with thin matte-black frames and a glass door; through the glass, a softly out-of-focus open-plan office with light wood desks, warm pendant lights and green plants; to the right of the partition a light grey wall with a large ultra-thin wall-mounted display. Same camera height, perspective and shallow depth of field as the photo, background slightly out of focus. Keep the woman, her hair edges, her hands, the cup and everything outside the marked zone exactly as they are. Photorealistic. Keep the flying drink can, the splashing water, droplets and orange slices exactly where they are and in front of the background. The display is off. Warm, bright morning light coming from the camera side.",
+    "providerPrompt": "Replace ONLY the marked background behind the woman. There are NO windows and NO mountains or city skyline behind her: this is the interior side of the same modern meeting room. Behind her: a floor-to-ceiling glass partition with thin matte-black frames and a glass door; through the glass, a softly out-of-focus open-plan office with light wood desks, warm pendant lights and green plants; to the right of the partition a light grey wall with a large ultra-thin wall-mounted display. Same camera height, perspective and shallow depth of field as the photo, background slightly out of focus. Keep the woman, her hair edges, her hands, the cup and everything outside the marked zone exactly as they are. Photorealistic. Keep the flying drink can, the splashing water, droplets and orange slices exactly where they are and in front of the background. The display is off. Warm, bright morning light coming from the camera side."
+  },
+  "mask": {
+    "touchedFraction": 0.41403350830078123,
+    "editable": 526793,
+    "soft": 15889,
+    "protected": 768038
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 90 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 82.676,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.66,
+        "bestError": 3.66,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 768038,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 526793,
+        "maxDelta": 243,
+        "meanDelta": 84.564,
+        "worst": {
+          "x": 3,
+          "y": 321
+        }
+      },
+      "seam": {
+        "pixels": 15889,
+        "maxDelta": 198,
+        "meanDelta": 20.083,
+        "worst": {
+          "x": 570,
+          "y": 216
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 768038,
+        "maxDelta": 158,
+        "meanDelta": 7.913,
+        "worst": {
+          "x": 606,
+          "y": 662
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1510,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 230
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 3020
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

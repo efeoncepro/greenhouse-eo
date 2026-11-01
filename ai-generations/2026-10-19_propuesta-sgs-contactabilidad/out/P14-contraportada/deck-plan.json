@@ -1,0 +1,66 @@
+{
+  "tenderId": "P14-contraportada",
+  "slides": [
+    {
+      "slideId": "deck-close-proposal",
+      "contentType": "deck.close-proposal",
+      "slots": {
+        "frame": {
+          "line": "revenue-salesforce",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "logoWidth": "--gl-logo-width=700px",
+          "sloganTop": "--gl-slogan-top=427px",
+          "sloganPx": "--gl-slogan-px=36.5px",
+          "sloganLeading": "--gl-slogan-leading=1",
+          "sloganRunLeading": "--gl-slogan-run-leading=normal",
+          "contactTop": "--gl-contact-top=573.5px",
+          "contactPx": "--gl-contact-px=20px",
+          "contactWeight": "--gl-contact-wght=500",
+          "contactLeading": "--gl-contact-leading=1",
+          "contactRowGap": "--gl-contact-row-gap=16px",
+          "contactBubbleHeight": "--gl-contact-bubble-height=30px",
+          "contactSocialGap": "--gl-contact-social-gap=22px",
+          "contactSocialIcon": "--gl-contact-social-icon=30px",
+          "contactSocialIconGap": "--gl-contact-social-icon-gap=22px",
+          "contactItemIcon": "--gl-contact-item-icon=22px",
+          "contactItemGap": "--gl-contact-item-gap=12px",
+          "contactIconOpacity": "--gl-contact-icon-opacity=0.78",
+          "contactSocialBelow": "--gl-contact-social-below=14px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:NXSF3-nexa-contraportada-bordada",
+          "alt": "Nexa, con la chaqueta de Efeonce, camina de espaldas por un piso brillante hacia un gran anillo vertical de luz celeste con una esfera blanca en lo alto"
+        },
+        "slogan": [
+          {
+            "text": "Empower",
+            "style": "800 italic #e2e2e2"
+          },
+          {
+            "text": "your",
+            "style": "800 normal #e2e2e2"
+          },
+          {
+            "text": "Revenue",
+            "style": "900 italic #2fb8ff"
+          }
+        ],
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phoneFirst": "+56 9 3732 3064",
+          "phoneSecond": "+1 (239) 235-2073",
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        },
+        "partnerMark": {
+          "left": "--gl-pm-left=140px",
+          "badgeTop": "--gl-pm-badge-top=863.5px",
+          "badgeHeight": "--gl-pm-badge-height=72px",
+          "badge": "asset-ref:file:salesforce-partner-badge-horizontal"
+        }
+      },
+      "template": "CloseProposal"
+    }
+  ]
+}

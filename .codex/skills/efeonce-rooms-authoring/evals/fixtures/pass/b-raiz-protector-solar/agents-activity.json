@@ -1,0 +1,35 @@
+{
+  "data": {
+    "items": [
+      {
+        "id": "act-5",
+        "occurredAt": "2026-10-30T14:05:00.000Z",
+        "operation": "editions.publish",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-raiz-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "editions.publish",
+        "noticeId": "notice-5",
+        "acknowledgedAt": null,
+        "reversal": null
+      },
+      {
+        "id": "act-6",
+        "occurredAt": "2026-10-30T14:06:00.000Z",
+        "operation": "invitations.create",
+        "scope": "efeonce.mcp.rooms.release",
+        "roomId": "sala-raiz-2027",
+        "personId": "pr-julio",
+        "agentClientId": "claude-code",
+        "channel": "cli",
+        "summary": "invitations.create",
+        "noticeId": "notice-6",
+        "acknowledgedAt": null,
+        "reversal": null
+      }
+    ],
+    "nextCursor": null
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "taskId": "TASK-2079",
+  "scenario": "rooms-orbit-foundation",
+  "reviewedAt": "2026-10-30",
+  "reviewer": "Claude (autoevaluación de implementación; pendiente revisión humana del operador)",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/01-desktop-orbit-canonical.png",
+    "mobile": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/05-mobile-orbit-canonical.png",
+    "dossier": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.5,
+      "rationale": "Cada región tiene un solo protagonista: «Entra.» dentro de la órbita, el arco que mide, el mapa.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Radios del canvas (330 escritorio, 140 móvil); la caja de la órbita es el anillo y el halo desborda sin descentrar.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Regiones de un viewport, controles al pie con la misma distancia en todas.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Laboratorio deliberadamente escaso; ningún control decorativo.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "Arco 200°–250°, esfera en la punta, halo userSpaceOnUse 1,86× con paradas 0,13/0,03/0 y escenas en radio 1700 idénticos al canvas aprobado. Trazos desde el token, algo más finos que el canvas.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": "Confirmar con el operador el grosor de trazo derivado del token frente al del canvas."
+    },
+    "templateResistance": {
+      "score": 4.75,
+      "rationale": "Composición propia de La órbita; sin cards ni grillas genéricas.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "accessibility": {
+      "score": 4.5,
+      "rationale": "axe sin violaciones en 3 tamaños; foco al título tras el salto y retorno al cerrar el iris; objetivos táctiles de 44 px; sin scroll horizontal.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Dibujo una vez y quieto; salto en dos fases cancelable; movimiento reducido = cortes; el cierre del iris es corte para no hacer esperar al teclado.",
+      "evidence": "docs/ui/reviews/TASK-2079-rooms-orbit-foundation/README.md",
+      "nextAction": ""
+    }
+  },
+  "average": 4.53,
+  "floor": 4.5,
+  "verdict": "pass-pending-human-review"
+}

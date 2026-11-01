@@ -1,0 +1,8 @@
+{
+  "reason": "Unscoped walker fails on an unrelated broken symlink in old cotizacion-pibank capture node_modules; no foreign artifact changed",
+  "scope": ".captures/2026-10-25T20-49-52_rooms-first-experience",
+  "gateSha256": "ab384ac70fde3a49faf82ee5114af728bafdad099ab2df5178919111612586ca",
+  "sourceUnmodified": true,
+  "exitCode": 0,
+  "stdout": "UI visual gate: PASS (TASK-2059)\n"
+}

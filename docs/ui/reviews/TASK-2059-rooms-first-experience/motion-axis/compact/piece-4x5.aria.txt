@@ -1,0 +1,78 @@
+- link "Ir al contenido":
+  - /url: "#main-content"
+- complementary "Demostración":
+  - text: Demostración
+  - navigation "Vistas de demostración":
+    - link "Cliente":
+      - /url: /demo
+    - link "Operador":
+      - /url: /demo/workspace?persona=operator
+    - link "Administrador":
+      - /url: /demo/workspace?persona=administrator
+- banner:
+  - link "Efeonce Rooms":
+    - /url: /demo
+    - img "Efeonce Rooms"
+  - text: Cliente
+- main:
+  - paragraph: Nómada × Efeonce
+  - heading "Menos prisa. Más camino." [level=1]
+  - paragraph: Una idea de marca. Tres formas de vivirla. Una historia que también se puede encontrar.
+  - button "Explorar propuesta"
+  - text: Edición 01 Pieza de demostración
+  - img "Menos prisa. Más camino.. Tu próxima historia empieza afuera."
+  - text: El comienzo
+  - button "Abrir pieza"
+  - text: Una propuesta, todo el contexto Creatividad + SEO / AEO
+  - region "De la idea a la evidencia":
+    - paragraph: Propuesta de marca y crecimiento
+    - heading "De la idea a la evidencia" [level=2]
+    - paragraph: Una propuesta se entiende mejor cuando puedes mirar el trabajo y también las decisiones que lo sostienen.
+    - tablist "Explorar la propuesta":
+      - tab "01 · Concepto creativo" [selected]
+      - tab "02 · Contenido SEO/AEO"
+      - tab "03 · Plan de trabajo"
+    - tabpanel "01 · Concepto creativo":
+      - region "Una idea. Distintas maneras de vivirla.":
+        - paragraph: Una invitación a mirar de nuevo
+        - heading "Una idea. Distintas maneras de vivirla." [level=3]
+        - paragraph: "La propuesta conecta el deseo de salir con una forma más atenta de viajar: elegir un recorrido, prepararlo y dejar espacio para descubrir. Nómada es una marca ficticia creada para esta demostración."
+        - group "Inventario creativo":
+          - article:
+            - img "Menos prisa. Más camino.. Tu próxima historia empieza afuera."
+            - text: "01"
+            - heading "El comienzo" [level=4]
+            - paragraph: Pieza editorial · 4:5
+            - 'button "Abrir pieza: El comienzo"'
+          - article:
+            - img "Hay otra forma de llegar.. La que te deja mirar el camino."
+            - text: "02"
+            - heading "A tu ritmo" [level=4]
+            - paragraph: Historia · 9:16
+            - 'button "Abrir pieza: A tu ritmo"'
+          - article:
+            - img "Un paso más cerca.. Sal. Explora. Encuentra tu ritmo."
+            - text: "03"
+            - heading "Un horizonte nuevo" [level=4]
+            - paragraph: Cabecera · 16:9
+            - 'button "Abrir pieza: Un horizonte nuevo"'
+  - paragraph: Efeonce Rooms
+  - heading "Todo el trabajo. Una conversación." [level=2]
+  - paragraph: Explora la propuesta a tu ritmo y vuelve a cada pieza con su contexto.
+  - link "Volver al inicio":
+    - /url: "#main-content"
+  - paragraph: Muestra sintética · Sin datos de clientes ni resultados comerciales medidos.
+  - dialog "El comienzo":
+    - heading "El comienzo" [level=2]
+    - button "Cerrar pieza"
+    - navigation "Navegar las piezas":
+      - button "Pieza anterior" [disabled]
+      - button "Pieza siguiente"
+    - img "Menos prisa. Más camino.. Tu próxima historia empieza afuera."
+    - paragraph: Pieza principal. La idea toma todo el espacio y deja respirar a la marca.
+    - status: "Pieza 1 de 3: El comienzo"
+    - text: Proporción original 4:5 · 1122 × 1402
+    - link "Ver imagen original en una nueva pestaña":
+      - /url: /demo/nomada-landscape.png
+      - text: Ver imagen original
+- alert

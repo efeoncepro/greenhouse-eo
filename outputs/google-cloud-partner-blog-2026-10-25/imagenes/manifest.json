@@ -1,0 +1,81 @@
+{
+  "version": 2,
+  "status": "produced-local-awaiting-visual-approval",
+  "bannerActivation": false,
+  "wordpressUpload": false,
+  "textInProductionImages": false,
+  "wordmarksInProductionImages": false,
+  "method": "Built-in Imagegen cinematic raster adaptations; Sharp export sizing and compression. Typography exists only in labelled QA simulations, never in production assets.",
+  "reference": "ai-generations/2026-10-19_google-partner-freeze/export/efeonce-google-feed-4x5.png",
+  "referenceSha256": "f13f5f4ac97144672497302b312421c41d45954743557834dbfdb125c9238fd1",
+  "fontsInProductionAssets": [],
+  "coverCompression": {
+    "quality": 64,
+    "bytes": 297404
+  },
+  "qa": {
+    "squareSafe": {
+      "left": 570,
+      "right": 1830,
+      "method": "Visual review of complete Gemini/Cloud pair in central square"
+    },
+    "inkContrast": "Not applicable: no production typography or wordmarks.",
+    "squarePreview": "qa/portada-recorte-cuadrado.png",
+    "cardFocus": "84% 30%",
+    "cardPreviewsAre": "Local visual simulations, not live site screenshots"
+  },
+  "files": [
+    {
+      "file": "export/efeonce-google-cloud-partner-plate.png",
+      "width": 2560,
+      "height": 1440,
+      "format": "png",
+      "bytes": 5745819,
+      "sha256": "8a8927c503567c43ed691b231f548787f72201877e7cbc7e48d5d6988506df22",
+      "alt": "Símbolos tridimensionales de Gemini y Google Cloud iluminados sobre un fondo azul cinematográfico, con espacio libre para el título de la tarjeta."
+    },
+    {
+      "file": "export/efeonce-google-cloud-partner-portada-og.jpg",
+      "width": 2400,
+      "height": 1260,
+      "format": "jpeg",
+      "bytes": 297404,
+      "sha256": "611e5fcd72cbcc3370b5eb1302d20435ecaa3c85c0d2bc474b25dcec7074555f",
+      "alt": "Símbolos tridimensionales de Gemini y Google Cloud con luz multicolor sobre un fondo azul cinematográfico, sin texto."
+    },
+    {
+      "file": "export/efeonce-google-cloud-partner-apertura.webp",
+      "width": 1600,
+      "height": 900,
+      "format": "webp",
+      "bytes": 173872,
+      "sha256": "4b5df263d8d7347a0918858ea918acae27a55e4562cd9aa0d9714f262827cf7b",
+      "alt": "Gemini y Google Cloud como esculturas luminosas en un entorno azul con profundidad cinematográfica, sin texto."
+    },
+    {
+      "file": "export/efeonce-google-cloud-partner-hero.webp",
+      "width": 2400,
+      "height": 1200,
+      "format": "webp",
+      "bytes": 139252,
+      "sha256": "cd5108930313be27a94eefcd02df1a391f8d5a5ec30dbdb2aebb6b592aee76ed",
+      "alt": "Símbolos de Gemini y Google Cloud con iluminación azul y profundidad cinematográfica, sobre un fondo oscuro sin texto."
+    }
+  ],
+  "nativeSources": [
+    {
+      "file": "fuentes/plate-generado-original.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "88b1764c9e9aa5cb64715558f83863e0aefb8f130d1f008a78fb871cb58e3171",
+      "exportResize": "Production dimensions are resized exports; source pixels preserved separately."
+    },
+    {
+      "file": "fuentes/portada-sin-texto-original-v2.png",
+      "width": 1730,
+      "height": 909,
+      "sha256": "d1793f23de4d918972ad01fe3f8ec91e5b4bd096c520b562b1111e253f332d2a",
+      "exportResize": "Production dimensions are resized exports; source pixels preserved separately."
+    }
+  ]
+}

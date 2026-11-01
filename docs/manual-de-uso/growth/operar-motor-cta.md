@@ -1,9 +1,9 @@
 # Operar el motor de CTAs (`/growth/ctas` + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-07-17 por Claude (TASK-1339)
-> **Ultima actualizacion:** 2026-10-23 por Claude (`open_growth_form` en diálogo, TASK-2044)
+> **Ultima actualizacion:** 2026-10-24 por Claude (diálogo en producción; armarlo en una landing source-led)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_ARCHITECTURE_V1.md)
 > **Skill de dominio (agentes):** `greenhouse-growth-ctas`
 
@@ -186,8 +186,27 @@ usa el titular del CTA) y sólo vale con `presentation: "dialog"`; si no, la pub
 `action_policy_invalid`. Esto **no** es la colocación interruptiva `popup_modal`: el diálogo sólo se abre cuando el
 visitante pulsa el botón. Renderer `1.4.0` (TASK-2045): el formulario se monta al abrir, Escape y el velo cierran
 salvo mientras envía, «Cerrar» del éxito cierra el diálogo y el foco vuelve al botón. La piel del diálogo va en el CSS
-del anfitrión con los tokens `--ghcta-dialog-*` (tabla en el contrato de runtime de formularios). Hasta el próximo
-release a `main`, el CTA publicado abre el formulario inline.
+del anfitrión con los tokens `--ghcta-dialog-*` (tabla en el contrato de runtime de formularios). En producción desde
+el release del 2026-10-24; primer consumidor: «Quiero ser partner» en `/partnership/` (CTA `partners-become-partner`).
+
+### Armar el popup en una landing source-led de efeoncepro.com
+
+1. Publica el formulario y el CTA (`presentation: "dialog"`) y guarda la key de la surface en un archivo 0600 bajo
+   `.auth/` (el publisher del CTA lo escribe; volver a correrlo rota la key).
+2. En el compilador de la landing reemplaza el botón del canvas por el lanzador compartido
+   (`<gh-meeting-cta location="<ubicación>">`) y declara la opción `meeting` (slug del CTA, ubicación y enlace sin
+   JavaScript). Sirve para cualquier CTA, no sólo para el agendador.
+3. Pasa el archivo de la key como input del publisher de la página: la key queda sólo en los settings del widget,
+   nunca en git ni en los logs.
+4. El `<dialog>` vive en `<body>`, fuera del scope de la landing: su piel va en la capa de página sin scope
+   (`body:has(.gh-<landing>) …`).
+5. Da al lanzador un ancho explícito: con `fit-content` colapsa a 0 por la contención del renderer.
+
+Receta completa y trampas del tema Ohio: skill `efeonce-public-site-wordpress` →
+`references/source-led-elementor-patterns.md` y `references/landings/partnership.md`.
+
+**Defecto conocido:** cerrar el diálogo con el primer campo enfocado dispara `gh_form_field_validation_failed`.
+No lo leas como fricción real del formulario hasta que se corrija en el renderer.
 
 ## Qué no hacer
 

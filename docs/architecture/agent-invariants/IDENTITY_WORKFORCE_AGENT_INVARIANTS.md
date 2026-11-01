@@ -6,6 +6,33 @@
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** Contrato: `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_INTERNAL_IDENTITY_V1.md` + task-specs TASK-784/785/872. Dedup = Slice 4.
 
+<!-- Traslado íntegro desde CLAUDE.md (2026-10-25); reglas sin cambios. -->
+
+### Auth en server components / layouts / pages — patrón canónico
+
+- **NUNCA** llamar `getServerAuthSession()` directo desde un layout o page con `try/catch + redirect` ad hoc. Usar siempre los helpers canónicos de `src/lib/auth/require-server-session.ts`:
+  - `requireServerSession(redirectTo = '/login')` — para layouts/pages que **requieren** sesión activa. Si no hay session, redirige; si hay, devuelve `Session` non-null.
+  - `getOptionalServerSession()` — para pages que opcionalmente quieren saber si hay sesión (login, landing pública). Devuelve `Session | null`. La decisión de redirect queda al caller.
+- **Razón**: ambos helpers detectan el `DYNAMIC_SERVER_USAGE` que Next.js lanza durante prerender (cuando NextAuth lee cookies/headers via SSG) y lo re-lanzan correctamente para que Next marque la ruta como dynamic — en lugar de loggearlo como `[X] getServerAuthSession failed:` que ensucia los logs de build y enmascara errores reales.
+- **Combinar con `export const dynamic = 'force-dynamic'`** en cada page/layout que consuma sesión — evita que Next intente prerender la ruta en build phase.
+- Patrón canónico:
+  ```ts
+  import { requireServerSession } from '@/lib/auth/require-server-session'
+
+  export const dynamic = 'force-dynamic'
+
+  const Layout = async ({ children }) => {
+    const session = await requireServerSession()
+    // session.user es non-null acá
+    return <Providers session={session}>{children}</Providers>
+  }
+  ```
+- API routes (`route.ts`) siguen usando `getServerAuthSession()` directo — no necesitan los wrappers porque las routes son siempre dynamic por default y el manejo de error es distinto (return 401 JSON, no redirect).
+
+### Auth resilience — invariantes (TASK-742)
+
+Las **7 capas defensivas** del flujo de autenticación (formato de secretos · readiness · ledger `auth_attempts` · magic-link · CHECK de `auth_mode` · rotación con verify-before-cutover · observabilidad) viven en **`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` → §`Auth resilience`**. **NUNCA** poner `signInAudience` de la Azure App en `AzureADMyOrg` (Greenhouse es multi-tenant: rompe SSO para todos — pasó el 2026-04-30; el canónico es `AzureADMultipleOrgs`); **NUNCA** rotar un secret de auth a mano (usar `pnpm secrets:rotate`, que hace verify-before-cutover y revierte solo); **NUNCA** computar la salud de SSO en el cliente (`/api/auth/health` es el único source of truth). Auditor de drift: `pnpm auth:audit-azure-app`.
+
 ### Reingreso, disponibilidad e historia (2026-09-03)
 
 - Un correo/OID nuevo no crea otra persona por sí solo: conserva el principal longitudinal y verifica el vínculo del proveedor sin auto-merge por email.

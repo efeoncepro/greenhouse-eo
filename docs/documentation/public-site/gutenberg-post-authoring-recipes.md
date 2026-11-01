@@ -8,6 +8,37 @@ agent should understand the editorial outline, the native block dialect and the
 legacy block debt before preparing any `post_draft_gutenberg` or
 `refresh_existing_gutenberg_post` artifact.
 
+## Efeonce editorial styles (since 2026-10-24)
+
+Ohio barely styles native blocks, so a post made only of paragraphs and lists looks unstyled. Since 2026-10-24 the
+plugin `efeonce-editorial-blocks` registers Efeonce styles on native blocks (since 0.8.0, four of them on
+`core/pullquote`: Destacado Efeonce, Destacado claro, Cita Efeonce and Cita clara). They are not new blocks: an editor
+can pick them in the block's «Styles» panel, and Content Factory emits them from the article spec.
+
+| Style | Native block | When to use it | In the spec |
+|---|---|---|---|
+| Destacado Efeonce / claro | `core/pullquote` | the thesis a section rests on; 1–2 per post, never next to the sentence it repeats; mark the landing phrase with `strong` (0.8.0) | `{ "kind": "pullquote", "text", "tone"? }` |
+| Cita Efeonce / clara | `core/pullquote` | a real quote with its author and source | `{ "kind": "pullquote", "variant": "cita", "text", "cite", "tone"? }` |
+| Pasos | ordered `core/list` | a step-by-step section | `{ "kind": "list", "ordered": true, "style": "steps" }` |
+| Recuadro | `core/list` | 2–6 short items seen at once: common mistakes, «three things», the closing invitations (Glitch → tool, PDR-020 order), a cluster map | `{ "kind": "list", "style": "box" }` |
+| Pregunta frecuente | `core/details` | each question of the FAQ section; the plugin builds the `FAQPage` schema from these blocks, so the post carries no hand-written JSON-LD | `{ "kind": "faq", "items": [...] }` (default `schema.source: "plugin"`) |
+
+**Gráfico Efeonce** (`efeoncepro/chart`, since plugin 0.9.0, in production since 2026-10-25) is the one real custom
+block: a self-closing dynamic block with ten kinds (`line`, `column` grouped or stacked, `bar` ranking, `pie` donut,
+`funnel`, `before-after`, `measure`, `per-hundred`, `matrix` 2×2 on 0–10, `venn` of three with `centerLabel`), all fed
+by the same rows × value-columns table. The server prints the title, an accessible data table («Ver los datos») and the
+source, so search and answer engines read the figures without JavaScript. In the spec:
+`{ "kind": "chart", "chart": {...}, "title"?, "caption"?, "sourceLabel"?, "sourceUrl"?, "tone"? }`; validator codes
+`chart_data_invalid`, `chart_attrs_unsupported`, `chart_not_self_closing` and `chart_tone_invalid`. Shapes per kind:
+`docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` §Gráfico Efeonce; how to use it:
+`docs/manual-de-uso/public-site/usar-graficos-en-articulos.md`.
+
+Diagrams and square images go centered (`{ "kind": "image", "align": "center" }`). The accent color of every style is
+the **line of the post's topic** (Paid Media → Voice, HubSpot → Revenue, SEO → Engine), the same color as its card on
+the blog home; a post whose line differs from its category's is set with `pnpm public-website:blog-home line`. Rules,
+design and production record: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` (FAQ:
+`docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`). How to operate it: `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`.
+
 ## Live Runtime Findings
 
 Read-only WP-CLI inspection on 2026-06-14 sampled the six latest published
@@ -21,6 +52,14 @@ native WordPress search with Yoast `noindex, follow`, and the visible archive
 render is owned by Ohio parent templates plus `global_blog_*` options. When a
 new or refreshed article is meant to support the content hub, review category,
 tags, featured image, excerpt and search/archive impact before publishing.
+
+Images are not part of the Gutenberg body contract except for body figures. A new Marketing con Manzanitas post
+enters the `/blog/` slider and the «Para leer con calma» rail on its own, so it ships three images outside the body:
+the cover (one JPEG 2400 × 1260 under 300 KB: featured image + Yoast Open Graph, uploaded with
+`scripts/public-website/blog-post-cover-apply.php`), the slider `hero` (WebP 2:1, `pnpm public-website:blog-home hero`)
+and the rail card image (the textless plate with focus `"84% 30%"`, `pnpm public-website:blog-home card`). Ohio does
+not show the featured image in the article header, so never repeat it in the body. Sizes, safe zones and who makes
+each piece: `docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md`.
 
 Runtime note 2026-07-15: the live WordPress runtime for `efeoncepro.com` registers
 both `core/details` and `core/accordion` alongside `yoast/faq-block`. For compact
@@ -101,8 +140,9 @@ Recommended enrichment:
   Contract: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - `core/quote` for actual quotes, strong principles outside the Glitch format,
   or temporary POV fallback when no custom block is available.
-- `core/pullquote` for a short, high-signal editorial callout when the source
-  post already uses highlighted claims or stats.
+- `core/pullquote` for a short, high-signal editorial callout, always with an
+  Efeonce style: a Destacado for a thesis, a Cita for a real attributed quote
+  (see «Efeonce editorial styles» above).
 - `core/details` for compact FAQ/disclosure moments inside a section when the
   summary must remain visible and the full answer should stay in HTML without a
   custom block.
@@ -329,12 +369,26 @@ deserve visual emphasis. They are allowed in generated drafts and should be
 preserved during refresh unless the refresh explicitly changes that section.
 
 ```html
-<!-- wp:pullquote -->
-<figure class="wp-block-pullquote">
-  <blockquote><p>El loop no es una campaña: es un sistema que aprende en cada vuelta.</p></blockquote>
+<!-- wp:pullquote {"className":"is-style-efeonce-destacado"} -->
+<figure class="wp-block-pullquote is-style-efeonce-destacado">
+  <blockquote><p>El loop no es una campaña: <strong>es un sistema que aprende en cada vuelta</strong>.</p></blockquote>
 </figure>
 <!-- /wp:pullquote -->
 ```
+
+Since 0.8.0 (in production 2026-10-25):
+
+- **Destacado** (`is-style-efeonce-destacado`, navy; `-destacado-claro`, paper):
+  no quotation marks. The render filter replaces the final period with the
+  sphere (no sphere if the line ends in «?», «!» or «…»: `is-eo-sin-esfera`) and
+  adds `is-eo-corta` to lines of 80 characters or less. Bricolage 400 opens and
+  `<strong>` (700) lands the idea; without `<strong>` the whole line is 700. In
+  the spec, the landing phrase is a segment `{ "text": "…", "strong": true }`.
+- **Cita** (`is-style-efeonce-cita`, `-cita-clara`): a real quote with its
+  author in `<cite>`. In the spec, `variant: "cita"` requires `cite`
+  (`content_factory_article_pullquote_cita_requires_cite`).
+- `tone: "light"` picks the paper variant of either one; default is `dark`.
+- How to choose and write them: `docs/manual-de-uso/public-site/usar-destacados-y-citas.md`.
 
 ### Images
 
@@ -415,9 +469,12 @@ real attachment ID:
 <!-- /wp:separator -->
 ```
 
-The spec emits the table style with `{ "kind": "table", "style": "stripes", … }`
-(since 2026-09-28; no other value is accepted). Separator styles are still not
-emitted. Check Ohio's render at 390 px before adopting stripes on wide tables.
+The spec emits the table style with `{ "kind": "table", "style": "efeonce" | "stripes", … }`.
+Since 2026-10-25 blog posts use `efeonce`, the «Tabla Efeonce» of efeonce-editorial-blocks 0.6.0
+(`is-style-efeonce-tabla`): a paper panel that never touches the column edge and, under 600 px, one
+card per row with each cell labeled by its header. Keep headers short and let the first column name
+what each row compares. `stripes` (core, since 2026-09-28) stays valid; no other value is accepted.
+Separator styles are still not emitted. Design: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md`.
 
 ### CTA buttons (`kind: "buttons"`, since 2026-09-28)
 

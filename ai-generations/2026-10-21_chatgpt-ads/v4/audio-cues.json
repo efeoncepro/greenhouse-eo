@@ -1,0 +1,11 @@
+{
+  "pieza": "Efeonce — Preguntando (ChatGPT Ads, v4)", "duracion_s": 12.0, "fps": 24, "tempo_bpm": 120,
+  "cues": [
+    { "t": 2.375, "hasta": 3.625, "imagen": "Se escribe la pregunta", "sonido": "teclas en semicorcheas" },
+    { "t": 3.75, "hasta": 4.0, "imagen": "Pausa antes del envío", "sonido": "silencio 3,75-4,0" },
+    { "t": 4.0, "imagen": "Golpe 1: se envía; la seda explota", "sonido": "golpe e impacto" },
+    { "t": 6.0, "imagen": "Golpe 2: cae el anuncio de Kaltis", "sonido": "golpe e impacto" },
+    { "t": 9.0, "imagen": "La esfera aterriza como punto de «Preguntando»", "sonido": "golpe e impacto" },
+    { "t": 10.0, "imagen": "Cierre: servicio, CTA y lockup", "sonido": "pico del sting" }
+  ]
+}

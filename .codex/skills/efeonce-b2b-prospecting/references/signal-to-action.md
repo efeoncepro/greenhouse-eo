@@ -37,6 +37,12 @@ vigente cuando se use email y coordinación por cuenta. No asignan calidez, pres
 | Referido o presentación / mensaje de quien conecta | Confirmar quién presenta a quién, motivo y permiso de usar su nombre; una sugerencia no es introducción ni aval | Ruta de acceso; la necesidad sigue desconocida si no fue expresada | Persona referida y referente como puente, no miembro comprador automáticamente | Preparar texto reenviable o acercamiento dentro del permiso; no registrar relación tibia bilateral por una lista compartida |
 | Noticia ambigua, snippet o señal antigua / original no accesible o evidencia parcial | Marcar fuente parcial y condición de revalidación; falta de corroboración mantiene desconocido | Investigación pendiente, sin oferta seleccionada por obligación | Fuente primaria o owner capaz de confirmar; contacto sólo si hay motivo independiente pertinente | Investigar o conservar pendiente; no crear urgencia ni exigir enriquecimiento pagado para compensar una señal débil |
 
+## Señal posterior a credenciales o propuesta
+
+Para avisos de HubSpot Documents, aplicar [visitas a documentos](document-engagement-signals.md):
+contrastar correo con sesiones/páginas en la UI, atribución, tiempos y contexto del proceso. La señal
+puede cambiar una recomendación de espera, sin levantar restricciones ni autorizar contacto automático.
+
 ## Vigencia que cambia decisiones
 
 No adoptar una caducidad universal de días. Elegir revisión por la naturaleza del hecho: cierre de convocatoria,

@@ -1,0 +1,8 @@
+imagenes/appstore/appstore-1_iPhone.jpg|
+imagenes/appstore/appstore-2_iPhone.jpg|
+imagenes/appstore/appstore-3_iPhone.jpg|
+imagenes/appstore/appstore-4_iPhone.jpg|
+imagenes/appstore/appstore-5_iPhone.jpg|
+imagenes/appstore/appstore-6_iPhone.jpg|
+imagenes/appstore/appstore-7_iPhone.jpg|
+imagenes/appstore/appstore-8_iPhone.jpg|

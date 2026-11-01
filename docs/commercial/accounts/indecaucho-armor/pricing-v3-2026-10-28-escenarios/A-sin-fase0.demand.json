@@ -1,0 +1,263 @@
+{
+ "schemaVersion": "pricing-v3-composition-demand/1",
+ "commercialUnit": "managed_service",
+ "brief": {
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-28",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "indecaucho-armor-90d",
+  "offerMarketCountry": "EC",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+   {
+    "lineId": "ECG-008",
+    "profile": "ECG-008",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "67"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-competitive-rebuild-2026-10-28",
+     "effectiveFrom": "2026-10-28",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "dedicationByPeriod": [
+     {
+      "periodId": 1,
+      "dedication": {
+       "unit": "hours_per_month",
+       "value": "99"
+      }
+     }
+    ],
+    "choices": []
+   },
+   {
+    "lineId": "ECG-009",
+    "profile": "ECG-009",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "20"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-competitive-rebuild-2026-10-28",
+     "effectiveFrom": "2026-10-28",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "dedicationByPeriod": [
+     {
+      "periodId": 1,
+      "dedication": {
+       "unit": "hours_per_month",
+       "value": "44"
+      }
+     }
+    ],
+    "choices": []
+   },
+   {
+    "lineId": "ECG-019",
+    "profile": "ECG-019",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "24"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-competitive-rebuild-2026-10-28",
+     "effectiveFrom": "2026-10-28",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "dedicationByPeriod": [],
+    "choices": []
+   },
+   {
+    "lineId": "ECG-011",
+    "profile": "ECG-011",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "hours_per_month",
+     "value": "10"
+    },
+    "dedicationEvidence": {
+     "reference": "estimate:armor-90d-competitive-rebuild-2026-10-28",
+     "effectiveFrom": "2026-10-28",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "dedicationByPeriod": [
+     {
+      "periodId": 1,
+      "dedication": {
+       "unit": "hours_per_month",
+       "value": "34"
+      }
+     }
+    ],
+    "choices": []
+   }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+   "kind": "not_resolved"
+  }
+ },
+ "work": [
+  {
+   "lineId": "ECG-008",
+   "assigneeIds": [
+    "planned-ECG-008-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "ECG-009",
+   "assigneeIds": [
+    "planned-ECG-009-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "ECG-019",
+   "assigneeIds": [
+    "planned-ECG-019-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "ECG-011",
+   "assigneeIds": [
+    "planned-ECG-011-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  }
+ ],
+ "serviceToolIds": [],
+ "allocations": [
+  {
+   "periodIds": [
+    1
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-28",
+    "effectiveFrom": "2026-10-28",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-28",
+    "effectiveFrom": "2026-10-28",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    2,
+    3
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-28",
+    "effectiveFrom": "2026-10-28",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    2,
+    3
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "4",
+   "serviceShare": "1",
+   "driver": {
+    "unit": "planned-named-user-seat-full-cost",
+    "totalUnits": "4",
+    "allocatedUnits": "4"
+   },
+   "reason": "Conservative full cost of one named seat per planning slot; no invented shared client portfolio, not a confirmed purchase or assignment. Current documented unit price only.",
+   "evidence": {
+    "reference": "estimate:armor-full-seat-cost-allocation-no-portfolio:2026-10-28",
+    "effectiveFrom": "2026-10-28",
+    "effectiveUntil": "2026-12-31",
+    "status": "estimated"
+   }
+  }
+ ],
+ "creditBudgets": [],
+ "fxRecordIds": []
+}

@@ -1,0 +1,44 @@
+{
+  "id": "BR3v",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "espalda"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa",
+      "puesta": "espalda-mujer"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic closing shot, the LAST FRAME OF A FILM, a vast dark hall at night, wide and quiet): far from the camera, she (the woman of the references) is seen FROM BEHIND, her back to the camera, walking away across a vast dark polished floor toward an enormous ring of light. She is SMALL in the frame: her whole figure, head to feet, is only about a quarter of the frame height, standing at about 79% of the frame width, her head and shoulders seen inside the lower half of the ring, horizontally centered within it. Her long, loose, wavy dark hair falls just past her shoulders, never tied, never a ponytail, never a straight bob. She wears the NAVY EFEONCE SOFTSHELL JACKET seen from the back exactly as in Image 4, with the Efeonce logotype of Image 4 on her upper back, small, in shadow and only softly legible. Image 5 shows only the rocket that sits inside that O, not a separate mark. Dark trousers, no lanyard, no watch. Her face is never visible: the back of her head faces the camera squarely; no cheek, nose, ear or profile shows. The ring backlights her, so her back falls into deep navy shadow, lit only by a thin cool blue-white rim on her hair and shoulders; nothing lights her from the camera side. Her long shadow stretches across the floor toward the camera. THE RING IS THE EFEONCE ORBIT AND MUST BE DRAWN WITH ITS EXACT ANATOMY: it stands upright on the horizon about twenty meters beyond her, its center at about 79% of the frame width, spanning from about 64% to 94% of the frame width, its top well below the top edge of the frame, the whole ring and its halo entirely inside the frame; between the left edge of the frame and the ring there is a wide band of empty darkness about twice as wide as the ring itself; its bottom touching the floor at about 62% of the frame height, faintly reflected on the floor. (1) The ring itself is a VERY FINE, FAINT thread of cool white-blue light, delicate and quiet, like a hairline drawn in light — never a thick neon tube, never a bright hoop; (2) on its upper-left part, from about the 10 o'clock to about the 11 o'clock position (a short arc of about 50 degrees, travelling clockwise), the line becomes slightly thicker and brighter in vivid red-orange (#F83902); (3) the arc ENDS in ONE small sphere of the same red-orange, exactly at the tip of the arc at the 11 o'clock position, ON the line, as its rounded end-point, only a little wider than the arc — never a big glowing ball, never floating, never at 12 o'clock; (4) a soft low halo. Soft cool haze hangs around and inside the ring and catches its light, giving it volume and depth like a gateway in mist; its glow fades to dark close to the ring and never reaches the left 60% of the frame. NO sparks, NO particles, NO motes, NO lens flare. COLOR: the faint ring, the haze and the floor reflection are cool azure blue (#0375DB) and cool white, the light of Efeonce; red-orange appears ONLY on that short arc and its sphere and lights nothing around it. Everything else is cool blue, cool white and deep navy black. The LEFT 60% of the frame, from top to bottom, is calm, deep, evenly dark navy sky of haze and dark floor with nothing in it: no ring, no glow, no reflection. The ring's reflection stays under the ring on the right; the lower-left quarter of the floor is near black. The dark polished concrete floor shows faint joints receding toward the ring. It runs clean all the way to the bottom edge of the frame, with no object, step, edge or riser in the foreground. Wide shot, 35mm, camera at waist height about twelve meters behind her. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": "sin-lecho",
+  "reservas": {
+    "texto": {
+      "muro": "calm, deep dark navy haze over an empty dark floor, from top to bottom",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "BR3h",
+  "alcance": "deck-portada",
+  "llave": {
+    "fuente": "the very fine, faint upright ring of cool blue-white light on the horizon, wrapped in haze",
+    "lado": "directly ahead of her, as a backlight that rims her hair and shoulders; nothing lights her from her side or from the camera side",
+    "tamano": "the ring is about ten meters across; in the frame its diameter is a little more than half the frame height",
+    "distancia": "about twenty meters beyond her"
+  },
+  "fondo": "an endless dark hall dissolving into cool blue haze around the ring, no practical lights",
+  "fenomeno": {
+    "que": "she walks toward a gateway ring of Efeonce light whose single red-orange sphere marks Voice",
+    "esServicio": "cierre de propuesta Voice (medios y distribución): hacia dónde va la pauta del cliente con Efeonce"
+  },
+  "linea": "voice",
+  "sinLechoPorque": "plano general de contraportada: el piso pulido llega limpio al borde inferior; un objeto junto al lente rompe la escala (la v2 sacó una tarima)"
+}

@@ -27,3 +27,14 @@
 
 Usar con [signal-to-action](../references/signal-to-action.md). Una señal no confirma compra ni autoriza alta
 o envío. Plantilla versionada sin personas/correos reales; datos del caso en expediente privado autorizado.
+
+## Si la señal es una visita a un documento
+
+- Documento/versión/portal y atribución del enlace; aviso vs detalle completo consultado:
+- Hora de evento / recepción / consulta, precisión y zona:
+- Sesiones y páginas únicas / tiempos registrados / límites de identificación:
+- Hecho vs hipótesis; historial, restricciones y motivo de esperar o preparar contacto:
+- Autorización de borrador / envío; readback Drafts / Enviados / EMAIL; siguiente decisión:
+
+Aplicar [visitas a documentos](../references/document-engagement-signals.md). Datos y cuerpos individuales
+permanecen en sistemas/expediente privado; no rellenar esta plantilla pública con PII.

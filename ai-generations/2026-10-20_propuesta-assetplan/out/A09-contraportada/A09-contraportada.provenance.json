@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ca437b79d76ce4683bfa306ddaae3838c4446215acf38e5c1bd0c853569207f7",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3h-v3-logo-acabado",
+      "path": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png",
+      "sha256": "795ab171654f0338795927bac6216ea6a2154e1ab6b3900d562c360989ddea98"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

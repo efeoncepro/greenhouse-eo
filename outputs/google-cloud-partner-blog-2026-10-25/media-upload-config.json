@@ -1,0 +1,28 @@
+{
+  "mode": "apply",
+  "manifest": "efeonce-google-cloud-partner-announcement",
+  "assets": [
+    {
+      "role": "cover",
+      "filename": "efeonce-google-cloud-partner-portada-og.jpg",
+      "title": "Efeonce y Google Cloud — portada del anuncio",
+      "alt": "Símbolos tridimensionales de Gemini y Google Cloud con luz multicolor sobre un fondo azul cinematográfico, sin texto.",
+      "caption": "Ilustración del anuncio de Efeonce, producida con apoyo de IA.",
+      "width": 2400,
+      "height": 1260,
+      "mime": "image/jpeg",
+      "sha256": "611e5fcd72cbcc3370b5eb1302d20435ecaa3c85c0d2bc474b25dcec7074555f"
+    },
+    {
+      "role": "opening",
+      "filename": "efeonce-google-cloud-partner-apertura.webp",
+      "title": "Efeonce y Google Cloud — apertura del artículo",
+      "alt": "Gemini y Google Cloud como esculturas luminosas en un entorno azul con profundidad cinematográfica, sin texto.",
+      "caption": "Ilustración del anuncio de Efeonce, producida con apoyo de IA.",
+      "width": 1600,
+      "height": 900,
+      "mime": "image/webp",
+      "sha256": "4b5df263d8d7347a0918858ea918acae27a55e4562cd9aa0d9714f262827cf7b"
+    }
+  ]
+}

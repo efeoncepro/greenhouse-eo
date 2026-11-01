@@ -43,3 +43,46 @@ Canvas: https://claude.ai/code/artifact/a167ca41-cc6c-4748-8370-dc14dd63e340
 - Enviado a Karla por Outlook el 20/10 a las 18:11, con firma gráfica, CCO HubSpot y los dos PDF. Readback en Enviados y EMAIL 119144374556 `SENT` en HubSpot.
 - Deal 66450601027: Precios y términos, 440 UF (proyección de 12 meses), cierre 04/11/2026 (vigencia).
 - Entregables también en OneDrive `Alineación/4. Comercial/Licitaciones/Assetplan/`.
+
+## Versión 2 — 27/10/2026 (respuesta a los cinco puntos de Karla)
+
+Karla pidió, antes de la reunión del miércoles 28/10 a las 15:45: persona asignada, continuidad, tiempos de respuesta,
+atención por su canal de Slack y alcance de las 25 h. Julio aprobó las respuestas; la propuesta pasa a 25 láminas.
+
+- **Nuevas:** `A041-bolsa` (content-text, «¿Qué se cobra aparte? Poco.»: ordinario y agentes priorizados dentro, aparte
+  sólo lo grande, hasta 5 h pasan al mes siguiente en los meses 1–4) · `A051-tiempos` (content-bullets: urgente ≤ 1 h con
+  plan en el día; importante ≤ 4 h y ajustes en 24 h hábiles; relevante ≤ 24 h y 48–72 h hábiles; Slack Connect) ·
+  `A071-continuidad` (content-bullets: respaldo designado, memoria en Notion, traspaso con traslape sin costo, acceso
+  nominativo). En `A051` la selección va en el ítem 3: en el 1 la etiqueta del cursor tapaba el «04» y en el 4 se salía
+  del lienzo.
+- **Cambiadas:** `A05` (canal en Slack de Assetplan por Slack Connect; ícono de Slack desde el kit de Salesforce, fix en
+  `content-day-live-approval.ts`), `A07` («Un equipo asignado»: dirección de cuenta, Especialista de CRM dedicado y especialistas; la cotización v3 dice lo mismo en su alcance), `A058`
+  (semana 2: Slack Connect + teamspace).
+- `plan.json` y `pdf-sprocket.mjs` con el nuevo orden; `pnpm brand:deck-plan` sin avisos. El caso ANAM se bajó del
+  archivo con `pnpm ai-gen:pull` (estaba archivado).
+- **Cotización v3** (`Efeonce-Cotizacion-Assetplan-HubSpot-v3.pdf`, ref. `ASSETPLAN-2026-10-27-v3`): mismo precio;
+  tiempos de respuesta en «Capacidad», traspaso de hasta 5 h en lugar de «no acumulable», Slack Connect en el ciclo,
+  contraparte y continuidad en el alcance. Datos en el expediente privado (`cotizacion-v3/`).
+- En OneDrive quedan las versiones enviadas el 20/10 sin tocar y, al lado, `…-Operacion-HubSpot-v2.pdf` y la cotización v3.
+- Canvas actualizado (versión 60). **Sin enviar:** el correo de respuesta a Karla lo envía Julio.
+
+## Versión 2 a 30 horas — 28/10/2026 (tras la reunión con Karla)
+
+En la reunión (nota en Notion «Discovery Call - Assetplan | Efeonce», 28/10 15:45) Karla pidió **30 horas mensuales** y
+una **persona fija** que entienda el negocio, presente en la segunda reunión. Julio decidió: precio proporcional
+(48 UF de lista, 36 UF netas en los meses 1–4, 1,2 UF/h), mantener los tiempos de respuesta de la lámina y presentar
+la contraparte como «Especialista de CRM fijo desde el inicio», sin nombre todavía.
+
+- Láminas recompuestas: `A02` (30 horas), `A04` y `A041` (30 horas), `A035` (sin landing pages: en Assetplan las hace
+  su diseñador), `A036` (sin Teams ni Microsoft 365), `A057` (reunión semanal; 26 de 30 h; revisión presencial o Meet),
+  `A06` (reunión semanal), `A07` (Especialista de CRM fijo desde el inicio), `A078` (36 UF; montos en
+  `render-eyebrow-chip.ts` y `render-pricing-real.ts`: 48 / −12 / 36) y `A08` (segunda reunión para conocer a la
+  contraparte; inicio antes de diciembre).
+- **Cotización v3** rehecha a 30 horas (`ASSETPLAN-2026-10-28-v3`): 36 UF + IVA = 42,84 UF en los meses 1–4; desde el
+  mes 5, 48 UF + IVA = 57,12 UF. Equipo asignado con Especialista fijo y reunión semanal en el ciclo. La v3 del 27/10
+  nunca se envió: se reemplazó.
+- OneDrive y canvas (versión 65) actualizados. Vigencia extendida al 30/11/2026 (Julio, 28/10). Deal 66450601027: monto 528 UF (4 × 36 + 8 × 48), readback verificado; cierre movido al 30/11/2026.
+- **Enviado el 28/10 a las 17:03** por Julio, en el hilo original: propuesta por link de documento de HubSpot
+  (https://hubs.ly/Q04CGTr30; el PDF pesa ~16 MB) y cotización v3 adjunta. Verificado en Enviados; HubSpot registró
+  EMAIL 119864568951 `SENT` en el deal. HubSpot: próximo paso actualizado, nota 119880247983 y tarea 119879914252
+  («confirmar Especialista de CRM y agendar la segunda reunión», vence 03/11).

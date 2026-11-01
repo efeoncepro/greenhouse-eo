@@ -30,7 +30,7 @@ export type InternalLoginHandlerDeps = {
   /** Only this fixed vocabulary crosses the audit boundary; never pass request URLs or upstream data. */
   onOutcome: (outcome: InternalLoginOutcome) => Promise<void>
   /** Must resolve canonical tenant/oid, enforce eligibility, then atomically mint session plus provenance. */
-  completeSession: (identity: UpstreamIdentity) => Promise<string>
+  completeSession: (identity: UpstreamIdentity, validatedReturnTo: string) => Promise<string>
 }
 
 export const isInternalLoginPath = (path: string): boolean =>
@@ -93,7 +93,7 @@ export const createInternalLoginHandler =
       })
 
       if (!deps.enabled()) throw new InternalLoginError('configuration_invalid')
-      const sessionCookie = await deps.completeSession(completed.identity)
+      const sessionCookie = await deps.completeSession(completed.identity, completed.returnTo)
       const response = redirectResponse(completed.returnTo)
 
       // This response model permits one cookie. The one-use transaction is already consumed; its

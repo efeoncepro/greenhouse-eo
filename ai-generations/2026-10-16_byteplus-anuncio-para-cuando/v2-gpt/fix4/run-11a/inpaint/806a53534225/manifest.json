@@ -1,0 +1,140 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "806a53534225",
+  "key": "806a5353422583b4681b4b0eb8c89924ae472886890ea1d5789c2cbc6d072f76",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:35:40.862Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/S11r-a.png",
+    "imageSha256": "769c0eabab105ab291a37a0c5dae1d28fd658137cc29e679d4f254385537dc24",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/11a.png",
+    "maskSha256": "49e1f06d7e9f37d90294871c231a4a3926a0ac41950c9aadd4f9a8a4ff3436e3",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/producto/lata.png",
+        "sha256": "d161bf641d4f491508ca0dffa48e2b97e2c678f3e1af886fd145c629b7725e59"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zone: the can riding the wave is EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), same position, size and tilt, surrounded by the same splashing water and orange slices. Keep everything outside the zone unchanged. Photorealistic high-speed photography.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked zone: the can riding the wave is EXACTLY the beverage can of image 2 (same aluminum, same orange-and-teal wave label, no text), same position, size and tilt, surrounded by the same splashing water and orange slices. Keep everything outside the zone unchanged. Photorealistic high-speed photography.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.05215530395507813,
+    "editable": 58265,
+    "soft": 10096,
+    "protected": 1242359
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 154,
+      "top": 387,
+      "width": 531,
+      "height": 583
+    },
+    "target": {
+      "width": 976,
+      "height": 1072
+    },
+    "aspectError": 0.00039366757585134577,
+    "reason": "la zona con contexto ocupa 23.4 % de la imagen: se genera recortada a 976x1072"
+  },
+  "estimate": {
+    "usd": 0.0483,
+    "basis": "1 × salida 976x1072 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 76.147,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -6,
+        "dy": -6,
+        "scale": 0.98,
+        "stillError": 20.93,
+        "bestError": 10.64,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1242359,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 58265,
+        "maxDelta": 255,
+        "meanDelta": 85.89,
+        "worst": {
+          "x": 481,
+          "y": 662
+        }
+      },
+      "seam": {
+        "pixels": 10096,
+        "maxDelta": 167,
+        "meanDelta": 19.92,
+        "worst": {
+          "x": 377,
+          "y": 542
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1242359,
+        "maxDelta": 242,
+        "meanDelta": 6.427,
+        "worst": {
+          "x": 181,
+          "y": 791
+        }
+      },
+      "outputUsd": 0.0483,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 2753,
+        "input_tokens_details": {
+          "image_tokens": 2559,
+          "text_tokens": 194
+        },
+        "output_tokens": 1609,
+        "output_tokens_details": {
+          "image_tokens": 1609,
+          "text_tokens": 0
+        },
+        "total_tokens": 4362
+      },
+      "meta": {
+        "size": "976x1072",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

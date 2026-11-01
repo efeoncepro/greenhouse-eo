@@ -1,0 +1,309 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-26T08:58:29.050Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.ai.mode.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "aeo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "qué es loop marketing",
+        "location_code": 2484,
+        "language_code": "es",
+        "device": "desktop"
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.01,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+      "sourceModifiedAt": "2026-07-29T13:48:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 10532,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 10532,
+        "costUsd": 0.004,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10260858-1987-0139-0000-4ced077b9f9b",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.004,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.004,
+    "tasks": [
+      {
+        "id": "10260858-1987-0139-0000-4ced077b9f9b",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "9.7098 sec.",
+        "cost": 0.004,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "ai_mode",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "ai_mode",
+          "keyword": "qué es loop marketing",
+          "location_code": 2484,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows"
+        },
+        "result": [
+          {
+            "keyword": "qué es loop marketing",
+            "type": "ai_mode",
+            "se_domain": "google.com",
+            "location_code": 2484,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=qu%C3%A9%20es%20loop%20marketing&hl=es&gl=MX&udm=50&uule=w+CAIQIFISCVNTaIg7OgSEERGYCWu-tGTt",
+            "datetime": "2026-10-26 08:58:28 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview"
+            ],
+            "se_results_count": 0,
+            "items_count": 1,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[2]/div[1]/div[9]/div[1]/section[1]/div[1]/div[1]/div[3]/div[4]/div[1]/div[1]/div[1]/div[3]",
+                "markdown": "El **Loop Marketing** (o marketing en bucle) es un `marco de trabajo y filosofía estratégica` —popularizado recientemente por [HubSpot](https://www.hubspot.es/loop-marketing) — diseñado para romper con las campañas lineales tradicionales y adaptarse a la velocidad de la era digital y de la **inteligencia artificial**.[[1]](https://www.hubspot.es/loop-marketing)\n\nA diferencia de hacer una campaña con un principio y un fin estático, el Loop Marketing funciona mediante un **ciclo continuo de cuatro etapas** que se retroalimentan y aprenden de cada interacción con el cliente:[[1]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)[[2]](https://www.hubspot.es/loop-marketing)\n\n### Las 4 etapas del Loop Marketing\n\n1. **Definición (Express):** \n\t- Se trata de expresar la **historia única, la identidad y la autenticidad** de tu marca.\n\t- La estrategia y la creatividad humana marcan el timón para asegurar que el mensaje tenga un trasfondo real y no suene genérico.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n2. **Adaptación (Tailor):** \n\t- Consiste en **personalizar los mensajes** y adaptarlos a audiencias específicas utilizando los datos centralizados de un CRM.\n\t- Aquí la segmentación asistida por IA ayuda a entregar el contenido adecuado a la persona correcta.[[1]](https://www.hubspot.es/loop-marketing)\n3. **Amplificación (Amplify):** \n\t- Implica **diversificar la estrategia en múltiples canales** (redes sociales, video, motores de búsqueda u optimización para motores de respuesta o AEO).\n\t- Busca maximizar el alcance de ese mensaje ya personalizado.[[1]](https://www.hubspot.es/loop-marketing)\n4. **Optimización (Evolve / Optimización):** \n\t- Es la fase de **análisis en tiempo real** . Se evalúan los datos del último experimento o campaña para ver qué funcionó y qué falló.\n\t- El sistema se vuelve más inteligente con cada ciclo, permitiendo hacer ajustes inmediatos antes de volver a empezar la rueda.[[1]](https://www.youtube.com/watch?v=QPqHmyzovtM)[[2]](https://www.hubspot.es/loop-marketing)\n\n### ¿Por qué es diferente?\n\n- **Deja de ser lineal:** No dependes de lanzar un anuncio y esperar a ver qué pasa al final del trimestre; el proceso es dinámico y se ajusta sobre la marcha.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n- **Combina humanos e IA:** Utiliza la eficiencia, el análisis de datos masivos y la automatización de la inteligencia artificial, pero manteniendo la dirección creativa y emocional impulsada por las personas.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n- **Aprendizaje constante:** Cada interacción alimenta el ciclo, haciendo que la marca sea más relevante y eficiente con el paso del tiempo.[[1]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n\nSi te interesa aplicar esta metodología, dime:\n\n- ¿A qué se dedica tu **negocio o empresa**?\n- ¿Qué **canales de marketing** utilizas actualmente?\n\nPuedo ayudarte a esbozar cómo funcionaría este **bucle continuo** para tu caso específico.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "El Loop Marketing (o marketing en bucle) es un marco de trabajo y filosofía estratégica —popularizado recientemente por HubSpot — diseñado para romper con las campañas lineales tradicionales y adaptarse a la velocidad de la era digital y de la inteligencia artificial.",
+                    "markdown": "El **Loop Marketing** (o marketing en bucle) es un `marco de trabajo y filosofía estratégica` —popularizado recientemente por [HubSpot](https://www.hubspot.es/loop-marketing) — diseñado para romper con las campañas lineales tradicionales y adaptarse a la velocidad de la era digital y de la **inteligencia artificial**.[[1]](https://www.hubspot.es/loop-marketing)",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "HubSpot",
+                        "description": null,
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "domain": "www.hubspot.es"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "El Loop Marketing es un marco de cuatro etapas diseñado por HubSpot que ayuda a los profesionales del marketing a adaptarse y crec..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "A diferencia de hacer una campaña con un principio y un fin estático, el Loop Marketing funciona mediante un ciclo continuo de cuatro etapas que se retroalimentan y aprenden de cada interacción con el cliente:",
+                    "markdown": "A diferencia de hacer una campaña con un principio y un fin estático, el Loop Marketing funciona mediante un **ciclo continuo de cuatro etapas** que se retroalimentan y aprenden de cada interacción con el cliente:[[1]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)[[2]](https://www.hubspot.es/loop-marketing)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Marketing Guys",
+                        "domain": "marketingguys.com",
+                        "url": "https://marketingguys.com/blog/what-is-loop-marketing/",
+                        "title": "¿Qué es Loop Marketing? El marco de crecimiento continuo ...",
+                        "text": "Loop Marketing es el método para marcas que desean destacar en la era digital actual. Relevante , porque aprende constantemente de..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "El Loop Marketing es un marco de cuatro etapas diseñado por HubSpot que ayuda a los profesionales del marketing a adaptarse y crecer en la era de la IA."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "Las 4 etapas del Loop Marketing",
+                    "text": "Definición (Express): Se trata de expresar la historia única, la identidad y la autenticidad de tu marca. La estrategia y la creatividad humana marcan el timón para asegurar que el mensaje tenga un trasfondo real y no suene genérico. Adaptación (Tailor): Consiste en personalizar los mensajes y adaptarlos a audiencias específicas utilizando los datos centralizados de un CRM. Aquí la segmentación asistida por IA ayuda a entregar el contenido adecuado a la persona correcta. Amplificación (Amplify): Implica diversificar la estrategia en múltiples canales (redes sociales, video, motores de búsqueda u optimización para motores de respuesta o AEO). Busca maximizar el alcance de ese mensaje ya personalizado. Optimización (Evolve / Optimización): Es la fase de análisis en tiempo real. Se evalúan los datos del último experimento o campaña para ver qué funcionó y qué falló. El sistema se vuelve más inteligente con cada ciclo, permitiendo hacer ajustes inmediatos antes de volver a empezar la rueda.",
+                    "markdown": "1. **Definición (Express):** \n\t- Se trata de expresar la **historia única, la identidad y la autenticidad** de tu marca.\n\t- La estrategia y la creatividad humana marcan el timón para asegurar que el mensaje tenga un trasfondo real y no suene genérico.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n2. **Adaptación (Tailor):** \n\t- Consiste en **personalizar los mensajes** y adaptarlos a audiencias específicas utilizando los datos centralizados de un CRM.\n\t- Aquí la segmentación asistida por IA ayuda a entregar el contenido adecuado a la persona correcta.[[1]](https://www.hubspot.es/loop-marketing)\n3. **Amplificación (Amplify):** \n\t- Implica **diversificar la estrategia en múltiples canales** (redes sociales, video, motores de búsqueda u optimización para motores de respuesta o AEO).\n\t- Busca maximizar el alcance de ese mensaje ya personalizado.[[1]](https://www.hubspot.es/loop-marketing)\n4. **Optimización (Evolve / Optimización):** \n\t- Es la fase de **análisis en tiempo real** . Se evalúan los datos del último experimento o campaña para ver qué funcionó y qué falló.\n\t- El sistema se vuelve más inteligente con cada ciclo, permitiendo hacer ajustes inmediatos antes de volver a empezar la rueda.[[1]](https://www.youtube.com/watch?v=QPqHmyzovtM)[[2]](https://www.hubspot.es/loop-marketing)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "El Loop Marketing es un marco de cuatro etapas diseñado por HubSpot que ayuda a los profesionales del marketing a adaptarse y crecer en la era de la IA."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Marketing Guys",
+                        "domain": "marketingguys.com",
+                        "url": "https://marketingguys.com/blog/what-is-loop-marketing/",
+                        "title": "¿Qué es Loop Marketing? El marco de crecimiento continuo ...",
+                        "text": "Loop Marketing es el método para marcas que desean destacar en la era digital actual. Relevante , porque aprende constantemente del cliente. Eficiente , porque se..."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "YouTube",
+                        "domain": "www.youtube.com",
+                        "url": "https://www.youtube.com/watch?v=QPqHmyzovtM",
+                        "title": "Convierte Datos en Conversiones con IA",
+                        "text": "El Loop Marketing Optimización es una etapa diseñada para analizar los datos del último experimento de marketing, identificar qué ..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "¿Por qué es diferente?",
+                    "text": "Deja de ser lineal: No dependes de lanzar un anuncio y esperar a ver qué pasa al final del trimestre; el proceso es dinámico y se ajusta sobre la marcha. Combina humanos e IA: Utiliza la eficiencia, el análisis de datos masivos y la automatización de la inteligencia artificial, pero manteniendo la dirección creativa y emocional impulsada por las personas. Aprendizaje constante: Cada interacción alimenta el ciclo, haciendo que la marca sea más relevante y eficiente con el paso del tiempo.",
+                    "markdown": "- **Deja de ser lineal:** No dependes de lanzar un anuncio y esperar a ver qué pasa al final del trimestre; el proceso es dinámico y se ajusta sobre la marcha.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n- **Combina humanos e IA:** Utiliza la eficiencia, el análisis de datos masivos y la automatización de la inteligencia artificial, pero manteniendo la dirección creativa y emocional impulsada por las personas.[[1]](https://www.hubspot.es/loop-marketing)[[2]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)\n- **Aprendizaje constante:** Cada interacción alimenta el ciclo, haciendo que la marca sea más relevante y eficiente con el paso del tiempo.[[1]](https://google.com/goto?url=CAEStwEB6zswFelKjIqYCgzuIqHnq_5Txpb0EiC61iWVq4g3AJtpCl6cj9LGRoK-EUQ68ayiJE-1pARW90RMPPiIB6DlN3ac2GcVC0E87HKq6XiNQOVmlRvz350XxUJGSKPGxiZcJbB6k9GYsNzWy4YD3f2mdjD5vINe4-r41inTJlDGJAaa5dfV3c1vP_bI0dgFn50ZPkoS65rgz2v9peZOcZVIJM4xKKY6WRGBlqcmwiOl8wvIdz2-ltY)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "HubSpot Español",
+                        "domain": "www.hubspot.es",
+                        "url": "https://www.hubspot.es/loop-marketing",
+                        "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                        "text": "El Loop Marketing es un marco de cuatro etapas diseñado por HubSpot que ayuda a los profesionales del marketing a adaptarse y crecer en la era de la IA."
+                      },
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Marketing Guys",
+                        "domain": "marketingguys.com",
+                        "url": "https://marketingguys.com/blog/what-is-loop-marketing/",
+                        "title": "¿Qué es Loop Marketing? El marco de crecimiento continuo ...",
+                        "text": "Loop Marketing es el método para marcas que desean destacar en la era digital actual. Relevante , porque aprende constantemente del cliente. Eficiente , porque se..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si te interesa aplicar esta metodología, dime:",
+                    "markdown": "Si te interesa aplicar esta metodología, dime:",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "¿A qué se dedica tu negocio o empresa ? ¿Qué canales de marketing utilizas actualmente?",
+                    "markdown": "- ¿A qué se dedica tu **negocio o empresa**?\n- ¿Qué **canales de marketing** utilizas actualmente?",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Puedo ayudarte a esbozar cómo funcionaría este bucle continuo para tu caso específico.",
+                    "markdown": "Puedo ayudarte a esbozar cómo funcionaría este **bucle continuo** para tu caso específico.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "HubSpot Español",
+                    "domain": "www.hubspot.es",
+                    "url": "https://www.hubspot.es/loop-marketing",
+                    "title": "Loop marketing | La filosofía de HubSpot para crecer con la IA",
+                    "text": "El Loop Marketing es un marco de cuatro etapas diseñado por HubSpot que ayuda a los profesionales del marketing a adaptarse y crecer en la era de la IA."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Marketing Guys",
+                    "domain": "marketingguys.com",
+                    "url": "https://marketingguys.com/blog/what-is-loop-marketing/",
+                    "title": "¿Qué es Loop Marketing? El marco de crecimiento continuo ...",
+                    "text": "Loop Marketing es el método para marcas que desean destacar en la era digital actual. Relevante , porque aprende constantemente del cliente. Eficiente , porque se..."
+                  },
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "YouTube",
+                    "domain": "www.youtube.com",
+                    "url": "https://www.youtube.com/watch?v=QPqHmyzovtM",
+                    "title": "Convierte Datos en Conversiones con IA",
+                    "text": "El Loop Marketing Optimización es una etapa diseñada para analizar los datos del último experimento de marketing, identificar qué funcionó, qué no y qué se puede c"
+                  }
+                ],
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" font-family="Inter, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Zonas seguras de la imagen del slider de la portada del blog</title>
+  <desc id="d">Imagen 2:1. Lo que se ve en todos los anchos va de x 42 % a x 96 % y de y 7 % a y 93 %. El título del slider tapa de x 29 % a x 65 % y de y 31 % a y 61 % en 1440. La tarjeta Siguiente tapa de x 75 % a x 92 % y de y 68 % a y 77 %. La tira de diapositivas tapa desde y 86 %. La cara va entre x 68 % y x 92 % y entre y 10 % y y 64 %.</desc>
+  <rect width="1200" height="600" fill="#001a33"/>
+  <!-- visible en todos los anchos: x 42–96 %, y 7–93 % -->
+  <rect x="504" y="42" width="648" height="516" fill="none" stroke="#36c8bf" stroke-width="3" stroke-dasharray="14 10"/>
+  <text x="514" y="70" fill="#36c8bf" font-size="16" font-weight="600">Se ve en 390, 1440 y 1920:</text>
+  <text x="514" y="92" fill="#36c8bf" font-size="16" font-weight="600">x 42–96 % · y 7–93 %</text>
+  <!-- título 1440 -->
+  <rect x="352" y="186" width="426" height="180" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-width="2"/>
+  <text x="362" y="216" fill="#ffffff" font-size="16" font-weight="600">Título del slider (1440)</text>
+  <text x="362" y="238" fill="#ffffff" font-size="14">x 29–65 % · y 31–61 %</text>
+  <text x="362" y="258" fill="#c9d4df" font-size="13">en 1920: x 19–54 %</text>
+  <!-- siguiente -->
+  <rect x="906" y="408" width="204" height="54" fill="#ffffff" fill-opacity="0.12" stroke="#ff8a66" stroke-width="2"/>
+  <text x="914" y="432" fill="#ff8a66" font-size="13">«Siguiente»</text>
+  <text x="914" y="450" fill="#ff8a66" font-size="13">x 75–92 % · y 68–77 %</text>
+  <!-- tira -->
+  <rect x="0" y="516" width="1200" height="84" fill="#ff4d6d" fill-opacity="0.18"/>
+  <text x="24" y="584" fill="#ff8fa3" font-size="15">Tira de diapositivas desde y 86 %: nada importante abajo</text>
+  <!-- cara -->
+  <rect x="816" y="60" width="288" height="324" rx="24" fill="none" stroke="#ffb020" stroke-width="3"/>
+  <text x="826" y="404" fill="#ffb020" font-size="15" font-weight="600">Cara y gesto: x 68–92 % · y 10–64 %</text>
+  <!-- izquierda -->
+  <text x="24" y="70" fill="#8fa3b8" font-size="15">2:1 · entrega 2400 × 1200</text>
+  <text x="24" y="110" fill="#8fa3b8" font-size="15">Izquierda oscura y</text>
+  <text x="24" y="130" fill="#8fa3b8" font-size="15">calma: ahí va el título.</text>
+  <text x="24" y="150" fill="#8fa3b8" font-size="15">En el teléfono no se</text>
+  <text x="24" y="170" fill="#8fa3b8" font-size="15">ve antes del 42 %.</text>
+  <text x="24" y="210" fill="#8fa3b8" font-size="15">Sin texto incrustado.</text>
+</svg>

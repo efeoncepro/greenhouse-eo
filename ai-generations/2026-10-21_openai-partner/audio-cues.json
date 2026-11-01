@@ -1,0 +1,20 @@
+{
+  "pieza": "Efeonce | OpenAI — velocidad de luz",
+  "duracion_s": 8.0,
+  "fps": 30,
+  "tempo_bpm": 120,
+  "nota": "Fuente única de tiempos: las constantes T_IN, T_STOP y T_SIGN de comp/anim-v2.html. Si cambian, se actualiza este archivo antes de mezclar.",
+  "cues": [
+    { "t": 0.0,  "evento": "Oscuridad y polvo",                         "sonido": "aire grave, casi silencio" },
+    { "t": 0.5,  "evento": "Arranca el hiperespacio (T_IN)",              "sonido": "tono sub + túnel de viento que entra" },
+    { "t": 0.5,  "hasta": 1.82, "evento": "Las líneas aceleran",          "sonido": "riser de velocidad: pitch sube y el pulso de 120 BPM se acelera a corcheas" },
+    { "t": 1.82, "hasta": 2.0, "evento": "Las líneas colapsan al horizonte", "sonido": "succión en reversa que corta seco en 2,0" },
+    { "t": 2.0,  "evento": "IMPACTO: nace el horizonte (T_STOP)",          "sonido": "golpe sub enorme + quiebre de cristal brillante; flash" },
+    { "t": 2.0,  "hasta": 2.38, "evento": "Explosión de chispas",         "sonido": "estallido de partículas, granos metálicos" },
+    { "t": 2.38, "evento": "Las chispas se congelan",                     "sonido": "time-stop: el ruido se detiene de golpe (tape stop) y queda la cola del cristal" },
+    { "t": 3.0,  "evento": "Aterriza el lockup (T_SIGN + 0,3)",            "sonido": "golpe del sting de Efeonce (su pico cae aquí; el archivo empieza en 2,4)" },
+    { "t": 3.25, "evento": "Aparece el eyebrow",                          "sonido": "—" },
+    { "t": 3.4,  "evento": "Aparece la fila de productos",                "sonido": "—" },
+    { "t": 3.0,  "hasta": 8.0, "evento": "Cuadro quieto",                 "sonido": "pad aireado y frío que se apaga; fade final 7,3 → 8,0" }
+  ]
+}

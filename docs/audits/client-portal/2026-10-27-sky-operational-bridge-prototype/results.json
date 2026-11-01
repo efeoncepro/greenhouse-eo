@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 1,
+  "task": "TASK-2073",
+  "evidence": "synthetic-only; local source anchors; no production adapters executed",
+  "sourceAnchors": [
+    {
+      "id": "company-space-without-active-filter",
+      "path": "src/lib/services/service-sync.ts",
+      "snippet": "WHERE o.hubspot_company_id = $1\n     LIMIT 1",
+      "fileSha256": "61c752dad3b6d49a59c8897b54c172b20bee491d2f1fa97acc1728c50d2c3992",
+      "line": 120
+    },
+    {
+      "id": "session-client-active-spaces",
+      "path": "migrations/20260601194051024_task-987-session-route-groups-lifecycle-fix.sql",
+      "snippet": "LEFT JOIN greenhouse_core.spaces spc ON spc.client_id = u.client_id AND spc.active = true",
+      "fileSha256": "9612221d6e733ecf5ae116d076de0c9121d9875cb8612254427f9ec0d06fbf46",
+      "line": 102
+    },
+    {
+      "id": "session-first-row",
+      "path": "src/lib/tenant/identity-store.ts",
+      "snippet": "SELECT * FROM greenhouse_serving.session_360 WHERE user_id = $1 LIMIT 1",
+      "fileSha256": "a1fb84fa7e5511cff25a830b15426329feb74781a2802c67669682640ea84b56",
+      "line": 288
+    },
+    {
+      "id": "notion-source-client-first-row",
+      "path": "src/lib/space-notion/space-notion-store.ts",
+      "snippet": "WHERE s.client_id = $1 AND s.active = TRUE AND sns.sync_enabled = TRUE\n     LIMIT 1",
+      "fileSha256": "8e09f53b9f798efb7468f6d5f3603349dfcfbb8b497ed5cd04ae57ec3675ac3b",
+      "line": 38
+    },
+    {
+      "id": "cache-organization-key",
+      "path": "src/lib/account-360/facet-cache.ts",
+      "snippet": "`account360:${orgId}:${facet}:${RESOLVER_VERSION}`",
+      "fileSha256": "7379855ed06426b1c519e48918d741db6fd1428eb9c05957a9bd57cf6885f9b3",
+      "line": 24
+    },
+    {
+      "id": "finance-client-candidates-before-org",
+      "path": "src/lib/service-attribution/materialize.ts",
+      "snippet": "(input.clientId ? indexes.byClientId.get(input.clientId) : null) ||\n    (input.organizationId ? indexes.byOrganizationId.get(input.organizationId) : null)",
+      "fileSha256": "cef58c1edc1faa348c9e54f09b90fa53da0fda209c6d024307f2bc3925b6058d",
+      "line": 529
+    },
+    {
+      "id": "finance-service-client-from-space",
+      "path": "src/lib/service-attribution/materialize.ts",
+      "snippet": "sp.client_id,",
+      "fileSha256": "cef58c1edc1faa348c9e54f09b90fa53da0fda209c6d024307f2bc3925b6058d",
+      "line": 663
+    },
+    {
+      "id": "commercial-instantiation-refuses-second-client",
+      "path": "src/lib/commercial/party/commands/instantiate-client-for-party.ts",
+      "snippet": "throw new OrganizationAlreadyHasClientError(input.organizationId, existingClientId)",
+      "fileSha256": "75ec7f74d6c3381ef5ef7bb762b0fb83b6ef0bb4471415219a7a2bce1144bc7f",
+      "line": 91
+    },
+    {
+      "id": "wizard-reuses-oldest-space",
+      "path": "src/lib/client-lifecycle/commands/provision-client-from-wizard.ts",
+      "snippet": "SELECT space_id FROM greenhouse_core.spaces WHERE client_id = $1 ORDER BY created_at ASC LIMIT 1",
+      "fileSha256": "6249111a3717ea5c3140724cf4077869b4eb9df21a09b214a69d32daef7422c9",
+      "line": 258
+    }
+  ],
+  "variants": [
+    {
+      "variant": "A-prime",
+      "legacy": {
+        "designProjectIds": [
+          "project-design"
+        ],
+        "seoProjectIds": [
+          "project-seo"
+        ],
+        "designSourceChoices": 1,
+        "seoSessionChoices": 1,
+        "companySpaceChoices": 2,
+        "invoiceCandidateIds": [
+          "service-design"
+        ],
+        "organizationCacheCollision": true
+      },
+      "checks": [
+        {
+          "id": "legacy-client-isolation-counterexample",
+          "pass": true,
+          "actual": [
+            "project-design"
+          ],
+          "expected": [
+            "project-design"
+          ]
+        },
+        {
+          "id": "legacy-source-ambiguity",
+          "pass": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "id": "legacy-session-ambiguity",
+          "pass": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "id": "legacy-company-routing-ambiguous-for-both",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "legacy-org-cache-collision-for-both",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "legacy-finance-false-unique-design-with-A-prime",
+          "pass": true,
+          "actual": [
+            "service-design"
+          ],
+          "expected": [
+            "service-design"
+          ]
+        },
+        {
+          "id": "deny-seo-reading-design",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "deny-designer-reading-seo",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "explicit-design-read",
+          "pass": true,
+          "actual": [
+            "project-design"
+          ],
+          "expected": [
+            "project-design"
+          ]
+        },
+        {
+          "id": "explicit-seo-read",
+          "pass": true,
+          "actual": [
+            "project-seo"
+          ],
+          "expected": [
+            "project-seo"
+          ]
+        },
+        {
+          "id": "refresh-retains-selected-space",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "space-cache-isolation",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "source-replay-stable",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "source-cannot-reattribute-design-project",
+          "pass": true,
+          "actual": "history_owner_conflict",
+          "expected": "history_owner_conflict"
+        },
+        {
+          "id": "service-routing-explicit",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "ambiguous-service-route-blocked",
+          "pass": true,
+          "actual": "routing_ambiguous",
+          "expected": "routing_ambiguous"
+        },
+        {
+          "id": "commercial-owner-common",
+          "pass": true,
+          "actual": "client-commercial",
+          "expected": "client-commercial"
+        },
+        {
+          "id": "finance-candidates-normalized-before-selection",
+          "pass": true,
+          "actual": [
+            "service-design",
+            "service-seo"
+          ],
+          "expected": [
+            "service-design",
+            "service-seo"
+          ]
+        },
+        {
+          "id": "unclassified-invoice-stays-unresolved",
+          "pass": true,
+          "actual": "unresolved",
+          "expected": "unresolved"
+        },
+        {
+          "id": "explicit-seo-attribution-survives-bridge",
+          "pass": true,
+          "actual": "service-seo",
+          "expected": "service-seo"
+        },
+        {
+          "id": "consolidated-canonical-invoice-once",
+          "pass": true,
+          "actual": {
+            "count": 1,
+            "amount": 100
+          },
+          "expected": {
+            "count": 1,
+            "amount": 100
+          }
+        },
+        {
+          "id": "three-observed-zero-sources-valid",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "missing-native-AEO-blocked",
+          "pass": true,
+          "actual": "required_source_missing:aeo_run",
+          "expected": "required_source_missing:aeo_run"
+        },
+        {
+          "id": "blog-projection-keeps-full-panel-denominator",
+          "pass": true,
+          "actual": {
+            "ga4FactIds": [
+              "ga4-blog"
+            ],
+            "gscFactIds": [
+              "gsc-blog"
+            ],
+            "aeoCitationRows": 2,
+            "aeoBlogResponses": 1,
+            "aeoDenominator": 4
+          },
+          "expected": {
+            "ga4FactIds": [
+              "ga4-blog"
+            ],
+            "gscFactIds": [
+              "gsc-blog"
+            ],
+            "aeoCitationRows": 2,
+            "aeoBlogResponses": 1,
+            "aeoDenominator": 4
+          }
+        },
+        {
+          "id": "historical-retry-before-current-mapping",
+          "pass": true,
+          "actual": "edition-1",
+          "expected": "edition-1"
+        },
+        {
+          "id": "new-admission-requires-current-mapping",
+          "pass": true,
+          "actual": "service_context_mismatch",
+          "expected": "service_context_mismatch"
+        },
+        {
+          "id": "same-key-other-account-never-returns-edition",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "revoked-cache-denied-before-hit",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "revoked-historical-retry-denied",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "provisioning-blocked-without-finance-foundation",
+          "pass": true,
+          "actual": "foundations_required",
+          "expected": "foundations_required"
+        },
+        {
+          "id": "child-provisioning-replay-no-commercial-duplicate",
+          "pass": true,
+          "actual": {
+            "organizations": 1,
+            "owners": 1,
+            "financeProfiles": 1,
+            "spaces": 2,
+            "operationalBridges": 1
+          },
+          "expected": {
+            "organizations": 1,
+            "owners": 1,
+            "financeProfiles": 1,
+            "spaces": 2,
+            "operationalBridges": 1
+          }
+        },
+        {
+          "id": "inactive-child-still-in-legacy-company-query",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "design-history-byte-equal",
+          "pass": true,
+          "actual": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+          "expected": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50"
+        },
+        {
+          "id": "provisioning-does-not-rewrite-design-history",
+          "pass": true,
+          "actual": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+          "expected": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50"
+        }
+      ],
+      "historyDigest": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+      "pass": true
+    },
+    {
+      "variant": "B",
+      "legacy": {
+        "designProjectIds": [
+          "project-design",
+          "project-seo"
+        ],
+        "seoProjectIds": [
+          "project-design",
+          "project-seo"
+        ],
+        "designSourceChoices": 2,
+        "seoSessionChoices": 2,
+        "companySpaceChoices": 2,
+        "invoiceCandidateIds": [
+          "service-design",
+          "service-seo"
+        ],
+        "organizationCacheCollision": true
+      },
+      "checks": [
+        {
+          "id": "legacy-client-isolation-counterexample",
+          "pass": true,
+          "actual": [
+            "project-design",
+            "project-seo"
+          ],
+          "expected": [
+            "project-design",
+            "project-seo"
+          ]
+        },
+        {
+          "id": "legacy-source-ambiguity",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "legacy-session-ambiguity",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "legacy-company-routing-ambiguous-for-both",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "legacy-org-cache-collision-for-both",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "legacy-finance-false-unique-design-with-A-prime",
+          "pass": true,
+          "actual": [
+            "service-design",
+            "service-seo"
+          ],
+          "expected": [
+            "service-design",
+            "service-seo"
+          ]
+        },
+        {
+          "id": "deny-seo-reading-design",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "deny-designer-reading-seo",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "explicit-design-read",
+          "pass": true,
+          "actual": [
+            "project-design"
+          ],
+          "expected": [
+            "project-design"
+          ]
+        },
+        {
+          "id": "explicit-seo-read",
+          "pass": true,
+          "actual": [
+            "project-seo"
+          ],
+          "expected": [
+            "project-seo"
+          ]
+        },
+        {
+          "id": "refresh-retains-selected-space",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "space-cache-isolation",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "source-replay-stable",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "source-cannot-reattribute-design-project",
+          "pass": true,
+          "actual": "history_owner_conflict",
+          "expected": "history_owner_conflict"
+        },
+        {
+          "id": "service-routing-explicit",
+          "pass": true,
+          "actual": "space-seo",
+          "expected": "space-seo"
+        },
+        {
+          "id": "ambiguous-service-route-blocked",
+          "pass": true,
+          "actual": "routing_ambiguous",
+          "expected": "routing_ambiguous"
+        },
+        {
+          "id": "commercial-owner-common",
+          "pass": true,
+          "actual": "client-commercial",
+          "expected": "client-commercial"
+        },
+        {
+          "id": "finance-candidates-normalized-before-selection",
+          "pass": true,
+          "actual": [
+            "service-design",
+            "service-seo"
+          ],
+          "expected": [
+            "service-design",
+            "service-seo"
+          ]
+        },
+        {
+          "id": "unclassified-invoice-stays-unresolved",
+          "pass": true,
+          "actual": "unresolved",
+          "expected": "unresolved"
+        },
+        {
+          "id": "explicit-seo-attribution-survives-bridge",
+          "pass": true,
+          "actual": "service-seo",
+          "expected": "service-seo"
+        },
+        {
+          "id": "consolidated-canonical-invoice-once",
+          "pass": true,
+          "actual": {
+            "count": 1,
+            "amount": 100
+          },
+          "expected": {
+            "count": 1,
+            "amount": 100
+          }
+        },
+        {
+          "id": "three-observed-zero-sources-valid",
+          "pass": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "id": "missing-native-AEO-blocked",
+          "pass": true,
+          "actual": "required_source_missing:aeo_run",
+          "expected": "required_source_missing:aeo_run"
+        },
+        {
+          "id": "blog-projection-keeps-full-panel-denominator",
+          "pass": true,
+          "actual": {
+            "ga4FactIds": [
+              "ga4-blog"
+            ],
+            "gscFactIds": [
+              "gsc-blog"
+            ],
+            "aeoCitationRows": 2,
+            "aeoBlogResponses": 1,
+            "aeoDenominator": 4
+          },
+          "expected": {
+            "ga4FactIds": [
+              "ga4-blog"
+            ],
+            "gscFactIds": [
+              "gsc-blog"
+            ],
+            "aeoCitationRows": 2,
+            "aeoBlogResponses": 1,
+            "aeoDenominator": 4
+          }
+        },
+        {
+          "id": "historical-retry-before-current-mapping",
+          "pass": true,
+          "actual": "edition-1",
+          "expected": "edition-1"
+        },
+        {
+          "id": "new-admission-requires-current-mapping",
+          "pass": true,
+          "actual": "service_context_mismatch",
+          "expected": "service_context_mismatch"
+        },
+        {
+          "id": "same-key-other-account-never-returns-edition",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "revoked-cache-denied-before-hit",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "revoked-historical-retry-denied",
+          "pass": true,
+          "actual": "forbidden",
+          "expected": "forbidden"
+        },
+        {
+          "id": "provisioning-blocked-without-finance-foundation",
+          "pass": true,
+          "actual": "foundations_required",
+          "expected": "foundations_required"
+        },
+        {
+          "id": "child-provisioning-replay-no-commercial-duplicate",
+          "pass": true,
+          "actual": {
+            "organizations": 1,
+            "owners": 1,
+            "financeProfiles": 1,
+            "spaces": 2,
+            "operationalBridges": 0
+          },
+          "expected": {
+            "organizations": 1,
+            "owners": 1,
+            "financeProfiles": 1,
+            "spaces": 2,
+            "operationalBridges": 0
+          }
+        },
+        {
+          "id": "inactive-child-still-in-legacy-company-query",
+          "pass": true,
+          "actual": 2,
+          "expected": 2
+        },
+        {
+          "id": "design-history-byte-equal",
+          "pass": true,
+          "actual": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+          "expected": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50"
+        },
+        {
+          "id": "provisioning-does-not-rewrite-design-history",
+          "pass": true,
+          "actual": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+          "expected": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50"
+        }
+      ],
+      "historyDigest": "61a8458f25a9f7b87c6272466a2cd8dda7fc92032f03677d46abd2125c007d50",
+      "pass": true
+    }
+  ],
+  "summary": {
+    "pass": true,
+    "checks": 68,
+    "preferred": "A-prime"
+  },
+  "decision": {
+    "recommendation": "A-prime",
+    "reason": "A-prime retains uniqueness of modeled legacy client-only selectors; B requires replacing all of them.",
+    "mandatoryForBoth": [
+      "explicit authorized context",
+      "deterministic service/source routing",
+      "space-aware cache",
+      "history ownership"
+    ],
+    "mandatoryForAPrime": [
+      "dedicated child provisioning command",
+      "commercial-owner normalization BEFORE financial candidates"
+    ],
+    "beforeAnySharedProvisioning": [
+      "U01 context",
+      "U02 routing",
+      "U02F finance foundation",
+      "accepted ADR and persisted contract"
+    ],
+    "productionReady": false,
+    "limitations": [
+      "No SQL transactions/concurrency",
+      "No live session/Notion/HubSpot/Finance",
+      "No real GA4/GSC/AEO query or report",
+      "No migration/rollback or delivered stakeholder isolation proof",
+      "No exhaustive legacy consumer inventory certification"
+    ]
+  }
+}

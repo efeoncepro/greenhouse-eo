@@ -173,6 +173,52 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
     exampleIntent: 'Refresh this pullquote so it connects Loop Marketing with faster learning cycles.'
   },
   {
+    blockName: 'efeoncepro/chart',
+    semanticKind: 'editorial_chart',
+    agentRole:
+      'Places a «Gráfico Efeonce» in a post (dynamic block, plugin efeonce-editorial-blocks): line, column, bar, pie, funnel, before-after, measure, per-hundred, matrix or venn. Authored as GutenbergArticleSpec kind="chart"; the numbers are printed as a table in the HTML and the chart is painted on top.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['attrs'],
+    semanticOperations: ['refresh_chart_data'],
+    compilesTo: ['update_attrs', 'preserve'],
+    requiredEvidence: [...baseEvidence, 'plugin_serialization_policy'],
+    applyPolicy: draftOnlyPolicy('Change data, title or source on a draft clone; the chart contract validates the shape per kind.'),
+    previewPolicy: previewRequired(
+      'figure.eo-chart reaches data-eo-chart-state="ready" on the published page, desktop and 390 px.',
+      'The title states the conclusion and the source line is present.'
+    ),
+    guardrails: [
+      'Every number needs a verifiable source; mark illustrative data as such in sourceLabel.',
+      'The title says what the chart proves, not its topic.',
+      'One highlighted entity: emphasis/highlight, never a second accent.'
+    ],
+    exampleIntent: 'Add a line chart of monthly organic clicks before and after the AEO work, highlighting the last month.'
+  },
+  {
+    blockName: 'efeoncepro/growth-cta',
+    semanticKind: 'conversion_cta',
+    agentRole:
+      'Places a governed Greenhouse Growth CTA in a post (dynamic block, plugin efeonce-editorial-blocks ≥ 0.7.0). Authored as GutenbergArticleSpec kind="growthCta" with the CTA slug; copy, action and measurement live in the Growth CTA engine.',
+    freedomLevel: 'guided',
+    editableSurfaces: ['attrs'],
+    semanticOperations: ['refresh_cta'],
+    compilesTo: ['update_attrs', 'preserve'],
+    requiredEvidence: [...baseEvidence, 'plugin_serialization_policy'],
+    applyPolicy: draftOnlyPolicy(
+      'The block only references a CTA slug; change the copy by publishing a new CTA version in Greenhouse, never in the post.'
+    ),
+    previewPolicy: previewRequired(
+      'One visible <greenhouse-cta> inside section.eo-gcta on the published page (data-ghc-state="visible"); the editor only shows a placeholder.',
+      'The slug is allowed by the blog surface (option eo_growth_cta_blog); otherwise the block prints nothing.'
+    ),
+    guardrails: [
+      'At most one Growth CTA per post, after the main answer and before the FAQ or the closing.',
+      'Never write CTA copy, forms or links inside the block: they are data of the Growth CTA engine.',
+      'emphasis must be one exact phrase of the published headline; never hand-write the block comment.'
+    ],
+    exampleIntent: 'Place the Efeonce AEO Assessment CTA before the FAQ of this AEO article.'
+  },
+  {
     blockName: 'efeoncepro/glitch-drop',
     semanticKind: 'editorial_aside',
     agentRole:
@@ -200,7 +246,7 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
   {
     blockName: 'core/table',
     semanticKind: 'editorial_table',
-    agentRole: 'Native comparison/data table with optional caption and the core-registered stripes style.',
+    agentRole: 'Native comparison/data table with optional caption, in the «Tabla Efeonce» style (or core stripes).',
     freedomLevel: 'constrained',
     editableSurfaces: ['text', 'attrs', 'structure'],
     semanticOperations: ['refresh_table_cells'],
@@ -212,7 +258,8 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
       'Caption credits the data source when figures come from third parties.'
     ),
     guardrails: [
-      'Use only the core-registered is-style-stripes style (spec table.style="stripes"); no inline colors.',
+      'Blog posts use «Tabla Efeonce» (spec table.style="efeonce", efeonce-editorial-blocks ≥ 0.6.0); core stripes only outside it; no inline colors.',
+      'The header names each column: on the phone every cell shows its header as a label, so headers stay short.',
       'Every row keeps the header column count.',
       'Prefer a table over columns for side-by-side comparisons.'
     ],
@@ -348,6 +395,24 @@ export const EFEONCE_GUTENBERG_BLOCK_CAPABILITIES: GutenbergBlockCapabilityEntry
       'Destinations are https:, http: or mailto: only; styles are the core fill (default) or is-style-outline.'
     ],
     exampleIntent: 'Make this CTA label more specific without changing the destination.'
+  },
+  {
+    blockName: 'core/code',
+    semanticKind: 'editorial_code',
+    agentRole: 'Code sample a reader copies (JavaScript, formulas, regex). Authored as GutenbergArticleSpec kind="code".',
+    freedomLevel: 'constrained',
+    editableSurfaces: ['text'],
+    semanticOperations: ['refresh_code_sample'],
+    compilesTo: ['update_text'],
+    requiredEvidence: [...baseEvidence],
+    applyPolicy: draftOnlyPolicy('Regenerate the sample from the spec so escaping stays governed; test the code before it ships.'),
+    previewPolicy: previewRequired('The sample scrolls inside its block at 390 px without widening the page.'),
+    guardrails: [
+      'Publish only code that was run against real cases; say where it was not tested (a live portal, a locale).',
+      'Plain text only: no markup inside the sample.',
+      'Keep explanation in the surrounding paragraphs, not in long code comments.'
+    ],
+    exampleIntent: 'Replace this validation snippet with the tested version that accepts RUTs under one million.'
   },
   {
     blockName: 'core/separator',

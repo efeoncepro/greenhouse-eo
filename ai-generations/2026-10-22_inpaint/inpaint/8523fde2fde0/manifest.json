@@ -1,0 +1,210 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "8523fde2fde0",
+  "key": "8523fde2fde073f6c71e6491d23fa9627057114b46f4e3fe5facd81f84027639",
+  "status": "completed",
+  "createdAt": "2026-10-22T17:21:43.638Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/inicio-v3-sin-gotas.png",
+    "imageSha256": "645c9a17d48d3f7a1aafab9354f166f40e3c30bb92d32a2fe44bc27dda31181b",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/mascara-hilo.png",
+    "maskSha256": "ba57040a197a969f2a390aecaf5f2775b47a8c7089e9b43fa0fdb7cb2e65ee76",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Fill the marked area with the plain, dry wooden tabletop that continues the surrounding wood grain and the warm low sunlight reflections. There is no water, no stream and no droplets in this area. The back of the grey laptop lid to the right stays exactly as it is.",
+    "providerPrompt": "Fill the marked area with the plain, dry wooden tabletop that continues the surrounding wood grain and the warm low sunlight reflections. There is no water, no stream and no droplets in this area. The back of the grey laptop lid to the right stays exactly as it is."
+  },
+  "mask": {
+    "touchedFraction": 0.01513519287109375,
+    "editable": 15234,
+    "soft": 4604,
+    "protected": 1290882
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 243,
+      "top": 696,
+      "width": 307,
+      "height": 432
+    },
+    "target": {
+      "width": 864,
+      "height": 1216
+    },
+    "aspectError": 0.00017146776406036152,
+    "reason": "la zona con contexto ocupa 10.0 % de la imagen: se genera recortada a 864x1216"
+  },
+  "estimate": {
+    "usd": 0.0748,
+    "basis": "2 × salida 864x1216 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 48.849,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 9.3,
+        "bestError": 9.3,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1290882,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 15234,
+        "maxDelta": 159,
+        "meanDelta": 60.009,
+        "worst": {
+          "x": 393,
+          "y": 857
+        }
+      },
+      "seam": {
+        "pixels": 4604,
+        "maxDelta": 148,
+        "meanDelta": 11.921,
+        "worst": {
+          "x": 358,
+          "y": 814
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1290882,
+        "maxDelta": 188,
+        "meanDelta": 2.165,
+        "worst": {
+          "x": 517,
+          "y": 762
+        }
+      },
+      "outputUsd": 0.0374,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1121,
+        "input_tokens_details": {
+          "image_tokens": 1026,
+          "text_tokens": 95
+        },
+        "output_tokens": 1245,
+        "output_tokens_details": {
+          "image_tokens": 1245,
+          "text_tokens": 0
+        },
+        "total_tokens": 2366
+      },
+      "meta": {
+        "size": "864x1216",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 45.633,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.89,
+        "bestError": 5.89,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1290882,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 15234,
+        "maxDelta": 167,
+        "meanDelta": 56.503,
+        "worst": {
+          "x": 414,
+          "y": 829
+        }
+      },
+      "seam": {
+        "pixels": 4604,
+        "maxDelta": 147,
+        "meanDelta": 9.667,
+        "worst": {
+          "x": 418,
+          "y": 812
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1290882,
+        "maxDelta": 168,
+        "meanDelta": 1.051,
+        "worst": {
+          "x": 423,
+          "y": 1061
+        }
+      },
+      "outputUsd": 0.0374,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1121,
+        "input_tokens_details": {
+          "image_tokens": 1026,
+          "text_tokens": 95
+        },
+        "output_tokens": 1245,
+        "output_tokens_details": {
+          "image_tokens": 1245,
+          "text_tokens": 0
+        },
+        "total_tokens": 2366
+      },
+      "meta": {
+        "size": "864x1216",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

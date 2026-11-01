@@ -249,5 +249,9 @@ describe('signing-keys-store', () => {
     const jws = await signWithActiveKey({ signer: v1.signer, payload: { sub: 'x', exp: 4102444800 } })
 
     expect(jws.split('.')).toHaveLength(3)
+    expect(JSON.parse(Buffer.from(jws.split('.')[0], 'base64url').toString()).typ).toBe('JWT')
+    const proof = await signWithActiveKey({ signer: v1.signer, payload: { aud: 'rooms' }, typ: 'rooms-invitation-proof+jwt' })
+
+    expect(JSON.parse(Buffer.from(proof.split('.')[0], 'base64url').toString()).typ).toBe('rooms-invitation-proof+jwt')
   })
 })

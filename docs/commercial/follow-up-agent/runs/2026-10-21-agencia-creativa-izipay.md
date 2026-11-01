@@ -109,3 +109,28 @@ La solicitud documental no crea nuevas comunicaciones ni scheduler. Se actualiza
 manual, capacidad comercial y módulos espejo: calidad de contacto, entregabilidad, mensaje y secuencias.
 No hay nuevo runtime/API/schema: no requiere una nueva capa funcional de producto; el manual y el registro
 explican el comportamiento comercial. Los gates de documentación y espejos se reportan en el commit/turno.
+
+
+## Actualización 21/10/2026 — Respuesta recibida
+
+Invitación RFQ001 recibida21Oct10:41:20Chile; Iris ya no inscrita; dos adyacentes continúan. La dirección antes inferida tiene ahora respuesta corporativa observada. [Lectura y próximos pasos](2026-10-21-1055-respuestas-izipay-olivos.md). Ningún nuevo envío ni escritura CRM por esta revisión.
+
+
+### 11:40 — Nueva instrucción ejecutada
+
+Ariana yDiego cancelados manualmente, ambos hs_sequences_is_enrolled=false; Iris ya no inscrita. Paquete y correo preparados para revisión, NOENVIADOS. No reactivar adyacentes. [Registro](2026-10-21-1140-izipay-paquete-olivos-secuencia.md).
+
+
+## Actualización21Oct: confirmación autorizada enviada
+
+Tras revisión de Julio, enviado11:49:59Chile únicamente a Compras, sinCC, firma gráfica, CCOHubSpot; E-RUT y referencias adjuntos, creativo y360completo mediante enlaces de HubSpot. Outlook y actividadEMAIL119215175851 SENT comprobados. Esperar aceptación de proveedor extranjero y equivalencia documental; brief/bases/cronograma pendientes. No repetir ni reinscribir adyacentes. [Evidencia](2026-10-21-1152-izipay-confirmacion-enviada.md).
+
+
+## Actualización21Oct: Lead autorizado creado
+
+Lead598745034768 creado13:53:31Chile, Conectado y abierto, dueñoJulio, conContact yCompanyprimarios existentes. MCP verificó lectura/catálogo, CLIoficialOAuth hizoalta yMCPconfirmóresultado. Faltanadmisión/bases/calendario; sinDeal ni envíoextra. [Evidencia](../../prospecting-agent/runs/2026-10-21-1354-izipay-lead-creado.md).
+
+
+## Actualización21Oct16:45: negocio abierto tras nueva respuesta
+
+Comprasacusóinterés16:37:50Chileyavisaránnovedadespróximassemanas. PorinstrucciónreiteradadeJulio, interpretadacomoexcepciónadministrativa, se creóDeal66481946424 porMCP, conCompany/Contact/Leadexistentes. DueñoJulio, bucketadministrativo, sinmonto/cierreestimados; etapaCalificadoparacomprarconlímites explícitosen descripción. Admisión/bases/calendario/contratopendientes,noGOpostulación/gasto. LifecycleCompany/Contactpasó opportunitynativo,LeadConnected. [Evidencia](../../prospecting-agent/runs/2026-10-21-1647-izipay-deal-abierto.md).

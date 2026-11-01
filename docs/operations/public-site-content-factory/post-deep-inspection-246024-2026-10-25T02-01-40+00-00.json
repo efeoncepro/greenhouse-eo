@@ -1,0 +1,924 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-10-25T02:01:40+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 246024,
+    "type": "post",
+    "status": "publish",
+    "slug": "como-crear-formularios-con-validacion-de-rut",
+    "title": "Cómo crear formularios con validación de RUT chileno en minutos",
+    "modified": "2024-11-20T01:06:29+00:00",
+    "permalink": "https://efeoncepro.com/hubspot/como-crear-formularios-con-validacion-de-rut/",
+    "contentLength": 9686
+  },
+  "seo": {
+    "yoastTitle": "",
+    "yoastDescription": "Aprende a integrar validación de RUT en formularios de HubSpot. Cumple normativas, mejora datos y facilita el registro de clientes chilenos.",
+    "primaryCategory": "19"
+  },
+  "summary": {
+    "totalBlocks": 71,
+    "topLevelBlocks": 55,
+    "counts": {
+      "core/code": 3,
+      "core/freeform": 27,
+      "core/heading": 8,
+      "core/list": 5,
+      "core/list-item": 15,
+      "core/paragraph": 11,
+      "core/separator": 1,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 3,
+    "linkCount": 7,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "6",
+      "level": 2,
+      "text": "¿Por qué validar el RUT en un formulario?"
+    },
+    {
+      "path": "14",
+      "level": 2,
+      "text": "Configuración del formulario en HubSpot"
+    },
+    {
+      "path": "20",
+      "level": 2,
+      "text": "Código para validar y formatear el RUT"
+    },
+    {
+      "path": "24",
+      "level": 4,
+      "text": "Función para validar el RUT"
+    },
+    {
+      "path": "30",
+      "level": 4,
+      "text": "Función para formatear el RUT"
+    },
+    {
+      "path": "36",
+      "level": 4,
+      "text": "Integración con el formulario de HubSpot"
+    },
+    {
+      "path": "42",
+      "level": 2,
+      "text": "Cómo incrustar el formulario en tu sitio web"
+    },
+    {
+      "path": "46",
+      "level": 2,
+      "text": "Pruebas y Consejos Finales"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¡Hola, marketer! Si estás aquí, es porque probablemente te has encontrado con un gran desafío: necesitas validar el RUT chileno en un formulario de HubSpot y no tienes idea de por dónde empezar. Tranquilo, no estás solo. Este es un dolor muy común para las emp…",
+      "innerBlockCount": 0,
+      "fingerprint": "22f60de2ea0fc49307a69a89cdf125d80f95f4a407df9dffb9711d1eb3e2c061",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/hubspot/hubspot-marketing-ventas/"
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Al final de este tutorial, tendrás un formulario de HubSpot que valida y formatea correctamente el RUT de tus clientes (ya sean personas o empresas). Además, cumplirá con las normativas legales y te ahorrarás dolores de cabeza.",
+      "innerBlockCount": 0,
+      "fingerprint": "e9eed246fda26df869742c69e4ad40fbace4821fbf56883dea80faecd9cf2b53",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidos¿Por qué validar el RUT en un formulario?Configuración del formulario en HubSpotCódigo para validar y formatear el RUTCómo incrustar el formulario en tu sitio webPruebas y Consejos Finales",
+      "innerBlockCount": 0,
+      "fingerprint": "b35a149a1af4d8872707ec1013cf1bfd7d012fe1cf1f1dba62d7aae4dfa72a08",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-por-que-validar-el-rut-en-un-formulario"
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Por qué validar el RUT en un formulario?",
+      "innerBlockCount": 0,
+      "fingerprint": "f8050f98e512dea2957a8c86b19d6d662a959bd55b0ca19e62d8e2f3419289cf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El RUT es esencial en Chile para identificar a personas y empresas. Sin una validación adecuada, podrías recibir datos erróneos o incompletos, lo que afecta procesos como:",
+      "innerBlockCount": 0,
+      "fingerprint": "e8b1a238a6b5ef9d621332b7a0b94408dc7257b79e07bcfe988eb8bfbe855d62",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "5f33b30ac4b8d73d5ac9d26302fcbacb111df0b9826179eed2e60c48dc60cd86",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "10.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Facturación electrónica.",
+      "innerBlockCount": 0,
+      "fingerprint": "9ba416071f355ab611d040c9886bc2914f5af24b9c1cccb1833dd883885a9e28",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "10.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Registro de clientes.",
+      "innerBlockCount": 0,
+      "fingerprint": "1ef74f9719f0c534925ac7ca8ff8977ef39a7ebd945b139359823a2dc50c12fa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "10.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Cumplimiento de normativas legales.",
+      "innerBlockCount": 0,
+      "fingerprint": "1529802a6a357882c2efc090b2f515d637f6eb0ec0e2cc75e276cc6c47568a20",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Además, una buena validación mejora la experiencia del usuario al evitar que ingresen datos incorrectos. ¡Un cliente feliz siempre vuelve! 😉",
+      "innerBlockCount": 0,
+      "fingerprint": "902199a5f00a25886e1d33de46ee2b655a20b495f1010f4747e126f84da5f183",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Configuración del formulario en HubSpot",
+      "innerBlockCount": 0,
+      "fingerprint": "8704744acd6d152115c35d548ddc18b3bb668d7ea2ebc79337605e45dc883448",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Antes de entrar en el código, necesitamos preparar el formulario en HubSpot. Sigue estos pasos:",
+      "innerBlockCount": 0,
+      "fingerprint": "a175866bcca259187d769806663bbcfe3ae144fd5eb8e9f00bb9a4c19f2654ef",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "86bd1c051f4134923d5e25e66620d6b4a96c5a99193c021c2cd0287d7302b537",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "18.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Ve a Marketing > Formularios en tu portal de HubSpot.",
+      "innerBlockCount": 0,
+      "fingerprint": "a86c6ef95807260ad988427865f52bbabf6407d23cc37f692bf0597cf6466bab",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Crea un nuevo formulario o edita uno existente.",
+      "innerBlockCount": 0,
+      "fingerprint": "1e69610478600b12720740ad040acdd9743c376bfa0defcfb0ca66d46f1c6297",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Añade los campos necesarios, como:NombreCorreo ElectrónicoTeléfonoRUT (propiedad personalizada de texto).Tip: Si estás trabajando con empresas, llama al campo \"RUT Empresa\". Si es para personas, simplemente \"RUT\".",
+      "innerBlockCount": 0,
+      "fingerprint": "3e38e15e382eb977c8e1178d899cf00e615582851607dd0c9b84fb27b74e0ccf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "18.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Guarda y publica tu formulario.",
+      "innerBlockCount": 0,
+      "fingerprint": "9ff22fccbe80d0a02faf0d022e6daf9a49c832416843eb71a587960aee080bbe",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Código para validar y formatear el RUT",
+      "innerBlockCount": 0,
+      "fingerprint": "b1eb1d8160cefcf74d9d5fab37d43af8575cb84d3998d0ab57250153224d4a76",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahora viene la parte técnica. Este es el código que necesitas para validar y formatear el RUT directamente en tu sitio web.",
+      "innerBlockCount": 0,
+      "fingerprint": "81df869ce4386fe55f37a2e87ef4eed5269dec8086a0245b6cc393fac5932be9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Función para validar el RUT",
+      "innerBlockCount": 0,
+      "fingerprint": "101e071d2b53cf2d86847f70aa0167c01feef1c707c6f39f81dd479741376afe",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta función limpia el RUT, calcula el dígito verificador (DV) y lo compara con el ingresado. Es el núcleo de la validación:",
+      "innerBlockCount": 0,
+      "fingerprint": "8319a0967cfae3d9874a3a47b50c8ae614edb56c562f9fcb610425cb3660097b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/code",
+      "attrs": {},
+      "text": "function validateRut(rut) { let cleanRut = rut.replace(/[^\\dKk]/g, ''); // Limpia caracteres no válidos let body = cleanRut.slice(0, -1); // Parte numérica let dv = cleanRut.slice(-1).toUpperCase(); // Dígito verificador if (body.length < 7 || body.length > 8)…",
+      "innerBlockCount": 0,
+      "fingerprint": "87f271f83b05818236bead86aed6509af2821005ca726194c56214ccfeb06f45",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Función para formatear el RUT",
+      "innerBlockCount": 0,
+      "fingerprint": "9dd2bba4f40cb828217c230f653cbff9bb37030102787eb7b3f3f9876351029d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Esta función convierte un RUT como 12345678K en un formato más legible: 12.345.678-K.",
+      "innerBlockCount": 0,
+      "fingerprint": "216a3057401d131d4b578adfc51a487570956c9c6e81f33c4218c645c74d5c5e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/code",
+      "attrs": {},
+      "text": "function formatRut(rut) { let cleanRut = rut.replace(/[^\\dKk]/g, ''); // Limpia caracteres no válidos let formattedRut = cleanRut.slice(-4, -1) + '-' + cleanRut.substr(cleanRut.length - 1); // Agrega DV for (let i = 4; i < cleanRut.length; i += 3) { formattedR…",
+      "innerBlockCount": 0,
+      "fingerprint": "d53ec7f7980fa569f27ba276391d16469d3eaedf50de0472b73489456f3bda54",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "Integración con el formulario de HubSpot",
+      "innerBlockCount": 0,
+      "fingerprint": "e111ebf8094ee8ac6e66bc2eb9666663dba48a9547bfb5167214d8c2be2b1631",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Este script valida el RUT en tiempo real y muestra mensajes de error si no es válido.",
+      "innerBlockCount": 0,
+      "fingerprint": "5f6808f0e631559d86dba09c7f8e16dcca03d33562a6bda83738f889bad1c71e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/code",
+      "attrs": {},
+      "text": "hbspt.forms.create({ region: \"na1\", portalId: \"TUPORTALID\", formId: \"TUFORMID\", onFormReady: function($form) { let CompanyRut = $form.find(\".hs-rut input\"); // Selecciona el campo RUT let submitButton = $form.find(\"input[type='submit']\"); // Deshabilitar el bo…",
+      "innerBlockCount": 0,
+      "fingerprint": "47812119a06f9916ca7c16a851f7e38453c66fed0fcecb02f1f6447c73249c70",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Cómo incrustar el formulario en tu sitio web",
+      "innerBlockCount": 0,
+      "fingerprint": "d0a41d079de3b6ef3edf546c50ecc1e3e13ce10d1bea543f5de04da7b4f92c28",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "2ccc081a0fa451b088210efebf5d9f240fa689e3772163b1070b9d48dd06b65a",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "44.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Copia el código de incrustación de HubSpot.",
+      "innerBlockCount": 0,
+      "fingerprint": "ce0f52e78442d68363836c6429d57ebc05838b7531bae6d00a6d8777eb2f049f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "44.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Añádelo a la página donde quieras que aparezca el formulario.",
+      "innerBlockCount": 0,
+      "fingerprint": "c5280b3bdc791890cc85477a43d41854e20f41a3b3b2ba12d1969eb021f8fda6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "44.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Incluye el código de validación y formateo del RUT (como el que te mostré arriba) debajo del script del formulario.",
+      "innerBlockCount": 0,
+      "fingerprint": "a402d0564bf5e665f07bb8329c6997c51116da77fda4520a3065fa50ee9cdcd2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "Pruebas y Consejos Finales",
+      "innerBlockCount": 0,
+      "fingerprint": "04149a983bc9dfd20baf42f11fa7424d55f9533822887acc9bd26381d70740fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "e6801c38dc5548aeb01432bd87e2b761bcd88bf789e7d986b0575bd5ab36fee0",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "48.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Prueba diferentes casos:",
+      "innerBlockCount": 1,
+      "fingerprint": "a32c5b4e396fcf412b16dd2765c278353910d45d171739479ef5a54c4e5dd038",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "48.0.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "3368a4299099c1b480dbfda01574788bf4f439c48d36d7e23fae9b933b440842",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "48.0.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "RUT válido: 12345678K → debería funcionar.",
+      "innerBlockCount": 0,
+      "fingerprint": "1edf2611abd0dfb7c1b2b1b702ba91382eeabdd97f20657b807752d2e36ecfb4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "48.0.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "RUT inválido: 12345678L → debería mostrar un error.",
+      "innerBlockCount": 0,
+      "fingerprint": "101541531d5ed1a39a5f96cf4f4b3ff78ced8eec9bda5db9eb7787c2c2d7646c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "48.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mensaje personalizado: Agrega mensajes claros y amigables para los usuarios.",
+      "innerBlockCount": 0,
+      "fingerprint": "6009b0219b64f1810febc0d2702bf003959a9372d64d159479dcf6199f05aee0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "48.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mantenimiento: Si cambias algo en el formulario, verifica que las validaciones sigan funcionando correctamente.",
+      "innerBlockCount": 0,
+      "fingerprint": "0da2025d1d4f03a969e1adaff684e67c440334bf5f485282f9260878e6ccecba",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5dccd797598c66c4504cbab7b22234a68db62b382e092c52025fa1a3774049bd",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¡Y listo! Ahora tienes un formulario de HubSpot que valida el RUT de tus usuarios, ya sean personas o empresas. Esto no solo cumple con normativas legales, sino que también mejora la calidad de los datos que capturas.",
+      "innerBlockCount": 0,
+      "fingerprint": "1fc73aaf70f15ba9d0cd5ea953726f8ee29443edd7302872284987c8bf816252",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si tienes dudas o necesitas ayuda con integraciones avanzadas de HubSpot, no dudes en contactar a Efeonce. ¡Estamos aquí para empoderar tu crecimiento! 🚀",
+      "innerBlockCount": 0,
+      "fingerprint": "cdc3741fda9c0418288c1bf198e8fd2c4c98acd774accd4ba744d02e2f2bfb86",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://efeoncepro.com/contacto/"
+    }
+  ],
+  "links": [
+    {
+      "href": "https://efeoncepro.com/hubspot/hubspot-marketing-ventas/",
+      "text": "HubSpot",
+      "kind": "internal_url"
+    },
+    {
+      "href": "#h-por-que-validar-el-rut-en-un-formulario",
+      "text": "¿Por qué validar el RUT en un formulario?",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-configuracion-del-formulario-en-hubspot",
+      "text": "Configuración del formulario en HubSpot",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-codigo-para-validar-y-formatear-el-rut",
+      "text": "Código para validar y formatear el RUT",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-como-incrustar-el-formulario-en-tu-sitio-web",
+      "text": "Cómo incrustar el formulario en tu sitio web",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-pruebas-y-consejos-finales",
+      "text": "Pruebas y Consejos Finales",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://efeoncepro.com/contacto/",
+      "text": "Efeonce",
+      "kind": "internal_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

@@ -84,6 +84,14 @@ desde IA ×3.** Tu vendor te está financiando el argumento de miedo, y encima e
 **Encaja con Loop Marketing** — la etapa **Amplify** (*"distribuir donde buscan humanos Y bots"*) es
 literalmente esto. Habla ese idioma → `modules/01_PRODUCTO_2026.md` § 4.
 
+> **Delta 2026-10-26 — Reach, el puente al AEO Assessment.** En las **4 Rs** de Loop 2026 (una métrica por
+> etapa), la de Amplify es **Reach**, y HubSpot la mide con *"LLM/AI share of voice"*, impresiones multicanal y
+> conversión por canal ✅ (textual en [hubspot.com/loop-marketing](https://www.hubspot.com/loop-marketing)). Es el
+> argumento de venta del **Efeonce AEO Assessment**: el cliente que adopta Loop necesita medir su share of voice en
+> la IA, y ese diagnóstico es nuestro (§3: no es HubSpot AEO). 🔴 La página en español no se actualizó y usa otro
+> scorecard: cita cada versión por su URL. Ledger y lo que no se cita → `SOURCES.md` § Loop Marketing 2026;
+> términos → `GLOSSARY.md` (Taste Profile, Buyer Sim, 4 Rs).
+
 ### Cómo se corre el diagnóstico
 Dueño del método: **`seo-aeo`**. Esta skill lo **consume**.
 🔴 **NUNCA muestres un run con `unknown`** en las dimensiones clave (hay drift de extracción en prosa).

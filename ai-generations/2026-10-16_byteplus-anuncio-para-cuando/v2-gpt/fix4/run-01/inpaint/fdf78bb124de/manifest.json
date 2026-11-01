@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "fdf78bb124de",
+  "key": "fdf78bb124ded8447ac9e75460b8733cb69e882b824ab808ac1a30e9fcb9ffb2",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:37:34.066Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/01-kickoff.png",
+    "imageSha256": "9b8f06bd79e14ab3c9fa29ec6517160c58c04df1b85a6726014c83a176a3c6ab",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/01.png",
+    "maskSha256": "ae4d7ab252c161d6a5c015495e1eee77e46fa9a0f679c8a09504fe3bd74c1352",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked background zone at the left behind the woman: there is NO window here. It is the interior side wall of the meeting room: a light grey wall with a tall concrete column and one sculptural green plant in a pot, softly out of focus, lit by cool overcast daylight coming from the window wall at the far end. Keep the woman, her hair and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Replace only the marked background zone at the left behind the woman: there is NO window here. It is the interior side wall of the meeting room: a light grey wall with a tall concrete column and one sculptural green plant in a pot, softly out of focus, lit by cool overcast daylight coming from the window wall at the far end. Keep the woman, her hair and everything outside the zone unchanged. Photorealistic."
+  },
+  "mask": {
+    "touchedFraction": 0.10581436157226562,
+    "editable": 130732,
+    "soft": 7961,
+    "protected": 1172027
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 42 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 77.444,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.66,
+        "bestError": 3.66,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1172027,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 130732,
+        "maxDelta": 215,
+        "meanDelta": 80.512,
+        "worst": {
+          "x": 44,
+          "y": 138
+        }
+      },
+      "seam": {
+        "pixels": 7961,
+        "maxDelta": 110,
+        "meanDelta": 27.058,
+        "worst": {
+          "x": 65,
+          "y": 580
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1172027,
+        "maxDelta": 193,
+        "meanDelta": 6.325,
+        "worst": {
+          "x": 326,
+          "y": 223
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1409,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 129
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2919
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -15,6 +15,8 @@
 
 import { KeyManagementServiceClient } from '@google-cloud/kms'
 
+import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+
 import {
   createCloudKmsSigner,
   getAuthServerKmsKeyName,
@@ -53,14 +55,17 @@ const printKeys = async () => {
 }
 
 const main = async () => {
-  const keyName = getAuthServerKmsKeyName()
-  const signer = createCloudKmsSigner()
+  loadGreenhouseToolEnv()
+  applyGreenhousePostgresProfile('ops')
 
   if (hasFlag('--status')) {
     await printKeys()
 
     return
   }
+
+  const keyName = getAuthServerKmsKeyName()
+  const signer = createCloudKmsSigner()
 
   const retireKid = valueOf('--retire')
 

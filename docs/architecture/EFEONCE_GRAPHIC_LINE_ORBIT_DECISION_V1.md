@@ -341,7 +341,7 @@ fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
 La órbita gobierna la totalidad de las superficies propias de Rooms: autoría, exploración, presentación, consola y evaluación. Bricolage editorial/Poppins funcional; paleta, componentes, iconografía y motion canónicos. AXIS es la infraestructura de distribución de ese sistema. La propuesta histórica Poppins/Geist para Rooms queda reemplazada. La composición específica sigue su revisión de píxeles; no se impone el formato pregunta/respuesta a las propuestas y no se altera el arte cliente.
 
-La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.
+La adopción de Rooms está documentada en [su ADR](rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md), [dirección visual](../ui/visual-directions/EFEONCE_ROOMS_VISUAL_DIRECTION_V1.md) y [EPIC-052](../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md). No implica migrar automáticamente el runtime de Greenhouse, modificar pins ni publicar nuevos assets. Decisión contrastada con tokens locales AXIS `f4dd2fe`, sin rollout Rooms.
 
 ## Aplicación al reproductor compartido
 

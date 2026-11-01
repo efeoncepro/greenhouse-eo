@@ -184,10 +184,13 @@ segura si el brief lo declara; en la marca propia Efeonce, una superficie gráfi
 anuncio) firma con el logo centrado abajo y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen
 (fusión de luminosidad sobre lecho muy oscuro; [referencia](../../efeonce-brand-studio/references/graphic-line-orbit.md)).
 En Marketing con Manzanitas, la imagen del artículo y el banner siguen el **registro Marketing con Manzanitas**
-(complementa La órbita): una sola pieza, Escena o Pizarra; la foto se genera en 16:9 y se lleva a 1200 × 630; la
-cabecera del programa va arriba a la izquierda, la voz en el lado oscuro y la firma puede ir abajo a la izquierda,
-cerrando la columna del texto; el eslogan no va
-([norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)).
+(complementa La órbita): una sola pieza, Escena o Pizarra; la foto se genera en 16:9 y se lleva a 1200 × 630; la voz
+va en el lado oscuro y el eslogan no va
+([norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) §5.6). El **banner** que
+sale del sitio lleva la cabecera arriba a la izquierda y la firma puede ir abajo a la izquierda. La **portada de un
+artículo** del blog de Efeonce usa la variante centrada: texto y cara dentro del cuadrado central x 285–915 y **sin
+firma** (2026-10-24). Un artículo nuevo lleva tres imágenes —plate, portada e imagen del slider— y sus posiciones y
+márgenes los fija el [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
 El sello de footer de la infografía de cuerpo no cambia. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
 dibuje una firma editorial: componer el activo oficial de forma determinística después de seleccionar el master.
@@ -307,7 +310,12 @@ Entregables recomendados por asset informativo **raster**:
 - fallback WebP de `1200px` cuando el runtime lo necesite;
 - derivado social en **PNG** (regla de `social-media-studio`: imágenes sociales siempre en PNG); JPEG sólo si la
   plataforma rechaza el PNG y ese rechazo quedó observado, nunca por costumbre;
-- para hero: crop `16:9` y OG dedicado `1200×630` o equivalente de alta resolución `1440×757`;
+- para hero: crop `16:9` y OG dedicado `1200×630` o equivalente de alta resolución `1440×757`. **Excepción, el blog
+  de Efeonce (Marketing con Manzanitas, desde el 2026-10-24):** manda el
+  [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md): portada JPEG
+  `2400×1260` de menos de 300 KB (destacada, OG y X; JPEG a propósito, porque los lectores de enlaces no tratan el
+  WebP de forma pareja), `hero` del slider WebP 2:1 `2400×1200` recortado del plate y sin texto, y el plate `2560×1440`
+  tal cual como foto de la tarjeta del rail, con punto focal `84% 30%`;
 - width/height, MIME, peso, hash y relación master→derivado en manifest.
 
 `1200×630` y `1440×757` comparten aproximadamente la relación social `1.905:1`. Son alternativas de resolución, no dos crops obligatorios. Usar el tamaño que el runtime necesite y verificar la miniatura real. Nunca estirar: hacer crop dirigido desde el master, preservando foco, safe area, anatomía y motivo. No upscale si la fuente no sostiene la resolución.

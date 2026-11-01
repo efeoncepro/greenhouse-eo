@@ -1,47 +1,25 @@
 import type { ConsentContextResolution } from '../consent-context'
 /**
- * Páginas HTML mínimas del emisor (TASK-1829): sin JS, CSS inline (CSP estricta), marca desde el
- * SSOT (`src/config/efeonce-brand.ts` + isotipo generado). La task ui-ux de login/consentimiento
- * reemplaza estas vistas; el contrato (rutas, campos del formulario, copy en `src/lib/copy/auth-server.ts`)
- * se mantiene.
+ * Páginas HTML nativas del emisor: CSS generado bajo hash CSP y marca del SSOT.
+ * TASK-2064 adapta sólo el login a V4; consentimiento y verificación conservan su shell.
+ * El controlador de login se agrega desde persons/pages.ts con nonce, sin runtime React/Next.
  */
 
 import { EFEONCE_BRAND_NAME } from '@/config/efeonce-brand'
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
-import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
 import { renderClientMark } from './client-marks'
-import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
+import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
+import { renderLoginV4Body, type LoginPresentation } from './login-v4'
 
 export const escapeHtml = (value: string): string =>
   value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char)
 
 const STYLES = AUTH_SERVER_STYLES
-
-/**
- * Shell compartido de las páginas del emisor. Exportado para que la superficie de personas
- * (TASK-1830) use EXACTAMENTE la misma marca y CSP que las del protocolo, en vez de un segundo
- * layout que se desincronice.
- */
-/**
- * Panel de marca del acceso. Sólo aparece en `/login` y sólo desde 64rem: es la primera pantalla que
- * ve alguien de fuera de Efeonce y lleva el logotipo institucional en negativo (SSOT
- * `public/branding/logo-negative.svg`), no una reconstrucción tipográfica. Va DESPUÉS del formulario
- * en el DOM —el orden visual lo pone CSS— para que el foco y los lectores de pantalla lleguen antes
- * al campo que al mensaje de marca.
- */
-const brandRail = (): string => `<aside class="id-rail">
-    <div class="id-rail-inner">
-      <div class="id-rail-logo" role="img" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_LOGOTYPE_NEGATIVE_SVG}</div>
-      <p class="id-rail-kicker">${escapeHtml(GH_AUTH_SERVER.brand_title)}</p>
-      <p class="id-rail-headline">${escapeHtml(GH_AUTH_SERVER.login_rail_headline)} <em>${escapeHtml(GH_AUTH_SERVER.login_rail_headline_accent)}</em>.</p>
-      <p class="id-rail-body">${escapeHtml(GH_AUTH_SERVER.login_rail_body)}</p>
-      <p class="id-rail-trust">${ICON_LOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rail_trust)}</span></p>
-    </div>
-  </aside>`
 
 /**
  * Ficha de la aplicación que pide acceso.
@@ -63,7 +41,7 @@ const clientContext = (clientName: string, clientId: string): string => {
 export const layout = (
   title: string,
   body: string,
-  options: { state?: 'login' | 'consent' | 'verification'; clientName?: string; clientId?: string } = {}
+  options: { state?: 'login' | 'consent' | 'verification'; clientName?: string; clientId?: string } & LoginPresentation = {}
 ): string => {
   const state = options.state ?? 'verification'
 
@@ -78,14 +56,13 @@ export const layout = (
 <style>${STYLES}</style>
 </head>
 <body>
-<div class="id-canvas" data-state="${state}">
+${state === 'login' ? renderLoginV4Body(body, options) : `<div class="id-canvas" data-state="${state}">
   <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
     <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
     ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
     <div class="id-surface">${body}</div>
   </main>
-  ${state === 'login' ? brandRail() : ''}
-</div>
+</div>`}
 </body>
 </html>`
 }

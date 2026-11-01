@@ -1,0 +1,76 @@
+{
+  "data": {
+    "serverNow": "2026-10-30T14:13:00.000Z",
+    "organizationId": "org-eval-local",
+    "roomId": "sala-volta-2027",
+    "title": "Llega antes, todo el año",
+    "revision": 11,
+    "currentEditionId": "ed-1",
+    "permissions": {
+      "canRead": true,
+      "canManage": true
+    },
+    "invitations": [
+      {
+        "invitationId": "inv-1",
+        "roomId": "sala-volta-2027",
+        "version": "1",
+        "status": "active",
+        "expiresAt": "2026-10-31T14:00:00.000Z",
+        "capabilities": [
+          "rooms.read"
+        ],
+        "deliveryStatus": "accepted",
+        "createdAt": "2026-10-30T14:11:00.000Z",
+        "recipientEmail": "carla.mendez@volta-bikes.example",
+        "actions": {
+          "canReissue": true,
+          "canRetryDelivery": false,
+          "canRevoke": true,
+          "retryAt": null,
+          "reissueMaxExpiresAt": null
+        }
+      },
+      {
+        "invitationId": "inv-2",
+        "roomId": "sala-volta-2027",
+        "version": "1",
+        "status": "active",
+        "expiresAt": "2026-10-31T14:00:00.000Z",
+        "capabilities": [
+          "rooms.read"
+        ],
+        "deliveryStatus": "accepted",
+        "createdAt": "2026-10-30T14:12:00.000Z",
+        "recipientEmail": "tomas.ruiz@volta-bikes.example",
+        "actions": {
+          "canReissue": true,
+          "canRetryDelivery": false,
+          "canRevoke": true,
+          "retryAt": null,
+          "reissueMaxExpiresAt": null
+        }
+      },
+      {
+        "invitationId": "inv-3",
+        "roomId": "sala-volta-2027",
+        "version": "1",
+        "status": "active",
+        "expiresAt": "2026-10-31T14:00:00.000Z",
+        "capabilities": [
+          "rooms.read"
+        ],
+        "deliveryStatus": "accepted",
+        "createdAt": "2026-10-30T14:13:00.000Z",
+        "recipientEmail": "andrea.soto@volta-bikes.example",
+        "actions": {
+          "canReissue": true,
+          "canRetryDelivery": false,
+          "canRevoke": true,
+          "retryAt": null,
+          "reissueMaxExpiresAt": null
+        }
+      }
+    ]
+  }
+}

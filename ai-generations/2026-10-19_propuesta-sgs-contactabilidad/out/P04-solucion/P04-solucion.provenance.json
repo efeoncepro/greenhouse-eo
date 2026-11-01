@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1f394b2cf8f8a05be98a82dbbc0b448ef7f206ba6825ae29e73a7719bebf039a",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:NXSF1-nexa-conexion",
+      "path": "ai-generations/2026-09-29_deck-salesforce/plates/NXSF1-nexa-conexion.png",
+      "sha256": "c3e35d3d13289638ce3b142040d55b324445695d908824d7e18023ea737bdac7"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

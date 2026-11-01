@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "articulo-seo-aeo-ejemplo-crm-cl-2026-10-25",
+  "market": "CL",
+  "locale": "es-CL",
+  "queries": [
+    "¿Qué CRM me recomiendas para una empresa B2B mediana en Chile?",
+    "¿Cuál es el mejor software de facturación electrónica para una pyme en Chile?"
+  ],
+  "maxOutputTokens": 1024,
+  "lanes": [
+    { "id": "chatgpt-consumer", "preset": "chatgpt-scraper", "surface": "consumer", "estimatedCostUsdPerTask": 0.03 },
+    { "id": "gemini-consumer", "preset": "gemini-scraper", "surface": "consumer", "estimatedCostUsdPerTask": 0.03 },
+    { "id": "perplexity-api", "preset": "perplexity-response", "surface": "api", "model": "sonar-pro", "webSearch": true, "estimatedCostUsdPerTask": 0.02 }
+  ]
+}

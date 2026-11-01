@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "3f1b248495f3",
+  "key": "3f1b248495f3d397db050e3ac4ee2a2c193d6198036343dbaa94004320f16a67",
+  "status": "completed",
+  "createdAt": "2026-10-17T21:22:34.184Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/17-lunes.png",
+    "imageSha256": "7821a574d133ad0144faba4fc17f8ee6252465238c4f78a56dc116f2f36884f6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/bloqueo/17-izq-mask.png",
+    "maskSha256": "1af91ca4cb3e91faebd8a2d35ea22572e7b4a7a1e4a52beaa76c93affa40258a",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Continue the wet wooden meeting table with a few droplets and the out-of-focus office behind it. No laptop, no hand, no sleeve, no person.",
+    "providerPrompt": "Continue the wet wooden meeting table with a few droplets and the out-of-focus office behind it. No laptop, no hand, no sleeve, no person."
+  },
+  "mask": {
+    "touchedFraction": 0.08996429443359374,
+    "editable": 104912,
+    "soft": 13006,
+    "protected": 1192802
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 38 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 100.753,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 18.57,
+        "bestError": 18.57,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1192802,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 104912,
+        "maxDelta": 235,
+        "meanDelta": 108.378,
+        "worst": {
+          "x": 13,
+          "y": 1115
+        }
+      },
+      "seam": {
+        "pixels": 13006,
+        "maxDelta": 204,
+        "meanDelta": 39.249,
+        "worst": {
+          "x": 166,
+          "y": 671
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1192802,
+        "maxDelta": 246,
+        "meanDelta": 47.871,
+        "worst": {
+          "x": 586,
+          "y": 203
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1352,
+        "input_tokens_details": {
+          "image_tokens": 1280,
+          "text_tokens": 72
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 2862
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

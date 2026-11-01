@@ -463,8 +463,14 @@ const SOFT_ON_DARK = (efeonceGraphicLine as unknown as { slogan: { leadColor: { 
  * Salesforce (declarado por el operador el 2026-09-29) y se cita como `salesforce-partner-authorization-2026-09-29`
  * (registro de partnerships de Greenhouse). La línea tiene que operarse sobre una plataforma de partner
  * (`lines[].platform`).
+ *
+ * La variante se elige por CONTRASTE con la superficie donde se posa (operador, 2026-10-31): una insignia de placa
+ * crema se disuelve sobre papel. Se toma la que AXIS declara para esa superficie (o para cualquiera); si AXIS no
+ * publica una que contraste, no compone. Las dos piezas que la llevan hoy son azul noche (`FRAME_SURFACE`).
  */
-const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset: SurfaceAssetRequest } => {
+const FRAME_SURFACE = 'dark'
+
+export const partnerBadge = (line: string, readbackRef: unknown, surface: 'light' | 'dark' = FRAME_SURFACE): { ref: string; asset: SurfaceAssetRequest } => {
   const platform = (efeonceGraphicLine.lines as unknown as { key: string; platform: string | null }[]).find(entry => entry.key === line)?.platform
 
   if (!platform) throw new SurfacePieceError(`La línea «${line}» no se opera sobre una plataforma de partner: no lleva insignia.`, 'invalid-intent')
@@ -476,9 +482,15 @@ const partnerBadge = (line: string, readbackRef: unknown): { ref: string; asset:
     )
   }
 
-  const badge = (AXIS_PARTNER_ASSETS as readonly { id: string; kind: string; partner: string }[]).find(asset => asset.kind === 'partner-badge' && asset.partner === platform)
+  const badges = (AXIS_PARTNER_ASSETS as readonly { id: string; kind: string; partner: string; surface: string }[]).filter(asset => asset.kind === 'partner-badge' && asset.partner === platform)
 
-  if (!badge) throw new SurfacePieceError(`AXIS no publica la insignia de partner de «${platform}».`, 'invalid-intent')
+  if (!badges.length) throw new SurfacePieceError(`AXIS no publica la insignia de partner de «${platform}».`, 'invalid-intent')
+
+  const badge = badges.find(asset => asset.surface === surface) ?? badges.find(asset => asset.surface === 'any')
+
+  if (!badge) {
+    throw new SurfacePieceError(`AXIS no publica una insignia de «${platform}» que contraste con una superficie ${surface === 'dark' ? 'oscura' : 'clara'}: no se pinta la que se disuelve.`, 'invalid-intent')
+  }
 
   return partnerFile(badge.id)
 }

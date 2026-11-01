@@ -1,0 +1,31 @@
+{
+ "id": "S04-aplastada-c",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. In the same brand-new contemporary meeting room on a high floor of a modern office tower in Santiago de Chile: floor-to-ceiling frameless glass walls, a long pale oak meeting table with a thin matte black steel base, modern upholstered chairs in warm grey, a large frameless wall display, linear recessed LED ceiling lights, polished concrete floor, one sculptural green plant; through the glass the Santiago skyline and the Andes. Current-generation hardware only (thin aluminum laptops, frameless screens), clean surfaces; nothing dated, no paper stacks, no books, no old monitors, nothing worn. Paula, medium shot, has collapsed forward: her forehead rests on the table next to her open laptop, arms limp, glasses still on her head, a paper coffee cup beside her, utterly defeated; a large empty area of calm grey wall and window above her head. Far behind her, at the far end of the same table, small and out of focus, Antonio keeps calmly typing on his laptop. Antonio wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, CLOSED, with its embroidered emblem on the left chest exactly as in the references, over a plain white t-shirt. GEOGRAPHY (critical, continuity): ONE single long pale oak meeting table runs from the foreground straight back toward the floor-to-ceiling window wall. The camera is at the interior end of that table, looking along it toward the windows. Paula sits on the LEFT long side of this same table in the foreground. Antonio sits on the RIGHT long side of the SAME table, at its far end next to the windows, about four meters behind her, facing diagonally toward her side; the table surface visibly continues without any gap from Paula's place to Antonio's laptop. There is NO second table or separate desk. Both laptops are current-generation ultra-thin space-grey aluminum laptops with minimal bezels. Paula's drink is a kraft paper coffee cup with a black lid. Light: soft, flat, cool overcast daylight from the windows under a flat grey sky, neutral and slightly grey, muted colors, calm and corporate — a modern office on a dull day, never fluorescent, never dirty.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "persona": "antonio"
+  }
+ ],
+ "identidad": [
+  "paula",
+  {
+   "persona": "antonio"
+  }
+ ],
+ "lecho": "sin-lecho"
+}

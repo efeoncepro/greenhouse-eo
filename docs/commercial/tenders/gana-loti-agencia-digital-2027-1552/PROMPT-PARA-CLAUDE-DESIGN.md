@@ -1,5 +1,7 @@
 # Texto para Claude Design
 
+> **Nota 29/10/2026.** Prompt histórico del 22/10. El deck ya se diseñó en el lienzo Claude Design ([artifact](https://claude.ai/artifact/FTkrgJDZZ77cNpsetLqd4q), versión 74: 41 láminas + Anexo A) y su PDF de 42 páginas está en el paquete para Wherex. Las menciones a «28 bloques» y al estado de borrador quedan superadas. Estado del caso en el [README](README.md).
+
 Adjuntar `PROPUESTA-GANA-LOTI-2027-PARA-CLAUDE-DESIGN.md` y los recursos oficiales de marca que se utilizarán. Los archivos internos de costos, investigación y control no forman parte del material para diseñar.
 
 ## Prompt para copiar

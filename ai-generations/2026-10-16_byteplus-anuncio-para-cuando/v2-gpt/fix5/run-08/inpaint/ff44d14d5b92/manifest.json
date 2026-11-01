@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ff44d14d5b92",
+  "key": "ff44d14d5b9279f2bc6cf90db4d6cf440fd6e071eae3aaa3c92e3becf8ce31ea",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:58:55.474Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/08.png",
+    "imageSha256": "7bf877c425a99e3094c8cb1eed6b4e44d57dfc013a6168eb6aa74b992fab5921",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix5/m/08.png",
+    "maskSha256": "b1006d2377495b95537e6aabbeea215746683b0260208f9a51ee556c341fc2b3",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked background patch behind the woman with the same softly out-of-focus open-plan office seen through the glass partition (desks, warm pendant lights, plants), seamlessly continuous with its surroundings, no building facade, no window to the outside, no hard edges. Keep everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nReplace only the marked background patch behind the woman with the same softly out-of-focus open-plan office seen through the glass partition (desks, warm pendant lights, plants), seamlessly continuous with its surroundings, no building facade, no window to the outside, no hard edges. Keep everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0516448974609375,
+    "editable": 57616,
+    "soft": 10076,
+    "protected": 1243028
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 0,
+      "top": 633,
+      "width": 543,
+      "height": 526
+    },
+    "target": {
+      "width": 1040,
+      "height": 1008
+    },
+    "aspectError": 0.0005557180462123432,
+    "reason": "la zona con contexto ocupa 21.6 % de la imagen: se genera recortada a 1040x1008"
+  },
+  "estimate": {
+    "usd": 0.0516,
+    "basis": "1 × salida 1040x1008 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 29.935,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -3,
+        "dy": -3,
+        "scale": 0.98,
+        "stillError": 9.24,
+        "bestError": 5.95,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -3.63,
+        -5.37,
+        -5.56
+      ],
+      "protected": {
+        "pixels": 1243028,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 57616,
+        "maxDelta": 193,
+        "meanDelta": 32.832,
+        "worst": {
+          "x": 141,
+          "y": 799
+        }
+      },
+      "seam": {
+        "pixels": 10076,
+        "maxDelta": 128,
+        "meanDelta": 13.368,
+        "worst": {
+          "x": 219,
+          "y": 1000
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1243028,
+        "maxDelta": 200,
+        "meanDelta": 3.087,
+        "worst": {
+          "x": 250,
+          "y": 678
+        }
+      },
+      "outputUsd": 0.0516,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 2326,
+        "input_tokens_details": {
+          "image_tokens": 2112,
+          "text_tokens": 214
+        },
+        "output_tokens": 1720,
+        "output_tokens_details": {
+          "image_tokens": 1720,
+          "text_tokens": 0
+        },
+        "total_tokens": 4046
+      },
+      "meta": {
+        "size": "1040x1008",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

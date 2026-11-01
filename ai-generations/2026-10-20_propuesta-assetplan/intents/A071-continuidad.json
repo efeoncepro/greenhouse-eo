@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Continuidad",
+    "question": "¿Y si cambia la persona?",
+    "answer": [
+      "Nada se pierde"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 3
+  },
+  "items": [
+    {
+      "title": "Respaldo designado",
+      "desc": "Una segunda persona conoce tu cuenta y cubre ausencias y vacaciones."
+    },
+    {
+      "title": "Memoria en Notion",
+      "desc": "Decisiones, configuraciones y solicitudes documentadas en tu teamspace."
+    },
+    {
+      "title": "Traspaso con traslape",
+      "desc": "Semanas de trabajo en paralelo antes del cambio, sin costo para Assetplan."
+    },
+    {
+      "title": "Acceso nominativo",
+      "desc": "Cada persona entra con su usuario Partner; los accesos se rotan y se revocan."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Assetplan",
+    "participantKind": "department"
+  }
+}

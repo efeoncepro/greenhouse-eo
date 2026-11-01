@@ -1,0 +1,302 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "bb18d8397889",
+  "key": "bb18d839788954199348b76bdf4677c3f317751c200d0f82c59c40b052c6e074",
+  "status": "completed",
+  "createdAt": "2026-10-22T17:40:37.997Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/11a-ola-llega.png",
+    "imageSha256": "8580bf9b6d8d4849861eac01d957a0f03fd777ec2d293e0e8dba19d67041eff6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/cuadro-inicio/mascara-11a-v2.png",
+    "maskSha256": "fe071ea8d015e32e541d1c55563e6eff579c7d5cba19e3376f1a92e26fc4223d",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 3,
+    "prompt": "Edit only the marked zone of image 1. This is one frame of a real-time live-action film (24 fps, 1/48 s shutter), a split second after a drink can was shot OUT OF THE LAPTOP SCREEN toward the woman. The laptop screen faces her; we see the back of its lid at the bottom centre.\n\nReplace the big upright can and the radial splash with this exact moment:\n- The BREAKR can from image 2 is a projectile flying through the air toward her. It is at its REAL size: about 16 cm tall, so in this frame it is clearly SMALLER than the laptop lid (about 70 % of the lid's height). It is fully in the air, a little above the top edge of the lid, with a clear gap of air between the lid and the bottom of the can; nothing touches the table. It is tilted about 35 degrees with its top leaning toward her, mid-tumble, with slight motion blur along its path toward her chest. Its orange body, teal band and white BREAKR lettering stay recognisable.\n- Water and a few orange slices burst out of the screen together with the can, in ONE direction only: a fan of water opening from behind the top edge of the lid toward her. The fast upper part flies through the air just behind and below the can toward her chest; the lower part is falling onto the table on her side of the laptop and starting to run toward her. The water is motion-blurred into streaks and sheets pointing from the laptop toward her, never round frozen droplets.\n- No water anywhere else: nothing going up into the air, nothing to the right toward the wall or behind her hand, nothing on the camera side of the laptop, no droplets hanging in the air around her.\n- Where the old can and splash covered her cream knit sweater, her raised open hand and the office behind her, restore them dry and intact.\nKeep her face, hair, coffee cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zone of image 1. This is one frame of a real-time live-action film (24 fps, 1/48 s shutter), a split second after a drink can was shot OUT OF THE LAPTOP SCREEN toward the woman. The laptop screen faces her; we see the back of its lid at the bottom centre.\n\nReplace the big upright can and the radial splash with this exact moment:\n- The BREAKR can from image 2 is a projectile flying through the air toward her. It is at its REAL size: about 16 cm tall, so in this frame it is clearly SMALLER than the laptop lid (about 70 % of the lid's height). It is fully in the air, a little above the top edge of the lid, with a clear gap of air between the lid and the bottom of the can; nothing touches the table. It is tilted about 35 degrees with its top leaning toward her, mid-tumble, with slight motion blur along its path toward her chest. Its orange body, teal band and white BREAKR lettering stay recognisable.\n- Water and a few orange slices burst out of the screen together with the can, in ONE direction only: a fan of water opening from behind the top edge of the lid toward her. The fast upper part flies through the air just behind and below the can toward her chest; the lower part is falling onto the table on her side of the laptop and starting to run toward her. The water is motion-blurred into streaks and sheets pointing from the laptop toward her, never round frozen droplets.\n- No water anywhere else: nothing going up into the air, nothing to the right toward the wall or behind her hand, nothing on the camera side of the laptop, no droplets hanging in the air around her.\n- Where the old can and splash covered her cream knit sweater, her raised open hand and the office behind her, restore them dry and intact.\nKeep her face, hair, coffee cup, the man in the navy jacket, the laptop and the warm low morning sunlight exactly as in image 1.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.35632781982421874,
+    "editable": 415649,
+    "soft": 51397,
+    "protected": 843674
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1359,
+    "basis": "3 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 44.893,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -5,
+        "scale": 1,
+        "stillError": 12.54,
+        "bestError": 10.39,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -10.2,
+        -10.03,
+        -6.19
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 253,
+        "meanDelta": 48.393,
+        "worst": {
+          "x": 645,
+          "y": 679
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 187,
+        "meanDelta": 16.59,
+        "worst": {
+          "x": 398,
+          "y": 875
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 223,
+        "meanDelta": 15.504,
+        "worst": {
+          "x": 316,
+          "y": 447
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4673,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 608
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6183
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 38.003,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.94,
+        "bestError": 1.94,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -4.71,
+        -4.88,
+        -3.56
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 254,
+        "meanDelta": 41.316,
+        "worst": {
+          "x": 354,
+          "y": 923
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 195,
+        "meanDelta": 11.207,
+        "worst": {
+          "x": 962,
+          "y": 666
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 242,
+        "meanDelta": 3.557,
+        "worst": {
+          "x": 415,
+          "y": 893
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4673,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 608
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6183
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 3,
+      "raw": "candidate-3-raw.png",
+      "final": "candidate-3.png",
+      "diff": "candidate-3-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 40.697,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.09,
+        "bestError": 6.09,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -4.64,
+        -5.17,
+        -2.65
+      ],
+      "protected": {
+        "pixels": 843674,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 415649,
+        "maxDelta": 253,
+        "meanDelta": 44.167,
+        "worst": {
+          "x": 331,
+          "y": 819
+        }
+      },
+      "seam": {
+        "pixels": 51397,
+        "maxDelta": 221,
+        "meanDelta": 12.633,
+        "worst": {
+          "x": 398,
+          "y": 898
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 843674,
+        "maxDelta": 240,
+        "meanDelta": 7.268,
+        "worst": {
+          "x": 417,
+          "y": 892
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4673,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 608
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6183
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

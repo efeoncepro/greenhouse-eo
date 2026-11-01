@@ -1,0 +1,50 @@
+{
+  "id": "IH2-cine",
+  "formato": "16:9",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "producto",
+  "linea": "revenue-hubspot",
+  "identidad": [
+    {
+      "persona": "antonio",
+      "vista": "perfil-der"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce",
+      "puesta": "espalda"
+    },
+    {
+      "objeto": "spark",
+      "color": "revenue-hubspot",
+      "vista": "tres-cuartos-der"
+    }
+  ],
+  "palanca": "proyeccion",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still with real depth of field: the instant a company's website is read by an AI before any human ever visits it): a vast dark concrete hall at night. On the RIGHT half of the frame, a monumental rough concrete wall, rising out of frame into darkness and running at a slight angle away from the camera toward the right edge, receives a projected WEBSITE PAGE several metres wide, thrown by the projector just beside the camera: a clean modern homepage whose blocks are mostly bright azure blue and white (a wide hero image, a headline bar, columns of text blocks and buttons), deliberately out of focus so no word, letter or logo is readable; the concrete's pores and seams break the projection. Antonio stands INSIDE the projector beam, about one and a half metres in front of the wall, seen three-quarters from behind, from the waist up; his left elbow is at about 55 % of the frame width and his right shoulder at about 80 %; between the left edge of the frame and his body there is a wide band of empty darkness. The projected page FALLS ACROSS his shoulders and the back of his jacket, and his own shadow punches a hard black hole through the page on the wall; his head turned toward the wall so only the hard edge of his profile, beard and brow is visible, calm and attentive, supervising. He wears the navy Efeonce bomber jacket, deep navy, never royal blue, even where the azure page falls on it, and its BACK carries EXACTLY what image 4 shows on the back: the white 'efeonce' wordmark across the upper back with 'Empower your Growth' in smaller letters below it, at the same size and position as in image 4, never the large standalone rocket emblem; the macro of image 5 is only the small chest embroidery and is NOT on the back. THE SPARK, copied EXACTLY from its reference and seen three-quarters as in that reference (glossy white hovering sphere, wide navy visor with two LED eyes, ONE four-pointed sparkle antenna on top only, tilted white orbit ring with its small sphere, short white arms with dark hands, three round belly windows; all its LEDs in the magenta of its reference; no extra ports or lenses on its sides), hovers between Antonio and the wall just beyond his RIGHT shoulder, at about 78 % of the frame width and a little above his head height, smaller than his head, turned toward the page; nothing of the Spark crosses into the left half of the frame. MOMENT: the scan is happening right now, the line is mid-sweep and Antonio has just turned his head to follow it. From its visor ONE thin, razor-sharp horizontal line of magenta light travels to the wall and lies across the projected page like a scanner; along that line the page is sharper and brighter, as if those few lines were being extracted. The magenta line and the Spark's LEDs are the only accent in the frame and they light nothing around them: not his face, not his jacket, not the wall beyond the line; the projector beam is the only light that models him. Haze in the hall makes the projector beam and the magenta line visible in the air; the beam stays entirely in the right half. The LEFT 45% of the frame is calm, deep dark empty hall space with only faint haze: no wall projection, no objects, no light spill, no people. REALISTIC ADULT PROPORTIONS: camera about two meters behind him at chest height, 85mm lens at f/1.8, nothing foreshortened. Photographic skin and hair, real fabric creases on the jacket, real concrete texture. Contemporary and premium, nothing retro. No logos of any other brand, no readable text anywhere.",
+  "llave": {
+    "fuente": "the projector just beside the lens at the bottom right, throwing the azure-white website page across his back and onto the concrete wall",
+    "lado": "from the right of the camera and slightly above, raking across his right shoulder, the right edge of his profile and the back of his jacket",
+    "tamano": "a single hard projector beam",
+    "distancia": "about two metres from him"
+  },
+  "primerPlano": "the dark matte back and top of the projector's housing at the far bottom-right corner, ten centimetres from the lens, its own lens facing away toward the wall and out of view, heavily out of focus and cut by the frame edge",
+  "fondo": "past the far end of the angled wall, at the right edge of the frame, the hall continues deep into darkness with a row of large round cold practical lights far behind, melted into big soft bokeh discs; nothing of it reaches the left half",
+  "fenomeno": {
+    "que": "a website projected wall-size by one hard beam, falling across his back and onto raw concrete, and one razor-thin magenta scan line from the Spark's visor reading it: only the few lines it touches turn sharper and brighter",
+    "esServicio": "AEO e inbound para la era de la IA: una IA lee tu web antes que tu cliente y decide qué citar de ella."
+  },
+  "lecho": "sin-lecho",
+  "sinLechoPorque": "hero web: la foto de la web no lleva logo; firma el encabezado del sitio (norma de superficies, web)",
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark empty hall",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Hero web de la landing de Inbound Marketing (sitio público, servicio; no es superficie de producto). Registro cine autorizado explícitamente por el operador el 2026-10-17 («el hero hazlo con registro cinematográfico»). Antonio es del elenco ficticio, anclado a sus referencias; la web no dibuja órbita encima."
+}

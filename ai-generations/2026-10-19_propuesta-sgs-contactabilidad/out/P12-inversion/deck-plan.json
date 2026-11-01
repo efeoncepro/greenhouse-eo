@@ -1,0 +1,140 @@
+{
+  "tenderId": "P12-inversion",
+  "slides": [
+    {
+      "slideId": "deck-content-pricing",
+      "contentType": "deck.content-pricing",
+      "slots": {
+        "frame": {
+          "line": "revenue-salesforce",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "bodyTop": 560,
+          "bodyPx": 25,
+          "bodyWidth": 470,
+          "legalTop": "--gl-pt-legal-top=880px",
+          "legalPx": "--gl-pt-legal-px=17px",
+          "plansLeft": "--gl-pt-plans-left=760px",
+          "plansTop": "--gl-pt-plans-top=250px",
+          "planWidth": "--gl-pt-plan-width=320px",
+          "planHeight": "--gl-pt-plan-height=640px",
+          "planGap": "--gl-pt-plan-gap=30px",
+          "planRadius": "--gl-pt-plan-radius=18px",
+          "liftPx": "--gl-pt-lift=50px",
+          "extraHeight": "--gl-pt-extra-height=100px",
+          "shadowY": "--gl-pt-shadow-y=40px",
+          "shadowBlur": "--gl-pt-shadow-blur=90px",
+          "shadowOpacity": "--gl-pt-shadow-opacity=45%",
+          "labelColor": "--gl-pt-label-color=#023c70",
+          "padY": "--gl-pt-pad-y=34px",
+          "padX": "--gl-pt-pad-x=32px",
+          "recPadY": "--gl-pt-rec-pad-y=40px",
+          "namePx": "--gl-pt-name-px=52px",
+          "recNamePx": "--gl-pt-rec-name-px=64px",
+          "taglinePx": "--gl-pt-tagline-px=21px",
+          "taglineGap": "--gl-pt-tagline-gap=10px",
+          "amountPx": "--gl-pt-amount-px=36px",
+          "recAmountPx": "--gl-pt-rec-amount-px=44px",
+          "amountGap": "--gl-pt-amount-gap=28px",
+          "recAmountGap": "--gl-pt-rec-amount-gap=34px",
+          "periodPx": "--gl-pt-period-px=17px",
+          "periodGap": "--gl-pt-period-gap=4px",
+          "featurePx": "--gl-pt-feature-px=20px",
+          "featurePad": "--gl-pt-feature-pad=13px",
+          "featureRule": "--gl-pt-feature-rule=1.5px",
+          "featuresGap": "--gl-pt-features-gap=26px",
+          "recFeaturesGap": "--gl-pt-rec-features-gap=30px",
+          "labelPx": "--gl-pt-label-px=15px",
+          "labelGap": "--gl-pt-label-gap=14px",
+          "recommended": "1"
+        },
+        "voice": {
+          "question": "¿Cómo se invierte?",
+          "answer": "etapas",
+          "eyebrow": "Inversión",
+          "answerLead": "Por"
+        },
+        "body": "Cada etapa se cotiza por separado y se avanza a la siguiente solo si la anterior cumplió.",
+        "legal": "Valores netos, IVA no incluido. Licencias de Aircall y consumo de WhatsApp, aparte.",
+        "plans": [
+          {
+            "label": "Recomendado",
+            "name": "Piloto",
+            "tagline": "Etapas 0 a 2",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Diagnóstico y procesos"
+              },
+              {
+                "text": "Correo, llamadas y WhatsApp"
+              },
+              {
+                "text": "Panel del piloto"
+              },
+              {
+                "text": "Capacitación por rol"
+              }
+            ]
+          },
+          {
+            "name": "Conexión",
+            "tagline": "Etapa 3, con la región",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Conector de Aircall"
+              },
+              {
+                "text": "Integración de WhatsApp"
+              },
+              {
+                "text": "Registro en Salesforce"
+              },
+              {
+                "text": "Pruebas con la región"
+              }
+            ]
+          },
+          {
+            "name": "Operación",
+            "tagline": "Etapa 4, mensual",
+            "amount": "[MONTO]",
+            "period": "neto + IVA",
+            "features": [
+              {
+                "text": "Panel e informe mensual"
+              },
+              {
+                "text": "Soporte a usuarios"
+              },
+              {
+                "text": "Altas de nuevos equipos"
+              },
+              {
+                "text": "Mejora continua"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "label": "SGS",
+          "anchor": "top-end",
+          "participantKind": "role",
+          "scale": 1.2,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "ContentPricing"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+- link "Ir al contenido":
+  - /url: "#main-content"
+- complementary "Demostración":
+  - text: Demostración
+  - navigation "Vistas de demostración":
+    - link "Cliente":
+      - /url: /demo
+    - link "Operador":
+      - /url: /demo/workspace?persona=operator
+    - link "Administrador":
+      - /url: /demo/workspace?persona=administrator
+- banner:
+  - link "Efeonce Rooms":
+    - /url: /demo
+    - img "Efeonce Rooms"
+  - text: Cliente
+- main:
+  - paragraph: Nómada × Efeonce
+  - heading "Menos prisa. Más camino." [level=1]
+  - paragraph: Una idea de marca. Tres formas de vivirla. Una historia que también se puede encontrar.
+  - button "Explorar propuesta"
+  - text: Edición 01 Pieza de demostración
+  - img "Menos prisa. Más camino.. Tu próxima historia empieza afuera."
+  - text: El comienzo
+  - button "Abrir pieza"
+  - text: Una propuesta, todo el contexto Creatividad + SEO / AEO
+  - region "De la idea a la evidencia":
+    - paragraph: Propuesta de marca y crecimiento
+    - heading "De la idea a la evidencia" [level=2]
+    - paragraph: Una propuesta se entiende mejor cuando puedes mirar el trabajo y también las decisiones que lo sostienen.
+    - tablist "Explorar la propuesta":
+      - tab "01 · Concepto creativo"
+      - tab "02 · Contenido SEO/AEO"
+      - tab "03 · Plan de trabajo" [selected]
+    - tabpanel "03 · Plan de trabajo":
+      - region "Una ruta para ponerlo en marcha.":
+        - paragraph: Siguientes pasos
+        - heading "Una ruta para ponerlo en marcha." [level=3]
+        - paragraph: Cada etapa conecta una entrega con una forma de evaluarla. Este plan es una propuesta de trabajo; todavía no se ha ejecutado.
+        - list:
+          - listitem:
+            - text: 01 Propuesto
+            - heading "Entender el punto de partida" [level=4]
+            - paragraph: Acordar audiencia, preguntas prioritarias y alcance con el equipo de la marca.
+            - term: Entrega
+            - definition: Brief compartido y mapa de oportunidades
+            - term: Cómo se evaluaría
+            - definition: "Baseline pendiente: requiere fuentes autorizadas de una marca real."
+          - listitem:
+            - text: 02 Propuesto
+            - heading "Construir una historia coherente" [level=4]
+            - paragraph: Desarrollar el concepto, sus adaptaciones y una muestra editorial con decisiones trazables.
+            - term: Entrega
+            - definition: Piezas por formato, artículo y radiografía
+            - term: Cómo se evaluaría
+            - definition: Revisión de claridad, fidelidad y cobertura del inventario.
+          - listitem:
+            - text: 03 Propuesto
+            - heading "Publicar, observar y aprender" [level=4]
+            - paragraph: Definir responsables, canales y una cadencia de revisión antes de activar contenido.
+            - term: Entrega
+            - definition: Plan de publicación y medición acordado
+            - term: Cómo se evaluaría
+            - definition: Sin resultados medidos. Indicadores y fuentes por acordar.
+  - paragraph: Efeonce Rooms
+  - heading "Todo el trabajo. Una conversación." [level=2]
+  - paragraph: Explora la propuesta a tu ritmo y vuelve a cada pieza con su contexto.
+  - link "Volver al inicio":
+    - /url: "#main-content"
+  - paragraph: Muestra sintética · Sin datos de clientes ni resultados comerciales medidos.
+- alert

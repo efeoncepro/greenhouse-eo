@@ -7,7 +7,8 @@
 > («Marketing con Manzanitas · Línea v1», https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG; los tableros `Grafico-*` y
 > `Texto-*` se leyeron en su fuente, con la lógica `renderVals()` de cada lámina) · inventarios de hechos de las sesiones
 > del 2026-09-28 y del 2026-09-29 · [ledger.md](ledger.md) (filas del 2026-09-28 y del 2026-09-29) ·
-> [criteria.md](criteria.md) §3.4 y §8.
+> [criteria.md](criteria.md) §3.4 y §8. · **Delta 2026-10-24:** §4.5 (las tres imágenes de un artículo nuevo del blog) y
+> §14 alineados con el [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) v1.4, medido en vivo ese día.
 >
 > **Estado: APROBADO por el operador (2026-09-28)** sobre la versión 39 del canvas: «Me encantan, queda aprobada toda
 > la línea gráfica». Cubre los formatos Pizarra, Escena, Lente y Recreo; la cabecera y la firma; la contraportada A;
@@ -223,6 +224,54 @@ toma **para** la lente: la cara y el objeto caben en el círculo fijo del format
   extensión (decidido el 2026-09-29; §7).
 - **Blog y banner:** la foto se genera en 16:9 y se lleva a 1,9:1 (1200 × 630). La voz va en el lado oscuro; la firma
   puede ir abajo a la izquierda, cerrando la columna del texto. Sin eslogan.
+- **Portada de artículo del blog: variante centrada** (operador, 2026-10-24; norma §5.6). La destacada también se ve
+  recortada en cuadrado, y ese recorte toma el centro (x 285–915 de 1200): la vista previa compacta de WhatsApp, la
+  miniatura de iMessage, Slack, Teams o Telegram, y «Te puede interesar», los relacionados al pie de cada artículo
+  (cuadrado de 339 × 339; 326 × 326 en el teléfono). El archivo v3 del blog es una lista de texto y no la muestra. Por
+  eso:
+  - cabecera, voz y respuesta en **x 312**, dentro de la columna x 312–782 e y 50–341; nada importante en los 15 px de
+    arriba y de abajo (la tarjeta grande de X, 2:1, puede cortarlos);
+  - la cara en **x 795–900**, dentro del borde del cuadrado; en el plate, x 68–75 % · y 10–40 %, pedida en torno al
+    85 % porque el modelo la corre unos 15 puntos al centro, con el 64 % izquierdo en oscuridad calma;
+  - **sin bajada y sin firma**: la cabecera identifica la pieza y la prenda ya lleva la marca, así que el logo sobra
+    (el banner que sale del sitio sí firma);
+  - la foto 16:9 se recorta a 1,9:1 quitando la parte de arriba, para que el lecho quede entero;
+  - se entrega en 2400 × 1260, JPEG calidad 88 con croma 4:4:4 y **menos de 300 KB**.
+  - **Delta 2026-10-25 (operador):** la portada **no exige pregunta y respuesta**: conserva el anillo arriba y la
+    esfera al cerrar el dominante, y la línea de arriba es pregunta sólo si el lector la tiene de verdad. Sin par, va el
+    anillo con un texto arriba y el destacado con la esfera abajo: una idea completa, nunca un fragmento tipo «A pocas.»
+    o «Pasajes.». La persona va cuando porta la idea; si un objeto o el
+    fenómeno cuentan mejor el tema, va sin persona (norma §5.6, delta 2026-10-25).
+
+  **Un artículo nuevo lleva tres imágenes y tres subidas.** Entra solo al slider de `/blog/` y, si se lee en 12
+  minutos o más, al rail «Para leer con calma»; los dos pintan su propio texto encima, así que la portada no les sirve:
+  1. **plate** (PNG 16:9, 2560 × 1440, sin texto) → imagen de la tarjeta del rail, con punto focal (metas
+     `_eo_card_image` / `_eo_card_focus`; TASK-2051, en producción desde el 2026-10-24, editorial-blocks 0.4.5). La
+     tarjeta mide 440 × 600 (tablet 361 × 492, teléfono 304 × 540); con el foco «84% 30%» deja ver x 49–91 % del plate
+     (57–89 % en el teléfono), con la etiqueta y la flecha arriba (y 5–8 %), el degradado desde y 36 % (sólido bajo
+     y 70 %) y el título desde y 64 %. Comando:
+     `pnpm public-website:blog-home card <post> --image <plate> --alt "<texto>" --focus "84% 30%"` (plan sin
+     `--apply`; ledger y readback; falla si la destacada cambió); revisa con
+     `node scripts/public-website/blog-v3/preview/serve.cjs --rail <cards.json>`. Nunca cambies la destacada para
+     arreglar el rail;
+  2. **portada** (esta variante) → destacada e imagen Open Graph;
+  3. **imagen del slider** (WebP 2:1, 2400 × 1200, recortada del plate, sin texto) → `hero`
+     (`blog-home hero <post> --image <archivo.webp> --alt "…"`). Se ve x 42–96 % · y 7–93 % en todos los anchos (el
+     teléfono muestra sólo la parte derecha, x 42–100 %, con el título debajo); en escritorio el título tapa
+     x 29–65 % · y 31–61 %, «Siguiente» x 75–92 % · y 68–77 % y la tira desde y 86 %. La cara va en x 68–92 % ·
+     y 10–64 %. La miniatura «Siguiente» (96 × 64) usa esta imagen cuando existe.
+
+  El operador aprueba viendo juntas la portada, su recorte cuadrado, la imagen del slider y la tarjeta (1440 y 390).
+  `og:image:alt` y `twitter:image:alt` salen del `alt` de la portada desde editorial-blocks 0.4.6 (en producción desde
+  el 2026-10-24). Márgenes por superficie y
+  diagramas: [inventario de imágenes por artículo](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+
+  **La portada está pendiente en AXIS:** todavía no es una pieza de `manzanitasRegister` ni la conoce la plantilla
+  `blog-banner`. Hoy
+  se compone con la maqueta `ai-generations/2026-10-24_portadas-blog/composicion/componer-centrada.cjs` y `FIRMA=0`.
+  Nunca la presentes como pieza de AXIS ni muevas sus posiciones a mano en otra copia. Paso a paso, zonas seguras por
+  superficie, subida con guardas (`scripts/public-website/blog-post-cover-apply.php`) y QA:
+  [manual](../../../../docs/manual-de-uso/creative/producir-portada-de-articulo-del-blog.md).
 
 ### 4.6 YouTube y pódcast
 
@@ -888,6 +937,34 @@ manda la regla.
 - [ ] Ninguna foto sintética ni ningún ejemplo versionado en una pieza para publicar; la procedencia
       (`<artifactId>.provenance.json`) acompaña la entrega.
 
+## 12b. Infografías de cuerpo del blog y fórmula de portadas (operador, 2026-10-25)
+
+- Pie de la infografía de cuerpo: fuente a la izquierda; **logo y burbuja `efeoncepro.com` a la derecha** (se comparten
+  solas). Rótulo de figura discreto en vez de encabezado. Elementos de interfaz (tarjeta, píldoras, baldosas) sí.
+  Bricolage en frases largas con contraste de pesos (400 + 760). Detalle y caso: [ledger.md](ledger.md) 2026-10-25.
+- **Portadas:** no repetir la fórmula «persona tras una mesa con tarjetas de vidrio»; la próxima propone otra idea.
+- **Método de construcción (tres casos: ICP y AEO el 2026-10-25, marketing de contenidos el 2026-10-26).** Un script
+  versionado por pieza; referencia vigente:
+  `ai-generations/2026-10-26_marketing-contenidos-leads/infografia/build.mjs` (copiarlo y adaptarlo, no partir de cero).
+  - Valores de La órbita desde `@efeoncepro/axis-tokens` (`efeonceGraphicLine`), la órbita con `orbitSvg` y los íconos
+    con `resolveIcon` de `@efeoncepro/axis-graphic-line`: ningún HEX, px ni trazo transcrito a mano.
+  - Texto **medido y contorneado con fontkit** (Poppins y Bricolage Grotesque; el peso de la idea clave sale de
+    `GL.type.answer.weight`) en `delivery/`; **texto vivo** en `source/` para editar. Pie con fuente, logo y burbuja URL.
+  - `preview.mjs` rinde los PNG con Playwright para revisar a tamaño real.
+  - **La línea de servicio sigue a la portada del artículo** (en marketing de contenidos, `brand`: acento `#bb1954` en
+    claro y `#ff6500` en oscuro), y con ella la voz de los íconos.
+  - **Cuatro variantes:** escritorio de 1600 de ancho y teléfono de 900 de ancho, en claro y en oscuro. **En el blog
+    sólo se publican las claras** (el sitio no sigue el modo oscuro del sistema; decisión del 2026-10-25 en el ICP);
+    las oscuras se construyen igual.
+  - **El build mide y falla** (resultado en `build-report.json`): texto fuera del lienzo o sobre el pie, texto que cruza
+    la órbita (`textCrossesRing`) y **texto encimado** (intersección de cajas entre textos protegidos). La tercera
+    comprobación nació el 2026-10-26: el canal de la última fila quedaba encimado sobre su texto y nada lo detectaba;
+    se corrigió llevando los canales a una pastilla junto al nombre. Una infografía sin esa medición no se entrega.
+  - Íconos del grupo en **una sola voz**: `auditIconGroup` corta con `mixed-voices` si se mezclan Trazo y Plastilina
+    (inventario por voz y formatos de contenido resueltos: [iconography.md](iconography.md) §0). Si el concepto no
+    tiene glifo en la voz de la pieza, se dibuja la forma al trazo con el mismo grosor relativo y la tinta del tema, sin
+    esfera propia (caso: el foco «idea» como cubo isométrico, que además retoma el cubo de la portada).
+
 ## 13. Pendientes del operador (no los decidas por tu cuenta)
 
 **Estado al 2026-09-29, tarde: no queda ninguna abierta** (`manzanitasRegister.pendingDecisions: []`). El operador
@@ -922,6 +999,15 @@ el acento; §10.1). Los carruseles de ejemplo del Composer y las identidades del
 
 ## 14. Lecciones de esta sesión (no las repitas)
 
+- **Una portada no sirve para todas las superficies** (2026-10-24). El slider y la tarjeta del rail pintan su propio
+  texto encima: si les das la portada con texto, chocan dos textos y la cara queda fuera. Cada superficie que pone
+  texto lleva una imagen sin texto (el plate o su recorte), y la portada queda para la destacada y Open Graph.
+- **Los márgenes se miden en vivo, no se recuerdan** (2026-10-24). La tarjeta del rail dejó de ser 4:3 de un día para
+  otro; los números de §4.5 valen para la portada del blog v3 y las cards v2. Si cambian, vuelve a medir antes de
+  producir ([inventario](../../../../docs/operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md)).
+- **Un banner pensado para el ancho completo pierde el texto en el recorte cuadrado** (2026-10-24). Antes de entregar
+  una imagen destacada, mira su recorte central: el banner en x 72 perdía la manzana, la voz y la firma. Y no firmes
+  por costumbre: si la cabecera y la prenda ya dicen la marca, el logo sobra (el operador lo pidió sacar).
 - **La manzana completa y legible.** Un recorte de sólo hoja + tallo se leyó como «orejas de conejo». Puede sangrar un
   borde, pero los dos lóbulos, la hendidura, la hoja y el tallo tienen que leerse.
 - **El acento nunca es superficie.** La contraportada C (acento a sangre) se rechazó por saturación y porque el logo

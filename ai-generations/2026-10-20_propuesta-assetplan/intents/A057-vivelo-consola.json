@@ -16,7 +16,7 @@
       "mes"
     ]
   },
-  "body": "Cada mes revisamos contigo **solicitudes**, horas y prioridades en una reunión por Teams.",
+  "body": "Cada semana nos reunimos contigo y cada mes revisamos **solicitudes**, horas y prioridades.",
   "console": {
     "icon": "data",
     "title": "Operación HubSpot · este mes",
@@ -29,9 +29,9 @@
         "detail": "del canal comercial"
       },
       {
-        "value": "21 h",
+        "value": "26 h",
         "label": "De la bolsa",
-        "detail": "de 25 horas"
+        "detail": "de 30 horas"
       },
       {
         "value": "3",
@@ -62,7 +62,7 @@
       }
     ],
     "review": {
-      "kicker": "Revisión mensual · Teams",
+      "kicker": "Revisión mensual · presencial o Meet",
       "title": "Consumo, avances y prioridades del próximo mes",
       "cta": "Ver agenda"
     }

@@ -33,6 +33,7 @@ export type OAuthHandlerDeps = {
   loadKeys: () => Promise<readonly SigningKeyRecord[]>
   cimd: ClientResolverDeps['cimd']
   now?: () => Date
+  firstParty?: (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
 }
 
 export type OAuthHandler = (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
@@ -94,6 +95,10 @@ export const createOAuthHandler = (deps: OAuthHandlerDeps): OAuthHandler => {
     if (!isOAuthPath(path)) return null
 
     if (!deps.config.oauthEnabled) return jsonResponse(404, { error: 'not_found' })
+
+    const firstParty = await deps.firstParty?.(request)
+
+    if (firstParty) return firstParty
 
     switch (path) {
       case OAUTH_ENDPOINT_PATHS.authorizationServerMetadata:

@@ -1,0 +1,144 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f740e95e690b",
+  "key": "f740e95e690be7a8910d7b65bb6f44148b8b28632aae77a7d4a9e653a7c8bff4",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:34:39.685Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-v3/07-antonio-pregunta.png",
+    "imageSha256": "69e10496516901fbb412eb8843a6c967350acf347f4631ab2a04229f186c5419",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/fix4/m/07.png",
+    "maskSha256": "3c96479bc1a1b79d22dea8123d79bf0bdb021cff56de41499912c7eb9a512418",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+        "sha256": "4ca4aec0dbc487f2ec71656dd28f94eae61a646637f6719bb3631e73054f9cf8"
+      },
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/continuidad/ref-vaso-paula.png",
+        "sha256": "06beb4bec2815b989f096da0fef98e2186a80defa7d11e991c70418f9408b92e"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked zone. Foreground left, out of focus and seen from behind (over-the-shoulder): the woman from image 2 — her shoulder-length straight dark brown hair, slim gold-rimmed reading glasses pushed up on top of her head, and the shoulder of her cream fine-knit sweater with a white shirt collar; same blur and depth of field as the original foreground. On the table in front of her, instead of the mug: her kraft paper coffee cup with a matte black lid (image 3). Keep the man, his laptop, the table and everything outside the zone unchanged. Photorealistic.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is a reference of the object or element to bring into image 1; match its look, shape and material.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nReplace only the marked zone. Foreground left, out of focus and seen from behind (over-the-shoulder): the woman from image 2 — her shoulder-length straight dark brown hair, slim gold-rimmed reading glasses pushed up on top of her head, and the shoulder of her cream fine-knit sweater with a white shirt collar; same blur and depth of field as the original foreground. On the table in front of her, instead of the mug: her kraft paper coffee cup with a matte black lid (image 3). Keep the man, his laptop, the table and everything outside the zone unchanged. Photorealistic.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.19917449951171876,
+    "editable": 239378,
+    "soft": 21684,
+    "protected": 1049658
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0453,
+    "basis": "1 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 91.708,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.59,
+        "bestError": 7.59,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1049658,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 239378,
+        "maxDelta": 187,
+        "meanDelta": 97.248,
+        "worst": {
+          "x": 399,
+          "y": 985
+        }
+      },
+      "seam": {
+        "pixels": 21684,
+        "maxDelta": 169,
+        "meanDelta": 30.544,
+        "worst": {
+          "x": 439,
+          "y": 1018
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1049658,
+        "maxDelta": 209,
+        "meanDelta": 12.994,
+        "worst": {
+          "x": 124,
+          "y": 709
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 3327,
+        "input_tokens_details": {
+          "image_tokens": 3037,
+          "text_tokens": 290
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 4837
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

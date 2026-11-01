@@ -101,6 +101,11 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'EO Portfolio plugin (TASK-2047)',
+    remotePath: 'wp-content/plugins/eo-portfolio',
+    required: false
+  },
+  {
     label: 'Efeonce editorial blocks + blog home content model (TASK-1337, TASK-2050)',
     remotePath: 'wp-content/plugins/efeonce-editorial-blocks',
     required: false

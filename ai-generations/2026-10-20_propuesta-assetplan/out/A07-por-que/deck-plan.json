@@ -1,0 +1,41 @@
+{
+  "tenderId": "A07-por-que",
+  "slides": [
+    {
+      "slideId": "deck-section-cine",
+      "contentType": "deck.section-cine",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 118,
+          "questionTop": 515,
+          "answerTop": 630,
+          "answerPx": 130,
+          "eyebrowPx": "--gl-sec-eyebrow-px=18px",
+          "eyebrowWght": "--gl-sec-eyebrow-wght=500",
+          "eyebrowTracking": "--gl-sec-eyebrow-tracking=0.22em",
+          "eyebrowColor": "--gl-sec-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-sec-question-px=36px",
+          "questionLeading": "--gl-sec-question-leading=1.2",
+          "questionColor": "--gl-sec-question-color=#f4f6f8",
+          "answerLeading": "--gl-sec-answer-leading=0.95",
+          "answerTracking": "--gl-sec-answer-tracking=-0.04em",
+          "answerInset": "--gl-sec-answer-inset=-4px",
+          "questionWidth": "--gl-sc-question-width=400px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:BR2b-portada-equipo-isotipo",
+          "alt": "Nexa al frente del equipo de Efeonce con sus uniformes y cinco agentes mini robots, todos mirando a cámara"
+        },
+        "voice": {
+          "question": "¿Quién atiende mis solicitudes?",
+          "answer": "Expertos",
+          "eyebrow": "Quién te acompaña"
+        },
+        "body": "Un <strong>equipo asignado</strong>: dirección de cuenta, un Especialista de CRM fijo desde el inicio y especialistas en desarrollo y datos."
+      },
+      "template": "SectionCine"
+    }
+  ]
+}

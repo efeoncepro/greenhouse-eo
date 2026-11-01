@@ -1,5 +1,12 @@
 # TASK-2053 — Growth Forms: contrato de formulario en línea, reserva por evento y conteo de reservas
 
+## Delta 2026-10-24
+
+- Las tarjetas v2 de «Para leer con calma» (TASK-2051, en producción) ya tienen diseñadas las insignias «Últimos
+  cupos» y «Lista de espera» de la tarjeta del webinar, pero no se encienden: esperan un estado público de cupos de
+  esta task. Se enchufa por el filtro de WordPress `eo_home_rail_signals` (`event:<id>` → `seats` / `wait`); nada más
+  las enciende y nunca se escriben a mano.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En producción desde el release 40b330175855 (2026-10-24): contrato inline_pill + consentBy submission con hash del aviso; formulario de Glitch publicado (fver-e6850cc8) y en uso en /blog/; formulario de reserva por evento sin publicar hasta que exista un evento real; falta un envío real de verificación`
+- Status real: `En producción desde el release 40b330175855 (2026-10-24): contrato inline_pill + consentBy submission con hash del aviso; formulario de Glitch publicado (fver-e6850cc8) y en uso en /blog/; correos de reserva desplegados en el release e593e3993bc3 (flag ON en ops-worker) pero sin enviar: la prueba de punta a punta con prueba-e2e-eventos-2026-10-24 destapó que consumer y recordatorio exigían status accepted y el envío ya estaba en delivered; corrección local sin release; integración HubSpot Marketing Events en diseño (RESEARCH-013) antes del próximo release; sin eventos reales hasta entonces; falta un envío real de verificación de Glitch`
 - Rank: `TBD`
 - Domain: `growth|forms|public-site`
 - Blocked by: `none`
@@ -54,6 +61,24 @@ asset (`src/app/api/public/growth/forms/**`): no existe forma gobernada de obten
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-10-24
+
+- **Plataforma decidida: webinar de Teams** (app Eventos, tenant M365 Business), no reunión normal. Greenhouse sigue
+  siendo dueño de la reserva, el cupo y la lista de espera; la espera no se registra en HubSpot.
+- **El conector nativo Teams↔HubSpot está roto:** HubSpot no lee ningún webinar del tenant y Eventos de marketing
+  sigue en 0. Caso abierto con soporte (ticket #50018204746, derivado a agente humano). Diagnóstico:
+  [anexo C](../../research/RESEARCH-013-annexes/C-teams-hubspot-sync-diagnosis.md).
+- **Diseño con Greenhouse como dueño de la inscripción:**
+  [anexo D](../../research/RESEARCH-013-annexes/D-greenhouse-owned-events-discovery.md) (inscripción en el webinar por
+  Graph con app de Entra dedicada, `joinWebUrl` personal, ledger de transiciones, asistencia por informe del webinar,
+  Eventos de marketing con una sola fuente por evento). Diseño, no implementado; sale en tasks `backend-data` nuevas,
+  no en esta.
+- **Pendiente canónico del módulo de eventos:**
+  [RESEARCH-013 §Backlog canónico](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos).
+- **Correcciones solo en local, sin release:** correos de reserva (`2a971d768`, `ACCEPTED_SUBMISSION_STATUSES`) y
+  píldora (`a5b028461`). El operador decidió no hacer release por ahora; hasta entonces los correos no salen en
+  producción.
 
 ## Architecture Alignment
 
@@ -268,7 +293,7 @@ Los textos por defecto de la presentación en línea vienen del canvas: Glitch �
 - [x] Consentimiento por el acto de suscribirse (aprobado por el operador el 2026-10-24): el submit guarda `notice_text_hash` del `inlinePill.note`, el adaptador HubSpot suscribe con `consentBy: 'submission'` sólo si el hash existe y una entrada con `consentBy` y `checkboxKey` falla con `invalid_communications_mapping` sin POST. — `src/lib/growth/forms/__tests__/inline-pill-notice-hash.test.ts` + 3 casos en `destinations/hubspot/__tests__/adapter.test.ts`; en producción desde el release `40b330175855`.
 - [ ] Envío real de verificación de la suscripción a Glitch con el contacto suscrito al tipo `535702717` en HubSpot. — pendiente: el envío desde el navegador automatizado de Claude no salió porque Turnstile lo rechazó (sin token, sin `POST /submit`); no se eludió. Falta que una persona se suscriba.
 - [x] Un formulario de evento rechaza envíos sobre el cupo o los pasa a lista de espera según su política. — `event-registration.test.ts` + verificación SQL en PostgreSQL 16 local.
-- [ ] Formulario de reserva de un evento publicado y probado con un envío y el conteo actualizado. — pendiente: no hay un evento real cargado (la portada oculta la sección de eventos); el ejemplo `webinar-aeo-2026-11-12.json` no se publicó.
+- [ ] Formulario de reserva de un evento publicado y probado con un envío y el conteo actualizado. — pendiente: no hay un evento real cargado (la portada oculta la sección de eventos); el ejemplo `webinar-aeo-2026-11-12.json` no se publicó. Prueba del 2026-10-24 con el formulario `prueba-e2e-eventos-2026-10-24` (sin WordPress): 2 reservas (confirmada + en espera) y HubSpot 200, pero los correos no salieron (filtro `status='accepted'` contra envíos ya `delivered`); corrección local sin release. Sin eventos reales hasta diseñar la integración con HubSpot Marketing Events (RESEARCH-013).
 - [x] La ruta del conteo responde sin PII, redondeado, con umbral, caché y rate limit. — `registrations-count.test.ts` + `registrations-count-route.test.ts`.
 
 ## Verification

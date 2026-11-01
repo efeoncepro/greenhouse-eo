@@ -1,0 +1,1726 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "efeonce-mattis-caso-de-negocio-2026-10-23",
+  "input": {
+    "artifactId": "efeonce-mattis-caso-de-negocio-2026-10-23",
+    "slides": [
+      {
+        "slideId": "portada",
+        "contentType": "report-cover-light",
+        "slots": {
+          "editionLabel": "Estrategia · Mattis · Octubre 2026",
+          "productLabel": "Estrategia",
+          "scopeLabel": "Sobre este documento",
+          "scopeLines": [
+            "Caso de negocio preliminar para decisión interna.",
+            "Evidencia pública, alcance del RFP y propuesta de trabajo.",
+            "Horizonte estimado: 12 meses. Sin precio ni retorno aprobado."
+          ],
+          "eyebrow": "Confidencial · Uso interno",
+          "reportTitle": "Mattis: marca y comercialización",
+          "reportSubtitle": "Caso de negocio preliminar para un proyecto inmobiliario y su programa de 12 meses.",
+          "preparedFor": {
+            "label": "Cuenta analizada",
+            "logo": "asset-ref:org-logo:mattis"
+          },
+          "confidentialityLine": "Confidencial · Uso interno · Versión 1 · 23 de octubre de 2026"
+        }
+      },
+      {
+        "slideId": "indice",
+        "contentType": "report-index",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Contenido",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Contenido",
+          "title": "Lectura para decidir",
+          "titleColumn": "Sección",
+          "pageColumn": "Página",
+          "entries": [
+            {
+              "mark": "01",
+              "title": "Decisión y alcance del caso",
+              "folio": "03"
+            },
+            {
+              "mark": "02",
+              "title": "Empresa y evidencia",
+              "folio": "04"
+            },
+            {
+              "mark": "03",
+              "title": "Marca y proyectos públicos",
+              "folio": "05"
+            },
+            {
+              "mark": "04",
+              "title": "Destino y consistencia",
+              "folio": "06"
+            },
+            {
+              "mark": "05",
+              "title": "Mercado y referentes",
+              "folio": "07"
+            },
+            {
+              "mark": "06",
+              "title": "Problema y teoría de valor",
+              "folio": "08"
+            },
+            {
+              "mark": "07",
+              "title": "Programa de doce meses",
+              "folio": "09"
+            },
+            {
+              "mark": "08",
+              "title": "Instalación y aceptación",
+              "folio": "10"
+            },
+            {
+              "mark": "09",
+              "title": "Base de producción propuesta",
+              "folio": "11"
+            },
+            {
+              "mark": "10",
+              "title": "Alcance y límites",
+              "folio": "12"
+            },
+            {
+              "mark": "11",
+              "title": "Gobierno y primer valor",
+              "folio": "13"
+            },
+            {
+              "mark": "12",
+              "title": "Medición y evidencia de valor",
+              "folio": "14"
+            },
+            {
+              "mark": "13",
+              "title": "Economía y decisión de inversión",
+              "folio": "15"
+            },
+            {
+              "mark": "14",
+              "title": "Riesgos y condiciones",
+              "folio": "16"
+            },
+            {
+              "mark": "15",
+              "title": "Decisiones antes de cotizar",
+              "folio": "17"
+            },
+            {
+              "mark": "16",
+              "title": "Fuentes primarias del caso",
+              "folio": "18"
+            },
+            {
+              "mark": "17",
+              "title": "Mercado, método y límites",
+              "folio": "19"
+            }
+          ],
+          "folio": {
+            "page": "02",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "resumen",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Decisión y alcance del caso",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Decisión y alcance del caso",
+          "assertion": "Preparar un programa de marca y producción para un proyecto definido.",
+          "lead": "Caso preliminar para Efeonce. La necesidad de apoyo existe en el RFP; producto, alcance final, capacidad y economía todavía requieren confirmación.",
+          "paragraphs": [
+            "Mattis declara que su equipo interno no puede atender todo el trabajo del proyecto. El RFP pide identidad, manual, contenidos digitales, audiovisual, material comercial y apoyo de implementación durante 12 meses estimados. No fija presupuesto.",
+            "La propuesta inicial combina definición e instalación en los meses 1–2 con diez ciclos de producción en los meses 3–12. Es una hipótesis de alcance de Efeonce, que se ajustará al proyecto y al calendario confirmado.",
+            "Recomendamos continuar la preparación y resolver cinco definiciones. Presentar depende de elegibilidad, alcance explícito, derechos, capacidad y costo completo aprobados; este caso no fija precio ni promete ventas."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Hay fundamento para preparar. Aún no hay base para un compromiso económico vinculante.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "RFP, Formato C9–C13 y A15. Consulta: 23/10/2026.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "03",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "empresa",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Empresa y evidencia",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Empresa y evidencia",
+          "assertion": "La identidad está corroborada; el proyecto sigue sin identificar.",
+          "lead": "",
+          "paragraphs": [
+            "La política pública vigente identifica Mattis como Compañía de Servicios Inmobiliarios y Empresariales S.A.S., NIT 900.554.998–7, filial de Grupo Réditos. Coincide con la captura de la licitación y el documento del Metro de marzo de 2026.",
+            "El Metro registra una prórroga y cambio de cláusulas del contrato 004327C-21 el 9 de marzo de 2026. Prueba una relación documentada en esa fecha. No prueba su vigencia exacta en octubre ni identifica el nuevo proyecto.",
+            "El sitio actual ofrece recorridos de compra, arriendo, publicación de inmuebles y reformas. Los informes históricos describen también espacios comerciales y Lite Home. Esta amplitud impide asumir una campaña de vivienda nueva."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Mantener separados Mattis, la sociedad contratante, el holding y el proyecto objeto del encargo.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Política Mattis; Metro marzo 2026; sitio actual.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "04",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "marca",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Marca y proyectos públicos",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Marca y proyectos públicos",
+          "assertion": "La marca corporativa ya existe; la identidad del proyecto es la oportunidad.",
+          "lead": "",
+          "paragraphs": [
+            "El logo original de la web contiene descriptor inmobiliario y el lema «Más que tu espacio». Se preservó el PNG transparente de 2.368 × 1.182, además de una variante compacta y recursos institucionales con procedencia.",
+            "Proponemos definir identidad propia del proyecto y su relación aprobada con Mattis y aliados. Naming sólo si se confirma que hace falta. No se atribuyen a Mattis funciones de constructor, desarrollador o garante sin documentación.",
+            "Bajo Puente Balsos y Estación Exposiciones son antecedentes públicos útiles. Ninguna fuente los vincula con esta licitación. Tampoco se usarán ingresos históricos, precios de fichas o imágenes públicas como presupuesto o insumos con licencia automática."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Conocer el activo y sus atributos antes de decidir nombre, promesa, público y endosos.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Mattis: home, Balsos, Exposiciones y logo original.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "05",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "digital",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Destino y consistencia",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Destino y consistencia",
+          "assertion": "Antes de activar la campaña, el recorrido del proyecto debe estar listo.",
+          "lead": "",
+          "paragraphs": [
+            "Mattis ya tiene web, catálogo, fichas, blog y canales sociales vinculados. La investigación no justifica reconstruir ese ecosistema ni incorporar automáticamente web, CRM, SEO o seguridad al alcance creativo.",
+            "El 23 de octubre, la ruta pública de proyectos mostró nombre genérico, texto de relleno y enlaces a #. Contacto devolvió 404; otros canales permanecían publicados. Una ficha tenía discrepancia de área y un enlace de compartir hacia otra propiedad.",
+            "Existe contenido ajeno al inmobiliario en HTML, oculto en el escritorio observado. No se determinó causa, indexación, penalización ni daño económico. La muestra pide revisión del responsable, no permite diagnosticar todo el sitio."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Ficha maestra, URL aprobada y responsable de atención son dependencias del lanzamiento.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Observación HTTP y navegador del 23/10/2026.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "06",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "mercado",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Mercado y referentes",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Mercado y referentes",
+          "assertion": "El diagnóstico de mercado debe corresponder al tipo real de inmueble.",
+          "lead": "",
+          "paragraphs": [
+            "Camacol registra 14.424 ventas de vivienda nueva en Antioquia entre enero y septiembre de 2026 frente a 18.568 en 2025: −22,3 %. Su oferta disponible a septiembre crece 7,6 %. Cobertura regional: 32 municipios; no es demanda del proyecto.",
+            "JLL reporta vacancia de oficinas de Medellín de 4,6 % al cierre de 2025. Oficinas, locales de transporte y vivienda tienen públicos y ventanas diferentes. Ninguna tasa se traslada al activo anónimo del RFP.",
+            "Santa Fe, Villacruz, Alberto Álvarez y Acrecer son comparables exploratorios por intermediación; Bienes & Bienes es aspiracional por desarrollo. Ya muestran rutas por rol, fichas y contacto. No se midieron conversiones, tráfico ni competencia efectiva en esta licitación."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Diferenciar con atributos verificables del proyecto y utilidad comercial; no sólo con presencia digital.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Camacol sep. 2026; JLL cierre 2025; cinco sitios.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "07",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "valor",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Problema y teoría de valor",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Problema y teoría de valor",
+          "assertion": "El valor empieza en capacidad útil y debe llegar al equipo comercial.",
+          "lead": "",
+          "paragraphs": [
+            "Trabajo del cliente: convertir un proyecto y sus hitos en una marca, materiales y producción que su equipo pueda aprobar y utilizar. La saturación interna es declarada por Mattis; retrasos, retrabajo y costos no fueron cuantificados.",
+            "Cadena propuesta: información validada → propuesta de valor e identidad → materiales aprobados → difusión y conversaciones registradas → oportunidades atendidas → negocios. Cada tramo requiere responsables y evidencia propios.",
+            "En vivienda se evalúan necesidades, financiación y confianza; en comercio, usos, condiciones y viabilidad de instalación; en turismo, experiencia y reserva. Son ramas condicionales. La campaña no debe intentar servirlas todas antes de conocer el activo."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Medir primero entrega y adopción; conectar resultados comerciales sólo con trazabilidad y datos.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Problema actual: RFP. Solución y segmentos: hipótesis.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "08",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "programa",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Programa de doce meses",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Programa de doce meses",
+          "assertion": "Una fase de instalación y diez ciclos sostienen un solo proyecto.",
+          "lead": "",
+          "paragraphs": [
+            "Supuesto propuesto: un proyecto, una identidad y un equipo aprobador. Mes 1 define producto, público, atributos, arquitectura de marca y mensajes; hasta dos rutas iniciales permiten elegir una dirección creativa.",
+            "Mes 2 desarrolla identidad, manual, aplicaciones y un kit listo para el hito comercial. El calendario arranca con insumos disponibles y se ajusta al lanzamiento real. Los meses 3–12 contienen diez ciclos de producción y aprendizaje.",
+            "Esta secuencia no agrega una puesta en marcha gratuita a doce meses de operación. Las fases organizan un programa completo de doce meses estimados, sujeto a aprobación, costeo y capacidad real."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La estructura de trabajo la propone Efeonce; Mattis debe confirmar producto, responsabilidades e hitos.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Planificación propia. Duración estimada del RFP.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "09",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "instalacion",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Instalación y aceptación",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Instalación y aceptación",
+          "assertion": "La marca debe quedar aplicada, documentada y lista para usarse.",
+          "lead": "",
+          "paragraphs": [
+            "Mes 1: brief, ficha de verdad, segmentos, mensajes permitidos y arquitectura aprobados. Naming se dimensiona si corresponde. El comprador valida planos, precios, atributos, titularidad y responsables de cada afirmación.",
+            "Mes 2: identidad y manual; hasta ocho aplicaciones acordadas. Un dossier de hasta 12 páginas y una presentación de hasta 15 láminas forman parte de esas ocho. Las seis restantes se fijarán por tipo y complejidad, sin equivalencias ficticias.",
+            "Se entregan plantillas, versiones finales del trabajo propio y registro de derechos. Los materiales de terceros se transfieren sólo según sus licencias. La aceptación exige archivos consistentes y un destino/contacto aprobado por sus responsables."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Ocho aplicaciones en total; no ocho más dossier y presentación.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Alcance propio propuesto; sujeto a definición y costo.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "10",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "produccion",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Base de producción propuesta",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Base de producción propuesta",
+          "assertion": "Ocho maestras y doce adaptaciones por ciclo dan una base dimensionable.",
+          "lead": "",
+          "paragraphs": [
+            "Por ciclo mensual: cuatro gráficas estáticas, dos carruseles de hasta cinco láminas y dos videos de 15–45 segundos editados con material disponible y autorizado. Son ocho piezas maestras.",
+            "Además: hasta doce adaptaciones de formato del material aprobado. No incluyen nuevo concepto, guion, idioma ni contenido sustantivo. Un carrusel puede producir varios archivos: la unidad de entrega no equivale a archivo ni a precio por pieza.",
+            "Diez ciclos suman 80 maestras y 120 adaptaciones. Es una hipótesis comercial para discutir, no cantidad exigida por el RFP ni capacidad comprometida. Cambiar el mix exige revisar esfuerzo, plazos y costo."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "No hay volumen ilimitado. Rodajes, 3D, locución y licencias nuevas deben dimensionarse expresamente.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Propuesta Efeonce: 4 + 2 + 2 = 8; diez ciclos.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "11",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "limites",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Alcance y límites",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Alcance y límites",
+          "assertion": "La responsabilidad creativa debe distinguirse de operación y terceros.",
+          "lead": "",
+          "paragraphs": [
+            "Núcleo: marca del proyecto, manual, material digital/comercial, edición audiovisual y gestión creativa del programa. Hasta dos rondas consolidadas por entregable; corregir errores propios no consume rondas. Un cambio del brief requiere replanificación.",
+            "Publicación, atención de mensajes, pauta, web, CRM y medición técnica requieren confirmar quién opera y qué se compra. La inversión de medios se mantiene separada de honorarios. La existencia de WhatsApp no prueba recepción o seguimiento.",
+            "Rodajes, fotografía, renders, talento, viajes, impresión, instalación y eventos se dimensionan si son necesarios. Antes de comprometer terceros se validan cotizaciones, permisos, derechos, responsabilidades y condiciones."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Los módulos adicionales pueden ser necesarios; deben tener alcance y precio explícitos.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "RFP y matriz de alcance. Sin obligaciones inferidas.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "12",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "gobierno",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Gobierno y primer valor",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Gobierno y primer valor",
+          "assertion": "Un operador y un flujo de aprobación conectan producción con uso.",
+          "lead": "",
+          "paragraphs": [
+            "Mattis debe identificar operador, aprobador de marca/proyecto, sponsor, comprador económico, Compras/Legal/Finanzas y dueño del seguimiento comercial. Son funciones pendientes de confirmar, no personas ni autoridades atribuidas por cargo.",
+            "Efeonce dirige el programa creativo, organiza prioridades, versiones y control de calidad. Primer valor: brief aprobado y kit utilizable en un hito real. Adopción: materiales usados, feedback consolidado y acceso a la versión vigente.",
+            "El RFP CRM de 2025 documenta problemas históricos de coordinación y datos. Una correspondencia acusa recepción de una oferta; no prueba adjudicación ni CRM implementado. Sirve para discovery, no para vender una sustitución tecnológica."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "La continuidad debe dejar archivos y criterios transferibles, además de producción.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Roles propuestos; antecedentes CRM 2025 históricos.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "13",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "medicion",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Medición y evidencia de valor",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Medición y evidencia de valor",
+          "assertion": "Producir, utilizar y vender son resultados distintos.",
+          "lead": "",
+          "paragraphs": [
+            "Capacidad: backlog aceptado y entregas por ciclo. Tiempo: entregas a plazo dividido por entregas cuyo plazo vence en el ciclo. Calidad: aprobación inicial sobre primeras versiones revisadas; registrar las causas del retrabajo.",
+            "Adopción: uso de materiales por el equipo y uso de briefs/plantillas. Las mejoras requieren baseline y método; no se declaran porcentajes de ahorro sin medición previa.",
+            "Resultado comercial, si hay acceso y alcance: contactos únicos elegibles, citas o visitas, oportunidades y negocios netos. Mattis debe registrar etapas y contribución. No hay datos públicos para fijar CAC, ROAS, cierre, ventas incrementales o retorno."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Acordar definiciones y responsables antes de objetivos numéricos de negocio.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Marco propuesto; ninguna métrica privada reconstruida.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "14",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "economia",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Economía y decisión de inversión",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Economía y decisión de inversión",
+          "assertion": "El caso puede ordenar el costo; todavía no puede calcular un retorno.",
+          "lead": "",
+          "paragraphs": [
+            "Para Efeonce: definición e instalación + diez ciclos de producción/gestión + recursos incrementales + derechos + terceros + contingencia + costo financiero/tributario aplicable. Costear con catálogo y políticas vigentes; validar capacidad y margen del trabajo propio.",
+            "Para Mattis: honorarios + medios + producción/terceros + costos internos adicionales + impuestos no recuperables aplicables. Umbral condicional: negocios adicionales necesarios = techo de inversión dividido por contribución incremental neta por negocio.",
+            "La contribución de Mattis puede ser comisión o renta contractual; el precio completo del inmueble no es su ingreso por defecto. Faltan producto, inversión, margen, baseline y atribución. No sumar un mismo beneficio como venta, ahorro y menor vacancia."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "No reutilizar presupuestos CRM, ingresos de 2024 ni precios de otra licitación.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Modelo por variables; sin precio ni retorno aprobado.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "15",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "riesgos",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Riesgos y condiciones",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Riesgos y condiciones",
+          "assertion": "El principal riesgo es comprometer un alcance abierto en un contrato.",
+          "lead": "",
+          "paragraphs": [
+            "El RFP indica que la propuesta y el formato integran la orden o contrato. Cantidades, límites, insumos, cambios y aceptación deben quedar expresos. La matriz técnica vacía y sus listas de ejemplo no permiten marcar cumplimiento genérico.",
+            "Compras debe confirmar participación de sociedad chilena, facturación extranjera y equivalencia documental. También debe aclarar las filas de requisitos y la estructura de campaña. La investigación no certifica elegibilidad legal.",
+            "Pago mostrado: 30 días corridos desde recepción de factura. No implica anticipo ni cobro garantizado. El cierre capturado es 30/10/2026 a las 18:00 sin zona; confirmar fecha efectiva, zona y respuestas del portal antes de presentar."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Alcance, elegibilidad, derechos, capacidad y caja deben estar resueltos antes de comprometer.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Formato A15 y captura del comprador.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "16",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "siguiente",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Decisiones antes de cotizar",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Decisiones antes de cotizar",
+          "assertion": "Cinco respuestas afinan el caso; la propuesta sigue siendo trabajo de Efeonce.",
+          "lead": "",
+          "paragraphs": [
+            "Confirmar brief y calendario; insumos disponibles; responsabilidad de ejecución; audiovisual y presencia local; admisibilidad y matriz documental. Las cinco consultas están preparadas y no fueron enviadas.",
+            "Efeonce debe cerrar entregables, cantidades, secuencia, recursos, revisión, capacidad y costo. El programa aquí descrito permite esa conversación, pero no reemplaza la validación ni la aprobación económica.",
+            "La preparación deja un caso editable, investigación temática, fuentes, capturas y logos originales. No hay propuesta vinculante, publicación, preguntas enviadas ni cambio adicional del negocio en CRM."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Siguiente decisión: confirmar el producto y el alcance para costear una base defendible.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Corte de preparación: 23 de octubre de 2026.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "17",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "fuentes-1",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Fuentes primarias del caso",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Fuentes primarias del caso",
+          "assertion": "La evidencia diferencia documento del comprador, fuente pública y observación.",
+          "lead": "",
+          "paragraphs": [
+            "RFP Agencia Proyecto Inmobiliario, recibido el 23/10/2026: cuatro hojas y anexos completos. Formato C9–C13: necesidad, duración y presupuesto; A15: incorporación a orden/contrato. Captura Wherex: calendario, pago y documentación.",
+            "Mattis: inicio, Nosotros y política de datos personales, consultados el 23/10/2026. La política identifica sociedad y NIT. Dominio: mattisinmobiliaria.com.co. Logo original: /wp-content/uploads/2025/09/logo.png.",
+            "Metro de Medellín: listado de contratos de marzo de 2026, página física 3, contrato 004327C-21. Fuente: metrodemedellin.gov.co/hubfs/proveedores-y-contratistas/consecutivo-contratos-marzo-2026.pdf.",
+            "Grupo Réditos: informe de gestión segundo semestre 2024, páginas 40–42. Es antecedente histórico, no presupuesto. Los informes posteriores indexados no recuperados no se trataron como leídos."
+          ],
+          "pullQuote": {
+            "text": "Fuentes e inventarios completos acompañan el caso editable.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "18",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "fuentes-2",
+        "contentType": "report-narrative",
+        "slots": {
+          "clientName": "Mattis · Uso interno",
+          "runningSection": "Mercado, método y límites",
+          "runningPeriod": "Corte: 23 de octubre de 2026",
+          "footerEdition": "Estrategia · Mattis · Octubre 2026",
+          "footerContact": {
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+            "phone": "+56 9 3732 3064"
+          },
+          "eyebrow": "Mercado, método y límites",
+          "assertion": "El caso es una base de decisión, no una validación de resultados futuros.",
+          "lead": "",
+          "paragraphs": [
+            "Camacol: Tablas de Coyuntura, corte septiembre de 2026; XLSX y extracción conservados. Antioquia: 32 municipios, vivienda nueva. Fuente: camacol.co/descargable/tablas-de-coyuntura-unidades-corte-septiembre-2026.",
+            "JLL: reporte de oficinas Medellín, cierre 2025, publicado 15/04/2026. Fuente: jll.com/en-us/insights/market-dynamics/reporte-oficinas-medellin. El benchmark cualitativo conserva los sitios de cinco referentes; no mide su desempeño.",
+            "Observaciones del sitio Mattis: páginas y captura/DOM fechados el 23/10/2026. Se conservaron rutas, pruebas y límites de las muestras. Los antecedentes CRM de 2025 se leyeron como históricos; respuestas del proponente no son requisitos del comprador.",
+            "No hubo entrevistas, acceso a métricas privadas, prueba de atención o ventas, ni identificación del proyecto anónimo. Fuentes de una misma compañía conservan su sesgo; los supuestos comerciales se rotulan como propuestas y requieren validación."
+          ],
+          "closing": [
+            {
+              "kind": "measure",
+              "label": "Lo que significa",
+              "text": "Confianza alta para lo observado y lo documentado; baja para impacto comercial aún no medido.",
+              "signature": "Lectura de Efeonce"
+            }
+          ],
+          "pullQuote": {
+            "text": "Investigación pública y documental. Corte: 23/10/2026.",
+            "source": "Fuentes y método"
+          },
+          "folio": {
+            "page": "19",
+            "total": "20"
+          }
+        }
+      },
+      {
+        "slideId": "contraportada",
+        "contentType": "report-back-cover",
+        "slots": {
+          "editionLabel": "Estrategia · Mattis · Octubre 2026",
+          "contact": {
+            "email": "sales@efeoncepro.com",
+            "phonePrimary": "+56 9 3732 3064",
+            "phoneSecondary": "+1 (239) 235-2073",
+            "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+          },
+          "marketsLine": "Chile · Estados Unidos · Colombia · México · Perú",
+          "legalLine": "Efeonce Group SpA · RUT 77.357.182-1 · Confidencial · Uso interno · Corte: 23 de octubre de 2026"
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "insights-report",
+    "version": "0.2",
+    "registryHash": "8223faae6aa8ff84571121d6fb61a60484a752b8216a9061238abee3d4b9952d",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "report-cover-light",
+      "slots": {
+        "editionLabel": "Estrategia · Mattis · Octubre 2026",
+        "productLabel": "Estrategia",
+        "scopeLabel": "Sobre este documento",
+        "scopeLines": [
+          "Caso de negocio preliminar para decisión interna.",
+          "Evidencia pública, alcance del RFP y propuesta de trabajo.",
+          "Horizonte estimado: 12 meses. Sin precio ni retorno aprobado."
+        ],
+        "eyebrow": "Confidencial · Uso interno",
+        "reportTitle": "Mattis: marca y comercialización",
+        "reportSubtitle": "Caso de negocio preliminar para un proyecto inmobiliario y su programa de 12 meses.",
+        "preparedFor": {
+          "label": "Cuenta analizada",
+          "logo": "asset-ref:org-logo:mattis"
+        },
+        "confidentialityLine": "Confidencial · Uso interno · Versión 1 · 23 de octubre de 2026"
+      },
+      "template": "ReportCoverLightPage",
+      "contractHash": "8572b7d31558d742ed408af69cd20633c0de2b9581ee71675ce847968e775eaf",
+      "templateHash": "bdc349c07d96850243ce5778b499acbe1827769ce604c0dd65c4ac6d99d267fd"
+    },
+    {
+      "slideId": "indice",
+      "contentType": "report-index",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Contenido",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Contenido",
+        "title": "Lectura para decidir",
+        "titleColumn": "Sección",
+        "pageColumn": "Página",
+        "entries": [
+          {
+            "mark": "01",
+            "title": "Decisión y alcance del caso",
+            "folio": "03"
+          },
+          {
+            "mark": "02",
+            "title": "Empresa y evidencia",
+            "folio": "04"
+          },
+          {
+            "mark": "03",
+            "title": "Marca y proyectos públicos",
+            "folio": "05"
+          },
+          {
+            "mark": "04",
+            "title": "Destino y consistencia",
+            "folio": "06"
+          },
+          {
+            "mark": "05",
+            "title": "Mercado y referentes",
+            "folio": "07"
+          },
+          {
+            "mark": "06",
+            "title": "Problema y teoría de valor",
+            "folio": "08"
+          },
+          {
+            "mark": "07",
+            "title": "Programa de doce meses",
+            "folio": "09"
+          },
+          {
+            "mark": "08",
+            "title": "Instalación y aceptación",
+            "folio": "10"
+          },
+          {
+            "mark": "09",
+            "title": "Base de producción propuesta",
+            "folio": "11"
+          },
+          {
+            "mark": "10",
+            "title": "Alcance y límites",
+            "folio": "12"
+          },
+          {
+            "mark": "11",
+            "title": "Gobierno y primer valor",
+            "folio": "13"
+          },
+          {
+            "mark": "12",
+            "title": "Medición y evidencia de valor",
+            "folio": "14"
+          },
+          {
+            "mark": "13",
+            "title": "Economía y decisión de inversión",
+            "folio": "15"
+          },
+          {
+            "mark": "14",
+            "title": "Riesgos y condiciones",
+            "folio": "16"
+          },
+          {
+            "mark": "15",
+            "title": "Decisiones antes de cotizar",
+            "folio": "17"
+          },
+          {
+            "mark": "16",
+            "title": "Fuentes primarias del caso",
+            "folio": "18"
+          },
+          {
+            "mark": "17",
+            "title": "Mercado, método y límites",
+            "folio": "19"
+          }
+        ],
+        "folio": {
+          "page": "02",
+          "total": "20"
+        }
+      },
+      "template": "ReportIndexPage",
+      "contractHash": "b448f1bf55538cbeaa9a413939cdae42fd617674b9cc3d781f3f425a8ba373fd",
+      "templateHash": "d220ec82cc4cbb79c4adc4cdadcc252a485ddf65349bbe28e48ffc85d6d27b96"
+    },
+    {
+      "slideId": "resumen",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Decisión y alcance del caso",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Decisión y alcance del caso",
+        "assertion": "Preparar un programa de marca y producción para un proyecto definido.",
+        "lead": "Caso preliminar para Efeonce. La necesidad de apoyo existe en el RFP; producto, alcance final, capacidad y economía todavía requieren confirmación.",
+        "paragraphs": [
+          "Mattis declara que su equipo interno no puede atender todo el trabajo del proyecto. El RFP pide identidad, manual, contenidos digitales, audiovisual, material comercial y apoyo de implementación durante 12 meses estimados. No fija presupuesto.",
+          "La propuesta inicial combina definición e instalación en los meses 1–2 con diez ciclos de producción en los meses 3–12. Es una hipótesis de alcance de Efeonce, que se ajustará al proyecto y al calendario confirmado.",
+          "Recomendamos continuar la preparación y resolver cinco definiciones. Presentar depende de elegibilidad, alcance explícito, derechos, capacidad y costo completo aprobados; este caso no fija precio ni promete ventas."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Hay fundamento para preparar. Aún no hay base para un compromiso económico vinculante.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "RFP, Formato C9–C13 y A15. Consulta: 23/10/2026.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "03",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "empresa",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Empresa y evidencia",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Empresa y evidencia",
+        "assertion": "La identidad está corroborada; el proyecto sigue sin identificar.",
+        "lead": "",
+        "paragraphs": [
+          "La política pública vigente identifica Mattis como Compañía de Servicios Inmobiliarios y Empresariales S.A.S., NIT 900.554.998–7, filial de Grupo Réditos. Coincide con la captura de la licitación y el documento del Metro de marzo de 2026.",
+          "El Metro registra una prórroga y cambio de cláusulas del contrato 004327C-21 el 9 de marzo de 2026. Prueba una relación documentada en esa fecha. No prueba su vigencia exacta en octubre ni identifica el nuevo proyecto.",
+          "El sitio actual ofrece recorridos de compra, arriendo, publicación de inmuebles y reformas. Los informes históricos describen también espacios comerciales y Lite Home. Esta amplitud impide asumir una campaña de vivienda nueva."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Mantener separados Mattis, la sociedad contratante, el holding y el proyecto objeto del encargo.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Política Mattis; Metro marzo 2026; sitio actual.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "04",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "marca",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Marca y proyectos públicos",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Marca y proyectos públicos",
+        "assertion": "La marca corporativa ya existe; la identidad del proyecto es la oportunidad.",
+        "lead": "",
+        "paragraphs": [
+          "El logo original de la web contiene descriptor inmobiliario y el lema «Más que tu espacio». Se preservó el PNG transparente de 2.368 × 1.182, además de una variante compacta y recursos institucionales con procedencia.",
+          "Proponemos definir identidad propia del proyecto y su relación aprobada con Mattis y aliados. Naming sólo si se confirma que hace falta. No se atribuyen a Mattis funciones de constructor, desarrollador o garante sin documentación.",
+          "Bajo Puente Balsos y Estación Exposiciones son antecedentes públicos útiles. Ninguna fuente los vincula con esta licitación. Tampoco se usarán ingresos históricos, precios de fichas o imágenes públicas como presupuesto o insumos con licencia automática."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Conocer el activo y sus atributos antes de decidir nombre, promesa, público y endosos.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Mattis: home, Balsos, Exposiciones y logo original.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "05",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "digital",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Destino y consistencia",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Destino y consistencia",
+        "assertion": "Antes de activar la campaña, el recorrido del proyecto debe estar listo.",
+        "lead": "",
+        "paragraphs": [
+          "Mattis ya tiene web, catálogo, fichas, blog y canales sociales vinculados. La investigación no justifica reconstruir ese ecosistema ni incorporar automáticamente web, CRM, SEO o seguridad al alcance creativo.",
+          "El 23 de octubre, la ruta pública de proyectos mostró nombre genérico, texto de relleno y enlaces a #. Contacto devolvió 404; otros canales permanecían publicados. Una ficha tenía discrepancia de área y un enlace de compartir hacia otra propiedad.",
+          "Existe contenido ajeno al inmobiliario en HTML, oculto en el escritorio observado. No se determinó causa, indexación, penalización ni daño económico. La muestra pide revisión del responsable, no permite diagnosticar todo el sitio."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Ficha maestra, URL aprobada y responsable de atención son dependencias del lanzamiento.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Observación HTTP y navegador del 23/10/2026.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "06",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "mercado",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Mercado y referentes",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Mercado y referentes",
+        "assertion": "El diagnóstico de mercado debe corresponder al tipo real de inmueble.",
+        "lead": "",
+        "paragraphs": [
+          "Camacol registra 14.424 ventas de vivienda nueva en Antioquia entre enero y septiembre de 2026 frente a 18.568 en 2025: −22,3 %. Su oferta disponible a septiembre crece 7,6 %. Cobertura regional: 32 municipios; no es demanda del proyecto.",
+          "JLL reporta vacancia de oficinas de Medellín de 4,6 % al cierre de 2025. Oficinas, locales de transporte y vivienda tienen públicos y ventanas diferentes. Ninguna tasa se traslada al activo anónimo del RFP.",
+          "Santa Fe, Villacruz, Alberto Álvarez y Acrecer son comparables exploratorios por intermediación; Bienes & Bienes es aspiracional por desarrollo. Ya muestran rutas por rol, fichas y contacto. No se midieron conversiones, tráfico ni competencia efectiva en esta licitación."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Diferenciar con atributos verificables del proyecto y utilidad comercial; no sólo con presencia digital.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Camacol sep. 2026; JLL cierre 2025; cinco sitios.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "07",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "valor",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Problema y teoría de valor",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Problema y teoría de valor",
+        "assertion": "El valor empieza en capacidad útil y debe llegar al equipo comercial.",
+        "lead": "",
+        "paragraphs": [
+          "Trabajo del cliente: convertir un proyecto y sus hitos en una marca, materiales y producción que su equipo pueda aprobar y utilizar. La saturación interna es declarada por Mattis; retrasos, retrabajo y costos no fueron cuantificados.",
+          "Cadena propuesta: información validada → propuesta de valor e identidad → materiales aprobados → difusión y conversaciones registradas → oportunidades atendidas → negocios. Cada tramo requiere responsables y evidencia propios.",
+          "En vivienda se evalúan necesidades, financiación y confianza; en comercio, usos, condiciones y viabilidad de instalación; en turismo, experiencia y reserva. Son ramas condicionales. La campaña no debe intentar servirlas todas antes de conocer el activo."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Medir primero entrega y adopción; conectar resultados comerciales sólo con trazabilidad y datos.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Problema actual: RFP. Solución y segmentos: hipótesis.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "08",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "programa",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Programa de doce meses",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Programa de doce meses",
+        "assertion": "Una fase de instalación y diez ciclos sostienen un solo proyecto.",
+        "lead": "",
+        "paragraphs": [
+          "Supuesto propuesto: un proyecto, una identidad y un equipo aprobador. Mes 1 define producto, público, atributos, arquitectura de marca y mensajes; hasta dos rutas iniciales permiten elegir una dirección creativa.",
+          "Mes 2 desarrolla identidad, manual, aplicaciones y un kit listo para el hito comercial. El calendario arranca con insumos disponibles y se ajusta al lanzamiento real. Los meses 3–12 contienen diez ciclos de producción y aprendizaje.",
+          "Esta secuencia no agrega una puesta en marcha gratuita a doce meses de operación. Las fases organizan un programa completo de doce meses estimados, sujeto a aprobación, costeo y capacidad real."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La estructura de trabajo la propone Efeonce; Mattis debe confirmar producto, responsabilidades e hitos.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Planificación propia. Duración estimada del RFP.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "09",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "instalacion",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Instalación y aceptación",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Instalación y aceptación",
+        "assertion": "La marca debe quedar aplicada, documentada y lista para usarse.",
+        "lead": "",
+        "paragraphs": [
+          "Mes 1: brief, ficha de verdad, segmentos, mensajes permitidos y arquitectura aprobados. Naming se dimensiona si corresponde. El comprador valida planos, precios, atributos, titularidad y responsables de cada afirmación.",
+          "Mes 2: identidad y manual; hasta ocho aplicaciones acordadas. Un dossier de hasta 12 páginas y una presentación de hasta 15 láminas forman parte de esas ocho. Las seis restantes se fijarán por tipo y complejidad, sin equivalencias ficticias.",
+          "Se entregan plantillas, versiones finales del trabajo propio y registro de derechos. Los materiales de terceros se transfieren sólo según sus licencias. La aceptación exige archivos consistentes y un destino/contacto aprobado por sus responsables."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Ocho aplicaciones en total; no ocho más dossier y presentación.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Alcance propio propuesto; sujeto a definición y costo.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "10",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "produccion",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Base de producción propuesta",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Base de producción propuesta",
+        "assertion": "Ocho maestras y doce adaptaciones por ciclo dan una base dimensionable.",
+        "lead": "",
+        "paragraphs": [
+          "Por ciclo mensual: cuatro gráficas estáticas, dos carruseles de hasta cinco láminas y dos videos de 15–45 segundos editados con material disponible y autorizado. Son ocho piezas maestras.",
+          "Además: hasta doce adaptaciones de formato del material aprobado. No incluyen nuevo concepto, guion, idioma ni contenido sustantivo. Un carrusel puede producir varios archivos: la unidad de entrega no equivale a archivo ni a precio por pieza.",
+          "Diez ciclos suman 80 maestras y 120 adaptaciones. Es una hipótesis comercial para discutir, no cantidad exigida por el RFP ni capacidad comprometida. Cambiar el mix exige revisar esfuerzo, plazos y costo."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "No hay volumen ilimitado. Rodajes, 3D, locución y licencias nuevas deben dimensionarse expresamente.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Propuesta Efeonce: 4 + 2 + 2 = 8; diez ciclos.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "11",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "limites",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Alcance y límites",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Alcance y límites",
+        "assertion": "La responsabilidad creativa debe distinguirse de operación y terceros.",
+        "lead": "",
+        "paragraphs": [
+          "Núcleo: marca del proyecto, manual, material digital/comercial, edición audiovisual y gestión creativa del programa. Hasta dos rondas consolidadas por entregable; corregir errores propios no consume rondas. Un cambio del brief requiere replanificación.",
+          "Publicación, atención de mensajes, pauta, web, CRM y medición técnica requieren confirmar quién opera y qué se compra. La inversión de medios se mantiene separada de honorarios. La existencia de WhatsApp no prueba recepción o seguimiento.",
+          "Rodajes, fotografía, renders, talento, viajes, impresión, instalación y eventos se dimensionan si son necesarios. Antes de comprometer terceros se validan cotizaciones, permisos, derechos, responsabilidades y condiciones."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Los módulos adicionales pueden ser necesarios; deben tener alcance y precio explícitos.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "RFP y matriz de alcance. Sin obligaciones inferidas.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "12",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "gobierno",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Gobierno y primer valor",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Gobierno y primer valor",
+        "assertion": "Un operador y un flujo de aprobación conectan producción con uso.",
+        "lead": "",
+        "paragraphs": [
+          "Mattis debe identificar operador, aprobador de marca/proyecto, sponsor, comprador económico, Compras/Legal/Finanzas y dueño del seguimiento comercial. Son funciones pendientes de confirmar, no personas ni autoridades atribuidas por cargo.",
+          "Efeonce dirige el programa creativo, organiza prioridades, versiones y control de calidad. Primer valor: brief aprobado y kit utilizable en un hito real. Adopción: materiales usados, feedback consolidado y acceso a la versión vigente.",
+          "El RFP CRM de 2025 documenta problemas históricos de coordinación y datos. Una correspondencia acusa recepción de una oferta; no prueba adjudicación ni CRM implementado. Sirve para discovery, no para vender una sustitución tecnológica."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "La continuidad debe dejar archivos y criterios transferibles, además de producción.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Roles propuestos; antecedentes CRM 2025 históricos.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "13",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Medición y evidencia de valor",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Medición y evidencia de valor",
+        "assertion": "Producir, utilizar y vender son resultados distintos.",
+        "lead": "",
+        "paragraphs": [
+          "Capacidad: backlog aceptado y entregas por ciclo. Tiempo: entregas a plazo dividido por entregas cuyo plazo vence en el ciclo. Calidad: aprobación inicial sobre primeras versiones revisadas; registrar las causas del retrabajo.",
+          "Adopción: uso de materiales por el equipo y uso de briefs/plantillas. Las mejoras requieren baseline y método; no se declaran porcentajes de ahorro sin medición previa.",
+          "Resultado comercial, si hay acceso y alcance: contactos únicos elegibles, citas o visitas, oportunidades y negocios netos. Mattis debe registrar etapas y contribución. No hay datos públicos para fijar CAC, ROAS, cierre, ventas incrementales o retorno."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Acordar definiciones y responsables antes de objetivos numéricos de negocio.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Marco propuesto; ninguna métrica privada reconstruida.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "14",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "economia",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Economía y decisión de inversión",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Economía y decisión de inversión",
+        "assertion": "El caso puede ordenar el costo; todavía no puede calcular un retorno.",
+        "lead": "",
+        "paragraphs": [
+          "Para Efeonce: definición e instalación + diez ciclos de producción/gestión + recursos incrementales + derechos + terceros + contingencia + costo financiero/tributario aplicable. Costear con catálogo y políticas vigentes; validar capacidad y margen del trabajo propio.",
+          "Para Mattis: honorarios + medios + producción/terceros + costos internos adicionales + impuestos no recuperables aplicables. Umbral condicional: negocios adicionales necesarios = techo de inversión dividido por contribución incremental neta por negocio.",
+          "La contribución de Mattis puede ser comisión o renta contractual; el precio completo del inmueble no es su ingreso por defecto. Faltan producto, inversión, margen, baseline y atribución. No sumar un mismo beneficio como venta, ahorro y menor vacancia."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "No reutilizar presupuestos CRM, ingresos de 2024 ni precios de otra licitación.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Modelo por variables; sin precio ni retorno aprobado.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "15",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "riesgos",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Riesgos y condiciones",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Riesgos y condiciones",
+        "assertion": "El principal riesgo es comprometer un alcance abierto en un contrato.",
+        "lead": "",
+        "paragraphs": [
+          "El RFP indica que la propuesta y el formato integran la orden o contrato. Cantidades, límites, insumos, cambios y aceptación deben quedar expresos. La matriz técnica vacía y sus listas de ejemplo no permiten marcar cumplimiento genérico.",
+          "Compras debe confirmar participación de sociedad chilena, facturación extranjera y equivalencia documental. También debe aclarar las filas de requisitos y la estructura de campaña. La investigación no certifica elegibilidad legal.",
+          "Pago mostrado: 30 días corridos desde recepción de factura. No implica anticipo ni cobro garantizado. El cierre capturado es 30/10/2026 a las 18:00 sin zona; confirmar fecha efectiva, zona y respuestas del portal antes de presentar."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Alcance, elegibilidad, derechos, capacidad y caja deben estar resueltos antes de comprometer.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Formato A15 y captura del comprador.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "16",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "siguiente",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Decisiones antes de cotizar",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Decisiones antes de cotizar",
+        "assertion": "Cinco respuestas afinan el caso; la propuesta sigue siendo trabajo de Efeonce.",
+        "lead": "",
+        "paragraphs": [
+          "Confirmar brief y calendario; insumos disponibles; responsabilidad de ejecución; audiovisual y presencia local; admisibilidad y matriz documental. Las cinco consultas están preparadas y no fueron enviadas.",
+          "Efeonce debe cerrar entregables, cantidades, secuencia, recursos, revisión, capacidad y costo. El programa aquí descrito permite esa conversación, pero no reemplaza la validación ni la aprobación económica.",
+          "La preparación deja un caso editable, investigación temática, fuentes, capturas y logos originales. No hay propuesta vinculante, publicación, preguntas enviadas ni cambio adicional del negocio en CRM."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Siguiente decisión: confirmar el producto y el alcance para costear una base defendible.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Corte de preparación: 23 de octubre de 2026.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "17",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "fuentes-1",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Fuentes primarias del caso",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Fuentes primarias del caso",
+        "assertion": "La evidencia diferencia documento del comprador, fuente pública y observación.",
+        "lead": "",
+        "paragraphs": [
+          "RFP Agencia Proyecto Inmobiliario, recibido el 23/10/2026: cuatro hojas y anexos completos. Formato C9–C13: necesidad, duración y presupuesto; A15: incorporación a orden/contrato. Captura Wherex: calendario, pago y documentación.",
+          "Mattis: inicio, Nosotros y política de datos personales, consultados el 23/10/2026. La política identifica sociedad y NIT. Dominio: mattisinmobiliaria.com.co. Logo original: /wp-content/uploads/2025/09/logo.png.",
+          "Metro de Medellín: listado de contratos de marzo de 2026, página física 3, contrato 004327C-21. Fuente: metrodemedellin.gov.co/hubfs/proveedores-y-contratistas/consecutivo-contratos-marzo-2026.pdf.",
+          "Grupo Réditos: informe de gestión segundo semestre 2024, páginas 40–42. Es antecedente histórico, no presupuesto. Los informes posteriores indexados no recuperados no se trataron como leídos."
+        ],
+        "pullQuote": {
+          "text": "Fuentes e inventarios completos acompañan el caso editable.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "18",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "fuentes-2",
+      "contentType": "report-narrative",
+      "slots": {
+        "clientName": "Mattis · Uso interno",
+        "runningSection": "Mercado, método y límites",
+        "runningPeriod": "Corte: 23 de octubre de 2026",
+        "footerEdition": "Estrategia · Mattis · Octubre 2026",
+        "footerContact": {
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+          "phone": "+56 9 3732 3064"
+        },
+        "eyebrow": "Mercado, método y límites",
+        "assertion": "El caso es una base de decisión, no una validación de resultados futuros.",
+        "lead": "",
+        "paragraphs": [
+          "Camacol: Tablas de Coyuntura, corte septiembre de 2026; XLSX y extracción conservados. Antioquia: 32 municipios, vivienda nueva. Fuente: camacol.co/descargable/tablas-de-coyuntura-unidades-corte-septiembre-2026.",
+          "JLL: reporte de oficinas Medellín, cierre 2025, publicado 15/04/2026. Fuente: jll.com/en-us/insights/market-dynamics/reporte-oficinas-medellin. El benchmark cualitativo conserva los sitios de cinco referentes; no mide su desempeño.",
+          "Observaciones del sitio Mattis: páginas y captura/DOM fechados el 23/10/2026. Se conservaron rutas, pruebas y límites de las muestras. Los antecedentes CRM de 2025 se leyeron como históricos; respuestas del proponente no son requisitos del comprador.",
+          "No hubo entrevistas, acceso a métricas privadas, prueba de atención o ventas, ni identificación del proyecto anónimo. Fuentes de una misma compañía conservan su sesgo; los supuestos comerciales se rotulan como propuestas y requieren validación."
+        ],
+        "closing": [
+          {
+            "kind": "measure",
+            "label": "Lo que significa",
+            "text": "Confianza alta para lo observado y lo documentado; baja para impacto comercial aún no medido.",
+            "signature": "Lectura de Efeonce"
+          }
+        ],
+        "pullQuote": {
+          "text": "Investigación pública y documental. Corte: 23/10/2026.",
+          "source": "Fuentes y método"
+        },
+        "folio": {
+          "page": "19",
+          "total": "20"
+        }
+      },
+      "template": "ReportNarrativePage",
+      "contractHash": "2d24738c974817732a49e5167600b72a2d9dac6f442779b30b14699f662dfcf0",
+      "templateHash": "7b1e78dc10d849cda898d5a556fb48a8890a4d6204ca8e65289ba3a515930a7b"
+    },
+    {
+      "slideId": "contraportada",
+      "contentType": "report-back-cover",
+      "slots": {
+        "editionLabel": "Estrategia · Mattis · Octubre 2026",
+        "contact": {
+          "email": "sales@efeoncepro.com",
+          "phonePrimary": "+56 9 3732 3064",
+          "phoneSecondary": "+1 (239) 235-2073",
+          "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+        },
+        "marketsLine": "Chile · Estados Unidos · Colombia · México · Perú",
+        "legalLine": "Efeonce Group SpA · RUT 77.357.182-1 · Confidencial · Uso interno · Corte: 23 de octubre de 2026"
+      },
+      "template": "ReportBackCoverPage",
+      "contractHash": "354d007b38172b3bbc5885777d3cb7f61959346b89f9da43423d68de7fa28b7b",
+      "templateHash": "33b4b0f1c551ad32fbe267a832a6e3bf13ded5b331b8329113ed4b9b1bfba288"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "a1799bf28372efd37ade66d96d9a5f4bf11b2124fe8c7f1a3ffc2fbf1cd446b0"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    }
+  ],
+  "validators": []
+}

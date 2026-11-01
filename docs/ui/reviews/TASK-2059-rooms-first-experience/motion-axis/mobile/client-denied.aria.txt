@@ -1,0 +1,23 @@
+- link "Ir al contenido":
+  - /url: "#main-content"
+- complementary "Demostración":
+  - text: Demostración
+  - navigation "Vistas de demostración":
+    - link "Cliente":
+      - /url: /demo
+    - link "Operador":
+      - /url: /demo/workspace?persona=operator
+    - link "Administrador":
+      - /url: /demo/workspace?persona=administrator
+- banner:
+  - link "Efeonce Rooms":
+    - /url: /demo
+    - img "Efeonce Rooms"
+  - text: Cliente
+- main:
+  - paragraph: Efeonce Rooms
+  - heading "Esta vista es del equipo." [level=1]
+  - paragraph: Tu acceso de cliente permite explorar la propuesta. El espacio de trabajo y las notas internas requieren permisos de operador o administrador.
+  - link "Volver a la propuesta":
+    - /url: /demo
+- alert

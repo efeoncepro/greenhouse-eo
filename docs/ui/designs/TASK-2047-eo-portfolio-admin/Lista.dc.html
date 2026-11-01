@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Proyectos · Portafolio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#f0f0f1;color:#1d2327;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;font-size:13px;line-height:1.5}
+a{color:#2271b1}a:hover{color:#135e96}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border:1px solid #2271b1;border-radius:3px;background:#f6f7f7;color:#2271b1;font:inherit;cursor:pointer;text-decoration:none}
+.chip{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:11px;font-size:12px;font-weight:600}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #f0f0f1;vertical-align:top}
+th{font-weight:600;border-bottom:1px solid #c3c4c7}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-direction: column;">
+  <header style="height: 32px; background: #1d2327; color: #f0f0f1; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">
+    <span>Efeonce Group</span>
+    <span>Hola, Ana</span>
+  </header>
+  <div style="display: flex; flex-wrap: wrap; flex: 1 1 auto;">
+    <nav aria-label="Menú principal" style="flex: 0 0 160px; background: #1d2327; color: #f0f0f1; padding: 8px 0;">
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Escritorio</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Entradas</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Medios</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Páginas</a>
+      <a href="#" aria-current="page" style="display: block; padding: 8px 12px; color: #fff; background: #2271b1; font-weight: 600; text-decoration: none;">Portafolio</a>
+      <a href="#" style="display: block; padding: 6px 12px 6px 24px; color: #fff; font-size: 12px; font-weight: 600; text-decoration: none;">Proyectos</a>
+      <a href="Main.dc.html" style="display: block; padding: 6px 12px 6px 24px; color: #f0f0f1; font-size: 12px; text-decoration: none;">Agregar proyecto</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Apariencia</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Plugins</a>
+      <a href="#" style="display: block; padding: 8px 12px; color: #f0f0f1; text-decoration: none;">Ajustes</a>
+    </nav>
+    <main style="flex: 999 1 560px; min-width: 0; padding: 20px 24px 48px; box-sizing: border-box;">
+      <div style="max-width: 1240px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <h1 style="margin: 0; font-size: 23px; font-weight: 400;">Proyectos</h1>
+          <a href="Main.dc.html" class="btn">Agregar proyecto</a>
+        </div>
+        <p style="margin: 0; color: #50575e; max-width: 760px;">Cada proyecto se publica sólo con la aprobación del cliente. Lo que la aprobación no cubre no aparece en el sitio.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+          <a href="#" aria-current="true" style="font-weight: 600; color: #1d2327; text-decoration: none;">Todos (3)</a><span style="color: #a7aaad;">|</span>
+          <a href="#">Publicados (1)</a><span style="color: #a7aaad;">|</span>
+          <a href="#">Borradores (2)</a><span style="color: #a7aaad;">|</span>
+          <a href="#">Les falta algo para publicar (2)</a>
+        </div>
+        <div style="background: #fff; border: 1px solid #c3c4c7; overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+            <thead>
+              <tr>
+                <th scope="col">Proyecto</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Línea</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Aprobación</th>
+                <th scope="col">Último cambio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a href="Main.dc.html" style="font-weight: 600;">Un año de campañas en cinco mercados</a>
+                  <div style="color: #50575e; font-size: 12px;">Video, reel y feed · 9 piezas</div>
+                </td>
+                <td>Sky Airline</td>
+                <td><span class="chip" style="background: #fbe7ef; color: #8f1240;">Brand</span></td>
+                <td><span class="chip" style="background: #dcdcde; color: #1d2327;">Borrador</span></td>
+                <td style="color: #8a5a00;">Falta registrar<div style="color: #50575e; font-size: 12px;">y 2 errores en el contenido</div></td>
+                <td>r3 · Ana · 23 oct.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="Publicado.dc.html" style="font-weight: 600;">Marca y menú para comida venezolana a domicilio</a>
+                  <div style="color: #50575e; font-size: 12px;">Imágenes · 2 piezas</div>
+                </td>
+                <td>PabellonToGo</td>
+                <td><span class="chip" style="background: #fbe7ef; color: #8f1240;">Brand</span></td>
+                <td><span class="chip" style="background: #e6f4ea; color: #00661b;">Publicado</span></td>
+                <td>Piezas<div style="color: #50575e; font-size: 12px;">sin logo, cifras ni testimonio</div></td>
+                <td>r4 · Agente · 24 oct.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="#" style="font-weight: 600;">Tableros de HubSpot en los que el equipo confía</a>
+                  <div style="color: #50575e; font-size: 12px;">Sólo texto · caso en el blog</div>
+                </td>
+                <td>ANAM</td>
+                <td><span class="chip" style="background: #e3f4f2; color: #0a5c56;">Revenue</span></td>
+                <td><span class="chip" style="background: #dcdcde; color: #1d2327;">Borrador</span></td>
+                <td>Cifras<div style="color: #50575e; font-size: 12px;">lista para publicar</div></td>
+                <td>r2 · Ana · 24 oct.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

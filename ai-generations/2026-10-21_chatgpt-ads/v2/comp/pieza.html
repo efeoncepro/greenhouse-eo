@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Bric;src:url(BricolageGrotesque-Variable.ttf);font-weight:200 800;font-stretch:75% 100%}
+@font-face{font-family:Pop;src:url(Poppins-400.ttf);font-weight:400}
+@font-face{font-family:Pop;src:url(Poppins-500.ttf);font-weight:500}
+@font-face{font-family:Pop;src:url(Poppins-600.ttf);font-weight:600}
+@font-face{font-family:Pop;src:url(Poppins-700.ttf);font-weight:700}
+*{box-sizing:border-box;font-synthesis:none}
+html,body{margin:0;background:#000}
+#root{position:relative;width:1080px;overflow:hidden;background:#020617}
+#bgwrap{position:absolute;inset:0;overflow:hidden}
+#bg{position:absolute;left:0;top:0;width:1080px;transform-origin:50% 50%}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#ring{position:absolute;border-radius:50%;border:6px solid rgba(255,255,255,.9);opacity:0;pointer-events:none;box-shadow:0 0 60px rgba(255,255,255,.6),inset 0 0 40px rgba(255,255,255,.4)}
+#stage{position:absolute;left:0;width:1080px;height:1350px}
+.abs{position:absolute}
+#logo{left:0;width:1080px;display:flex;justify-content:center;opacity:0}
+#bar{left:100px;width:880px;height:124px;border-radius:62px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05)),rgba(6,10,36,.38);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.5);border:1.5px solid rgba(255,255,255,.55);box-shadow:0 30px 90px rgba(0,0,20,.45),inset 0 1px 0 rgba(255,255,255,.6),inset 0 -20px 40px rgba(10,20,60,.25);display:flex;align-items:center;padding:0 22px 0 40px;font-family:Pop;font-size:31px;color:#fff;white-space:nowrap;opacity:0;transform-origin:50% 50%}
+#bar .ph{color:rgba(255,255,255,.72)}
+#bar .caret{display:inline-block;width:3px;height:40px;background:#fff;vertical-align:-8px;margin-left:3px}
+#send{margin-left:auto;width:78px;height:78px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.ln{left:150px;height:16px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.18));opacity:0;transform-origin:0 50%}
+#card{left:100px;width:880px;height:220px;border-radius:40px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(240,244,255,.90));box-shadow:0 50px 120px rgba(0,0,30,.55),0 0 0 1.5px rgba(255,255,255,.9),0 0 80px rgba(255,255,255,.25);display:flex;align-items:center;gap:30px;padding:0 36px;opacity:0;transform-origin:50% 50%}
+#card .lbl{position:absolute;left:38px;top:22px;font-family:Pop;font-weight:500;font-size:22px;color:#6b6b78}
+#card .av{width:118px;height:118px;border-radius:30px;background:linear-gradient(135deg,#0375db,#7b5cff);display:flex;align-items:center;justify-content:center;font-family:Bric;font-weight:760;font-size:48px;color:#fff;flex:none;margin-top:26px}
+#card .tx{flex:1;font-family:Pop;margin-top:26px}
+#card .t1{font-weight:700;font-size:40px;color:#111118;letter-spacing:-.01em}
+#card .t2{font-size:27px;color:#55556a;margin-top:2px}
+#card .cta{flex:none;font-family:Pop;font-weight:600;font-size:26px;color:#fff;background:#111118;border-radius:999px;padding:18px 32px;margin-top:26px}
+#h{left:90px;width:900px;text-align:center;font-family:Bric;font-weight:760;letter-spacing:-.028em;line-height:1.0;font-size:100px;color:#fff;opacity:0;text-shadow:0 6px 40px rgba(0,0,30,.35)}
+#lk{left:0;width:1080px;display:flex;align-items:center;justify-content:center;gap:42px;opacity:0}
+</style></head><body><div id="root">
+<div id="bgwrap"><img id="bg"></div>
+<div id="ring"></div>
+<div id="stage">
+  <div class="abs" id="logo"><img src="chatgpt-logo-blanco.svg" style="height:58px"></div>
+  <div class="abs" id="bar"><svg width="34" height="34" viewBox="0 0 24 24" style="flex:none;margin-right:22px"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span id="btext" style="flex:1;min-width:0;overflow:hidden"></span><svg width="34" height="34" viewBox="0 0 24 24" style="margin-left:16px;margin-right:22px;flex:none"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><div id="send" style="margin-left:0"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke="#111118" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  <div class="abs ln" id="l0" style="width:780px"></div><div class="abs ln" id="l1" style="width:700px"></div><div class="abs ln" id="l2" style="width:520px"></div>
+  <div class="abs" id="card"><div class="lbl">Patrocinado</div><div class="av">TM</div><div class="tx"><div class="t1">Tu marca</div><div class="t2">ERP para operación regional</div></div><div class="cta">Ver más</div></div>
+  <div class="abs" id="h">Tu marca, donde tu<br>cliente decide.</div>
+  <div class="abs" id="lk"><img src="efeonce-negativo.svg" style="width:300px"><span style="width:2px;height:80px;background:rgba(255,255,255,.6)"></span><img src="openai-blanco.svg" style="height:78px"></div>
+</div>
+<div id="flash"></div>
+</div>
+<script>
+const q=new URLSearchParams(location.search),H=+(q.get('h')||1350),BG=q.get('bg')||''
+const root=document.getElementById('root');root.style.height=H+'px'
+const OFF=(H-1350)/2,ST=H>1350;document.getElementById('stage').style.top=OFF+'px'
+const $=id=>document.getElementById(id)
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t
+const eo=t=>1-Math.pow(1-t,3),eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2
+const back=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+const PROMPT='¿Qué ERP conviene para 5 países?'
+// posiciones (4:5); la story separa titular y lockup
+const Y={logo:520,barC:612,barT:430,l0:600,l1:634,l2:668,card:735,h:150,lk:1135}
+if(ST){Y.h-=150;Y.lk+=210;Y.logo-=20}
+$('logo').style.top=Y.logo+'px';$('h').style.top=Y.h+'px';$('lk').style.top=Y.lk+'px'
+for(const k of ['l0','l1','l2'])$(k).style.top=Y[k]+'px';$('card').style.top=Y.card+'px'
+const bg=$('bg')
+window.setBgSrc=s=>new Promise(r=>{bg.onload=()=>r();bg.src=s})
+window.setT=function(t){
+ // fondo: empujón en cada golpe y deriva continua
+ let z=1+0.04*(t/8);for(const g of [2.0,4.0]){const d=t-g;if(d>=0&&d<0.5)z+=0.08*(1-eo(d/0.5))}
+ const bh=bg.naturalHeight?1080*bg.naturalHeight/bg.naturalWidth:1620;bg.style.height=bh+'px';bg.style.top=((H-bh)/2)+'px'
+ let sh=0;for(const g of [2.0,4.0]){const d=t-g;if(d>=0&&d<0.22)sh=Math.max(sh,(1-d/0.22)*16)}
+ bg.style.transform=`scale(${z}) translate(${sh*Math.sin(t*170)}px,${sh*Math.cos(t*150)}px)`
+ let fl=0;for(const g of [2.0,4.0]){const d=t-g;if(d>=0&&d<0.3)fl=Math.max(fl,0.9*(1-d/0.3))}
+ $('flash').style.opacity=fl
+ // logo de ChatGPT y barra
+ $('logo').style.opacity=t<2?clamp(t/0.3):clamp(1-(t-2)/0.2)
+ const up=eio(clamp((t-2.0)/0.45)),sendPop=t>=2&&t<2.15?0.94:1
+ const bar=$('bar');bar.style.opacity=clamp(t/0.3);bar.style.top=lerp(Y.barC,Y.barT,up)+'px'
+ bar.style.transform=`scale(${lerp(0.96,1,eo(clamp(t/0.4)))*sendPop}) translate(${sh*0.6*Math.sin(t*170)}px,0)`
+ const typed=t<0.35?0:Math.min(PROMPT.length,Math.floor((t-0.35)/1.25*PROMPT.length))
+ $('btext').innerHTML=t>=2.0?'<span class="ph">Pregúntale a ChatGPT</span>':(typed?PROMPT.slice(0,typed)+'<span class="caret"></span>':'<span class="ph">Pregúntale a ChatGPT</span>')
+ // la respuesta como luz (sin texto inventado)
+ ;['l0','l1','l2'].forEach((k,i)=>{const p=clamp((t-2.35-i*0.25)/0.35);const e=$(k);e.style.opacity=p*0.9;e.style.transform=`scaleX(${eo(p)})`})
+ // la losa patrocinada cae en el golpe 2
+ const c=$('card'),cp=clamp((t-3.88)/0.12),land=clamp((t-4.0)/0.35)
+ c.style.opacity=t>=3.88?1:0
+ const cy=t<4?lerp(-520,0,eio(cp)):0,cs=t<4?lerp(1.9,1.06,cp):lerp(1.06,1,back(land))
+ c.style.transform=`translateY(${cy}px) scale(${cs}) translate(${sh*Math.sin(t*170)}px,0)`
+ // onda expansiva
+ const r=$('ring'),rd=t-4.0;if(rd>=0&&rd<0.7){const R=lerp(80,1500,eo(rd/0.7)),cx=540,cyR=OFF+Y.card+110;r.style.width=r.style.height=R+'px';r.style.left=(cx-R/2)+'px';r.style.top=(cyR-R/2)+'px';r.style.opacity=0.85*(1-rd/0.7);r.style.borderWidth=lerp(10,2,rd/0.7)+'px'}else r.style.opacity=0
+ // cierre: titular y lockup (sting en 5,0)
+ const hp=clamp((t-4.55)/0.4);$('h').style.opacity=hp;$('h').style.transform=`translateY(${24*(1-eo(hp))}px)`
+ const lp=clamp((t-4.75)/0.4);$('lk').style.opacity=lp;$('lk').style.transform=`scale(${lerp(1.12,1,eo(lp))})`
+}
+</script></body></html>

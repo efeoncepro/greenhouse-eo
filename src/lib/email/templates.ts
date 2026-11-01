@@ -11,6 +11,8 @@ import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
 import LeaveRequestSubmittedEmail from '@/emails/LeaveRequestSubmittedEmail'
 import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
+import RoomsInvitationOtpEmail, { type RoomsInvitationOtpEmailProps } from '@/emails/RoomsInvitationOtpEmail'
+import { ROOMS_INVITATION_EMAIL_COPY } from '@/lib/copy/rooms-invitation-email'
 import AuthServerMagicLinkEmail from '@/emails/AuthServerMagicLinkEmail'
 import MagicLinkEmail from '@/emails/MagicLinkEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
@@ -359,6 +361,16 @@ registerTemplate(
     }
   }
 )
+
+// TASK-2067: one message contains the Rooms invitation link and issuer-generated code.
+registerTemplate('auth_server_rooms_invitation_otp', (context: RoomsInvitationOtpEmailProps & EmailTemplateContext) => ({
+  subject: ROOMS_INVITATION_EMAIL_COPY.subject,
+  react: RoomsInvitationOtpEmail(context),
+  text: [ROOMS_INVITATION_EMAIL_COPY.heading, ROOMS_INVITATION_EMAIL_COPY.body(context.roomLabel),
+    `${ROOMS_INVITATION_EMAIL_COPY.codeLabel}: ${context.code}`,
+    ROOMS_INVITATION_EMAIL_COPY.validity(context.expiresInMinutes), context.invitationUrl,
+    ROOMS_INVITATION_EMAIL_COPY.disclaimer].join('\n\n')
+}))
 
 // TASK-1830 — Acceso a Efeonce ID (`auth.efeonce.org`), persona EXTERNA autorizando una aplicación.
 registerTemplate(
@@ -2874,4 +2886,15 @@ registerPreviewMeta('insights_edition_delivery_attachment', {
     locale: 'es'
   },
   propsSchema: INSIGHTS_DELIVERY_PREVIEW_SCHEMA
+})
+
+registerPreviewMeta('auth_server_rooms_invitation_otp', {
+  label: 'Invitación a Rooms con código',
+  description: 'Correo único de invitación personal; código y enlace sintéticos para preview.',
+  domain: 'identity', supportsLocale: false,
+  defaultProps: { invitationUrl: 'https://rooms.efeonce.org/invite#token=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', roomLabel: 'Sala de ejemplo', code: '123456', expiresInMinutes: 10 },
+  propsSchema: [
+    { key: 'roomLabel', label: 'Nombre de la sala', type: 'text' },
+    { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
+  ]
 })

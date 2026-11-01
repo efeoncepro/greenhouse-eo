@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-26",
+  "backendCommit": "d056708f91bdae17b84a4050c3c9d00cae55e067",
+  "backendBranch": "task/2072-cloud-media-backend",
+  "pullRequest": "https://github.com/efeoncepro/efeonce-rooms/pull/1",
+  "pullRequestBase": "task/2070-2071-private-media",
+  "productionMain": "20f9fe974e1c2f994380d6eff694bb18232e4b2d",
+  "worktreeClean": true,
+  "newVisualChanges": false,
+  "verification": {
+    "pnpmVerify": {
+      "exitCode": 0,
+      "tests": 225,
+      "pass": 225,
+      "fail": 0,
+      "skip": 0,
+      "lint": "PASS",
+      "negativeLint": "PASS",
+      "types": "PASS",
+      "nextBuild": "PASS"
+    },
+    "workerBuild": {
+      "entries": 5,
+      "inputs": 42,
+      "runtimeDependencies": 8,
+      "result": "PASS"
+    },
+    "isolatedProductionWorkerSmoke": {
+      "result": "PASS",
+      "sourceCheckout": false,
+      "devDependencies": false,
+      "cloudCalls": 0
+    },
+    "linuxDockerCI": "SUCCESS",
+    "vercelPreviewCheck": "SUCCESS",
+    "recovery": {
+      "pg16FreshMigrations": 7,
+      "pg18Isolated": "PASS",
+      "tenants": 2,
+      "rooms": 6,
+      "tables": 25,
+      "objects": 18,
+      "generationBindings": 12,
+      "aclHashesLegacyCorruptionRevocation": "PASS",
+      "identity": "fixture; not an OIDC canary"
+    }
+  },
+  "cloudResourcesReadback": {
+    "bucket": "not_found",
+    "workerServiceAccount": "not_found",
+    "workerJob": "read_unavailable",
+    "workerPasswordSecret": "not_found",
+    "cli": "valid after canonical renewal",
+    "adc": "valid after canonical renewal"
+  },
+  "notExecuted": [
+    "new cloud resources or IAM writes",
+    "cloud migrations",
+    "production promotion",
+    "media flag activation",
+    "invitation email send",
+    "live GCS signed upload canary"
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9c8bea232dba",
+  "key": "9c8bea232dbaa1c00c986ba3bda63945b1a0568e9f1df33f0ae914864614a8f1",
+  "status": "completed",
+  "createdAt": "2026-10-24T23:09:35.052Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-24_tarjetas-riel/plates/R1-agente-agenda-plate.png",
+    "imageSha256": "cf9cc99a359e0881ae04a451a1acb057576806093b39ec25c23c2e3b6aef5a97",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla3-mask.png",
+    "maskSha256": "9ad2f277ede225851c6adb053b198ec2161e0ff59c7acad1b797a6bc8665d9d6",
+    "maskConvention": "white-editable",
+    "width": 1152,
+    "height": 1440,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "The marked area is the glass screen of a current flagship smartphone; a thumb rests on its right edge and stays exactly as it is. Redraw the whole screen as one continuous, evenly lit light-mode chat app in Spanish, with the same perspective, sharpness, screen brightness and the same cool blue glow, edge to edge inside the screen glass and right up to the thumb. Top: a slim status bar with the time 11:24. A blue user message bubble at the top right reading exactly: ¿Me agendas una reunión? Below it, a large white confirmation card with a big blue check circle, the bold title reading exactly: Reunión agendada, a calendar row with a small calendar icon reading exactly: Jue 12 nov · 10:00, and a solid blue button with no text. A thin message input bar at the bottom. No English words, no other text.",
+    "providerPrompt": "The marked area is the glass screen of a current flagship smartphone; a thumb rests on its right edge and stays exactly as it is. Redraw the whole screen as one continuous, evenly lit light-mode chat app in Spanish, with the same perspective, sharpness, screen brightness and the same cool blue glow, edge to edge inside the screen glass and right up to the thumb. Top: a slim status bar with the time 11:24. A blue user message bubble at the top right reading exactly: ¿Me agendas una reunión? Below it, a large white confirmation card with a big blue check circle, the bold title reading exactly: Reunión agendada, a calendar row with a small calendar icon reading exactly: Jue 12 nov · 10:00, and a solid blue button with no text. A thin message input bar at the bottom. No English words, no other text."
+  },
+  "mask": {
+    "touchedFraction": 0.0944239486882716,
+    "editable": 153043,
+    "soft": 3595,
+    "protected": 1502242
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1152,
+      "height": 1440
+    },
+    "target": {
+      "width": 1152,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 54 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1002,
+    "basis": "2 × salida 1152x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 54.499,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.57,
+        "bestError": 2.57,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": [
+        11.35,
+        8.49,
+        4
+      ],
+      "protected": {
+        "pixels": 1502242,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 153043,
+        "maxDelta": 254,
+        "meanDelta": 55.391,
+        "worst": {
+          "x": 435,
+          "y": 799
+        }
+      },
+      "seam": {
+        "pixels": 3595,
+        "maxDelta": 185,
+        "meanDelta": 16.517,
+        "worst": {
+          "x": 702,
+          "y": 714
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1502242,
+        "maxDelta": 251,
+        "meanDelta": 4.898,
+        "worst": {
+          "x": 444,
+          "y": 815
+        }
+      },
+      "outputUsd": 0.0501,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1704,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 199
+        },
+        "output_tokens": 1669,
+        "output_tokens_details": {
+          "image_tokens": 1669,
+          "text_tokens": 0
+        },
+        "total_tokens": 3373
+      },
+      "meta": {
+        "size": "1152x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 57.09,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.52,
+        "bestError": 2.52,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": [
+        5.45,
+        2.71,
+        -1.93
+      ],
+      "protected": {
+        "pixels": 1502242,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 153043,
+        "maxDelta": 249,
+        "meanDelta": 58.015,
+        "worst": {
+          "x": 421,
+          "y": 707
+        }
+      },
+      "seam": {
+        "pixels": 3595,
+        "maxDelta": 198,
+        "meanDelta": 17.733,
+        "worst": {
+          "x": 702,
+          "y": 714
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1502242,
+        "maxDelta": 247,
+        "meanDelta": 4.52,
+        "worst": {
+          "x": 455,
+          "y": 837
+        }
+      },
+      "outputUsd": 0.0501,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1704,
+        "input_tokens_details": {
+          "image_tokens": 1505,
+          "text_tokens": 199
+        },
+        "output_tokens": 1669,
+        "output_tokens_details": {
+          "image_tokens": 1669,
+          "text_tokens": 0
+        },
+        "total_tokens": 3373
+      },
+      "meta": {
+        "size": "1152x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

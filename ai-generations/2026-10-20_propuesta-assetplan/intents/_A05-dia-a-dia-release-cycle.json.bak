@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day-release-cycle",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Qué llega a producción?",
+    "answer": [
+      "Lo que",
+      "apruebes"
+    ]
+  },
+  "body": "Los cambios sensibles pasan por tu **aprobación**: los probamos antes y te mostramos qué cambia en un video corto.",
+  "release": {
+    "kicker": "Solicitud 18 · Sales Hub",
+    "title": "Nueva etapa en el pipeline de arriendos",
+    "icon": "sales",
+    "currentStep": 3,
+    "videoTool": "loom",
+    "videoDuration": "2:40",
+    "presenterInitials": "EF",
+    "videoCaption": "Qué cambia para tu equipo comercial",
+    "approveCta": "Aprobar cambio"
+  },
+  "tools": [
+    {
+      "tool": "teams",
+      "kicker": "Microsoft Teams",
+      "label": "Nos hablamos"
+    },
+    {
+      "tool": "notion",
+      "kicker": "Notion",
+      "label": "Solicitudes y documentos"
+    },
+    {
+      "tool": "loom",
+      "kicker": "Loom",
+      "label": "Te lo mostramos"
+    },
+    {
+      "tool": "hs-icon:data",
+      "kicker": "HubSpot",
+      "label": "Pruebas antes de publicar"
+    }
+  ]
+}

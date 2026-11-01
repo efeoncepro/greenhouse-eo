@@ -1,0 +1,471 @@
+{
+  "url": "https://openai.com/index/introducing-dots/",
+  "dom": {
+    "title": "Presentamos los dots | OpenAI",
+    "iframes": [
+      "https://player.vimeo.com/video/1231177365?h=bc1cde7d20&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=0&muted=1&loop=0&controls=0&background=0",
+      "https://player.vimeo.com/video/1231113706?h=9e51d5dd78&badge=0&autopause=0&player_id=0&app_id=58479&background=0&autoplay=0&muted=1&loop=1&controls=0",
+      "https://player.vimeo.com/video/1230606080?h=ae5fad6134&badge=0&autopause=0&player_id=0&app_id=58479&background=0&autoplay=0&muted=1&loop=1&controls=0",
+      "https://player.vimeo.com/video/1231093676?h=f34d33b0cb&badge=0&autopause=0&player_id=0&app_id=58479&autoplay=0&muted=0&loop=0&controls=0&background=0",
+      ""
+    ],
+    "videos": [],
+    "posters": [],
+    "imgs": [
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/KKSjto3MtJguvsLQsM1Bp/1704a6937d22b1bb3cac38dc5f43f9df/dots-o.svg",
+        "alt": "",
+        "w": 81
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/3sMQM1f0yOmybdijOp1fCe/8bcd684e244230a291fd776052585cd4/260928_Dots_Vision_Film_Thumbnail.png?w=1920&q=50&fm=webp",
+        "alt": "Introducing dots — Live from the Lab launch film poster",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/1Oztywa7RH91YIrrs6wScO/79f7b4aa2e8129ecd3682c462e7fe644/50f176cb-5be9-4b8d-8635-a7f85b9a9783.png?w=1920&q=50&fm=webp",
+        "alt": "Introducing dots > Codex screen capture video > poster",
+        "w": 1366
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/1xROyxcQu9wVqdHbbOjetz/4598e195e1e8acb11b66dd7f340fde12/introducing-dots-carousel-feedback.png?w=1920&q=90&fm=webp",
+        "alt": "Iggy, el dot rosa, prepara una corrección de la lista de comprobación de una versión beta de iOS junto a un área de trabajo para el lanzamiento.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/1NZB4F7BL01EyZAiEQdj12/40b5d5cc58214ea082c25d136fb08ebf/introducing-dots-carousel-launch.png?w=1920&q=90&fm=webp",
+        "alt": "Felipe, el dot azul, revisa los materiales de lanzamiento junto a dos opciones de diseño para correo electrónico y redes sociales.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/2ADI0hAjbA1bMau54PP90I/449d54baf7746f6f73a3c5fdfe5fecb3/introducing-dots-carousel-analysis.png?w=3840&q=90&fm=webp",
+        "alt": "Todd, el dot verde, comenta los hallazgos de pruebas repetidas junto al borrador de un correo electrónico y un gráfico comparativo.",
+        "w": 0
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/6FLrjxbFjTxYrhc6wKch43/85e34bf667a7837764568873e39a21b7/introducing-dots-carousel-proposal.png?w=3840&q=90&fm=webp",
+        "alt": "Alfred, el dot amarillo, comenta una propuesta para una empresa junto a un documento que enumera los pasos para cerrar el acuerdo.",
+        "w": 0
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/2Fkq1Gdj9qCPROo9D0OcYV/b0f10d9782bad4c8fe13545441a38a30/introducing-dots-carousel-content.png?w=1920&q=90&fm=webp",
+        "alt": "Jojo, el dot morado, ayuda a un creador a preparar una publicación sobre una entrevista junto a una imagen para redes sociales.",
+        "w": 1440
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/6E0HwFxJrpWOEiFct0ZfQE/bb595e7e6ab06dfd2c953cb915c8f89a/build-more-responsive-apps-with-the-decisions-api-cover.png?w=1920&q=90&fm=webp",
+        "alt": "Build more responsive apps with the Decisions API — Cover",
+        "w": 810
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/30Y90LyD1QsbcsXhgLcbqH/7a9226e0bf6e06c7309a2b322e729a84/uber-brings-chatgpt-work-to-all-employees-cover.png?w=1920&q=90&fm=webp",
+        "alt": "Uber brings ChatGPT Work to all employees — cover",
+        "w": 810
+      },
+      {
+        "src": "https://images.ctfassets.net/kftzwdyauwt9/5yeylkVM0cZ2W6k2lcnVyE/42a8333bccf5064328630ebf7c667082/broad-access-through-consistent-standards-cover.png?w=1920&q=90&fm=webp",
+        "alt": "Broad access through consistent standards — Cover",
+        "w": 810
+      }
+    ],
+    "links": [
+      "https://openai.com/es-ES/index/introducing-dots/#main",
+      "https://chatgpt.com/dots?openaicom-did=08a95ddf-ef6f-4eae-9c07-523ebd061739&openaicom_referred=true",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-pueden-trabajar-por-su-cuenta",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-son-una-extension-de-ti",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-trabajan-donde-tu-trabajas",
+      "https://openai.com/es-ES/index/introducing-dots/#siempre-tienes-el-control",
+      "https://openai.com/es-ES/index/introducing-dots/#medidas-de-proteccion-integradas",
+      "https://openai.com/es-ES/index/introducing-dots/#acceso-y-permisos",
+      "https://openai.com/es-ES/index/introducing-dots/#revision-y-aprobacion-de-acciones",
+      "https://openai.com/es-ES/index/introducing-dots/#dots-especializados-para-tu-organizacion",
+      "https://openai.com/es-ES/index/introducing-dots/#incorporamos-dots-especializados-a-microsoft-agent-365",
+      "https://openai.com/es-ES/index/introducing-dots/#empieza-a-usar-los-dots",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-pueden-trabajar-por-su-cuenta",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-son-una-extension-de-ti",
+      "https://openai.com/es-ES/index/introducing-dots/#los-dots-trabajan-donde-tu-trabajas",
+      "https://openai.com/es-ES/index/introducing-dots/#siempre-tienes-el-control",
+      "https://openai.com/es-ES/index/introducing-dots/#medidas-de-proteccion-integradas",
+      "https://openai.com/es-ES/index/introducing-dots/#acceso-y-permisos",
+      "https://openai.com/es-ES/index/introducing-dots/#revision-y-aprobacion-de-acciones",
+      "https://openai.com/es-ES/index/introducing-dots/#dots-especializados-para-tu-organizacion",
+      "https://openai.com/es-ES/index/introducing-dots/#incorporamos-dots-especializados-a-microsoft-agent-365",
+      "https://openai.com/es-ES/index/introducing-dots/#empieza-a-usar-los-dots",
+      "https://openai.com/es-ES/index/how-we-build-safety-security-and-privacy-into-dots/",
+      "https://help.openai.com/articles/7730893-data-controls-in-chatgpt",
+      "https://openai.com/es-ES/index/how-we-build-safety-security-and-privacy-into-dots/",
+      "http://help.openai.com/articles/20001529",
+      "https://help.openai.com/articles/20001530",
+      "https://chatgpt.com/features/dots?openaicom-did=08a95ddf-ef6f-4eae-9c07-523ebd061739&openaicom_referred=true",
+      "https://help.openai.com/",
+      "https://x.com/OpenAI",
+      "https://www.youtube.com/OpenAI",
+      "https://www.linkedin.com/company/openai",
+      "https://www.instagram.com/openai/",
+      "https://www.tiktok.com/@openai"
+    ],
+    "text": "Ir al contenido principal\nInvestigación\nProductos\nEmpresas\nDesarrolladores\nEmpresa\nFundación\n(se abre en una ventana nueva)\nIniciar sesión\nProbar ChatGPT\n(se abre en una ventana nueva)\nPresentamos los dots | OpenAI\n\n29 de septiembre de 2026\n\nProducto\nEmpresa\nPresentamos los dots\nCrea tu dot\n(se abre en una ventana nueva)\nContactar con un experto\nEscucha el artículo\n11:12\nCompartir\nLos dots pueden trabajar por su cuenta\nLos dots son una extensión de ti\nLos dots trabajan donde tú trabajas\nSiempre tienes el control\nMedidas de protección integradas\nAcceso y permisos\nRevisión y aprobación de acciones\nDots especializados para tu organización\nIncorporamos dots especializados a Microsoft Agent 365\nEmpieza a usar los dots\n\nLos dots son agentes de gran capacidad, siempre disponibles y diseñados para encargarse de todo. Son una forma totalmente nueva de trabajar con la IA: aprenden qué te importa, trabajan siempre en tu nombre y se encargan de tareas importantes para que recuperes tiempo y puedas dedicar tu atención a otras cosas.\n\nVídeo de lanzamiento de Live from the Lab que presenta los dots.\n\n00:0502:26\n\n[RECURSO: vídeo de lanzamiento de Live from the Lab]\n\nLos dots son inteligencia de vanguardia que está de tu lado. Con la tecnología de GPT‑6 Astra, tienen su propio ordenador en la nube, aprenden de tus comentarios con el tiempo y pueden trabajar de forma ininterrumpida para alcanzar tus objetivos. Gracias a nuestro ecosistema de complementos, pueden conectarse fácilmente a más de 4000 aplicaciones y disponer de las herramientas necesarias para ayudarte allí donde los necesites.\n\nTu dot siempre está a tu alcance, ya sea a través de ChatGPT, Slack o Teams. Puedes hacer preguntas, explorar ideas y enviar comentarios durante el proceso; o simplemente hacer una llamada por voz cuando necesites aclarar algo. Cuanto más trabajáis juntos, más aprende el dot sobre tus preferencias, tu forma de pensar y lo que para ti es algo bien hecho.\n\nLa magia de los dots aparece cuando te entregan un trabajo hecho como lo harías tú y, a veces, antes incluso de que se te ocurra pedirlo. Cuando tienes dots a tu lado, esas ideas y proyectos ambiciosos para los que no has tenido tiempo o apoyo empiezan a parecer posibles.\n\nDentro de OpenAI, estamos empezando a ver cómo es trabajar cuando la inteligencia trabaja siempre a tu lado. Se notifica un error en Slack y los dots empiezan inmediatamente a investigarlo. Llega un nuevo diseño y los dots lo convierten en una aplicación funcional mientras el equipo se centra en los comentarios de los clientes. Se pone en marcha un ciclo de planificación y los dots ayudan a seguir avanzando de forma coordinada para cumplir el plazo. Fuera de OpenAI, el dot de uno de los primeros usuarios de prueba detectó que al usuario se le había olvidado emitir una factura a una publicación, preparó la factura y la envió después de que el usuario la aprobara.\n\nHoy puedes empezar con tu dot principal, ponerle un nombre y personalizarlo. Con el tiempo, imaginamos equipos de dots que trabajen juntos en tu nombre. Estamos empezando a ofrecer los dots en los planes Pro, Business Premium y Enterprise en los mercados admitidos. Tenemos previsto ampliar pronto el acceso a los dots a más usuarios. También ofrecemos una versión preliminar de dots especializados con identidad propia para la gestión de accesos, el hardware aprovisionado por TI y la compatibilidad con integraciones profundas con los sistemas de registro de una empresa, para que puedan asumir responsabilidades bien definidas dentro de las organizaciones.\n\nLos dots pueden trabajar por su cuenta\n\nLos dots pueden hacer casi cualquier cosa con su propio ordenador en la nube, su propio navegador y las aplicaciones que has conectado.\n\nPuedes abrir el ordenador de tu dot en cualquier momento para revisar su trabajo. Además de sus propios dispositivos, los dots pueden conectarse a otros, y también puedes dar permiso al dot para conectarse a tu portátil y usarlo, para que pueda ayudarte directamente en lo que estés haciendo.\n\nCaptura de pantalla de un dot que usa Codex en su ordenador.\n\nTu dot puede hacerse cargo de un proyecto y sacarlo adelante, incluso mientras trabaja en varios más. Puedes seguir pasándole nuevas tareas e ideas sin tener que gestionar varios hilos por separado ni dirigir cada paso.\n\nLos dots son una extensión de ti\n\nCon un dot que conoce tus objetivos y tus criterios de calidad, puedes abarcar más sin tener que dirigir cada paso. Así funciona en la práctica:\n\nConvierte los comentarios en correcciones probadas\n\nEres desarrollador y trabajas en una aplicación. Tu dot revisa los comentarios de los clientes para detectar peticiones recurrentes, define el alcance de pequeñas mejoras y correcciones de errores, las desarrolla y prueba, y te entrega pull requests completas para que las revises, con vídeos adjuntos que muestran los cambios. Puedes seguir desarrollando la próxima gran función mientras revisas las correcciones y mejoras que prepara el dot.\n\nRevisa un lanzamiento cuando cambie su alcance\n\nLideras el lanzamiento de un producto. Tu dot aprende a conocer a tu público, tu posicionamiento y tus criterios creativos. Cuando cambia el alcance del producto, analiza cómo afecta al mensaje, revisa los materiales de lanzamiento y prepara borradores de los cambios en los recursos y documentos. Al volver, te encuentras con un plan de lanzamiento y un trabajo creativo que siguen las directrices que has marcado, listos para que los revises.\n\nActualiza un análisis con nuevas evidencias\n\nTe dedicas a la ciencia. Tu dot aprende cuál es tu pregunta de investigación y cómo evalúas las evidencias. A medida que llegan nuevos datos, vuelve a ejecutar los análisis, investiga los resultados inesperados y actualiza las figuras de tu artículo. Cuando cambian los hallazgos, revisa la explicación que los respalda y señala lo que debes revisar. Al volver del laboratorio, te encuentras con un trabajo que refleja las evidencias más recientes.\n\nActualiza una p"
+  },
+  "medios": [
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/KKSjto3MtJguvsLQsM1Bp/1704a6937d22b1bb3cac38dc5f43f9df/dots-o.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": "513"
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/magnifying-glass-lg.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/xmark-lg.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/play-sm-fill.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/arrow-right-lg.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/github-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/arrow-left-lg.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/sidebar.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/instagram-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/youtube-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/tiktok-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/x-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/linkedin-logo.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/favicon.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/3sMQM1f0yOmybdijOp1fCe/8bcd684e244230a291fd776052585cd4/260928_Dots_Vision_Film_Thumbnail.png?w=1920&q=50&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "24978"
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/ellipsis-horizontal.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/arrow-up-right-arrow-down-left-md-expand.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://videos.ctfassets.net/kftzwdyauwt9/6uzdRgJTUrxfMVNLKLtBie/284aabbc7cb186d0c351b574e6a25bdb/dots-intro-updated-o-light.mp4",
+      "ct": "video/mp4",
+      "status": 206,
+      "len": "332964"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206457710-eb21b0670a819d91949620fc76c6dc46e0c5725b66da0f441ac42ab522f87794-d?mw=80&q=85",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "674"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206457710-eb21b0670a819d91949620fc76c6dc46e0c5725b66da0f441ac42ab522f87794-d?mw=2300&mh=1295&q=70",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "11539"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MTEyNS0xOTY0NTU2/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~cNES-MPIHjxT-JWnEmpVfmaVtU5JvuAZYBmSLWT6mSI&r=dXMtY2VudHJhbDE%3D&range=1125-1964556",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "1963432"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MC04MDQ/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~9f2H0EuTelQ1_r3tzpjHZ0yDYG14Yq_LdfsP3YwiJHc&r=dXMtY2VudHJhbDE%3D&range=0-804",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "805"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MC02Nzc/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~AlUzDojiopmm1AT7jhVa8Ak4hfOVK7szxk-zJ-QWGJo&r=dXM%3D&range=0-677",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "678"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MTAxMC0xNDY3NDc/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~Fr7rcjXR957Em2Z1atu1x4VSHXqH-Hqcq7pTCkZ_wxs&r=dXM%3D&range=1010-146747",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "145738"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MTQ2NzQ4LTI5MjA1OA/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~DoSlxyCIMIqp6jD8QH88JysMKkwLe9kRQQK3gnMyye8&r=dXM%3D&range=146748-292058",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "145311"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MTk2NDU1Ny00MjI0NTcx/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~IYaxAFLaDEpncPfnB9ujLGD1qReatKfggfRDHnjePBI&r=dXMtY2VudHJhbDE%3D&range=1964557-4224571",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "2260015"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9MjkyMDU5LTQzNzYyMQ/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~QfUcAZgzpZ3QbJnVnrr0eumdUZYL2hhHLfZbAT5PccA&r=dXM%3D&range=292059-437621",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "145563"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9NDIyNDU3Mi02ODg5NjM5/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~a37wL7pRnDRgMpH99ofW8Hxv5eSElc5tyHJhew3-NIg&r=dXMtY2VudHJhbDE%3D&range=4224572-6889639",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "2665068"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9Njg4OTY0MC04NjU1ODYw/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~BbFqLlmQ1N7tOHvw5aItsrTefuSr-26g4UEA1R6MeeI&r=dXMtY2VudHJhbDE%3D&range=6889640-8655860",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "1766221"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9NDM3NjIyLTU4MjkzNw/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~MNSVcPdOvMsBY2dIq_iDWu0wbuDHBF1a-5IkpOynsfU&r=dXM%3D&range=437622-582937",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "145316"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9ODY1NTg2MS0xMDYyMTEzMQ/avf/821d0f17-6bcd-46c1-8965-63ee9e52bcfd.mp4?pathsig=8c953e4f~2dIMYD1OxYlcKwJY-FVMEn9dumLpKFI3hztUFoKlEsc&r=dXMtY2VudHJhbDE%3D&range=8655861-10621131",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "1965271"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707219~acl=%2F310ce484-e12b-4202-80a4-23e299a5ab98%2Fpsid%3D56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619%2F%2A~hmac=c5161ad4a77fcdce9a764f1208e7c73aa13dc5c9d1114f607709419ba9811ed0/310ce484-e12b-4202-80a4-23e299a5ab98/psid=56e0b71bf621d9e7a1a69556a3f658c0b5a88b401792703619/v2/range/prot/cmFuZ2U9NTgyOTM4LTcyODUxOQ/avf/0e9afe4c-5f6d-4c3d-88fa-b477965f47d8.mp4?pathsig=8c953e4f~NIhk1a99dLQTBkv-mVFiyPu7D5zodEJuKJrgbj_F1dE&r=dXM%3D&range=582938-728519",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "145582"
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/pause-sm-fill.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://openai.com/icons/cms/dbb6e7ac01deaca0/speaker-slash-fill.svg",
+      "ct": "image/svg+xml",
+      "status": 200,
+      "len": null
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/1Oztywa7RH91YIrrs6wScO/79f7b4aa2e8129ecd3682c462e7fe644/50f176cb-5be9-4b8d-8635-a7f85b9a9783.png?w=1920&q=50&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "48982"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/1NZB4F7BL01EyZAiEQdj12/40b5d5cc58214ea082c25d136fb08ebf/introducing-dots-carousel-launch.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "105884"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/1xROyxcQu9wVqdHbbOjetz/4598e195e1e8acb11b66dd7f340fde12/introducing-dots-carousel-feedback.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "104628"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/2Fkq1Gdj9qCPROo9D0OcYV/b0f10d9782bad4c8fe13545441a38a30/introducing-dots-carousel-content.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "168876"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206197686-f42e496d62b646790140456f108898cff1b3768bbfdecf13fe96fd09c606fcbe-d?mw=80&q=85",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "1075"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206197686-f42e496d62b646790140456f108898cff1b3768bbfdecf13fe96fd09c606fcbe-d?mw=2300&mh=1295&q=70",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "55572"
+    },
+    {
+      "u": "https://skyfire.vimeocdn.com/1792707226-0xc5a805861774ccbadbfbf62f9a27bf27d7608a07/2e25f724-5f11-497b-a7df-078384c76b57/psid=263a393d1c84a50cfe0d1754b0b4f14a2e29e40e1792703626/v2/range/prot/cmFuZ2U9ODczLTQzMjM5Mw/avf/990551bf-aa30-4b0d-ab3b-0257c71145ff.mp4?pathsig=8c953e4f~tjWk2W836hRzCdg4j-hYjbG2xviKh79oaR3QfWYnHso&r=dXMtd2VzdDE%3D&range=873-432393",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "431521"
+    },
+    {
+      "u": "https://skyfire.vimeocdn.com/1792707226-0xc5a805861774ccbadbfbf62f9a27bf27d7608a07/2e25f724-5f11-497b-a7df-078384c76b57/psid=263a393d1c84a50cfe0d1754b0b4f14a2e29e40e1792703626/v2/range/prot/cmFuZ2U9NDMyMzk0LTc3MjI0OQ/avf/990551bf-aa30-4b0d-ab3b-0257c71145ff.mp4?pathsig=8c953e4f~IYzWMbzKl29h4XJdKWGWq3npWz8q2us7SpeIrIZ6hbM&r=dXMtd2VzdDE%3D&range=432394-772249",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "339856"
+    },
+    {
+      "u": "https://skyfire.vimeocdn.com/1792707226-0xc5a805861774ccbadbfbf62f9a27bf27d7608a07/2e25f724-5f11-497b-a7df-078384c76b57/psid=263a393d1c84a50cfe0d1754b0b4f14a2e29e40e1792703626/v2/range/prot/cmFuZ2U9NzcyMjUwLTExMzY5Mjg/avf/990551bf-aa30-4b0d-ab3b-0257c71145ff.mp4?pathsig=8c953e4f~EnQVqnDc8AWetzz1CUedSMsImVYOvVYx3q42XR5sHOc&r=dXMtd2VzdDE%3D&range=772250-1136928",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "364679"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206160625-87ba02c575827804291d0a6545fb3f0abc76b773438f52a771c5f2602425f192-d?mw=80&q=85",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "786"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206160625-87ba02c575827804291d0a6545fb3f0abc76b773438f52a771c5f2602425f192-d?mw=2300&mh=1295&q=70",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "30472"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206258015-9eb3298f52ffc0637cf4ef4b4a344d851955ee2964c156e2acf2ef00bdeec1ad-d?mw=80&q=85",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "1726"
+    },
+    {
+      "u": "https://i.vimeocdn.com/video/2206258015-9eb3298f52ffc0637cf4ef4b4a344d851955ee2964c156e2acf2ef00bdeec1ad-d?mw=2300&mh=1295&q=70",
+      "ct": "image/avif",
+      "status": 200,
+      "len": "104410"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9NzgyLTU0MzE/avf/288fa879-971c-40f2-a0e1-a568fe080986.mp4?pathsig=8c953e4f~1R32zEdRaIRDsVwgIQ9h1xILMtLvJGTVi6DsEye9F70&r=dXM%3D&range=782-5431",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "4650"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9ODk3LTYzMzIxMw/avf/38e5db29-5d5d-4eb9-b425-6be9bf32e054.mp4?pathsig=8c953e4f~wKI8rD7MP8MSRYf2iYpeJWI85G5bH3j54H8oAXJC98w&r=dXMtY2VudHJhbDE%3D&range=897-633213",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "632317"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9NTQzMi0xMDA4MQ/avf/288fa879-971c-40f2-a0e1-a568fe080986.mp4?pathsig=8c953e4f~uaJz1Xt3u0xQEWDwoRiC2XX9niXL7BGXpwbsL98j1Lk&r=dXM%3D&range=5432-10081",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "4650"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9NjMzMjE0LTE0NDE2MzQ/avf/38e5db29-5d5d-4eb9-b425-6be9bf32e054.mp4?pathsig=8c953e4f~u0osPHq6A6z2WMQiv9KmIGyiAkeyMq2L3KEKdq2cfmY&r=dXMtY2VudHJhbDE%3D&range=633214-1441634",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "808421"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MTAwODItMTQ3MzE/avf/288fa879-971c-40f2-a0e1-a568fe080986.mp4?pathsig=8c953e4f~6D9FPna4FhUMsTkyBqeuVEy7zXFbWxl20C-9bZmC4Dc&r=dXM%3D&range=10082-14731",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "4650"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MTQ0MTYzNS0yMjc1MDcw/avf/38e5db29-5d5d-4eb9-b425-6be9bf32e054.mp4?pathsig=8c953e4f~vD1s9OfIJs4MHJSKWtNicUTfe7xDE5VBL8mxSsHQn4E&r=dXMtY2VudHJhbDE%3D&range=1441635-2275070",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "833436"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MTQ3MzItMTkzODE/avf/288fa879-971c-40f2-a0e1-a568fe080986.mp4?pathsig=8c953e4f~AD4lPWRfXXpO7yhVQhOicRHoTGz8cHfaI9Zax0Suc9I&r=dXM%3D&range=14732-19381",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "4650"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MjI3NTA3MS0zMDkyNTAy/avf/38e5db29-5d5d-4eb9-b425-6be9bf32e054.mp4?pathsig=8c953e4f~CZPxUtvxKI6Ak_SHCtIVP1013O2H6dJprefY56qvqcQ&r=dXMtY2VudHJhbDE%3D&range=2275071-3092502",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "817432"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/6E0HwFxJrpWOEiFct0ZfQE/bb595e7e6ab06dfd2c953cb915c8f89a/build-more-responsive-apps-with-the-decisions-api-cover.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "16786"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/30Y90LyD1QsbcsXhgLcbqH/7a9226e0bf6e06c7309a2b322e729a84/uber-brings-chatgpt-work-to-all-employees-cover.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "20548"
+    },
+    {
+      "u": "https://images.ctfassets.net/kftzwdyauwt9/5yeylkVM0cZ2W6k2lcnVyE/42a8333bccf5064328630ebf7c667082/broad-access-through-consistent-standards-cover.png?w=1920&q=90&fm=webp",
+      "ct": "image/webp",
+      "status": 200,
+      "len": "16640"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MTkzODItMjIzOTY/avf/288fa879-971c-40f2-a0e1-a568fe080986.mp4?pathsig=8c953e4f~Dd15jFpgEywingBTy-6F6raKBREacdG8Wx-34LGj3ZI&r=dXM%3D&range=19382-22396",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "3015"
+    },
+    {
+      "u": "https://vod-adaptive-ak.vimeocdn.com/exp=1792707228~acl=%2F102e89dc-7cc2-482f-abdb-32069dbda066%2Fpsid%3Dc738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628%2F%2A~hmac=64295a85ba4243c81841d240495681168337f25e3f622d360d82e37003ddc2f5/102e89dc-7cc2-482f-abdb-32069dbda066/psid=c738f33b4f40b6291b508938c2fd4c2a8fab4d671792703628/v2/range/prot/cmFuZ2U9MzA5MjUwMy0zNDAxOTky/avf/38e5db29-5d5d-4eb9-b425-6be9bf32e054.mp4?pathsig=8c953e4f~waPcKQKewpnMXYYZjqqqPQlQdMvB1mQlzO1M_1Wdjzg&r=dXMtY2VudHJhbDE%3D&range=3092503-3401992",
+      "ct": "video/mp4",
+      "status": 200,
+      "len": "309490"
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 # TASK-1316 — Growth E-E-A-T: Rater (rúbrica 4 pilares, YMYL-aware)
 
+## Delta 2026-10-25
+
+- efeoncepro.com ya expone autoría completa en cada post: byline «Por {autor}» enlazado al archivo, ficha de autor con cargo, bio, temas y redes (`rel="me"`), y un Person de Yoast coherente con lo visible (`jobTitle`, `image`, `sameAs` = redes visibles, `worksFor` por `@id #organization`). Un rater E-E-A-T puede leerlo de `EO_Author_Profile` / el JSON-LD — cerrado por trabajo en TASK-2057.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

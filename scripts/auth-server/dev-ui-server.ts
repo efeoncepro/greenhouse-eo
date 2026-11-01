@@ -1,6 +1,9 @@
 /** TASK-1835 visual harness: real renderers, fictional DTOs, no authentication or command execution. */
 import { createServer } from 'node:http'
 
+import type { LoginAnnouncementDto } from '../../src/lib/login-announcements/types'
+import { loadPublicLoginAnnouncements } from '../../src/lib/auth-server/persons/login-announcements'
+
 import { internalLoginFailureResponse } from '../../src/lib/auth-server/internal/login-error-page'
 
 import { htmlResponse } from '../../src/lib/auth-server/oauth/http'
@@ -33,9 +36,17 @@ const authority = `${host}:${port}`
 // This return path is inert: the harness has no OAuth route or command handler.
 const returnTo = '/oauth/authorize?client_id=visual-fixture&scope=efeonce.mcp.read'
 
+// Fictional editorial fixtures exercise both public DTO variants without querying production.
+const announcements: LoginAnnouncementDto[] = [
+  { id: 'fixture-text', kind: 'text', serviceLine: 'brand', tabLabel: 'Tu próximo paso', kicker: 'Ejemplo editorial', title: 'Un espacio para avanzar juntos.', body: 'Revisa las novedades de tu equipo en un solo lugar.', cta: { label: 'Conocer Efeonce', url: 'https://efeonce.com' }, image: { path: '/images/login/announcement-brand.webp', alt: 'Escena de trabajo creativo del set aprobado' }, lens: { x: 52, y: 30, radiusRatio: 0.24 } },
+  { id: 'fixture-banner', kind: 'banner', serviceLine: 'engine', tabLabel: 'Una nueva mirada', kicker: null, title: null, body: null, cta: { label: 'Conocer Efeonce', url: 'https://efeonce.com' }, image: { path: '/images/login/announcement-engine.webp', alt: 'Escena editorial de Efeonce' }, lens: null }
+]
+
 /** `/login` se sirve por el constructor canónico: su nonce y su `script-src` son los reales. */
 const loginFixtures = new Map<string, () => ReturnType<typeof renderLoginPageResponse>>([
   ['/login', () => renderLoginPageResponse(200, { returnTo, internalLoginUrl: '/noop/microsoft' })],
+  ['/login/rooms', () => renderLoginPageResponse(200, { returnTo, internalLoginUrl: '/noop/microsoft', productContext: { product: 'rooms', displayName: 'Rooms', returnUrl: 'https://rooms.efeonce.org' } })],
+  ['/login/announcements', () => renderLoginPageResponse(200, { returnTo, internalLoginUrl: '/noop/microsoft', announcements })],
   ['/login/external', () => renderLoginPageResponse(200, { returnTo })],
   [
     '/login/invalid-email',
@@ -155,6 +166,23 @@ return
 
   // Exact paths: no arbitrary filesystem lookup, query-driven fixtures or redirects.
   const path = request.url ?? ''
+
+  // Read-only preview of the exact published editorial feed used by the issuer wiring.
+  if (path === '/login/public-feed-preview') {
+    void loadPublicLoginAnnouncements().then(publicAnnouncements => {
+      const result = renderLoginPageResponse(200, {
+        returnTo, internalLoginUrl: '/noop/microsoft', announcements: publicAnnouncements
+      })
+
+      response.writeHead(result.status, {
+        ...result.headers,
+        'X-Auth-UI-Harness': 'public-editorial-preview-no-authentication'
+      })
+      response.end(result.body)
+    })
+
+    return
+  }
 
   if (path === '/internal-error') {
     const result = internalLoginFailureResponse(

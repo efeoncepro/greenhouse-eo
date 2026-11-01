@@ -1,0 +1,650 @@
+[
+  {
+    "id": "blue_beret",
+    "title": "Felipe",
+    "file": "dots-preset-001-blue_beret.png",
+    "reused": true
+  },
+  {
+    "id": "alfred",
+    "title": "Alfred",
+    "file": "dots-preset-002-alfred.png",
+    "reused": true
+  },
+  {
+    "id": "purple_heart",
+    "title": "Jojo",
+    "file": "dots-preset-003-purple_heart.png",
+    "reused": true
+  },
+  {
+    "id": "lime_frog",
+    "title": "Todd",
+    "file": "dots-preset-004-lime_frog.png",
+    "reused": true
+  },
+  {
+    "id": "coral_monocle",
+    "title": "Iris",
+    "file": "dots-preset-005-coral_monocle.png",
+    "reused": true
+  },
+  {
+    "id": "gus",
+    "title": "Thelma",
+    "file": "dots-preset-006-gus.png",
+    "reused": true
+  },
+  {
+    "id": "blue_spectacles",
+    "title": "Josh",
+    "file": "dots-preset-007-blue_spectacles.png",
+    "reused": true
+  },
+  {
+    "id": "lime_headphones",
+    "title": "Iggy",
+    "file": "dots-preset-008-lime_headphones.png",
+    "reused": true
+  },
+  {
+    "id": "matisse",
+    "title": "Tavi",
+    "file": "dots-preset-009-matisse.png",
+    "reused": true
+  },
+  {
+    "id": "zadie",
+    "title": "Nomi",
+    "file": "dots-preset-010-zadie.png",
+    "reused": true
+  },
+  {
+    "id": "otto",
+    "title": "Otto",
+    "file": "dots-preset-011-otto.png",
+    "reused": true
+  },
+  {
+    "id": "frida",
+    "title": "Fia",
+    "file": "dots-preset-012-frida.png",
+    "reused": true
+  },
+  {
+    "id": "remy",
+    "title": "Rolo",
+    "file": "dots-preset-013-remy.png",
+    "reused": true
+  },
+  {
+    "id": "nico",
+    "title": "Nico",
+    "file": "dots-preset-014-nico.png",
+    "reused": true
+  },
+  {
+    "id": "alma",
+    "title": "Alma",
+    "file": "dots-preset-015-alma.png",
+    "reused": true
+  },
+  {
+    "id": "claude",
+    "title": "Cado",
+    "file": "dots-preset-016-claude.png",
+    "reused": true
+  },
+  {
+    "id": "suki",
+    "title": "Suki",
+    "file": "dots-preset-017-suki.png",
+    "reused": true
+  },
+  {
+    "id": "pippa",
+    "title": "Pippa",
+    "file": "dots-preset-018-pippa.png",
+    "reused": true
+  },
+  {
+    "id": "jett",
+    "title": "Jett",
+    "file": "dots-preset-019-jett.png",
+    "reused": true
+  },
+  {
+    "id": "disco",
+    "title": "Disco",
+    "file": "dots-preset-020-disco.png",
+    "reused": true
+  },
+  {
+    "id": "vega",
+    "title": "Vega",
+    "file": "dots-preset-021-vega.png",
+    "reused": true
+  },
+  {
+    "id": "rumi",
+    "title": "Runi",
+    "file": "dots-preset-022-rumi.png",
+    "reused": true
+  },
+  {
+    "id": "ziggy",
+    "title": "Zumi",
+    "file": "dots-preset-023-ziggy.png",
+    "reused": true
+  },
+  {
+    "id": "echo",
+    "title": "Echo",
+    "file": "dots-preset-024-echo.png",
+    "reused": true
+  },
+  {
+    "id": "onyx",
+    "title": "Onyx",
+    "file": "dots-preset-025-onyx.png",
+    "reused": true
+  },
+  {
+    "id": "lola",
+    "title": "Lola",
+    "file": "dots-preset-026-lola.png",
+    "reused": true
+  },
+  {
+    "id": "tempo",
+    "title": "Tempo",
+    "file": "dots-preset-027-tempo.png",
+    "reused": true
+  },
+  {
+    "id": "muse",
+    "title": "Muse",
+    "file": "dots-preset-028-muse.png",
+    "reused": true
+  },
+  {
+    "id": "winston",
+    "title": "Willo",
+    "file": "dots-preset-029-winston.png",
+    "ms": 5320
+  },
+  {
+    "id": "bea",
+    "title": "Bea",
+    "file": "dots-preset-030-bea.png",
+    "ms": 1070
+  },
+  {
+    "id": "quill",
+    "title": "Quill",
+    "file": "dots-preset-031-quill.png",
+    "ms": 3346
+  },
+  {
+    "id": "hugo",
+    "title": "Hugo",
+    "file": "dots-preset-032-hugo.png",
+    "ms": 2055
+  },
+  {
+    "id": "ada",
+    "title": "Ada",
+    "file": "dots-preset-033-ada.png",
+    "ms": 1191
+  },
+  {
+    "id": "milo",
+    "title": "Milo",
+    "file": "dots-preset-034-milo.png",
+    "ms": 1024
+  },
+  {
+    "id": "margot",
+    "title": "Margot",
+    "file": "dots-preset-035-margot.png",
+    "ms": 1252
+  },
+  {
+    "id": "linus",
+    "title": "Linus",
+    "file": "dots-preset-036-linus.png",
+    "ms": 1018
+  },
+  {
+    "id": "wren",
+    "title": "Wren",
+    "file": "dots-preset-037-wren.png",
+    "ms": 1097
+  },
+  {
+    "id": "edie",
+    "title": "Edie",
+    "file": "dots-preset-038-edie.png",
+    "ms": 861
+  },
+  {
+    "id": "lumi",
+    "title": "Lumi",
+    "file": "dots-preset-039-lumi.png",
+    "ms": 937
+  },
+  {
+    "id": "mochi",
+    "title": "Mochi",
+    "file": "dots-preset-040-mochi.png",
+    "ms": 2134
+  },
+  {
+    "id": "fable",
+    "title": "Fable",
+    "file": "dots-preset-041-fable.png",
+    "ms": 2397
+  },
+  {
+    "id": "clover",
+    "title": "Clover",
+    "file": "dots-preset-042-clover.png",
+    "ms": 1063
+  },
+  {
+    "id": "sol",
+    "title": "Sol",
+    "file": "dots-preset-043-sol.png",
+    "ms": 1162
+  },
+  {
+    "id": "una",
+    "title": "Una",
+    "file": "dots-preset-044-una.png",
+    "ms": 1736
+  },
+  {
+    "id": "dove",
+    "title": "Dove",
+    "file": "dots-preset-045-dove.png",
+    "ms": 1050
+  },
+  {
+    "id": "pebble",
+    "title": "Pebble",
+    "file": "dots-preset-046-pebble.png",
+    "ms": 1574
+  },
+  {
+    "id": "kiki",
+    "title": "Kiki",
+    "file": "dots-preset-047-kiki.png",
+    "ms": 945
+  },
+  {
+    "id": "mallow",
+    "title": "Mallow",
+    "file": "dots-preset-048-mallow.png",
+    "ms": 1540
+  },
+  {
+    "id": "duke",
+    "title": "Dumo",
+    "file": "dots-preset-049-duke.png",
+    "ms": 2352
+  },
+  {
+    "id": "cleo",
+    "title": "Cleo",
+    "file": "dots-preset-050-cleo.png",
+    "ms": 1400
+  },
+  {
+    "id": "archie",
+    "title": "Archie",
+    "file": "dots-preset-051-archie.png",
+    "ms": 1718
+  },
+  {
+    "id": "dottie",
+    "title": "Dottie",
+    "file": "dots-preset-052-dottie.png",
+    "ms": 2124
+  },
+  {
+    "id": "percy",
+    "title": "Percy",
+    "file": "dots-preset-053-percy.png",
+    "ms": 1717
+  },
+  {
+    "id": "gigi",
+    "title": "Gigi",
+    "file": "dots-preset-054-gigi.png",
+    "ms": 2070
+  },
+  {
+    "id": "rupert",
+    "title": "Rupe",
+    "file": "dots-preset-055-rupert.png",
+    "ms": 1743
+  },
+  {
+    "id": "estelle",
+    "title": "Esti",
+    "file": "dots-preset-056-estelle.png",
+    "ms": 1561
+  },
+  {
+    "id": "teddy",
+    "title": "Teddy",
+    "file": "dots-preset-057-teddy.png",
+    "ms": 1844
+  },
+  {
+    "id": "rex",
+    "title": "Rex",
+    "file": "dots-preset-058-rex.png",
+    "ms": 961
+  },
+  {
+    "id": "watt",
+    "title": "Watt",
+    "file": "dots-preset-059-watt.png",
+    "ms": 2073
+  },
+  {
+    "id": "pixel",
+    "title": "Pixel",
+    "file": "dots-preset-060-pixel.png",
+    "ms": 1319
+  },
+  {
+    "id": "nova",
+    "title": "Nova",
+    "file": "dots-preset-061-nova.png",
+    "ms": 889
+  },
+  {
+    "id": "fizz",
+    "title": "Fizz",
+    "file": "dots-preset-062-fizz.png",
+    "ms": 975
+  },
+  {
+    "id": "dot",
+    "title": "Dot",
+    "file": "dots-preset-063-dot.png",
+    "ms": 2048
+  },
+  {
+    "id": "flint",
+    "title": "Flint",
+    "file": "dots-preset-064-flint.png",
+    "ms": 1191
+  },
+  {
+    "id": "zest",
+    "title": "Zest",
+    "file": "dots-preset-065-zest.png",
+    "ms": 1678
+  },
+  {
+    "id": "sora",
+    "title": "Sora",
+    "file": "dots-preset-066-sora.png",
+    "ms": 988
+  },
+  {
+    "id": "pico",
+    "title": "Pico",
+    "file": "dots-preset-067-pico.png",
+    "ms": 2147
+  },
+  {
+    "id": "saffron",
+    "title": "Saffron",
+    "file": "dots-preset-068-saffron.png",
+    "ms": 1694
+  },
+  {
+    "id": "scout",
+    "title": "Scout",
+    "file": "dots-preset-069-scout.png",
+    "ms": 1824
+  },
+  {
+    "id": "pogo",
+    "title": "Pogo",
+    "file": "dots-preset-070-pogo.png",
+    "ms": 1988
+  },
+  {
+    "id": "sunny",
+    "title": "Sunny",
+    "file": "dots-preset-071-sunny.png",
+    "ms": 1529
+  },
+  {
+    "id": "nell",
+    "title": "Nell",
+    "file": "dots-preset-072-nell.png",
+    "ms": 1951
+  },
+  {
+    "id": "taro",
+    "title": "Taro",
+    "file": "dots-preset-073-taro.png",
+    "ms": 1683
+  },
+  {
+    "id": "rio",
+    "title": "Rio",
+    "file": "dots-preset-074-rio.png",
+    "ms": 1196
+  },
+  {
+    "id": "birdie",
+    "title": "Birdie",
+    "file": "dots-preset-075-birdie.png",
+    "ms": 1644
+  },
+  {
+    "id": "wally",
+    "title": "Wally",
+    "file": "dots-preset-076-wally.png",
+    "ms": 1180
+  },
+  {
+    "id": "mabel",
+    "title": "Mabel",
+    "file": "dots-preset-077-mabel.png",
+    "ms": 1502
+  },
+  {
+    "id": "otis",
+    "title": "Otis",
+    "file": "dots-preset-078-otis.png",
+    "ms": 1531
+  },
+  {
+    "id": "tutti",
+    "title": "Tutti",
+    "file": "dots-preset-079-tutti.png",
+    "ms": 1906
+  },
+  {
+    "id": "juno",
+    "title": "Juno",
+    "file": "dots-preset-080-juno.png",
+    "ms": 1953
+  },
+  {
+    "id": "puck",
+    "title": "Puck",
+    "file": "dots-preset-081-puck.png",
+    "ms": 1392
+  },
+  {
+    "id": "gumdrop",
+    "title": "Gumi",
+    "file": "dots-preset-082-gumdrop.png",
+    "ms": 987
+  },
+  {
+    "id": "rocco",
+    "title": "Rocco",
+    "file": "dots-preset-083-rocco.png",
+    "ms": 935
+  },
+  {
+    "id": "nori",
+    "title": "Nori",
+    "file": "dots-preset-084-nori.png",
+    "ms": 1320
+  },
+  {
+    "id": "peaches",
+    "title": "Peaches",
+    "file": "dots-preset-085-peaches.png",
+    "ms": 1093
+  },
+  {
+    "id": "bowie",
+    "title": "Bibi",
+    "file": "dots-preset-086-bowie.png",
+    "ms": 804
+  },
+  {
+    "id": "taffy",
+    "title": "Taffy",
+    "file": "dots-preset-087-taffy.png",
+    "ms": 831
+  },
+  {
+    "id": "moxie",
+    "title": "Moxie",
+    "file": "dots-preset-088-moxie.png",
+    "ms": 1392
+  },
+  {
+    "id": "halo",
+    "title": "Cielo",
+    "file": "dots-preset-089-halo.png",
+    "ms": 1127
+  },
+  {
+    "id": "orbit",
+    "title": "Ollo",
+    "file": "dots-preset-090-orbit.png",
+    "ms": 1602
+  },
+  {
+    "id": "prism",
+    "title": "Prism",
+    "file": "dots-preset-091-prism.png",
+    "ms": 1179
+  },
+  {
+    "id": "opal",
+    "title": "Opal",
+    "file": "dots-preset-092-opal.png",
+    "ms": 983
+  },
+  {
+    "id": "aster",
+    "title": "Aster",
+    "file": "dots-preset-093-aster.png",
+    "ms": 932
+  },
+  {
+    "id": "cosmo",
+    "title": "Cosmo",
+    "file": "dots-preset-094-cosmo.png",
+    "ms": 1502
+  },
+  {
+    "id": "lyra",
+    "title": "Lyra",
+    "file": "dots-preset-095-lyra.png",
+    "ms": 2130
+  },
+  {
+    "id": "elio",
+    "title": "Elio",
+    "file": "dots-preset-096-elio.png",
+    "ms": 1175
+  },
+  {
+    "id": "neptune",
+    "title": "Neptune",
+    "file": "dots-preset-097-neptune.png",
+    "ms": 1346
+  },
+  {
+    "id": "comet",
+    "title": "Comet",
+    "file": "dots-preset-098-comet.png",
+    "ms": 959
+  },
+  {
+    "id": "mika",
+    "title": "Mika",
+    "file": "dots-preset-099-mika.png",
+    "ms": 4078
+  },
+  {
+    "id": "fergus",
+    "title": "Fergus",
+    "file": "dots-preset-100-fergus.png",
+    "ms": 2577
+  },
+  {
+    "id": "noel",
+    "title": "Noel",
+    "file": "dots-preset-101-noel.png",
+    "ms": 3392
+  },
+  {
+    "id": "basil",
+    "title": "Basil",
+    "file": "dots-preset-102-basil.png",
+    "ms": 1678
+  },
+  {
+    "id": "tilly",
+    "title": "Tilly",
+    "file": "dots-preset-103-tilly.png",
+    "ms": 1875
+  },
+  {
+    "id": "arlo",
+    "title": "Arlo",
+    "file": "dots-preset-104-arlo.png",
+    "ms": 2242
+  },
+  {
+    "id": "nina",
+    "title": "Nina",
+    "file": "dots-preset-105-nina.png",
+    "ms": 1526
+  },
+  {
+    "id": "chai",
+    "title": "Chai",
+    "file": "dots-preset-106-chai.png",
+    "ms": 2214
+  },
+  {
+    "id": "ollie",
+    "title": "Ollie",
+    "file": "dots-preset-107-ollie.png",
+    "ms": 1943
+  },
+  {
+    "id": "dahlia",
+    "title": "Dahlia",
+    "file": "dots-preset-108-dahlia.png",
+    "ms": 1259
+  }
+]

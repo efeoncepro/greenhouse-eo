@@ -1,5 +1,18 @@
 # TASK-2050 — Portada del blog v3: modelo de contenido en WordPress
 
+## Delta 2026-10-24 (Glitch Nota retirada)
+
+- `eo_format` pierde «Glitch Nota»: todo Glitch sin número de edición es Flash (decisión del operador; PDR-029 delta
+  «Glitch: Edición o Flash»; `efeonce-editorial-blocks` 0.5.0, `TERMS_VERSION` 4 migra y borra el término).
+
+## Delta 2026-10-24 (tarjetas v2)
+
+- El modelo creció con las tarjetas v2 de «Para leer con calma» (en producción desde 21:12 UTC; `efeonce-editorial-blocks`
+  0.4.4, `EO_CM_VERSION` 0.2.1): formato `podcast` (`TERMS_VERSION` 3), metas `_eo_reviewed_at` y `_eo_client` en
+  `EO_Home_Pins` (panel y REST), y el riel suma el próximo evento y los podcast sin el mínimo de 12 minutos, armado por
+  `EO_Home_Adapter::rail()` con insignias por regla. Test del modelo: 202 checks — cerrado por trabajo en TASK-2051.
+  Contrato: PDR-029, delta de las tarjetas v2.
+
 ## Delta 2026-10-24
 
 - Cada evento puede tener su formulario de reserva (`event_registration`, `form_key` propio, `event_key` fijo como campo

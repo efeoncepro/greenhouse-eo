@@ -1,0 +1,393 @@
+{
+  "template": "cotizacion-a4",
+  "version": 2,
+  "templateFiles": [
+    {
+      "name": "template-lineas.html",
+      "sha256": "eda1239a73718a0b01a6814d1f4abe0e511c921b8585cd1103493d3b265e6ec3"
+    },
+    {
+      "name": "template.css",
+      "sha256": "c79c121d37ae2619e36dcfe497be9f4150e5bba52f57835502891869d8e16fe5"
+    },
+    {
+      "name": "template-lineas.css",
+      "sha256": "17bf450749b18317675a51ddd2a58843a58501dd4736a234c8ea51a965fcdb9e"
+    }
+  ],
+  "generatedAt": "2026-10-29T21:49:14.151Z",
+  "dataVersion": 2,
+  "pageCount": 4,
+  "status": "draft",
+  "signed": false,
+  "submitted": false,
+  "currency": "COP",
+  "sourceCurrency": "COP",
+  "presentation": {
+    "currency": "COP",
+    "sourceCurrency": "COP",
+    "locale": "es-CL",
+    "precision": 0,
+    "fx": null
+  },
+  "amounts": {
+    "net": 456000000,
+    "vat": 0,
+    "total": 456000000,
+    "monthly": null,
+    "taxSource": "not_applicable"
+  },
+  "dataSource": "docs/commercial/tenders/gana-loti-agencia-digital-2027-1552/cotizacion/cotizacion.json",
+  "dataSha256": "35fe188270f4c72c487767b4d0ac31f8c4094263712c3d4ff9b1d7eb2e019c39",
+  "brand": {
+    "line": "engine",
+    "assets": [
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/efeonce-logo-positive.svg",
+        "source": "axis-brand-assets:efeonce-logo-positive",
+        "bytes": 4383,
+        "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+      },
+      {
+        "file": "node_modules/@efeoncepro/axis-brand-assets/assets/url-bubble-baked-light.svg",
+        "source": "axis-brand-assets:url-bubble-baked-light",
+        "bytes": 9410,
+        "sha256": "12d726db31d0dad6b07723f3bf0289094216c8f5baf72d93e10af2e1e5d930b8"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/bricolage-grotesque-variable.ttf",
+        "source": "axis-fonts",
+        "bytes": 408496,
+        "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-400.ttf",
+        "source": "axis-fonts",
+        "bytes": 158240,
+        "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-500.ttf",
+        "source": "axis-fonts",
+        "bytes": 152860,
+        "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-600.ttf",
+        "source": "axis-fonts",
+        "bytes": 151516,
+        "sha256": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+      },
+      {
+        "file": "src/lib/artifact-composer/brand-packs/axis/fonts/poppins-700.ttf",
+        "source": "axis-fonts",
+        "bytes": 150292,
+        "sha256": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+      }
+    ],
+    "contactSource": "src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json",
+    "orbit": {
+      "schema": "axis.graphic-line-orbit-composition.v1",
+      "contract": {
+        "id": "efeonce.graphic-line-orbit",
+        "version": "0.3.1"
+      },
+      "canvas": {
+        "width": 794,
+        "height": 1123,
+        "line": "engine",
+        "product": "wave",
+        "platform": null,
+        "surface": "light",
+        "channel": "print",
+        "scale": 1,
+        "socialMultiplierApplied": false
+      },
+      "palette": {
+        "accent": "#0375db",
+        "background": "#f7f8f6",
+        "ring": "#72ded8",
+        "halo": "#72ded8"
+      },
+      "elements": [
+        {
+          "kind": "orbit",
+          "id": "orbit",
+          "placement": {
+            "region": "center",
+            "radius": {
+              "ratio": 0.3,
+              "of": "width"
+            }
+          },
+          "ring": {
+            "strokePx": 1,
+            "opacity": 0.16,
+            "color": "#023c70",
+            "innerOrbits": [
+              {
+                "radiusRatio": 0.72,
+                "opacity": 0.11
+              },
+              {
+                "radiusRatio": 0.44,
+                "opacity": 0.06
+              }
+            ]
+          },
+          "innerOrbits": false,
+          "arc": {
+            "startDeg": 65,
+            "sweepDeg": 50,
+            "strokePx": 1.6,
+            "color": "#0375db",
+            "linecap": "round",
+            "gradient": false
+          },
+          "trajectory": {
+            "meaning": "accent",
+            "origin": null,
+            "direction": "clockwise",
+            "sweepDeg": 50,
+            "value": null,
+            "valueLabel": null,
+            "pairsWithNumber": false
+          },
+          "sphere": {
+            "radiusPx": 3.5,
+            "color": "#0375db",
+            "at": "arc-end",
+            "ring": null
+          },
+          "halo": null
+        }
+      ],
+      "adapterChecks": [
+        "text-never-crosses-ring",
+        "ring-center-on-target-center",
+        "sphere-on-arc-end",
+        "lens-subject-inside-circle",
+        "url-as-bubble-never-text",
+        "decorative-svg-hidden-from-accessibility-tree",
+        "signature-centered",
+        "signature-min-contrast",
+        "accent-text-min-size",
+        "orbit-never-over-subject-or-reserves",
+        "accent-arc-never-reads-as-data",
+        "answer-period-part-of-text",
+        "measure-shows-value-and-source"
+      ]
+    }
+  },
+  "checks": {
+    "layout": [
+      {
+        "page": 1,
+        "gapPx": 40.5,
+        "headerGapPx": 64,
+        "contentPx": 768.25,
+        "overflow": []
+      },
+      {
+        "page": 2,
+        "gapPx": 74.421875,
+        "headerGapPx": 22.265625,
+        "contentPx": 814.140625,
+        "overflow": []
+      },
+      {
+        "page": 3,
+        "gapPx": 30.046875,
+        "headerGapPx": 22.265625,
+        "contentPx": 858.515625,
+        "overflow": []
+      },
+      {
+        "page": 4,
+        "gapPx": 190.6875,
+        "headerGapPx": 22.265625,
+        "contentPx": 697.875,
+        "overflow": []
+      }
+    ],
+    "fixedPages": [
+      {
+        "page": 1,
+        "name": "portada",
+        "estimatedPx": 768.32,
+        "capacityPx": 802.75,
+        "blocks": [
+          {
+            "key": "label",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "title",
+            "gapPx": 16,
+            "heightPx": 186.12
+          },
+          {
+            "key": "subtitle",
+            "gapPx": 22,
+            "heightPx": 92.8
+          },
+          {
+            "key": "client",
+            "gapPx": 28,
+            "heightPx": 99.8
+          },
+          {
+            "key": "investment",
+            "gapPx": 28,
+            "heightPx": 198.6
+          },
+          {
+            "key": "supplier",
+            "gapPx": 24,
+            "heightPx": 57
+          }
+        ],
+        "measuredPx": 768.25
+      },
+      {
+        "page": 2,
+        "name": "alcance",
+        "estimatedPx": 814.39,
+        "capacityPx": 882.56,
+        "blocks": [
+          {
+            "key": "overline",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "title",
+            "gapPx": 10,
+            "heightPx": 85.07
+          },
+          {
+            "key": "intro",
+            "gapPx": 14,
+            "heightPx": 43.95
+          },
+          {
+            "key": "rows",
+            "gapPx": 20,
+            "heightPx": 434.4
+          },
+          {
+            "key": "scheduleHeading",
+            "gapPx": 23,
+            "heightPx": 23.33
+          },
+          {
+            "key": "phases",
+            "gapPx": 14,
+            "heightPx": 130.64
+          }
+        ],
+        "measuredPx": 814.14
+      },
+      {
+        "page": 4,
+        "name": "condiciones",
+        "estimatedPx": 697.91,
+        "capacityPx": 882.56,
+        "blocks": [
+          {
+            "key": "overline",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "title",
+            "gapPx": 10,
+            "heightPx": 85.07
+          },
+          {
+            "key": "rows",
+            "gapPx": 22,
+            "heightPx": 510.24
+          },
+          {
+            "key": "contact",
+            "gapPx": 22,
+            "heightPx": 32.6
+          }
+        ],
+        "measuredPx": 697.88
+      }
+    ],
+    "interiorHeader": {
+      "unit": 1,
+      "section": 1,
+      "reference": 1,
+      "limit": 3
+    },
+    "pagination": [
+      {
+        "page": 3,
+        "estimatedPx": 858.68,
+        "capacityPx": 870,
+        "blocks": [
+          {
+            "key": "overline",
+            "gapPx": 0,
+            "heightPx": 16
+          },
+          {
+            "key": "title",
+            "gapPx": 10,
+            "heightPx": 85.07
+          },
+          {
+            "key": "intro",
+            "gapPx": 14,
+            "heightPx": 43.95
+          },
+          {
+            "key": "lines",
+            "gapPx": 20,
+            "heightPx": 383.53,
+            "rowsPx": [
+              69.11,
+              69.11,
+              69.11,
+              69.11,
+              69.11
+            ]
+          },
+          {
+            "key": "totals",
+            "gapPx": 22,
+            "heightPx": 232
+          },
+          {
+            "key": "taxNote",
+            "gapPx": 14,
+            "heightPx": 18.13
+          }
+        ],
+        "measuredPx": 858.52
+      }
+    ],
+    "mobile": {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    "browserErrors": [],
+    "visualReview": "pending",
+    "pdfTextAndPageAudit": "pending"
+  },
+  "files": [
+    {
+      "name": "cotizacion.html",
+      "sha256": "b2cefd85c3ad10b9347e9cd0902af95a2bcc8a8b4bd7d6ee8c3762ff09ef75da"
+    },
+    {
+      "name": "cotizacion.pdf",
+      "sha256": "dd9125d1ab5a647b6b53aa0d6475855d2775801bc5426d3e76544c964cc01162"
+    }
+  ]
+}

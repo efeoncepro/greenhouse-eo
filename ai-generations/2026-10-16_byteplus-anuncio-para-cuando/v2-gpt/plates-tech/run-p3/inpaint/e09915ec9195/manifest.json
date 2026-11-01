@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e09915ec9195",
+  "key": "e09915ec919558caedc36be31ddb6c3566ed3bb4628c7ae7e928b6ad724e59fa",
+  "status": "completed",
+  "createdAt": "2026-10-17T11:13:18.854Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates/p3.png",
+    "imageSha256": "458608dcd545f2fb03073642eeb00e8ced0f58f96bc32a5f32dad5ae64b18bb5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/plates-tech/masks/p3.png",
+    "maskSha256": "9460a198b11631a7171fa3bc0c42fe18bb66f0558f83b744688a5b44885745fa",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 1152,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the tablet inside the marked zone with a current-generation premium tablet: very thin, slim uniform bezels, flat aluminum edges, same size and angle, still held by the same hand, its screen showing the same beach photo collage. Keep her fingers and hand natural and unchanged in pose. Photorealistic webcam image.",
+    "providerPrompt": "Replace only the tablet inside the marked zone with a current-generation premium tablet: very thin, slim uniform bezels, flat aluminum edges, same size and angle, still held by the same hand, its screen showing the same beach photo collage. Keep her fingers and hand natural and unchanged in pose. Photorealistic webcam image."
+  },
+  "mask": {
+    "touchedFraction": 0.19963243272569445,
+    "editable": 316400,
+    "soft": 36844,
+    "protected": 1416228
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 1152
+    },
+    "target": {
+      "width": 1536,
+      "height": 1152
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 57 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0489,
+    "basis": "1 × salida 1536x1152 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 84.058,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.21,
+        "bestError": 3.21,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1416228,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 316400,
+        "maxDelta": 241,
+        "meanDelta": 92.673,
+        "worst": {
+          "x": 1379,
+          "y": 775
+        }
+      },
+      "seam": {
+        "pixels": 36844,
+        "maxDelta": 227,
+        "meanDelta": 10.075,
+        "worst": {
+          "x": 877,
+          "y": 516
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1416228,
+        "maxDelta": 168,
+        "meanDelta": 6.667,
+        "worst": {
+          "x": 1460,
+          "y": 786
+        }
+      },
+      "outputUsd": 0.0489,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1559,
+        "input_tokens_details": {
+          "image_tokens": 1452,
+          "text_tokens": 107
+        },
+        "output_tokens": 1629,
+        "output_tokens_details": {
+          "image_tokens": 1629,
+          "text_tokens": 0
+        },
+        "total_tokens": 3188
+      },
+      "meta": {
+        "size": "1536x1152",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

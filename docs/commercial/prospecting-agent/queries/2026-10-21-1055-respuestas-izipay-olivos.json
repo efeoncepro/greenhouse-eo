@@ -1,0 +1,80 @@
+{
+  "run_id": "2026-10-21-1055-respuestas-izipay-olivos",
+  "last_checked_at": "2026-10-21T10:55:09.010755-03:00",
+  "timezone": "America/Santiago",
+  "type": "buyer_replies_review",
+  "queries": [
+    {
+      "source": "Outlook",
+      "query": "from:[dominio corporativo izipay] received>=2026-10-21",
+      "redacted": true,
+      "results": 2,
+      "read": "invitación RFQ001; NDR anterior no reintentado"
+    },
+    {
+      "source": "Outlook",
+      "query": "from:[dominio corporativo Olivos del Sur] received>=2026-10-21",
+      "redacted": true,
+      "results": 1
+    },
+    {
+      "source": "Outlook",
+      "operation": "fetch_messages_batch",
+      "count": 2,
+      "result": "dos cuerpos íntegros leídos; sin adjuntos"
+    },
+    {
+      "source": "HubSpot",
+      "operation": "get_crm_objects CONTACT",
+      "ids": [
+        256738112539,
+        253263177790,
+        256748000582,
+        256741155649
+      ],
+      "result": "Iris no inscrita; adyacentes dos inscritos; ninguna mutación"
+    }
+  ],
+  "candidates": [
+    {
+      "account": "izipay",
+      "reference": "RFQ001-AgenciaCreativa-2027",
+      "result": "INVITACION_RECIBIDA_INVESTIGACION_INCOMPLETA",
+      "source": "correo primario del comprador; cuerpo íntegro leído",
+      "document_read": "invitación; sin contrato, bases o brief adjuntos",
+      "last_checked_at": "2026-10-21T10:55:09.010755-03:00",
+      "published_at": null,
+      "first_seen_at": "2026-10-21T13:41:20Z",
+      "deadline_at": "2026-10-22T17:00:00",
+      "deadline_timezone": "NO_INFORMADA",
+      "deadline_stage": "confirmación de interés, no entrega de ofertas",
+      "awardee": "NO_VERIFICADO",
+      "award_act_order": "NO_VERIFICADO",
+      "contract_status": "NO_VERIFICADO",
+      "signed_at": "NO_VERIFICADO",
+      "execution_start_end": "año2027 general; fechas contractuales NO_VERIFICADAS",
+      "blocking_data": [
+        "zona horaria",
+        "brief",
+        "bases y criterios",
+        "calendario de propuestas",
+        "contrato/adjudicación y expediente no revisados"
+      ],
+      "approved_actions": "lectura y documentación local; sin envío ni CRM"
+    },
+    {
+      "account": "Olivos del Sur",
+      "result": "ACUSE_REVISION_INTERNA_ESPERAR",
+      "last_checked_at": "2026-10-21T10:55:09.010755-03:00",
+      "source": "correo del equipo Marketing leído íntegramente",
+      "first_seen_at": "2026-10-21T13:39:37Z",
+      "deadline_at": null,
+      "contract_control": "NO_VERIFICADO; no se propone compra disponible ni postulación por el acuse",
+      "new_request": false
+    }
+  ],
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-1055-respuestas-izipay-olivos",
+  "crm_writes": 0,
+  "sends": 0,
+  "sequence_changes": 0
+}

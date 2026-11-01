@@ -1,0 +1,17 @@
+{
+  "pieza": "Efeonce | Microsoft — Escala sin límites (glasmorfismo Fluent)",
+  "duracion_s": 8.0, "fps": 24, "tempo_bpm": 120, "tiempo_s": 0.5,
+  "regla": "Imagen, SFX y música sobre la misma grilla. Golpes en 2,0 y 4,0 (un compás). Logo en 5,0 con entrada lenta.",
+  "cues": [
+    { "t": 0.0,  "hasta": 0.5,  "imagen": "Se enciende una cápsula de vidrio esmerilado", "sonido": "campanilla de vidrio + tono grave" },
+    { "t": 0.5,  "hasta": 1.5,  "imagen": "Se duplica en cada tiempo (0,5 · 1,0 · 1,5): 2, 4, 8; retroceso seco de cámara por salto", "sonido": "campanillas que se duplican (negras→corcheas→semicorcheas); riser una octava por salto" },
+    { "t": 1.5,  "hasta": 1.75, "imagen": "Estallido: cientos de burbujas en espiral", "sonido": "redoble de vidrio que se vuelve rugido" },
+    { "t": 1.75, "hasta": 2.0,  "imagen": "Congelado", "sonido": "silencio absoluto" },
+    { "t": 2.0,  "imagen": "GOLPE 1 — corte con fogonazo al túnel de cintas curvas", "sonido": "drop: impacto de vidrio + sub + braam" },
+    { "t": 2.0,  "hasta": 4.0,  "imagen": "Vuelo por el túnel con pulsos de luz", "sonido": "pulso en corcheas; cada pulso de luz un acento; barrido creciente" },
+    { "t": 4.0,  "imagen": "GOLPE 2 — sale del túnel y revela la nube sobre el horizonte Azure", "sonido": "gran acorde + braam + brillo de cristal" },
+    { "t": 4.6,  "hasta": 4.98, "imagen": "La nube se asienta", "sonido": "vacío del resto de la mezcla" },
+    { "t": 5.0,  "imagen": "Lockup en etapas", "sonido": "sting de Efeonce (pico)" },
+    { "t": 5.0,  "hasta": 8.0,  "imagen": "Nube viva", "sonido": "pad + fundido" }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a6460da72944",
+  "key": "a6460da72944f0ab8c2d26b763a1357fd2f6a3991e4ca8d8d4adad4a715f1373",
+  "status": "completed",
+  "createdAt": "2026-10-20T16:29:24.744Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png",
+    "imageSha256": "5fe61d83c650e74976f73a5033f07cff0fec8c41480d5bf54662103f9bf6d8f9",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-20_propuesta-assetplan/plates/BR3-mask-luz.png",
+    "maskSha256": "82593f62f9a85f4a7703443ed5b171c527870490d3c8a998fa15442978e85f56",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 2,
+    "prompt": "Relight this exact scene so the glowing ring portal is a neon light in a vivid magenta-pink (the color #E86BD0) instead of teal. The sphere at the top of the ring is a white-hot light source with a soft magenta-pink bloom around it, like a real bright lamp: a bright almost-white core fading into saturated pink glow, never a flat pastel disc. The ring keeps exactly the same shape, thickness, position and the same gap where it meets the sphere. The thin haze inside and around the ring glows a soft, clean magenta-pink near the ring and fades into deep dark navy-black away from it; no red, no maroon, no brown tint anywhere. The wet floor reflections and the light line on the horizon reflect the same magenta-pink light. Everything else stays identical: same composition, same camera, same dark studio, same floor texture. Do not add any object or text. Keep the framing identical. Photographic, cinematic, realistic light physics.",
+    "providerPrompt": "Relight this exact scene so the glowing ring portal is a neon light in a vivid magenta-pink (the color #E86BD0) instead of teal. The sphere at the top of the ring is a white-hot light source with a soft magenta-pink bloom around it, like a real bright lamp: a bright almost-white core fading into saturated pink glow, never a flat pastel disc. The ring keeps exactly the same shape, thickness, position and the same gap where it meets the sphere. The thin haze inside and around the ring glows a soft, clean magenta-pink near the ring and fades into deep dark navy-black away from it; no red, no maroon, no brown tint anywhere. The wet floor reflections and the light line on the horizon reflect the same magenta-pink light. Everything else stays identical: same composition, same camera, same dark studio, same floor texture. Do not add any object or text. Keep the framing identical. Photographic, cinematic, realistic light physics."
+  },
+  "mask": {
+    "touchedFraction": 0.9630208696637835,
+    "editable": 1767151,
+    "soft": 0,
+    "protected": 67857
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1792,
+      "height": 1024
+    },
+    "target": {
+      "width": 1792,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0746,
+    "basis": "2 × salida 1792x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 26.633,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.48,
+        "bestError": 4.48,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        35.16,
+        -26.98,
+        6.94
+      ],
+      "protected": {
+        "pixels": 67857,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1767151,
+        "maxDelta": 180,
+        "meanDelta": 26.633,
+        "worst": {
+          "x": 1433,
+          "y": 804
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 67857,
+        "maxDelta": 210,
+        "meanDelta": 16.825,
+        "worst": {
+          "x": 1143,
+          "y": 592
+        }
+      },
+      "outputUsd": 0.0373,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 1728,
+        "input_tokens_details": {
+          "image_tokens": 1479,
+          "text_tokens": 249
+        },
+        "output_tokens": 1243,
+        "output_tokens_details": {
+          "image_tokens": 1243,
+          "text_tokens": 0
+        },
+        "total_tokens": 2971
+      },
+      "meta": {
+        "size": "1792x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 27.02,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.31,
+        "bestError": 6.31,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        28.28,
+        -29.36,
+        4.77
+      ],
+      "protected": {
+        "pixels": 67857,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1767151,
+        "maxDelta": 184,
+        "meanDelta": 27.02,
+        "worst": {
+          "x": 1433,
+          "y": 804
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 67857,
+        "maxDelta": 211,
+        "meanDelta": 16.413,
+        "worst": {
+          "x": 1143,
+          "y": 592
+        }
+      },
+      "outputUsd": 0.0373,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 1728,
+        "input_tokens_details": {
+          "image_tokens": 1479,
+          "text_tokens": 249
+        },
+        "output_tokens": 1243,
+        "output_tokens_details": {
+          "image_tokens": 1243,
+          "text_tokens": 0
+        },
+        "total_tokens": 2971
+      },
+      "meta": {
+        "size": "1792x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

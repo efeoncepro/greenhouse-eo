@@ -13,6 +13,7 @@ import { createAuthServerStyles } from './styles'
 import { renderAuthFontAssetsModule } from './generate-font-assets'
 import { generateStepUpController } from './step-up-controller-build'
 import { generateLoginController } from './login-controller-build'
+import { renderLoginStageAssetsModule } from './generate-login-stage-assets'
 
 const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
@@ -35,6 +36,7 @@ const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(pat
 
 const svg = readBrandSvg(SOURCE)
 const logotype = readBrandSvg(LOGOTYPE_SOURCE)
+const positiveLogotype = readBrandSvg(join(ROOT, 'public/branding/logo-full.svg'))
 
 /**
  * Las marcas de terceros se embeben TAL CUAL: `sanitizeBrandSvg` está hecho para los SVG de Efeonce
@@ -65,6 +67,8 @@ const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding
 export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
 
 export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
+
+export const EFEONCE_LOGOTYPE_SVG = ${JSON.stringify(positiveLogotype)}
 
 /** Marcas de terceros para la ficha de aplicación del consentimiento (ver client-marks.ts). */
 export const CLIENT_MARK_CLAUDE_SVG = ${JSON.stringify(clientMarks.CLAUDE)}
@@ -108,3 +112,5 @@ void generateLoginController().catch(() => {
   console.error('[auth-server] login controller generation failed')
   process.exitCode = 1
 })
+
+writeFileSync(join(ROOT, 'src/lib/auth-server/oauth/pages/login-stage.generated.ts'), renderLoginStageAssetsModule(ROOT))

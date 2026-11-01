@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "7f9d93e1b4ac",
+  "key": "7f9d93e1b4acd6ceb95e80dab9e4a1ed82975ba29428f4801f2d70264843cfae",
+  "status": "completed",
+  "createdAt": "2026-10-17T20:27:41.988Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/final/12-paredes.png",
+    "imageSha256": "34a750b60c7160ab2aee0f05d2058adb6e45f391a4531224d0a6b5321d8b08d4",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/planos/12-borde-mask.png",
+    "maskSha256": "7e0707ccf52112a86d49205e8a2d63e4153df32f20b7c40d6e833839c494ae3f",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Clean floor-to-ceiling window glass with the same bright daylight and the distant city and sky behind it, continuing the window frame. No screen, no orange glow, no reflection of the screen.",
+    "providerPrompt": "Clean floor-to-ceiling window glass with the same bright daylight and the distant city and sky behind it, continuing the window frame. No screen, no orange glow, no reflection of the screen."
+  },
+  "mask": {
+    "touchedFraction": 0.0215118408203125,
+    "editable": 20124,
+    "soft": 8072,
+    "protected": 1282524
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 719,
+      "top": 0,
+      "width": 305,
+      "height": 907
+    },
+    "target": {
+      "width": 592,
+      "height": 1760
+    },
+    "aspectError": 0.00026818439166844554,
+    "reason": "la zona con contexto ocupa 20.9 % de la imagen: se genera recortada a 592x1760"
+  },
+  "estimate": {
+    "usd": 0.0176,
+    "basis": "1 × salida 592x1760 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 63.572,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 13.2,
+        "bestError": 13.2,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1282524,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 20124,
+        "maxDelta": 201,
+        "meanDelta": 68.361,
+        "worst": {
+          "x": 981,
+          "y": 544
+        }
+      },
+      "seam": {
+        "pixels": 8072,
+        "maxDelta": 198,
+        "meanDelta": 51.634,
+        "worst": {
+          "x": 980,
+          "y": 500
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1282524,
+        "maxDelta": 226,
+        "meanDelta": 9.037,
+        "worst": {
+          "x": 957,
+          "y": 613
+        }
+      },
+      "outputUsd": 0.0176,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1125,
+        "input_tokens_details": {
+          "image_tokens": 1045,
+          "text_tokens": 80
+        },
+        "output_tokens": 585,
+        "output_tokens_details": {
+          "image_tokens": 585,
+          "text_tokens": 0
+        },
+        "total_tokens": 1710
+      },
+      "meta": {
+        "size": "592x1760",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

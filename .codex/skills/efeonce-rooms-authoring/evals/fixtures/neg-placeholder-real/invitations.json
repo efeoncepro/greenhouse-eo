@@ -1,0 +1,36 @@
+{
+  "data": {
+    "serverNow": "2026-10-30T14:06:00.000Z",
+    "organizationId": "org-eval-local",
+    "roomId": "sala-raiz-2027",
+    "title": "Que te recomienden también cuando preguntan",
+    "revision": 4,
+    "currentEditionId": "ed-1",
+    "permissions": {
+      "canRead": true,
+      "canManage": true
+    },
+    "invitations": [
+      {
+        "invitationId": "inv-1",
+        "roomId": "sala-raiz-2027",
+        "version": "1",
+        "status": "active",
+        "expiresAt": "2026-10-31T14:00:00.000Z",
+        "capabilities": [
+          "rooms.read"
+        ],
+        "deliveryStatus": "accepted",
+        "createdAt": "2026-10-30T14:06:00.000Z",
+        "recipientEmail": "lucia.herrera@raiz-lab.example",
+        "actions": {
+          "canReissue": true,
+          "canRetryDelivery": false,
+          "canRevoke": true,
+          "retryAt": null,
+          "reissueMaxExpiresAt": null
+        }
+      }
+    ]
+  }
+}

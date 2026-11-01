@@ -338,6 +338,7 @@ describe('authorGutenbergDraft', () => {
             {
               kind: 'faq',
               schema: {
+                source: 'inline',
                 name: 'Preguntas frecuentes sobre Creative Workflows'
               },
               items: [
@@ -405,7 +406,7 @@ describe('authorGutenbergDraft', () => {
     expect(validation.status).toBe('pass')
   })
 
-  it('leaves the FAQ schema to the plugin when schema.source is plugin', () => {
+  it('leaves the FAQ schema to the plugin by default and inlines it only on request', () => {
     const faq = (source?: 'inline' | 'plugin') =>
       authorGutenbergDraft({
         ...kungFuSpec,
@@ -429,7 +430,7 @@ describe('authorGutenbergDraft', () => {
         ]
       })
 
-    const plugin = faq('plugin')
+    const plugin = faq()
     const content = plugin.draft.kind === 'gutenberg_post' ? plugin.draft.postContent : ''
 
     expect(content).not.toContain('application/ld+json')
@@ -437,10 +438,85 @@ describe('authorGutenbergDraft', () => {
     expect(plugin.draft.kind === 'gutenberg_post' && plugin.draft.observedBlocks).not.toContain('core/html')
     expect(validateGeneratedGutenbergDraft(plugin).status).toBe('pass')
 
-    const inline = faq()
+    expect(faq('plugin').draft).toEqual(plugin.draft)
+
+    const inline = faq('inline')
     const inlineContent = inline.draft.kind === 'gutenberg_post' ? inline.draft.postContent : ''
 
     expect(inlineContent).toContain('"@type": "FAQPage"')
+  })
+
+  it('emits the Efeonce editorial styles for pullquotes, steps, boxes and centered images', () => {
+    const draft = authorGutenbergDraft({
+      ...kungFuSpec,
+      sections: [
+        {
+          heading: 'Composición editorial',
+          level: 2,
+          blocks: [
+            { kind: 'pullquote', text: 'La publicidad compra la primera mirada; el contenido gana la decisión.', cite: 'Efeonce' },
+            { kind: 'list', ordered: true, style: 'steps', items: ['Uno.', 'Dos.'] },
+            { kind: 'list', style: 'box', items: ['Glitch', 'AI Visibility Report'] },
+            {
+              kind: 'image',
+              mediaId: 244955,
+              url: 'https://efeoncepro.com/wp-content/uploads/2024/10/messy-middle.svg',
+              alt: 'Diagrama del Messy Middle',
+              width: 520,
+              height: 520,
+              align: 'center'
+            }
+          ]
+        },
+        ...kungFuSpec.sections
+      ]
+    })
+
+    const content = draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+
+    expect(content).toContain('<!-- wp:pullquote {"className":"is-style-efeonce-destacado"} -->')
+    expect(content).toContain('<figure class="wp-block-pullquote is-style-efeonce-destacado"><blockquote><p>')
+    expect(content).toContain('<cite>Efeonce</cite></blockquote>')
+    expect(content).toContain('<!-- wp:list {"ordered":true,"className":"is-style-efeonce-pasos"} -->\n<ol class="is-style-efeonce-pasos">')
+    expect(content).toContain('<!-- wp:list {"className":"is-style-efeonce-recuadro"} -->\n<ul class="is-style-efeonce-recuadro">')
+    expect(content).toContain('"linkDestination":"none","align":"center"} -->\n<figure class="wp-block-image aligncenter size-large">')
+    expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
+
+    const steps = (ordered: boolean) =>
+      authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [{ heading: 'Pasos', level: 2, blocks: [{ kind: 'list', ordered, style: 'steps', items: ['Uno.'] }] }, ...kungFuSpec.sections]
+      })
+
+    expect(() => steps(false)).toThrow('content_factory_article_list_steps_requires_ordered')
+  })
+
+  it('emits the four pullquote styles: Destacado and Cita, dark and light (efeonce-editorial-blocks 0.8.0)', () => {
+    const pq = (block: Record<string, unknown>) => {
+      const draft = authorGutenbergDraft({
+        ...kungFuSpec,
+        sections: [{ heading: 'Destacados', level: 2, blocks: [{ kind: 'pullquote', ...block } as never] }, ...kungFuSpec.sections]
+      })
+
+      return draft.draft.kind === 'gutenberg_post' ? draft.draft.postContent : ''
+    }
+
+    const tesis = pq({ text: [{ text: 'Si Google no puede indexar tu página, ' }, { text: 'ninguna IA de Google la va a citar.', strong: true }] })
+
+    expect(tesis).toContain('<figure class="wp-block-pullquote is-style-efeonce-destacado"><blockquote><p>Si Google no puede indexar tu página, <strong>ninguna IA de Google la va a citar.</strong></p></blockquote></figure>')
+    expect(pq({ text: 'Una tesis.', tone: 'light' })).toContain('{"className":"is-style-efeonce-destacado-claro"}')
+
+    const cita = pq({
+      text: 'No hay requisitos técnicos adicionales.',
+      variant: 'cita',
+      cite: [{ text: 'Google Search Central', strong: true }, { text: ' · ' }, { text: 'Ver la fuente', href: 'https://developers.google.com/search/docs/appearance/ai-features' }]
+    })
+
+    expect(cita).toContain('<figure class="wp-block-pullquote is-style-efeonce-cita"><blockquote><p>No hay requisitos técnicos adicionales.</p><cite><strong>Google Search Central</strong> · <a href="https://developers.google.com/search/docs/appearance/ai-features">Ver la fuente</a></cite>')
+    expect(pq({ text: 'Cita.', variant: 'cita', tone: 'light', cite: 'Alguien' })).toContain('{"className":"is-style-efeonce-cita-clara"}')
+    expect(() => pq({ text: 'Cita sin autor.', variant: 'cita' })).toThrow('content_factory_article_pullquote_cita_requires_cite')
+    expect(() => pq({ text: 'X.', variant: 'banner' })).toThrow('content_factory_article_pullquote_variant_invalid')
+    expect(() => pq({ text: 'X.', tone: 'gris' })).toThrow('content_factory_article_pullquote_tone_invalid')
   })
 
   it('rejects a FAQ that repeats a question', () => {

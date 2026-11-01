@@ -1,0 +1,7 @@
+09-ya-esta planos/09-ya-esta-breakr-v1.png
+10-lata planos/10-lata-breakr-v2.png
+12-paredes planos/12-paredes-breakr-v1.png
+14-bogota planos/14-bogota-breakr-v1.png
+15-santiago planos/15-santiago-breakr-v1.png
+17-lunes planos/17-lunes-breakr-v1.png
+18-tambien planos/18-tambien-breakr-v1.png

@@ -1,0 +1,63 @@
+{
+  "status": "passed",
+  "mode": "chromium-browser-redirect-and-http",
+  "issuer": "real-first-party-protocol-and-postgresql-local",
+  "rooms": "real-auth-http-business-api-and-postgresql-local",
+  "checks": [
+    "zero-context-denied",
+    "one-context-selected",
+    "multiple-contexts-explicit",
+    "role-isolation",
+    "published-reads",
+    "cross-tenant-denial",
+    "local-logout",
+    "issuer-revocation"
+  ],
+  "mcpChecks": [
+    "rooms-and-issuer-http-only-sessions-present",
+    "rooms-sign-in-still-requires-new-mcp-consent",
+    "real-read-consent-form",
+    "no-mcp-code-before-consent",
+    "silent-read-denied-until-explicit-consent",
+    "write-requires-step-up-before-read-consent",
+    "write-denial-does-not-issue-code",
+    "explicit-browser-consent-issues-one-mcp-code",
+    "mcp-code-exchange-succeeds",
+    "local-issuer-jwks-available",
+    "signed-token-bound-to-same-subject-mcp-client-audience-and-read-only",
+    "mcp-code-replay-denied",
+    "write-still-requires-step-up-after-read-consent",
+    "write-after-read-consent-issues-no-additional-code",
+    "same-browser-context-and-unchanged-sessions-throughout-mcp-flow",
+    "rooms-session-remains-usable-after-mcp-consent"
+  ],
+  "relyingParties": 2,
+  "limitation": "Local B10: PostgreSQL identity and Rooms, in-memory MCP consent/grant store; issuer step-up denial, not gateway tool dispatch or human MFA.",
+  "observedAt": "2026-10-29T00:56:01.231302+00:00",
+  "runtimeBranch": "codex/rooms-design-integration",
+  "runtimeCommit": "e0edf1e6c94a887c40c5e9615f05ce4ac2c81c08",
+  "issuerSource": {
+    "branch": "codex/auth-develop-integration-local",
+    "matchingCommit": "1136ac2739b4480dd19f2b3ec2812ececcbb39e6",
+    "sha256": {
+      "scripts/auth-server/first-party-local-server.ts": "8bd118c2f962b83bc0f9350838acc9f3d403cc9ad8c6ff995451f9fc3b544bbc",
+      "scripts/qa/verify-auth-first-party-local-pg.py": "e50c0a7dd80594fc3aea46ed147712318346509daed36cbb6280caa8c9464e5f"
+    }
+  },
+  "mcpCheckCount": 16,
+  "existingRoomsCheckGroups": 8,
+  "verification": {
+    "eslint": "PASS",
+    "typecheck": "PASS",
+    "fullSuiteRepeated": false
+  },
+  "cleanup": {
+    "rooms19335Stopped": true,
+    "issuer19334Stopped": true,
+    "roomsPg55432Stopped": true,
+    "issuerDatabase": "ephemeral database stopped and temporary data removed"
+  },
+  "realEmailsSent": 0,
+  "productionTouched": false,
+  "authConsumerContractChanged": false
+}

@@ -1,0 +1,445 @@
+{
+  "method": "minimum-per-text-line-background-grid-4px",
+  "results": [
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Entra a Rooms",
+      "floor": 3,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Accede con tu cuenta Efeonce.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Continuar con Microsoft",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Entrar con mi passkey",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "o recibe un enlace por correo",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Correo electrónico",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Enviarme el enlace",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "El acceso a cada espacio depende de los permisos de tu cuenta.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Rooms",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Identidad protegida por Efeonce ID",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/rooms",
+      "text": "Volver a Rooms",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Entra a Efeonce",
+      "floor": 3,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Una cuenta para tus espacios de trabajo.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Continuar con Microsoft",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Entrar con mi passkey",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "o recibe un enlace por correo",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Correo electrónico",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Enviarme el enlace",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "El acceso a cada espacio depende de los permisos de tu cuenta.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Identidad protegida por Efeonce ID",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Ejemplo editorial",
+      "floor": 4.5,
+      "minimum": 11.03,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Un espacio para avanzar juntos.",
+      "floor": 3,
+      "minimum": 4.17,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Revisa las novedades de tu equipo en un solo lugar.",
+      "floor": 4.5,
+      "minimum": 18.26,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Conocer Efeonce",
+      "floor": 4.5,
+      "minimum": 19.17,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "→",
+      "floor": 4.5,
+      "minimum": 19.17,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Tu próximo paso",
+      "floor": 4.5,
+      "minimum": 20.14,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "Una nueva mirada",
+      "floor": 4.5,
+      "minimum": 19.8,
+      "pass": true
+    },
+    {
+      "width": 1440,
+      "route": "/login/announcements",
+      "text": "▶",
+      "floor": 4.5,
+      "minimum": 20.14,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Entra a Rooms",
+      "floor": 3,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Accede con tu cuenta Efeonce.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Continuar con Microsoft",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Entrar con mi passkey",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "o recibe un enlace por correo",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Correo electrónico",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Enviarme el enlace",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "El acceso a cada espacio depende de los permisos de tu cuenta.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Rooms",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Identidad protegida por Efeonce ID",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/rooms",
+      "text": "Volver a Rooms",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Entra a Efeonce",
+      "floor": 3,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Una cuenta para tus espacios de trabajo.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Continuar con Microsoft",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Entrar con mi passkey",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "o recibe un enlace por correo",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Correo electrónico",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Enviarme el enlace",
+      "floor": 4.5,
+      "minimum": 10.47,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "El acceso a cada espacio depende de los permisos de tu cuenta.",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Identidad protegida por Efeonce ID",
+      "floor": 4.5,
+      "minimum": 6.05,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Ejemplo editorial",
+      "floor": 4.5,
+      "minimum": 7.69,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Un espacio para avanzar juntos.",
+      "floor": 3,
+      "minimum": 4.12,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Conocer Efeonce",
+      "floor": 4.5,
+      "minimum": 4.74,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "→",
+      "floor": 4.5,
+      "minimum": 11.03,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Tu próximo paso",
+      "floor": 4.5,
+      "minimum": 19.17,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "Una nueva mirada",
+      "floor": 4.5,
+      "minimum": 19.17,
+      "pass": true
+    },
+    {
+      "width": 390,
+      "route": "/login/announcements",
+      "text": "▶",
+      "floor": 4.5,
+      "minimum": 19.56,
+      "pass": true
+    }
+  ]
+}

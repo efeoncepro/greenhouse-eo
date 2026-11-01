@@ -1,0 +1,96 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#000}#c{width:1080px;height:1350px;position:relative;overflow:hidden;background:#000814;font-family:Poppins}
+canvas{position:absolute;inset:0}
+#eb{position:absolute;left:0;top:470px;width:1080px;text-align:center;font-weight:600;font-size:22px;letter-spacing:.14em;color:#cfe4fa;opacity:0}
+#lk{position:absolute;left:0;top:516px;width:1080px;display:flex;align-items:center;justify-content:center;gap:40px;opacity:0}
+#row{position:absolute;left:0;top:642px;width:1080px;display:flex;justify-content:center;align-items:center;gap:36px;font-weight:500;font-size:24px;letter-spacing:.02em;color:#b4c6da;opacity:0}#row span{display:flex;align-items:center;gap:12px}#row img{height:32px}
+#eb,#lk,#row{display:none!important}</style></head><body><div id="c">
+<canvas id="cv" width="1080" height="1350"></canvas>
+<div id="eb">AHORA SOMOS PARTNERS</div>
+<div id="lk"><img src="file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-21_openai-partner/comp/efeonce.svg" style="width:392px;height:92px"><span style="width:2px;height:88px;background:rgba(207,228,250,.45)"></span><img src="file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-21_openai-partner/comp/openai-blanco.svg" style="width:362px;height:98px"></div>
+<div id="row"><span><img src="file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-21_openai-partner/comp/prod/chatgpt-gris.png">ChatGPT Enterprise</span><span><img src="file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-21_openai-partner/comp/prod/codex-gris.png">Codex</span></div>
+</div>
+<script>
+const W=1080,H=1350,HY=860,CX=540
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d')
+const bg=new Image();bg.src='file:///Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-21_openai-partner/comp/../capas/vacio-navy.png'
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),easeOut=t=>1-Math.pow(1-t,3)
+const T_IN=0.5,T_STOP=2.0,T_SIGN=2.7
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647}
+const STREAKS=[...Array(420)].map(()=>({a:rnd()*6.283,r0:rnd()*1100,v:0.5+rnd()*1.2,w:0.6+rnd()*2.2,b:0.35+rnd()*0.65}))
+const SPARKS=[...Array(560)].map(()=>{const a=rnd()*6.283,sp=Math.pow(rnd(),0.6);let vx=Math.cos(a)*sp*1150,vy=Math.sin(a)*sp*1150*0.42;if(vy<0)vy*=0.45
+  const big=rnd()<0.06;return {vx,vy,tl:20+sp*160,w:big?3+rnd()*4:0.6+rnd()*1.6,b:big?0.25:0.4+rnd()*0.6,blur:big?3+rnd()*5:0,dot:rnd()<0.5}})
+function warpS(t){const p=clamp((t-T_IN)/(T_STOP-T_IN));return 120+5200*Math.pow(p,2.2)}
+function warpK(t){let k=0;const n=60;for(let i=0;i<n;i++){const ti=T_IN+(t-T_IN)*(i+0.5)/n;k+=warpS(ti)*(t-T_IN)/n}return Math.max(0,k)}
+const expo=t=>t>=1?1:1-Math.pow(2,-10*t)
+function headX(t){ // velocidad alta constante y frenazo seco en los últimos 0,25 s
+  const TB=T_STOP-0.25,XB=CX-70
+  if(t<=TB){const p=clamp((t-T_IN)/(TB-T_IN));return -300+(XB+300)*p}
+  const q=clamp((t-TB)/0.25);return XB+70*(1-Math.pow(1-q,3))}
+function glowLine(x0,x1,y,core,alpha){ // línea con resplandor aditivo
+  ctx.save();ctx.globalCompositeOperation='lighter'
+  for(const [w,a,b] of [[60,.05,30],[22,.12,10],[8,.35,3],[core,1,0]]){
+    ctx.filter=b?'blur('+b+'px)':'none';ctx.globalAlpha=a*alpha
+    const g=ctx.createLinearGradient(x0,0,x1,0);g.addColorStop(0,'rgba(200,225,255,0)');g.addColorStop(1,'rgba(255,255,255,1)')
+    ctx.fillStyle=g;ctx.fillRect(Math.min(x0,x1),y-w/2,Math.abs(x1-x0),w)}
+  ctx.restore()}
+function flare(x,y,r,a){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a
+  let g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(210,230,255,.5)');g.addColorStop(1,'rgba(150,190,255,0)')
+  ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)
+  // destello anamórfico horizontal
+  ctx.filter='blur(2px)';g=ctx.createLinearGradient(x-r*4,0,x+r*4,0);g.addColorStop(0,'rgba(160,200,255,0)');g.addColorStop(.5,'rgba(235,245,255,.9)');g.addColorStop(1,'rgba(160,200,255,0)')
+  ctx.fillStyle=g;ctx.fillRect(x-r*4,y-1.5,r*8,3);ctx.restore()}
+window.setT=function(t){
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.filter='none'
+  // fondo (cover) con sacudida al frenar
+  const ds=t-T_STOP;let sx=0,sy=0;if(ds>=0&&ds<.25){const a=10*(1-ds/.25);sx=a*Math.sin(ds*80);sy=a*Math.cos(ds*60)}
+  const sc=Math.max(W/bg.width,H/bg.height);ctx.fillStyle='#001a33';ctx.fillRect(0,0,W,H)
+  {const g=ctx.createRadialGradient(CX,HY+120,0,CX,HY+120,900);g.addColorStop(0,'rgba(14,46,90,0.6)');g.addColorStop(1,'rgba(0,12,28,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  {const g=ctx.createLinearGradient(0,0,0,H*0.6);g.addColorStop(0,'rgba(0,6,16,0.78)');g.addColorStop(1,'rgba(0,6,16,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  ctx.globalCompositeOperation='screen';ctx.globalAlpha=0.55;ctx.drawImage(bg,(W-bg.width*sc)/2+sx,(H-bg.height*sc)/2+sy,bg.width*sc,bg.height*sc)
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+  const fade=clamp(t/0.5);ctx.fillStyle='rgba(0,4,12,'+(1-fade)*.9+')';ctx.fillRect(0,0,W,H)
+  // --- hiperespacio: líneas que salen del centro, aceleran y luego colapsan al horizonte
+  if(t>=T_IN&&t<T_STOP+0.12){
+    const k=warpK(t), sp=warpS(t), flat=t<T_STOP-0.18?1:Math.max(0.02,1-(t-(T_STOP-0.18))/0.2)
+    const fadeOut=t<T_STOP?1:Math.max(0,1-(t-T_STOP)/0.12)
+    ctx.save();ctx.globalCompositeOperation='lighter'
+    for(const s of STREAKS){
+      const r=(s.r0+k*s.v)%1100+20, len=Math.min(900,(12+sp*s.v*0.09)*(0.4+r/700))
+      const ca=Math.cos(s.a),sa=Math.sin(s.a)
+      const x0=CX+ca*r,y0=HY+sa*r*flat,x1=CX+ca*(r+len),y1=HY+sa*(r+len)*flat
+      const al=0.8*Math.min(1,r/260)*s.b*fadeOut*Math.min(1,(t-T_IN)/0.3)
+      const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,'rgba(190,215,255,0)');g.addColorStop(1,'rgba(240,248,255,'+al+')')
+      ctx.strokeStyle=g;ctx.lineWidth=s.w*(0.6+r/900);ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke()}
+    ctx.restore()
+    // núcleo que se carga en el centro
+    const charge=clamp((t-T_IN)/(T_STOP-T_IN));flare(CX,HY,20+60*charge,0.4+0.6*charge)
+  }
+  if(t>=T_STOP){ // nace el horizonte
+    const p=easeOut(clamp(ds/0.45)),half=(W*0.62)*p
+    glowLine(CX-half,CX,HY,3,1);glowLine(CX+half,CX,HY,3,1);glowLine(CX-half,CX,HY,3,0.6);glowLine(CX+half,CX,HY,3,0.6)
+    const fl=Math.max(0,1-ds/0.5);flare(CX,HY,40+260*fl,0.35+0.65*fl)
+    flare(CX,HY,120,0.42)
+    // onda expansiva elíptica
+    const rw=clamp(ds/0.9);if(rw<1){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=0.35*(1-rw);ctx.strokeStyle='rgba(200,225,255,1)';ctx.lineWidth=2;ctx.filter='blur(1.5px)';ctx.beginPath();ctx.ellipse(CX,HY,40+700*easeOut(rw),12+150*easeOut(rw),0,0,Math.PI*2);ctx.stroke();ctx.restore()}
+    // explosión de chispas que se congela con su estela
+    const pe=easeOut(clamp(ds/0.38));
+    ctx.save();ctx.globalCompositeOperation='lighter'
+    for(const p of SPARKS){const x=CX+p.vx*pe,y=HY+p.vy*pe;const tl=p.tl*(0.25+0.75*(1-pe*0.6))
+      const n=Math.hypot(p.vx,p.vy)||1,ux=p.vx/n,uy=p.vy/n
+      ctx.strokeStyle='rgba(235,245,255,'+p.b+')';ctx.lineWidth=p.w;ctx.filter=p.blur?'blur('+p.blur+'px)':'none'
+      ctx.beginPath();ctx.moveTo(x-ux*tl,y-uy*tl);ctx.lineTo(x,y);ctx.stroke()
+      if(p.dot){ctx.fillStyle='rgba(255,255,255,'+p.b+')';ctx.beginPath();ctx.arc(x,y,p.w*1.2,0,6.283);ctx.fill()}}
+    ctx.restore();ctx.filter='none'
+    // flash de pantalla
+    const ff=[.7,.45,.28,.15,.07,.03][Math.floor(ds*30)]||0;if(ff){ctx.fillStyle='rgba(225,238,255,'+ff+')';ctx.fillRect(0,0,W,H)}
+  }
+  // firma
+  const h=t-T_SIGN,tl=clamp(h/0.3),lk=document.getElementById('lk')
+  lk.style.opacity=clamp(tl*1.8);lk.style.transform='scale('+(1.15-0.15*easeOut(tl))+')'
+  const te=clamp((h-0.25)/0.27),tr=clamp((h-0.4)/0.27)
+  for(const [id,v] of [['eb',te],['row',tr]]){const e=document.getElementById(id);e.style.opacity=v;e.style.transform='translateY('+8*(1-easeOut(v))+'px)'}
+}
+bg.onload=()=>setT(0)
+</script></body></html>

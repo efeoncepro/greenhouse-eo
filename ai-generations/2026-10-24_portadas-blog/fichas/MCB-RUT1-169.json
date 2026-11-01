@@ -1,0 +1,43 @@
+{
+  "id": "MCB-RUT1-169",
+  "formato": "16:9",
+  "registro": "cine",
+  "alcance": "manzanitas",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "linea": "revenue-hubspot",
+  "identidad": [
+    {
+      "persona": "antonio",
+      "vista": "45-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    }
+  ],
+  "llave": {
+    "fuente": "the thin vertical gate of azure-white light standing on the table in front of him",
+    "lado": "below and slightly toward frame-left of his face",
+    "tamano": "a narrow upright slit of light the height of a sheet of paper",
+    "distancia": "about 45 cm from his face, as he leans over the table"
+  },
+  "fondo": "a row of large cold white-azure practical lights very far behind him, melted into round bokeh, all of them to the right of 72 % of the frame width",
+  "fenomeno": {
+    "que": "one glass card pushed through a thin upright gate of azure light on the table: the half that has passed glows clean, the half that has not is as dull as the small crooked pile waiting on the entry side; on the exit side, only that one card: only what is correct gets through, once",
+    "esServicio": "HubSpot bien implementado: el RUT se valida al entrar y llega al CRM una sola vez"
+  },
+  "escena": "SCENE (cinematic still, Hollywood drama, a vast dark Efeonce operations room at night with a faint haze only far behind him, far behind him on the right, softly out of focus, the tall dark glass wall and the ceiling grid of the room recede into the darkness, giving the room its scale, a cool frame, natural warm-neutral skin): a MEDIUM-WIDE shot of Antonio, wearing the EFEONCE SOFTSHELL JACKET of the corporate uniform over a plain dark polo, STANDING behind the far end of a long review table of matte oiled walnut with no reflections, about six metres long; he leans slightly forward over the table, his face about 45 cm above it; the camera at the near end of the table, at his chest height, about six metres from him, 85mm f/2.8; the table runs away from the lens diagonally toward the right of the frame, so its far end, where he stands, is in the right quarter of the frame. His near shoulder is at about 78 % of the frame width and his face at about 86 %; between the left edge of the frame and his body there is a wide band of empty darkness. MOMENT, caught at the exact instant: on the table directly in front of his chest, at about 84 % of the frame width, stands ONE thin upright gate of azure-white light (#0375DB and cold white): a narrow slit of light the height of a sheet of paper, standing across the table and turned slightly toward the camera, self-contained: its light does NOT rise above it as a beam and the air above it stays dark. It is the only key light, lighting his face from below and slightly from frame-left. To the LEFT of the gate in the frame, under his RIGHT hand, lies a small crooked pile of four dull, cloudy, misaligned plain glass cards that have not gone through; with the fingertips of that RIGHT hand he pushes one plain glass card, about 9 cm long, flat on the table from left to right through the gate: the half still on the left of the gate is dull and cloudy like the pile, the half that has already come out on the right glows clean, clear and perfectly square to the table edge. To the RIGHT of the gate there is nothing but that ONE card. His LEFT hand rests flat and still on the table, further to the right, empty. Everything on the table stays directly in front of him, between 70 % and 92 % of the frame width, and never higher than his waist. The cards are plain glass with NO text, NO numbers, NO symbols, NO marks, NO checkmark, NO chip and NO barcode; there is no card reader, no turnstile and no device. He looks straight into the lens with a calm, precise focus and a contained closed-mouth smile. At the leading corner of the card that has passed the gate sits ONE tiny point of magenta light (#E86BD0), smaller than any bokeh disc: the only accent in the frame; it lights nothing around it. Near the lens the tabletop fills the whole width of the bottom of the frame; the left two thirds of the visible tabletop are bare, empty dark walnut. Above the bare tabletop, the LEFT 64% of the frame is calm, deep dark space: no light and no objects, no bokeh, no beams. No laptops, no papers, no mugs, no plants, no monitors, no lamps. Enormous contrast, no readable text anywhere, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near edge of the matte oiled walnut review table, spanning the whole width of the bottom of the frame, only a few centimetres in front of the lens, in deep shadow, outside every light, with no reflections",
+    "tono": "DARK walnut in deep shadow, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark room above the bare walnut tabletop, empty all the way to his shoulder",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Elenco ficticio (Antonio, personaje de la línea revenue-hubspot) en Marketing con Manzanitas: precedente del operador del 2026-10-18 (fotos del menú: el elenco, nunca Julio). Sin nombre en pantalla."
+}

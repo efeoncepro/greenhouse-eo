@@ -1,0 +1,121 @@
+{
+  "schema": "portfolio-entry.v1",
+  "slug": "COMPLETAR-slug",
+  "client": {
+    "name": "[COMPLETAR: nombre del cliente]",
+    "industry": "retail"
+  },
+  "title": "[COMPLETAR: título del proyecto de redes]",
+  "audience": "[COMPLETAR: para quién era, en una frase]",
+  "need": "[COMPLETAR: qué necesitaba en redes]",
+  "line": "brand",
+  "services": ["creative-services"],
+  "steps": {
+    "challenge": {
+      "title": "[COMPLETAR: el reto]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "idea": {
+      "title": "[COMPLETAR: la idea]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    },
+    "execution": {
+      "title": "[COMPLETAR: la ejecución]",
+      "body": "[COMPLETAR: qué pasó en esta etapa, en dos o tres frases]"
+    }
+  },
+  "clientApproval": {
+    "ref": "[COMPLETAR: dónde quedó la aprobación del cliente]",
+    "date": "2026-01-01",
+    "scope": [
+      "pieces",
+      "metrics"
+    ]
+  },
+  "seo": {
+    "title": "[COMPLETAR: cliente y título, 65 caracteres o menos]",
+    "description": "[COMPLETAR: qué se hizo, para quién y por qué, 150 caracteres o menos]"
+  },
+  "kind": "social",
+  "hero": {
+    "mediaRef": "ig-feed"
+  },
+  "chapters": [
+    {
+      "name": "[COMPLETAR: nombre de la campaña o temporada]",
+      "media": [
+        {
+          "id": "ig-feed",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 1080,
+          "height": 1350,
+          "alt": "[COMPLETAR: qué muestra la publicación]",
+          "role": "post",
+          "channel": "instagram",
+          "placement": "feed",
+          "postText": "[COMPLETAR: texto real de la publicación]",
+          "postedAt": "2026-01-01"
+        },
+        {
+          "id": "ig-reel",
+          "kind": "video",
+          "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/ig-reel.mp4",
+          "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/ig-reel.webp",
+          "width": 1080,
+          "height": 1920,
+          "alt": "[COMPLETAR: qué muestra el reel]",
+          "role": "post",
+          "channel": "instagram",
+          "placement": "reel",
+          "postText": "[COMPLETAR: texto real del reel]"
+        },
+        {
+          "id": "li-post",
+          "kind": "image",
+          "mediaId": 1,
+          "width": 1080,
+          "height": 1080,
+          "alt": "[COMPLETAR: qué muestra la publicación]",
+          "role": "post",
+          "channel": "linkedin",
+          "placement": "post",
+          "postText": "[COMPLETAR: texto real]"
+        },
+        {
+          "id": "x-post",
+          "kind": "video",
+          "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/x-post.mp4",
+          "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/x-post.webp",
+          "width": 1920,
+          "height": 1080,
+          "alt": "[COMPLETAR: qué muestra el video]",
+          "role": "post",
+          "channel": "x",
+          "placement": "post",
+          "postText": "[COMPLETAR: texto real del post]"
+        },
+        {
+          "id": "tt-video",
+          "kind": "video",
+          "src": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/tt-video.mp4",
+          "poster": "https://storage.googleapis.com/efeonce-group-axis-public-media/portfolio/v1/COMPLETAR-slug/tt-video.webp",
+          "width": 1080,
+          "height": 1920,
+          "alt": "[COMPLETAR: qué muestra el video]",
+          "role": "post",
+          "channel": "tiktok",
+          "placement": "video"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "value": "[COMPLETAR]",
+      "label": "[COMPLETAR: qué mide la cifra]",
+      "kind": "text",
+      "source": "[COMPLETAR: dónde está registrada]"
+    }
+  ]
+}

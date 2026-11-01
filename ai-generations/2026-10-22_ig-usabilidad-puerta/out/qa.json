@@ -1,0 +1,28 @@
+[
+  {
+    "id": "u2-usabilidad-45",
+    "dominante": [
+      "no es usable."
+    ],
+    "ratioDominanteEntrada": 3.8,
+    "contraste": {
+      "entrada": 18.53,
+      "dominante": 18.57,
+      "cierre-frase": 18.57,
+      "logo": 16.72
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.12
+      }
+    ],
+    "seleccion": null
+  }
+]

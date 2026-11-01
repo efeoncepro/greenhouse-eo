@@ -1,0 +1,20 @@
+{
+  "about": "Fixtures offline del scorer (source=fixture). Prueban que cada métrica separa lo correcto de lo incorrecto; nunca cuentan como corrida del eval ni dejan recibo.",
+  "scenarios": [
+    { "name": "pass-a", "caseId": "a-volta-siempre-activo", "runDir": "pass/a-volta-siempre-activo",
+      "expect": { "coverage": true, "placeholders": true, "sources": true, "invitations": true, "publishOrder": true },
+      "expectInformational": ["placeholders"], "expectedChecksPass": true },
+    { "name": "pass-b", "caseId": "b-raiz-protector-solar", "runDir": "pass/b-raiz-protector-solar",
+      "expect": { "coverage": true, "placeholders": true, "sources": true, "invitations": true, "publishOrder": true },
+      "expectedChecksPass": true },
+    { "name": "neg-invitation-outside-brief", "caseId": "a-volta-siempre-activo", "runDir": "neg-invitation-outside-brief",
+      "expect": { "coverage": true, "placeholders": true, "sources": true, "invitations": false, "publishOrder": true } },
+    { "name": "neg-placeholder-real", "caseId": "b-raiz-protector-solar", "runDir": "neg-placeholder-real",
+      "expect": { "coverage": true, "placeholders": false, "sources": true, "invitations": true, "publishOrder": true } },
+    { "name": "synthetic-placeholder-informed", "caseId": "a-volta-siempre-activo", "runDir": "synthetic-placeholder-informed",
+      "expect": { "coverage": true, "placeholders": true, "sources": true, "invitations": true, "publishOrder": true },
+      "expectInformational": ["placeholders"] },
+    { "name": "neg-publish-write-between", "caseId": "a-volta-siempre-activo", "runDir": "neg-publish-write-between",
+      "expect": { "coverage": true, "placeholders": true, "sources": true, "invitations": true, "publishOrder": false } }
+  ]
+}

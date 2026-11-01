@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "model": "gemini-3.8-flash",
+    "thinking": "medium",
+    "preset": "cierre@1",
+    "promptHash": "d7b9765830dc",
+    "fps": null,
+    "clip": null,
+    "resolution": "high",
+    "processing": "agentic",
+    "files": [
+      {
+        "path": "ai-generations/2026-10-21_aws-partner/export/efeonce-aws-feed-4x5.mp4",
+        "sha256": "f8ea5338f236"
+      }
+    ],
+    "usage": {
+      "inputTokens": 1011,
+      "outputTokens": 1460,
+      "thoughtTokens": 2857
+    },
+    "latencyMs": 154848
+  },
+  "resumen": "El cierre garantiza tiempo suficiente de lectura en pantalla para la marca (3,5 segundos), pero sufre de una frenada visual excesivamente estática en los últimos 2,5 segundos. A nivel sonoro, el impacto principal se gasta en el globo terráqueo a los 4,0 s, dejando la entrada del lockup sin un sting de marca sincronizado.",
+  "hallazgos": [
+    {
+      "t": 4,
+      "tipo": "desfase",
+      "severidad": "media",
+      "afirmacion": "El impacto sonoro culmina en t=4.0s sobre el destello del globo, dejando la entrada del lockup (t=4.5s a 5.0s) sin sting ni acento musical dedicado.",
+      "medible": true,
+      "sugerencia": "Sincronizar el golpe sonoro final o agregar un acento secundario (shimmer o sub-bass) exactamente cuando se revelan los logos de Efeonce y AWS.",
+      "verificacion": {
+        "estado": "refutado",
+        "medido": "1 par(es); desfase mediano +0 ms (el sonido llega antes de la imagen); rango 0…0 ms; tolerancia ±42 ms"
+      }
+    },
+    {
+      "t": 4.5,
+      "tipo": "legibilidad",
+      "severidad": "media",
+      "afirmacion": "Los logos y el titular principal se leen con claridad durante 3,5 s, pero los textos de servicios inferiores (EC2, S3, Bedrock) tienen un puntaje diminuto para pantallas móviles.",
+      "medible": true,
+      "sugerencia": "Aumentar la escala de la barra inferior de servicios o espaciarlos mejor para garantizar legibilidad en el feed vertical.",
+      "t_fin": 8,
+      "verificacion": {
+        "estado": "no_medible",
+        "medido": "«legibilidad» es juicio: no se mide"
+      }
+    },
+    {
+      "t": 5.5,
+      "tipo": "cuadro_quieto",
+      "severidad": "alta",
+      "afirmacion": "El cuadro queda totalmente congelado y estático durante los últimos 2,5 segundos de la pieza hasta el corte final en t=8.0s.",
+      "medible": true,
+      "sugerencia": "Mantener una rotación lenta continua en el planeta y un sutil drift o resplandor en las líneas de red para no perder energía visual.",
+      "t_fin": 8,
+      "verificacion": {
+        "estado": "refutado",
+        "medido": "0 cuadro(s) quieto(s) seguidos en 5.50–8.00 s (diferencia mínima 0.86; quieto < 0.15)"
+      }
+    },
+    {
+      "t": 3.8,
+      "tipo": "ritmo",
+      "severidad": "baja",
+      "afirmacion": "La dirección de movimiento cambia abruptamente de un avance veloz en túnel a una desaceleración en seco de la Tierra.",
+      "medible": false,
+      "sugerencia": "Suavizar la curva de animación de la cámara al encuadrar el planeta antes de asentar el lockup.",
+      "t_fin": 4.8,
+      "verificacion": {
+        "estado": "no_medible",
+        "medido": "«ritmo» es juicio: no se mide"
+      }
+    }
+  ],
+  "puntajes": {
+    "cierre": 5.8,
+    "legibilidad": 6.8
+  }
+}

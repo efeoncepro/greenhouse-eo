@@ -95,6 +95,11 @@ Antes de fijar el angulo:
 - identificar si otra superficie, por ejemplo WordPress o Think, ya aloja una
   version equivalente;
 - decidir si crear, actualizar, consolidar o no publicar.
+- (overlay Efeonce, 2026-10-26) los datos de GSC deciden el refresh, pero la
+  pieza publica nunca expone la caida de posiciones o de trafico de un contenido
+  propio; es `BLOCK` (`copywriting` -> `efeonce/AGENTIC_BLOGPOST_AUTHORING.md`
+  §8 «Exposicion propia»). Al consolidar, inventariar los visuales de los
+  originales (mismo archivo, §7 «Refresh o fusion»).
 
 ### Decision de research
 
@@ -284,7 +289,11 @@ Usar el tipo que corresponda al contenido visible e incluir, cuando apliquen:
 
 Validar JSON-LD parseable y el grafo final, no solo el objeto de la spec. No
 prometer rich results. `FAQPage` solo si preguntas y respuestas son visibles y
-la feature sigue siendo pertinente al publicar.
+la feature sigue siendo pertinente al publicar. En el blog de Efeonce (desde
+2026-10-24) el `FAQPage` lo genera el plugin `efeonce-editorial-blocks` desde
+los bloques «Pregunta frecuente» visibles, con un `Question` por bloque y su
+ancla `faq-<slug>`: no se escribe JSON-LD a mano y QA verifica que haya uno
+solo (`docs/public-site/BLOG_FAQ_BLOCK_ANALYSIS_V1.md`).
 
 ### Open Graph y Twitter/X
 
@@ -374,6 +383,13 @@ resultado; abrir manualmente las fuentes criticas. Reportar `no verificado`, no
 - No poner nombre, email, telefono, empresa, account ID, client ID, token ni
   otro PII/secreto en query strings, UTMs, URLs, logs o `dataLayer`.
 - Verificar URL final, redirect, analytics y ausencia de PII en navegador.
+
+### Enlaces en el cuerpo (overlay Efeonce, 2026-10-26)
+
+En el blog de Efeonce los enlaces del cuerpo van en negrita y las landings,
+servicios y productos de Efeonce van como `mention` (pildora AXIS), no como
+enlace de texto. Regla y criterio: `copywriting` ->
+`efeonce/JULIO_REYES_VOICE_SYSTEM.md` §4.6.
 
 ## 9. Verificacion live
 

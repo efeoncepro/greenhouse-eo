@@ -229,6 +229,50 @@ CMYK o Pantone se fija con prueba física del proveedor, nunca sin prueba.
 
 ## 4. La voz: pregunta y respuesta
 
+### Delta 2026-10-25 — Anillo arriba, esfera abajo; el par sólo cuando hay algo que decir (operador)
+
+**Decisión del operador (2026-10-25, portada de «SEO y AEO» en Marketing con Manzanitas):** «la dinámica de preguntas y
+respuesta funciona cuando de verdad tiene algo que decir; cuando se tiene que forzar no funciona en lo absoluto. Lo que
+sí funciona es el ring arriba y la esfera abajo». Cinco pares seguidos para la misma portada («¿Qué cita la IA de tu
+sitio? Pasajes.», «¿A quién recomienda la IA? A pocos.» y otros) fueron rechazados: se escribieron para llenar el slot,
+no porque el lector tuviera esa pregunta. Esto extiende a **todas las piezas de La órbita, Marketing con Manzanitas
+incluido**, lo que el delta del 2026-10-06 dejó escrito para decks y piezas de una pantalla.
+
+**El par pregunta–respuesta no es obligatorio en ninguna pieza.** Sale sólo si pasa las pruebas de abajo; si para que
+salga hay que buscarle una pregunta a una respuesta, o recortar la respuesta hasta un acertijo, la pieza va sin par.
+
+**Lo que se conserva siempre es la estructura: el anillo en la línea de arriba, la esfera al final de la de abajo.**
+Por qué funciona, racionalizado:
+
+1. **Es la órbita leída de arriba abajo.** El anillo es el contorno abierto y la esfera, el punto lleno: el mismo
+   recorrido del isotipo, de abrir a cerrar. Con los dos en su lugar la pieza ya dice Efeonce sin necesitar el logo
+   en ese bloque, y sin que la frase tenga que ser una pregunta.
+2. **El peso de la marca coincide con el peso del texto.** El anillo es fino y va con la línea chica en Poppins 300,
+   lo que todavía está abierto. La esfera es llena y va con el dominante en Bricolage 760, lo que se decidió. La marca
+   refuerza la jerarquía de 3× en vez de competir con ella.
+3. **El anillo marca lo que abre, no el signo de interrogación.** La línea de arriba puede ser una pregunta real, el
+   tema, el contexto o un dato. El anillo funciona igual porque su trabajo es decir «aquí empieza», y la esfera, «aquí
+   se cierra».
+4. **La lectura entra por lo liviano y sale por lo pesado.** El ojo encuentra primero el anillo, baja al dominante y
+   termina en la esfera. Es un recorrido de dos tiempos que se entiende en un vistazo, en el teléfono y en el recorte
+   cuadrado de una vista previa.
+5. **Respeta «una esfera por pieza».** La esfera queda una sola vez, cerrando lo único que la pieza afirma.
+
+**Cuándo no lleva anillo:** cuando la línea de arriba sólo clasifica y no abre nada (una fecha, una categoría, el
+nombre del producto, un rótulo de interfaz). Ahí va como eyebrow sin anillo, igual que en la portada de propuesta
+`cover-proposal` · `orbit-decision`.
+
+**El destacado es una idea completa, no un remate de acertijo.** Los rechazados terminaban en fragmentos que sólo se
+entienden si alguien los explica: «Pasajes.», «A pocas.», «Nombra pocas.». Sin par, la pieza lleva el anillo con un
+texto arriba y, abajo, el destacado con la esfera, y los dos juntos dicen algo que el lector entiende a la primera,
+con palabras suyas y sin jerga de especialista («pasaje» no lo entendió ni quien sabe de SEO). Si el destacado no cabe
+claro en el espacio, se reescribe la frase completa; no se recorta hasta dejar un fragmento. Fórmula que funcionó (skill `copywriting`, 4 U's y beneficio directo): **una sola
+frase en dos tiempos**, donde la línea de arriba la abre y el destacado la completa con el beneficio o el resultado.
+Ejemplo de la misma portada: «○ Google te encuentra. La IA / **te elige**●»: cada mitad nombra un canal, la frase se
+lee entera y el destacado conversa con la imagen (una ficha elegida entre cientos). Otras formas válidas: el beneficio
+en imperativo («○ Sé la marca que la IA / **elige**●») o el tema que el lector busca como destacado, cuando la línea
+de arriba ya promete. Se escriben varias variantes y se lee la frase completa en voz alta antes de elegir.
+
 ### Delta 2026-10-06 — La voz por defecto es la decisión; el par es un recurso (operador)
 
 **Decisión del operador (2026-10-06):** leída en secuencia, como la lee un cliente, la pregunta y respuesta en cada
@@ -598,7 +642,7 @@ Norma, alternativas y consecuencias: [ADR de la marca](../../architecture/rooms/
 aplicaciones del canvas [«Efeonce Rooms — Logo»](https://claude.ai/artifact/GxQAjo17CqRKTDvQVMa8R1) (enlace compartido,
 invitación, modo presentación, ícono de app, placa de sala, lanzamiento y la apertura en movimiento) son exploraciones:
 no aprueban composiciones de la sala, que siguen sujetas a los contratos de UI y al go de
-[EPIC-052](../../epics/to-do/EPIC-052-efeonce-rooms-sales-enablement-platform.md), ni una animación de logo nueva.
+[EPIC-052](../../epics/in-progress/EPIC-052-efeonce-rooms-sales-enablement-platform.md), ni una animación de logo nueva.
 Pendiente: la prueba sin contexto del símbolo a 16–32 px, en claro y oscuro, frente a 🔗, ⚣ y argollas de boda; si
 confunde, el símbolo va siempre junto a la palabra.
 

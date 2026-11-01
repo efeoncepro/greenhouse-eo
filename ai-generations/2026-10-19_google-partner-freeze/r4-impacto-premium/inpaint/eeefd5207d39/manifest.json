@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "eeefd5207d39",
+  "key": "eeefd5207d39c0771a3eb8ef06eb14e173d9a25caa1dfa976ec40591045786cc",
+  "status": "failed",
+  "createdAt": "2026-10-19T22:45:11.129Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_google-partner-freeze/r4-impacto-premium/expand-inputs/0da91ae57fdd-canvas.png",
+    "imageSha256": "9fa38b249584ceebac3a7b1dab2396ffde87dd4ffe331cfbcd856c85df4a3255",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-19_google-partner-freeze/r4-impacto-premium/expand-inputs/0da91ae57fdd-mask.png",
+    "maskSha256": "53a3becbae1c9f484ca0b9d255eec304ffb96bd827d92359ec5333c1c5316eb4",
+    "maskConvention": "white-editable",
+    "width": 1536,
+    "height": 2730,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Continue the same deep navy seamless studio background with the same very subtle soft haze and gentle gradient; empty, calm, nothing in it: no spheres, no droplets, no objects, no text.",
+    "providerPrompt": "Continue the same deep navy seamless studio background with the same very subtle soft haze and gentle gradient; empty, calm, nothing in it: no spheres, no droplets, no objects, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3142857142857143,
+    "editable": 1247232,
+    "soft": 70656,
+    "protected": 2875392
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1536,
+      "height": 2730
+    },
+    "target": {
+      "width": 1088,
+      "height": 1904
+    },
+    "aspectError": 0.01538461538461533,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "error": "fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing"
+}

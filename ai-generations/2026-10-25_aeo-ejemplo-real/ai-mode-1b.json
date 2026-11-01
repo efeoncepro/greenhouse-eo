@@ -1,0 +1,255 @@
+{
+  "cliVersion": "1.1.0",
+  "ok": true,
+  "outcome": "success",
+  "queriedAt": "2026-10-25T15:48:52.761Z",
+  "surface": "dataforseo-cli",
+  "request": {
+    "ok": true,
+    "dryRun": false,
+    "surface": "dataforseo-cli",
+    "endpoint": {
+      "id": "post:serp.google.ai.mode.live.advanced",
+      "method": "POST",
+      "path": "/v3/serp/google/ai_mode/live/advanced"
+    },
+    "family": "serp",
+    "organizationId": null,
+    "consumer": "aeo",
+    "taskCount": 1,
+    "requestCount": 1,
+    "requestBatchSize": null,
+    "tasks": [
+      {
+        "keyword": "¿Qué CRM me recomiendas para una empresa B2B mediana en Chile?",
+        "location_code": 2152,
+        "language_code": "es",
+        "device": "desktop"
+      }
+    ],
+    "batchLimit": null,
+    "estimatedCostUsd": 0.004,
+    "estimateStatus": "available",
+    "maxUsd": 0.01,
+    "source": {
+      "documentationUrl": "https://docs.dataforseo.com/v3/serp/google/ai_mode/live/advanced/",
+      "sourceModifiedAt": "2026-07-29T13:48:30.000Z"
+    }
+  },
+  "response": {
+    "httpStatus": 200,
+    "latencyMs": 7705,
+    "breakerOpen": false,
+    "requests": [
+      {
+        "index": 1,
+        "taskCount": 1,
+        "httpStatus": 200,
+        "latencyMs": 7705,
+        "costUsd": 0.004,
+        "breakerOpen": false
+      }
+    ],
+    "taskCodes": [
+      {
+        "id": "10251548-1987-0139-0000-e4fb382f12b7",
+        "statusCode": 20000,
+        "statusMessage": "Ok.",
+        "resultCount": 1,
+        "cost": 0.004,
+        "hasResult": true
+      }
+    ],
+    "costUsd": 0.004,
+    "tasks": [
+      {
+        "id": "10251548-1987-0139-0000-e4fb382f12b7",
+        "status_code": 20000,
+        "status_message": "Ok.",
+        "time": "6.7591 sec.",
+        "cost": 0.004,
+        "result_count": 1,
+        "path": [
+          "v3",
+          "serp",
+          "google",
+          "ai_mode",
+          "live",
+          "advanced"
+        ],
+        "data": {
+          "api": "serp",
+          "function": "live",
+          "se": "google",
+          "se_type": "ai_mode",
+          "keyword": "¿Qué CRM me recomiendas para una empresa B2B mediana en Chile?",
+          "location_code": 2152,
+          "language_code": "es",
+          "device": "desktop",
+          "os": "windows"
+        },
+        "result": [
+          {
+            "keyword": "¿Qué CRM me recomiendas para una empresa B2B mediana en Chile?",
+            "type": "ai_mode",
+            "se_domain": "google.com",
+            "location_code": 2152,
+            "language_code": "es",
+            "check_url": "https://www.google.com/search?q=%C2%BFQu%C3%A9%20CRM%20me%20recomiendas%20para%20una%20empresa%20B2B%20mediana%20en%20Chile%3F&hl=es&gl=CL&udm=50&uule=w+CAIQIFISCS-vJQRBxWKWER25AhET4QUF",
+            "datetime": "2026-10-25 15:48:52 +00:00",
+            "spell": null,
+            "refinement_chips": null,
+            "item_types": [
+              "ai_overview"
+            ],
+            "se_results_count": 0,
+            "items_count": 1,
+            "items": [
+              {
+                "type": "ai_overview",
+                "rank_group": 1,
+                "rank_absolute": 1,
+                "page": 1,
+                "position": "left",
+                "xpath": "/html[1]/body[1]/div[2]/div[1]/div[9]/div[1]/section[1]/div[1]/div[1]/div[3]/div[4]/div[1]/div[1]/div[1]/div[3]",
+                "markdown": "Para una empresa B2B mediana en Chile, la elección del CRM `depende de la complejidad de tus ciclos de venta, la integración con otros sistemas (como ERPs locales o herramientas de marketing) y el presupuesto`.\n\nLas opciones más sólidas y recomendadas en el mercado chileno para este segmento se dividen según su enfoque principal:\n\n### 1. [HubSpot CRM](https://blog.hubspot.es/sales/mejores-crm-b2b) (El estándar para Inbound y B2B integral)\n\n- **Ideal para:** Empresas B2B que combinan ventas, marketing de contenidos y atención al cliente en una sola estrategia.[[1]](https://www.simla.com/blog/crm-en-chile)\n- **Ventajas:** Su interfaz es sumamente intuitiva, la adopción por parte de los equipos comerciales es alta y cuenta con potentes herramientas de automatización de marketing y secuencias de correo.[[1]](https://www.simla.com/blog/crm-en-chile)\n- **Consideración:** A medida que escalas y requieres funciones avanzadas o aumenta el volumen de contactos, los costos de sus planes Professional y Enterprise pueden elevarse significativamente.\n\n### 2. Pipedrive (Enfoque puro en gestión comercial)\n\n- **Ideal para:** Equipos comerciales B2B cuyo objetivo principal es la gestión visual del embudo de ventas y la productividad de los ejecutivos (llamados, correos y reuniones).\n- **Ventajas:** Extremadamente visual, fácil de configurar y con una curva de aprendizaje muy corta. Destaca por su enfoque orientado a la acción y cierre de tratos, además de tener un costo por usuario accesible y un ecosistema robusto de integraciones.\n- **Consideración:** Si necesitas automatizaciones de marketing muy complejas o servicio de atención al cliente postventa nativo muy robusto, necesitarás integrarlo con otras herramientas.\n\n### 3. Zoho CRM (La opción más flexible y relación costo-beneficio)\n\n- **Ideal para:** Empresas medianas que buscan alta personalización, flujos de trabajo avanzados y un presupuesto contenido.\n- **Ventajas:** Es altamente escalable y personalizable por módulos. Su versión Enterprise ofrece funciones muy avanzadas (como IA predictiva y analítica de datos) a una fracción del costo de los gigantes de la industria.\n- **Consideración:** Su interfaz y configuración inicial pueden requerir más tiempo y soporte técnico especializado para exprimir todo su potencial.[[1]](https://www.simla.com/blog/crm-en-chile)\n\n### 4. Salesforce CRM (Para alta complejidad y grandes corporativos)\n\n- **Ideal para:** Empresas medianas en camino a ser grandes, con procesos B2B altamente complejos, múltiples capas de aprobación y necesidad de integraciones profundas con ERPs (SAP, Oracle, etc.).\n- **Ventajas:** Es el líder mundial indiscutible; prácticamente cualquier integración o reporte avanzado que imagines es posible de desarrollar.\n- **Consideración:** Requiere una inversión considerable no solo en licencias, sino en consultores certificados para su implementación y mantenimiento continuo.\n\nSi me compartes:\n\n- Cuál es tu **presupuesto aproximado por usuario** o mensual\n- Qué **sistema ERP o de contabilidad** utilizan actualmente en Chile\n- Si necesitas un enfoque fuerte en **marketing digital** o estrictamente en **gestión de ventas (pipeline)** \n\nPodemos **acotar la recomendación al sistema ideal** para tu operación.",
+                "items": [
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Para una empresa B2B mediana en Chile, la elección del CRM depende de la complejidad de tus ciclos de venta, la integración con otros sistemas (como ERPs locales o herramientas de marketing) y el presupuesto.",
+                    "markdown": "Para una empresa B2B mediana en Chile, la elección del CRM `depende de la complejidad de tus ciclos de venta, la integración con otros sistemas (como ERPs locales o herramientas de marketing) y el presupuesto`.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Las opciones más sólidas y recomendadas en el mercado chileno para este segmento se dividen según su enfoque principal:",
+                    "markdown": "Las opciones más sólidas y recomendadas en el mercado chileno para este segmento se dividen según su enfoque principal:",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "1. HubSpot CRM (El estándar para Inbound y B2B integral)",
+                    "text": "Ideal para: Empresas B2B que combinan ventas, marketing de contenidos y atención al cliente en una sola estrategia. Ventajas: Su interfaz es sumamente intuitiva, la adopción por parte de los equipos comerciales es alta y cuenta con potentes herramientas de automatización de marketing y secuencias de correo. Consideración: A medida que escalas y requieres funciones avanzadas o aumenta el volumen de contactos, los costos de sus planes Professional y Enterprise pueden elevarse significativamente.",
+                    "markdown": "- **Ideal para:** Empresas B2B que combinan ventas, marketing de contenidos y atención al cliente en una sola estrategia.[[1]](https://www.simla.com/blog/crm-en-chile)\n- **Ventajas:** Su interfaz es sumamente intuitiva, la adopción por parte de los equipos comerciales es alta y cuenta con potentes herramientas de automatización de marketing y secuencias de correo.[[1]](https://www.simla.com/blog/crm-en-chile)\n- **Consideración:** A medida que escalas y requieres funciones avanzadas o aumenta el volumen de contactos, los costos de sus planes Professional y Enterprise pueden elevarse significativamente.",
+                    "links": [
+                      {
+                        "type": "link_element",
+                        "title": "HubSpot CRM",
+                        "description": null,
+                        "url": "https://blog.hubspot.es/sales/mejores-crm-b2b",
+                        "domain": "blog.hubspot.es"
+                      }
+                    ],
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Simla.com",
+                        "domain": "www.simla.com",
+                        "url": "https://www.simla.com/blog/crm-en-chile",
+                        "title": "TOP CRM en Chile 2026: Mejores software para ventas ...",
+                        "text": "HubSpot CRM: solución integral para ventas y marketing. CRM más completos, integrando ventas, marketing y servicio al cliente en u..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "2. Pipedrive (Enfoque puro en gestión comercial)",
+                    "text": "Ideal para: Equipos comerciales B2B cuyo objetivo principal es la gestión visual del embudo de ventas y la productividad de los ejecutivos (llamados, correos y reuniones). Ventajas: Extremadamente visual, fácil de configurar y con una curva de aprendizaje muy corta. Destaca por su enfoque orientado a la acción y cierre de tratos, además de tener un costo por usuario accesible y un ecosistema robusto de integraciones. Consideración: Si necesitas automatizaciones de marketing muy complejas o servicio de atención al cliente postventa nativo muy robusto, necesitarás integrarlo con otras herramientas.",
+                    "markdown": "- **Ideal para:** Equipos comerciales B2B cuyo objetivo principal es la gestión visual del embudo de ventas y la productividad de los ejecutivos (llamados, correos y reuniones).\n- **Ventajas:** Extremadamente visual, fácil de configurar y con una curva de aprendizaje muy corta. Destaca por su enfoque orientado a la acción y cierre de tratos, además de tener un costo por usuario accesible y un ecosistema robusto de integraciones.\n- **Consideración:** Si necesitas automatizaciones de marketing muy complejas o servicio de atención al cliente postventa nativo muy robusto, necesitarás integrarlo con otras herramientas.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "3. Zoho CRM (La opción más flexible y relación costo-beneficio)",
+                    "text": "Ideal para: Empresas medianas que buscan alta personalización, flujos de trabajo avanzados y un presupuesto contenido. Ventajas: Es altamente escalable y personalizable por módulos. Su versión Enterprise ofrece funciones muy avanzadas (como IA predictiva y analítica de datos) a una fracción del costo de los gigantes de la industria. Consideración: Su interfaz y configuración inicial pueden requerir más tiempo y soporte técnico especializado para exprimir todo su potencial.",
+                    "markdown": "- **Ideal para:** Empresas medianas que buscan alta personalización, flujos de trabajo avanzados y un presupuesto contenido.\n- **Ventajas:** Es altamente escalable y personalizable por módulos. Su versión Enterprise ofrece funciones muy avanzadas (como IA predictiva y analítica de datos) a una fracción del costo de los gigantes de la industria.\n- **Consideración:** Su interfaz y configuración inicial pueden requerir más tiempo y soporte técnico especializado para exprimir todo su potencial.[[1]](https://www.simla.com/blog/crm-en-chile)",
+                    "links": null,
+                    "images": null,
+                    "references": [
+                      {
+                        "type": "ai_overview_reference",
+                        "position": "left",
+                        "source": "Simla.com",
+                        "domain": "www.simla.com",
+                        "url": "https://www.simla.com/blog/crm-en-chile",
+                        "title": "TOP CRM en Chile 2026: Mejores software para ventas ...",
+                        "text": "HubSpot CRM: solución integral para ventas y marketing. Zoho CRM: flexible y escalable para pequeñas y medianas empresas. Ofrece opciones de personalización y auto..."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": "4. Salesforce CRM (Para alta complejidad y grandes corporativos)",
+                    "text": "Ideal para: Empresas medianas en camino a ser grandes, con procesos B2B altamente complejos, múltiples capas de aprobación y necesidad de integraciones profundas con ERPs (SAP, Oracle, etc.). Ventajas: Es el líder mundial indiscutible; prácticamente cualquier integración o reporte avanzado que imagines es posible de desarrollar. Consideración: Requiere una inversión considerable no solo en licencias, sino en consultores certificados para su implementación y mantenimiento continuo.",
+                    "markdown": "- **Ideal para:** Empresas medianas en camino a ser grandes, con procesos B2B altamente complejos, múltiples capas de aprobación y necesidad de integraciones profundas con ERPs (SAP, Oracle, etc.).\n- **Ventajas:** Es el líder mundial indiscutible; prácticamente cualquier integración o reporte avanzado que imagines es posible de desarrollar.\n- **Consideración:** Requiere una inversión considerable no solo en licencias, sino en consultores certificados para su implementación y mantenimiento continuo.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Si me compartes:",
+                    "markdown": "Si me compartes:",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Cuál es tu presupuesto aproximado por usuario o mensual Qué sistema ERP o de contabilidad utilizan actualmente en Chile Si necesitas un enfoque fuerte en marketing digital o estrictamente en gestión de ventas (pipeline)",
+                    "markdown": "- Cuál es tu **presupuesto aproximado por usuario** o mensual\n- Qué **sistema ERP o de contabilidad** utilizan actualmente en Chile\n- Si necesitas un enfoque fuerte en **marketing digital** o estrictamente en **gestión de ventas (pipeline)**",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  },
+                  {
+                    "type": "ai_overview_element",
+                    "position": "left",
+                    "title": null,
+                    "text": "Podemos acotar la recomendación al sistema ideal para tu operación.",
+                    "markdown": "Podemos **acotar la recomendación al sistema ideal** para tu operación.",
+                    "links": null,
+                    "images": null,
+                    "references": null
+                  }
+                ],
+                "references": [
+                  {
+                    "type": "ai_overview_reference",
+                    "position": "right",
+                    "source": "Simla.com",
+                    "domain": "www.simla.com",
+                    "url": "https://www.simla.com/blog/crm-en-chile",
+                    "title": "TOP CRM en Chile 2026: Mejores software para ventas ...",
+                    "text": "HubSpot CRM: solución integral para ventas y marketing. Zoho CRM: flexible y escalable para pequeñas y medianas empresas. Ofrece opciones de personalización y auto..."
+                  }
+                ],
+                "rectangle": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

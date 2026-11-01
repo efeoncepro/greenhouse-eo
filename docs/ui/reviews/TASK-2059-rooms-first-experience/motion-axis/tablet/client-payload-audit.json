@@ -1,0 +1,17 @@
+{
+  "checkedUrls": [
+    "http://127.0.0.1:3210/demo",
+    "http://127.0.0.1:3210/_next/static/chunks/1yjp3ljjdz222.js",
+    "http://127.0.0.1:3210/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+    "http://127.0.0.1:3210/_next/static/chunks/3zmmz98ibeenh.js",
+    "http://127.0.0.1:3210/_next/static/chunks/2pjgbt2kgaj7u.js",
+    "http://127.0.0.1:3210/_next/static/chunks/07m9qu5ywc3kj.js",
+    "http://127.0.0.1:3210/_next/static/chunks/2-c18pep8wlly.js",
+    "http://127.0.0.1:3210/_next/static/chunks/10w9qwo2j7u3e.js",
+    "http://127.0.0.1:3210/_next/static/chunks/1sc-_qonexlel.js",
+    "http://127.0.0.1:3210/_next/static/chunks/24ra0gaep__7b.js"
+  ],
+  "sentinelAbsent": true,
+  "rawAuthorityObjectsAbsent": true,
+  "note": "Synthetic demonstration responses only; real authorization is exercised separately through protected APIs."
+}

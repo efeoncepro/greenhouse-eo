@@ -1,0 +1,7 @@
+  ⚠ --mask indica dónde editar, pero este comando NO recompone ni verifica la zona protegida. Para una pieza final usa pnpm ai:inpaint image (garantiza delta 0 fuera de la máscara).
+  $ costo estimado ≈ USD 0.045 (1 × 1510 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ /private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/e78d4383-696d-47ba-be63-c509418ab5ec/scratchpad/car/exp/s5-relleno.png (edit) …
+  ✓ 1458KB · gpt-image-2.5-sunburst · 1024x1280 · high
+    usage: in 1462 (img 1280 · txt 182) · out 1510 · total 2972
+done
+✓ /private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/e78d4383-696d-47ba-be63-c509418ab5ec/scratchpad/car/exp/s5.png · contenido original al 82 % desde y=0.180

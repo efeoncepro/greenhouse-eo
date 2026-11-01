@@ -905,3 +905,62 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md` lista cada
 - **El compositor no emite enlaces en el PDF.** Para que la tarjeta de agenda de `decision-next-steps` lleve a
   `https://efeoncepro.com/agenda/` se agregó una anotación URI con pdf-lib al armar el PDF (`pdf-sprocket.mjs`,
   constante `LINKS`) y un `<a>` sobre la tarjeta en el canvas.
+
+## 2026-10-27/28 — Propuesta Assetplan v2 (25 láminas, `revenue-hubspot`)
+
+Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
+[README de recetas](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md), «Delta v2 (27–28/10)».
+
+- **Slack es de Salesforce en cualquier línea (2026-10-27).** Síntoma: `content-day-live-approval` con
+  `channel.tool: 'slack'` en un deck `revenue-hubspot` lanzaba «el ícono de producto es uno de marketing · sales…». Regla: corregir la
+  receta, no la lámina. En `src/lib/brand-surfaces/recipes/line-stage/content-day-live-approval.ts` el ícono de Slack
+  sale siempre del kit `revenue-salesforce` (`productIcon('slack', …, 'revenue-salesforce')`); test en
+  `src/lib/brand-surfaces/__tests__/line-stage-content-day-live-approval.test.ts`.
+- **La selección de `content-bullets` puede tapar o salirse (2026-10-27).** Síntoma: en `A051`, `selected: 1` dejó la
+  etiqueta del cursor sobre el número «04» y `selected: 4` lanzó `GraphicLineSelectionError` (fuera del lienzo).
+  Regla: `selected: 3` (abajo a la izquierda) es la posición limpia; mirar la lámina al 100 %, porque el gate no ve que
+  la etiqueta tape un número.
+- **Raster archivado no se regenera (2026-10-28).** Síntoma: el caso ANAM
+  (`ai-generations/2026-10-12_brochure-efeonce-360/laminas-v9/62-ANM-...jpg`) no estaba en disco al rearmar el PDF.
+  Regla: `pnpm ai-gen:where` + `pnpm ai-gen:pull` antes de componer; nunca regenerar ni aproximar.
+- **La copia local del canvas no es la fuente (2026-10-28).** Síntoma: la copia en el scratchpad se pierde entre
+  sesiones y el artefacto puede tener versiones más nuevas (el visor guarda). Regla: leer los archivos con
+  `action: read` antes de publicar; subir el PNG como asset, cambiar el `/_blob/<id>` y el `alt`, y publicar con
+  `file_path` + `root` (+ `files`).
+
+## 2026-10-29
+
+- **Deck en el canvas de diseño (propuesta operativa Sky): el indicador de avance se veía como un cuadro.** Síntoma: en
+  las láminas interiores, el componente `EfeonceOrbit.Progress` del sistema «Efeonce — La órbita» (bundle con
+  `axis-graphic-line` 0.6.0) a 80 × 80 px pintó un cuadro con su propio fondo y un anillo casi invisible; el operador
+  lo leyó como «quisiste poner la órbita y no lo lograste». El primer arreglo fue quitarlo, y también fue un error: el
+  operador corrigió «no había que quitarlo». Causa: `Progress` compone la pieza `progress` en un lienzo propio del
+  tamaño que se le pasa y con fondo; no es el indicador de esquina. El indicador de las láminas de contenido es la pieza
+  `pieces.deck.content` (anillo cx 1760, cy 130, r 40; arco desde las 12 hasta n/N; esfera en la punta), la misma que
+  pintan `DeckSlide` y las recetas de contenido (`content-text`, `content-bullets`: «Indicador de navegación arriba a la
+  derecha: es la única órbita de la lámina»). Regla: en un deck, **toda lámina interior lleva el indicador de 80 px**
+  (applications.md §B1) y se reproduce desde la pieza, no con `Progress` a tamaño chico: se toma el SVG que genera
+  `DeckSlide slide="content"` (con `sections` y `current` del deck), se le quita el rectángulo de fondo y se monta a
+  1920 × 1080 sobre la lámina. Todas las páginas llevan el mismo `sections`. Y antes de inventar una portada o un cierre
+  para una propuesta, se usan las recetas aprobadas (`cover-proposal-*`, `close-proposal-*`) compuestas con
+  `pnpm brand:compose`: la propuesta no lleva «¿Conversamos?».
+- **SVG con clases `<style>` sale negro en el canvas de diseño (propuesta Agencia Digital 2027 GRD-1552).** Síntoma: el
+  badge de HubSpot en SVG con estilos por clase se pintó negro en la lámina. Regla: un SVG cuyo color depende de un
+  bloque `<style>` se rasteriza a PNG antes de subirlo al canvas.
+- **Logos de clientes «un tono» para láminas de papel (GRD-1552).** Para la grilla de clientes en papel (lámina
+  canónica del brochure 360° v9, p. 78) los logos se generan desde
+  `src/lib/artifact-composer/catalogs/deck-axis/assets/clients/` mapeando los píxeles opacos a navy `#023c70` (claros →
+  blanco, medios → navy medio). Mirar cada logo al 100 %: la regla del isotipo dentro de un cuadrado de color
+  (`deck-studio`, brochure Servicios web) sigue vigente.
+
+## 2026-10-30 — Propuesta Mattis (Grupo Réditos, Wherex N.º 1555): 45 láminas y muestra ficticia TEMPO
+
+- **Órbita centrada a mano en las láminas de sección.** Síntoma: el `EfeonceOrbit.Progress` grande, centrado a mano,
+  dejó el arco cruzando el número de la sección; el operador lo rechazó («así no funciona la órbita»). Regla: las
+  láminas de sección se construyen con `deckSlideHtml('section', { sections, current, question, answer })` de
+  `@efeoncepro/axis-graphic-line`; nunca se recompone la órbita de sección con `Progress`.
+- **Valla/DOOH como lámina plana.** Regla: una pieza de vía pública sigue sus reglas (≤ 4 mensajes legibles en 3 s,
+  sin UI de vidrio ni pills) y se muestra montada en una foto de contexto (pantalla en blanco generada + homografía
+  `matrix3d`), no como un rectángulo suelto.
+- **Plantas de venta dibujadas como cajas etiquetadas.** Síntoma: rechazo del operador. Regla: una planta se dibuja
+  como plano arquitectónico: muros con grosor, puertas con giro, ventanas, mobiliario, cotas, escala y norte.

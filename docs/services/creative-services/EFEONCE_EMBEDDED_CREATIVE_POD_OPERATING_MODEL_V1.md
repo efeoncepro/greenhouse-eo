@@ -325,3 +325,27 @@ Portfolio declara clientes, interno y no asignado; no prueba inventario real. Ca
 crean sucesores con impacto, sin modificar quotes o contratos anteriores. Estado permanece `Approved for validation`;
 [manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
 [pendientes](../../../data/pricing/v3-operating/operational-gaps.json) definen ejecución y owners.
+
+## 15. Patrón Home Market Lead (cuentas multimercado)
+
+Delta 2026-10-29 — primer caso: [SKY Performance](SKY_PERFORMANCE_CREATIVE_OPERATING_MODEL_V1.md), propuesta, sin
+validar todavía en operación. Aplica cuando un pod produce la misma campaña para varios países y hoy «todos están en
+todo».
+
+- **Un dueño por mercado.** Cada Home Market Lead (HML) responde por sus mercados de punta a punta: convierte el pedido
+  en tareas y grilla, organiza la producción (la hace o la delega en el otro HML), revisa con checklist, entrega y
+  responde ante el cliente. La responsabilidad no cambia de manos cuando se delega una pieza.
+- **Rotación.** Los mercados rotan al inicio de cada trimestre para que el conocimiento no quede en una sola persona;
+  las reglas de cada mercado se documentan en el workspace para que nada se pierda al rotar.
+- **Dirección conjunta.** El cliente decide **qué** se comunica y lo de negocio (precios, descuentos, legales) y
+  entrega KV y material de marca; la Creative Operations Lead de Efeonce decide **cómo** (adapta el KV, plantillas y
+  maestros, carga y apoyo entre mercados) y dirige al equipo. La lead no carga con el conocimiento técnico del negocio.
+- **Entrada única y fuente de verdad.** El cliente canaliza todo pedido —correo, PPT comentado, foto o Excel— a una sola
+  entrada; lo que no está en el workspace (Notion en el caso fuente) no existe.
+- **Dos entregas.** Una entrega a revisión en la herramienta de revisión acordada y una entrega final en el repositorio
+  del cliente, solo después de una aprobación con fecha.
+- **Casos especiales escritos antes de partir:** alianzas, campañas pequeñas (no se dividen), ausencia de un HML (la
+  lead cubre con el otro HML) y ausencia del aprobador del cliente.
+
+Es una forma de operar el Embedded Managed Pod (§4.2), no un cambio de pricing ni de RACI base (§8).
+

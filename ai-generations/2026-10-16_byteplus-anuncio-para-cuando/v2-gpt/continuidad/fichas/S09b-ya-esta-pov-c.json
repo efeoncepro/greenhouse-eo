@@ -1,0 +1,31 @@
+{
+ "id": "S09b-ya-esta-pov-c",
+ "formato": "4:5",
+ "impacto": true,
+ "escena": "SCENE: a still from a modern, cinematic corporate comedy sketch, photorealistic. Over-the-shoulder shot from behind Paula, who sits at the NEAR end of a long pale oak meeting table with a thin matte black steel base: her shoulder, dark brown hair and cream sweater fill the lower-left foreground, soft and out of focus. GEOGRAPHY (critical, continuity, same room as every other shot): ONE single long pale oak meeting table. Paula sits on one long side; Antonio sits on the OPPOSITE long side of the same table, diagonally across from her, about three meters away, a little closer to the floor-to-ceiling window wall, facing her across the table — he is NOT at the head or far end of the table. Behind Antonio: the window wall with the Santiago skyline and the Andes; the tall Costanera tower is visible to the LEFT of Antonio, never to his right. A thin dark wall display on the right side wall. On the table: Antonio's ultra-thin space-grey aluminum laptop and his navy ceramic mug in front of him; on Paula's side, her own open laptop and her kraft paper coffee cup with a matte black lid. The camera is behind Paula's shoulder looking diagonally across the table at Antonio, 50mm f/2.8, in the same brand-new contemporary glass-walled meeting room on a high floor in Santiago de Chile, modern upholstered chairs in warm grey, Santiago skyline and the Andes through the frameless glass. Across the table, about three meters away, Antonio — sharp — calmly turns his open thin laptop around to face Paula and the camera, with one hand, a confident closed-mouth half-smile, looking straight down the table at her. The room is cool, flat and grey under overcast daylight, BUT his laptop screen blasts vivid orange and teal light that spills across the table surface toward Paula and onto Antonio's face and navy jacket; the screen shows only glowing color, no readable content. Antonio wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit, CLOSED, with its embroidered emblem on the left chest exactly as in the references, over a plain white t-shirt. Current-generation hardware only, clean surfaces; nothing dated.",
+ "sinLechoPorque": "Storyboard de video (keyframe), sin firma ni capa gráfica: no lleva lecho.",
+ "casting": {
+  "paula": {
+   "etiqueta": "Paula (casting)",
+   "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean marketing manager, 42, light-medium olive skin, shoulder-length straight dark brown hair, dark brown eyes, defined natural brows, small silver hoop earrings, slim gold-rimmed reading glasses pushed up on top of her head. She wears a cream fine-knit crewneck sweater over a crisp white collared shirt. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+   "refs": [
+    "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png"
+   ],
+   "cuerpo": "ai-generations/2026-10-16_byteplus-anuncio-para-cuando/v2-gpt/casting/ancla-paula.png",
+   "silueta": "mujer"
+  }
+ },
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce",
+   "persona": "antonio"
+  }
+ ],
+ "identidad": [
+  "paula",
+  {
+   "persona": "antonio"
+  }
+ ],
+ "lecho": "sin-lecho"
+}

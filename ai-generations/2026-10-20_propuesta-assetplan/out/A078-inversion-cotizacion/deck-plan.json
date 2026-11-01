@@ -1,0 +1,164 @@
+{
+  "tenderId": "A078-inversion-cotizacion",
+  "slides": [
+    {
+      "slideId": "deck-content-pricing",
+      "contentType": "deck.content-pricing.live",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "bodyPx": 26,
+          "bodyWidth": 380,
+          "questionWidth": "--gl-flow-question-width=470px",
+          "answerGap": "--gl-flow-answer-gap=36px",
+          "bodyGap": "--gl-flow-body-gap=252px",
+          "answerSize": "--gl-flow-answer-px=120px",
+          "answerLeading": "--gl-flow-answer-leading=0.9",
+          "answerShadowY": "--gl-flow-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-flow-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-flow-answer-shadow-opacity=35%",
+          "docLeft": "--gl-pv-doc-left=800px",
+          "docTop": "--gl-pv-doc-top=170px",
+          "docWidth": "--gl-pv-doc-width=780px",
+          "docPadTop": "--gl-pv-doc-pad-top=38px",
+          "docPadX": "--gl-pv-doc-pad-x=42px",
+          "docPadBottom": "--gl-pv-doc-pad-bottom=40px",
+          "docRadius": "--gl-pv-doc-radius=26px",
+          "docPerspective": "--gl-pv-doc-perspective=1800px",
+          "docRotate": "--gl-pv-doc-rotate=-7deg",
+          "tileSize": "--gl-pv-tile=56px",
+          "tileRadius": "--gl-pv-tile-radius=16px",
+          "isotypeSize": "--gl-pv-isotype=30px",
+          "headerGap": "--gl-pv-header-gap=16px",
+          "kickerGap": "--gl-pv-kicker-gap=4px",
+          "kickerPx": "--gl-pv-kicker-px=14px",
+          "kickerColor": "--gl-pv-kicker-color=#023c70",
+          "titlePx": "--gl-pv-title-px=34px",
+          "rowsGapTop": "--gl-pv-rows-gap-top=26px",
+          "rowPad": "--gl-pv-row-pad=20px",
+          "rowRule": "--gl-pv-row-rule=1.5px",
+          "rowGap": "--gl-pv-row-gap=18px",
+          "rowTile": "--gl-pv-row-tile=44px",
+          "rowTileRadius": "--gl-pv-row-tile-radius=12px",
+          "rowNumberPx": "--gl-pv-row-number-px=20px",
+          "rowNamePx": "--gl-pv-row-name-px=22px",
+          "rowDescPx": "--gl-pv-row-desc-px=16px",
+          "rowDescGap": "--gl-pv-row-desc-gap=2px",
+          "rowAmountPx": "--gl-pv-row-amount-px=21px",
+          "totalPad": "--gl-pv-total-pad=22px",
+          "totalRule": "--gl-pv-total-rule=2px",
+          "totalLabelPx": "--gl-pv-total-label-px=15px",
+          "totalAmountPx": "--gl-pv-total-amount-px=56px",
+          "totalAmountGap": "--gl-pv-total-amount-gap=6px",
+          "taxPx": "--gl-pv-tax-px=15px",
+          "taxGap": "--gl-pv-tax-gap=6px",
+          "ctaPx": "--gl-pv-cta-px=22px",
+          "ctaPadY": "--gl-pv-cta-pad-y=20px",
+          "ctaPadX": "--gl-pv-cta-pad-x=32px",
+          "ctaRadius": "--gl-pv-cta-radius=14px",
+          "chipPerspective": "--gl-pv-chip-perspective=1400px",
+          "chipPadY": "--gl-pv-chip-pad-y=18px",
+          "chipPadX": "--gl-pv-chip-pad-x=22px",
+          "chipRadius": "--gl-pv-chip-radius=18px",
+          "chipKickerPx": "--gl-pv-chip-kicker-px=13px",
+          "chipTextPx": "--gl-pv-chip-text-px=21px",
+          "chipTextGap": "--gl-pv-chip-text-gap=6px",
+          "haloColor": "--gl-pv-halo-color=#72ded8",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "docFill": "--gl-pv-doc-color=#ffffff",
+          "docInk": "--gl-pv-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-pv-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-pv-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-pv-doc-chip-color=#f5f7fa",
+          "docShadowColor": "--gl-pv-doc-shadow-color=#000610",
+          "docShadowY": "--gl-pv-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-pv-doc-shadow-blur=110px",
+          "docShadowOpacity": "--gl-pv-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-pv-doc-halo-blur=90px",
+          "docHaloOpacity": "--gl-pv-doc-halo-opacity=22%",
+          "docEdgeOpacity": "--gl-pv-doc-edge-opacity=16%",
+          "glassFrom": "--gl-pv-glass-from-color=#12344f",
+          "glassTo": "--gl-pv-glass-to-color=#081c30",
+          "glassAngle": "--gl-pv-glass-angle=160deg",
+          "glassEdgeOpacity": "--gl-pv-glass-edge-opacity=16%",
+          "glassShadowColor": "--gl-pv-glass-shadow-color=#000610",
+          "glassShadowY": "--gl-pv-glass-shadow-y=30px",
+          "glassShadowBlur": "--gl-pv-glass-shadow-blur=70px",
+          "glassShadowOpacity": "--gl-pv-glass-shadow-opacity=65%",
+          "glassHaloBlur": "--gl-pv-glass-halo-blur=40px",
+          "glassHaloOpacity": "--gl-pv-glass-halo-opacity=16%",
+          "chip1Left": "--gl-pv-chip1-left=1520px",
+          "chip1Top": "--gl-pv-chip1-top=110px",
+          "chip1Rotate": "--gl-pv-chip1-rotate=-14deg",
+          "chip2Left": "--gl-pv-chip2-left=1600px",
+          "chip2Top": "--gl-pv-chip2-top=850px",
+          "chip2Rotate": "--gl-pv-chip2-rotate=-16deg"
+        },
+        "stage": {
+          "src": "asset-ref:layer:content-pricing-live-bg"
+        },
+        "platform": {
+          "src": "asset-ref:layer:content-pricing-live-platform"
+        },
+        "voice": {
+          "question": "¿Cuánto es al mes?",
+          "answer": "36 UF",
+          "eyebrow": "Inversión"
+        },
+        "body": "Precio de lista: <strong>48 UF + IVA</strong> al mes. Del mes 1 al 4 tienes 25 % de descuento; después, mes a mes.",
+        "quote": {
+          "kicker": "Cotización · v3",
+          "title": "Para Assetplan",
+          "totalLabel": "Meses 1 a 4",
+          "total": "36 UF",
+          "tax": "neto + IVA"
+        },
+        "lines": [
+          {
+            "number": "1",
+            "name": "Operación HubSpot",
+            "desc": "30 h al mes: canal, soporte y proyectos",
+            "amount": "48 UF / mes"
+          },
+          {
+            "number": "2",
+            "name": "Descuento inicial",
+            "desc": "−25 % sobre el precio de lista, meses 1 a 4",
+            "amount": "−12 UF / mes"
+          },
+          {
+            "number": "3",
+            "name": "Primer mes",
+            "desc": "Sin permanencia: si no funciona, terminamos",
+            "amount": "Incluido"
+          },
+          {
+            "number": "4",
+            "name": "Bolsa ajustable",
+            "desc": "Desde el mes 2, con aviso de 15 días",
+            "amount": "Incluido"
+          }
+        ],
+        "chips": [
+          {
+            "kicker": "Desde el mes 5",
+            "text": "48 UF + IVA,\nmes a mes"
+          },
+          {
+            "kicker": "Plazo inicial",
+            "text": "Cuatro meses;\nvigencia al 30/11/2026"
+          }
+        ],
+        "cta": {
+          "text": "Aprobar propuesta",
+          "cursorScale": 1.2
+        }
+      },
+      "template": "ContentPricingLive"
+    }
+  ]
+}

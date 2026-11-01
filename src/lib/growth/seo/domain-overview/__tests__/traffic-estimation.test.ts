@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
  * TASK-1775 — Screening de cartera (`bulk_traffic_estimation`).
@@ -69,6 +69,19 @@ vi.mock('@/lib/sync/publish-event', () => ({
 }))
 
 import { estimateBulkTrafficCost, estimateDomainTraffic, parseBulkTrafficItem } from '../traffic-estimation'
+
+// These fixtures run under the default `legacy` selector, valid only before the provider cutoff
+// (ETV_PROVIDER_CUTOFF_ISO, 2026-11-01). Pin the clock so the verdict does not flip when the wall
+// clock crosses it, as it did on 2026-11-01; post-cutoff behavior is covered by the policy tests.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-10-15T12:00:00.000Z'))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 
 const ETV_FIXTURE = { version: 'legacy_static_v1', evidence: 'explicit_request', requestedAt: '2026-10-15T12:00:00.000Z', policyVersion: 'etv-policy.v1', historicalBasis: null } as const
 

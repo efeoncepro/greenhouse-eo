@@ -134,3 +134,12 @@ en shell no interactiva. Leer objetos y asociaciones tras automatización, verif
 membresía efectiva de segmentos cuando corresponda. Reportar preparado/aprobado/escrito/leído por separado.
 Si cambió metadata, conservar snapshot fechado y comparar nombres, tipos, opciones y writers antes de
 actualizar guías. Descubrir drift no autoriza crear propiedades, migrar registros ni cambiar workflows.
+
+## Empresa automática por dominio de email
+
+Después de crear el contacto, releer Primary: el portal puede reemplazar la asociación suministrada por
+una Company automática del dominio laboral, aunque el sitio de la empresa sea otro. Corregir la principal
+con el carril autorizado y verificar etiqueta y `associatedcompanyid`; no basta el payload de creación.
+No fusionar/eliminar la secundaria como efecto implícito. El [adapter](../../../.codex/skills/hubspot-as-a-service/references/account-based-prospecting.md#readback-tras-automatización-y-pedido-de-alta-repetido)
+conserva el recorrido UI y [Mambrino](../../commercial/prospecting-agent/runs/2026-10-31-mambrino-dayanna.md)
+la evidencia. Membresía pendiente por límites del carril no invalida lo escrito ni acredita pertenencia.

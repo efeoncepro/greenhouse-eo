@@ -1,5 +1,42 @@
 # Commercial
 
+**Cierre focal 30–31/10:** [Wequips / Mayra](prospecting-agent/runs/2026-10-30-wequips-mayra.md), correo
+inferido rebotado sin reintento; [Mambrino / Dayanna](prospecting-agent/runs/2026-10-31-mambrino-dayanna.md),
+Apollo verificado, Contact/Primary y correo SENT comprobados. [Docs y skills](../audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
+Sin nueva secuencia; membresía de segmentos y Company secundaria de Mambrino pendientes.
+
+**Cobertura pendiente:** [diagnóstico Perú](sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
+
+**Sales Navigator multimercado:** [44 búsquedas guardadas](sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md) para Chile, México, Colombia y Perú; criterios, muestras y límites documentados. Las listas financieras 54/57 conservan su corte.
+
+**Sales Navigator, último corte:** [54cuentas/57personas y evidencia de contratación](prospects/servicios-financieros-chile-2026-10/GERENCIAS-AGENCIAS-Y-CONTRATACION-2026-10-29.md). Priorización de gerentes/subgerentes/heads por agencias/proveedores/presupuesto o liderazgo funcional; estado anterior47/37 conservado como historia.
+
+**SalesNavigator, corte posterior29/10:** [47cuentas/37personas y criterio comprador](prospects/servicios-financieros-chile-2026-10/AMPLIACION-Y-CRITERIO-COMPRADOR-2026-10-29.md).
+Julio excluyeCommunityManagers/ejecución pura de listas comerciales; liderazgo funcional para impulsar contratación.
+Haulmerresuelto. Los bloques de guardado iniciales que siguen conservan sus cifras de fase.
+
+- [Sales Navigator Core — operación y filtros con agentes](../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md):
+  adapter interactivo sobre Chrome/Julio, 15 familias de filtros de cuentas (14 operables), selección por
+  relevancia antes de relación y [uso táctico de InMail](../operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md).
+  150 disponibles observados el 29/10; 50 queda como declaración histórica, sin reposición inferida.
+  [Portafolio e ICP](sales-navigator/PORTAFOLIO-E-ICP-2026-10-29.md): doce servicios/landings y cinco Personas
+  persistidos; [manifest exacto](sales-navigator/PORTAFOLIO-CONFIGURADO-2026-10-29.json). El
+  [primer corte de cuatro servicios](sales-navigator/CONFIGURACION-2026-10-29.md) se conserva como historia.
+- [Servicios financieros/fintech de Chile — cuentas y listas](prospects/servicios-financieros-chile-2026-10/CARTERA-Y-LISTAS-2026-10-29.md):
+  base firmográfica 295; 31/28 son pasadas de acceso. Tres listas sectoriales, 31 cuentas únicas con membresía
+  nominal verificada y Haulmer con asociación incierta. [Cinco listas de personas por servicio](prospects/servicios-financieros-chile-2026-10/LISTAS-PERSONAS-POR-SERVICIO-2026-10-29.md):
+  23 identidades únicas releídas. [BCI](prospects/contactos-conocidos-banca-retail-2026-10/BCI-SALES-NAVIGATOR-2026-10-29.md)
+  y [BICE VIDA](prospects/bice-vida-2026-10/SALES-NAVIGATOR-2026-10-29.md) conservan aplicaciones y descartes.
+  Configuración y guardado autorizados; sin comunicaciones, créditos consumidos ni altas CRM.
+
+- [ARMOR EPPS / Indecaucho — discovery y caso de negocio](accounts/indecaucho-armor/README.md):
+  preparación de la reunión27/10, investigación de marca/canal/demanda, caso v0 y continuidad desde
+  la transcripción HubSpot/Notion. Invitación y confirmación enviadas; terna aún por decidir.
+
+- [UTP Perú — convocatoria de proveedores, 25/10/2026](prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company y Contact de Compras creados, correo Verified por Apollo (2 créditos), presentación con brochures/firma/CCO y EMAIL `SENT` verificados; LinkedIn pendiente por créditos, sin nueva secuencia ni homologación acreditada.
+
+- [Octubre comercial — análisis profundo y plan propuesto, 24/10/2026](analyses/2026-10-prospeccion/README.md): 147 correos a 62 cuentas, madurez de cohortes, expansión, calidad del pipeline y prioridades al 06/11; matriz por cuenta y datos auditables. Incluye Solidaria y excluye Momentum de la cohorte de clientes; no activa contactos ni cambios CRM. [Revisión de mensajes por cuenta](analyses/2026-10-prospeccion/REVISION-MENSAJES.md): 64 fichas, 47 textos alternativos condicionados y 17 decisiones sin nuevo mensaje.
+
 - [Partnerships y distribuidores: operación](../manual-de-uso/comercial/operar-partnerships-y-distribuidores.md) · [registro vigente](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md): Adobe/Nexsys, Google/Ingram y Microsoft/AWS/LOL; identidad, formación, crédito, archivos externos y evidencia de envío.
 
 Nombres de Deal/Lead: [convención vigente Efeonce](../operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md),
@@ -12,7 +49,7 @@ no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre
 
 - [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.
 
-> **Naming AEO vigente:** **Efeonce AEO** es la capacidad comercial; **Efeonce AEO Assessment** es el diagnóstico público y **Efeonce AI Visibility Report** su entregable. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
+> **Naming AEO vigente:** en copy nuevo el servicio se escribe **Efeonce | AEO**; Efeonce es la marca que habla y firma. **Efeonce | AEO Assessment** conserva su identidad de diagnóstico; la landing pública del diagnóstico usa **Efeonce | AI Visibility Report** según el delta del 03/10. Casos y propuestas fechados conservan sus nombres de época (`AI Visibility Grader`, `Brand Visibility Grader`, `AEO Grader`). [ADR y deltas vigentes](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Índice operativo de ventas de Efeonce. Esta carpeta conecta las metas aprobadas, el forecast y los negocios
 verificados sin convertir Markdown en una segunda base de datos comercial.

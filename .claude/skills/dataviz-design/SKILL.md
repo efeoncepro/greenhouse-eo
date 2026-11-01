@@ -121,6 +121,10 @@ Decisions 1–13 govern charts inside the Greenhouse portal. A chart on an Efeon
 
 The nine chart recipes (Medida en la órbita, Ranking, Antes y después, Tendencia, Partes de un todo, De cada 100, Venn de tres, Matriz 2 × 2, Embudo) are approved **only for Marketing con Manzanitas**; whether they pass to La órbita for other Efeonce pieces is pending. None of the register is in AXIS yet: the source is the [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG) (boards `Grafico-1…9`).
 
+### 15. Charts inside efeoncepro.com blog articles use the «Gráfico Efeonce» block
+
+A chart in the body of a blog article on efeoncepro.com is **not** an SVG image (decision 14) nor a hand-built ECharts embed: it is the block `efeoncepro/chart` («Gráfico Efeonce», `efeonce-editorial-blocks` 0.9.0, live and approved 2026-10-25), authored as `kind: "chart"` in the Content Factory spec. Ten kinds from one pasted table: `line`, `column` (grouped or `stacked`), `bar` ranking, `pie` donut (≤ 8 parts of a total, center shows the highlighted part), `funnel`, `before-after`, `measure` (the La órbita ring), `per-hundred`, `matrix` 2 × 2, `venn` of three. The engine is ECharts, built in greenhouse-eo (`pnpm renderer:editorial-chart:build`) and loaded near the viewport; the numbers also ship as an HTML table («Ver los datos»), so the data is readable without JS. Rules: title = the conclusion, source always, **one** highlighted entity in the post's line accent, the rest in context greys, text in ink (never the series color). Manual: [`usar-graficos-en-articulos.md`](../../../docs/manual-de-uso/public-site/usar-graficos-en-articulos.md); contract: [`BLOG_EDITORIAL_BLOCK_STYLES_V1.md`](../../../docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md) §Gráfico Efeonce; authoring: `efeonce-public-site-wordpress` → `references/content-factory-gutenberg.md`. Decision 14 still governs social pieces and chart images.
+
 ## Compose with (Greenhouse skills)
 
 - `web-perf-design-greenhouse-overlay` — lazy load + bundle budgets.
@@ -130,6 +134,7 @@ The nine chart recipes (Medida en la órbita, Ranking, Antes y después, Tendenc
 
 ## Version
 
+- **v1.4** — 2026-10-25 — pinned decision 15 (blog article charts on efeoncepro.com use the live «Gráfico Efeonce» block: ECharts engine, one highlight, data also as an HTML table).
 - **v1.3** — 2026-09-28 — pinned decision 14 (brand social pieces do not use ECharts; they follow the chart grammar of La órbita and of the registro Marketing con Manzanitas).
 - **v1.2** — 2026-08-08 — TASK-1309: pinned decision 12 (Apex `radialBar` measures 0 in a fluid container; deterministic SVG arc is the canonical gauge) and 13 (adjacent KPIs with different provenance declare it on the surface).
 - **v1.1** — 2026-08-07 — TASK-1307: `baseValue` rule for areas over an inverted axis (§5); pinned decision 11 (curated registry of confirmed external facts for chart annotation).

@@ -448,9 +448,12 @@ GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED="${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED:-true
 ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED}"
 # 2026-10-24 — Correos de las reservas de eventos (confirmación + lista de espera vía consumer reactivo; recordatorio
 # vía /growth/events/reminders). Sólo actúa sobre formularios event_registration que declaran
-# ui_policy.eventRegistration.event: sin eventos así es no-op. Rollback (<5min):
+# ui_policy.eventRegistration.event: sin eventos así es no-op.
+# 2026-10-25 — Mantener OFF en el release Auth/Rooms: el fix del filtro viaja en el
+# batch compartido, pero el lanzamiento y los correos de eventos siguen pendientes.
+# Activar sólo con su rollout autorizado. Rollback (<5min):
 # `gcloud run services update ops-worker --update-env-vars GROWTH_EVENT_EMAILS_ENABLED=false`.
-GROWTH_EVENT_EMAILS_ENABLED="${GROWTH_EVENT_EMAILS_ENABLED:-true}"
+GROWTH_EVENT_EMAILS_ENABLED="${GROWTH_EVENT_EMAILS_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},GROWTH_EVENT_EMAILS_ENABLED=${GROWTH_EVENT_EMAILS_ENABLED}"
 
 # TASK-1689 — Emails transaccionales del ciclo de Hiring. Los 4 consumers reactivos

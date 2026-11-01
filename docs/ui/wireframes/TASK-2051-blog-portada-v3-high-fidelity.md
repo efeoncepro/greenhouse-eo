@@ -49,7 +49,7 @@
 │   «Lo que te llevas» 01/02/03 (7fr) | «Agenda · 45 minutos» línea de tiempo (5fr)                   │
 │   «Próximos en vivo» entradas ×2 (5fr) | «Grabaciones» ×3 con play (7fr)                            │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 5 RIEL «Para leer con calma» (papel) tarjetas 440×600 deslizables · flechas ← →                     │
+│ 5 RIEL «Para leer con calma» (papel) tarjetas v2 440×600 deslizables · flechas ← → (desvío 14)       │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 1 ÓRBITA (navy) «Explora por tema / ¿De qué escribimos más?» arco medido por tema + último          │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -63,7 +63,8 @@
 
 Mismo orden. Slider a 100 svh con swipe; buscador 64 px; Glitch apilado con la píldora a ancho completo; tarjeta del
 evento en una columna (información → arte 200 px → franja 2×2 a 84 px → speakers, reserva y prueba social);
-aprendizajes y agenda apilados; riel horizontal con scroll-snap; años como píldoras con scroll; cinta a 60 px.
+aprendizajes y agenda apilados; riel horizontal con scroll-snap y tarjetas de 304×540; años como píldoras con scroll;
+cinta a 60 px.
 
 ## Content Slots
 
@@ -74,9 +75,42 @@ aprendizajes y agenda apilados; riel horizontal con scroll-snap; años como píl
 | Glitch | `glitch` | edición, Flash, 4 números |
 | Evento próximo | `events.next` | título, bajada, fecha/zona, duración, modalidad, speakers, aprendizajes, agenda, arte clave, form |
 | Próximos / grabaciones | `events.upcoming` / `events.recordings` | 2 / 3 |
-| Riel | `rail` | casos, guías, recursos (herramienta antes que diagnóstico) |
+| Riel | `rail` + `events.next` | tarjetas v2 (ver «Riel v2» abajo): cuatro lecturas largas o episodios de podcast, recursos `rail` y el próximo evento |
 | Temas | `topics` | conteo, porcentaje, último |
 | Archivo | `archive` | por año, 12 filas, paginado |
+
+### Riel v2 «Para leer con calma» (desvío 14, canvas versión 93)
+
+En producción desde el 2026-10-24 21:12 UTC. Una sola plantilla de tarjeta para todos los formatos
+(`scripts/public-website/blog-v3/lib/rail-v2.cjs`); datos de `EO_Home_Adapter::rail()`. Contrato completo:
+[runtime V1 § «Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
+
+| Tarjeta | Cuándo | Centro | Pie |
+|---|---|---|---|
+| Foto a sangre (navy / azul alternados) | entrada con imagen destacada; guía o herramienta con imagen de escena | la imagen propia de la tarjeta (`_eo_card_image`) o, si no hay, la destacada; recorte al punto focal `_eo_card_focus` (`object-position`, vacío = centro); texto sobre un velo abajo | autor con foto o iniciales, fecha, minutos |
+| Cliente (papel) | caso con «Cliente del caso» (`_eo_client`; hoy `anam`) | logo del cliente | autor, fecha, minutos |
+| Pregunta (tinta) | recurso `diagnostico` | la pregunta (las dos líneas del slider) | logo de Efeonce AEO, «3 motores de IA» |
+| Entrada de webinar | el próximo evento publicado, hasta que termina | día, mes, día de semana y hora en su zona; «Faltan N días» / «Mañana» / «Hoy» / «En vivo ahora» | primer speaker (o «Equipo de Efeonce»), duración |
+| Onda de podcast | entrada con formato Podcast (sin mínimo de minutos) | la onda de punta a punta | autor, duración (`_eo_video_duration`) |
+| Tipográfica (papel) | entrada sin imagen ni cliente | tema, título y bajada | autor, fecha, minutos |
+
+Copy fijo: botón con el verbo del formato (crece de círculo a píldora al hover); ícono del formato en el color de su
+tema; bajada de dos líneas. Las guías de `think.efeoncepro.com` firman con el logo de Efeonce Think; las demás, con el
+logo negativo de Efeonce.
+
+| Insignia (una por tarjeta, gana el menor rango) | Dato que la enciende |
+|---|---|
+| 1 En vivo | reloj del evento |
+| 2 Últimos cupos / Lista de espera | reservas de Growth Forms (TASK-2053) — sin lector todavía |
+| 3 Más leído · 4 Tendencia | lecturas de GA4 — sin lector todavía |
+| 5 Nuevo | publicada hace 14 días o menos |
+| 6 Actualizado | «Última revisión» (`_eo_reviewed_at`) de los últimos 30 días en una entrada de más de 60; el pie dice «Actualizado <fecha>» |
+| 7 Gratis | recursos y eventos gratis |
+
+Accesibilidad: cada tarjeta es un enlace (`role="listitem"`) con título visible; la imagen de fondo es decorativa
+(`alt=""`) y el logo del cliente lleva su nombre como `alt`. Movimiento reducido: sin inclinación, zoom ni destello de
+la insignia, la onda queda quieta; sólo cambian luz y color. axe 0 en los tres tableros y desborde 0 px de 320 a 1920
+(en vivo, 2026-10-24).
 
 ## States
 
@@ -119,3 +153,9 @@ aprendizajes y agenda apilados; riel horizontal con scroll-snap; años como píl
 - **Primitive:** extender AXIS (TASK-2052) para botón con texto que rueda y flecha dibujada, segmentado e indicador,
   buscador con haz; los módulos de página quedan en el plugin.
 - **Riesgos abiertos:** rieles laterales de Ohio desde 1181 px; peso del hero; renderer de formularios en línea.
+- **Delta 2026-10-24 (tarjetas v2):** el riel v1 del canvas congelado se reemplaza por la plantilla v2 aprobada
+  (canvas versión 93) en los tres tableros; las insignias de cupos y lecturas esperan su lector (filtro
+  `eo_home_rail_signals`).
+  Sub-delta 2026-10-24 (0.4.5): la tarjeta de foto acepta imagen propia y punto focal, para portadas con texto
+  incrustado (Manzanitas); la destacada sigue siendo la OG. Un solo foco «84% 30%» sirve en los tres tableros para una
+  cara a ≈71 % de la placa.

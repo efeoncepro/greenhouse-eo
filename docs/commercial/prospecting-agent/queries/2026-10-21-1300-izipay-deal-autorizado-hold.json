@@ -1,0 +1,65 @@
+{
+  "checked_at": "2026-10-21T13:00:35.677065-03:00",
+  "scope": "Solicitud focal de alta de Deal por MCP; no descubrimiento20celdas",
+  "week_window": {
+    "start": "2026-10-19T00:00:00-03:00",
+    "end": "2026-10-21T13:00:35.677065-03:00"
+  },
+  "queries": [
+    {
+      "source": "HubSpot MCP get_user_details",
+      "query": "USER_INFORMATION + TOOL_INFORMATION",
+      "result": "48713323 /75788512, DEAL writeAVAILABLE"
+    },
+    {
+      "source": "Outlook search_messages",
+      "query": "from:[correo laboral de Iris redactado] received>=2026-10-21",
+      "pii_redacted": true,
+      "result": "Una invitación íntegra RFQ001; sin adjuntos"
+    },
+    {
+      "source": "Outlook search_messages",
+      "query": "RFQ001 received>=2026-10-21",
+      "result": "Dos correos: invitación y confirmación enviada; sin nuevos documentos"
+    },
+    {
+      "source": "HubSpot MCP search_crm_objects",
+      "query": "DEAL query izipay,limit100",
+      "result": "total0"
+    },
+    {
+      "source": "HubSpot MCP search_crm_objects",
+      "query": "DEAL asociado Company59717761399,limit100",
+      "result": "total0"
+    },
+    {
+      "source": "HubSpot MCP get_crm_objects",
+      "query": "Company59717761399 y Contact256738112539",
+      "result": "Identidades existentes y dueño verificados"
+    },
+    {
+      "source": "HubSpot MCP discover_hubspot_schema",
+      "query": "GET_PIPELINES DEAL",
+      "result": "Ventas default y pipelinecompartido HubSpot; sin etapa de invitación"
+    }
+  ],
+  "contract_control": {
+    "result": "HOLD_INCOMPLETE",
+    "read": "Correo primario RFQ001 íntegro; sin nuevo mensaje posterior del comprador encontrado",
+    "awardee": "NO_VERIFICADO",
+    "award_act_order": "NO_VERIFICADO",
+    "contract": "NO_VERIFICADO",
+    "signature": "NO_VERIFICADO",
+    "execution_dates": "NO_VERIFICADO; 2027 general",
+    "published_at": "NO_VERIFICADO",
+    "interest_deadline": "2026-10-22 17:00 zona no indicada",
+    "offer_calendar": "PENDIENTE anunciado por comprador",
+    "buyer_admission_foreign_supplier": "PENDIENTE"
+  },
+  "last_checked_at": "2026-10-21T13:00:35.677065-03:00",
+  "publication_at": "NO_VERIFICADO",
+  "first_seen_at": "2026-10-21T13:41:20Z",
+  "approval": "Autorizado por Julio, pendiente control factual obligatorio",
+  "writes": 0,
+  "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-10-21-izipay-confirmacion/deal-create-authorized-hold.json"
+}

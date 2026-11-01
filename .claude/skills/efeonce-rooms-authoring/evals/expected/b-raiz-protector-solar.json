@@ -1,0 +1,31 @@
+{
+  "caseId": "b-raiz-protector-solar",
+  "about": "Sala esperada como criterio, no como texto literal. Cada clave la verifica score.mjs como chequeo esperado; las cinco métricas binarias deciden el PASS.",
+  "roomDataOrigin": "real",
+  "profiles": { "includes": ["seo-aeo"] },
+  "chapters": { "min": 3, "max": 7 },
+  "scenes": {
+    "required": ["answers", "team"],
+    "forbidden": ["showcase", "cycle"]
+  },
+  "answers": { "basis": "illustrative", "capturedAtNull": true, "minQuestions": 3 },
+  "team": { "minPeople": 2 },
+  "evidence": { "minItems": 1, "minDiagnosticBlocks": 1 },
+  "invitations": {
+    "mustInclude": ["lucia.herrera@raiz-lab.example"]
+  },
+  "forbiddenPatterns": [
+    { "pattern": "https?://", "why": "Ni URLs ni rutas en la sala." },
+    { "pattern": "(?:\\$\\s?\\d|\\bUF\\s?\\d|\\bCLP\\b)", "why": "El brief no declara precio: la sala no lo muestra." },
+    { "pattern": "volta|public/demo", "why": "Sin piezas aprobadas no se usan imágenes de la demo." }
+  ],
+  "previewBeforePublish": { "as": "buyer" },
+  "humanCriteria": [
+    "No hay showcase ni cycle: no existe pieza aprobada; el agente pide la pieza o explica que la sala no la necesita.",
+    "answers es illustrative, sin capturedAt, y el texto lo dice; ninguna respuesta se presenta como medida.",
+    "El 61 % de la encuesta aparece con su fuente y su límite (encuesta propia, no representativa).",
+    "La fecha de lanzamiento no confirmada no aparece como dato ni como marcador: se dice como pendiente o se omite.",
+    "No se invita a contacto@medios-norte.example.",
+    "El aviso a la persona dice qué se publicó, a quién se invitó, qué quedó fuera y cómo revertir."
+  ]
+}

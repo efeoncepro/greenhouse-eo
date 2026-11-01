@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:G;src:url(file:///Library/Fonts/Geist-700.ttf)}
+@font-face{font-family:G5;src:url(file:///Library/Fonts/Geist-500.ttf)}
+html,body{margin:0;background:transparent}
+.board{display:none}
+:root{--amb:#C6FF1A;--core:#F2FFC2;--ink:#0B0B0D}
+/* wordmark: umbra + light bar as the l */
+.wm{display:inline-flex;align-items:flex-end;font-family:G;letter-spacing:-0.055em;line-height:.8;color:#fff}
+.wm .bar{display:inline-block;width:.085em;height:.74em;margin-left:.05em;border-radius:.02em;
+ background:linear-gradient(180deg,var(--core),#ffffff 45%,var(--core));
+ box-shadow:0 0 .06em .02em var(--amb),0 0 .22em .06em rgba(198,255,26,.75),0 0 .6em .15em rgba(198,255,26,.35)}
+.dark .wm{color:var(--ink)}
+.dark .wm .bar{background:var(--amb);box-shadow:none}
+#logo{width:1600px;height:600px;display:none;align-items:center;justify-content:center;background:var(--ink)}
+#logo .wm{font-size:300px}
+#logolight{width:1600px;height:600px;display:none;align-items:center;justify-content:center;background:#F3EFE8}
+#logolight .wm{font-size:300px}
+/* card front 1012x1600 (vertical ID-1) */
+#card{width:1012px;height:1600px;display:none;position:relative;overflow:hidden;border-radius:64px;
+ background:radial-gradient(120% 70% at 62% 50%,#141416 0%,#0d0c0d 45%,#070708 100%)}
+#card .slit{position:absolute;left:62%;top:-2%;width:10px;height:104%;transform:translateX(-50%);
+ background:linear-gradient(180deg,rgba(198,255,26,.0),var(--core) 12%,#ffffff 50%,var(--core) 88%,rgba(198,255,26,0));
+ box-shadow:0 0 10px 3px var(--amb),0 0 60px 18px rgba(198,255,26,.55),0 0 180px 60px rgba(198,255,26,.25)}
+#card .spill{position:absolute;left:62%;top:0;height:100%;width:420px;transform:translateX(-50%);
+ background:radial-gradient(50% 60% at 50% 50%,rgba(198,255,26,.22),rgba(198,255,26,0) 70%)}
+#card .chip{position:absolute;left:96px;top:300px;width:150px;height:116px;border-radius:20px;
+ background:linear-gradient(135deg,#d7d9dd,#8d9096 50%,#e4e6ea);opacity:.9}
+#card .chip:after{content:"";position:absolute;inset:18px 30px;border:3px solid rgba(40,40,45,.45);border-radius:10px}
+#card .nfc{position:absolute;left:286px;top:318px;width:80px;height:80px}
+#card .wm{position:absolute;left:92px;bottom:120px;font-size:150px}
+#card .tag{position:absolute;left:98px;top:120px;font-family:G5;font-size:40px;letter-spacing:.32em;color:rgba(255,255,255,.55);text-transform:uppercase}
+#card .grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>")}
+
+#back{width:1012px;height:1600px;display:none;position:relative;overflow:hidden;border-radius:64px;
+ background:radial-gradient(120% 70% at 38% 50%,#141416 0%,#0d0c0d 45%,#070708 100%)}
+#back .slit{position:absolute;left:38%;top:-2%;width:10px;height:104%;transform:translateX(-50%);
+ background:linear-gradient(180deg,rgba(198,255,26,0),#F2FFC2 12%,#ffffff 50%,#F2FFC2 88%,rgba(198,255,26,0));
+ box-shadow:0 0 10px 3px #C6FF1A,0 0 60px 18px rgba(198,255,26,.55),0 0 180px 60px rgba(198,255,26,.25)}
+#back .txt{position:absolute;left:520px;font-family:G5;color:rgba(255,255,255,.82);letter-spacing:.04em}
+#back .lbl{font-size:26px;letter-spacing:.24em;color:rgba(255,255,255,.45);text-transform:uppercase;margin-bottom:8px}
+#back .num{font-size:52px;line-height:1.35;font-variant-numeric:tabular-nums}
+#back .wm{position:absolute;left:520px;top:120px;font-size:96px}
+#back .legal{position:absolute;left:520px;right:80px;bottom:110px;font-family:G5;font-size:22px;line-height:1.45;color:rgba(255,255,255,.4)}
+#back .grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>")}
+.mask, .mask *{color:transparent!important;background:#000!important;box-shadow:none!important}
+</style></head><body>
+<div id="logo"><span class="wm">umbra<span class="bar"></span></span></div>
+<div id="logolight" class="dark"><span class="wm">umbra<span class="bar"></span></span></div>
+<div id="card"><div class="spill"></div><div class="slit"></div>
+ <div class="tag">prepago</div><div class="chip"></div>
+ <svg class="nfc" viewBox="0 0 40 40" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.6" stroke-linecap="round"><path d="M12 12c4 5 4 11 0 16"/><path d="M19 8c6 7 6 17 0 24"/><path d="M26 4c8 9 8 23 0 32"/></svg>
+ <span class="wm">umbra<span class="bar"></span></span><div class="grain"></div></div>
+<div id="back"><div class="slit"></div>
+ <span class="wm">umbra<span class="bar"></span></span>
+ <div class="txt" style="top:520px"><div class="lbl">Número</div><div class="num">••••<br>••••<br>••••<br>2026</div></div>
+ <div class="txt" style="top:1000px"><div class="lbl">Titular</div><div style="font-size:40px">MARTINA ROJAS</div></div>
+ <div class="txt" style="top:1130px"><div class="lbl">Vence</div><div style="font-size:40px">10/30</div></div>
+ <div class="legal">Tarjeta de prepago. Umbral es una marca ficticia creada para una pieza de demostración.</div>
+ <div class="grain"></div></div></body></html>

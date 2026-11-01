@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ea23b52f3f516d37deb0975f625926d37589d3a3cea9ecd8baef80d725bcc2e8",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.decision-case",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:base-cine",
+      "path": "ai-generations/2026-10-20_propuesta-assetplan/caso-ssilva/base-cine.png",
+      "sha256": "d2e0b6ff269ce6bd918516ce29a59baa3dde8dfc6a578f61b36d0a05ed608230"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "eyebrow-chip-outline-2026-10-20"
+}

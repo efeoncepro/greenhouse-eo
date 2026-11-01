@@ -1,7 +1,7 @@
 # Portada del blog — Marketing con Manzanitas en efeoncepro.com/blog/
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.6
 > **Creado:** 2026-10-24 por Claude
 > **Ultima actualizacion:** 2026-10-24 por Claude
 > **Documentacion tecnica:** [Portada del blog — runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) ·
@@ -26,12 +26,24 @@ Tiene tres versiones del mismo diseño: escritorio (desde 1100 px de ancho), tab
 | Pregúntale al blog | Un buscador con preguntas sugeridas | La búsqueda del sitio |
 | Glitch | La manzana en bytes, la última edición, el último Flash y la suscripción | Las entradas de Glitch y el formulario de suscripción |
 | Eventos y webinars | El próximo evento con cuenta regresiva, aprendizajes, agenda, próximos y grabaciones | Los eventos cargados en WordPress |
-| Para leer con calma | Un riel de lecturas largas y recursos | Entradas y recursos marcados para el riel |
-| ¿De qué escribimos más? | Una órbita con los temas del blog y cuánto se escribe de cada uno | Las categorías de las entradas publicadas |
+| Para leer con calma | Un riel de tarjetas de la misma familia: lecturas largas, casos, guías, el diagnóstico, el próximo webinar y episodios de podcast, con autor, fecha, tema e insignia | Entradas, recursos marcados para el riel y el próximo evento |
+| Elige por dónde empezar | Una órbita con seis temas del blog: cada uno lleva a su categoría y, al pasar el cursor, muestra de qué trata y tres lecturas para empezar (en el celular, una lista) | Las categorías del blog, su descripción y sus entradas |
 | Archivo por año | Todo el archivo, filtrable por año y tema | Todas las entradas publicadas |
 | Suscripción del final | La suscripción a Glitch | El mismo formulario de suscripción |
 
-Cada entrada tiene un **formato** (Artículo, Caso, Guía, Grabación, Novedad o las tres variantes de Glitch) que decide
+Las tarjetas de «Para leer con calma» llevan como máximo **una insignia**, y sólo cuando hay un dato real que la
+respalda: «Nuevo» (publicada hace 14 días o menos), «Actualizado» (el editor marcó una revisión de fondo en los
+últimos 30 días; el pie dice la fecha), «Gratis» (guías, diagnóstico y eventos sin costo) y «En vivo» (mientras ocurre
+un evento). «Más leído», «Tendencia», «Últimos cupos» y «Lista de espera» ya están diseñadas pero todavía no se
+encienden: esperan la lectura de visitas y de reservas. Un caso con cliente asignado muestra el logo del cliente.
+
+La tarjeta de foto es vertical y recorta la imagen destacada, que es horizontal. Cuando la destacada trae texto
+encima (como las portadas de Manzanitas), el editor puede darle a la tarjeta una imagen propia sin texto y elegir hacia
+dónde se centra el recorte; la destacada no cambia y sigue siendo la que se ve al compartir la entrada.
+
+> Detalle técnico: [runtime V1 § «Para leer con calma» v2](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
+
+Cada entrada tiene un **formato** (Artículo, Caso, Guía, Grabación, Podcast, Novedad o las tres variantes de Glitch) que decide
 su ícono y el texto del botón. El formato es distinto de la categoría y no cambia la URL de la entrada.
 
 > Detalle técnico: [PDR-029 §1](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md) y
@@ -56,6 +68,25 @@ Hoy el slider muestra dos entradas recientes, el último Flash de Glitch, la gu�
 > Detalle técnico: [runtime V1 §3](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md) y el manual
 > [por CLI](../../manual-de-uso/public-site/operar-portada-blog-por-cli.md).
 
+## Qué imagen usa cada parte
+
+Un artículo nuevo de Marketing con Manzanitas aparece solo en el slider y, si dura 12 minutos o más, en «Para leer
+con calma». Su portada lleva texto encima, así que no sirve para todo: cada lugar usa la imagen que le corresponde.
+
+| Lugar | Qué imagen usa |
+|---|---|
+| Slider | Su **imagen del slider**: una versión ancha de la foto, sin texto, porque el slider pone su propio título. Sin ella usa la portada con un velo, y el título del slider choca con el texto de la portada |
+| Miniatura «Siguiente» del slider | La imagen del slider si existe; si no, la portada |
+| Tarjeta de «Para leer con calma» | Su **imagen de la tarjeta**: la foto sin texto, recortada hacia la cara. Sin ella usa la portada, y el recorte corta el texto y deja fuera la cara |
+| Al compartir el enlace (LinkedIn, Facebook, WhatsApp, X y otras) y en Google | La **portada** completa; en WhatsApp a veces sólo su cuadrado central |
+| «Te puede interesar», al pie de cada artículo | La **portada**, en cuadrado |
+| Cabecera del artículo, páginas de archivo del blog (temas, etiquetas, autores y búsqueda), temas de la órbita y tarjetas del menú del sitio | Ninguna imagen del artículo (el menú usa fotos propias) |
+
+Por eso cada artículo nuevo lleva tres imágenes: la foto sin texto, la portada y la imagen del slider.
+
+> Detalle técnico: [inventario de imágenes por artículo](../../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md) y
+> [runtime V1](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
+
 ## La foto del autor
 
 El círculo del autor en cada diapositiva muestra **la foto de perfil subida en WordPress** para esa persona. Si el
@@ -79,9 +110,13 @@ foto: se prefieren las iniciales. Las diapositivas de Glitch no llevan foto de a
   registrado nada. Esta regla nació el mismo día del corte, cuando los formularios de ejemplo del diseño respondieron
   «¡Listo!» durante unos 40 minutos sin guardar los datos.
 
-Estado al 2026-10-24: conectada y verificada en los tres tamaños, sin un envío de prueba. Falta que una persona se
-suscriba de verdad y confirmar en HubSpot que el contacto quedó suscrito. La píldora del final reemplaza el campo con
-casilla del diseño original y espera el visto bueno visual del operador.
+Estado al 2026-10-24: conectada y verificada en los tres tamaños, y **probada con una suscripción real**: el contacto
+quedó suscrito (SUBSCRIBED) en HubSpot. Todavía falta:
+
+- un **correo de bienvenida** a Glitch (hoy no se manda ninguno);
+- decidir si Glitch tiene su **propio tipo de suscripción** en HubSpot (hoy usa «Marketing Information», que es
+  genérico);
+- el visto bueno visual del operador a la píldora del final, que reemplaza el campo con casilla del diseño original.
 
 > Detalle técnico: [runtime V1 §4](../../architecture/public-site/BLOG_HOME_RUNTIME_V1.md).
 
@@ -93,6 +128,16 @@ casilla del diseño original y espera el visto bueno visual del operador.
 - El enlace privado de la sala (Zoom, Teams, Meet) nunca se guarda en el evento.
 - Las grabaciones de webinars son entradas con formato Grabación y aparecen en «Grabaciones para ver cuando quieras».
 - **Sin un evento próximo, la sección de eventos no se muestra.** Así está hoy: todavía no hay un evento real cargado.
+- **Estado (2026-10-24): todavía no se lanzan eventos reales.** Las reservas funcionan y llegan a HubSpot, y Greenhouse
+  lleva el cupo y la lista de espera. Los correos de confirmación y recordatorio están corregidos en local pero no
+  salen hasta el próximo release.
+- La sesión será un **webinar de Teams** (seminario web de la app Eventos). Lo que viene, todavía sin construir: cada
+  persona confirmada queda inscrita en el webinar con su enlace personal, se lee la asistencia y el evento aparece en
+  Eventos de marketing de HubSpot. El conector nativo de Teams con HubSpot no funciona hoy (caso abierto con el soporte
+  de HubSpot).
+- El pendiente completo está en el
+  [backlog de RESEARCH-013](../../research/RESEARCH-013-events-webinars-hubspot-teams.md#backlog-canónico-para-cerrar-el-módulo-de-eventos);
+  cómo operarlo, en el [manual para lanzar un evento](../../manual-de-uso/public-site/lanzar-evento-o-webinar.md).
 
 > Detalle técnico: [PDR-029 §3](../../public-site/decisions/PDR-029-modelo-de-contenido-portada-blog.md).
 
@@ -125,8 +170,8 @@ diagnóstico.
 
 ## Pendientes
 
-- Primer envío real de suscripción y confirmación en HubSpot.
+- Correo de bienvenida a Glitch y decisión sobre su tipo de suscripción propio en HubSpot.
 - Visto bueno del operador a la suscripción del final.
-- Primer evento real.
+- Primer evento real (después del release que cierre el backlog de RESEARCH-013).
 - Medir en el hosting que la portada se actualiza en menos de dos minutos.
 - Decidir si se elimina la página de revisión `/blog-v3-revision/` (no indexada).

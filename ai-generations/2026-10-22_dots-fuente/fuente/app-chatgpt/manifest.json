@@ -1,0 +1,580 @@
+[
+  {
+    "name": "Aime",
+    "source": "Aime-90dd62f0513a.js",
+    "variants": [
+      "default",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-aime-nativo-large.svg",
+      "dots-aime-nativo-small.svg",
+      "dots-aime-orange-large.svg",
+      "dots-aime-orange-small.svg",
+      "dots-aime-yellow-large.svg",
+      "dots-aime-yellow-small.svg",
+      "dots-aime-green-large.svg",
+      "dots-aime-green-small.svg",
+      "dots-aime-blue-large.svg",
+      "dots-aime-blue-small.svg",
+      "dots-aime-purple-large.svg",
+      "dots-aime-purple-small.svg",
+      "dots-aime-pink-large.svg",
+      "dots-aime-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Appy",
+    "source": "Appy-cb6cd418dd2d.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-appy-nativo-large.svg",
+      "dots-appy-nativo-small.svg",
+      "dots-appy-red-large.svg",
+      "dots-appy-red-small.svg",
+      "dots-appy-orange-large.svg",
+      "dots-appy-orange-small.svg",
+      "dots-appy-yellow-large.svg",
+      "dots-appy-yellow-small.svg",
+      "dots-appy-green-large.svg",
+      "dots-appy-green-small.svg",
+      "dots-appy-purple-large.svg",
+      "dots-appy-purple-small.svg",
+      "dots-appy-pink-large.svg",
+      "dots-appy-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Bloop",
+    "source": "Bloop-acf7a80e00b5.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-bloop-nativo-large.svg",
+      "dots-bloop-nativo-small.svg",
+      "dots-bloop-red-large.svg",
+      "dots-bloop-red-small.svg",
+      "dots-bloop-orange-large.svg",
+      "dots-bloop-orange-small.svg",
+      "dots-bloop-yellow-large.svg",
+      "dots-bloop-yellow-small.svg",
+      "dots-bloop-green-large.svg",
+      "dots-bloop-green-small.svg",
+      "dots-bloop-purple-large.svg",
+      "dots-bloop-purple-small.svg",
+      "dots-bloop-pink-large.svg",
+      "dots-bloop-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Brief",
+    "source": "Brief-50cd71044398.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-brief-nativo-large.svg",
+      "dots-brief-nativo-small.svg",
+      "dots-brief-red-large.svg",
+      "dots-brief-red-small.svg",
+      "dots-brief-orange-large.svg",
+      "dots-brief-orange-small.svg",
+      "dots-brief-yellow-large.svg",
+      "dots-brief-yellow-small.svg",
+      "dots-brief-blue-large.svg",
+      "dots-brief-blue-small.svg",
+      "dots-brief-purple-large.svg",
+      "dots-brief-purple-small.svg",
+      "dots-brief-pink-large.svg",
+      "dots-brief-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Chip",
+    "source": "Chip-25ae7324be9c.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-chip-nativo-large.svg",
+      "dots-chip-nativo-small.svg",
+      "dots-chip-red-large.svg",
+      "dots-chip-red-small.svg",
+      "dots-chip-orange-large.svg",
+      "dots-chip-orange-small.svg",
+      "dots-chip-yellow-large.svg",
+      "dots-chip-yellow-small.svg",
+      "dots-chip-green-large.svg",
+      "dots-chip-green-small.svg",
+      "dots-chip-purple-large.svg",
+      "dots-chip-purple-small.svg",
+      "dots-chip-pink-large.svg",
+      "dots-chip-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Clank",
+    "source": "Clank-120da7cdce0e.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "pink"
+    ],
+    "renders": [
+      "dots-clank-nativo-large.svg",
+      "dots-clank-nativo-small.svg",
+      "dots-clank-red-large.svg",
+      "dots-clank-red-small.svg",
+      "dots-clank-orange-large.svg",
+      "dots-clank-orange-small.svg",
+      "dots-clank-yellow-large.svg",
+      "dots-clank-yellow-small.svg",
+      "dots-clank-green-large.svg",
+      "dots-clank-green-small.svg",
+      "dots-clank-blue-large.svg",
+      "dots-clank-blue-small.svg",
+      "dots-clank-pink-large.svg",
+      "dots-clank-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Clippy",
+    "source": "Clippy-16d140d2e048.js",
+    "variants": [
+      "default",
+      "red",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-clippy-nativo-large.svg",
+      "dots-clippy-nativo-small.svg",
+      "dots-clippy-red-large.svg",
+      "dots-clippy-red-small.svg",
+      "dots-clippy-yellow-large.svg",
+      "dots-clippy-yellow-small.svg",
+      "dots-clippy-green-large.svg",
+      "dots-clippy-green-small.svg",
+      "dots-clippy-blue-large.svg",
+      "dots-clippy-blue-small.svg",
+      "dots-clippy-purple-large.svg",
+      "dots-clippy-purple-small.svg",
+      "dots-clippy-pink-large.svg",
+      "dots-clippy-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Collab",
+    "source": "Collab-5c756e12a595.js",
+    "variants": [
+      "default",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-collab-nativo-large.svg",
+      "dots-collab-nativo-small.svg",
+      "dots-collab-orange-large.svg",
+      "dots-collab-orange-small.svg",
+      "dots-collab-yellow-large.svg",
+      "dots-collab-yellow-small.svg",
+      "dots-collab-green-large.svg",
+      "dots-collab-green-small.svg",
+      "dots-collab-blue-large.svg",
+      "dots-collab-blue-small.svg",
+      "dots-collab-purple-large.svg",
+      "dots-collab-purple-small.svg",
+      "dots-collab-pink-large.svg",
+      "dots-collab-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Dailee",
+    "source": "Dailee-bac79e433ad8.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-dailee-nativo-large.svg",
+      "dots-dailee-nativo-small.svg",
+      "dots-dailee-red-large.svg",
+      "dots-dailee-red-small.svg",
+      "dots-dailee-orange-large.svg",
+      "dots-dailee-orange-small.svg",
+      "dots-dailee-yellow-large.svg",
+      "dots-dailee-yellow-small.svg",
+      "dots-dailee-green-large.svg",
+      "dots-dailee-green-small.svg",
+      "dots-dailee-purple-large.svg",
+      "dots-dailee-purple-small.svg",
+      "dots-dailee-pink-large.svg",
+      "dots-dailee-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Digit",
+    "source": "Digit-62bbb860c465.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-digit-nativo-large.svg",
+      "dots-digit-nativo-small.svg",
+      "dots-digit-red-large.svg",
+      "dots-digit-red-small.svg",
+      "dots-digit-orange-large.svg",
+      "dots-digit-orange-small.svg",
+      "dots-digit-yellow-large.svg",
+      "dots-digit-yellow-small.svg",
+      "dots-digit-blue-large.svg",
+      "dots-digit-blue-small.svg",
+      "dots-digit-purple-large.svg",
+      "dots-digit-purple-small.svg",
+      "dots-digit-pink-large.svg",
+      "dots-digit-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Dot",
+    "source": "Dot-4312659d881b.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-dot-nativo-large.svg",
+      "dots-dot-nativo-small.svg",
+      "dots-dot-red-large.svg",
+      "dots-dot-red-small.svg",
+      "dots-dot-orange-large.svg",
+      "dots-dot-orange-small.svg",
+      "dots-dot-yellow-large.svg",
+      "dots-dot-yellow-small.svg",
+      "dots-dot-green-large.svg",
+      "dots-dot-green-small.svg",
+      "dots-dot-blue-large.svg",
+      "dots-dot-blue-small.svg",
+      "dots-dot-purple-large.svg",
+      "dots-dot-purple-small.svg",
+      "dots-dot-pink-large.svg",
+      "dots-dot-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Fuego",
+    "source": "Fuego-88585ba2f55c.js",
+    "variants": [],
+    "renders": [
+      "dots-fuego-nativo-large.svg",
+      "dots-fuego-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Kit",
+    "source": "Kit-51e7f4013191.js",
+    "variants": [
+      "default"
+    ],
+    "renders": [
+      "dots-kit-nativo-large.svg",
+      "dots-kit-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "MadamLuminary",
+    "source": "MadamLuminary-8e9eef3688f2.js",
+    "variants": [
+      "default"
+    ],
+    "renders": [
+      "dots-madam-luminary-nativo-large.svg",
+      "dots-madam-luminary-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Mailman",
+    "source": "Mailman-a175c431f738.js",
+    "variants": [
+      "default"
+    ],
+    "renders": [
+      "dots-mailman-nativo-large.svg",
+      "dots-mailman-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Paige",
+    "source": "Paige-9ea8d131c9e5.js",
+    "variants": [],
+    "renders": [
+      "dots-paige-nativo-large.svg",
+      "dots-paige-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Pocket",
+    "source": "Pocket-cc3558d6bf69.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-pocket-nativo-large.svg",
+      "dots-pocket-nativo-small.svg",
+      "dots-pocket-red-large.svg",
+      "dots-pocket-red-small.svg",
+      "dots-pocket-orange-large.svg",
+      "dots-pocket-orange-small.svg",
+      "dots-pocket-yellow-large.svg",
+      "dots-pocket-yellow-small.svg",
+      "dots-pocket-green-large.svg",
+      "dots-pocket-green-small.svg",
+      "dots-pocket-purple-large.svg",
+      "dots-pocket-purple-small.svg",
+      "dots-pocket-pink-large.svg",
+      "dots-pocket-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Scout",
+    "source": "Scout-c69ccb06cf09.js",
+    "variants": [],
+    "renders": [
+      "dots-scout-nativo-large.svg",
+      "dots-scout-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Scribble",
+    "source": "Scribble-bf74db7576c2.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-scribble-nativo-large.svg",
+      "dots-scribble-nativo-small.svg",
+      "dots-scribble-red-large.svg",
+      "dots-scribble-red-small.svg",
+      "dots-scribble-orange-large.svg",
+      "dots-scribble-orange-small.svg",
+      "dots-scribble-green-large.svg",
+      "dots-scribble-green-small.svg",
+      "dots-scribble-blue-large.svg",
+      "dots-scribble-blue-small.svg",
+      "dots-scribble-purple-large.svg",
+      "dots-scribble-purple-small.svg",
+      "dots-scribble-pink-large.svg",
+      "dots-scribble-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Starry",
+    "source": "Starry-ba6517066952.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-starry-nativo-large.svg",
+      "dots-starry-nativo-small.svg",
+      "dots-starry-red-large.svg",
+      "dots-starry-red-small.svg",
+      "dots-starry-orange-large.svg",
+      "dots-starry-orange-small.svg",
+      "dots-starry-green-large.svg",
+      "dots-starry-green-small.svg",
+      "dots-starry-blue-large.svg",
+      "dots-starry-blue-small.svg",
+      "dots-starry-purple-large.svg",
+      "dots-starry-purple-small.svg",
+      "dots-starry-pink-large.svg",
+      "dots-starry-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Stax",
+    "source": "Stax-ac3c898a3b3a.js",
+    "variants": [
+      "default"
+    ],
+    "renders": [
+      "dots-stax-nativo-large.svg",
+      "dots-stax-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Tome",
+    "source": "Tome-27753783855f.js",
+    "variants": [
+      "default",
+      "orange",
+      "yellow",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-tome-nativo-large.svg",
+      "dots-tome-nativo-small.svg",
+      "dots-tome-orange-large.svg",
+      "dots-tome-orange-small.svg",
+      "dots-tome-yellow-large.svg",
+      "dots-tome-yellow-small.svg",
+      "dots-tome-green-large.svg",
+      "dots-tome-green-small.svg",
+      "dots-tome-blue-large.svg",
+      "dots-tome-blue-small.svg",
+      "dots-tome-purple-large.svg",
+      "dots-tome-purple-small.svg",
+      "dots-tome-pink-large.svg",
+      "dots-tome-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Whirr",
+    "source": "Whirr-7af12a6fbd6b.js",
+    "variants": [
+      "default"
+    ],
+    "renders": [
+      "dots-whirr-nativo-large.svg",
+      "dots-whirr-nativo-small.svg"
+    ]
+  },
+  {
+    "name": "Yo",
+    "source": "Yo-d8fe58bb84e0.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "yellow",
+      "green",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-yo-nativo-large.svg",
+      "dots-yo-nativo-small.svg",
+      "dots-yo-red-large.svg",
+      "dots-yo-red-small.svg",
+      "dots-yo-orange-large.svg",
+      "dots-yo-orange-small.svg",
+      "dots-yo-yellow-large.svg",
+      "dots-yo-yellow-small.svg",
+      "dots-yo-green-large.svg",
+      "dots-yo-green-small.svg",
+      "dots-yo-purple-large.svg",
+      "dots-yo-purple-small.svg",
+      "dots-yo-pink-large.svg",
+      "dots-yo-pink-small.svg"
+    ]
+  },
+  {
+    "name": "Zapp",
+    "source": "Zapp-b4a19b0fda80.js",
+    "variants": [
+      "default",
+      "red",
+      "orange",
+      "green",
+      "blue",
+      "purple",
+      "pink"
+    ],
+    "renders": [
+      "dots-zapp-nativo-large.svg",
+      "dots-zapp-nativo-small.svg",
+      "dots-zapp-red-large.svg",
+      "dots-zapp-red-small.svg",
+      "dots-zapp-orange-large.svg",
+      "dots-zapp-orange-small.svg",
+      "dots-zapp-green-large.svg",
+      "dots-zapp-green-small.svg",
+      "dots-zapp-blue-large.svg",
+      "dots-zapp-blue-small.svg",
+      "dots-zapp-purple-large.svg",
+      "dots-zapp-purple-small.svg",
+      "dots-zapp-pink-large.svg",
+      "dots-zapp-pink-small.svg"
+    ]
+  }
+]

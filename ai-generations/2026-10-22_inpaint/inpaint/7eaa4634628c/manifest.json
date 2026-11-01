@@ -1,0 +1,302 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "7eaa4634628c",
+  "key": "7eaa4634628c56da34b29d53b94845df4686fe8c855e113cbbb0ec16cd4d574f",
+  "status": "completed",
+  "createdAt": "2026-10-22T18:31:40.027Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/b-inicio-v1.png",
+    "imageSha256": "a368d75e66aed10d40cdb4ac154238ddc815e41837c3e3f4d36706a7ae8430d5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/video/11a-11b/fisica/planoA/mascara-b-agua.png",
+    "maskSha256": "58e45d6e5b427c9a270420c0dbd981e251cf0ecc57870bcda0981f98967ca421",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1280,
+    "sketch": null,
+    "references": [
+      {
+        "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-17_breakr-marca/lata/breakr-lata-v1.png",
+        "sha256": "0df65a914b53de2df35fb9b7acfebdccca499250a3e3ecc42111cd1b68b9a180"
+      }
+    ]
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 3,
+    "prompt": "Edit only the marked zone of image 1. Keep her face, hair, cup, raised hand, the laptop, the man, the room and the light exactly as they are. This is one frame of a high-speed live-action film, a split second before impact.\n\nIn the marked zone show:\n- The BREAKR can from image 2 flying almost END-ON straight away from the camera toward the centre of her chest, at chest height, about 15 cm in front of her sweater: we mostly see the silver bottom of the can, with a narrow band of its orange and teal side visible because it is tilted slightly; its top points at her chest. It is the same size as now, slightly motion-blurred along its path.\n- Around and right behind the can, a big, heavy burst of clear water as wide as her torso, coming over the top edge of the laptop lid from the screen and travelling with the can toward her chest. Its leading edge is a few centimetres from her sweater and has not hit her yet. The water is motion-blurred into thick sheets and streaks pointing at her chest, with two or three orange slices inside it.\n- Her cream sweater is still completely dry.\nNo water anywhere outside this burst, nothing going up into the air, nothing to the sides.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nImage 3 is a reference of the object or element to bring into image 1; match its look, shape and material.\nEdit only the marked zone of image 1. Keep her face, hair, cup, raised hand, the laptop, the man, the room and the light exactly as they are. This is one frame of a high-speed live-action film, a split second before impact.\n\nIn the marked zone show:\n- The BREAKR can from image 2 flying almost END-ON straight away from the camera toward the centre of her chest, at chest height, about 15 cm in front of her sweater: we mostly see the silver bottom of the can, with a narrow band of its orange and teal side visible because it is tilted slightly; its top points at her chest. It is the same size as now, slightly motion-blurred along its path.\n- Around and right behind the can, a big, heavy burst of clear water as wide as her torso, coming over the top edge of the laptop lid from the screen and travelling with the can toward her chest. Its leading edge is a few centimetres from her sweater and has not hit her yet. The water is motion-blurred into thick sheets and streaks pointing at her chest, with two or three orange slices inside it.\n- Her cream sweater is still completely dry.\nNo water anywhere outside this burst, nothing going up into the air, nothing to the sides.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.0978363037109375,
+    "editable": 99032,
+    "soft": 29204,
+    "protected": 1182484
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1280
+    },
+    "target": {
+      "width": 1024,
+      "height": 1280
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 81 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.1359,
+    "basis": "3 × salida 1024x1280 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 48.161,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -5,
+        "dy": -11,
+        "scale": 0.98,
+        "stillError": 15.19,
+        "bestError": 8.87,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -6.87,
+        -6.1,
+        -3.42
+      ],
+      "protected": {
+        "pixels": 1182484,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 99032,
+        "maxDelta": 245,
+        "meanDelta": 54.923,
+        "worst": {
+          "x": 420,
+          "y": 725
+        }
+      },
+      "seam": {
+        "pixels": 29204,
+        "maxDelta": 206,
+        "meanDelta": 25.232,
+        "worst": {
+          "x": 385,
+          "y": 601
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1182484,
+        "maxDelta": 238,
+        "meanDelta": 21.593,
+        "worst": {
+          "x": 478,
+          "y": 905
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4490,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 425
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6000
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 2,
+      "raw": "candidate-2-raw.png",
+      "final": "candidate-2.png",
+      "diff": "candidate-2-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 44.269,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -5,
+        "dy": -11,
+        "scale": 0.98,
+        "stillError": 14.86,
+        "bestError": 10.16,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.52,
+        -0.36,
+        1.67
+      ],
+      "protected": {
+        "pixels": 1182484,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 99032,
+        "maxDelta": 247,
+        "meanDelta": 51.473,
+        "worst": {
+          "x": 426,
+          "y": 727
+        }
+      },
+      "seam": {
+        "pixels": 29204,
+        "maxDelta": 208,
+        "meanDelta": 19.839,
+        "worst": {
+          "x": 383,
+          "y": 602
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1182484,
+        "maxDelta": 226,
+        "meanDelta": 20.182,
+        "worst": {
+          "x": 483,
+          "y": 247
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4490,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 425
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6000
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    },
+    {
+      "index": 3,
+      "raw": "candidate-3-raw.png",
+      "final": "candidate-3.png",
+      "diff": "candidate-3-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 47.673,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": -5,
+        "dy": -11,
+        "scale": 0.98,
+        "stillError": 15.34,
+        "bestError": 8.91,
+        "misaligned": true
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -7.93,
+        -7.52,
+        -5.14
+      ],
+      "protected": {
+        "pixels": 1182484,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 99032,
+        "maxDelta": 244,
+        "meanDelta": 54.663,
+        "worst": {
+          "x": 429,
+          "y": 736
+        }
+      },
+      "seam": {
+        "pixels": 29204,
+        "maxDelta": 217,
+        "meanDelta": 23.968,
+        "worst": {
+          "x": 382,
+          "y": 602
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1182484,
+        "maxDelta": 248,
+        "meanDelta": 21.516,
+        "worst": {
+          "x": 475,
+          "y": 916
+        }
+      },
+      "outputUsd": 0.0453,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 4490,
+        "input_tokens_details": {
+          "image_tokens": 4065,
+          "text_tokens": 425
+        },
+        "output_tokens": 1510,
+        "output_tokens_details": {
+          "image_tokens": 1510,
+          "text_tokens": 0
+        },
+        "total_tokens": 6000
+      },
+      "meta": {
+        "size": "1024x1280",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

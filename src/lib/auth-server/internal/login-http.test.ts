@@ -73,7 +73,7 @@ describe('corporate login HTTP boundary', () => {
     const response = await f.request('/auth/internal/callback?state=state&code=code&return_to=https://attacker.example')
 
     expect(f.flow.complete).toHaveBeenCalledWith({ state: 'state', code: 'code', browserBinding: 'binding' })
-    expect(f.completeSession).toHaveBeenCalledWith(identity)
+    expect(f.completeSession).toHaveBeenCalledWith(identity, '/oauth/authorize?client_id=trusted')
     expect(response?.headers.Location).toBe('/oauth/authorize?client_id=trusted')
     expect(response?.headers['Set-Cookie']).toContain('__Host-session=')
   })

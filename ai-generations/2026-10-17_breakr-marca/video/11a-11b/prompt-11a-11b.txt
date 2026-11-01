@@ -1,0 +1,18 @@
+One continuous live-action shot, 6 seconds, photorealistic, shot on a cinema camera, natural motion blur. The first frame and the last frame are given: animate the physical action that connects them, with no cut.
+
+Framing note: the top and bottom bands of both frames are mirrored padding added only to fit the vertical format. Keep them still and plain; all the action happens in the central area.
+
+Setting: a modern bright office meeting room on a Monday morning, warm low morning sun from the windows behind. A wooden table. The camera sits behind a calm man in a dark navy jacket (only his out-of-focus shoulder, ear and hand at the right edge of frame). In front of him on the table is his thin aluminium laptop, seen from behind: its lid faces the camera and its screen faces the woman across the table.
+
+Action, in order:
+- 0.0–2.0 s: a wave of clear water with orange slices pours out of the laptop screen and rolls across the table, moving away from the camera toward the woman. A tall orange-and-teal BREAKR can rides the crest of the wave, tilted toward her, getting smaller as it travels away from the lens. Droplets catch the warm sun.
+- 2.0–3.5 s: the woman (brown wavy hair, sunglasses on her head, cream knit sweater over a white collar, paper coffee cup in her right hand) sees it coming: surprised face, free hand rising, starting to lean back.
+- 3.5–6.0 s: the wave hits her chest and face and splashes up; her hair gets soaked and flies; she shuts her eyes and shouts; the can bounces off the impact and flies up to the upper left of frame, shedding water in the direction it moves. Orange slices land on the wet table. Ends exactly on the last frame.
+
+Camera: a slow, steady push-in toward her during the whole shot, as in the two frames; no handheld shake, no cut, no change of axis. The man never moves or reacts: he stays still and calm the whole time.
+
+Physics: real water weight, the wave loses height as it spreads, splash goes up and outward from the impact, wet hair clings. The can is a real 16 cm can, its scale shrinks as it moves away from the camera.
+
+Keep identical to the frames: her face, hair, clothes and cup; the laptop; the room; the warm light. The can's label stays the same orange and teal BREAKR design. No text on screen, no subtitles, no logos added, no extra people.
+
+Sound: water rush and splash, the can clinking on impact, a short surprised shout from her. No music, no dialogue.

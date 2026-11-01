@@ -1,0 +1,9 @@
+{
+  "pieza": "Efeonce — Ese anuncio puede ser el tuyo (ChatGPT Ads, v10: toma 2 de eleven_music_v2_5 con un solo empalme sobre ataques)", "duracion_s": 15.0, "fps": 24, "tempo_bpm": 120,
+  "cues": [
+    { "t": 0.07, "imagen": "Arranca la pieza", "sonido": "primer golpe propio de la toma" },
+    { "t": 4.05, "imagen": "Se envía la pregunta", "sonido": "tiempo fuerte del compás 3, sin pausa previa" },
+    { "t": 10.05, "imagen": "La esfera aterriza como punto del titular", "sonido": "acorde final (empalme 12 ms antes de su ataque)" },
+    { "t": 10.6, "hasta": 14.6, "imagen": "Tapa: servicio, CTA y lockup", "sonido": "el acorde resuena solo y se apaga natural" }
+  ]
+}
