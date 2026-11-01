@@ -14,7 +14,6 @@ conflicto de intereses adjuntada en el reenvío de las 17:38 (sin comisión Wher
 espejo: Wherex (`wherex-radar-chrome-playwright.md`) y «La órbita» (`lessons.md`). HubSpot: deal 66672959873 en
 «Presentación de soluciones», COP 120.000.000, nota 120053981805. Sin push.
 
-
 ## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
 
 [Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,
@@ -256,14 +255,3 @@ correr siempre el gate en producción con `archive preview`. Pendientes fuera de
 `?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Task cerrada: `pnpm test` (21 299 pruebas) y `pnpm build`
 verdes sobre `f908db7d5`. Residual: el runtime no se empujó a su remoto (origin/main ya estaba divergido). Propuesta
 abierta: variante Glitch de `/category/glitch/` (= `/glitch/`), espera decisión del operador y tablero en el canvas.
-
-## 2026-10-24 — Partners: popup «Quiero ser partner» en vivo tras el release (TASK-2044/2045)
-
-El release a `main` llevó los renderers formularios `1.2.0` y CTA `1.4.0`. En `/partnership/` (248003, módulo
-«cierre») el botón abre el Growth CTA `partners-become-partner` en diálogo con el formulario
-`efeonce-partner-application` (HubSpot directo a «Lead Gean - Partnership»); verificado en vivo 1440/390 (diálogo
-«Sumémonos», 5 campos + consentimiento, Escape, `dataLayer` con `activation_mode: dialog`). Snapshot
-`_gh_partners_v2_before_20261024_122057`; backups `/tmp/eo-partners-widgets-before-20261024-12*.tar`. **Pendiente:**
-smoke de envío real (requiere OK del operador: crea un registro CRM), DLV GTM + dimensión GA4 `activation_mode`
-(preview + confirmación) y GVC formal; defecto: cerrar con el primer campo enfocado dispara
-`gh_form_field_validation_failed` (renderer). TASK-2044/2045 siguen `in-progress`. **Sin push** (develop adelantado).

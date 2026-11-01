@@ -12,7 +12,6 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 en Wherex el 30/10 por COP 120 millones. La skill de licitaciones suma carga de archivos, exportación de lienzos a PDF,
 cotización en COP, RFP Excel y cláusula tributaria Chile–Colombia; «La órbita» suma secciones, DOOH y plantas de venta.
 
-
 ## 2026-10-29 — Prospección: búsquedas Sales Navigator multimercado
 
 [44 búsquedas persistidas](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md),
@@ -577,9 +576,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   (ElevenLabs Lucía es-MX, −16 LUFS), OG v3 en adjunto nuevo y cache-busting `?ver=filemtime` en hero/audio del widget.
 - Política Meta + Google UPD publicada para `efeonce-contacto`; GA4 `generate_lead` verificado. Bible de Nexa: voz
   mexicana por decisión del operador. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
-
-## 2026-10-16 — Brochure oficial «Agencia de Marketing 360°»
-
-- Aprobado como brochure oficial de la agencia: versión completa (84 láminas) y corta (26), con índice linkeable,
-  Channel & Commerce dentro de Brand y casos Berel y Sky compuestos con piezas reales. Registrado en la
-  [norma](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md), la documentación funcional y el manual.
