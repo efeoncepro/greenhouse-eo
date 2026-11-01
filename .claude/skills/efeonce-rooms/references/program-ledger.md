@@ -7,14 +7,16 @@
 
 ## Estado vigente (2026-11-01)
 
-- **PR #12 (`claude/rooms-invitation-lifetime`, `1eeb31d`), code complete, SIN deploy:** invitación de propuesta B2B
-  30 días por defecto / 90 tope (antes 24 h), sesión del invitado 8 h (antes 15 min, tope 1 h), formulario en días.
-  Migración `1793268000000` (CHECK de `rooms.invitation_sessions` a 12 h) **debe aplicarse en `rooms_production` antes del
-  merge**: si el código llega primero, la base rechaza las sesiones de 8 h y los invitados no entran. Ensayo en clon PASS
-  (427/427), corrida en seco 1 pendiente. El `--apply` en producción lo bloqueó el clasificador de permisos: requiere
-  autorización explícita del operador. Luego: merge, deploy, `vercel alias set` y readback.
+- **PR #12 (`main@30845e7`), en producción desde 2026-11-01 (`vivo`):** invitación de propuesta B2B 30 días por defecto /
+  90 tope (antes 24 h), sesión del invitado 8 h (antes 15 min, tope 1 h), formulario en días. Migración `1793268000000`
+  (CHECK de `rooms.invitation_sessions` a 12 h) aplicada en `rooms_production` ANTES del merge, con respaldo
+  `.local/production-backups/rooms-production-20261101T112716Z.dump` y readback (26 migraciones, hashes y conteos intactos).
+  Deploy `efeonce-rooms-lu0np7peo` (`dpl_GxH7cWJ2doCYXYsYSvWonUwbD6t2`) con alias reasignado; smoke `/rooms` 307, `/login`
+  302, `/auth/error` 200, `/api/auth/session` 401. Sin verificar: una invitación real de punta a punta en producción. El
+  respaldo se borra tras esa verificación. Lección: un tope de vida en el código puede tener un CHECK gemelo en la base;
+  ampliar uno sin el otro rompe el login del invitado.
 
-- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve el deploy `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
+- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
   inventario de migraciones revisadas). Debajo, en orden: PR #10 `main@449a0cd` (nombre del espacio, `f59d1df`),
   PR #9 `main@97588d3` (307 sin sesión, `1021e75`), PR #8 `main@21b10a9` (casa agentes primero, TASK-2085), PR #7
   `main@d7d6f6b` (TASK-2084 expand) y PR #5/#4. Alias **manual**: tras cada deploy,

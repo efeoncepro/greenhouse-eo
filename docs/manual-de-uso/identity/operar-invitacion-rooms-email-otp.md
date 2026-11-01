@@ -23,7 +23,7 @@ Estado al 1 de noviembre de 2026: first-party y OTP de invitación están ON en 
 
 El código vence a los diez minutos; si vence, la persona pide otro desde el mismo enlace («Enviarme un código nuevo»), sin
 que el equipo tenga que reinvitar. La invitación es mucho más larga que el código: 30 días por defecto y hasta 90 (PR #12 de
-Rooms, pendiente de deploy; antes 24 horas), y la sesión del invitado dura 8 horas. Los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
+Rooms, en producción desde el 2026-11-01; antes 24 horas), y la sesión del invitado dura 8 horas. Los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
 
 ## Configuración de runtime
 
