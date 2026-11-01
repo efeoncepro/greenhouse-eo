@@ -87,7 +87,8 @@ const readBody = (req: IncomingMessage): Promise<string | null> =>
       received += chunk.length
 
       if (received > MAX_BODY_BYTES) {
-        req.destroy()
+        // Keep the socket alive long enough to send 413; the caller closes it after the response.
+        req.pause()
         resolve(null)
 
         return
@@ -261,7 +262,7 @@ return
         const body = method === 'GET' || method === 'HEAD' ? '' : await readBody(req)
 
         if (body === null) {
-          writeJson(res, 413, { error: 'invalid_request', error_description: 'body too large' })
+          writeJson(res, 413, { error: 'invalid_request', error_description: 'body too large' }, { Connection: 'close' })
 
           return
         }

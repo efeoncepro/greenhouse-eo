@@ -2,6 +2,9 @@ import { generateKeyPair, jwtVerify, SignJWT } from 'jose'
 import { describe, expect, it, vi } from 'vitest'
 
 import { buildPkceChallenge, sha256Hex } from '../oauth/primitives'
+import { AUTH_SERVER_OAUTH_DEFAULTS } from '../oauth/config'
+import { createStaticGrantsPort } from '../oauth/grants'
+import { createOAuthHandler } from '../oauth/handler'
 import { InMemoryOAuthStore } from '../oauth/store/memory-store'
 import { MemoryFirstPartyStore } from './memory-store'
 import { createFirstPartyHandler, resolveFirstPartyLoginContext, type FirstPartyDeps } from './protocol'
@@ -58,6 +61,117 @@ const fixture = async () => {
 }
 
 describe('TASK-1834 first-party OIDC authority', () => {
+  it('keeps a Rooms sign-in separate from new MCP consent for one synthetic session', async () => {
+    const h = await fixture()
+    const mcpClientId = 'mcp-new-client'
+    const mcpRedirect = 'https://client.example.test/callback'
+    const mcpAudience = 'https://mcp.example.test/mcp'
+    const mcpKeys = await generateKeyPair('ES256')
+    let mcpSignatures = 0
+
+    await h.auditStore.upsertClient({
+      clientId: mcpClientId, registrationKind: 'preregistered', clientType: 'public',
+      clientName: 'New MCP client', redirectUris: [mcpRedirect], grantTypes: ['authorization_code'],
+      responseTypes: ['code'], tokenEndpointAuthMethod: 'none', clientSecretHash: null,
+      allowedScopes: ['efeonce.mcp.read', 'efeonce.mcp.seo.write'], status: 'active', metadata: {},
+      createdBy: 'test', createdAt: h.now(), updatedAt: h.now()
+    })
+
+    const handler = createOAuthHandler({
+      store: h.auditStore,
+      config: { ...AUTH_SERVER_OAUTH_DEFAULTS, issuer, environmentId: 'efeonce-auth', mcpAudience,
+        oauthEnabled: true, firstPartyEnabled: true, allowLocalhostAlias: false },
+      signer: payload => {
+        mcpSignatures++
+
+        return new SignJWT(payload).setProtectedHeader({ alg: 'ES256', kid: 'mcp-test-key', typ: 'JWT' }).sign(mcpKeys.privateKey)
+      },
+      subjectPort: { resolve: async () => {
+        const session = h.identity()
+
+        return session ? { subject: session.subject, environmentId: session.environmentId,
+          authLevel: 'primary', authTime: session.authTime } : null
+      } },
+      grantsPort: createStaticGrantsPort({ bound: true, grantsVersion: 1, profileId: 'profile-one', memberships: 1 }),
+      consentContextPort: { resolve: async () => ({ outcome: 'resolved', population: 'internal',
+        organizations: [{ organizationName: 'Efeonce', capabilities: [] }] }) },
+      loadKeys: async () => [],
+      cimd: { resolveAddresses: async () => [], fetcher: async () => { throw new Error('unexpected CIMD fetch') } },
+      firstParty: h.handler,
+      now: h.now
+    })
+
+    const roomsAuthorization = await handler(request(h.authorizeUrl()))
+    const roomsCode = new URL(roomsAuthorization!.headers.Location).searchParams.get('code')!
+
+    const roomsExchange = await handler(request('/oauth/token', {
+      grant_type: 'authorization_code', code: roomsCode, code_verifier: verifier, redirect_uri: callback
+    }, h.basic))
+
+    expect(roomsAuthorization?.status).toBe(302)
+    expect(roomsExchange?.status).toBe(200)
+    expect(h.auditStore.consents).toHaveLength(0)
+
+    const mcpAuthorize = (scope: string) => '/oauth/authorize?' + new URLSearchParams({
+      response_type: 'code', client_id: mcpClientId, redirect_uri: mcpRedirect, scope,
+      state: 'mcp-state', code_challenge_method: 'S256', code_challenge: buildPkceChallenge(verifier),
+      resource: mcpAudience
+    })
+
+    const readPath = mcpAuthorize('efeonce.mcp.read')
+    const readConsent = await handler(request(readPath))
+    const writeConsent = await handler(request(mcpAuthorize('efeonce.mcp.seo.write')))
+
+    expect(readConsent?.status).toBe(200)
+    expect(readConsent?.body).toContain('action="/oauth/consent"')
+    expect(writeConsent?.status).toBe(403)
+    expect(writeConsent?.body).toContain('/login/step-up?')
+    expect(h.auditStore.consents).toHaveLength(0)
+    expect(h.auditStore.codes.size).toBe(0)
+    expect(mcpSignatures).toBe(0)
+
+    const approvedRead = await handler({
+      ...request('/oauth/consent', { client_id: mcpClientId, scope: 'efeonce.mcp.read',
+        return_to: readPath, decision: 'allow' }),
+      headers: new Headers({ 'content-type': 'application/x-www-form-urlencoded',
+        origin: issuer, 'sec-fetch-site': 'same-origin' })
+    })
+
+    const readCode = await handler(request(readPath))
+
+    expect(approvedRead?.status).toBe(302)
+    expect(h.auditStore.consents.map(consent => consent.scope)).toEqual(['efeonce.mcp.read'])
+    expect(readCode?.status).toBe(302)
+    const mcpCode = new URL(readCode!.headers.Location).searchParams.get('code')!
+
+    expect(mcpCode).toBeTruthy()
+    expect(h.auditStore.codes.size).toBe(1)
+    expect(mcpSignatures).toBe(0)
+
+    const mcpExchange = await handler(request('/oauth/token', {
+      grant_type: 'authorization_code', client_id: mcpClientId, code: mcpCode,
+      code_verifier: verifier, redirect_uri: mcpRedirect
+    }))
+
+    const mcpTokens = JSON.parse(mcpExchange!.body)
+
+    expect(mcpExchange?.status).toBe(200)
+    expect(mcpSignatures).toBe(1)
+    expect(mcpTokens.scope).toBe('efeonce.mcp.read')
+
+    const { payload: mcpClaims } = await jwtVerify(mcpTokens.access_token, mcpKeys.publicKey, {
+      issuer, audience: mcpAudience, currentDate: h.now()
+    })
+
+    expect(mcpClaims.scope).toBe('efeonce.mcp.read')
+    expect(mcpClaims.azp).toBe(mcpClientId)
+    expect(mcpClaims.scope).not.toContain('efeonce.mcp.seo.write')
+    expect((await handler(request(mcpAuthorize('efeonce.mcp.seo.write'))))?.status).toBe(403)
+    expect(h.auditStore.consents.map(consent => consent.scope)).toEqual(['efeonce.mcp.read'])
+    expect(h.auditStore.codes.size).toBe(1)
+    expect(mcpSignatures).toBe(1)
+  })
+
   it('signs minimal audience-bound identity; opaque handle validates live identity without MCP consent or grants', async () => {
     const h = await fixture()
     const response = await h.exchange(await h.issueCode())
@@ -111,6 +225,32 @@ describe('TASK-1834 first-party OIDC authority', () => {
     expect((await h.handler(request(continuation)))!.headers.Location).toContain(callback)
     expect((await h.handler(request(continuation)))!.status).toBe(400)
     expect(await resolveFirstPartyLoginContext('/oauth/authorize?client_id=efeonce-rp-rooms-test&redirect_uri=https://evil.test', h.deps)).toBeNull()
+  })
+
+  it('derives login brand and return origin only from the registered RP and its bound continuation', async () => {
+    const h = await fixture()
+
+    const second = await registerFirstPartyClient({ clientId: 'efeonce-rp-second', product: 'synthetic-rp',
+      redirectUris: ['https://other.test/callback'], actor: 'test' }, { store: h.store })
+
+    const injected = h.authorizeUrl({ product: 'synthetic-rp', display_name: 'Fake brand',
+      return_to: 'https://evil.test/steal', flow_class: 'first_party_sign_in' })
+
+    expect(await resolveFirstPartyLoginContext(injected, h.deps)).toEqual({
+      product: 'rooms', displayName: 'Rooms', returnUrl: 'https://rooms.example.test'
+    })
+    expect(await resolveFirstPartyLoginContext(h.authorizeUrl({ client_id: 'mcp-client',
+      flow_class: 'first_party_sign_in' }), h.deps)).toBeNull()
+    const login = await h.handler(request(h.authorizeUrl({ prompt: 'login' })))
+    const continuation = new URL(login!.headers.Location, issuer).searchParams.get('return_to')!
+    const crossClient = new URL(continuation, issuer)
+
+    crossClient.searchParams.set('client_id', second.client.clientId)
+    expect(await resolveFirstPartyLoginContext(crossClient.pathname + crossClient.search, h.deps)).toBeNull()
+    expect((await h.handler(request(crossClient.pathname + crossClient.search)))?.status).toBe(400)
+    expect(await resolveFirstPartyLoginContext(continuation, h.deps)).toEqual({
+      product: 'rooms', displayName: 'Rooms', returnUrl: 'https://rooms.example.test'
+    })
   })
 
   it.each<Record<string, string>>([{ prompt: 'login' }, { max_age: '0' }])('requires a changed session even when authentication occurred in the same second: %j', async overrides => {

@@ -85,6 +85,10 @@ El orquestador toma decisiones binarias claras en cada job:
 
 Para verificar a mano en qué SHA quedaron los 6 recursos Cloud Run (los 4 workers + `auth-server`, que entró al orquestador con TASK-1828 y se desplegó por primera vez con el release `9100bbd2765d` del 2026-09-04, + el Job `artifact-worker`, que entró con TASK-1846 el 2026-09-16 y se despliega a producción por primera vez en el siguiente release) existe `pnpm release:workers` (con `--expected-sha=<sha>` compara contra el target). Tres de ellos, `ops-worker`, `auth-server` y `artifact-worker`, son *change-gated*: si el release no tocó ninguna ruta de su runtime, el workflow salta el deploy y el servicio conserva el SHA anterior; eso no es drift, y desde ese mismo día el watchdog lo etiqueta como `change-gated` en vez de `DRIFT` (cada servicio change-gated tiene su lista de rutas espejada en el reader y un test de paridad contra el workflow real). El comando `pnpm release:workers` reemplaza al `gcloud` crudo que el runbook documentaba, que dejó de funcionar sin que nadie lo notara hasta que un release lo ejecutó. `artifact-worker` es distinto por ser un *Job* (un proceso que corre por lotes, sin tráfico): no tiene revisiones, su SHA se lee en una etiqueta del Job y, si hay que volver atrás, se apunta el Job a la imagen anterior en vez de mover tráfico.
 
+Corrección Auth pendiente de promoción (2026-10-28): el workflow del emisor queda sin `on.push`;
+el orquestador lo llama después del gate de aprobación y sólo un `workflow_dispatch` auditado
+puede servir de break-glass. La corrección local aún no acredita que el remoto siga ese contrato.
+
 Desde el hardening 2026-05-11, los workers Cloud Run no hacen production deploy
 automatico por `push:main`. `push:develop` sigue actualizando staging; production
 normal se ejecuta via `workflow_call` dentro de `production-release.yml`.

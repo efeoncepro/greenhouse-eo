@@ -137,6 +137,127 @@ export type RegisterSigningKeyVersionResult = Readonly<{
   alreadyRegistered: boolean
 }>
 
+export type PreparedSigningKeyVersion = Readonly<{
+  versionName: string
+  kid: string
+  publicJwk: EcPublicJwk
+}>
+
+/** KMS RPCs are deliberately outside the PostgreSQL activation transaction. */
+export const prepareSigningKeyVersion = async (
+  signer: KmsSignerPort,
+  versionName: string,
+  keyName: string
+): Promise<PreparedSigningKeyVersion> => {
+  assertKmsVersionBelongsToKey(versionName, keyName)
+  const pem = await signer.getPublicKeyPem(versionName)
+  const publicJwk = await pemToPublicJwk(pem)
+  const kid = await computeKid(publicJwk)
+
+  await signCompactJws({
+    signer,
+    versionName,
+    kid,
+    publicJwk,
+    typ: 'auth-key-preflight+jwt',
+    payload: { purpose: 'signing-key-registration-preflight' }
+  })
+
+  return { versionName, kid, publicJwk }
+}
+
+/** Caller owns the transaction so the rotation ledger and registry commit together. */
+export const registerPreparedSigningKeyVersionInTransaction = async (
+  client: Pick<PoolClient, 'query'>,
+  prepared: PreparedSigningKeyVersion,
+  actor: string,
+  activate: boolean,
+  expectedPreviousActiveKid?: string
+): Promise<RegisterSigningKeyVersionResult> => {
+  const { versionName, kid, publicJwk } = prepared
+
+  await client.query(`SELECT pg_advisory_xact_lock(hashtext('greenhouse_auth.signing_keys'))`)
+
+  const existing = await client.query<SigningKeyRow>(
+    `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE kms_key_version = $1 OR kid = $2`,
+    [versionName, kid]
+  )
+
+  const existingRow = existing.rows[0]
+
+  if (existingRow) {
+    if (existingRow.kms_key_version !== versionName || existingRow.kid !== kid) {
+      throw new Error('Signing key collision: kid/version pair already registered with different identity')
+    }
+
+    if (!activate || existingRow.state === 'active') {
+      if (expectedPreviousActiveKid !== undefined) {
+        const currentActive = await client.query<SigningKeyRow>(
+          `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE state = 'active' FOR UPDATE`
+        )
+
+        if (currentActive.rows[0]?.kid !== expectedPreviousActiveKid) {
+          throw new Error('Signing key predecessor changed before activation')
+        }
+      }
+
+      return { key: mapRow(existingRow), previousActiveKid: null, alreadyRegistered: true }
+    }
+
+    if (existingRow.state === 'retired') {
+      throw new Error('A retired signing key cannot be re-activated')
+    }
+  }
+
+  const active = await client.query<SigningKeyRow>(
+    `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE state = 'active' FOR UPDATE`
+  )
+
+  const previousActive = active.rows[0] ?? null
+
+  if (expectedPreviousActiveKid !== undefined && previousActive?.kid !== expectedPreviousActiveKid) {
+    throw new Error('Signing key predecessor changed before activation')
+  }
+
+  const shouldActivate = activate || !previousActive
+
+  if (shouldActivate && previousActive && previousActive.kid !== kid) {
+    await client.query(
+      `UPDATE greenhouse_auth.signing_keys SET state = 'retiring', retiring_at = now() WHERE kid = $1`,
+      [previousActive.kid]
+    )
+    await insertEvent(client, previousActive.kid, 'retiring', actor, { replacedBy: kid })
+  }
+
+  const targetState: SigningKeyState = shouldActivate ? 'active' : 'retiring'
+
+  const upserted = await client.query<SigningKeyRow>(
+    `INSERT INTO greenhouse_auth.signing_keys
+       (kid, kms_key_version, algorithm, public_jwk, state, activated_at, retiring_at, created_by)
+     VALUES ($1, $2, 'ES256', $3::jsonb, $4, now(), CASE WHEN $4 = 'retiring' THEN now() END, $5)
+     ON CONFLICT (kid) DO UPDATE
+       SET state = EXCLUDED.state,
+           activated_at = CASE WHEN EXCLUDED.state = 'active' THEN now() ELSE greenhouse_auth.signing_keys.activated_at END,
+           retiring_at = CASE WHEN EXCLUDED.state = 'active' THEN NULL ELSE greenhouse_auth.signing_keys.retiring_at END
+     RETURNING ${SELECT_COLUMNS}`,
+    [kid, versionName, JSON.stringify(publicJwk), targetState, actor]
+  )
+
+  const row = upserted.rows[0]
+
+  if (!row) throw new Error('Signing key upsert returned no row')
+
+  if (!existingRow) {
+    await insertEvent(client, kid, 'registered', actor, { kmsKeyVersion: versionName })
+  }
+
+  if (shouldActivate) {
+    await insertEvent(client, kid, 'activated', actor, { previousActiveKid: previousActive?.kid ?? null })
+  }
+
+  return { key: mapRow(row), previousActiveKid: previousActive?.kid ?? null, alreadyRegistered: Boolean(existingRow) }
+}
+
 /**
  * Registra (y por defecto activa) una versión KMS existente. Idempotente por `kms_key_version`:
  * registrar dos veces la misma versión no crea una segunda fila ni un segundo evento de activación.
@@ -148,81 +269,9 @@ export const registerSigningKeyVersion = async ({
   activate = true,
   keyName = getAuthServerKmsKeyName()
 }: RegisterSigningKeyVersionInput): Promise<RegisterSigningKeyVersionResult> => {
-  assertKmsVersionBelongsToKey(versionName, keyName)
+  const prepared = await prepareSigningKeyVersion(signer, versionName, keyName)
 
-  const pem = await signer.getPublicKeyPem(versionName)
-  const publicJwk = await pemToPublicJwk(pem)
-  const kid = await computeKid(publicJwk)
-
-  return withTransaction(async client => {
-    await client.query(`SELECT pg_advisory_xact_lock(hashtext('greenhouse_auth.signing_keys'))`)
-
-    const existing = await client.query<SigningKeyRow>(
-      `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE kms_key_version = $1 OR kid = $2`,
-      [versionName, kid]
-    )
-
-    const existingRow = existing.rows[0]
-
-    if (existingRow) {
-      if (existingRow.kms_key_version !== versionName || existingRow.kid !== kid) {
-        throw new Error('Signing key collision: kid/version pair already registered with different identity')
-      }
-
-      if (!activate || existingRow.state === 'active') {
-        return { key: mapRow(existingRow), previousActiveKid: null, alreadyRegistered: true }
-      }
-
-      if (existingRow.state === 'retired') {
-        throw new Error('A retired signing key cannot be re-activated')
-      }
-    }
-
-    const active = await client.query<SigningKeyRow>(
-      `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE state = 'active' FOR UPDATE`
-    )
-
-    const previousActive = active.rows[0] ?? null
-    const shouldActivate = activate || !previousActive
-
-    if (shouldActivate && previousActive && previousActive.kid !== kid) {
-      await client.query(
-        `UPDATE greenhouse_auth.signing_keys SET state = 'retiring', retiring_at = now() WHERE kid = $1`,
-        [previousActive.kid]
-      )
-      await insertEvent(client, previousActive.kid, 'retiring', actor, { replacedBy: kid })
-    }
-
-    const targetState: SigningKeyState = shouldActivate ? 'active' : 'retiring'
-
-    const upserted = await client.query<SigningKeyRow>(
-      `INSERT INTO greenhouse_auth.signing_keys
-         (kid, kms_key_version, algorithm, public_jwk, state, activated_at, retiring_at, created_by)
-       VALUES ($1, $2, 'ES256', $3::jsonb, $4, now(), CASE WHEN $4 = 'retiring' THEN now() END, $5)
-       ON CONFLICT (kid) DO UPDATE
-         SET state = EXCLUDED.state,
-             activated_at = CASE WHEN EXCLUDED.state = 'active' THEN now() ELSE greenhouse_auth.signing_keys.activated_at END,
-             retiring_at = CASE WHEN EXCLUDED.state = 'active' THEN NULL ELSE greenhouse_auth.signing_keys.retiring_at END
-       RETURNING ${SELECT_COLUMNS}`,
-      [kid, versionName, JSON.stringify(publicJwk), targetState, actor]
-    )
-
-    const row = upserted.rows[0]
-
-    if (!row) {
-      throw new Error('Signing key upsert returned no row')
-    }
-
-    if (!existingRow) {
-      await insertEvent(client, kid, 'registered', actor, { kmsKeyVersion: versionName })
-    }
-
-    if (shouldActivate) {
-      await insertEvent(client, kid, 'activated', actor, { previousActiveKid: previousActive?.kid ?? null })
-    }
-
-    return { key: mapRow(row), previousActiveKid: previousActive?.kid ?? null, alreadyRegistered: Boolean(existingRow) }
-  })
+  return withTransaction(client => registerPreparedSigningKeyVersionInTransaction(client, prepared, actor, activate))
 }
 
 export type RetireSigningKeyInput = Readonly<{
@@ -235,6 +284,8 @@ export type RetireSigningKeyInput = Readonly<{
 
 export const retireSigningKey = async ({ kid, actor, force = false, now = new Date() }: RetireSigningKeyInput) =>
   withTransaction(async client => {
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext('greenhouse_auth.signing_keys'))`)
+
     const result = await client.query<SigningKeyRow>(
       `SELECT ${SELECT_COLUMNS} FROM greenhouse_auth.signing_keys WHERE kid = $1 FOR UPDATE`,
       [kid]

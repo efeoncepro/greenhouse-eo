@@ -86,6 +86,11 @@ Production de workers no se despliega automaticamente por `push:main`. Los
 pushes de worker siguen sirviendo staging (`develop`); production normal vive
 en este orquestador y `workflow_dispatch` queda solo como break-glass auditado.
 
+Corrección Auth pendiente de promoción (2026-10-28): `auth-server-deploy.yml` no debe iniciar un deploy
+productivo por `push`. El orquestador lo llama tras `approval-gate`; `workflow_dispatch` se reserva
+para break-glass auditado. Hasta que el guard llegue al remoto, inspeccionar los triggers efectivos
+antes de empujar cambios a `main` o `develop`.
+
 Para mirar los 6 recursos Cloud Run de un vistazo (5 services + el Job `artifact-worker`), sin recordar regiones ni flags de `gcloud`:
 
 ```bash

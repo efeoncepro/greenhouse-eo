@@ -2,12 +2,13 @@
 /**
  * Worker deploy-path coverage gate (canonical).
  *
- * Los workflows de deploy de los workers Cloud Run deciden DOS veces si hay que
- * desplegar, y ambas decisiones se toman contra una lista de rutas mantenida A MANO:
+ * Los workflows de deploy de los workers Cloud Run deciden hasta DOS veces si hay que
+ * desplegar, con listas de rutas mantenidas A MANO:
  *
- *   1. `on.push.paths` — decide si el workflow siquiera corre.
+ *   1. `on.push.paths` — decide si los workflows reactivos siquiera corren.
  *   2. `WORKER_RUNTIME_PATHS` — el drift-check: si `git diff --quiet EXPECTED..CURRENT`
  *      no ve cambios en esas rutas, el step de deploy se SALTA y el job cierra `success`.
+ * Auth es orchestrator-only: no tiene push y sólo necesita la segunda lista.
  *
  * Bug class: el worker bundlea código de `src/lib/**` que la lista NO menciona. El
  * cambio entra a `main`, el release queda verde, el manifest transiciona a `released`
@@ -58,7 +59,8 @@ const WORKERS = [
   {
     name: 'auth-server',
     entry: 'services/auth-server/server.ts',
-    workflow: '.github/workflows/auth-server-deploy.yml'
+    workflow: '.github/workflows/auth-server-deploy.yml',
+    orchestratorOnly: true
   },
   {
     // TASK-1846 — Cloud Run JOB multiconsumidor (Proposal + Insights). Corre con tsx sobre el árbol
@@ -104,9 +106,9 @@ const collectBundleFiles = async entry => {
 }
 
 /**
- * Prefijos declarados en el workflow. Une las dos listas porque un hueco en
- * CUALQUIERA de las dos deja el worker stale: sin `on.push.paths` el workflow no
- * corre; sin `WORKER_RUNTIME_PATHS` corre pero el drift-check salta el deploy.
+ * Prefijos declarados en el workflow. Para los workers reactivos, un hueco en
+ * cualquiera de las dos listas deja el worker stale. Auth corre por workflow_call,
+ * así que se evalúa sólo contra WORKER_RUNTIME_PATHS.
  */
 const readDeclaredPrefixes = workflowPath => {
   const raw = readFileSync(join(repoRoot, workflowPath), 'utf8')
@@ -162,7 +164,8 @@ for (const worker of WORKERS) {
     continue
   }
 
-  const uncovered = bundleFiles.filter(file => !isCovered(file, declared.all))
+  const requiredPaths = worker.orchestratorOnly ? declared.runtimePaths : declared.all
+  const uncovered = bundleFiles.filter(file => !isCovered(file, requiredPaths))
 
   // Un hueco SÓLO en runtimePaths es igual de grave: el workflow corre y el
   // drift-check lo salta. Se reporta aparte porque la remediación es distinta.
@@ -171,7 +174,7 @@ for (const worker of WORKERS) {
   // `WORKER_RUNTIME_PATHS` no tiene drift-check que saltarse, así que exigirle
   // cobertura ahí es un falso positivo (marcaría todo su push filter como hueco).
   const runtimeOnlyGaps =
-    declared.runtimePaths.length === 0
+    worker.orchestratorOnly || declared.runtimePaths.length === 0
       ? []
       : bundleFiles.filter(
           file => isCovered(file, declared.pushPaths) && !isCovered(file, declared.runtimePaths)
@@ -209,8 +212,8 @@ for (const worker of WORKERS) {
 
 if (hadError) {
   console.error('')
-  console.error('Remediación: agregar el prefijo faltante a AMBAS listas del workflow')
-  console.error('(on.push.paths y WORKER_RUNTIME_PATHS). Declarar el directorio, no el archivo.')
+  console.error('Remediación: agregar el prefijo a WORKER_RUNTIME_PATHS y, donde exista push,')
+  console.error('también a on.push.paths. Declarar el directorio, no el archivo.')
   process.exit(1)
 }
 

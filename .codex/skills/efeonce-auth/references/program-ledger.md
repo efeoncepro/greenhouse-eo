@@ -8,11 +8,12 @@
 
 - La evaluación ofensiva propia (20 casos, refutación separada) y los casos (a)/(b) de TASK-1831 están hechos; se
   tildaron en `develop` los dos criterios que los respaldan. Esa conciliación existía antes sólo en ramas de Codex.
-- 🔴 **Rama local `codex/auth-pr-develop-stack`** (punta `dddc922d7`, 2026-10-29) **no está en `origin`** y su contenido no
-  llegó a `develop` ni a producción: revocación de consentimiento + tokens atómica, recuperación atómica, 413 antes de
+- **Rama local `codex/auth-pr-develop-stack`** (punta `dddc922d7`, 2026-10-29): **integrada en `develop` el 2026-11-01**
+  (sin release a `main` ni deploy). Trae: revocación de consentimiento + tokens atómica, recuperación atómica, 413 antes de
   cerrar un cuerpo excesivo, Job aislado de rotación (migración `20261029092236733`, workflow `auth-key-maintenance-deploy.yml`)
-  e inventario de privacidad corregido. El release `935583f88db0` sólo tomó de ella el feed del login. Integrarla
-  (con sus gates y release) es el paso que desbloquea el cierre de TASK-1833. Lo mismo vale para `efeonce-mcp`
+  e inventario de privacidad corregido. Además: verificación post-deploy de la revisión activa y retiro del trigger `push:main` de Auth; se conservó el guard
+  squash y se declararon las tablas del Job en el allowlist de escritura. Falta promoverla a `main`, aplicar la migración
+  y provisionar el Job (`AUTH_KEY_MAINTENANCE_PROVISIONED`). Lo mismo vale para `efeonce-mcp`
   rama local `codex/auth-gateway-assurance@9fb877b` (tests (a)/(b)).
 - GCP (lectura 2026-11-01): sin Job ni Scheduler de rotación; KMS versiones 1 y 2 del 2026-09-04.
   `auth.keys.rotation_overdue` avisará pasados 80 días, alrededor del 2026-11-23.

@@ -35,6 +35,9 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1828 — registry de llaves de firma (la privada vive en KMS).
   'greenhouse_auth.signing_keys',
   'greenhouse_auth.signing_key_events',
+  // TASK-1833 — ledger de intención del Job aislado de rotación (la intención se escribe antes del RPC KMS no idempotente).
+  'greenhouse_auth.signing_key_rotation_operations',
+  'greenhouse_auth.signing_key_rotation_events',
 
   // TASK-1829 — superficie OAuth del emisor.
   'greenhouse_auth.oauth_clients',

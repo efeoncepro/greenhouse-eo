@@ -29,6 +29,18 @@ Rollback de Efeonce ID: las dos variables de GitHub en `false` + tráfico a `aut
 autorizado y luego adoptado por el bootstrap de TASK-2082 como administrador hasta 2027-11-01
 ([recibo](../audits/rooms/2026-10-31-durable-access-production.md)); falta su primer login real con la versión nueva.
 
+## Auth — Job de rotación de llaves (TASK-1833), integrado en develop 2026-11-01
+
+Código del Job aislado en `develop` desde el 2026-11-01; **no existe en cloud** (sin SA, login PG, secreto, Job ni
+Scheduler). El orquestador sólo lo despliega si la variable GitHub `AUTH_KEY_MAINTENANCE_PROVISIONED=true`, y el deploy
+declara `ENABLED=false`/`DRY_RUN=true`. La migración `20261029092236733_task-1833-auth-key-maintenance.sql` no está aplicada.
+
+| Flag | Runtime | Valor | Límite |
+| --- | --- | --- | --- |
+| `AUTH_KEY_MAINTENANCE_ENABLED` | Futuro Cloud Run Job `auth-key-maintenance` | `false` | Job inexistente en cloud. OFF retorna antes de leer PostgreSQL o KMS. |
+| `AUTH_KEY_MAINTENANCE_DRY_RUN` | Futuro Cloud Run Job `auth-key-maintenance` | `true` | Con enabled ON, dry-run lee metadata y no reclama lease ni crea versión. |
+| `AUTH_KEY_MAINTENANCE_PROVISIONED` | Variable GitHub del release control plane | ausente = no desplegar | Prenderla exige SA, login PG, secreto e IAM revisados y la migración aplicada. |
+
 ## Rooms / Auth — estado releído26Oct2026
 
 Lectura sin mutaciones a17:38:40Chile: [metadata y PRs](../audits/rooms/2026-10-26-docs-skills-state-readback.json).

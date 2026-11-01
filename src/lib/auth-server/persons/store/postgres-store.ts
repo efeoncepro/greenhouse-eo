@@ -24,7 +24,7 @@ import type {
   TotpEnrollmentRecord
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
-import type { PersonAuthStorePort } from './port'
+import type { PersonAuthStorePort, RevokePersonAuthStateCounts, RevokePersonAuthStateInput } from './port'
 
 const asDate = (value: unknown): Date => (value instanceof Date ? value : new Date(String(value)))
 const asDateOrNull = (value: unknown): Date | null => (value === null || value === undefined ? null : asDate(value))
@@ -214,6 +214,51 @@ const mapTotp = (row: TotpRow): TotpEnrollmentRecord => ({
 })
 
 export class PostgresPersonAuthStore implements PersonAuthStorePort {
+  async revokeAuthStateWithAudit(input: RevokePersonAuthStateInput): Promise<RevokePersonAuthStateCounts> {
+    return withTransaction(async client => {
+      const sessions = await client.query<{ session_hash: string }>(
+        `UPDATE greenhouse_auth.sessions
+            SET revoked_at=$3, revoke_reason=$4
+          WHERE environment_id=$1 AND subject=$2 AND revoked_at IS NULL
+          RETURNING session_hash`,
+        [input.environmentId, input.subject, input.now, input.reason]
+      )
+
+      const passkeys = await client.query<{ credential_id: string }>(
+        `UPDATE greenhouse_auth.passkey_credentials
+            SET revoked_at=$3, revoke_reason=$4
+          WHERE environment_id=$1 AND subject=$2 AND revoked_at IS NULL
+          RETURNING credential_id`,
+        [input.environmentId, input.subject, input.now, input.reason]
+      )
+
+      const totp = await client.query<{ subject: string }>(
+        `UPDATE greenhouse_auth.totp_enrollments
+            SET status='revoked', revoked_at=$3, revoke_reason=$4
+          WHERE environment_id=$1 AND subject=$2 AND status<>'revoked'
+          RETURNING subject`,
+        [input.environmentId, input.subject, input.now, input.reason]
+      )
+
+      const counts = {
+        sessionsRevoked: sessions.rows.length,
+        passkeysRevoked: passkeys.rows.length,
+        totpRevoked: totp.rows.length > 0
+      }
+
+      await client.query(
+        `INSERT INTO greenhouse_auth.person_auth_attempts (
+          method, stage, outcome, reason_code, environment_id, subject_hash, ip_hash, user_agent_hash,
+          correlation_id, details
+        ) VALUES ('recovery','revoke','success',$1,$2,$3,NULL,NULL,$4,$5::jsonb)`,
+        [input.reason, input.environmentId, input.subjectHash, input.correlationId,
+          JSON.stringify({ ...counts, actorRef: input.actorRef })]
+      )
+
+      return counts
+    })
+  }
+
   async insertSession(record: PersonSessionRecord): Promise<void> {
     await query(
       `INSERT INTO greenhouse_auth.sessions (${SESSION_COLUMNS})

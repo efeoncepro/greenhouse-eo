@@ -163,6 +163,8 @@
     "auth-server:person-auth:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-smoke.ts",
     "auth-server:register-issuer-environment": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-issuer-environment.ts",
     "auth-server:rotate-key": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/rotate-signing-key.ts",
+    "auth-server:attest-rotation-baseline": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/attest-key-rotation-baseline.ts",
+    "auth-server:reconcile-key-rotation": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/reconcile-key-rotation.ts",
     "claude-md": "node scripts/ci/claude-md.mjs",
     "claude-md:budget": "node scripts/ci/claude-md.mjs budget",
     "claude-md:inventory": "node scripts/ci/claude-md.mjs inventory",

@@ -3,34 +3,12 @@ name: Auth Server Deploy
 # TASK-1828 / EPIC-044 — Efeonce authorization server (`auth.efeonce.org`) on Cloud Run.
 #
 # ONE service serves production at auth.efeonce.org: no staging deployment exists.
-# Only main pushes, production-release.yml workflow_call and audited production
-# dispatches may deploy. All lanes use the production Environment and one lock.
+# Only production-release.yml workflow_call and audited production dispatches
+# may deploy. A push to main is not a release approval. Both lanes use the
+# production Environment and one lock.
 # Feature flags/cohorts remain independent governed inputs; routing never enables them.
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'services/auth-server/**'
-      - 'scripts/auth-server/rooms-config-drift.py'
-      - '.github/workflows/auth-server-deploy.yml'
-      - 'services/_shared/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.dockerignore'
-      - '.gcloudignore'
-      - 'vendor/**'
-      - 'tsconfig.json'
-      # Coarse on purpose (same rationale as ops-worker): the bundle pulls
-      # src/lib transitively. Gate: `pnpm worker:deploy-path-gate`.
-      - 'src/lib/**'
-      - 'src/emails/**'
-      - 'src/types/**'
-      - 'src/config/**'
-      - 'src/components/**'
-      - 'src/i18n/**'
-      - 'src/@core/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -164,6 +142,9 @@ jobs:
             package.json
             pnpm-lock.yaml
             tsconfig.json
+            vendor
+            .dockerignore
+            .gcloudignore
             services/auth-server
             scripts/auth-server/rooms-config-drift.py
             .github/workflows/auth-server-deploy.yml
@@ -285,23 +266,6 @@ jobs:
           EXTERNAL_IDENTITY_CANARY_ENABLED: ${{ vars.EXTERNAL_IDENTITY_CANARY_ENABLED || 'false' }}
           EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
 
-      - name: Verify deployment health
-        run: |
-          REVISION="$(gcloud run services describe auth-server \
-            --project=${GCP_PROJECT_ID} \
-            --region=${GCP_REGION} \
-            --format='value(status.latestReadyRevisionName)')"
-          READY="$(gcloud run services describe auth-server \
-            --project=${GCP_PROJECT_ID} \
-            --region=${GCP_REGION} \
-            --format='value(status.conditions[0].status)')"
-          echo "Latest ready revision: ${REVISION}"
-          echo "Service ready: ${READY}"
-          if [ "${READY}" != "True" ]; then
-            echo "::warning::Service reports not-ready. Check Cloud Run logs."
-          fi
-          echo "✓ auth-server deploy verified (revision ${REVISION})"
-
       - name: Poll Ready=True bounded
         run: |
           DEADLINE=$((SECONDS + 300))
@@ -320,9 +284,45 @@ jobs:
           echo "ERROR: Service did not reach Ready=True within 300s"
           exit 1
 
+      - name: Verify active Auth revision
+        id: verify-active
+        shell: bash
+        env:
+          DEPLOY_NEEDED: ${{ steps.worker-drift.outputs.deploy_needed }}
+          PREVIOUS_GIT_SHA: ${{ steps.worker-drift.outputs.current_git_sha }}
+        run: |
+          set -euo pipefail
+          if [ "${DEPLOY_NEEDED}" != "true" ] && [ "${DEPLOY_NEEDED}" != "false" ]; then
+            echo "ERROR: missing or invalid deploy decision."
+            exit 1
+          fi
+          REQUIRED_SHA="${PREVIOUS_GIT_SHA}"
+          if [ "${DEPLOY_NEEDED}" = "true" ]; then
+            REQUIRED_SHA="${EXPECTED_SHA}"
+          fi
+          if [[ ! "${REQUIRED_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "ERROR: active revision check requires a full source SHA."
+            exit 1
+          fi
+          ACTIVE_REVISION="$(gcloud run services describe auth-server \
+            --project="${GCP_PROJECT_ID}" --region="${GCP_REGION}" --format=json \
+            | python3 -c 'import json, sys; traffic = [t for t in json.load(sys.stdin).get("status", {}).get("traffic", []) if t.get("percent", 0) > 0]; sys.exit("ERROR: Auth must serve exactly one revision at 100% traffic") if len(traffic) != 1 or traffic[0].get("percent") != 100 or not traffic[0].get("revisionName") else print(traffic[0]["revisionName"])')"
+          SERVED_SHA="$(gcloud run revisions describe "${ACTIVE_REVISION}" \
+            --project="${GCP_PROJECT_ID}" --region="${GCP_REGION}" --format=json \
+            | python3 -c 'import json, sys; data = json.load(sys.stdin); print(next((env.get("value", "") for c in data.get("spec", {}).get("containers", []) or [] for env in c.get("env") or [] if env.get("name") == "GIT_SHA"), ""))')"
+          if [ "${SERVED_SHA}" != "${REQUIRED_SHA}" ]; then
+            echo "ERROR: active Auth revision ${ACTIVE_REVISION} has GIT_SHA=${SERVED_SHA:-none}; required ${REQUIRED_SHA}."
+            exit 1
+          fi
+          echo "Active Auth revision ${ACTIVE_REVISION} serves GIT_SHA=${SERVED_SHA} at 100% traffic."
+          echo "active_revision=${ACTIVE_REVISION}" >> "${GITHUB_OUTPUT}"
+          echo "served_sha=${SERVED_SHA}" >> "${GITHUB_OUTPUT}"
+
       - name: Record deployment commit
         run: |
-          echo "Deployed commit: ${{ steps.resolve-sha.outputs.expected_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Target commit: ${{ steps.resolve-sha.outputs.expected_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Active Auth revision: ${{ steps.verify-active.outputs.active_revision }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Active revision SHA: ${{ steps.verify-active.outputs.served_sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "SHA resolution: ${{ steps.resolve-sha.outputs.resolution_source }}" >> "$GITHUB_STEP_SUMMARY"

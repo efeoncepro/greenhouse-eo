@@ -95,7 +95,8 @@ export const revokeClientConsent = async (
 
   const now = (deps.now ?? (() => new Date()))()
 
-  const consentsRevoked = await deps.store.revokeConsents({
+  // A failure while revoking token families must not leave consent changed on its own.
+  const revoked = await deps.store.revokeConsentAndGrants({
     subject: input.subject,
     environmentId: input.environmentId,
     clientId: input.clientId,
@@ -105,16 +106,6 @@ export const revokeClientConsent = async (
     now
   })
 
-  // Sin consentimiento no hay token: se revoca toda familia viva de (subject, client), aunque quede
-  // algún scope consentido (el cliente vuelve a authorize y recibe un set nuevo con el scope vigente).
-  const revoked = await deps.store.revokeGrantsForSubjectClient({
-    subject: input.subject,
-    environmentId: input.environmentId,
-    clientId: input.clientId,
-    now,
-    reason: `consent_revoked:${input.reason}`
-  })
-
   await recordOAuthAudit(deps.store, deps.audit ?? SYSTEM_AUDIT, {
     eventType: 'consent_revoked',
     outcome: 'success',
@@ -122,10 +113,10 @@ export const revokeClientConsent = async (
     subject: input.subject,
     grantId: null,
     errorCode: null,
-    details: { scopes: input.scopes ? [...input.scopes] : null, consentsRevoked, ...revoked, via: input.via }
+    details: { scopes: input.scopes ? [...input.scopes] : null, ...revoked, via: input.via }
   })
 
-  return { consentsRevoked, ...revoked }
+  return revoked
 }
 
 /** Scopes pedidos que todavía no tienen consentimiento activo. */

@@ -246,6 +246,16 @@ export interface OAuthStorePort {
     reason: string
     now: Date
   }): Promise<number>
+  /** Atomically revokes consent rows and all live token families for the same subject and client. */
+  revokeConsentAndGrants(input: {
+    subject: string
+    environmentId: string
+    clientId: string
+    scopes: readonly string[] | null
+    revokedBy: string
+    reason: string
+    now: Date
+  }): Promise<{ consentsRevoked: number } & RevokeGrantResult>
 
   // audit
   recordAuditEvent(event: OAuthAuditEvent): Promise<void>

@@ -111,11 +111,11 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-11-01 (conciliación): evaluación ofensiva propia hecha (20 casos, refutación separada 18 PASS, B15/B20 parciales; revisión de protocolo separada) y casos (a)/(b) de TASK-1831 probados en local. En producción desde el release 935583f88db0: first-party/OTP ON para Rooms y las cinco señales nuevas. NO integrado: las correcciones del 28–29 de octubre (revocación de consentimiento atómica, recuperación atómica, 413 de cuerpo excesivo, Job aislado de rotación, inventario de privacidad corregido) viven sólo en la rama local codex/auth-pr-develop-stack, sin push. Pendientes: integrar esa rama, rotación cloud + scheduler, ventana steady de 7 días, simulacro de revocación masiva en staging, aprobación de privacidad V2 y cobertura ofensiva CIMD/gateway bloqueada.`
+- Status real: `2026-11-01 (conciliación): evaluación ofensiva propia hecha (20 casos, refutación separada 18 PASS, B15/B20 parciales; revisión de protocolo separada) y casos (a)/(b) de TASK-1831 probados en local. En producción desde el release 935583f88db0: first-party/OTP ON para Rooms y las cinco señales nuevas. Integradas en develop el 2026-11-01 (sin release a main ni deploy): las correcciones del 28–29 de octubre que vivían en la rama local codex/auth-pr-develop-stack (revocación de consentimiento atómica, recuperación atómica, 413 de cuerpo excesivo, Job aislado de rotación con su migración sin aplicar, inventario de privacidad corregido, verificación post-deploy de la revisión activa). Pendientes: promoverlas a main, aplicar la migración y provisionar el Job, rotación cloud + scheduler, ventana steady de 7 días, simulacro de revocación masiva en staging, aprobación de privacidad V2 y cobertura ofensiva CIMD/gateway bloqueada.`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
-- Branch: `Greenhouse develop; checkout compartido; sin worktrees. Trabajo pendiente de integrar en la rama local codex/auth-pr-develop-stack (sin push)`
+- Branch: `Greenhouse develop; checkout compartido; sin worktrees. La rama local codex/auth-pr-develop-stack quedó integrada en develop el 2026-11-01`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -136,8 +136,10 @@ Conciliación contra evidencia del repo y de GCP (lectura), hecha el 2026-11-01 
   `getAuthServerSignals`. Runbooks de [incidente](../../operations/runbooks/auth-server-incident.md) y
   [rotación](../../operations/runbooks/auth-server-key-rotation.md) publicados.
 
-**Hecho pero NO integrado** — la rama local `codex/auth-pr-develop-stack` (punta `dddc922d7`, 2026-10-29) no existe en
-`origin` y su contenido no está en `develop` ni en producción (diff de 42 archivos de Auth contra `develop`):
+**Integrado en `develop` el 2026-11-01, sin release a `main` ni deploy** — venía de la rama local
+`codex/auth-pr-develop-stack` (punta `dddc922d7`, 2026-10-29). Se conservó el guard squash vigente, se agregó la
+verificación post-deploy de la revisión activa (habría detenido el caso de ISSUE-185) y se retiró el trigger `push:main` de
+`auth-server-deploy.yml`. 1047 pruebas Vitest, 30 Python, typecheck, lint y gates de workers/migraciones/flags en verde:
 
 - Revocación de consentimiento y de familias de tokens en una sola operación (`revokeConsentAndGrants`); hoy son dos pasos
   y un fallo intermedio deja el consentimiento revocado con tokens vivos. Prueba SQL red/green 3 PASS en local.
@@ -149,7 +151,8 @@ Conciliación contra evidencia del repo y de GCP (lectura), hecha el 2026-11-01 
 
 **Falta**
 
-- Integrar esa rama a `develop` con sus gates y promoverla por el release.
+- Promover lo integrado a `main` por el release; aplicar la migración `20261029092236733` y provisionar SA, login PG,
+  secreto e IAM del Job antes de prender `AUTH_KEY_MAINTENANCE_PROVISIONED`.
 - Rotación de llave real en staging y producción con scheduler. Lectura GCP del 2026-11-01: no existe Job ni Scheduler de
   rotación; KMS tiene las versiones 1 y 2, ambas del 2026-09-04. La señal `auth.keys.rotation_overdue` avisa pasados
   80 días de la llave activa, alrededor del 2026-11-23.
@@ -459,7 +462,7 @@ la activación productiva usa canaries acotados, no ataques de carga contra SQL 
 - [x] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
       tildados allá: `efeonce-mcp` rama local `codex/auth-gateway-assurance@9fb877b`, `test/auth-assurance-1831.test.ts` 3 PASS en callback y HTTP MCP; no acredita producción.
 - [ ] Evaluación ofensiva propia>=10casos con alcance documentado, revisión independiente de otro agente, retest y sin críticos/altos abiertos; expresamente sin certificación de tercero. Sin tildar: el HIGH provisional de CIMD tiene corrección defensiva local, pero la validación ofensiva CIMD/gateway quedó bloqueada y las correcciones del 28–29 de octubre no están integradas.
-- [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación. Sin tildar: el Job existe sólo en la rama local; GCP no tiene Job ni Scheduler de rotación (lectura 2026-11-01).
+- [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación. Sin tildar: el Job está en `develop` (2026-11-01) pero no en cloud; GCP no tiene Job ni Scheduler de rotación (lectura 2026-11-01).
 - [ ] Señales del dominio registradas en el control plane con steady y severidad. Ocho existentes y cinco nuevas integradas localmente; 17 tests de lectores PASS y SQL agregado real PASS. Ventana productiva steady aún pendiente; no se tilda por código.
 - [ ] Runbooks de incidente, rotación y revocación masiva publicados y ensayados en staging. Sin tildar: publicados, simulacro masivo pendiente.
 - [ ] Revisión de privacidad V2 publicada con retención por tabla y registro de actividades. Sin tildar: revisión técnica publicada; decisiones de tratamiento, plazos y aprobación responsable pendientes, y el inventario corregido sigue en la rama local.

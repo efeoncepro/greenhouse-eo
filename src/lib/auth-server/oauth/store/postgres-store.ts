@@ -590,6 +590,36 @@ export class PostgresOAuthStore implements OAuthStorePort {
     return rows.length
   }
 
+  async revokeConsentAndGrants({ subject, environmentId, clientId, scopes, revokedBy, reason, now }: {
+    subject: string
+    environmentId: string
+    clientId: string
+    scopes: readonly string[] | null
+    revokedBy: string
+    reason: string
+    now: Date
+  }) {
+    return withTransaction(async client => {
+      const consents = await client.query(
+        `UPDATE greenhouse_auth.client_consents
+         SET status = 'revoked', revoked_at = $4, revoked_by = $5, revoke_reason = $6
+         WHERE subject = $1 AND environment_id = $2 AND client_id = $3 AND status = 'active'
+           AND ($7::text[] IS NULL OR scope = ANY($7::text[]))
+         RETURNING consent_id`,
+        [subject, environmentId, clientId, now, revokedBy, reason, scopes ? [...scopes] : null]
+      )
+
+      // A selective consent revoke still kills all current families; reauthorization can issue
+      // a new family for the scopes that remain consented.
+      const where = 'subject = $1 AND environment_id = $2 AND client_id = $3'
+
+      const tokens = await revokeWhere(client, where, where, [subject, environmentId, clientId], now,
+        `consent_revoked:${reason}`)
+
+      return { consentsRevoked: consents.rows.length, ...tokens }
+    })
+  }
+
   async recordAuditEvent(e: OAuthAuditEvent) {
     await query(
       `INSERT INTO greenhouse_auth.oauth_audit_events

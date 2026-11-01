@@ -18,7 +18,7 @@ import type {
   TotpEnrollmentRecord
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
-import type { PersonAuthStorePort } from './port'
+import type { PersonAuthStorePort, RevokePersonAuthStateCounts, RevokePersonAuthStateInput } from './port'
 
 type LinkState = { linkId: string; subject: string; sourceSystem: string; active: boolean }
 
@@ -468,6 +468,50 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
     return [...this.totpBackupCodes.values()].filter(
       record => record.environmentId === environmentId && record.subject === subject && !record.consumedAt
     ).length
+  }
+
+  async revokeAuthStateWithAudit(input: RevokePersonAuthStateInput): Promise<RevokePersonAuthStateCounts> {
+    const sessionsBefore = new Map([...this.sessions].map(([key, value]) => [key, { ...value }]))
+    const passkeysBefore = new Map([...this.passkeys].map(([key, value]) => [key, { ...value }]))
+    const totpBefore = new Map([...this.totpEnrollments].map(([key, value]) => [key, { ...value }]))
+    const attemptsBefore = this.attempts.length
+
+    try {
+      const sessionsRevoked = await this.revokeSessionsForSubject(input)
+      const credentials = await this.listPasskeyCredentials(input)
+      let passkeysRevoked = 0
+
+      for (const credential of credentials) {
+        passkeysRevoked += await this.revokePasskeyCredential({ credentialId: credential.credentialId, now: input.now, reason: input.reason })
+      }
+
+      const totpRevoked = (await this.revokeTotpEnrollment(input)) > 0
+      const counts = { sessionsRevoked, passkeysRevoked, totpRevoked }
+
+      await this.recordAttempt({
+        method: 'recovery',
+        stage: 'revoke',
+        outcome: 'success',
+        reasonCode: input.reason,
+        environmentId: input.environmentId,
+        subjectHash: input.subjectHash,
+        ipHash: null,
+        userAgentHash: null,
+        correlationId: input.correlationId,
+        details: { ...counts, actorRef: input.actorRef }
+      })
+
+      return counts
+    } catch (error) {
+      this.sessions.clear()
+      this.passkeys.clear()
+      this.totpEnrollments.clear()
+      for (const [key, value] of sessionsBefore) this.sessions.set(key, value)
+      for (const [key, value] of passkeysBefore) this.passkeys.set(key, value)
+      for (const [key, value] of totpBefore) this.totpEnrollments.set(key, value)
+      this.attempts.length = attemptsBefore
+      throw error
+    }
   }
 
   async recordAttempt(event: PersonAuthAttemptEvent): Promise<void> {

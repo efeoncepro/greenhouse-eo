@@ -65,6 +65,8 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     // Registrado ANTES del primer deploy production, como exige la regla dura del
     // control plane. Con cloudRunService: el orquestador lo despliega vía workflow_call
     // y el watchdog compara su GIT_SHA (deploy change-gated como los demás workers).
+    // Auth no se despliega por push a main: production-release es el camino normal;
+    // workflow_dispatch queda reservado para break-glass auditado.
     // TASK-1844: same workflow/service; its change-gate also compares multi-org flag/cohort.
     workflowName: 'Auth Server Deploy',
     cloudRunService: 'auth-server',
@@ -79,6 +81,14 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     cloudRunService: 'artifact-worker',
     cloudRunRegion: 'us-east4',
     cloudRunResourceKind: 'job'
+  },
+  {
+    // TASK-1833 — registered before the first production release so CI failures
+    // from the new workflow cannot poison the release preflight. No Cloud Run
+    // mapping until the dedicated SA/login/secret and Job actually exist;
+    // mapping a nonexistent Job would make the watchdog report perpetual drift.
+    // Add cloudRunService + cloudRunResourceKind:'job' in the provisioning release.
+    workflowName: 'Auth Key Maintenance Job Deploy'
   },
   {
     // TASK-1378 — Scanner de firmas de assets de candidato. Registrado ANTES

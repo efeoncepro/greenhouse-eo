@@ -206,6 +206,23 @@ describe('signing-keys-store', () => {
     expect(jwks.keys.every(k => !('d' in k))).toBe(true)
   })
 
+  it('keeps the previous active key when the candidate signature does not match its public key', async () => {
+    const { registerSigningKeyVersion, getActiveSigningKey } = await import('./signing-keys-store')
+    const v1 = createSigner(`${KEY_NAME}/cryptoKeyVersions/1`)
+    const v2 = createSigner(`${KEY_NAME}/cryptoKeyVersions/2`)
+    const first = await registerSigningKeyVersion({ signer: v1.signer, versionName: v1.version, actor: 'test' })
+
+    await expect(registerSigningKeyVersion({
+      signer: { ...v2.signer, signDigest: v1.signer.signDigest },
+      versionName: v2.version,
+      actor: 'rotator'
+    })).rejects.toThrow()
+
+    expect((await getActiveSigningKey())?.kid).toBe(first.key.kid)
+    expect(fake.keys.size).toBe(1)
+    expect(fake.events.map(event => event.event_type)).toEqual(['registered', 'activated'])
+  })
+
   it('refuses to retire before the overlap window unless forced, and never re-activates a retired key', async () => {
     const { registerSigningKeyVersion, retireSigningKey } = await import('./signing-keys-store')
     const v1 = createSigner(`${KEY_NAME}/cryptoKeyVersions/1`)

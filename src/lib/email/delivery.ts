@@ -166,15 +166,18 @@ const checkEmailTypeEnabled = async (emailType: string): Promise<{ enabled: bool
       [emailType]
     )
 
-    if (!rows[0]) return { enabled: true }
+    // A credential-bearing OTP must never bypass its explicit delivery gate
+    // when the config row is missing. Other email types retain their legacy policy.
+    if (!rows[0]) return { enabled: emailType !== 'auth_server_rooms_invitation_otp' }
 
     return {
       enabled: rows[0].enabled === true,
       pausedReason: rows[0].paused_reason ?? undefined
     }
   } catch {
-    // Non-blocking: if kill switch check fails, allow sending
-    return { enabled: true }
+    // Fail closed for the Rooms access code if the pause state cannot be read.
+    // Preserve the existing availability policy for unrelated mail types.
+    return { enabled: emailType !== 'auth_server_rooms_invitation_otp' }
   }
 }
 

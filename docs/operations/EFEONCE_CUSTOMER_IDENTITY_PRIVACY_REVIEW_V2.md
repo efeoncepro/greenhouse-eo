@@ -16,6 +16,12 @@ retención aprobada ni pentest completo. [Canary](../audits/rooms/2026-10-26-aut
 [metadata releída26Oct](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
 Corrección de deploy Auth retenida en PR263/264; no aplicada. Decisiones de tratamiento/plazos siguen pendientes.
 
+Delta técnico 2026-10-29: cotejo de `CREATE TABLE` de las migraciones Auth/Identity
+TASK-1631/1828/1829/1830/1834/1836/2067 contra este inventario. Se
+incorporan `internal_native_enrollments` y `internal_native_access_audit`,
+las dos tablas omitidas; el cotejo de nombres no prueba retención efectiva,
+contenido de filas ni aprobación de plazos.
+
 ## Alcance y evidencia
 
 Esta V2 sustituye el análisis técnico activo de la [V1](EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md), que se
@@ -77,6 +83,8 @@ como datos anónimos. Cifrar o hashear reduce exposición, pero conserva posibil
 | `greenhouse_core.external_identity_environments`, `external_organization_bindings`, `external_capability_grants`; enlaces/perfiles canónicos asociados | Issuer, organización, perfil, autoridad y vigencia; resolver acceso | Estado/revocación y vigencias; GC Auth no elimina este directorio | Baja, conservación contractual y supresión coordinada con owners de identidad |
 | `greenhouse_core.external_member_invitations` | Email y email normalizado, referencias de persona/organización, invitación y estado | Expiración/revocación no equivalen a purga; fuera de GC Auth | Plazo y tratamiento de invitaciones no aceptadas/revocadas |
 | `external_identity_audit_log`, `external_access_resolution_log` | Actor, referencias, decisiones y eventos de acceso | No cubiertos por GC efímero revisado | Plazo por finalidad, acceso de soporte y política de preservación |
+| `greenhouse_core.internal_native_enrollments` | Perfil, binding, enlaces de procedencia, tenant/object ID upstream, actor y motivo de enrollment interno | Estado `active/revoked` y fecha de revocación; no tiene purga en el GC Auth revisado | Plazo y mecanismo tras revocación, coordinación con enlaces y bindings; limitar el texto libre de `reason` |
+| `greenhouse_core.internal_native_access_audit` | Evento, enrollment, actor, motivo y `metadata_json` de operación interna | Trigger append-only impide UPDATE/DELETE ordinarios; no hay política de retención implementada en el GC Auth | Aprobar finalidad/plazo, acceso y preservación; revisar contenido de `reason`/metadata y mecanismo gobernado para derechos o eliminación cuando corresponda |
 | `greenhouse_auth.sessions` | Hash de cookie, sujeto/perfil/link/entorno, amr, tiempos, hashes IP/UA | Defaults: 12 h deslizantes, máximo 7 d; GC usa expiración absoluta anterior al cutoff y dependencias | Validar adecuación del mínimo de 30 d tras expiración y capacidad de purga |
 | `magic_link_tokens`, `passkey_challenges`, `auth_rate_limits` | Hash de token/reto/email/IP, sujeto y contadores | Magic link 15 min; reto passkey 5 min; GC por expiración o último uso/bloqueo anterior al cutoff | Justificación de 30 d; revisar inferencia de hashes en datasets accesibles |
 | `passkey_credentials` | ID, clave pública COSE, contador, transports, nombre opcional de dispositivo, AAGUID y estado | Revocación disponible; no purga en GC revisado; clave privada no almacenada en esta tabla | Retención tras revocación, minimización de nombre y metadata de dispositivo |

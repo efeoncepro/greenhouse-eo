@@ -1,3 +1,6 @@
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import { createHttpInvitationAuthority, INVITATION_AUTHORITY_PATH } from './authority-http'
@@ -46,6 +49,62 @@ describe('canonical invitation HTTP authority', () => {
 
     expect(await authority.resolve(binding)).toBeNull()
   })
+  it('does not forward its credential across a real HTTP redirect on loopback', async () => {
+    let redirectedRequests = 0
+
+    const destination = createServer((_request, response) => {
+      redirectedRequests += 1
+      response.end('unexpected redirect')
+    })
+
+    const sourceRequests: Array<{ path: string | undefined; authorization: string | undefined }> = []
+
+    const source = createServer((request, response) => {
+      sourceRequests.push({ path: request.url, authorization: request.headers.authorization })
+      response.writeHead(302, { Location: `http://127.0.0.1:${(destination.address() as AddressInfo).port}/capture` })
+      response.end()
+    })
+
+    try {
+      await new Promise<void>(resolve => destination.listen(0, '127.0.0.1', resolve))
+      await new Promise<void>(resolve => source.listen(0, '127.0.0.1', resolve))
+      const roomsOrigin = `http://127.0.0.1:${(source.address() as AddressInfo).port}`
+      const authority = createHttpInvitationAuthority({ roomsOrigin, serviceToken: token, allowLocalDevelopment: true })
+
+      expect(await authority.resolve(binding)).toBeNull()
+      expect(sourceRequests).toEqual([{ path: INVITATION_AUTHORITY_PATH, authorization: `Bearer ${token}` }])
+      expect(redirectedRequests).toBe(0)
+    } finally {
+      await Promise.all([source, destination].map(server => new Promise<void>((resolve, reject) => {
+        server.close(error => error ? reject(error) : resolve())
+      })))
+    }
+  })
+  it('rejects a real chunked response over 8192 bytes while accepting the bounded control', async () => {
+    let requests = 0
+    let roomsOrigin = ''
+
+    const server = createServer((_request, response) => {
+      requests += 1
+      const payload = JSON.stringify({ ...valid, invitationUrl: `${roomsOrigin}/invite#token=${'a'.repeat(43)}` })
+
+      response.writeHead(200, { 'Content-Type': 'application/json' })
+      response.write(payload)
+      response.end(requests === 1 ? ' '.repeat(9000) : '')
+    })
+
+    try {
+      await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+      roomsOrigin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+      const authority = createHttpInvitationAuthority({ roomsOrigin, serviceToken: token, allowLocalDevelopment: true })
+
+      expect(await authority.resolve(binding)).toBeNull()
+      expect(await authority.resolve(binding)).toEqual(expect.objectContaining(binding))
+      expect(requests).toBe(2)
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
+    }
+  }, 10_000)
   it('fails closed without exposing upstream exceptions', async () => {
     const authority = createHttpInvitationAuthority({ roomsOrigin: origin, serviceToken: token,
       fetch: async () => { throw new Error('sensitive upstream failure') } })

@@ -130,3 +130,12 @@ test('worker workflow exige todos los inputs compartidos', () => {
   assert.match(findings.join('\n'), /pnpm-lock\.yaml/)
   assert.match(findings.join('\n'), /vendor\/\*\*/)
 })
+
+test('Auth sólo despliega desde el orquestador o un dispatch explícito', () => {
+  const allowed = { on: { workflow_call: {}, workflow_dispatch: {} } }
+  const unsafe = { on: { push: { branches: ['main'] }, workflow_dispatch: {} } }
+
+  assert.deepEqual(validateWorkerWorkflowPaths({ path: 'auth.yml', workflow: allowed, orchestratorOnly: true }), [])
+  assert.match(validateWorkerWorkflowPaths({ path: 'auth.yml', workflow: unsafe, orchestratorOnly: true }).join('\n'),
+    /no puede desplegar por push.*falta workflow_call del orquestador/s)
+})

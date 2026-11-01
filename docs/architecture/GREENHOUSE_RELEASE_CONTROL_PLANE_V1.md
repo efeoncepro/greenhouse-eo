@@ -801,6 +801,14 @@ hasta que production restauró `00043-ndg`. Vercel conserva configuración por e
 sí están separados. El change-gate incluye drift de `AUTH_SERVER_INTERNAL_AUTH_ENABLED` y
 `EXTERNAL_IDENTITY_CANARY_ENABLED`: una diferencia fuerza el deploy incluso si el diff del bundle es vacío.
 
+**Corrección propuesta 2026-10-28 (candidato local, aún no promovido).** El workflow Auth no debe
+tener `on.push`: un push a `main` no crea ni aprueba el manifest de release. El camino normal es
+`production-release.yml` → `workflow_call` después de `approval-gate`; `workflow_dispatch` queda
+para break-glass auditado. El guard conserva environment Production, lock único, `EXPECTED_SHA`,
+change-gate y verificación del SHA servido. La propuesta resuelve la divergencia con el
+[contrato Auth inicial](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md), que contemplaba
+push a `main`; no representa un release ejecutado ni cambia flags o cohortes.
+
 ## Delta 2026-09-16 — TASK-1846: `Artifact Worker Deploy` (Cloud Run Job) entra al control plane
 
 El Cloud Run **Job** `artifact-worker` (render del Artifact Composer para Proposal y Efeonce Insights) es el sexto
