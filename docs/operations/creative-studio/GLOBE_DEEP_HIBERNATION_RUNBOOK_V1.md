@@ -604,3 +604,15 @@ Verification scope, executable regression tests and the still-pending source pro
 - budget alerts remain alert-only; they do not shut down resources;
 - current status wording: **hibernation applied; realized saving pending 24-hour, 7-day and monthly Billing Export**;
 - never say “saved CLP X” using the modeled residual. Say “modeled reduction” until observed.
+
+
+## 2026-11-01 — Retained-IP front-door suspension
+
+Decision: [hibernated front door](../../architecture/creative-studio/GLOBE_HIBERNATED_FRONT_DOOR_DECISION_V1.md).
+This supersedes earlier statements that all front-door resources remain provisioned: only the HTTP/HTTPS forwarding rules are absent while hibernated. The reserved address and all data/configuration remain.
+
+The normal zero-delete gate remains mandatory except for this explicitly approved listener suspension: its full saved plan may delete exactly the two named forwarding rules and nothing else. Never generalize this exception to SQL, IP, storage or other resources.
+
+For restart, changing lifecycle to `draining` automatically recreates both listeners. Verify the original reserved IP, unchanged DNS and certificate readiness, alongside SQL/API readiness; then continue section 9. Restoring listeners alone does not authorize productive lanes or scheduler resume. No restart rehearsal is authorized by the cost reduction.
+
+Expected comparable monthly residual: approximately CLP 22,000–23,000 with idle static IP retained. Confirm actual forwarding-rule cessation and idle-IP SKU in Billing Export after ingestion; keep gross, credits and net separate. Do not claim the forecast as realized savings.

@@ -13,6 +13,27 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-11-01 — suspensión de listeners, IP conservada
+
+Autorización explícita de Julio para reducir el residual sin perder datos ni complicar el encendido.
+Readback `2026-11-01T14:37:38Z`: full saved plan y apply `0 add / 0 change / 2 destroy`, exclusivamente
+`google_compute_global_forwarding_rule.front_door_http[0]` y `front_door_https[0]`.
+No forwarding rules restantes. IP `globe-studio-front-door-ip` conserva `8.233.189.79`, ahora `RESERVED`.
+SQL `STOPPED/NEVER`, tres schedulers Globe y caller externo `PAUSED`. Datos, buckets, secretos, imágenes,
+certificado, proxies, backends, NEG y DNS no formaron parte de los cambios del plan.
+
+El dominio no acepta HTTP/HTTPS mientras está hibernado. Terraform conserva las definiciones y recrea ambos
+listeners automáticamente en `draining`; seguir el runbook de encendido completo antes de activar producción.
+[Decisión y límites](../../architecture/creative-studio/GLOBE_HIBERNATED_FRONT_DOOR_DECISION_V1.md).
+Post-plan completo: `No changes` (exit0). Validación Terraform PASS y 35 tests de infraestructura PASS. No SQL wake, generación, deploy ni prueba HTTP.
+
+Octubre observado: bruto CLP33.487,38, créditos −72,52, neto33.414,87 (ajustes tardíos posibles).
+Nuevo residual estimado CLP22.000–23.000/mes, ahorro incremental aproximado10.800/mes; **todavía no observado**.
+La IP inactiva reemplaza parte del costo del balanceador.
+Source guardado en commit local Globe `d02d320`, sin push. Antes de cualquier apply desde otro checkout/CI,
+incorporar este cambio: source remoto anterior podría recrear las dos reglas y devolver el costo. Monitor diario actualizado para verificar ausencia
+intencional de listeners, IP conservada y ventanas Billing completas posteriores al corte. Sin cambio DNS.
+
 ## Corte 2026-09-03 — TASK-1807: pausa reversible del caller externo de tenancy
 
 Globe sigue siendo un producto comercial temporalmente pausado, no cerrado. Readback a
