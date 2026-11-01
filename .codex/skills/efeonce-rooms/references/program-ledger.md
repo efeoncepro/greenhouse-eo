@@ -7,6 +7,19 @@
 
 ## Estado vigente (2026-11-01)
 
+- **PR #17 + #18 (`main@5533dcd`), en producción desde 2026-11-01:** causa de
+  [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md) encontrada: cada conexión
+  nueva del conector de Cloud SQL usa el certificado temporal guardado sin revisar si venció, y su refresco (temporizador)
+  no corre con la función de Vercel congelada. Fix: un checkout fallido descarta el pool y reintenta **una sola vez**
+  (ninguna consulta ni COMMIT se reintenta) y el pool se recicla a los 40 min. Flujo completo revisado logueado y sin
+  loguear: la raíz es la portada (con sesión, el proxy manda a `/rooms`; sin sesión NO, porque «Volver a Rooms» de
+  Efeonce ID apunta a la raíz y formaba un círculo con `/login`), `/auth` → `/rooms`, 404/error sin banda de demo,
+  `AccessState` según quien mira (miembro, sesión vencida, invitado, anónimo), páginas de sala en el espacio
+  seleccionado, invitado válido gana a cookie interna vencida, `/login` con sesión abierta va directo, `returnTo` con las
+  rutas reales y por defecto `/rooms`, el selector de espacio conserva el enlace, cerrar sesión termina en `/salir`.
+  Deploy `efeonce-rooms-g2rwd5xbq`, alias reasignado. Rediseño de `/salir` (y de la portada) en canvas, pendiente de
+  aprobación: https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2. **Regla:** la raíz sin sesión nunca redirige a
+  `/rooms`; un destino protegido tras cerrar sesión vuelve a entrar solo con la sesión de Efeonce ID abierta.
 - **PR #16 (`main@1989576`), en producción desde 2026-11-01:** el callback reinicia el login una vez ante
   `login_required` o transacción de Rooms vencida (5 min); cookie `__Host-rooms_login_retry` de 2 min contra el bucle.
   Deploy `efeonce-rooms-m6kqevsxq`, alias reasignado. Con el hotfix de Efeonce ID

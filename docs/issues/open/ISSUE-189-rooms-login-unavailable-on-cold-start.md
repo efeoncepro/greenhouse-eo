@@ -19,14 +19,14 @@ el resto ~1,5 s). Hay errores parecidos en `/auth/callback` el 31-10 a las 14:13
 
 ## Causa raíz
 
-**Sin confirmar.** El inicio de login abre el pool de la base (secreto en Secret Manager, opciones del conector,
-conexión y validación de identidad del rol) y ejecuta una transacción. Cualquier fallo se convierte en `unavailable`
-y el error queda sanitizado, sin decir el paso. Hipótesis:
-
-1. **Tope de conexiones del rol runtime:** `validateDatabaseIdentity` acepta `rolconnlimit` hasta 8; cada instancia
-   de Vercel usa un pool de hasta 2, y las previews de los PR y la producción comparten la base. Varias instancias a
-   la vez agotarían el tope y fallarían rápido.
-2. **Arranque en frío del conector o del secreto**, con un error rápido en lugar de un timeout.
+**Mecanismo identificado el 2026-11-01 (tarde); el código exacto del error se confirma con el próximo registro.** Con el registro de PR #13, producción mostró `rooms.db.connect_failed` (no
+`init_failed`) en ráfagas: el pool inicializaba bien y fallaba al tomar conexiones nuevas, 4 de cada 5 veces y en
+~0,5 s. Las conexiones del rol estaban en 1 de 8, así que no era el tope. En `@google-cloud/cloud-sql-connector`
+1.12.1, `createDirectSocket` usa el certificado temporal guardado **sin revisar si venció**, y su renovación corre con
+un `setTimeout`, que no se ejecuta mientras Vercel tiene la función congelada. Al despertar, cada conexión nueva falla
+en TLS (y dispara un refresco en segundo plano) hasta que el refresco termina; por eso «Reintentar» funcionaba. El
+código del error se registraba como `unknown`, lo que calza con un código de OpenSSL con `/` (`ERR_SSL_SSL/TLS_*`), que el saneado descartaba (inferido, no observado). Esta versión del conector
+no tiene opción de refresco perezoso.
 
 ## Impacto
 
@@ -37,14 +37,17 @@ información ni se rompe la sesión de nadie, pero da mala primera impresión, j
 
 - **Hecho (Rooms PR #13, `c5d5b35`, en producción desde el 2026-11-01):** registro saneado `rooms.db.init_failed`
   (paso, milisegundos y código con forma de identificador) y `rooms.db.connect_failed` al tomar una conexión del pool.
-- **Pendiente:** leer el próximo registro, confirmar la causa y corregirla. Si es el tope de conexiones, ajustar el
-  tope del rol o el tamaño del pool y cortar las previews contra la base de producción. Si es el arranque en frío,
-  reintentar una sola vez la inicialización (no la consulta).
+- **Hecho (Rooms PR #17, `2d52d7b`, en producción desde el 2026-11-01):** un checkout fallido no envió ninguna
+  sentencia, así que se descarta el pool (se drena en segundo plano) y se reintenta **una sola vez** sobre uno nuevo
+  (`rooms.db.connect_recovered`); las consultas y los COMMIT siguen sin reintentarse. El pool se recicla a los 40 min,
+  antes del vencimiento del certificado de una hora. El registro conserva códigos con `/` y `.`.
 
 ## Verificación
 
-Pendiente: un registro `rooms.db.*` que identifique el paso, el fix y una semana sin `browser_error` de `unavailable`
-en `/login` y `/auth/callback`.
+- 2026-11-01, sobre el deploy nuevo: 22 de 22 inicios de login llegaron a Efeonce ID (antes 4 de 5 fallaban).
+- **Pendiente para cerrar:** el deploy nuevo trae certificados frescos, así que la prueba de fondo es tras más de una
+  hora sin tráfico. Cerrar con una semana sin `browser_error` de `unavailable` en `/login` y `/auth/callback`, y con
+  algún `rooms.db.connect_recovered` (o ningún `connect_retry_failed`) en el registro.
 
 ## Relacionado
 
