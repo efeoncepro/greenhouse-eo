@@ -31,7 +31,8 @@ quedaba en un error sin salida. Alta visibilidad: es la primera pantalla de un c
 
 ## Solución
 
-- **Efeonce ID** (greenhouse-eo `b05403b3d`, en `develop`, **pendiente de release a `main`**): una continuación
+- **Efeonce ID** (hotfix PR #266, `main@60872da`, **en producción** desde 2026-11-01 en `auth-server-00171-xdd`; release
+  `60872da089ed-6925b98e…` `released`; el mismo cambio está en `develop` como `b05403b3d`): una continuación
   vencida redirige al `redirect_uri` registrado con `error=login_required`, su `state` e `iss`, sin código; una
   desconocida o reusada sigue siendo error, pero el navegador recibe la página de error de Efeonce ID y no JSON.
 - **Rooms** (PR #16, `main@1989576`, **en producción** desde 2026-11-01, deploy `efeonce-rooms-m6kqevsxq`): el
@@ -43,7 +44,10 @@ quedaba en un error sin salida. Alta visibilidad: es la primera pantalla de un c
 - Pruebas: 730 de `auth-server` (2 nuevas) y 40 de auth de Rooms (1 nueva), más la suite completa de Rooms.
 - Producción Rooms: `/auth/callback?error=login_required` responde 303 a `/login?returnTo=/rooms` con la cookie de
   reintento.
-- Pendiente: release de Efeonce ID y un login real de más de 10 minutos que entre sin error.
+- Producción Efeonce ID: la misma continuación vencida del incidente (`efpt_VdViay…`) ahora responde 302 a
+  `efeonce-rooms.vercel.app/auth/callback?error=login_required&error_description=first_party_request_expired`, y Rooms
+  responde 303 a `/login?returnTo=/rooms`. Una continuación desconocida devuelve 400 `text/html`.
+- Resuelto el 2026-11-01. Sin verificar: un login humano real de más de 10 minutos de punta a punta.
 
 ## Relacionado
 

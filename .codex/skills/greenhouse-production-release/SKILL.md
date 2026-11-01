@@ -58,6 +58,13 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - `.github/workflows/{ops-worker,commercial-cost-worker,ico-batch,hubspot-greenhouse-integration}-deploy.yml`
 - `.github/workflows/{azure-teams-deploy,azure-teams-bot-deploy}.yml`
 
+> **Delta 2026-11-01 (tarde) — hotfix acotado de Efeonce ID (PR #266):** un hotfix a `main` llega al preflight con
+> `playwright_smoke` en 0 corridas, siempre. Decide de entrada: correr el smoke por `workflow_dispatch` sobre el SHA
+> (camino sin bypass) o pedir la autorización de `bypass_preflight_reason` junto con la del hotfix; el clasificador
+> de permisos bloquea el bypass sin ella. Si el job final «Transition → released» lo cancela el runner (checkout
+> colgado), el reconciliador deja el manifiesto `aborted` aunque todo esté desplegado: verificar el runtime y redespachar
+> el mismo SHA (deploys no-op), nunca tocar el manifiesto. Fila en `PRODUCTION_RELEASE_TIMING_LEDGER.md`.
+
 ## Hard Rules
 
 - Never treat a push to `main` as a completed production release.

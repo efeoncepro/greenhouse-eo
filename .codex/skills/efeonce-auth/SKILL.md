@@ -9,14 +9,15 @@ description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/O
 release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (`released`, orquestador run `41284120477`, squash PR #262).
 Estado `vivo`:
 
-- **Revisión:** `auth-server-00170-qlx` al 100 %, `GIT_SHA` `935583f88`, los mismos 6 secretos que la 00169.
+- **Revisión:** `auth-server-00171-xdd` al 100 %, `GIT_SHA` `60872da` (hotfix PR #266 de ISSUE-190, release
+  `60872da089ed-6925b98e…` `released`); antes `auth-server-00170-qlx` (`935583f88`).
 - **Flags:** `AUTH_SERVER_FIRST_PARTY_ENABLED` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` ON. Su fuente durable son las
   variables de repo GitHub.
 - **Login V4 con carrusel de novedades** en `/login` y en la entrada desde Rooms («Entra a Rooms»). El carrusel lee el feed
   público de Greenhouse (TASK-2064).
 - **El tráfico va a la última revisión** desde el `update-traffic --to-latest` del 2026-11-01.
 - **Rollback:** `gcloud run services update-traffic auth-server --region us-east4 --project efeonce-group
-  --to-revisions=auth-server-00169-4pq=100`, con readback.
+  --to-revisions=auth-server-00170-qlx=100`, con readback (deja el tráfico fijado: volver a `--to-latest` después).
 - **PR #263/#264** (guard original de Codex) se cerraron el 2026-11-01, superadas por el release; las ramas se conservan.
 - **Sin verificar:** errores de Sentry del release y un login humano completo hacia Rooms.
 - **En `develop`, sin release a `main` (commit `e09d72d70`, 2026-11-01):** el trabajo de TASK-1833 que estaba varado en la rama

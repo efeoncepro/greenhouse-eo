@@ -4,7 +4,12 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
-## 2026-11-01 — Login first-party vencido: fix en develop, pendiente de release
+## 2026-11-01 — Login first-party vencido: hotfix en producción (`auth-server-00171-xdd`)
+
+- Hotfix PR #266 (`main@60872da`), release `60872da089ed-6925b98e-7b47-4ab4-8435-d3eb64ad94c9` `released` (run
+  `41328604666`). El primer intento quedó `aborted` porque el job final se colgó en el checkout; los deploys ya estaban
+  verdes. Se usó `bypass_preflight_reason` autorizado por el operador (solo advertencias `playwright_smoke` y staging).
+  Rollback: tráfico a `auth-server-00170-qlx`. ISSUE-190 resuelto.
 
 - [ISSUE-190](../../../../docs/issues/open/ISSUE-190-rooms-login-expired-continuation-raw-json.md): la solicitud first-party dura 10 min y
   un login con MFA de 12 min devolvía `{"error":"invalid_request"}` en crudo. `b05403b3d` (develop): continuación vencida →
