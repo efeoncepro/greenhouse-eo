@@ -4,6 +4,19 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Operador levanta la retención; panel de novedades integrado en develop (sin desplegar)
+
+- Operador: «Levanta la retención». `local`: `4a5d00277` en `develop` (sin push) trae desde
+  `codex/auth-pr-develop-stack` sólo el lector del feed público (`src/lib/auth-server/persons/login-announcements.ts`)
+  y su conexión en `routes.ts`/`server.ts`; 213 tests de `persons` PASS, typecheck PASS. Arnés
+  `/login/public-feed-preview` renderiza el carrusel con el feed de producción de Greenhouse.
+- `vivo`: el feed `https://greenhouse.efeoncepro.com/api/public/login-announcements` responde 200 con historias.
+- Hallazgo: `develop` ya tiene el guard de deploy (`f6ea72278`); `main` no. El workflow sólo despliega desde `main`
+  (`expected_sha` ancestro de `origin/main`). `develop` está 4 761 commits delante de `main` y la PR #262 es esa
+  promoción completa (7 735 archivos). Producción Auth corre `754a2a28` (develop) en la 00169.
+- Pendiente: decisión de cómo llegar a `main` (release completo #262 vs. PR enfocada de Auth) y luego deploy gobernado,
+  `update-traffic`, readback (GIT_SHA, flags, discovery/JWKS/readyz) y rollback a la 00169.
+
 ## 2026-10-31 — First-party y OTP ON en producción para Rooms; PR #263/#264 siguen sin merge
 
 - Autorización del operador: «Prende todo» y, tras explicar qué implica liberar Efeonce ID, «Todo»; después
