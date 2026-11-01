@@ -4,7 +4,11 @@ Fecha: **2026-10-27**. [ADR Proposed](../../../architecture/GREENHOUSE_OPERATION
 · [TASK-2073](../../../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md)
 · [Plan](../../../tasks/plans/TASK-2073-plan.md) · [Resultados reproducibles](results.json).
 
-## Resultado y decisión recomendada
+> **Actualización 01-11:** la [revisión crítica](../2026-11-01-sky-bridge-critical-review.md) difiere la elección
+> A′/B, ampliada en [seis frentes](../2026-11-01-sky-deep-review/README.md). Los resultados de abajo conservan
+> su valor como simulación; no bastan para aceptar el puente.
+
+## Resultado y recomendación histórica del 27-10 (diferida el 01-11)
 
 **Recomendar A′: un bridge operativo legacy por Space, con un owner comercial/financiero común.** Mantener una
 Organization SKY, el Space histórico de Diseño y un Space futuro para Blog SEO/AEO. El experimento da evidencia

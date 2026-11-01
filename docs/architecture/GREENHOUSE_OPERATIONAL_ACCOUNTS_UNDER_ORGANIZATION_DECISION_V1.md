@@ -11,6 +11,16 @@
 - Validated as of: `2026-10-27`, código del checkout y discovery sellado en `4be89a9d4`; sin nueva conexión productiva.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
 
+## Revisión 2026-11-01 — Elección del bridge pendiente
+
+La [revisión crítica con tres subagentes](../audits/client-portal/2026-11-01-sky-bridge-critical-review.md), ampliada
+por la [revisión profunda de seis frentes](../audits/client-portal/2026-11-01-sky-deep-review/README.md),
+suspende la recomendación de aceptar A′. Las 97 pruebas del modelo siguen pasando, pero no ejercitan grants,
+refresh, perfiles/P&L financieros o rematerialización histórica reales. A′ y B requieren comparación con DB
+local aislada y commands/readers reales. El modelo Organization→Spaces se mantiene como dirección; bridge y
+schema siguen pendientes. La medición/preview interna del Blog puede desarrollarse sin esperar al alta del
+segundo Space; la apertura departamental exige aislamiento completo. No hay autorización de provisioning.
+
 ## Context
 
 SKY tiene una relación histórica de Diseño y suma Blog SEO/AEO con stakeholders distintos. Necesita dos cuentas
@@ -39,10 +49,10 @@ Se propone una Organization con varios Spaces. El Space histórico conserva iden
 indicadores y ediciones de Diseño. La nueva relación Blog SEO/AEO se aloja en un Space propio. Un Space puede
 contener varios Servicios de la misma operación; no se crea una Organization por departamento ni un master Account.
 
-Tras la comparación local, se recomienda **A′: bridge operativo legacy distinto por Space, con un único owner
-comercial/financiero**. B (client compartido con contexto Space en todos los consumers) sigue siendo viable
-si se retiran todos sus selectores client-only antes de abrir. La preferencia condicionada a foundations
-no autoriza insertar filas reales.
+La comparación local del 27-10 recomendó **A′: bridge operativo legacy distinto por Space, con un único owner
+comercial/financiero**. Esa preferencia queda diferida por la revisión del 01-11; no es la selección vigente.
+B (client compartido con contexto Space en todos los consumers) sigue siendo viable si se retiran todos sus
+selectores client-only antes de abrir. Ninguna de las alternativas autoriza insertar filas reales.
 
 El bridge operativo no representa otra empresa, Company de HubSpot, perfil Finance, factura, pago o persona.
 Su representación persistida —campo/relación de owner y rol del bridge— se diseñará en una unidad posterior.
@@ -54,15 +64,19 @@ de forma canónica antes del cutover, A′ queda bloqueada; no se acepta duplica
 1. El contexto efectivo es Organization + Space y, cuando aplica, Service. El servidor cruza membership vigente,
    capacidades/entitlements y propiedad del recurso. Ni `client_id`, un rol global, el selector de UI ni la
    pertenencia a la Organization conceden por sí solos acceso a otro Space.
-2. Una persona puede operar ambos Spaces con un principal y contexto activo persistente. El refresh no vuelve
-   a resolver `LIMIT 1`. El consolidado corporativo exige autoridad explícita adicional.
+2. Una persona puede operar ambos Spaces con un principal. Cada request declara su contexto y el servidor
+   lo intersecta con grants vigentes y ownership del recurso. La preferencia de contexto persistida no redirige
+   writes de otra pestaña. El refresh no vuelve a resolver `LIMIT 1`; cambiar metadata del Space no cambia
+   autoridad ni selección. El consolidado corporativo exige autoridad explícita adicional.
 3. HubSpot conserva campos comerciales. Greenhouse resuelve Servicio→Space mediante mapping explícito y vigencia.
    Un sync ambiguo queda pendiente observable; no elige el primer Space ni vuelve a asignar el servicio.
 4. Fuente→Space tiene ownership inequívoco y no se copia una fuente de Diseño a SEO. Proyecto→Servicio requiere
    binding propio y vigencia: `module_id` referencia `service_modules`, no `services.service_id`.
 5. Finance normaliza bridge→owner comercial **antes** de seleccionar candidatos y pesos. Una factura sin señal
    de servicio se mantiene sin atribuir; no se asigna a Diseño porque SEO cambió de bridge. Consolidación cuenta
-   hechos por identidad canónica, conserva correcciones/supersessions y no copia snapshots cerrados.
+   hechos por identidad canónica, conserva correcciones/supersessions y no copia snapshots cerrados. Owner común
+   no obliga a una sola factura/contrato ni elimina la atribución por Space/Servicio. Recalcular un periodo previo
+   no reinterpreta su propiedad usando mappings o flags `active` actuales; una reclasificación crea revisión explícita.
 6. Cachés y readers incluyen Space/Service, período y versión de autoridad cuando corresponda; una revocación
    vuelve a evaluarse antes de servir resultados. El org scope no sustituye la cuenta operativa.
 7. Ownership de una edición histórica es inmutable. Un retry busca la clave existente antes de validar el mapping
@@ -71,7 +85,10 @@ de forma canónica antes del cutover, A′ queda bloqueada; no se acepta duplica
 8. Blog exige GA4 + GSC + corridas del motor AEO. El scope se aplica en cada productor: URL/landing en GA4,
    página en GSC, citas URL en AEO con denominador completo del panel. AI referrals no sustituye corridas AEO.
    Fuentes ausentes o sin cobertura no son cero; `allowPartial` no evita estos requisitos. Un scope borrado/null
-   no habilita medición de toda la Organization. Fechas de baseline y prestación se declaran por separado.
+   no habilita medición de toda la Organization. Se validan productor, ventana actual, propiedad/conexión,
+   scope y calidad por separado: algún fact por módulo, sólo facts comparativos o filas en cada día no certifican
+   el encargo. Adquisición y actividad GA4 son indicadores distintos. Fechas de baseline y prestación se declaran
+   por separado, sin atribuir causalidad del desempeño histórico al servicio nuevo.
 9. Distribución vuelve a validar destinatarios antes de cada envío nuevo. Un bearer share no prueba identidad
    departamental. Un envío aceptado o ambiguo se reconcilia antes de reintentar; la auditoría no reenvía.
 
@@ -97,11 +114,13 @@ puede retrasar apertura, antes que producir indicadores o atribuciones incorrect
 
 ### Orden de transición
 
-1. ADR + comparación local A′/B (TASK-2073); aceptación del puente con sus límites.
+1. Mantener ADR Proposed; TASK-2073 conserva su cierre como simulación. Comparar A′/B con implementaciones
+   reales en entorno aislado, incluidos los contratos comunes de los puntos siguientes, antes de aceptar el puente.
 2. U01 contexto/membership/refresh; U02 routing de servicios/fuentes; **U02F owner Finance y selección de
    candidatos**. Estas foundations preceden a U03, incluso si el nuevo Space se pensara crear inactivo.
 3. U03 provisioning hijo idempotente; U04 readers/caches; U05 bindings/historia/ICO/capacidad.
-4. U06 GA4/GSC/AEO; U07 informes/recurrencia/distribución; U08 QA sintético; U09 alta autorizada de SKY;
+4. U06 GA4/GSC/AEO puede avanzar en paralelo desde el inicio como desarrollo/validación interna, sin otro Space.
+   U07 informes/recurrencia/distribución requiere ownership y autoridad completos; U08 QA sintético; U09 alta autorizada de SKY;
    U10 operación durable. Ver [plan integral](../audits/client-portal/2026-10-27-sky-multi-account-discovery/05-decisions-transition-and-execution-plan.md).
 
 **No hay un rollback seguro que consista sólo en ocultar SEO.** Los writers compatibles deben mantenerse o
@@ -115,7 +134,7 @@ schemas, migrations, flags, fuentes reales, historial o configuración de SKY.
 
 Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en el prototipo:
 
-- `src/lib/tenant/identity-store.ts`, `src/auth.ts`, `src/lib/entitlements/effective-reader.ts` (contexto/acceso).
+- `src/lib/tenant/identity-store.ts`, `src/lib/auth.ts`, `src/lib/entitlements/effective-reader.ts` (contexto/acceso).
 - `src/lib/services/service-sync.ts`, `src/lib/services/upsert-service-from-hubspot.ts` (routing).
 - `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts` y
   `src/lib/commercial/party/commands/instantiate-client-for-party.ts` (commands existentes, no reutilizar como alta hija).

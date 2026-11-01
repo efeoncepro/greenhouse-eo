@@ -116,14 +116,18 @@ Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia 
 [Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
 estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
 
-## 2026-10-27 — SKY: ADR y puente operativo probado localmente
+## 2026-11-01 — SKY: revisión profunda; puente A′/B pendiente
 
 [TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
 97 tests/68 checks A′/B PASS, red/FS restringidos. [Evaluación](docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
 [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): una Organization,
-Spaces separados y A′ recomendado, owner Finance común normalizado **antes** de candidatos. U01/U02/U02F antes de
-provisioning; no producción, fuentes, servicios o historia Diseño tocados, ni push/deploy. Types global baseline
-agotó heap; lint global 0 errores/26 warnings existentes. Aceptación ADR y foundations reales pendientes.
+Spaces separados; la [revisión en seis frentes](docs/audits/client-portal/2026-11-01-sky-deep-review/README.md)
+difiere A′/B. Grants/contexto por request, owner Finance, sync y conservación histórica requieren integración
+real aislada. Medición interna puede avanzar antes del split: host Blog y requisitos separados GA4/GSC/AEO
+nativo; Berel path-only y gate por módulo no bastan. Reproducciones puras confirman fallback Account360
+cliente same-org y scope sin host; no incidentes productivos verificados. Sin cambios runtime/DB/producción,
+provisioning, envíos ni historia de Diseño. Próximo: contratos y pruebas de integración con implementaciones
+reales; no repetir sólo el simulador. TASK-2073 no se reabre ni acredita rollout.
 
 ## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
 
