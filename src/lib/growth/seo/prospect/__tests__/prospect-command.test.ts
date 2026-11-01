@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
  * TASK-1709 — el command con sus gates, en orden: flag OFF → disabled sin llamadas;
@@ -122,6 +122,19 @@ vi.mock('@/lib/observability/capture', () => ({
 }))
 
 import { runProspectDiagnostic } from '../command'
+
+// These fixtures run under the default `legacy` selector, valid only before the provider cutoff
+// (ETV_PROVIDER_CUTOFF_ISO, 2026-11-01). Pin the clock so the verdict does not flip when the wall
+// clock crosses it, as it did on 2026-11-01; post-cutoff behavior is covered by the policy tests.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-10-15T12:00:00.000Z'))
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 
 const INPUT = { rootDomain: 'acme.cl', market: 'CL', actor: 'operator@efeonce' }
 
