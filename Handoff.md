@@ -1,5 +1,16 @@
 # Handoff
 
+## 2026-11-01 — GCP: limpieza de imágenes y tarballs de Cloud Build
+
+Octubre cerró en ~CLP258k netos (junio 111k). Aplicado con autorización del operador: cleanup policy
+`keep-15-most-recent` + `delete-older-than-30d` (enforced) en `cloud-run-source-deploy` us-east4 y us-central1
+(simulación previa: 241 versiones viejas, 0 imágenes vivas; artifact-worker y notion-bq-sync sirven la más
+reciente), y lifecycle `age 30` sobre `gs://efeonce-group_cloudbuild/source/` (2.452 tarballs, 327 GB; soft
+delete de 7 días). Ahorro esperado ~CLP25–30k/mes, no confirmado hasta la factura de diciembre. Pendiente: cada
+tarball pesa ~727 MB porque `.gcloudignore` no excluye `ai-generations/`, `outputs/` ni `generated/` (ningún
+Dockerfile las copia). Decisiones abiertas: kortex-pg-dev detenida (11k), Looker Studio Pro (8.7k), clamav
+min=1 (19.5k), balanceador MCP (25k).
+
 ## 2026-11-01 — Globe: listeners suspendidos con IP conservada
 
 Aplicado exclusivamente retiro HTTP/HTTPS del balanceador (`0/0/2`); IP original reservada, SQL STOPPED/NEVER
