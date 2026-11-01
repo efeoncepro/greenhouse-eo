@@ -7,9 +7,10 @@
 
 ## Estado vigente (2026-11-01)
 
-- **PR #13 y #14 (`main@4932753`), en producción desde 2026-11-01:** la palabra de «el acceso se detuvo» se ajusta al
+- **PR #13 a #15 (`main@4d0e6df`), en producción desde 2026-11-01:** la palabra de «el acceso se detuvo» se ajusta al
   anillo según su largo (antes «Espera.», «Aún no.» y «Otra vez.» se salían) y la esquina superior quedó sin el rótulo
-  «Acceso a Rooms». Deploy `efeonce-rooms-mxfpl8vcw`, alias reasignado. Además, registro saneado `rooms.db.init_failed`
+  «Acceso a Rooms». PR #15 (`main@4d0e6df`): la línea «¿Sigues sin poder entrar?…» pasó de pie suelto a cerrar el
+  bloque de referencia, junto a las acciones. Deploy vigente `efeonce-rooms-dv0ii23nb`, alias reasignado. Además, registro saneado `rooms.db.init_failed`
   y `rooms.db.connect_failed` para el login intermitente de [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md)
   (abierto, causa sin confirmar). Lección: una palabra de tamaño fijo dentro de una forma fija revienta con la palabra
   más larga del copy; el tamaño debe derivarse del largo.
