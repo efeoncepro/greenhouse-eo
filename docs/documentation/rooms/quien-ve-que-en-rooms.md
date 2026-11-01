@@ -19,6 +19,7 @@ Todavía no hay clientes reales en Rooms. Invitar al primero exige una autorizac
 | Qué | Cómo funciona |
 |---|---|
 | Cómo entra | Con un enlace y un código que recibe por correo. No necesita cuenta de Efeonce. |
+| Cuánto dura | El enlace vale lo que dure la propuesta: 30 días por defecto y hasta 90; el equipo lo puede cerrar antes. El código vence a los 10 minutos, pero desde el mismo enlace se pide uno nuevo. Una vez dentro, puede leer hasta 8 horas sin volver a pedir código. *(Cambio en PR #12, pendiente de publicar; hasta entonces la invitación dura como máximo 24 horas.)* |
 | Qué ve | Sólo las ediciones **publicadas** de su sala: la órbita, las escenas «Vive el servicio» y «Qué cambió» entre ediciones. |
 | Pruebas | Las ve sólo si su invitación incluye el permiso de ver pruebas. |
 | Preguntas | Puede hacerlas sólo si su invitación incluye el permiso de preguntar. |

@@ -200,6 +200,13 @@ API/CLI y recovery mixto verificados; no editor ni nueva publicacióncloud.
 R04 se divide en consumerOIDC interno2065 y guest invitations2066. Foundationissuer1834 y loginV42064
 son deAuth; OTP2067 se rige por [ADR correo único](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md).
 Cada room conserva ID estable; cada invitación tiene token opaco revocable, destinatario/version/vigencia.
+
+**Vigencias de la invitación (PR #12 de `efeonce-rooms`, 2026-11-01, pendiente de deploy):** la invitación sigue la vida de
+una propuesta B2B: 30 días por defecto y tope de 90 (`INVITATION_MAX_LIFETIME_DAYS`), siempre acotada por la autoridad de
+quien invita y revocable. El enlace solo nunca autentica: cada entrada pide un código de 10 minutos al correo del
+destinatario, con reenvío por autoservicio. La sesión del invitado dura 8 horas (tope de configuración 12 h; migración
+`1793268000000` amplía el CHECK de `rooms.invitation_sessions`) y cada uso relee estado, versión y autoridad. Antes el tope era
+24 horas para la invitación y 15 minutos (máximo 1 h) para la sesión.
 UN correo Resend contiene enlace y código; Rooms muestra input y verifica S2S. No se presenta como MFA ni
 sesión SSOglobal; proof delissuer tieneaud/RP/invitación/nonce/jti y consumoúnico local. El rol invitado sólo
 lee publicado autorizado. Identidad propia para operador usa OIDC y bindingexplícito, nunca tokensMCP.

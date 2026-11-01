@@ -7,6 +7,13 @@
 
 ## Estado vigente (2026-11-01)
 
+- **PR #12 (`claude/rooms-invitation-lifetime`, `1eeb31d`), code complete, SIN deploy:** invitación de propuesta B2B
+  30 días por defecto / 90 tope (antes 24 h), sesión del invitado 8 h (antes 15 min, tope 1 h), formulario en días.
+  Migración `1793268000000` (CHECK de `rooms.invitation_sessions` a 12 h) **debe aplicarse en `rooms_production` antes del
+  merge**: si el código llega primero, la base rechaza las sesiones de 8 h y los invitados no entran. Ensayo en clon PASS
+  (427/427), corrida en seco 1 pendiente. El `--apply` en producción lo bloqueó el clasificador de permisos: requiere
+  autorización explícita del operador. Luego: merge, deploy, `vercel alias set` y readback.
+
 - Producción (`vivo`): `efeonce-rooms.vercel.app` sirve el deploy `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
   inventario de migraciones revisadas). Debajo, en orden: PR #10 `main@449a0cd` (nombre del espacio, `f59d1df`),
   PR #9 `main@97588d3` (307 sin sesión, `1021e75`), PR #8 `main@21b10a9` (casa agentes primero, TASK-2085), PR #7

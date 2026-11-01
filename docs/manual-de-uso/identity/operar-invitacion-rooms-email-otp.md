@@ -21,7 +21,9 @@ Estado al 1 de noviembre de 2026: first-party y OTP de invitación están ON en 
 4. La persona abre `{RoomsOrigin}/invite#token=<opaque43>`. Rooms lee el fragmento en memoria, limpia la barra mediante history.replaceState y hace POST start con el token. La persona introduce el código **en Rooms**; abrir el enlace no envía otro correo. El bearer no viaja en path/query HTTP ni en Referrer y el código nunca va en la URL.
 5. Rooms llama a `/auth/invitations/email-otp/verify` y consume el proof firmado una sola vez junto con la invitación vigente. La sesión guest queda limitada a esa sala. Este flujo no crea SSO global ni equivale a MFA.
 
-El código vence a los diez minutos; los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
+El código vence a los diez minutos; si vence, la persona pide otro desde el mismo enlace («Enviarme un código nuevo»), sin
+que el equipo tenga que reinvitar. La invitación es mucho más larga que el código: 30 días por defecto y hasta 90 (PR #12 de
+Rooms, pendiente de deploy; antes 24 horas), y la sesión del invitado dura 8 horas. Los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
 
 ## Configuración de runtime
 
