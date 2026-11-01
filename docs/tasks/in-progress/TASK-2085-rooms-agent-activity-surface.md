@@ -48,7 +48,7 @@
 - Motion: `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `Implementada en local (2026-10-31), rama efeonce-rooms claude/rooms-agent-activity (36d43eb, 6036048, 4b37a4e, bf3c0ae, daab4e9), sin upstream ni push; pnpm verify verde (396 pass, 24 skip por entorno); capturas 1440/1280/390 con y sin movimiento reducido, sin scroll horizontal y con las dos sondas de teclado OK. Incluye: sin sesión → /login?returnTo (safeReturnTo acepta /rooms/:id/actividad y ?accion=), invitado ve su variante, sin id crudo de espacio, primer día agentes primero. Falta: deploy (autorización), pnpm fe:capture + scorecard, campos del reader (topes/rechazos, filtro por sala, número de edición, invitado enmascarado, detalle) como delta de TASK-2084/2087.`
+- Status real: `En producción 2026-10-31 (autorizado: «Ok despliega»): PR efeoncepro/efeonce-rooms#8 mergeado a main@21b10a9, deploy dpl_J84WwdMnotLTQkPwvc3oG5B6kaSV, alias efeonce-rooms.vercel.app reasignado. Verificado: /rooms sin sesión → Efeonce ID «Entra a Rooms» (redirect por streaming RSC, no 307 de servidor), /demo/actividad 200 con el umbral, /api/auth/session 401. Falta: primer login real del operador con la casa nueva, redirect 307 en servidor, nombre legible del espacio (no existe en la base), campos del reader (topes/rechazos, filtro por sala, edición, invitado enmascarado, detalle), pnpm fe:capture + scorecard.`
 - Rank: `después de TASK-2084; el slice 1 (canvas) puede empezar antes`
 - Domain: `platform`
 - Blocked by: `TASK-2084 (slices 2 a 6; el slice 1 de canvas no depende de ella)`
