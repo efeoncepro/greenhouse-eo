@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-11-01 — Globe: listeners suspendidos con IP conservada
+
+Aplicado exclusivamente retiro HTTP/HTTPS del balanceador (`0/0/2`); IP original reservada, SQL STOPPED/NEVER
+y cuatro schedulers PAUSED. Forecast CLP22–23k/mes, no ahorro confirmado. Reactivación automática de listeners
+en `draining`, sin cambiar DNS; [estado y evidencia](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+Monitor actualizado, Terraform validate y 35 tests PASS. Sin deploy de servicios ni despertar SQL.
+
+
 **31/10 — Prospección focal:** [Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
 Mayra: NDR de correo inferido, sin reintento. Dayanna: Apollo Verified/2 créditos, Contact/Primary y email SENT
 comprobados; LinkedIn previo. Pendientes Commercial: respuesta/brief, secundaria vacía y verificación de

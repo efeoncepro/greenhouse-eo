@@ -444,3 +444,5 @@ veredicto de piso a nivel de cotización. Descarta el tercero como componente de
 catálogo, una tasa en la cotización, inferir «al costo» desde una tasa cero, un piso de cotización neto de lo
 refacturado, la paridad con el costo directo del cotizador en producción, la reserva como recargo de precio, como
 recurso fijo o sumada al costo humano, y dos contratos. El registro tiene cinco contratos.
+
+- Accepted 2026-11-01: [Globe hibernated front-door listeners](creative-studio/GLOBE_HIBERNATED_FRONT_DOOR_DECISION_V1.md): remove only HTTP/HTTPS forwarding rules, retain IP and data; draining restores listeners.
