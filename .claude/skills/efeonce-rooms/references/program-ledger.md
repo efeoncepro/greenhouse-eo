@@ -17,8 +17,12 @@
   `AccessState` según quien mira (miembro, sesión vencida, invitado, anónimo), páginas de sala en el espacio
   seleccionado, invitado válido gana a cookie interna vencida, `/login` con sesión abierta va directo, `returnTo` con las
   rutas reales y por defecto `/rooms`, el selector de espacio conserva el enlace, cerrar sesión termina en `/salir`.
-  Deploy `efeonce-rooms-g2rwd5xbq`, alias reasignado. Rediseño de `/salir` (y de la portada) en canvas, pendiente de
-  aprobación: https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2. **Regla:** la raíz sin sesión nunca redirige a
+  Deploy `efeonce-rooms-g2rwd5xbq`, alias reasignado.
+- **PR #19 (`main@b985998`), en producción desde 2026-11-01:** `/salir` con la dirección A aprobada en canvas
+  (https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2, «La órbita en reposo»): `SignedOutStage` reutiliza `DepthLayers`,
+  `Orbit` (`measure={{value:0,total:1}}`, anillo desnudo + halo canónico) y los estilos de access-issue; «Hasta pronto»
+  con la esfera como punto; copy en `INVITATION_COPY.access.signedOut`. Deploy `efeonce-rooms-iskmdcidc`, alias
+  reasignado. La portada (`/`) y el 404 siguen con el estado de acceso simple: pendiente llevarlos a esta familia. **Regla:** la raíz sin sesión nunca redirige a
   `/rooms`; un destino protegido tras cerrar sesión vuelve a entrar solo con la sesión de Efeonce ID abierta.
 - **PR #16 (`main@1989576`), en producción desde 2026-11-01:** el callback reinicia el login una vez ante
   `login_required` o transacción de Rooms vencida (5 min); cookie `__Host-rooms_login_retry` de 2 min contra el bucle.
