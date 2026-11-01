@@ -17,6 +17,8 @@
   - Lo que se revierte con interruptores: provider del gateway en `policy-blocked`, flag de Rooms y revocación del
     consentimiento.
   - Lo que es de una vía: la forma del token delegado y las columnas de actor.
+- **Enmienda D1-bis (2026-11-01, decisión del operador: «CLI primero»):** antes del gateway, un carril directo por
+  CLI con un cliente público first-party de Efeonce ID y audiencia Rooms. Ver [§ Enmienda D1-bis](#enmienda-d1-bis--carril-cli-directo-2026-11-01).
 - Historia: el primer borrador (Proposed, commit `5c47fb883`) exigía propuesta y confirmación humana para publicar y
   dar acceso. El operador lo descartó. Los controles de la revisión adversarial que no dependían de esa aprobación se
   conservan.
@@ -190,10 +192,93 @@ revertir.
 - **Reader:** `agents.activity`, con `scope=self` u `organization` (este último exige `members.manage`).
 - **Señales:** `rooms.agent.release_actions` y `rooms.agent.quota_hit`, en `pnpm access:health`.
 
+## Enmienda D1-bis — carril CLI directo (2026-11-01)
+
+**Decisión del operador:** «CLI primero, gateway después». Hoy un agente opera producción con una cookie humana
+copiada (`--session-file`), lo que obliga al operador a entrar con MFA y copiar cookies cada vez. Se suma un segundo
+camino a D1, que **no reemplaza** al gateway: queda para clientes remotos (TASK-2088).
+
+### Qué se decide
+
+1. **Cliente público first-party `efeonce-rooms-cli`** en Efeonce ID, pre-registrado (sin DCR ni CIMD):
+   - grants `authorization_code` (PKCE S256 obligatorio) y `refresh_token`; autenticación `none`;
+   - redirect solo loopback (`http://127.0.0.1/callback`, puerto libre en tiempo de login, RFC 8252 §7.3);
+   - `allowed_scopes` = `efeonce.mcp.rooms.read`, `.author`, `.release` y `.access`. **`read.client` no**: sigue
+     esperando su revisión de gobierno de datos IA.
+2. **Audiencia Rooms** (`AUTH_SERVER_ROOMS_AUDIENCE`, sin valor = apagada, `invalid_target` como hoy). Es el segundo
+   resource server del emisor:
+   - las clases `efeonce.mcp.rooms.*` viven **solo** en la audiencia Rooms; un token nunca mezcla audiencias y el
+     `aud` se deriva de las clases pedidas, contrastado con el `resource` (RFC 8707);
+   - las clases Rooms son **restringidas**: solo las recibe un cliente que las liste explícitamente. Un cliente con
+     `allowed_scopes` abierto (CIMD, DCR) nunca las obtiene;
+   - solo para personas **internas** (contexto de autorización interno con sesión corporativa Entra + MFA). Una
+     persona externa o invitada recibe un rechazo explícito.
+3. **Tokens:**
+   - access token JWT ES256 de **5 min** para la audiencia Rooms (15 min sigue siendo el de MCP);
+   - refresh opaco con **rotación en cada uso y detección de reuso** (un refresh repetido revoca la familia entera),
+     deslizante 30 días con tope absoluto de 90. Ya existía en el emisor y se reutiliza tal cual.
+4. **Consentimiento con step-up** para `author`, `release` y `access`, como cualquier clase de escritura.
+5. **Revocación por equipo en menos de 30 s:**
+   - `pnpm rooms logout` revoca la familia (RFC 7009) y borra el archivo local;
+   - Rooms introspecta (RFC 7662) con caché ≤ 30 s mediante un cliente confidencial propio
+     (`efeonce-rooms-resource`), que solo ve como activos los tokens de su audiencia;
+   - revocar el consentimiento, perder el binding o la membresía también corta por introspección.
+6. **Rooms acepta dos formas de bearer, ambas detrás de `ROOMS_AGENT_LANE_ENABLED`:**
+
+   | Forma | Quién la presenta | Qué exige Rooms |
+   | --- | --- | --- |
+   | Directa (este carril) | CLI y MCP stdio local en el equipo de la persona | `azp` en la lista de clientes CLI, `aud` Rooms, firma, `exp`, introspección activa, binding interno vigente |
+   | Delegada (D1 original) | Gateway `mcp.efeonce.org` | Lo anterior más `act` e identidad de workload del gateway (TASK-2086/2088) |
+
+   Un bearer con `act` sin identidad del gateway se sigue rechazando: la forma directa no lleva `act`.
+7. **Atribución, no autoridad.** El agente se declara con `X-Rooms-Agent` y el canal es `cli`, como hoy con la
+   cookie. Rooms mapea `sub` → `rooms.identity_bindings(issuer, subject)` con principal `internal` y aplica la
+   autoridad exacta de esa persona; el scope del token recorta por clase (D2) y nunca agrega. Sin principal propio
+   del agente.
+
+### Costo de seguridad aceptado y mitigaciones
+
+El refresh token vive en el equipo, como `gcloud`, `gh` o `vercel`. Quien lo copie actúa como la persona hasta que
+se revoque.
+
+| Riesgo | Mitigación |
+| --- | --- |
+| Robo del archivo local | Modo 0600 en `~/.config/efeonce-rooms/`; directorio 0700; nunca en el repo ni en logs |
+| Refresh copiado y usado en otro equipo | Rotación con detección de reuso: el primer uso doble quema la familia en ambos lados |
+| Token filtrado en un log o prompt | Access de 5 min; la CLI nunca imprime tokens; el MCP stdio no los expone al modelo |
+| Equipo perdido | `logout` remoto: revocar el consentimiento del cliente en Efeonce ID corta en < 30 s por introspección |
+| Persona que deja Efeonce | Binding o membresía revocada ⇒ introspección inactiva; refresh deja de emitir |
+| Agente en bucle | Cuotas por persona y hora de D7, que ya aplican al canal `cli` |
+| Otro cliente pide clases Rooms | Clases restringidas a clientes que las listan; audiencia Rooms apagada sin la variable |
+
+### Interruptores
+
+- `AUTH_SERVER_ROOMS_AUDIENCE` (Efeonce ID): sin valor, la audiencia no existe. Se fija por variable de repo y deploy
+  gobernado, nunca con `--update-env-vars`.
+- `ROOMS_AGENT_LANE_ENABLED` (Rooms): sin él, Rooms rechaza todo bearer y la cookie sigue igual.
+- Estado del cliente `efeonce-rooms-cli` (`active | suspended`): suspenderlo corta toda la flota de CLIs.
+
+### Qué no cambia
+
+- `--session-file` sigue funcionando para desarrollo y operación local.
+- El gateway (D1 original) y el canje RFC 8693 siguen siendo el camino para clientes remotos (TASK-2086, TASK-2088).
+- TASK-1833 no se cierra con esto: el cambio no agrega un grant nuevo (code + PKCE y refresh ya existen), sino una
+  audiencia y un cliente. Sus gates aplican igual antes de un cliente real.
+
+### Puntuación de la enmienda
+
+| Pilar | Evaluación |
+| --- | --- |
+| Seguridad | Autoridad = persona interna; PKCE + loopback; clases restringidas por cliente; step-up en escritura; refresh rotado con reuso; introspección ≤ 30 s. Residual aceptado: token en el equipo, como las CLIs de nube |
+| Robustez | Reutiliza code, refresh, revoke e introspect existentes; `aud` derivado y verificado en ambos extremos; sin migración de tokens |
+| Resiliencia | Tres interruptores; si Efeonce ID cae, la cookie sigue; introspección con fallo cerrado |
+| Escalabilidad | Una audiencia más por variable; caché de introspección por token; N equipos = N familias de refresh |
+
 ## Enmiendas a decisiones vigentes
 
-- **[Contrato de API y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md).** Producción acepta **solo** el token
-  delegado de D1, presentado junto con la identidad del gateway. Ningún otro bearer.
+- **[Contrato de API y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md).** Producción acepta **solo** dos
+  bearers de Efeonce ID con audiencia Rooms: el delegado de D1 con la identidad del gateway, o el directo de la CLI
+  first-party (D1-bis). Ningún otro.
 - **[Acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) / TASK-2082.**
   - Sin cambio de exposición: `members.*` sigue disponible para agentes, local y remoto.
   - `rooms.access_events` suma `actor_kind`, `agent_client_id` y `channel`.
@@ -233,7 +318,9 @@ revertir.
 ## Reglas duras
 
 - **NUNCA** un principal ni grants propios para un agente: actúa con la autoridad exacta de una persona interna.
-- **NUNCA** aceptar en producción un bearer sin `act` o sin la identidad de workload del gateway.
+- **NUNCA** aceptar en producción un bearer que no sea el delegado de D1 (con `act` e identidad del gateway) o el directo de la CLI first-party de D1-bis (`azp` en la lista, sin `act`).
+- **NUNCA** dar las clases `efeonce.mcp.rooms.*` a un cliente que no las liste explícitamente, ni a una persona externa.
+- **NUNCA** imprimir, loguear ni pasar al modelo un access o refresh token de la CLI.
 - **NUNCA** emitir tokens fuera de Efeonce ID, ni reenviar al provider el token del usuario.
 - **NUNCA** URLs firmadas, bytes ni URLs arbitrarias en el contexto del modelo.
 - **NUNCA** leer Greenhouse con una identidad de servicio en nombre de un agente, ni HubSpot directo.
@@ -254,9 +341,9 @@ revertir.
 
 1. **Rooms, ya:** D3 (actor y aviso), D4 («Actividad de agentes» y reversa), D7 (cuotas y señales) y el guard de
    clasificación de D2.
-2. **EPIC-044, task nueva:** delegación interactiva para la audiencia de Rooms. Bloqueada por la retención de
-   Efeonce ID.
-3. **Rooms:** verificador de D1 detrás de `ROOMS_AGENT_LANE_ENABLED`.
+2. **EPIC-044:** audiencia Rooms y cliente CLI first-party (D1-bis, TASK-2095); después, el canje para el gateway
+   (TASK-2086).
+3. **Rooms:** verificador del bearer directo y `pnpm rooms login` (TASK-2087); la forma delegada se suma con TASK-2088.
 4. **`efeonce-mcp`:** provider `rooms` con todas las clases y canary real.
 5. **D5:** fuentes y medios, cada uno con su canary.
 6. **D6:** skill de oficio y eval, antes del primer cliente real.

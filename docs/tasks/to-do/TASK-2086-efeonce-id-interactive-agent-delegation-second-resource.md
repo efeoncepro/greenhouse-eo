@@ -1,5 +1,14 @@
 # TASK-2086 — Efeonce ID: delegación interactiva de agentes para un segundo resource server
 
+## Delta 2026-11-01 — la audiencia Rooms llega antes, por la CLI (TASK-2095)
+
+- Enmienda D1-bis del ADR del carril de agentes (decisión del operador: «CLI primero»). La segunda audiencia, las
+  clases `efeonce.mcp.rooms.*` (restringidas por cliente) y la introspección por audiencia para el cliente
+  confidencial de Rooms se construyen en [TASK-2095](../in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md),
+  sin canje ni `act`. Esta task conserva **solo** el canje RFC 8693 del gateway, el claim `act` y la cascada de
+  revocación de tokens delegados, y debe reutilizar lo de TASK-2095 en lugar de recrearlo (Slice 2 queda cubierto).
+- La retención de PR #263/#264 se levantó el 2026-11-01: ya no bloquea.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +33,7 @@
 - Status real: `Diseno — registrada 2026-10-31 como pieza 2 del orden del ADR del carril de agentes de Rooms (EPIC-052). Sin implementación`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `Retención de Efeonce ID (PR #263 main y PR #264 develop abiertas y sin merge; ningún cambio nuevo del emisor se publica hasta liberarla) · TASK-1833 (gates de seguridad del emisor que apliquen a un grant nuevo: B15/B20, incidente y señales)`
+- Blocked by: `TASK-2095 (audiencia Rooms y clases) · TASK-1833 (gates de seguridad del emisor que apliquen a un grant nuevo: B15/B20, incidente y señales)`
 - Branch: `Greenhouse develop (services/auth-server, src/lib/auth-server, scripts/auth-server, migrations, docs); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

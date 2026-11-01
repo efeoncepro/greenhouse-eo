@@ -1,5 +1,18 @@
 # TASK-2087 — Rooms: verificador del token delegado + identidad del gateway
 
+## Delta 2026-11-01 — enmienda D1-bis: bearer directo de la CLI primero
+
+- El operador eligió «CLI primero, gateway después» (ADR del carril, § Enmienda D1-bis). Esta task se toma ahora con
+  alcance ampliado y en este orden:
+  1. verificador del **bearer directo** de la CLI first-party (`azp` en `ROOMS_AGENT_CLI_CLIENT_IDS`, `aud` Rooms,
+     JWKS de Efeonce ID, introspección con caché ≤ 30 s por el cliente confidencial `efeonce-rooms-resource`), detrás
+     de `ROOMS_AGENT_LANE_ENABLED`;
+  2. `pnpm rooms login|logout|whoami` con PKCE por loopback, tokens en `~/.config/efeonce-rooms/` (0600) y refresh
+     automático; el MCP stdio local reutiliza esos tokens;
+  3. la forma **delegada** (`act` + identidad del gateway) queda para cuando existan TASK-2086 y TASK-2088.
+- Depende de [TASK-2095](TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md) (audiencia Rooms en Efeonce
+  ID), no de TASK-2086. `--session-file` se mantiene.
+
 ## Delta 2026-10-31 — base lista en TASK-2084 (local)
 
 - El verificador fija el actor con `runWithActor({ actorKind: 'agent', agentClientId, channel: 'gateway' }, …)`
@@ -17,7 +30,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
