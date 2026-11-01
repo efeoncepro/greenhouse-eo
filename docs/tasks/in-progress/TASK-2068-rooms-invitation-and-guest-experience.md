@@ -1,5 +1,13 @@
 # TASK-2068 — Rooms: invitación, entrada con código y lectura compartida
 
+## Delta 2026-11-01 — acceso de colegas del comité comprador
+
+- El invitado podrá proponer colegas (aprobación automática del mismo dominio corporativo; otro dominio o correo gratuito
+  con aprobación del equipo; tope de 10 por sala). Lo dejaste fuera de alcance; lo toman
+  [TASK-2092](../to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (contrato) y
+  [TASK-2093](../to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (interfaz). La gestión de invitaciones gana el bloque «Solicitudes de tu cliente» y el origen «Propuesto por».
+
+
 ## Delta 2026-10-31 — interfaz aceptada por el operador
 
 - Aceptación humana de la interfaz: «Todas están aprobadas» (operador, 2026-10-31), revisada en local sobre el canvas implementado (`efeonce-rooms` `claude/rooms-approved-ui` `de1de34`, PR #4).

@@ -1,5 +1,13 @@
 # TASK-2066 — Rooms Tokenized Invitations and Email Code
 
+## Delta 2026-11-01 — acceso de colegas del comité comprador
+
+- El invitado podrá proponer colegas (aprobación automática del mismo dominio corporativo; otro dominio o correo gratuito
+  con aprobación del equipo; tope de 10 por sala). Lo dejaste fuera de alcance; lo toman
+  [TASK-2092](../to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (contrato) y
+  [TASK-2093](../to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (interfaz). La invitación del colega reusa esta invitación tokenizada y el flujo OTP sin cambios.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
