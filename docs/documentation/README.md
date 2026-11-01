@@ -20,8 +20,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Efeonce Rooms y Efeonce ID
 
-- [Rooms: quién ve qué](rooms/quien-ve-que-en-rooms.md): cliente invitado, equipo interno y agentes (hoy y lo decidido), y lo que falta en la interfaz.
-- [Rooms: acceso interno](rooms/acceso-interno-rooms.md): cómo se da, renueva y revoca el acceso del equipo; todo acceso vence en un año como máximo.
+- [Rooms: quién ve qué](rooms/quien-ve-que-en-rooms.md): cliente invitado, equipo interno (casa con actividad de agentes, «Crear sala», «Abrir autoría») y agentes, y lo que falta en la interfaz.
+- [Rooms: acceso interno](rooms/acceso-interno-rooms.md): cómo se da, renueva y revoca el acceso del equipo (todo acceso vence en un año como máximo), qué pasa si entras sin sesión y el nombre del espacio de trabajo.
 - [Rooms: capacidades y estado](rooms/primera-experiencia-local.md) y [contrato backend para Claude Design](rooms/backend-api-for-claude-design.md): API/permisos y medios privados publicados; consumidor e integración pendientes.
 - [Entrada a productos por Efeonce ID](identity/acceso-a-productos-efeonce.md): identidad, acceso local y estado de activación; corrección de despliegue Auth retenida en PR.
 

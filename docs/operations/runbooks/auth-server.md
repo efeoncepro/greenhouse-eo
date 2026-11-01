@@ -22,25 +22,28 @@
   `51d9f3203`) ya lee `SECRET_REFS` y no da falso drift con OTP ON.
 - PR #263/#264 siguen sin merge; TASK-1833 abierta: ningún cliente real sin autorización nueva.
 
-## Estado operativo y retención — 2026-10-26
+## Estado operativo — 2026-11-01
 
-El [readback del 26 de octubre a las 17:38:40 Chile](../../audits/rooms/2026-10-26-docs-skills-state-readback.json) conserva `auth-server-00168-vzb` con 100% del tráfico,
-`GIT_SHA=754a2a28…` y digest `122e2acb…`. First-party/OTP false, montajes HMAC/authority ausentes,
-Resend production v1 y Sentry production. El canary único de Rooms acreditó Microsoft/MFA, OIDC,
-PNG privado y un correo recibido; está cerrado. No repetir correo ni reabrirlo como prueba de otro deploy.
+`auth-server-00170-qlx` sirve el 100 % del tráfico con `GIT_SHA=935583f88`, la imagen del release
+`935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (orquestador run `41284120477`, `released`). First-party y OTP de
+invitación están ON; la fuente durable de ambos flags son las variables de repo GitHub, y la revisión monta los secretos
+HMAC del OTP y de autoridad de Rooms. Login V4 con el carrusel de novedades publicadas está en producción, también en la
+entrada desde Rooms. `/healthz`, `/readyz`, discovery, JWKS y `/login` responden 200; el AS del MCP no cambió.
 
-**El control production/main está preparado LOCALMENTE y en PR, no aplicado al remoto ni al servicio.**
-[PR #263 main](https://github.com/efeoncepro/greenhouse-eo/pull/263) HEAD `5e1fc2554` y
-[PR #264 develop](https://github.com/efeoncepro/greenhouse-eo/pull/264) HEAD `aabd6d78d` siguen abiertas.
-Corte de readback 2026-10-26 20:38:40 UTC: PR #264 CI completo/Vercel PASS; PR #263 fast feedback en curso,
-governance/reliability/Vercel PASS. Las 36 pruebas focales (14 Vitest + 22 Python), gates y hook normal PASS
-no equivalen a integración ni deploy. El operador indicó dejar Auth en PR: sin merge main/develop,
-despliegue, flags, correo ni disable/enable de workflows. El YAML remoto anterior todavía puede desplegar
-auth-server desde develop con defaults staging. Consultar [el expediente](../../audits/rooms/2026-10-26-auth-deploy-control.md)
-antes de cualquier publicación futura; el workspace corregido no prueba que esa protección esté vigente.
+- **Tráfico a la última revisión.** Desde el 2026-11-01 el servicio enruta `--to-latest`. Antes de cada dispatch, leer
+  `gcloud run services describe auth-server --region us-east4 --project efeonce-group --format='value(status.traffic)'`:
+  si aparece fijado a una revisión, el deploy gobernado publica sin tráfico ([ISSUE-185](../../issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)).
+- **Guard de despliegue.** `auth-server-deploy.yml` despliega producción sólo desde `main` y acepta releases por squash: si
+  el SHA servido no es ancestro del objetivo, exige que lo sea del commit más antiguo de `develop` con el mismo árbol
+  ([ISSUE-184](../../issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)). Las PR #263/#264 se
+  cerraron como superadas y la retención humana quedó levantada.
+- **Rollback.** `gcloud run services update-traffic auth-server --region us-east4 --project efeonce-group --to-revisions=auth-server-00169-4pq=100`
+  (misma configuración de flags; deja el tráfico fijado, así que después de corregir hay que volver a `--to-latest`).
+- **Sin verificar:** errores de Sentry del release y un login humano completo Efeonce ID → Rooms.
 
-La retención permite desarrollar nueva UI en un entorno aislado. Su aceptación visual y publicación,
-el release amplio #262 y la activación productiva de acceso son decisiones posteriores independientes.
+El canary único de Rooms del 26 de octubre está cerrado; no repetir el correo ni reabrirlo como prueba de otro deploy.
+Historia del control de despliegue: [expediente del 26-10](../../audits/rooms/2026-10-26-auth-deploy-control.md) y
+[ledger de Efeonce ID](../../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
 ## Para qué sirve
 

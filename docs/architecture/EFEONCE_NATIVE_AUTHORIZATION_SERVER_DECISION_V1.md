@@ -25,33 +25,32 @@ históricas de este ADR a contratación externa y pareo obligatorio de proveedor
 de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
 No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
 
-## Control de despliegue preparado en PR, sin integración — 2026-10-26
+## Control de despliegue vigente — 2026-11-01
 
-`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. **Estado: LOCAL+PR,
-retenido por el operador; no es todavía el contrato efectivo del YAML remoto.** PR #263 HEAD `5e1fc2554`
-y PR #264 HEAD `aabd6d78d` siguen abiertas, sin merge ni despliegue. El remoto todavía permite pushes de
-`develop` al servicio único. El control preparado usará sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
-productivo desde `main`. Al integrarse, todas las vías seleccionarían el Environment `production` y un único lock del
-servicio, sin cancelar un despliegue activo. Este contrato propuesto sustituiría las referencias históricas de este
-ADR a staging sobre el mismo servicio una vez integrado; no declarar esa sustitución aplicada hoy.
+`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. El control de despliegue está
+en `main` desde el release `935583f88db0` (2026-11-01) y sustituye las referencias históricas de este ADR a staging
+sobre el mismo servicio. PR #263/#264, que lo preparaban, se cerraron como superadas.
 
-En el control preparado, el SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
-el workflow preparado identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
-dividido o reemplazar código vivo no promovido por un target anterior o divergente. Publicar un fix del
-control no promueve el runtime servido desde `develop`: ese caso queda bloqueado antes de build/deploy,
-con error explícito. El release amplio y la activación first-party/OTP siguen siendo decisiones separadas.
+- **Vías:** `.github/workflows/auth-server-deploy.yml` sólo despliega desde push a `main`, desde la promoción por
+  `production-release.yml` o por dispatch productivo desde `main`. Todas usan el Environment `production` y un único
+  lock del servicio, sin cancelar un despliegue activo. Un push a `develop` no despliega Auth.
+- **SHA:** el SHA completo debe estar publicado en `main` y ser el checkout construido.
+- **Tráfico antes de crear la revisión:** el workflow exige una única revisión con 100 % del tráfico y rechaza tráfico
+  dividido o una fuente desconocida.
+- **Commit servido:** debe ser ancestro del objetivo. En un release por squash (`develop`→`main`) no lo es, así que se
+  acepta sólo si es ancestro de la coincidencia de árbol **más antigua** en `origin/develop`. Se rechaza un runtime
+  servido más nuevo y el caso revert (un árbol repetido más tarde). Tests: `scripts/auth-server/test_deploy_contract.py`;
+  incidente: [ISSUE-184](../issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md).
+- **Tráfico tras el deploy:** debe enrutar a la última revisión. Si se fija con `--to-revisions` (rollback o activación
+  manual), el deploy gobernado publica la revisión nueva con 0 %
+  ([ISSUE-185](../issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)). Desde el 2026-11-01 el
+  servicio está en `--to-latest`. Comprobar el tráfico antes de cada dispatch sigue siendo manual; un guard que verifique
+  el tráfico después del deploy es una mejora pendiente.
+- **Montajes OTP:** el deploy retira los montajes de HMAC y autoridad Rooms cuando el flag OTP está OFF. Flags y
+  cohortes conservan sus inputs gobernados (variables de repo GitHub).
 
-El runtime vivo conserva Resend production v1 y Sentry `production`. El drift preparado verificará ambos
-y el deploy preparado retirará los montajes OTP con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
-del disparador de `develop` exige actualizar también su YAML remoto: GitHub evalúa el workflow de la rama
-que recibe el push. Las PR estrechas de control se publican por separado sobre cada base, sin incorporar
-el historial local ni código runtime/UI. Preparar o fusionar esas PR no acredita un deploy: comprobar
-checks, ausencia de build cuando el guard bloquee y revisión con tráfico después de una publicación autorizada.
-Antes de la futura integración de PR #264, proteger de forma gobernada los deploys artifact/commercial/ico/ops
-que coinciden con el nuevo path de test `src/lib/**`; ninguna protección temporal se aplicó ahora.
-Seguimiento CI26Oct: PR #263 y #264 CI completo y Vercel PASS; ambas siguen abiertas por retención humana. La retención no bloquea nueva UI aislada; no autoriza el release #262 ni activación.
-Estado vivo: [readback del 26 de octubre 17:38:40 Chile](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
-Secuencia y retención: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+Fusionar o desplegar no acredita un runtime: comprobar checks y hacer readback de la revisión con tráfico (`GIT_SHA`,
+flags, discovery, JWKS, `readyz`). Estado vivo: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
 ## Contrato vigente de acceso interno y federación
 

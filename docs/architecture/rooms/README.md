@@ -1,6 +1,6 @@
 # Efeonce Rooms
 
-## Estado vigente — 2026-10-31: en producción para el equipo
+## Estado vigente — 2026-11-01: en producción para el equipo
 
 Rooms está en producción para uso del equipo de Efeonce. Todavía no hay clientes reales: eso exige una autorización
 nueva. Las marcas `vivo`, `doc` y `local` indican de dónde viene cada dato: readback en producción, recibo de otra
@@ -8,18 +8,23 @@ sesión o código.
 
 | Frente | Estado | Marca |
 | --- | --- | --- |
-| Deploy de Rooms | `main@a2d72c0` (PR #5: acceso interno durable y página de error del login) en `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`. `/rooms` y `/auth/error` responden 200; `/api/auth/session` sin sesión responde 401 | `vivo` |
-| Flags de Rooms (Vercel Production) | `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED` y `ROOMS_MEDIA_DISPATCH_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false` | `vivo` |
-| Base `rooms_production` | Migraciones 9–18 aplicadas con ensayo previo en un clon | `vivo` |
-| Migración 19 (TASK-2082) | Aplicada por la sesión de acceso | `doc` |
-| Efeonce ID | Revisión `auth-server-00169-4pq` con el 100 % del tráfico, first-party y código por correo encendidos; variables de repo de GitHub fijadas para que el próximo deploy gobernado conserve el estado; tipo de correo `auth_server_rooms_invitation_otp` habilitado | `vivo` |
-| Acceso del dueño | Restaurado y adoptado como administrador hasta 2027-11-01. Falta su primer login real con la versión nueva | `vivo` / `doc` |
+| Deploy de Rooms | `efeonce-rooms-12zux9578` (PR #11, `8aef9db`), sobre PR #10 `main@449a0cd` (nombre del espacio), PR #9 (entrada sin sesión 307), PR #8 (casa agentes primero, TASK-2085) y PR #7 (atribución de agentes, TASK-2084 expand). Alias reasignado | `vivo` |
+| Entrada sin sesión | `/rooms` y `/rooms/:id/actividad` responden 307 a `/login?returnTo=…`; `/login` 302 a Efeonce ID; `/auth/error` 200; `/api/auth/session` 401 | `vivo` |
+| Nombre del espacio | Tabla `rooms.organization_profiles`; el espacio del piloto se llama «Efeonce» (command `organization.rename`). Sin ver todavía con una sesión humana | `vivo` |
+| Flags de Rooms (Vercel Production) | `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED` y `ROOMS_MEDIA_DISPATCH_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false` (releídos 2026-10-31) | `vivo` |
+| Base `rooms_production` | 25 migraciones hasta `1793267000000_rooms-organization-profile` (52 tablas), cada tanda con ensayo en un clon y respaldo lógico previo | `vivo` |
+| Efeonce ID | First-party y código por correo encendidos; desde el release de Greenhouse `935583f88db0` (2026-11-01) la entrada desde Rooms muestra el login V4 «Entra a Rooms» con carrusel de novedades. Detalle en la documentación de Efeonce ID | `doc` |
+| Acceso del dueño | Administrador con renovación automática. Login humano con MFA: aceptación reportada por Julio vía sesión Auth el 2026-11-01, sin logs ni prueba instrumentada añadidos; no certifica el encabezado ni el QA de la casa | `vivo` / `doc` |
 
 Recibos: [activación](../../audits/rooms/2026-10-31-production-activation.md),
 [migraciones aplicadas](../../audits/rooms/2026-10-31-production-migrations-applied.md),
-[ensayo de migraciones](../../audits/rooms/2026-10-31-production-migration-rehearsal.md) y
-[acceso durable](../../audits/rooms/2026-10-31-durable-access-production.md). Operación diaria y rollback:
-[manual de producción](../../manual-de-uso/rooms/operar-produccion-rooms.md). Qué ve cada persona:
+[ensayo de migraciones](../../audits/rooms/2026-10-31-production-migration-rehearsal.md),
+[acceso durable](../../audits/rooms/2026-10-31-durable-access-production.md) y
+[atribución de agentes](../../audits/rooms/2026-10-31-agent-lane-attribution-production.md). Incidentes resueltos del
+corte: [ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md) (inventario de
+migraciones revisadas) e [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)
+(entrada sin sesión). Operación diaria y rollback: [manual de producción](../../manual-de-uso/rooms/operar-produccion-rooms.md).
+Nombre del espacio: [manual](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md). Qué ve cada persona:
 [quién ve qué](../../documentation/rooms/quien-ve-que-en-rooms.md).
 
 **Trampa del alias manual.** `efeonce-rooms.vercel.app` es un alias manual: **no sigue a producción**. Después de
@@ -42,22 +47,24 @@ Producto y plataforma: [ADR consolidado](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECI
 [sala en vivo](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md),
 [«Vive el servicio»](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) (en producción desde el PR #4),
 [acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) (TASK-2082 y TASK-2083 en
-producción) y [carril de agentes](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (Accepted 2026-10-31, sin implementar).
+producción) y [carril de agentes](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (Accepted 2026-10-31; en producción la
+atribución, avisos, reversas y cuotas de TASK-2084 y la casa de TASK-2085; sin bearer delegado ni gateway).
 El contenido de cada decisión vive en su ADR.
 
 ### Lo que sigue, en orden
 
-1. Primer login real del dueño con la versión nueva y un segundo administrador.
-2. Carril de agentes, primera parte en Rooms: registro del actor, aviso a la persona, «Actividad de agentes» con
-   reversa, cuotas y guard de clasificación ([orden del ADR](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#orden-cada-parte-con-su-task)).
-3. Task nueva en EPIC-044: delegación interactiva para la audiencia de Rooms. TASK-1917 no la cubre; bloqueada por la
-   retención de Efeonce ID.
-4. Verificador del token delegado en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
-5. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
-6. Skill de oficio y eval antes del primer cliente real.
-7. Rediseño agentes-primero del canvas de administración; las demás pantallas de administración están pausadas.
-8. Antes de clientes reales: medir la sala en vivo (encendida y sin medir), cerrar TASK-1833 y revisar el gobierno de
-   datos IA para `read.client`.
+El login con MFA tiene [aceptación reportada por el operador](../../audits/rooms/2026-11-01-operator-mfa-acceptance.md).
+La evidencia instrumentada y la revisión visual de la casa conservan su alcance separado.
+
+1. Recorrido real de acción, aviso y reversa de agente en producción (TASK-2084/2085); después, slice 6 contract.
+2. QA de la casa nueva: encabezado «Efeonce», captura GVC con scorecard y campos pendientes del reader (TASK-2085).
+3. Medición Live en Vercel (streams y pool).
+4. Task nueva en EPIC-044: delegación interactiva de Efeonce ID para la audiencia de Rooms. Es [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md)
+   (`to-do`); TASK-1917 no la cubre. La retención de Efeonce ID ya se levantó.
+5. Verificador del token delegado en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+6. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
+7. Segundo administrador interno; antes de clientes reales, cerrar TASK-1833 y revisar el gobierno de datos IA para
+   `read.client`, además de la medición Live y una nueva autorización del operador.
 
 Lo que sigue abajo es historia de cortes anteriores; el estado vigente es esta sección.
 

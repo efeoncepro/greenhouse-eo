@@ -5,6 +5,19 @@ Mayra: NDR de correo inferido, sin reintento. Dayanna: Apollo Verified/2 crédit
 comprobados; LinkedIn previo. Pendientes Commercial: respuesta/brief, secundaria vacía y verificación de
 segmentos Mambrino. Skills espejo y canon actualizados; sin nueva comunicación o secuencia en este cierre.
 
+## 2026-11-01 — Efeonce ID en `main` con carrusel; Rooms con entrada 307 y nombre del espacio
+
+Release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (run `41284120477`) `released` al tercer intento:
+`auth-server-00170-qlx` al 100 %, first-party/OTP ON, Login V4 con carrusel también en la entrada a Rooms; tráfico a la
+última revisión, rollback a `00169-4pq`. Intentos 1 y 2 abortados por [ISSUE-184](docs/issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)
+(guard vs squash, PR #265) y [ISSUE-185](docs/issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)
+(tráfico fijado); CI rojo previo por [ISSUE-186](docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md).
+PR #263/#264 cerradas, retención levantada. Rooms PR #9–#11 en producción: 307 sin sesión ([ISSUE-188](docs/issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)),
+`organization.rename` + espacio «Efeonce» ([manual](docs/manual-de-uso/rooms/nombrar-espacio-de-trabajo.md)) y gate de
+migraciones revisadas ([ISSUE-187](docs/issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
+Sin verificar: Sentry del release y login humano Efeonce ID → Rooms (TASK-2064/2085 siguen in-progress). Próximo:
+TASK-2086 (delegación interactiva para Rooms) y TASK-1833 antes de cualquier cliente real.
+
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 
 [Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por
@@ -241,17 +254,3 @@ canonical, index, desborde 0, axe 0 en 7 vistas, `/blog/` verify verde). **Pendi
 necesita el renderer de Growth Forms 1.3.0 en producción (commit en develop, sin push ni release). **Pedido del
 operador para después:** no le gusta la grilla «Para leer con calma» de la portada (tarjetas tipográficas sin foto
 alternadas con tarjetas con foto); es un cambio de diseño de TASK-2051 que se dibuja primero en el canvas.
-
-## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción, task cerrada
-
-**Búsqueda, temas, etiquetas y autores de efeoncepro.com sirven el «Archivo del blog» desde el 2026-10-24 ~18:20 UTC**
-(`eo_blog_archive_enabled = 1`): dirección D aprobada (canvas «Portada Blog Efeonce» v75), plantilla en `eo-blog-home`
-(`EOBH_Archive`, runtime `2c2cfbb`), datos por `EO_Archive_Adapter` (`efeonce-editorial-blocks`), seis descripciones de
-temas aprobadas y cargadas. Verificado en vivo: matriz HTTP/robots/canonical/schema, sin desborde ni palabras cortadas de
-320 a 1920, axe 0, `/blog/` verify verde, post con FAQ intacto. Rollback: `pnpm public-website:blog-home archive 0 --apply`.
-Contrato `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`; manual `operar-archivo-del-blog.md`.
-Lección: el `header-cap` de 108 px de Ohio sólo existe en archivos (el preview local con el shell de /blog/ no lo ve):
-correr siempre el gate en producción con `archive preview`. Pendientes fuera de alcance: `/wp-json/wp/v2/users` y
-`?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Task cerrada: `pnpm test` (21 299 pruebas) y `pnpm build`
-verdes sobre `f908db7d5`. Residual: el runtime no se empujó a su remoto (origin/main ya estaba divergido). Propuesta
-abierta: variante Glitch de `/category/glitch/` (= `/glitch/`), espera decisión del operador y tablero en el canvas.

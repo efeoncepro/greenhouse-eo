@@ -7,22 +7,17 @@
 > Confidence: alta en límites; readiness productiva depende de pruebas y rollout.
 > Validated as of: 2026-10-25, discovery de código y probes públicos del issuer.
 
-**Actualización 2026-10-29:** [corte consolidado Auth+Rooms](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
-El canary único del 26-10 sigue cerrado con acceso humano OFF. Login V4 fue
-revisado en el candidato Auth local, cuya CI/release y readback visual faltan;
-la nueva UI de Rooms no se había entregado. El Job de rotación y los guards
-de deploy continúan como candidatos locales, sin activar producción.
+**Antecedente 2026-10-29** (superado por el corte del 2026-11-01): [corte consolidado Auth+Rooms](../audits/rooms/2026-10-29-auth-rooms-program-consolidation.md).
 
-## Corte operativo — 2026-10-26
+## Corte operativo — 2026-11-01
 
-El canary conjunto Auth+Rooms pasó con una identidad interna y Microsoft/MFA, OIDC y renovación SSO,
-una sala sintética, un PNG privado y un único correo recibido. Se verificaron wrong-code, replay y
-revocación; invitación revocada, sala archivada y sesiones de prueba cerradas. No repetir el correo.
-Auth conserva `00168-vzb` al 100%, SHA754a2a28/digest122e2acb, first-party/OTP false y montajes HMAC/authority
-ausentes; Resend production v1 y Sentry production. Esto no abre acceso general ni acredita pentest,
-release #262, migración del portal o aceptación de la nueva UI. La UI puede desarrollarse aislada.
-El control de deploy sólo está LOCAL+PR #263/#264 abiertas, con retención humana sin merge/despliegue.
-[Estado, CI y próximos pasos](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+Efeonce ID está en `main` desde el release `935583f88db0` (`released`). `auth-server-00170-qlx` sirve el 100 % con
+`GIT_SHA` `935583f88`, first-party y OTP de invitación ON (fuente durable: variables de repo GitHub, activadas el
+2026-10-31) y el login V4 con el carrusel de novedades. El tráfico enruta a la última revisión; rollback = tráfico a
+`auth-server-00169-4pq`. La retención humana se levantó y PR #263/#264 se cerraron, superadas por el release, cuyo guard
+de deploy sólo despliega desde `main`. El canary único del 26-10 sigue cerrado y no se repite. Siguen abiertos un login
+humano completo hacia Rooms con la 00170, TASK-1833 (sin pentest completo) y la regla de ningún cliente real sin una
+autorización nueva. Estado vivo: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
 ## Context (baseline de aceptación 2026-10-25)
 
@@ -116,7 +111,7 @@ rollout general siguen pendientes de decisiones separadas.
 La autorización inicial del 25 de octubre cubrió discovery, ajuste canónico, implementación y pruebas locales. Push, deploy,
 registro real de clientes, secretos y DB cloud se preparan con recibos/canary y se ejecutan bajo su autorización
 de release; no se deducen de la demo Rooms. Las acciones acotadas del canary del 26 de octubre se documentan arriba;
-la retención actual de Auth sustituye aquella secuencia como próximo paso operativo. Una migración en Cloud SQL compartido afecta producción.
+el release gobernado del 2026-11-01 (ver «Corte operativo — 2026-11-01») sustituye aquella secuencia. Una migración en Cloud SQL compartido afecta producción.
 
 Baseline previo: 442 tests Auth PASS, 7 skip explícitos de integración; `pg:doctor` PASS. Esto no valida el
 nuevo carril. El cierre exige SQL real aislado, regresiones MCP, browser E2E Rooms/issuer, GVC V4 desktop/390px,

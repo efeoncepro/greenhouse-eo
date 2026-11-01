@@ -19,10 +19,9 @@
 ## Corte operativo posterior — 2026-10-26
 
 Rooms sigue primero; el canary OIDC/OTP real acotado ya pasó con Microsoft/MFA, PNG privado y un correo
-recibido, y quedó cerrado. Auth first-party/OTP false, sin montajes HMAC/authority; no hay apertura de
-cohorte ni migración Greenhouse (TASK-2063). PR #263/#264 del control de deploy siguen abiertas y retenidas;
-el guard del workspace todavía no protege los YAML remotos. Nueva UI puede desarrollarse aislada,
-sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+recibido, y quedó cerrado. Desde el 2026-11-01 first-party/OTP están ON sólo para Rooms (`auth-server-00170-qlx`) y el
+guard de deploy productivo vive en `main`; no hay apertura de cohorte ni migración Greenhouse (TASK-2063). Nueva UI puede desarrollarse aislada,
+sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo--2026-11-01).
 
 ## Estado de implementación al aceptar la decisión (2026-09-07)
 

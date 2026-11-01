@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.11
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-01 (Efeonce ID en producción con carrusel; retención levantada)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---

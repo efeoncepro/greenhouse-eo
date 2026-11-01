@@ -19,8 +19,8 @@
 ## Extensión first-party — baseline25-oct y canary del 26 de octubre
 
 TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md). Registro server-owned, scope openid, ID token y handle opaco por RP; sin refresh ni userinfo en este corte. El canary conjunto Rooms del 26 de octubre acreditó el carril real para una identidad interna con Microsoft/MFA;
-volvió a OFF y quedó cerrado. No es rollout general ni autorización de un nuevo correo.
-Estado efectivo, retención PR #263/#264 y límites: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
+volvió a OFF y quedó cerrado. El carril first-party está ON en producción desde el 2026-10-31 y en `main` desde el release `935583f88db0` (2026-11-01); no es rollout general ni autorización de un nuevo correo ni de clientes reales.
+Estado efectivo y límites: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
 
 ## 1. Decisión en una línea
 

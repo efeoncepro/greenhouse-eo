@@ -1,10 +1,10 @@
 # Rooms — Acceso interno del equipo Efeonce
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-31 por Claude (TASK-2082/2083)
-> **Ultima actualizacion:** 2026-10-31 por Claude
-> **Documentacion tecnica:** [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md)
+> **Ultima actualizacion:** 2026-11-01 por Claude (TASK-2085)
+> **Documentacion tecnica:** [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) · [API y acceso: espacio de trabajo y entrada sin sesión](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md#acceso-interno-y-espacio-de-trabajo--vigente-al-2026-11-01)
 
 ## Qué resuelve
 
@@ -24,6 +24,36 @@ año, avisa antes de vencer y nunca puede quedar sin nadie que lo administre.
 
 > Detalle técnico: comandos `members.grantInternal`, `members.renewInternal`, `members.revokeInternal` y lectura
 > `members.list` en `efeonce-rooms` `src/server/access/**`.
+
+## Si entras sin haber iniciado sesión
+
+Si abres la casa del equipo (`/rooms`) o la actividad de una sala sin una sesión de Rooms, vas directo a Efeonce ID,
+que muestra «Entra a Rooms». No ves una pantalla de carga antes. Rooms guarda la página que habías abierto (y, si
+venías desde el aviso de una acción de agente, esa acción) para devolverte ahí cuando terminas de entrar. El recorrido
+completo con una persona real todavía no se ha verificado.
+
+Si tu sesión venció, Rooms igual abre la página y ahí te pide entrar de nuevo: quien decide si puedes pasar es Rooms,
+no el atajo de la entrada.
+
+> Detalle técnico: el proxy de Rooms responde 307 a `/login?returnTo=…` cuando no hay ninguna cookie de sesión
+> (interna o de invitado) y sólo conserva `?accion=`. Antes la página mostraba «Cargando la sala…» y redirigía sin
+> 307 ([ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)). Código:
+> `efeonce-rooms` `src/proxy.ts` y `src/server/agents/anonymous-entry.ts`.
+
+## El nombre del espacio de trabajo
+
+Cada organización de Rooms puede tener un nombre legible, por ejemplo «Efeonce». Aparece en el encabezado y en el
+selector de espacio, en lugar del identificador técnico. Si un espacio todavía no tiene nombre, o Rooms no puede
+leerlo en ese momento, se muestra «Espacio de trabajo» y puedes entrar igual.
+
+- Sólo quien administra miembros puede cambiar el nombre. Para cualquier otra persona, el espacio «no existe» a
+  efectos de ese cambio.
+- El nombre va de 1 a 80 caracteres; los espacios al inicio y al final se quitan.
+- Cada cambio queda registrado con quién lo hizo: una persona o un agente, y por qué canal.
+
+> Detalle técnico: comando `organization.rename` (capacidad `members.manage`), tabla
+> `rooms.organization_profiles` y lectura `profile.get.organizationName`. Cómo hacerlo:
+> [Nombrar el espacio de trabajo](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md).
 
 ## Reglas
 
@@ -52,4 +82,5 @@ En vez de un mensaje técnico, Rooms muestra una página con la palabra del moti
 
 ## Cómo operarlo
 
-Ver el manual [Administrar el acceso interno](../../manual-de-uso/rooms/administrar-acceso-interno.md).
+Ver los manuales [Administrar el acceso interno](../../manual-de-uso/rooms/administrar-acceso-interno.md) y
+[Nombrar el espacio de trabajo](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md).

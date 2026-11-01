@@ -1,9 +1,9 @@
 # Revisar y diagnosticar las pantallas de Efeonce ID
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-01 (login V4 con carrusel de novedades en producción)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Administracion en portal:** ninguna. Estas pantallas viven en `auth.efeonce.org` (servicio Cloud Run `auth-server`), no en el portal, y se revisan con un harness local y dos verificadores de linea de comandos.
 > **Documentacion relacionada:** [Pantallas de Efeonce ID](../../documentation/identity/pantallas-efeonce-id.md) (funcional), [Operar el autorizador de Efeonce](operar-autorizador-efeonce.md) (el servicio, sus llaves y flags), [Operar la autenticacion de clientes externos](operar-autenticacion-clientes-externos.md) (invitar, revocar, canary), [PATTERNS.md § Runtime sin React](../../architecture/ui-platform/PATTERNS.md)
@@ -21,14 +21,17 @@ responde, o cuando necesitas revisar un estado que en produccion no se puede pro
 **Este manual no cubre** invitar personas, revocar accesos, rotar llaves ni prender flags: eso esta en
 los dos manuales relacionados de arriba.
 
-## Corte de interfaz — 2026-10-26
+## Corte de interfaz — 2026-11-01
 
-Login V4 ya está servido en `/login`; `/login/rooms` toma el contexto sólo del registro/transacción
-confiable. El canary acotado validó el recorrido real con Microsoft/MFA, pero Auth first-party/OTP quedó
-OFF y el ensayo cerrado. Eso no acredita aceptación visual de una nueva dirección ni el feed de novedades del issuer.
-Puede continuar nueva UI en harness/entorno aislado; su publicación y activación necesitan decisiones
-separadas. PR #263/#264 siguen abiertas y retenidas; no desplegar para revisar una pantalla.
-[Estado operativo](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+- **Qué hay en producción:** login V4 con el carrusel de novedades, servido en `https://auth.efeonce.org/login` desde la
+  revisión `auth-server-00170-qlx` (release del 2026-11-01).
+- **Contexto Rooms:** `/login/rooms` toma el contexto sólo del registro o la transacción confiable. Quien llega desde Rooms
+  ve «Entra a Rooms» con el mismo carrusel.
+- **De dónde salen las novedades:** del feed público de Greenhouse. Se publican con el
+  [manual de novedades](administrar-novedades-del-login.md); Auth no tiene administración propia.
+- **Si el feed falla o no hay novedades:** queda la fotografía oficial y el acceso sigue funcionando.
+- **Cómo revisar un cambio de pantalla:** en el arnés, nunca desplegando. Llevarlo a producción exige un release gobernado
+  desde `main`.
 
 El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
 septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
@@ -71,6 +74,7 @@ Cada direccion dibuja una pantalla real con datos ficticios:
 | --- | --- |
 | `/login` | Inicio de sesion con los tres caminos (Microsoft, passkey, correo). |
 | `/login/rooms` | Contexto Rooms derivado de datos confiables del harness; no activa el acceso del producto. |
+| `/login/public-feed-preview` | Inicio de sesión con el carrusel alimentado por el feed **real** de producción de Greenhouse (sólo lectura). Si el feed no responde, muestra la fotografía oficial, igual que producción. |
 | `/login/external` | El mismo, sin el acceso corporativo: lo que ve alguien de fuera de Efeonce. |
 | `/login/invalid-email` | Inicio de sesion con el error de correo mal escrito. |
 | `/consent` | Consentimiento con una organizacion y dos permisos (uno de lectura, uno de escritura). |
@@ -124,6 +128,8 @@ recuento al final.
 
 | Lo que ves | Que significa |
 | --- | --- |
+| Carrusel con pestañas en `/login` | Hay novedades publicadas y vigentes en el feed de Greenhouse (máximo tres). |
+| Sólo la fotografía, sin pestañas | No hay novedades vigentes o el feed no respondió en 600 ms. El acceso no se ve afectado. |
 | `421` en el harness | Entraste por un host que no es `127.0.0.1:19036`. No es una falla del servicio. |
 | `405` en el harness | Intentaste un metodo que no es `GET` sobre una ruta de solo lectura. |
 | `contraste OK en todas las pantallas` | Ningun texto quedo bajo 4.5:1 (o 3:1 si es texto grande) en ninguna de las dos anchuras. |
@@ -162,10 +168,12 @@ recuento al final.
 | Una persona reporta que su enlace «ya no sirve» | Los enlaces duran 15 minutos y funcionan una sola vez; tambien los queman algunos escaneres de correo | La pantalla ofrece «Pedir un enlace nuevo». Si se repite, revisa la entrega de correo en el manual de clientes externos. |
 | Una persona pide autorizar una escritura y queda en la verificacion adicional | Es el comportamiento esperado: los permisos de escritura exigen segundo factor | Si no tiene ninguno configurado, la misma pantalla le ofrece activarlo. |
 | Una persona pregunta como crear su passkey | No existe la pantalla todavia | Explicale que entra por enlace de correo. Lo cierra `TASK-1842`. |
+| Una novedad recién publicada no aparece en `auth.efeonce.org/login` | Caché: hasta 5 minutos en el feed de Greenhouse más 30 segundos en el autorizador | Espera unos minutos y recarga. Si sigue sin verse, revisa el feed público según el [manual de novedades](administrar-novedades-del-login.md). |
 
 ## Referencias tecnicas
 
 - Patron del runtime sin React: [`docs/architecture/ui-platform/PATTERNS.md`](../../architecture/ui-platform/PATTERNS.md) § «Runtime sin React — shell Efeonce ID».
+- Lector del feed de novedades: [`src/lib/auth-server/persons/login-announcements.ts`](../../../src/lib/auth-server/persons/login-announcements.ts) (TASK-2064).
 - Plantillas: [`src/lib/auth-server/persons/pages.ts`](../../../src/lib/auth-server/persons/pages.ts), [`src/lib/auth-server/persons/step-up-page.ts`](../../../src/lib/auth-server/persons/step-up-page.ts), [`src/lib/auth-server/oauth/pages/render.ts`](../../../src/lib/auth-server/oauth/pages/render.ts).
 - Texto visible: [`src/lib/copy/auth-server.ts`](../../../src/lib/copy/auth-server.ts) y [`src/lib/copy/auth-server-step-up.ts`](../../../src/lib/copy/auth-server-step-up.ts).
 - Harness y verificadores: [`scripts/auth-server/dev-ui-server.ts`](../../../scripts/auth-server/dev-ui-server.ts), [`scripts/auth-server/verify-contrast.mjs`](../../../scripts/auth-server/verify-contrast.mjs), [`scripts/auth-server/verify-passkey-lane.mjs`](../../../scripts/auth-server/verify-passkey-lane.mjs).

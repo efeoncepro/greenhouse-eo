@@ -1,5 +1,25 @@
 # TASK-2085 — Rooms: pantalla «Actividad de agentes» con reversa
 
+## Delta 2026-11-01 — entrada 307, nombre del espacio y gate de migraciones en producción
+
+- PR #9 (`1021e75`, `main@97588d3`): `/rooms` y `/rooms/:id/actividad` sin ninguna cookie de sesión de Rooms responden
+  307 desde el proxy a `/login?returnTo=…` (sólo conserva `?accion=`); `homeGate` sigue siendo la autoridad. Cierra el
+  «redirect por streaming RSC» del Status anterior. [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md).
+- PR #10 (`f59d1df`, `main@449a0cd`): `rooms.organization_profiles` + command `organization.rename` (`members.manage`,
+  clase `author`) + `profile.get.organizationName`; encabezado y selector caen a «Espacio de trabajo» si falta el
+  nombre. Migración `1793267` aplicada en `rooms_production` con respaldo previo; el espacio del piloto se llama
+  «Efeonce» (recibo atribuido al agente por CLI). Herramienta `pnpm access:rename-organization`.
+- PR #11 (`8aef9db`): `REVIEWED_MIGRATIONS` al día y atado a `migrations/*.sql` por prueba.
+  [ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md). Deploy
+  `efeonce-rooms-12zux9578`, alias reasignado.
+- Docs: [quién ve qué](../../documentation/rooms/quien-ve-que-en-rooms.md) («Lo que todavía falta en la interfaz»),
+  [acceso interno](../../documentation/rooms/acceso-interno-rooms.md), manual
+  [Nombrar el espacio de trabajo](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md),
+  [contrato de API y acceso](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md) y ledger de la skill.
+- 2026-11-01: login con MFA aceptado según reporte de Julio transmitido por la sesión Auth; sin logs ni prueba
+  instrumentada añadidos. [Registro](../../audits/rooms/2026-11-01-operator-mfa-acceptance.md). Siguen pendientes el
+  encabezado «Efeonce» y el QA de la casa nueva, además del recorrido real de acción y reversa de agente.
+
 ## Delta 2026-10-31 — propuesta del slice 1 en el canvas (aprobada 2026-10-31)
 
 - Canvas `https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL`, fila «El lado de Efeonce — lo que hicieron tus agentes»:
@@ -48,7 +68,7 @@
 - Motion: `docs/ui/motion/TASK-2085-rooms-agent-activity-surface-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-052`
-- Status real: `En producción 2026-10-31 (autorizado: «Ok despliega»): PR efeoncepro/efeonce-rooms#8 mergeado a main@21b10a9, deploy dpl_J84WwdMnotLTQkPwvc3oG5B6kaSV, alias efeonce-rooms.vercel.app reasignado. Verificado: /rooms sin sesión → Efeonce ID «Entra a Rooms» (redirect por streaming RSC, no 307 de servidor), /demo/actividad 200 con el umbral, /api/auth/session 401. Falta: primer login real del operador con la casa nueva, redirect 307 en servidor, nombre legible del espacio (no existe en la base), campos del reader (topes/rechazos, filtro por sala, edición, invitado enmascarado, detalle), pnpm fe:capture + scorecard.`
+- Status real: `En producción 2026-11-01: casa agentes primero (PR #8, main@21b10a9), entrada sin sesión 307 desde el proxy (PR #9, 1021e75, ISSUE-188), nombre legible del espacio con organization.rename y migración 1793267 aplicada con respaldo (PR #10, f59d1df; espacio del piloto = «Efeonce»), inventario de migraciones revisadas (PR #11, 8aef9db, ISSUE-187); deploy efeonce-rooms-12zux9578 con alias reasignado. Docs funcionales y manual del nombre del espacio al día. Login con MFA aceptado por reporte del operador vía sesión Auth el 2026-11-01 (sin logs ni prueba instrumentada añadidos; recibo docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md). Falta: QA de la casa nueva y encabezado «Efeonce», campos del reader (topes/rechazos, filtro por sala, edición, invitado enmascarado, detalle), pnpm fe:capture + scorecard, recorrido real con un agente y manual para revisar y revertir acciones de agentes.`
 - Rank: `después de TASK-2084; el slice 1 (canvas) puede empezar antes`
 - Domain: `platform`
 - Blocked by: `TASK-2084 (slices 2 a 6; el slice 1 de canvas no depende de ella)`
@@ -468,7 +488,7 @@ Puntos que el agente debe confirmar en Discovery:
 - [x] Ningún bloque de Bricolage de varias líneas va entero en negrita: los titulares alternan pesos.
 - [x] Sin hex ni medidas literales: sólo tokens de `theme.ts`.
 - [x] Movimiento reducido no desplaza la página al enfocar una acción.
-- [ ] (capturas Playwright en 1440, 1280 y 390, con y sin movimiento reducido, sin scroll horizontal; falta pnpm fe:capture y scorecard) GVC desktop y móvil capturado y mirado (1440, 1280, 390) sin scroll horizontal; scorecard sobre el umbral.
+- [ ] (capturas Playwright en 1440, 1280 y 390, con y sin movimiento reducido, sin scroll horizontal; falta pnpm fe:capture, scorecard y la mirada con login humano real) GVC desktop y móvil capturado y mirado (1440, 1280, 390) sin scroll horizontal; scorecard sobre el umbral.
 - [x] `UI ready` siguió en `no` hasta tener aprobación, implementation mapping, plan GVC y decision log; si pasa a
   `yes`, `pnpm task:lint --task TASK-2085` queda sin hallazgos.
 - [ ] (pendiente: no se ejercitó con un agente real) Recorrido real en local: un agente por CLI invita, la persona revierte y la invitación deja de servir.
@@ -488,9 +508,9 @@ Puntos que el agente debe confirmar en Discovery:
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `docs/documentation/rooms/quien-ve-que-en-rooms.md` actualizado («Lo que todavía falta en la interfaz»).
-- [ ] Manual en `docs/manual-de-uso/rooms/` para revisar y revertir acciones de agentes.
-- [ ] `references/program-ledger.md` de la skill `efeonce-rooms` actualizado y espejo `.codex` sincronizado.
+- [x] `docs/documentation/rooms/quien-ve-que-en-rooms.md` actualizado («Lo que todavía falta en la interfaz»; v1.1, 2026-11-01).
+- [ ] (pendiente: existe el manual del nombre del espacio; el de revisar y revertir acciones de agentes espera el recorrido real con un agente) Manual en `docs/manual-de-uso/rooms/` para revisar y revertir acciones de agentes.
+- [ ] (parcial: ledger `.claude` actualizado el 2026-11-01; el espejo `.codex` lo sincroniza otra sesión con `pnpm skills:mirrors`) `references/program-ledger.md` de la skill `efeonce-rooms` actualizado y espejo `.codex` sincronizado.
 
 ## Follow-ups
 

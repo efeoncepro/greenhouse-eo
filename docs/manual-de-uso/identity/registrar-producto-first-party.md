@@ -12,9 +12,8 @@ salas, organizaciones, roles ni grants MCP. El callback de Rooms resuelve un bin
 
 ## Estado y límite actual
 
-El registro existente no equivale a acceso habilitado. Auth quedó `00168-vzb` al 100%, first-party/OTP OFF,
-sin montajes OTP/authority; el canary Microsoft/MFA+PNG+correo recibido ya pasó y no se repite.
-Las PR #263/#264 siguen abiertas, con integración retenida. Consultar [runbook](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26)
+Estado al 2026-11-01: Auth sirve `auth-server-00170-qlx` al 100 % con first-party/OTP ON sólo para Rooms; registrar
+un producto nuevo no lo habilita. El canary Microsoft/MFA+PNG+correo recibido ya pasó y no se repite. Consultar [runbook](../../operations/runbooks/auth-server.md#estado-operativo--2026-11-01)
 y cliente/redirect/secreto efectivos antes de cualquier cambio autorizado; el ejemplo siguiente no es un
 comando para rehacer Rooms ni declara que el dominio ilustrativo sea el callback actualmente registrado.
 

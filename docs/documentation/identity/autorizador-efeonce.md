@@ -1,9 +1,9 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-04 por Claude
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-01 (release a `main`, login V4 con carrusel y guard de deploy)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -16,13 +16,13 @@ Efeonce ID autentica a las personas y emite tokens propios para conectar aplicac
 El acceso corporativo usa Microsoft como proveedor de login; la autoridad para cada aplicación y
 organización la resuelve Efeonce. Compartir un emisor no comparte permisos entre empleados y clientes.
 
-## Estado Auth+Rooms al 26 de octubre
+## Estado Auth+Rooms al 1 de noviembre
 
-El canary real único pasó con Microsoft/MFA, OIDC, una imagen PNG privada y un correo recibido; se cerró.
-La revisión `00168-vzb` conserva first-party/OTP false, sin HMAC/authority montados; no abre clientes ni
-migra el portal. El login V4 servido no acredita aceptación de una nueva UI. Desarrollarla aislada sigue
-permitido. El control production/main está sólo LOCAL+PR #263/#264 abiertas, retenidas sin merge ni deploy.
-[Estado detallado y corte de CI](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+Efeonce ID está en `main` desde el release del 2026-11-01. La revisión `auth-server-00170-qlx` sirve el login V4 con el
+carrusel de novedades, y el acceso propio de Rooms (first-party) y el código de invitación por correo están encendidos.
+Si hay que volver atrás, el tráfico se devuelve a la revisión anterior. Siguen pendientes la revisión de seguridad
+completa (TASK-1833) y un login humano de punta a punta hacia Rooms con esta versión. Ningún cliente real entra sin
+una autorización nueva. Operación: [manual del autorizador](../../manual-de-uso/identity/operar-autorizador-efeonce.md).
 
 ## Qué hace hoy
 
@@ -225,10 +225,9 @@ El login del portal Greenhouse conserva su contrato. Efeonce ID tiene cookie y s
   códigos, tokens, consentimientos y auditoría). La autoridad compartida se modifica por los commands canónicos de identidad; no reutiliza sesiones del portal.
 - El portal expone dos rutas de administración (registrar cliente confidencial, revocar consentimiento) que
   llaman a los **mismos commands** que usa el emisor; no hay lógica duplicada en la UI.
-- Comparte el **repositorio** (`services/auth-server/`) y el **carril de despliegue** de los workers Cloud Run:
-  el YAML remoto anterior todavía puede desplegar el único servicio productivo al empujar a `develop`.
-  La corrección production/main está preparada en PR #263/#264, sin integrar por retención humana. Ninguna
-  etiqueta staging aísla ese host. El primer release fue `9100bbd2765d`,2026-09-04.
+- Comparte el **repositorio** (`services/auth-server/`) y el **carril de despliegue** de los workers Cloud Run.
+  Desde el 2026-11-01 sólo se despliega desde `main` por el release gobernado; un push a `develop` ya no toca el
+  servicio. Ninguna etiqueta staging aísla ese host. El primer release fue `9100bbd2765d`, el 2026-09-04.
 - El emisor está registrado como environment `efeonce-auth`, activo para el piloto. Su `issuerClass`
   no decide si la persona es interna o externa; el binding persistido y el resolver correspondiente lo hacen.
 - Usa las mismas piezas de **observabilidad**: incidentes en Sentry (dominio `identity`, componente

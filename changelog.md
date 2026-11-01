@@ -6,6 +6,13 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-01 — Efeonce ID y Rooms: login con novedades y entrada directa
+
+El login de Efeonce ID muestra las novedades publicadas de Greenhouse, también al entrar a Rooms (release
+`935583f88db0`, `auth-server-00170-qlx`). Rooms lleva a Efeonce ID sin parpadeo cuando no hay sesión y muestra el nombre
+del espacio («Efeonce»); el despliegue de Auth acepta releases por squash y enruta a la última revisión. Issues
+184–188 resueltos; login humano de punta a punta pendiente.
+
 ## 2026-10-30 — Licitaciones: Mattis GRD-1555 enviada y lecciones de carga en Wherex
 
 [Oferta a Mattis (Grupo Réditos)](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md) enviada
@@ -569,10 +576,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - `pnpm gtm:snapshot` versiona también el container servidor (sGTM/Meta CAPI) y tapa secretos con huella sha256;
   `gtm-drift.yml` compara a diario ambos containers live contra git y falla ante drift. El publish por script
   reescribe los snapshots. [ADR, delta 2026-10-16](docs/architecture/GREENHOUSE_MEASUREMENT_TAGGING_DEPLOYMENT_DECISION_V1.md).
-
-## 2026-10-16 — Contacto: Nexa canónica, voz mexicana y medición Meta
-
-- Hero de `/contacto/` con el rostro canónico de Nexa (inpaint Sunburst + anclas), voz «Escucha a Nexa» nueva
-  (ElevenLabs Lucía es-MX, −16 LUFS), OG v3 en adjunto nuevo y cache-busting `?ver=filemtime` en hero/audio del widget.
-- Política Meta + Google UPD publicada para `efeonce-contacto`; GA4 `generate_lead` verificado. Bible de Nexa: voz
-  mexicana por decisión del operador. [Landing](.claude/skills/efeonce-public-site-wordpress/references/landings/contacto.md).

@@ -16,10 +16,12 @@ La diferencia con otras capas de documentacion:
 
 ### Efeonce Rooms e identidad
 
+- [Índice de manuales de Rooms](rooms/README.md): producción, acceso, nombre del espacio, medios y desarrollo local.
 - [Integrar Claude Design en local](rooms/integrar-claude-design-local.md): entorno aislado y SDK tipado; sin publicación ni activación productiva.
 
-- [Operar Rooms en producción](rooms/operar-produccion-rooms.md): deploy activo y alias manual, dónde viven los flags, rollback de la activación e `identity_unbound`.
+- [Operar Rooms en producción](rooms/operar-produccion-rooms.md): deploy activo y alias manual, dónde viven los flags, migraciones con respaldo y gate de migraciones revisadas, rollback de la activación e `identity_unbound`.
 - [Administrar el acceso interno de Rooms](rooms/administrar-acceso-interno.md): dar, renovar y revocar acceso, y atender un código de solicitud de la página «Casi.».
+- [Nombrar el espacio de trabajo de Rooms](rooms/nombrar-espacio-de-trabajo.md): poner o cambiar el nombre legible de una organización con `organization.rename` (sesión o `pnpm access:rename-organization`).
 - [Operar Rooms en desarrollo](rooms/operar-primera-experiencia-local.md): sesiones y fixtures aislados, sin autoridad productiva.
 - [Operar el worker privado de imágenes](rooms/operar-worker-medios.md): Scheduler/Job, leases, comprobación y rollback.
 - [Invitación Rooms por correo y código](identity/operar-invitacion-rooms-email-otp.md): canary único ya comprobado; no repetir envíos ni activar por conectar diseño.

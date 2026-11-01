@@ -1,19 +1,20 @@
 # Novedades del login — Carrusel del acceso a Greenhouse
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-02 por Claude (TASK-1963 / TASK-1964)
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-01 (Efeonce ID consume el feed en producción)
 > **Documentacion tecnica:** [TASK-1963](../../tasks/in-progress/TASK-1963-login-announcements-governed-reader.md) · [TASK-1964](../../tasks/in-progress/TASK-1964-login-v4-premium-access-transition.md) · [Wireframe del login V4](../../ui/wireframes/TASK-1964-login-v4-premium-access.md)
 > **Manual de uso:** [Administrar las novedades del login](../../manual-de-uso/identity/administrar-novedades-del-login.md)
 
-## Límite de consumo Auth — 2026-10-26
+## También en Efeonce ID — desde 2026-11-01
 
-Este reader y su administración pertenecen al login de Greenhouse. Reutilizar la composición V4 en Auth
-no acredita que el issuer ya consuma este feed: en Auth se conserva la fotografía oficial de fallback y
-su integración de novedades sigue pendiente. Nueva UI aislada puede continuar; no publicar novedades
-para probar Auth ni inferir que una modificación de esta tabla activa Rooms.
-[Estado Auth](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+El login de Efeonce ID (`auth.efeonce.org/login`, también el que ve quien entra desde Rooms) muestra el mismo
+carrusel. Lee el feed público de Greenhouse, toma hasta tres novedades y, si el feed tarda o falla, muestra la
+fotografía oficial sin afectar el acceso. Publicar o archivar aquí cambia los dos logins a la vez.
+
+> Detalle técnico: lector `createCachedLoginAnnouncementsLoader` en `src/lib/auth-server/persons/login-announcements.ts`
+> (600 ms de espera máxima, 16 KB, caché de 30 s en el autorizador); [TASK-2064](../../tasks/in-progress/TASK-2064-efeonce-id-login-v4-rooms.md).
 
 ## Qué son
 

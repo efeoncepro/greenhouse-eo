@@ -33,6 +33,36 @@ Entorno aislado construido y detenido; nueva interfaz Claude Design aún sin int
 real26Oct ya cerrado, sin repetición. Auth retenido en PR263/264; producción y activación general
 no cambian. [Estado vivo](README.md).
 
+## Acceso interno y espacio de trabajo — vigente al 2026-11-01
+
+Contrato en producción (`efeonce-rooms` PR #9 y PR #10, TASK-2085). Complementa el
+[ADR de acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md), dueño de `members.*`.
+
+**Entrada sin sesión (307 en el proxy).** En `/rooms` y `/rooms/:roomId/actividad`, si la petición no trae ninguna
+cookie de sesión de Rooms (`__Host-rooms_session`, `rooms_session_local`, `__Host-rooms_guest`, `rooms_guest_local`),
+`src/proxy.ts` responde **307** a `/login?returnTo=<ruta>` antes de que la página haga streaming. Sólo se conserva
+`?accion=` cuando es un id válido; cualquier otro parámetro se descarta. Cabeceras: `Cache-Control: private,
+no-store`, `Referrer-Policy: no-referrer`, `Vary: Cookie`. El proxy mira sólo la **presencia** de la cookie: la
+autoridad sigue en `homeGate` de la página, así que una cookie vencida o inválida llega a la página y ésta decide.
+Lógica pura en `src/server/agents/anonymous-entry.ts` (`hasRoomsSession`, `anonymousEntryRedirect`); prueba
+`tests/auth-anonymous-entry.test.ts`. Antes, `src/app/rooms/loading.tsx` se pintaba primero y `redirect()` viajaba por
+RSC (HTTP 200 y «Cargando la sala…»): [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md).
+
+**Nombre legible del espacio.** Rooms crea `organization_id` y es dueño de sus miembros; el nombre es el perfil único
+de esa organización, no una identidad paralela.
+
+| Pieza | Contrato |
+|---|---|
+| Tabla | `rooms.organization_profiles(organization_id text PK, display_name text NOT NULL, updated_at timestamptz)`. `display_name` recortado y de 1 a 80 caracteres (CHECK). Sin FK. `rooms_runtime` tiene `SELECT`, `INSERT` y `UPDATE(display_name, updated_at)`; nada para `PUBLIC`. Migración `1793267000000_rooms-organization-profile` con guarda anti pre-up-marker; su down se niega si hay nombres guardados. |
+| Command | `organization.rename { displayName }` (versión 1), capacidad `members.manage` sobre la organización. Upsert del perfil y recibo de command (`rooms.command_receipts`) como traza con el actor. Misma `Idempotency-Key` y mismo nombre = `replayed: true`; misma clave con otro nombre = `conflict`. Sin `members.manage` = `not_found` (no revela si la organización existe); nombre vacío o mayor a 80 = `invalid_input`; sin sesión = `unauthenticated`. Recibo: `{ operation, organizationId, displayName, replayed }`. |
+| Paridad | API `POST /api/v1/commands`, SDK (`organizationCommandSchemas`), CLI `pnpm rooms execute --operation organization.rename`, MCP stdio en el toolset `members` (nunca en `all`) y catálogo del carril de agentes con clase `author` (`efeonce.mcp.rooms.author`). |
+| Lectura | `profile.get` devuelve `organizationName`. El encabezado (`product-frame.tsx`) y el selector de contexto leen `organizationNames(ids)` sólo con ids de la propia sesión (máximo 50); si falta el nombre o la base no responde devuelve `{}` y la superficie cae al rótulo genérico «Espacio de trabajo». El nombre nunca bloquea la entrada. |
+| Herramienta administrativa | `pnpm access:rename-organization --organization ORG --principal ID --name "…" --agent CLIENT_ID [--apply]` y su variante `pnpm access:production rename-organization …`. Ejecuta el mismo command como el principal interno indicado, cuyo `members.manage` se relee de la base, dentro de `runWithActor({ actorKind: 'agent', channel: 'cli' })`. En seco imprime el nombre actual y el nuevo. [Manual](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md). |
+
+Gate de migraciones: toda migración nueva entra en `REVIEWED_MIGRATIONS` (`scripts/design-integration/config.ts`) en el
+mismo PR; `tests/integration-env.test.ts` exige que coincida exactamente con `migrations/*.sql`
+([ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
+
 ## 1. Paridad por capacidad
 
 La API es la entrada al dominio. UI, CLI y MCP consumen las mismas operaciones, políticas y estados; ninguna mutation existe únicamente en una server action o click handler. Un registro versionado declara operationId, schema, authorization, idempotency, auditoría y exposición por canal. OpenAPI y catálogo MCP se contrastan contra ese registro.

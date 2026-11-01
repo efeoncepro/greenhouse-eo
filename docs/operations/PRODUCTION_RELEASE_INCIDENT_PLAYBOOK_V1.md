@@ -705,6 +705,30 @@ entorno; un timeout que se repite bajo coverage se corre en local con `--coverag
 otro PR. Y antes de abrir el PR de un `develop` acumulado varios días, correr `pnpm test` completo en local: cada rojo
 ajeno que se cuela cuesta una vuelta de CI completa, y se pagan en serie.
 
+### 23. Desplegar Auth sin mirar el tráfico, o leer el guard de squash como falso positivo
+
+**Release 2026-11-01, `935583f88db0`** (PR #262, `released` en el run `41284120477`). Antes hubo dos intentos
+abortados, por dos causas distintas del mismo servicio:
+
+- **Guard vs squash** (run `41274930062`, [ISSUE-184](../issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)).
+  El guard de `auth-server-deploy.yml` exigía que el commit servido fuera ancestro del objetivo, y un squash
+  `develop→main` nunca lo es. Se corrigió en el guard (PR #265: coincidencia de árbol más antigua en `origin/develop`)
+  con tests del caso revert. No se usó bypass ni se relajó el chequeo.
+- **Tráfico fijado** (run `41282851247`, [ISSUE-185](../issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)).
+  La activación manual del 31-10 había dejado el tráfico fijado a `auth-server-00169-4pq`, y el deploy gobernado
+  creó la 00170 con 0 %. Se resolvió con `update-traffic --to-latest` y readback completo.
+
+El mismo día, el CI de `develop` cayó por 20 tests atados a la fecha de corte ETV
+([ISSUE-186](../issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md)). Ninguno de los tres se veía en
+el preflight.
+
+**Regla:**
+
+- Antes del dispatch de un release que incluya Auth, lee `status.traffic` de `auth-server`: tiene que haber una sola
+  entrada al 100 % con `latestRevision: true`.
+- Un rechazo del guard de ancestría hoy es real: compara `GIT_SHA` servido contra el objetivo antes de tocar el guard.
+- Detalle operativo en el runbook de release, §2.3 gotchas 10–12.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:

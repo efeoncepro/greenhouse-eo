@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-01 (login V4 con carrusel de novedades en producción)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Documentacion tecnica:** [PATTERNS.md § Runtime sin React — shell «Efeonce ID»](../../architecture/ui-platform/PATTERNS.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 > **Manual de uso:** [Revisar y diagnosticar las pantallas de Efeonce ID](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md)
@@ -27,14 +27,13 @@ sin framework de interfaz y con una politica de seguridad de contenido muy cerra
 Efeonce porque los colores, la tipografia y el logotipo **se generan desde la misma fuente de verdad
 de marca** del portal, no porque se hayan copiado a mano.
 
-## Corte de interfaz — 2026-10-26
+## Corte de interfaz — 2026-11-01
 
-Login V4 ya está servido en `/login`; `/login/rooms` toma el contexto sólo del registro/transacción
-confiable. El canary acotado validó el recorrido real con Microsoft/MFA, pero Auth first-party/OTP quedó
-OFF y el ensayo cerrado. Eso no acredita aceptación visual de una nueva dirección ni el feed de novedades del issuer.
-Puede continuar nueva UI en harness/entorno aislado; su publicación y activación necesitan decisiones
-separadas. PR #263/#264 siguen abiertas y retenidas; no desplegar para revisar una pantalla.
-[Estado operativo](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+El login V4 con el carrusel de novedades está en producción en `auth.efeonce.org/login` desde el 2026-11-01. Quien llega
+desde Rooms ve «Entra a Rooms»; ese contexto sale sólo del registro o la transacción confiable, nunca de la dirección.
+Las novedades vienen del mismo feed público del login de Greenhouse; si no responde, queda la fotografía oficial y el
+acceso sigue igual. Los cambios de pantalla se revisan en el arnés local y llegan a producción sólo por release.
+[Manual de las pantallas](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md).
 
 El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
 septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.

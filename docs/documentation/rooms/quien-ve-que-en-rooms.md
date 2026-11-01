@@ -1,9 +1,9 @@
 # Rooms — Quién ve qué: cliente, equipo y agentes
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-31 por Claude
-> **Ultima actualizacion:** 2026-10-31 por Claude
+> **Ultima actualizacion:** 2026-11-01 por Claude (TASK-2085)
 > **Documentacion tecnica:** [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) · [ADR carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) · [ADR «Vive el servicio»](../../architecture/rooms/EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) · [API y acceso](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md)
 
 ## Para qué sirve este documento
@@ -31,15 +31,22 @@ Todavía no hay clientes reales en Rooms. Invitar al primero exige una autorizac
 ## Equipo interno
 
 Para entrar, la persona usa Efeonce ID y además necesita acceso dado dentro de Rooms. Ser administrador de Greenhouse
-o de Efeonce ID no basta. Si no tiene acceso, Rooms le muestra la página «Casi.» con un código de solicitud; el
-detalle está en [acceso interno](acceso-interno-rooms.md).
+o de Efeonce ID no basta. Si abre `/rooms` sin sesión, va directo a Efeonce ID («Entra a Rooms»), sin pantalla de
+carga intermedia. Si no tiene acceso, Rooms le muestra la página «Casi.» con un código de solicitud; el detalle está
+en [acceso interno](acceso-interno-rooms.md).
+
+El encabezado muestra el nombre del espacio (por ejemplo, «Efeonce»). Si el espacio no tiene nombre todavía, dice
+«Espacio de trabajo».
 
 | Pantalla | Qué permite |
 |---|---|
-| `/rooms` | Ver la lista de salas del espacio. |
-| «Abrir sala» | Ver la sala tal como la ve el cliente. |
+| `/rooms` (la casa) | Ver primero lo que hicieron los agentes en nombre del equipo y, debajo, la lista de salas del espacio. |
+| «Crear sala» | Crear una sala y llegar a su mesa de autoría. |
+| «Abrir autoría» | Ir a la mesa de autoría (`/rooms/:id/authoring`) de una sala, si la persona puede editar contenido. |
+| Actividad de una sala (`/rooms/:id/actividad`) | Ver lo que pasó en esa sala, con accesos a «Ver como cliente», «Abrir autoría», «Invitaciones» y «Qué cambió». |
+| «Abrir sala» / «Ver como cliente» | Ver la sala tal como la ve el cliente. |
 | «Invitaciones» | Invitar a una persona. Hoy la pantalla sólo ofrece dos permisos: ver la sala y ver pruebas. |
-| Mesa de autoría (`/rooms/:id/authoring`) | Crear y editar el contenido, incluidas las escenas. Existe, pero **ningún botón lleva a ella**: hay que escribir la dirección. |
+| Deshacer una acción de agente | Revertir, con confirmación, una acción que salió de la mesa (publicar, invitar, dar acceso), cuando Rooms lo permite. |
 
 > Detalle técnico: el acceso interno se administra con los comandos `members.*`; ver
 > [manual de acceso interno](../../manual-de-uso/rooms/administrar-acceso-interno.md).
@@ -50,9 +57,11 @@ detalle está en [acceso interno](acceso-interno-rooms.md).
 
 - Un agente trabaja con la línea de comandos `pnpm rooms` o con el MCP local, que corre en la máquina de la persona.
 - Usa la sesión de esa persona (un archivo de sesión). Por eso puede hacer todo lo que ella puede hacer, incluidos los
-  comandos de acceso `members.*`.
-- No hay un MCP remoto: ningún agente opera Rooms sin la sesión local de una persona.
-- Rooms todavía no distingue si una acción la hizo la persona o un agente en su nombre.
+  comandos de acceso `members.*` y el cambio de nombre del espacio.
+- No hay un MCP remoto: ningún agente opera Rooms sin la sesión local de una persona o sin una herramienta
+  administrativa que corre el operador.
+- Rooms registra si una acción la hizo la persona o un agente, y por qué canal; la persona recibe un aviso y puede
+  deshacer lo que salió de la mesa. El primer recorrido real con un agente todavía no se ha hecho.
 
 ### Lo decidido (todavía sin construir)
 
@@ -70,14 +79,14 @@ El [ADR del carril de agentes](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE
 
 | Falta | Cómo se hace hoy |
 |---|---|
-| Botón para crear una sala | Sólo por API o con la línea de comandos. |
-| Enlace a la mesa de autoría | Escribir la dirección `/rooms/:id/authoring`. |
 | Todos los permisos de invitación en pantalla | La pantalla ofrece ver sala y ver pruebas; otros permisos, como preguntar, se dan por API o comandos. |
+| Cambiar el nombre del espacio | Sólo por comando ([manual](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md)). |
+| Detalle completo de cada acción de agente | La casa muestra quién, qué, cuándo y por qué canal; el resumen y el detalle de cada acción todavía no llegan. |
 | Consola de presentación | Sólo por API. |
 | Señales de actividad | Sólo por API. |
 
-Las pantallas de administración que faltan están en pausa: se van a rediseñar pensando primero en los agentes, con
-una vista de «Actividad de agentes» y una vista por sala.
+Desde el 2026-10-31 ya existen «Crear sala», «Abrir autoría», la casa con la actividad de agentes y la vista por sala
+(TASK-2085). Las demás pantallas de administración siguen en pausa.
 
 > Detalle técnico: estado y próximos pasos en el [dossier de Rooms](../../architecture/rooms/README.md); operación de
 > producción en el [manual de producción](../../manual-de-uso/rooms/operar-produccion-rooms.md).

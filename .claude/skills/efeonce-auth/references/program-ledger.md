@@ -18,7 +18,20 @@
 - Guard de `auth-server-deploy.yml` compatible con squash (PR #265): si el commit servido no es ancestro del objetivo, acepta sólo si es
   ancestro de la coincidencia de árbol MÁS ANTIGUA en `origin/develop`; un runtime servido más nuevo sigue rechazado (pruebas en
   `scripts/auth-server/test_deploy_contract.py`, incluido el caso de revert).
-- `main` ya contiene el guard de deploy (PR #263/#264 quedan superados por el release; cerrarlos o rebasarlos es limpieza pendiente).
+- `main` ya contiene el guard de deploy. PR #263 (`main`) y #264 (`develop`) de Codex se **cerraron** el 2026-11-01 como superadas
+  por el release; las ramas se conservan.
+- Intentos abortados antes del `released` (`doc`, timing ledger): run `41274930062` (manifest `5f2e69806eee…`), el guard viejo exigía
+  ancestría y el squash no la tiene → [ISSUE-184](../../../../docs/issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md);
+  run `41282851247` (manifest `935583f88db0-3f177dd4…`), el deploy gobernado creó `auth-server-00170` con 0 % porque el tráfico seguía
+  fijado a `auth-server-00169-4pq` desde la activación manual del 31-10 →
+  [ISSUE-185](../../../../docs/issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md).
+- CI de `develop` bloqueado ese mismo día por 20 tests de growth SEO atados al corte ETV `2026-11-01T00:00:00.000Z`; fix `1543335fb`
+  (reloj fijado) → [ISSUE-186](../../../../docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md). La rotación de
+  `changelog.md` (`9c166d03b`) fue rutina.
+- `vivo`: watchdog 6/6 synced; `ops-worker` y `artifact-worker` quedan en `1543335fb` por change-gate legítimo (el diff del release
+  posterior es sólo el workflow de Auth y su test).
+- **Sin verificar:** errores de Sentry del release (sin token local) y un login humano completo a Rooms de punta a punta. Por eso
+  TASK-2064 sigue `in-progress`.
 - Sigue abierto: TASK-1833 (sin pentest completo) y ningún cliente real sin autorización nueva; delegación interactiva para la audiencia
   Rooms (EPIC-044) sigue como task por crear.
 
