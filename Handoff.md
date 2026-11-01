@@ -1,6 +1,9 @@
 # Handoff
 
-## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP por cerrar
+## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP cerrado
+
+**Actualización:** el operador cerró `efeonce-kortex-dev` (estado `DELETE_REQUESTED`, se puede deshacer con
+`gcloud projects undelete` durante 30 días); el respaldo en `efeonce-group-kortex-archive` sigue intacto.
 
 Decisión del operador: Kortex no continúa. Respaldo verificado de `kortex-pg-dev` (`kortex_app` 41 tablas +
 `postgres`) en `gs://efeonce-group-kortex-archive/` (clase ARCHIVE, proyecto efeonce-group); la base quedó otra vez
