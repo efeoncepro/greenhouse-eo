@@ -230,8 +230,19 @@ jobs:
             fi
             if ! git merge-base --is-ancestor "${CURRENT_GIT_SHA}" "${EXPECTED_SHA}" \
               && ! git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
-              echo "ERROR: target would replace unpromoted or newer Auth runtime; promote/reconcile it first."
-              exit 1
+              # A squash release (develop -> main) never has the develop commit Auth may serve as an ancestor.
+              # Accept only when the served commit is contained in the develop commit whose tree is exactly the
+              # target tree, i.e. the commit that was squashed into EXPECTED_SHA. Anything else stays refused.
+              SQUASH_SOURCE=""
+              if git fetch --no-tags origin develop >/dev/null 2>&1; then
+                TARGET_TREE="$(git rev-parse "${EXPECTED_SHA}^{tree}")"
+                SQUASH_SOURCE="$(git log --format='%H %T' -n 1000 origin/develop | awk -v tree="${TARGET_TREE}" '$2 == tree { print $1; exit }')"
+              fi
+              if [ -z "${SQUASH_SOURCE}" ] || ! git merge-base --is-ancestor "${CURRENT_GIT_SHA}" "${SQUASH_SOURCE}"; then
+                echo "ERROR: target would replace unpromoted or newer Auth runtime; promote/reconcile it first."
+                exit 1
+              fi
+              echo "auth-server served ${CURRENT_GIT_SHA} is contained in ${SQUASH_SOURCE}, the develop commit squashed into ${EXPECTED_SHA}."
             fi
           fi
 

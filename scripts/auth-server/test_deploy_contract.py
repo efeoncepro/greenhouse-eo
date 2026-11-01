@@ -103,6 +103,31 @@ class DeployContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
 
+    def _squash_release(self, served_offset):
+        """develop gets two Auth commits; main receives a squash with develop's final tree."""
+        self.git('checkout', '-qb', 'develop')
+        commits = []
+        for text in ('served develop runtime', 'released develop runtime', 'newer develop runtime'):
+            (self.repo / 'src/lib/auth.ts').write_text(text)
+            self.git('commit', '-qam', text)
+            commits.append(self.git('rev-parse', 'HEAD'))
+        source = commits[1]
+        self.git('push', '-q', 'origin', 'develop')
+        squash = self.git('commit-tree', self.git('rev-parse', source + '^{tree}'), '-p', self.sha, '-m', 'release squash')
+        revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': commits[served_offset]}]}]}}
+        return self.run_step('Check deployed revision drift', EXPECTED_SHA=squash,
+                             TEST_REVISION=json.dumps(revision), GCP_PROJECT_ID='test', GCP_REGION='test')
+
+    def test_squash_release_may_replace_the_develop_commit_it_contains(self):
+        result = self._squash_release(served_offset=0)
+        self.assertNotIn('target would replace unpromoted or newer Auth runtime', result.stdout)
+        self.assertIn('the develop commit squashed into', result.stdout)
+
+    def test_squash_release_still_refuses_a_newer_served_develop_commit(self):
+        result = self._squash_release(served_offset=2)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
+
     def test_split_traffic_or_missing_source_never_deploys(self):
         split = {'status': {'traffic': [{'revisionName': 'a', 'percent': 50}, {'revisionName': 'b', 'percent': 50}]}}
         for env in ({'TEST_SERVICE': json.dumps(split)}, {'TEST_REVISION': '{"spec":{"containers":[{"env":[]}]}}'}):
