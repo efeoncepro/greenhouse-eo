@@ -40,6 +40,12 @@
   8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
      datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
 
+## 2026-11-01 — Casa agentes primero (TASK-2085) y redirección a Efeonce ID EN PRODUCCIÓN
+
+- TASK-2085 en `main@21b10a9` (PR #8). PR #9 en `main@97588d3`: el proxy responde 307 a `/login?returnTo=…` en `/rooms` y `/rooms/:id/actividad` cuando no hay ninguna cookie de sesión de Rooms; conserva sólo `?accion=`; `homeGate` sigue siendo la autoridad. Deploy `efeonce-rooms-nveyuogvr` + `vercel alias set`; readback: `/rooms` → 307 → `/login` → 302 a `auth.efeonce.org/oauth/authorize`.
+- Antes, `src/app/rooms/loading.tsx` se mostraba antes de que la página decidiera y `redirect()` viajaba por RSC (200 + parpadeo). Lección: una redirección que debe ser 307 en un segmento con `loading.tsx` va en el proxy.
+- Pendiente: el nombre legible del espacio no existe (Rooms crea `organization_id` y no guarda nombre); requiere tabla + command y migración en `rooms_production`, sin autorizar. El login V4 de Efeonce ID en producción carece del panel de novedades (`71aff5f70`, sólo en ramas locales de Codex); depende de levantar la retención de Auth.
+
 ## 2026-10-31 — Renovación automática al entrar EN PRODUCCIÓN
 
 - «Corrige el bug, y luego despliegas». `vivo`: migración 20 aplicada (20 migraciones, hashes y conteos intactos);
