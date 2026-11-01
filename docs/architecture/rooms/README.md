@@ -32,8 +32,12 @@ cada deploy hay que reasignarlo con `vercel alias set <deploy> efeonce-rooms.ver
 Sin ese paso el dominio público sigue sirviendo el deploy anterior aunque el nuevo esté READY. El alias del equipo
 (`efeonce-rooms-efeonce-7670142f.vercel.app`) tiene SSO de Vercel y no sirve para probar como visitante.
 
-**Retención de Efeonce ID.** Los PR #263/#264 siguen sin merge; sus flags se liberaron sólo para
-esta activación. TASK-1833 (revisión de seguridad) sigue abierta.
+**Efeonce ID: retención levantada.** El release `935583f88db0` llegó a `main` el 2026-11-01 e incluye el guard de
+deploy del [PR #265](https://github.com/efeoncepro/greenhouse-eo/pull/265). Los PR
+[#263](https://github.com/efeoncepro/greenhouse-eo/pull/263) y
+[#264](https://github.com/efeoncepro/greenhouse-eo/pull/264) están cerrados sin merge, superados por ese release;
+ya no son una retención vigente. Detalle en el [ledger de Auth](../../../.codex/skills/efeonce-auth/references/program-ledger.md).
+TASK-1833 (revisión de seguridad) y los gates para clientes siguen abiertos.
 
 ### ADR aceptados
 

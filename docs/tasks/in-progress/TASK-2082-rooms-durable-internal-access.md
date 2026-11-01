@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-052`
-- Status real: `2026-10-31: EN PRODUCCIÓN. Migraciones 19 y 20 aplicadas (ensayos PASS); dueño adoptado con members.manage y auto_renew (renueva al entrar); main@aae04cd desplegado (dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N, alias reasignado); fix de la carrera de reloj en access_requests incluido; health sin señales. Recibo docs/audits/rooms/2026-10-31-durable-access-production.md. Falta: primer login humano del dueño con esta versión y un segundo administrador.`
+- Status real: `2026-10-31: EN PRODUCCIÓN. Migraciones 19 y 20 aplicadas (ensayos PASS); dueño adoptado con members.manage y auto_renew (renueva al entrar); main@aae04cd desplegado (dpl_8oVZvbYgpTUE2f79aYQJFCReuQ4N, alias reasignado); fix de la carrera de reloj en access_requests incluido; health sin señales. Recibo docs/audits/rooms/2026-10-31-durable-access-production.md. 2026-11-01: login humano con MFA aceptado según reporte de Julio transmitido por la sesión Auth (docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md), sin logs ni prueba instrumentada añadidos. Falta: segundo administrador y evidencia específica de renovación al entrar; el reporte no prueba esa renovación.`
 - Rank: `antes del primer cliente real y antes de dar acceso a otra persona interna`
 - Domain: `platform|identity`
 - Blocked by: `ninguno para el corte local; producción espera autorización (migración + merge)`
