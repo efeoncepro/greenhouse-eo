@@ -10,6 +10,13 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-01 — Marca de Efeonce ID
+
+Efeonce ID, la cuenta de Efeonce Auth, tiene marca aprobada: la órbita vive en la D, con la esfera Growth a la 1:30
+([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)). Los archivos oficiales (logo, lockup e isotipos) entran a
+AXIS en `axis-brand-assets` 0.4.31. En la pantalla de entrada irá sólo como favicon y dentro del formulario; el carrusel de
+novedades se conserva. La adopción en Efeonce Auth queda pendiente.
+
 ## 2026-11-01 — Efeonce ID y Rooms: login con novedades y entrada directa
 
 El login de Efeonce ID muestra las novedades publicadas de Greenhouse, también al entrar a Rooms (release

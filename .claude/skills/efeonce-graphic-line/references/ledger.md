@@ -1,5 +1,25 @@
 # Registro de decisiones y versiones
 
+### 2026-11-01 — Marca de Efeonce ID: la órbita vive en la D (aprobada)
+
+Caso: logo de Efeonce ID, la cuenta de Efeonce Auth (canvas `https://claude.ai/code/artifact/4e613ff0-2a09-48c6-8e98-4adffc6da9bd`,
+exploración en `ai-generations/2026-11-01_efeonce-id-logo/`). ADR: `docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md`.
+
+- **Aprobada la ruta A pulida** («Bien, está aprobado»): la D es asta, **tramo recto de 110** y media órbita; esfera
+  Growth a la 1:30 con el corte concéntrico; anillo 64, esfera 88, aire 22. 12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`
+  en `@efeoncepro/axis-brand-assets` **0.4.31** (commit AXIS `5a6a597`), públicos en «Logotipos». Generador
+  `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas).
+- **El tramo recto resolvió la primera queja** («no me gusta mucho»): sin él la media órbita salía del asta, dejaba un
+  muñón entre asta y esfera y la panza parecía un alambre pegado a la barra. Anillos de 80 y 96 se probaron y se
+  descartaron: volvían a pesar.
+- **Descartadas:** la nave de Efeonce + «ID» («la nave no funciona, descártala»); la huella con surcos concéntricos en
+  la panza, en tres grados, con remates redondos y en trazo fino («muy pesada y no tan limpia para el logo e incluso para
+  nuestra línea gráfica»); la I dentro de una órbita (se lee ⓘ); la esfera como punto de la i (sin órbita, choca con
+  Insights).
+- **Pantalla de entrada de Efeonce Auth:** la marca va **sólo en el favicon y en ciertas aplicaciones del formulario**
+  (lockup en el encabezado, botón «Continuar con Efeonce ID»). **Nunca el isotipo grande en el panel lateral**: es del
+  carrusel de novedades, que se conserva. La adopción en `auth-server` no está hecha.
+
 ### 2026-10-28 — Home de efeoncepro.com en «La órbita» (canvas «Home Efeonce en órbita»): aprobada y publicada
 
 Caso: rediseño de la home del sitio con la línea gráfica y el motion de referencia de getpingback.com (canvas

@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-11-01 — Marca de Efeonce ID aprobada y canonizada en AXIS
+
+«La órbita vive en la D»: asta, tramo recto de 110 y media órbita, esfera Growth a la 1:30 ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
+Generador `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas aprobado); 12 SVG
+`efeonce-id-*` en `axis-brand-assets` 0.4.31 (commit AXIS `5a6a597`; 59/59 pruebas del paquete y la del Lab verdes).
+Regla del operador: en el login de Auth sólo favicon y formulario; el panel lateral es del carrusel de novedades.
+Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizadas y espejadas. Pendiente: la release
+del paquete (tag `v0.4.31`), fijarlo en Greenhouse (TASK-2014) y adoptar la marca en `auth-server`.
+
 ## 2026-11-01 — Cloud Build: paquete de subida 986 → 131 MB
 
 `.gcloudignore` excluye `/ai-generations/`, `/outputs/`, `/generated/` y `/scripts/frontend/` (anclados a la raíz;

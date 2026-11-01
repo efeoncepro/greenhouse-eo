@@ -19,6 +19,16 @@
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
 
+## 2026-11-01 — Una escala redondeada a dos decimales recorta el logo dentro del lockup
+
+**Síntoma:** en el canvas de Efeonce ID, el operador preguntó si el lockup «se ve recortado a propósito»: el borde
+derecho de la D quedaba cortado en positivo, negativo y blanco. Ninguna prueba lo detectó; se vio a ojo.
+**Causa:** el generador escalaba la marca dentro del lockup con `scale(${f(s)})`, y `f()` redondea a dos decimales:
+0,0292 pasó a 0,03, la marca creció casi un 3 % y se salió del `viewBox`. El mismo redondeo movía la teja de app un 0,6 %.
+**Regla:** las coordenadas se redondean a dos decimales; **una escala nunca** (va con seis, o con un `<svg>` anidado y su
+propio `viewBox`, como hacen los generadores de la familia). Al terminar un lockup, comprueba que la última columna con
+tinta coincida con el borde del archivo y mira la curva: un borde recto donde debería haber curva es recorte.
+
 ## 2026-09-26
 
 - **Las recetas se alejaron del canvas en silencio.** Síntoma: lente con disco gigante, foco sin anillo, firma con el

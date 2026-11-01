@@ -4,6 +4,19 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Marca de Efeonce ID aprobada (archivos en AXIS; adopción en Auth pendiente)
+
+- `doc`: [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md). «La órbita vive en la D»:
+  asta, tramo recto y media órbita, esfera Growth a la 1:30. `local`: 12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`
+  en `@efeoncepro/axis-brand-assets` 0.4.31 (commit AXIS `5a6a597`), generador `scripts/brand/build-efeonce-id-logos.mjs`.
+- **Regla del operador para la pantalla de entrada:** la marca va **sólo en el favicon** (`efeonce-id-isotype-small-*`, para
+  ≤ 32 px) **y en ciertas aplicaciones del formulario** (lockup `efeonce-id-lockup-*` en el encabezado; botón «Continuar con
+  Efeonce ID» con el isotipo chico en las aplicaciones). **Nunca el isotipo grande en el panel lateral:** ese panel es del
+  carrusel de novedades, que se conserva.
+- **No implementado en `auth-server`:** favicon, encabezado y botón siguen como están. Hacerlo es una tarea aparte, se itera
+  en el arnés (`pnpm auth-server:dev-ui`) y llega a producción sólo por release gobernado. Greenhouse fija
+  `axis-brand-assets` 0.4.25; la 0.4.31 hay que publicarla y fijarla antes de consumir los archivos desde el paquete.
+
 ## 2026-11-01 — Login first-party vencido: hotfix en producción (`auth-server-00171-xdd`)
 
 - Hotfix PR #266 (`main@60872da`), release `60872da089ed-6925b98e-7b47-4ab4-8435-d3eb64ad94c9` `released` (run

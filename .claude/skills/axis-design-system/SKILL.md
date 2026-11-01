@@ -795,6 +795,25 @@ sphere, air and concentric terminations as the family; cuts computed as outlines
   `docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md` and `efeonce-graphic-line` → `references/ledger.md`
   (2026-10-08).
 
+### Efeonce ID product mark (brand assets only; 2026-11-01)
+
+The operator approved the **Efeonce ID** mark (the account of Efeonce Auth, `auth.efeonce.org`): «the orbit lives in the
+**D**». «ID» has no O, so the D is the stem, a **straight run of 110 units** and **half an orbit** (12 to 6 on the right),
+with the single **Growth** sphere at 1:30 and the family's concentric cut; ring 64, sphere 88, air 22, Poppins Bold «I».
+Nothing else: a fingerprint with ridges inside the D was rejected as too heavy for the line.
+
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.31`** (AXIS commit `5a6a597`): 12 SVG
+  `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`; brand key `efeonce-id`, logo family
+  `efeonce-id` (public in «Logotipos»). `lockup` «Efeonce | ID» is the default; `isotype-small` (ring 110, sphere 104,
+  air 30) only at 32 px or less (favicon, «Continuar con Efeonce ID» button).
+- **Sign-in screen rule:** on the Efeonce Auth sign-in screen only the favicon and the in-form pieces (header lockup,
+  button); never the large isotype in the side panel, which belongs to the news slider.
+- **Generation:** Greenhouse `scripts/brand/build-efeonce-id-logos.mjs`; copy to `packages/brand-assets/assets/` and
+  `apps/lab/public/branding/`, then `pnpm seal`; never edit by hand. Never round an SVG `scale()` to two decimals (it
+  clipped the D in the first lockups).
+- **Adoption:** not in `auth-server` yet; Greenhouse pins `0.4.25`. Decision: Greenhouse ADR
+  `docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md`.
+
 ### Efeonce Wave, Reach and Globe in the product family (brand assets only; 2026-10-09, route «H3»)
 
 The operator moved Wave, Reach and Globe into the family («Efeonce Wave», not «Wave by efeonce»). Each product **keeps
