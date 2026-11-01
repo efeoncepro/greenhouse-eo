@@ -11,6 +11,8 @@
   Rollback: tráfico a `auth-server-00169-4pq`.
 - La retención humana se levantó; PR #263/#264 se cerraron como superadas. TASK-1833 sigue abierta: ningún cliente real
   sin una autorización nueva. Sin verificar: Sentry del release y un login humano completo hacia Rooms.
+- El trabajo de TASK-1833 que vivía en la rama local de Codex quedó en `develop` (`e09d72d70`), sin release a `main`: revocación y
+  recuperación atómicas, 413, OTP con fallo cerrado, Job aislado de rotación y verificación post-deploy del tráfico.
 - Siguiente unidad del carril de agentes de Rooms: [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md).
 
 ## Delta 2026-10-31 — first-party y OTP en producción para Rooms

@@ -40,6 +40,9 @@ entrada desde Rooms. `/healthz`, `/readyz`, discovery, JWKS y `/login` responden
 - **Rollback.** `gcloud run services update-traffic auth-server --region us-east4 --project efeonce-group --to-revisions=auth-server-00169-4pq=100`
   (misma configuración de flags; deja el tráfico fijado, así que después de corregir hay que volver a `--to-latest`).
 - **Sin verificar:** errores de Sentry del release y un login humano completo Efeonce ID → Rooms.
+- **En `develop`, pendiente de release (`e09d72d70`):** verificación post-deploy de la revisión activa, retiro del trigger
+  `push:main`, revocación atómica, recuperación atómica, 413, OTP con fallo cerrado y el Job aislado de rotación
+  ([runbook de rotación](auth-server-key-rotation.md); migración sin aplicar y Job sin provisionar).
 
 El canary único de Rooms del 26 de octubre está cerrado; no repetir el correo ni reabrirlo como prueba de otro deploy.
 Historia del control de despliegue: [expediente del 26-10](../../audits/rooms/2026-10-26-auth-deploy-control.md) y

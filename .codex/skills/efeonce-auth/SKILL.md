@@ -19,6 +19,10 @@ Estado `vivo`:
   --to-revisions=auth-server-00169-4pq=100`, con readback.
 - **PR #263/#264** (guard original de Codex) se cerraron el 2026-11-01, superadas por el release; las ramas se conservan.
 - **Sin verificar:** errores de Sentry del release y un login humano completo hacia Rooms.
+- **En `develop`, sin release a `main` (commit `e09d72d70`, 2026-11-01):** el trabajo de TASK-1833 que estaba varado en la rama
+  local de Codex. Incluye revocación atómica de consentimiento y tokens, recuperación atómica, 413, OTP con fallo cerrado, Job
+  aislado de rotación (migración sin aplicar; gate `AUTH_KEY_MAINTENANCE_PROVISIONED` ausente), retiro del trigger `push:main`
+  y verificación post-deploy de la revisión activa. Nada de esto corre en producción hasta el próximo release.
 
 Incidentes del release, ya resueltos: [ISSUE-184](../../../docs/issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)
 (guard vs squash), [ISSUE-185](../../../docs/issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)

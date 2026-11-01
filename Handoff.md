@@ -17,6 +17,10 @@ PR #263/#264 cerradas, retención levantada. Rooms PR #9–#11 en producción: 3
 migraciones revisadas ([ISSUE-187](docs/issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
 Sin verificar: Sentry del release y login humano Efeonce ID → Rooms (TASK-2064/2085 siguen in-progress). Próximo:
 TASK-2086 (delegación interactiva para Rooms) y TASK-1833 antes de cualquier cliente real.
+Después (local, sin push): [TASK-1833 conciliada](docs/tasks/in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md)
+y la rama local de Codex `codex/auth-pr-develop-stack` integrada en `develop` (`e09d72d70`): revocación/recuperación atómicas,
+413, OTP con fallo cerrado, Job de rotación (migración sin aplicar) y verificación post-deploy del tráfico. Requiere release a
+`main`; la llave de firma (KMS v1/v2 del 04-09) dispara `auth.keys.rotation_overdue` hacia el 23-11.
 
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 

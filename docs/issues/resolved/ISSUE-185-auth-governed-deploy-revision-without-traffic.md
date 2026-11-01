@@ -54,6 +54,11 @@ una comprobación manual antes del dispatch. Mejora recomendada, sin task creada
 después del deploy (la revisión nueva al 100 %) y falle con un mensaje explícito, o que compruebe `latestRevision`
 antes de desplegar.
 
+**Actualización 2026-11-01:** la verificación post-deploy ya existe en `develop` (commit `e09d72d70`, paso «Verify active
+Auth revision» de `auth-server-deploy.yml`, con pruebas en `scripts/auth-server/test_deploy_contract.py`): exige una sola
+revisión al 100 % que sirva el SHA esperado y falla con un mensaje explícito si no. Rige desde el próximo release a `main`;
+hasta entonces sigue valiendo la comprobación manual antes del dispatch.
+
 ## Relacionado
 
 - Runs `41282851247` (abortado), `41284120477` (`released`); release anterior [ISSUE-184](ISSUE-184-auth-deploy-guard-rejected-squash-releases.md).
