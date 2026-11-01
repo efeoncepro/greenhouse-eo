@@ -263,3 +263,12 @@ own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and
 - Catalogs: `pnpm composer:visual-gate --catalog=insights` (scoped; never re-freeze `deck-axis`/SKY frames) and a real
   PDF opened page by page — a render canary needs an organization with data, not the sandbox (see `operations.md`).
 - Docs: `pnpm task:lint`, `pnpm docs:context-check:strict`, `pnpm skills:mirrors`, `pnpm mcp:skills:check`.
+
+## SKY Blog — contrato y prueba local (2026-11-01)
+
+TASK-2094 conserva un [contrato candidato](../../../docs/architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md)
+para host/binding/calidad y tres productores actuales: GA4, GSC y motor AEO nativo. No confundir referrals GA4
+con corrida nativa ni CURRENT GAP PASS con fix. [Evidencia local](../../../docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md):
+89 pruebas, 27 PG16 real; no grants/rollout completo. A′/B pendientes. Reproducir sólo con el
+[runner privado](../../../docs/manual-de-uso/insights/validar-blog-y-bridge-localmente.md); nunca contra DB compartida.
+TASK-2033/1960 retienen scope/reporting; no se altera el contrato Berel v1 ni se activa medición SKY productiva.

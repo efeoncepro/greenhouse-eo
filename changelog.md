@@ -1,5 +1,9 @@
 # changelog.md
 
+**2026-11-01 · SKY, tooling local:** [contrato Blog y 89 pruebas](docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md)
+con GA4/GSC/AEO y componentes reales sobre PostgreSQL efímero. TASK-2094 en progreso; bridge y rollout pendientes.
+Sin cambio productivo ni de historia de Diseño.
+
 **2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
 registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary
 tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal; sin cambio de runtime.

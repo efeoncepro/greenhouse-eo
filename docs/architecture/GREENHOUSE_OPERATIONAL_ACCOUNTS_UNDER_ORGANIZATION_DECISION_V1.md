@@ -7,8 +7,8 @@
 - Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio decide aceptación y apertura.
 - Scope: cuentas operativas, bridge legacy, contexto autorizado, sync, atribución y reporting por servicio.
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
-- Confidence: `medium`; la evidencia local no certifica migración, transacciones ni rollout.
-- Validated as of: `2026-10-27`, código del checkout y discovery sellado en `4be89a9d4`; sin nueva conexión productiva.
+- Confidence: `medium`; transacción local acotada verificada; migración, autorización integral y rollout pendientes.
+- Validated as of: `2026-11-01`, componentes reales en PostgreSQL efímero (TASK-2094); sin conexión productiva.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
 
 ## Revisión 2026-11-01 — Elección del bridge pendiente
@@ -20,6 +20,16 @@ refresh, perfiles/P&L financieros o rematerialización histórica reales. A′ y
 local aislada y commands/readers reales. El modelo Organization→Spaces se mantiene como dirección; bridge y
 schema siguen pendientes. La medición/preview interna del Blog puede desarrollarse sin esperar al alta del
 segundo Space; la apertura departamental exige aislamiento completo. No hay autorización de provisioning.
+
+## Incremento local TASK-2094
+
+[Contrato candidato Blog](EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md) y
+[evaluación con componentes reales](../audits/client-portal/2026-11-01-sky-real-component-validation/README.md):
+89 pruebas pasan, 27 sobre PG16 efímero. A′ conserva selectividad por client pero requiere provisioning operativo
+sin duplicación comercial; B revela default de sesión dependiente de metadata. Ambos reproducen revocación
+insuficiente, replay de owner Services y alcance org de Account360. Snapshot sellado y rollback local sí probados.
+No es una implementación completa de ninguno de los bridges. Decisión sigue pendiente de contexto/grants,
+refresh, P&L, ICO histórico, sincronización y entrega reales sobre fixtures; sin mutaciones de producción.
 
 ## Context
 

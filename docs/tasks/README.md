@@ -1,5 +1,7 @@
 # Task Index
 
+- `TASK-2094` — [SKY: contrato y componentes reales](in-progress/TASK-2094-sky-measurement-real-component-local-validation.md), in-progress local; 89 pruebas PASS (27 PG16), contrato GA4/GSC/AEO; elección A′/B pendiente, sin producción.
+
 - `TASK-2083` — [Rooms: página «el acceso se detuvo»](in-progress/TASK-2083-rooms-access-issue-page.md), in-progress; **en producción** 2026-10-31, aprobada por el operador; falta verla en un login humano real.
 - `TASK-2082` — [Rooms: acceso interno durable y gobernado](in-progress/TASK-2082-rooms-durable-internal-access.md), in-progress; **en producción** 2026-10-31 (`main@aae04cd`, migraciones 19–20, dueño adoptado con renovación al entrar); login con MFA aceptado por reporte del operador vía sesión Auth el 2026-11-01; sin evidencia instrumentada añadida. Siguen pendientes segundo administrador y verificación específica de renovación.
 - `TASK-2081` — [Rooms: sala en vivo](in-progress/TASK-2081-rooms-live-room-realtime.md), in-progress; ADR aceptado, presencia SSE + capa de cursores implementadas en local; falta medición en Vercel y autorización de producción.
@@ -13,7 +15,7 @@
 
 - `TASK-2075` — [Rooms: presentación durable](complete/TASK-2075-rooms-durable-presentation.md), complete local; backend local R09, sin UI ni producción.
 
-- `TASK-2073` — [Cuentas operativas: comparación local del bridge](complete/TASK-2073-operational-account-bridge-local-prototype.md), complete por sandbox local: 97 tests/68 checks PASS; A′ recomendado con owner Finance común; ADR Proposed, sin producción/historia.
+- `TASK-2073` — [Cuentas operativas: comparación local del bridge](complete/TASK-2073-operational-account-bridge-local-prototype.md), complete por sandbox local: 97 tests/68 checks PASS; elección A′/B diferida por revisión 01-11; ADR Proposed, sin producción/historia.
 - `TASK-2072` — [Rooms: backend cloud de medios](in-progress/TASK-2072-rooms-cloud-media-backend.md), in-progress; main e4b2e890, GCS/SQL8migraciones/26tablas y Scheduler/worker verificados; entorno aislado/SDK probados; consumidor Claude Design y rollout general pendientes.
 - `TASK-2071` — [Rooms: autoría y lectura de imágenes privadas](in-progress/TASK-2071-rooms-private-image-authoring-and-viewer.md), in-progress; nueva interfaz Claude Design, UI ready=no; contrato backend disponible, integración/GVC/aceptación humana pendientes.
 
@@ -65,7 +67,7 @@ Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../a
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2094`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2095`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress/parcial. [Release main2559e9242](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md) con Grader y clasificación auditada servidos; CI/Deep/smoke/health y watchdog6/6 PASS. GTM6/10, EC ON y13 Forms+Discovery verificados; Grader comercial, Contacto fueraAds, Web quote_request. Primera identidad nativa/recibo Graph/recepción y atribución Ads pendientes; umbrella `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.
@@ -2057,7 +2059,7 @@ Reglas de lectura:
 
 ## To Do
 
-- **Comité del comprador en Rooms (creado 2026-11-01).** En B2B compra un comité: el invitado suma a sus colegas. [`TASK-2092`](to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (P1, backend) crea las reglas: aprobación automática del mismo dominio corporativo, otro dominio o correo gratuito con aprobación del equipo, tope de 10 por sala, el colega nunca recibe más permisos ni vigencia. [`TASK-2093`](to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (P1, interfaz, canvas primero) las hace visibles en la sala y en la gestión de invitaciones. Siguiente ID: TASK-2094.
+- **Comité del comprador en Rooms (creado 2026-11-01).** En B2B compra un comité: el invitado suma a sus colegas. [`TASK-2092`](to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (P1, backend) crea las reglas: aprobación automática del mismo dominio corporativo, otro dominio o correo gratuito con aprobación del equipo, tope de 10 por sala, el colega nunca recibe más permisos ni vigencia. [`TASK-2093`](to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (P1, interfaz, canvas primero) las hace visibles en la sala y en la gestión de invitaciones. Siguiente ID: TASK-2095.
 - **Carril de agentes de Rooms (creado 2026-10-31).** Implementa el ADR `docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md` (agentes ciudadanos de primera clase). Ya, sin depender de Efeonce ID: [`TASK-2084`](in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md) atribución, aviso, reversa y cuotas (P1) → [`TASK-2085`](in-progress/TASK-2085-rooms-agent-activity-surface.md) pantalla «Actividad de agentes» (P1, dirección aprobada, en implementación); [`TASK-2090`](in-progress/TASK-2090-rooms-governed-media-import.md) medios gobernados (P2, en curso: slices 1–3 en local); [`TASK-2091`](in-progress/TASK-2091-rooms-authoring-craft-skill-and-eval.md) skill de oficio + eval (P1, en curso: slices 1–3 en local). MCP remoto: [`TASK-2086`](to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md) delegación en Efeonce ID (EPIC-044, bloqueada por la retención) → [`TASK-2087`](to-do/TASK-2087-rooms-delegated-bearer-verifier.md) verificador → [`TASK-2088`](to-do/TASK-2088-efeonce-mcp-rooms-provider.md) provider `rooms`. Fuentes: [`TASK-2089`](to-do/TASK-2089-rooms-content-sources-xray-crm.md) Radiografía AEO y CRM (P2, canary bloqueado por 2086).
 
 

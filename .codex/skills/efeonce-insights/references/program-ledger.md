@@ -906,3 +906,9 @@ sus hallazgos por página lo respetan.
   PR #250, junto con TASK-1974/1975); Think `0c5701a` antes. Watchdog `ok` 6/6.
 - **Pendiente:** glifos Trazo para clics, impresiones, CTR y posición (para retirar Tabler), los 10 isotipos sin
   productor (entran con TASK-1991/1992), promoción de `channelForDomain`/vocabulario y cifra adaptativa (`03e19f3ee`, ya hechos en develop). El canal no es campo autorado: la validación vive en el resolver, no falta agregarla al plan. Decisión de visitas por asistente y `metricIcon` pendientes.
+
+## TASK-2094 — SKY Blog local (2026-11-01, in-progress)
+
+Contrato de medición candidato y pruebas reales acotadas; 89 casos, 27 PG16. No acepta A′/B ni activa runtime.
+Continuidad y límites: `docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md`.
+Siguiente: contexto/grants/refresh reales antes de escoger bridge; ownership e historia integral pendientes.

@@ -116,18 +116,17 @@ Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia 
 [Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
 estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
 
-## 2026-11-01 — SKY: revisión profunda; puente A′/B pendiente
+## 2026-11-01 — SKY: contrato Blog y validación real local; puente pendiente
 
-[TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
-97 tests/68 checks A′/B PASS, red/FS restringidos. [Evaluación](docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
-[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): una Organization,
-Spaces separados; la [revisión en seis frentes](docs/audits/client-portal/2026-11-01-sky-deep-review/README.md)
-difiere A′/B. Grants/contexto por request, owner Finance, sync y conservación histórica requieren integración
-real aislada. Medición interna puede avanzar antes del split: host Blog y requisitos separados GA4/GSC/AEO
-nativo; Berel path-only y gate por módulo no bastan. Reproducciones puras confirman fallback Account360
-cliente same-org y scope sin host; no incidentes productivos verificados. Sin cambios runtime/DB/producción,
-provisioning, envíos ni historia de Diseño. Próximo: contratos y pruebas de integración con implementaciones
-reales; no repetir sólo el simulador. TASK-2073 no se reabre ni acredita rollout.
+Discovery propio commit `c618bc662`. [TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
+[contrato candidato](docs/architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md) exige GA4/GSC/AEO nativo
+actuales, host/binding/calidad/disponibilidad y comparación explícitos. [89 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md),
+27 con PG16 efímero y componentes reales; 15 adapter/validación con puertos mock y 47 del contrato. CURRENT GAP
+reproduce fallos, no los corrige. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
+A′/B sin elegir; A′ requiere alta operativa y owner canónico, B contexto de Space sin default por metadata.
+Snapshots sellados/rollback locales probados; grants/refresh, P&L, ICO, sync/entrega completos pendientes.
+TASK-2073 conserva cierre sólo de simulador; TASK-2033/1960 conservan scope/reporting. Próximo: contexto autorizado
+real con fixtures A′/B. Sin runtime/producción, provisioning real, envíos ni historia de Diseño modificados.
 
 ## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
 

@@ -2781,3 +2781,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro 2026-10-31: 2084–2091 verificados libres en filas, notas, `docs/**` y `origin/develop` justo antes de reservarlos (carril de agentes de Rooms, ADR `EFEONCE_ROOMS_AGENT_LANE_DECISION_V1`). Siguiente ID libre TASK-2092.
 
 > Registro 2026-11-01: 2092–2093 verificados libres en filas, notas, `docs/**`, `origin/develop` y ramas justo antes de reservarlos (acceso de colegas del comité comprador en Rooms, decisión del operador del 2026-11-01). Siguiente ID libre TASK-2094.
+
+| `TASK-2094` | `in-progress` | SKY: contrato Blog y validación local con componentes reales sobre PostgreSQL efímero; sin runtime/producción ni historia de Diseño. | `docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md` |
+
+> Registro 2026-11-01: 2094 libre en filas/reservas/filesystem; conserva TASK-2033/1960 y TASK-2073 complete. Autorización directa para contrato y pruebas locales. Siguiente ID libre TASK-2095.
