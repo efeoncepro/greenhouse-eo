@@ -40,11 +40,21 @@
   8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
      datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
 
+## 2026-11-01 — Nombre del espacio de trabajo EN PRODUCCIÓN
+
+- Operador: «Autorizo». `vivo`:
+  - ensayo en clon PASS (427/427; diff de rollback sólo marcas `\restrict` de pg_dump);
+  - migración `1793267000000_rooms-organization-profile` aplicada con `ROOMS_EXPECT_PENDING=1 pnpm db:migrate-production --apply`: respaldo `rooms-production-20261101T024624Z.dump`, 25 migraciones, 52 tablas, hashes y conteos intactos;
+  - [PR #10](https://github.com/efeoncepro/efeonce-rooms/pull/10) en `main@449a0cd`, deploy `efeonce-rooms-r00l7k48n` + `vercel alias set`;
+  - `org-2df565fb-…` nombrada «Efeonce» con `pnpm access:production rename-organization … --agent claude-code --apply` (recibo atribuido al agente por CLI, como el principal `rooms-pilot-julio-20261025`); relectura `current: "Efeonce"`.
+- Contrato: `organization.rename` (members.manage, clase `author`); `profile.get.organizationName`; encabezado de `/rooms` y actividad de sala + selector de espacio con fallback genérico. Sin ver con sesión real.
+- Deuda vista: `REVIEWED_MIGRATIONS` de la integración local no incluye 1793262–1793267 (`integration:up` fallaría en preflight). La rama `claude/rooms-media-import` trae 1793266, ya aplicada en la PG local.
+
 ## 2026-11-01 — Casa agentes primero (TASK-2085) y redirección a Efeonce ID EN PRODUCCIÓN
 
 - TASK-2085 en `main@21b10a9` (PR #8). PR #9 en `main@97588d3`: el proxy responde 307 a `/login?returnTo=…` en `/rooms` y `/rooms/:id/actividad` cuando no hay ninguna cookie de sesión de Rooms; conserva sólo `?accion=`; `homeGate` sigue siendo la autoridad. Deploy `efeonce-rooms-nveyuogvr` + `vercel alias set`; readback: `/rooms` → 307 → `/login` → 302 a `auth.efeonce.org/oauth/authorize`.
 - Antes, `src/app/rooms/loading.tsx` se mostraba antes de que la página decidiera y `redirect()` viajaba por RSC (200 + parpadeo). Lección: una redirección que debe ser 307 en un segmento con `loading.tsx` va en el proxy.
-- Pendiente: el nombre legible del espacio no existe (Rooms crea `organization_id` y no guarda nombre); requiere tabla + command y migración en `rooms_production`, sin autorizar. El login V4 de Efeonce ID en producción carece del panel de novedades (`71aff5f70`, sólo en ramas locales de Codex); depende de levantar la retención de Auth.
+- El nombre del espacio se resolvió en la entrada de arriba. El login V4 de Efeonce ID en producción carece del panel de novedades (`71aff5f70`, sólo en ramas locales de Codex); depende de levantar la retención de Auth.
 
 ## 2026-10-31 — Renovación automática al entrar EN PRODUCCIÓN
 
