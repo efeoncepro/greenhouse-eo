@@ -125,17 +125,18 @@ Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia 
 [Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
 estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
 
-## 2026-11-01 — SKY: contrato Blog y validación real local; puente pendiente
+## 2026-11-01 — SKY: permisos/contexto locales; puente pendiente
 
-Discovery propio commit `c618bc662`. [TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
-[contrato candidato](docs/architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md) exige GA4/GSC/AEO nativo
-actuales, host/binding/calidad/disponibilidad y comparación explícitos. [89 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md),
-27 con PG16 efímero y componentes reales; 15 adapter/validación con puertos mock y 47 del contrato. CURRENT GAP
-reproduce fallos, no los corrige. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
-A′/B sin elegir; A′ requiere alta operativa y owner canónico, B contexto de Space sin default por metadata.
-Snapshots sellados/rollback locales probados; grants/refresh, P&L, ICO, sync/entrega completos pendientes.
-TASK-2073 conserva cierre sólo de simulador; TASK-2033/1960 conservan scope/reporting. Próximo: contexto autorizado
-real con fixtures A′/B. Sin runtime/producción, provisioning real, envíos ni historia de Diseño modificados.
+[TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
+[167 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md), 78 nuevas
+sobre cookie/App sessions/recurso Insights reales y contexto candidato PG16. A′ tampoco aísla el listado
+Insights org; ambos bridges cumplen el candidato Space/Service/grant con principal fresco. Revocar SEO
+conserva Diseño del dual. Callback cookie conserva claims de usuario inactivo; App sí rechaza. Son
+reproducciones locales, no fixes ni incidentes confirmados. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
+seguridad requiere contrato común; A′/B se decidirán por compatibilidad/owner/historia. Próximo: routing de
+writers, owner comercial y protección histórica; HTTP/UI/concurrencia/ICO/distribución no certificados.
+Contrato Blog GA4/GSC/AEO sigue candidato; TASK-2033/1960 conservan scope/reporting. Discovery `c618bc662`,
+primer laboratorio `149aed558`. Sin src/producción/provisioning/envíos ni historia de Diseño modificados.
 
 ## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
 

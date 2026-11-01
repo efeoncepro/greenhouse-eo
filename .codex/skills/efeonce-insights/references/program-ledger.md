@@ -912,3 +912,7 @@ sus hallazgos por página lo respetan.
 Contrato de medición candidato y pruebas reales acotadas; 89 casos, 27 PG16. No acepta A′/B ni activa runtime.
 Continuidad y límites: `docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md`.
 Siguiente: contexto/grants/refresh reales antes de escoger bridge; ownership e historia integral pendientes.
+
+Incremento posterior TASK-2094: 78 pruebas permisos/contexto (total167), callbacks cookie/App/resource Insights
+reales y candidato SQL; no cambia src. Evidencia: `docs/audits/client-portal/2026-11-01-sky-space-context-validation/`.
+Siguiente: owner comercial y routing de writers; aislamiento no proviene del client_id, sino del grant/contexto.

@@ -35,3 +35,19 @@ puede requerir revisar exclusivamente su propio directorio; nunca detener todos 
 Para actualizar la evidencia versionada, conservar resultados por caso y hashes de las fuentes ejercitadas,
 separar las fronteras mock y escribir qué nuevas afirmaciones quedaron probadas. Mantener propuestas las
 reglas de suficiencia y el ADR hasta contar con evidencia de acceso, ownership e historia completa.
+
+## Incremento de permisos/contexto
+
+La misma ejecución incluye 78 casos nuevos A′/B sobre callbacks cookie, sesiones App y recurso Insights con
+SQL real, además del contexto candidato por Space. Total vigente: 167. [Límites y resultados](../../audits/client-portal/2026-11-01-sky-space-context-validation/README.md).
+`permissions-baseline.sql` crea sólo dependencias/authority experimental en el cluster; la tabla App se extrae
+de la migración original. Nunca aplicar ese archivo a una instancia compartida.
+
+Typecheck reproducible, sin ejecutar imports runtime:
+
+```sh
+node scripts/experiments/sky-measurement-bridge/check-types.mjs
+```
+
+Incluye tipos locales y dependencias importadas, con la ampliación NextAuth canónica; no sustituye el typecheck
+global. Requiere conservar `src/types/next-auth.d.ts` en las raíces: omitirla produjo diagnósticos artificiales.

@@ -31,3 +31,13 @@ in-progress si esos criterios siguen dentro del siguiente incremento; el contrat
 evidencia separada. Ningún resultado autoriza configurar SKY en DB compartida ni emitir un informe.
 
 Rollback: el runner detiene y elimina exclusivamente su directorio mkdtemp; retirar tooling no toca runtime.
+
+## Incremento autorizado — permisos/contexto por Space
+
+El operador autoriza continuar localmente con revocación, renovación de sesión y personas de ambos departamentos.
+Comparar por la misma matriz A′/B: callbacks cookie y sesiones App reales, lector tenant real, puerta/listado
+Insights reales con PostgreSQL efímero; metadatos de UI/locale y transportes fuera de alcance explícitos.
+Añadir contexto candidato con grants departamentales sólo en schema experimental local; nunca inferir
+permisos de una membership descriptiva. Probar identidad vigente, verbo, relación org/Space/Service, vigencia,
+revocación y selección independiente por request. No implementar ni desplegar autorización productiva.
+Guardar evidencia separada de la corrida anterior; conservar límites de P&L/ICO/delivery y ADR Proposed.

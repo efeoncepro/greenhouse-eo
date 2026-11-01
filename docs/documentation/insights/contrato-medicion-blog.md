@@ -15,3 +15,8 @@ su identidad; medir tráfico antiguo del Blog no atribuye ese resultado al nuevo
 Especificación: [contrato técnico](../../architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md).
 Estado y límites: [evaluación local](../../audits/client-portal/2026-11-01-sky-real-component-validation/README.md).
 Reproducción: [manual](../../manual-de-uso/insights/validar-blog-y-bridge-localmente.md).
+
+Acceso departamental también propuesto: una persona puede operar Diseño, SEO o ambos mediante contexto y
+permiso explícito por Space/Service. [Prueba local](../../audits/client-portal/2026-11-01-sky-space-context-validation/README.md)
+con revocación y renovación confirma ese comportamiento candidato en A′ y B. El listado actual de Insights
+sigue siendo por Organization; la separación todavía no está activa para clientes reales.

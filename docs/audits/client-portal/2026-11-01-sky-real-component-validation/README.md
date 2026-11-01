@@ -85,3 +85,9 @@ harness, no sandbox general frente a código malicioso: UNIX sockets están perm
 allowlist efectiva de PG sale del entorno fijo/setup; no se ejecuta código externo no confiable.
 
 [Gates y dictamen de QA](QA.md): cierre del incremento local separado de aceptación del puente.
+
+## Incremento posterior — permisos/contexto
+
+[78 pruebas nuevas, total 167](../2026-11-01-sky-space-context-validation/README.md): callbacks cookie, App
+sessions y recurso/reader Insights reales; contexto/grants candidato funciona con A′ y B. Este recibo de 89
+permanece histórico en `149aed558`; el nuevo receipt tiene hashes del runner ampliado.

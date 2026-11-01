@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Contrato candidato y 89 pruebas locales PASS (27 PG16); integración completa y elección A′/B pendientes`
+- Status real: `Contrato y 167 pruebas locales PASS; 78 nuevas de permisos/contexto A′/B; ownership/historia integral y decisión pendientes`
 - Rank: `2094`
 - Domain: `identity|data|insights`
 - Blocked by: `none`
@@ -93,7 +93,7 @@ ADR Proposed; Organization/Spaces/Service separados. DB local efímera no sustit
 
 ### Gap
 
-SQL actual y alternativas ya ejercitados de forma acotada; grants/refresh, P&L, ICO y delivery integrales pendientes. La validación editorial por módulo no garantiza
+SQL, callbacks de sesión y permisos/contexto candidatos ya ejercitados localmente; integración HTTP/UI, P&L, ICO y delivery integrales pendientes. La validación editorial por módulo no garantiza
 las tres fuentes requeridas; scope v1 ignora host. Propiedad histórica y distribución siguen sin certificar.
 
 ## Modular Placement Contract
@@ -248,6 +248,7 @@ Ninguna, repo-only. Elección definitiva/rollout después de evidencia suficient
 - [x] Source of truth, acceso, idempotencia, errores, historia y rollback explícitos; sin schema runtime nuevo.
 - [x] Matriz separa resultados actuales, contrato candidato y pruebas pendientes; elección sólo si evidencia basta.
 
+- [x] Usuarios Diseño/SEO/dual, revocación y renovación ejecutados con lógica real y contexto candidato en PG local; 78 casos y límites en auditoría.
 - [ ] Decisión A′/B sustentada por integración de autoridad, ownership e historia completos; aún falta evidencia.
 
 Evidencia de los criterios marcados: [evaluación y recibo](../../audits/client-portal/2026-11-01-sky-real-component-validation/README.md).
@@ -257,13 +258,17 @@ Se cumplen sólo en el alcance sintético declarado; ningún criterio marcado ac
 
 - `node scripts/experiments/sky-measurement-bridge/run-local.mjs`
 - `pnpm task:lint --task TASK-2094`
-- Typecheck/lint focal del tooling y cierre documental focal.
+- `node scripts/experiments/sky-measurement-bridge/check-types.mjs`
+- ESLint focal del tooling y cierre documental focal.
 
 ## Avance 2026-11-01
 
-Contrato, harness y comparación acotada implementados. 89 pruebas PASS; typecheck focal 0 diagnósticos propios,
-112 en dependencias transitivas (no equivale a typecheck global limpio). Revisión adversarial independiente
-sin blocker local. Próximo incremento: contexto explícito y grants/refresh en entrypoints reales para A′/B.
+Primer incremento `149aed558`: 89 pruebas. Incremento autorizado de permisos/contexto: **167/167 PASS**,
+78 nuevas (39 A′ y 39 B), App sessions/callbacks cookie/listado Insights reales y contexto candidato SQL.
+[Auditoría y límites](../../audits/client-portal/2026-11-01-sky-space-context-validation/README.md).
+Typecheck focal con ampliación NextAuth: 0 diagnósticos incluyendo dependencias importadas (corrige el checker
+anterior sin esa ampliación; no es typecheck global). No acepta bridge ni corrige src. Próximo: owner/routing de
+writers y preservación histórica; HTTP/UI/refresh concurrente/issuer quedan explícitamente pendientes.
 
 ## Closing Protocol
 
@@ -273,8 +278,8 @@ sin blocker local. Próximo incremento: contexto explícito y grants/refresh en 
 - [x] Commits sólo propios, sin push ni modificaciones de historia de Diseño.
 
 Gates: task lint 0 errores/0 warnings; ESLint y sintaxis PASS; ops lint sin errores con 15 advertencias
-de epics ajenos. Closure focal con 2 advertencias revisadas. Context strict global conserva 2 excesos
-preexistentes; [dictamen](../../audits/client-portal/2026-11-01-sky-real-component-validation/QA.md).
+de epics ajenos. Closure focal con 2 advertencias revisadas. Context strict global conserva 3 excesos
+preexistentes; [dictamen actualizado](../../audits/client-portal/2026-11-01-sky-space-context-validation/QA.md).
 
 ## Follow-ups
 

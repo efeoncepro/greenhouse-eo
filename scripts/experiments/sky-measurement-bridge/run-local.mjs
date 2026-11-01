@@ -56,8 +56,14 @@ try {
 
   if (!snapshotTable || !noDelete || triggerStart < 0 || triggerEnd < triggerStart) throw new Error('Snapshot SQL anchors changed; no substitute triggers allowed')
   psql('sky_bridge_test', snapshotTable + '\n' + noDelete + '\n' + insights.slice(triggerStart, triggerEnd))
-  psql('sky_bridge_test', `GRANT USAGE ON SCHEMA greenhouse_core, greenhouse_finance, greenhouse_serving, greenhouse_insights TO sky_test_app;
-    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA greenhouse_core, greenhouse_finance, greenhouse_insights TO sky_test_app;
+  const appMigration = readFileSync(join(root, 'migrations/20260426021650967_task-617-api-platform-app-foundation.sql'), 'utf8')
+  const appTable = appMigration.match(/CREATE TABLE IF NOT EXISTS greenhouse_core\.first_party_app_sessions \([\s\S]*?\n\);/)?.[0]
+
+  if (!appTable) throw new Error('Real app session table not found; refusing substitute')
+  psql('sky_bridge_test', appTable)
+  psql('sky_bridge_test', readFileSync(join(here, 'permissions-baseline.sql'), 'utf8'))
+  psql('sky_bridge_test', `GRANT USAGE ON SCHEMA greenhouse_core, greenhouse_finance, greenhouse_serving, greenhouse_insights, greenhouse_client_portal, sky_experiment TO sky_test_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA greenhouse_core, greenhouse_finance, greenhouse_insights, greenhouse_client_portal, sky_experiment TO sky_test_app;
     GRANT SELECT ON ALL TABLES IN SCHEMA greenhouse_serving TO sky_test_app;`)
 
   const testEnv = { ...env,

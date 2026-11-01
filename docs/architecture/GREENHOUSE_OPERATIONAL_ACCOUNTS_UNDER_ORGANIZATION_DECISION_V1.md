@@ -31,6 +31,17 @@ insuficiente, replay de owner Services y alcance org de Account360. Snapshot sel
 No es una implementación completa de ninguno de los bridges. Decisión sigue pendiente de contexto/grants,
 refresh, P&L, ICO histórico, sincronización y entrega reales sobre fixtures; sin mutaciones de producción.
 
+## Incremento local de autoridad — 2026-11-01
+
+[Pruebas de permisos/contexto](../audits/client-portal/2026-11-01-sky-space-context-validation/README.md):
+78 nuevas, total 167 PASS. El recurso real de Insights mezcla reports departamentales bajo la Organization
+con A′ y B; el parámetro Space no basta. Callbacks cookie y sesiones App difieren al desactivar usuario.
+Contexto experimental, principal fresco, grant por Space/verbo y binding Service/report permiten el mismo
+comportamiento seguro bajo ambos bridges, incluida revocación SEO que conserva Diseño del usuario dual.
+A′ no obtiene ventaja de autorización por separar client_id. El contrato requerido es común; la decisión del
+bridge depende ahora de compatibilidad de readers/writers, owner comercial y preservación histórica. No se
+acepta el ADR ni se autoriza provisioning; falta integración HTTP/UI, concurrencia, Finance/ICO y distribución.
+
 ## Context
 
 SKY tiene una relación histórica de Diseño y suma Blog SEO/AEO con stakeholders distintos. Necesita dos cuentas

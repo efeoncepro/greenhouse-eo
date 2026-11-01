@@ -272,3 +272,9 @@ con corrida nativa ni CURRENT GAP PASS con fix. [Evidencia local](../../../docs/
 89 pruebas, 27 PG16 real; no grants/rollout completo. A′/B pendientes. Reproducir sólo con el
 [runner privado](../../../docs/manual-de-uso/insights/validar-blog-y-bridge-localmente.md); nunca contra DB compartida.
 TASK-2033/1960 retienen scope/reporting; no se altera el contrato Berel v1 ni se activa medición SKY productiva.
+
+Incremento TASK-2094 de permisos/contexto: [167 pruebas locales, 78 nuevas](../../../docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md).
+Separar client_id (A′) no recorta el listado real de Insights por departamento. Ambos bridges requieren
+principal vigente + grant Space/verbo + vínculo Service/report. Cookie/App difieren en revocación de usuario;
+no afirmar fix productivo por reproducirlo. Contexto candidato sólo en experiments; elección A′/B pendiente
+de owner/routing/historia e integración completa.

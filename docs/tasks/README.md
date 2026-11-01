@@ -1,6 +1,6 @@
 # Task Index
 
-- `TASK-2094` — [SKY: contrato y componentes reales](in-progress/TASK-2094-sky-measurement-real-component-local-validation.md), in-progress local; 89 pruebas PASS (27 PG16), contrato GA4/GSC/AEO; elección A′/B pendiente, sin producción.
+- `TASK-2094` — [SKY: contrato y componentes reales](in-progress/TASK-2094-sky-measurement-real-component-local-validation.md), in-progress local; 167 pruebas PASS (78 nuevas de permisos/contexto), contrato GA4/GSC/AEO; elección A′/B pendiente, sin producción.
 
 - `TASK-2083` — [Rooms: página «el acceso se detuvo»](in-progress/TASK-2083-rooms-access-issue-page.md), in-progress; **en producción** 2026-10-31, aprobada por el operador; falta verla en un login humano real.
 - `TASK-2082` — [Rooms: acceso interno durable y gobernado](in-progress/TASK-2082-rooms-durable-internal-access.md), in-progress; **en producción** 2026-10-31 (`main@aae04cd`, migraciones 19–20, dueño adoptado con renovación al entrar); login con MFA aceptado por reporte del operador vía sesión Auth el 2026-11-01; sin evidencia instrumentada añadida. Siguen pendientes segundo administrador y verificación específica de renovación.
