@@ -23,7 +23,7 @@
 
 - `doc`: [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md). «La órbita vive en la D»:
   asta, tramo recto y media órbita, esfera Growth a la 1:30. `local`: 12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`
-  en `@efeoncepro/axis-brand-assets` 0.4.31 (commit AXIS `5a6a597`), generador `scripts/brand/build-efeonce-id-logos.mjs`.
+  en `@efeoncepro/axis-brand-assets` 0.4.31 (publicado en el release `v0.4.31`: AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages), generador `scripts/brand/build-efeonce-id-logos.mjs`.
 - **Regla del operador para la pantalla de entrada:** la marca va **sólo en el favicon** (`efeonce-id-isotype-small-*`, para
   ≤ 32 px) **y en ciertas aplicaciones del formulario** (lockup `efeonce-id-lockup-*` en el encabezado; botón «Continuar con
   Efeonce ID» con el isotipo chico en las aplicaciones). **Nunca el isotipo grande en el panel lateral:** ese panel es del

@@ -46,8 +46,9 @@ tiene O.
 Las cuatro piezas existen en `positive`, `negative` y `white` (12 SVG). Junto a Efeonce, «ID» va en el gris medido de la
 familia (`#6b6b6b` / `#6f89a2`) y sólo la esfera conserva el acento. Las genera
 [`scripts/brand/build-efeonce-id-logos.mjs`](../../../scripts/brand/build-efeonce-id-logos.mjs) (mismos píxeles que la
-versión aprobada en el canvas, verificado) y se sellan en `@efeoncepro/axis-brand-assets` **0.4.31** (commit AXIS
-`5a6a597`), públicas en la página «Logotipos» del Lab. Nunca se editan a mano: regenerar es correr el generador, copiar a
+versión aprobada en el canvas, verificado) y se sellan en `@efeoncepro/axis-brand-assets` **0.4.31**, publicado en el
+release `v0.4.31` (AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages), públicas en la página
+«Logotipos» del Lab. Nunca se editan a mano: regenerar es correr el generador, copiar a
 `packages/brand-assets/assets/` y `apps/lab/public/branding/` de AXIS y correr `pnpm seal`.
 
 ## Dónde va la marca en la pantalla de entrada de Efeonce Auth (operador, 2026-11-01)

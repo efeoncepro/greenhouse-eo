@@ -802,7 +802,7 @@ The operator approved the **Efeonce ID** mark (the account of Efeonce Auth, `aut
 with the single **Growth** sphere at 1:30 and the family's concentric cut; ring 64, sphere 88, air 22, Poppins Bold «I».
 Nothing else: a fingerprint with ridges inside the D was rejected as too heavy for the line.
 
-- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.31`** (AXIS commit `5a6a597`): 12 SVG
+- **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.31`** (published in release `v0.4.31`, AXIS `5a6a597` + `5540a2c`, 2026-11-02, registry readback): 12 SVG
   `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`; brand key `efeonce-id`, logo family
   `efeonce-id` (public in «Logotipos»). `lockup` «Efeonce | ID» is the default; `isotype-small` (ring 110, sphere 104,
   air 30) only at 32 px or less (favicon, «Continuar con Efeonce ID» button).

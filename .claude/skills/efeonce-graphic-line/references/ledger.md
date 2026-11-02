@@ -7,7 +7,7 @@ exploración en `ai-generations/2026-11-01_efeonce-id-logo/`). ADR: `docs/archit
 
 - **Aprobada la ruta A pulida** («Bien, está aprobado»): la D es asta, **tramo recto de 110** y media órbita; esfera
   Growth a la 1:30 con el corte concéntrico; anillo 64, esfera 88, aire 22. 12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`
-  en `@efeoncepro/axis-brand-assets` **0.4.31** (commit AXIS `5a6a597`), públicos en «Logotipos». Generador
+  en `@efeoncepro/axis-brand-assets` **0.4.31** (publicado en el release `v0.4.31`: AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages), públicos en «Logotipos». Generador
   `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas).
 - **El tramo recto resolvió la primera queja** («no me gusta mucho»): sin él la media órbita salía del asta, dejaba un
   muñón entre asta y esfera y la panza parecía un alambre pegado a la barra. Anillos de 80 y 96 se probaron y se
