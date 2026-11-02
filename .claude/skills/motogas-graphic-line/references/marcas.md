@@ -80,4 +80,5 @@ Datos cruzados entre locales (sello, teléfono o vigencia de otro local), años 
 
 ## 8. Recetas de piezas
 
-_Pendiente: se agregan a medida que se resuelven (siguiente: Rey del Gas · Horario, Ubicación, Mesa de ayuda)._
+_Pendiente: se agregan a medida que se resuelven._ El Rey del Gas tiene un kit de mundo (v01, sin revisar) y el mapa
+de sus piezas en [`mundo-rey-del-gas.md`](mundo-rey-del-gas.md) §3; Horario, Ubicación y Mesa de ayuda se construyen desde ahí.

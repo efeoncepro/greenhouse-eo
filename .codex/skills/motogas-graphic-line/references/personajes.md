@@ -71,6 +71,9 @@ Motor para los tres: `pnpm ai:image --openai-key personal --model gpt-image-2.5-
 
 ---
 
+Su corte (paje, escudero, guardia, gigante, heraldo), el villano El Frío y los objetos 3D de su reino viven en
+[`mundo-rey-del-gas.md`](mundo-rey-del-gas.md).
+
 ## 2. Gasfield (Gas Don Julio · Pudahuel y Quinta Normal)
 
 ### Identidad

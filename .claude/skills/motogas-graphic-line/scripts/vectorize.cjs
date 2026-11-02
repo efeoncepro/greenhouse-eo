@@ -1,5 +1,5 @@
 // Vectoriza una pose 2D del Rey del Gas en capas de color exactas de la marca.
-// Uso: NODE_PATH=$PWD/node_modules node vectorize.cjs <entrada.png> <salida-sin-extension> [--fondo r,g,b] [--escala 2]
+// Uso: NODE_PATH=$PWD/node_modules node vectorize.cjs <entrada.png> <salida-sin-extension> [--fondo r,g,b] [--escala 2] [--extra nombre:r,g,b;…]
 // Clasifica cada píxel al color de paleta más cercano (más el fondo, si la entrada no trae alfa),
 // traza cada máscara con potrace y apila: silueta negra abajo, rojo, amarillo y blanco encima.
 // El negro que queda visible entre colores ES el contorno, así no aparecen costuras.
@@ -13,6 +13,17 @@ const PALETA = {
   rojo: [255, 0, 0],
   blanco: [255, 255, 255],
   amarillo: [255, 194, 20]
+}
+
+// Colores extra de un personaje que los necesita (el Frío: celeste y azul hielo). --extra nombre:r,g,b;nombre:r,g,b
+const iExtra = process.argv.indexOf('--extra')
+
+if (iExtra > 0) {
+  for (const par of process.argv[iExtra + 1].split(';')) {
+    const [n, rgb] = par.split(':')
+
+    PALETA[n] = rgb.split(',').map(Number)
+  }
 }
 
 const args = process.argv.slice(2)
@@ -81,7 +92,10 @@ const dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) *
     return { transform: g[1], cuerpo: g[2] }
   }
 
-  const capas = [['silueta', silueta, '#000000'], ['rojo', mascaras.rojo, '#FF0000'], ['amarillo', mascaras.amarillo, '#FFC214'], ['blanco', mascaras.blanco, '#FFFFFF']]
+  const hex = (c) => '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase()
+  const extras = Object.keys(PALETA).filter((k) => !['negro', 'rojo', 'blanco', 'amarillo'].includes(k))
+  const capas = [['silueta', silueta, '#000000'], ['rojo', mascaras.rojo, '#FF0000'], ['amarillo', mascaras.amarillo, '#FFC214'],
+    ...extras.map((k) => [k, mascaras[k], hex(PALETA[k])]), ['blanco', mascaras.blanco, '#FFFFFF']]
 
   // potrace -s escribe width/height en pt; usamos su viewBox de píxeles
   const grupos = capas.map(([n, b, c]) => {

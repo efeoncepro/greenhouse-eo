@@ -25,6 +25,7 @@ argument-hint: '[personaje y pose, o pieza Motogas a producir o revisar]'
 |---|---|
 | Pose nueva de un personaje, o revisar una | [`references/personajes.md`](references/personajes.md) (la biblia) |
 | Cualquier pieza de las cuentas | [`references/marcas.md`](references/marcas.md) + el análisis completo (abajo) |
+| Pieza del Rey del Gas, o un elemento nuevo de su reino | [`references/mundo-rey-del-gas.md`](references/mundo-rey-del-gas.md) (corte 2D, objetos 3D satinados, escenario, composición por capas) |
 
 ## 2. Los tres personajes, en una línea
 
