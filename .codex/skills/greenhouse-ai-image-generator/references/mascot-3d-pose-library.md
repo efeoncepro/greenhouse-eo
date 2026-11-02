@@ -83,6 +83,14 @@ Perfil y cenital **fallan con una indicación genérica**; exigen geometría exp
 - **Cenital:** «TOP-DOWN BIRD'S-EYE VIEW: camera high above looking almost straight down (about 75 degrees down)» +
   qué superficie domina (cara superior de 12×8 cubos / racimo de lóbulos), cara frontal escorzada, patas ocultas,
   sombra alrededor. v01 no fue cenital en ninguna mascota; v02 aprobada (en Codex queda un picado alto de ~70°).
+- **Perfil de un cuerpo REDONDO (cilindro, barril, esfera) [medido 2026-11-02, Gasfield de Motogas]:** el texto no
+  basta. Tres intentos pidiendo «el mismo ancho que de frente» dieron un cuerpo de cápsula angosta (ancho 78 % → 88 % del
+  frente, incluso pasando la espalda como guía). Lo que cerró: **guía en Blender por revolución** — medir el contorno de la
+  vista aprobada fila por fila (`sharp`, máscara del color del cuerpo), girarlo sobre su eje (1 unidad = 1000 px), sumar
+  aro/válvula/extremidades simples, cámara ortográfica a la misma escala, y pasar ese render como imagen 1 con la orden de
+  copiar cámara, silueta y proporciones, no su aspecto. Resultado: 97 % a la primera. Y revisa la geometría del brief:
+  vista desde SU izquierda, la cara apunta a la izquierda del cuadro (pedir «lado izquierdo, cara a la derecha» es imposible
+  y confunde al modelo). Registro: `ai-generations/2026-11-02_motogas-gasfield-modelo/LEEME.md`.
 
 ## 6. Los 8 accesorios ligados a servicios de Efeonce
 
