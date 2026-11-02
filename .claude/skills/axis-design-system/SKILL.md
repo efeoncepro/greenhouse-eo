@@ -806,7 +806,7 @@ Nothing else: a fingerprint with ridges inside the D was rejected as too heavy f
   `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`; brand key `efeonce-id`, logo family
   `efeonce-id` (public in «Logotipos»). `lockup` «Efeonce | ID» is the default; `isotype-small` (ring 110, sphere 104,
   air 30) only at 32 px or less (favicon).
-- **«Continuar con Efeonce ID» button (approved 2026-11-02, `0.4.32`, AXIS `0d45749`):** «Continuar con» +
+- **«Continuar con Efeonce ID» button (approved 2026-11-02, `0.4.32` published in release `v0.4.32`, AXIS `0d45749`, registry readback):** «Continuar con» +
   `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID with «ID» in the text ink, not the family gray). Dark
   seal on paper, white button on dark; 52 px default, 56/40/full-width/symbol-only; ten states (hover with teal border
   and halo, loading with the family orbit glyph, connected with the full turn, error with notice below). Spec in the

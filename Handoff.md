@@ -3,9 +3,9 @@
 ## 2026-11-02 — Botón «Continuar con Efeonce ID» canonizado
 
 «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID con «ID» en la tinta del texto) en
-`axis-brand-assets` 0.4.32 (commit AXIS `0d45749`, sin empujar; 59/59 pruebas del paquete y 179/179 del Lab). Anatomía,
+`axis-brand-assets` 0.4.32 (publicado en el release `v0.4.32`, AXIS `0d45749`, 2026-11-02, readback en GitHub Packages; 59/59 pruebas del paquete y 179/179 del Lab). Anatomía,
 tamaños y los diez estados en el README del paquete y en el [ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md).
-Pendiente: release `v0.4.32`, primitive en `axis-ui-primitives` y adopción en Rooms, Studio y Greenhouse.
+Pendiente: primitive en `axis-ui-primitives` y adopción en Rooms, Studio y Greenhouse.
 
 ## 2026-11-01 — Perfil de clave OpenAI `personal` para generación creativa
 

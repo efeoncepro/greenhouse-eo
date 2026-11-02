@@ -71,7 +71,7 @@ release `v0.4.31` (AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Pa
 ## El botón «Continuar con Efeonce ID» (aprobado 2026-11-02)
 
 El botón canónico con el que Rooms, Studio, Greenhouse y cualquier relying party entran con Efeonce ID es **«Continuar
-con» + el lockup del botón** (`efeonce-id-button-lockup-{positive,negative}`, `axis-brand-assets` 0.4.32), igual que
+con» + el lockup del botón** (`efeonce-id-button-lockup-{positive,negative}`, `axis-brand-assets` 0.4.32, publicado en `v0.4.32` el 2026-11-02), igual que
 «Pagar con PayPal». En ese lockup «ID» va **en la tinta del texto** (blanco en el sello oscuro, navy en el botón blanco)
 y no en el gris de la familia: el botón nombra la cuenta, no sólo a Efeonce. Sólo la esfera va en el acento.
 

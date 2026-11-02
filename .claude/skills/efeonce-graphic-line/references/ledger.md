@@ -2,7 +2,7 @@
 
 ### 2026-11-02 — Botón «Continuar con Efeonce ID» (aprobado)
 
-- **Canónico:** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (`axis-brand-assets` 0.4.32, AXIS
+- **Canónico:** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (`axis-brand-assets` 0.4.32, publicado en `v0.4.32`, AXIS
   `0d45749`): el lockup Efeonce | ID con «ID» en la tinta del texto, no en gris. Sello oscuro sobre papel, blanco sobre
   oscuro; 52 px por defecto, grande 56, compacto 40, ancho completo y sólo símbolo; diez estados (cursor con halo teal,
   cargando con la órbita, conectado con la vuelta completa, error con aviso debajo). ADR de la marca, sección del botón.
