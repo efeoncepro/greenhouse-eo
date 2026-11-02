@@ -11,12 +11,16 @@ forma, una sola transformación generada por IA de 8 s, sin cortes, más la tapa
 color entra hacia los 2–3 s y el titular hacia los 4–5 s. No hay voz; hay 4 pistas de música en todo el corpus. Las
 fuentes de esos clips eran Firefly/Magnific a 720p.
 
-**El efecto Berel: los objetos saltan a la escena** (operador, 2026-11-02, revisado en los 29 reels publicados). Llegan
-uno tras otro, sólidos y opacos, con un rebote corto al apoyarse y su sombra de contacto: lámparas que bajan del techo
-(cocina), mesas que se despliegan y alfombras que se desenrollan (N31), cubetas o piezas que caen y rebotan (N20, N42).
-La pintura se extiende en manchas orgánicas que se juntan, no en un barrido parejo. **Nunca** fundidos ni objetos
-semitransparentes. El prompt anterior («smooth continuous transformation… settle into place») producía fundidos: FLUX 3
+**El efecto Berel: los objetos aparecen en su lugar** (operador, 2026-11-02, revisado en los 29 reels publicados).
+Llegan uno tras otro directamente donde van, sólidos y opacos, con un asentamiento breve y suave y su sombra de
+contacto: lámparas que bajan del techo (cocina), la mesa que se arma y la alfombra que se desenrolla sobre el piso
+(N31). La pintura avanza en manchas o con borde irregular, como pintura real. **Nunca** fundidos ni objetos
+semitransparentes, y **nunca** objetos que vuelan o rebotan: la prueba con rebote (FLUX 3, *drops in / hops / bounce*)
+se vio irreal. El prompt original («smooth continuous transformation… settle into place») producía fundidos: FLUX 3
 barría el muro y la lámpara entraba difuminada; Omni metía una ola de pintura rosada y una silla transparente.
+Caso que sí funcionó (estudio Ultravioleta, Seedance 2.0, 96 créditos): escritorio, alfombra, silla, lámpara y objetos
+aparecen sólidos en su sitio y el escritorio baja apenas al asentarse; el muro quedó a ΔE 4,3 y `corregir` lo dejó
+en 0,8. Seedance tardó unos 10 minutos.
 
 El reel nuevo sale a **1080 × 1920, 30 fps, 14 s**: clip de 8 s + marcador (2,5 s, fundido 0,6) + titular (4,5 s,
 fundido 0,8) + tapa vigente (`Tapa de Cierre_3._9.16-DOS.mp4`, nunca la carpeta «Viejo»).
@@ -41,10 +45,11 @@ node $R comparar --out $O/../comparar.mp4 --modelos "flux3 omni" <dir> [<dir>…
    juntos**: si la cámara se movió, el video lo delata.
 2. **Capas.** `capas` compone la story sobre el cuadro después y separa marcador y titular en dos PNG transparentes.
 3. **Clip.** Motor según §3. Guárdalo como `<toma>/<modelo>.mp4`. El `--transformacion` describe la pintura en manchas
-   y nombra cada objeto con su forma de entrar (*drops in*, *hops into place*, *pops onto*, *unrolls*, *swings down from
-   the ceiling*) en el orden en que aparece; la plantilla del contrato añade que todo entra sólido y saltando.
+   y nombra cada objeto que aparece en su lugar en el orden en que llega (*appears in place*, *unrolls flat along the
+   floor*, *lowers gently from the ceiling*). Sin verbos de vuelo o rebote (*drops in*, *hops*, *bounces*). La
+   plantilla del contrato añade que todo aparece sólido en su sitio, con un asentamiento suave.
 4. **QA.** `qa` falla cerrado (salida 1) solo por color. Además, **mira la hoja de cuadros** (3 por segundo): cada
-   objeto entra sólido y saltando, la pintura en manchas, nada semitransparente. Si solo falla el color, `corregir`
+   objeto aparece sólido en su lugar, sin volar ni rebotar; nada semitransparente. Si solo falla el color, `corregir`
    aplica al clip una ganancia por canal que lleva el muro del último cuadro al plate, **solo en los píxeles con el
    tono del muro** (los muebles y los blancos quedan intactos), y se vuelve a correr `qa` sobre la salida. Caso fuente:
    estudio Ultravioleta 2026-11-02, FLUX 3 saturó el muro (ΔE 7,2; L −2, a +4, b −5) y quedó en ΔE 0,6 sin tocar madera
@@ -107,5 +112,7 @@ nueva en `music.tracks` del contrato.
 
 - Revisión de Berel (Daniela, Andrés o Melkin) de los reels piloto.
 - El titular entra con fundido, no palabra a palabra como en el corpus.
-- La evidencia de motores de §3 se midió con el prompt anterior (fundidos); falta repetirla con el efecto de salto.
+- La evidencia de motores de §3 se midió con el prompt original (fundidos). Con el efecto «aparecen en su lugar» solo
+  hay una toma por motor (estudio Ultravioleta): Seedance 2.0 lo resolvió realista; FLUX 3 se probó con rebote, no con
+  este prompt. Falta decidir el motor por defecto con más tomas.
 - Si la exportación antigua a 750 × 1334 era decisión o límite (el reel nuevo sale a 1080 × 1920).
