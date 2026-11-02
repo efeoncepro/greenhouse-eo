@@ -188,6 +188,29 @@
 - **Dónde quedó:** `brands/berel/compose/type.mjs`; `brands/berel/AGENTS.md`. **Codificada** (falla cerrado al cargar; las
   pruebas del compositor la ejercitan cuando hay recursos locales).
 
+## 2026-11-02 · Lecho del logo: probado y apagado
+
+- **Cita:** «Si no funciona no te compliques con el lecho... hasta el momento lo hemos hecho sin él y sin problema».
+- **Qué pasó:** el primer plano desenfocado subió el logo de 1–2,5:1 a 10–19:1, pero ocupó en mediana el 9 % del cuadro
+  (17× el logo) y el operador lo vio grande. Al achicarlo y anclar los recortes, el exterior soleado y el marco
+  de puerta no lo sostuvieron, y 9 de 13 lechos repetían la misma forma.
+- **Regla:** el lecho queda opcional y apagado (`--lecho`, `photo.lecho`); el esfuerzo va a las tomas y a la banda del titular.
+- **Dónde quedó:** `berel-photo-registers.json` (`foreground.status`, `lessons`). **Codificada + prueba**.
+
+## 2026-11-02 · El titular nunca sobre un objeto
+
+- **Cita:** «asegurarnos de que la foto deje un espacio para que el texto del título sí tenga dónde estar sin que tenga
+  objetos o algo detrás».
+- **Qué pasó:** el titular de post y story ocupa una banda arriba, casi a todo el ancho del recorte, no solo la esquina.
+  En el piloto fallaron las tomas cuya propia cámara metía textura ahí: cielo de tormenta, sombras de hojas, reja alta,
+  rodillo, árbol, lámpara colgante. Con `TEXT SPACE` en el prompt y la cámara de cada toma corregida pasaron 12 de 12
+  (exterior y proceso cambiando el focal del post). Una story con bordes 5,28 pasaba la medición y aun así «calidez»
+  rozaba la ventana.
+- **Regla:** `titleSpace` en todo prompt; `medir-plate.mjs` antes de componer con el focal del job; el umbral 6 no
+  reemplaza mirar: el titular no toca ningún objeto, y ante duda gana el titular limpio sobre la viñeta.
+- **Dónde quedó:** `berel-photo-registers.json` (`titleSpace`, cámaras de `takes`); `scripts/medir-plate.mjs`;
+  pieza `projects/berel/tomas-fotograficas`. **Codificada + prueba**.
+
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
