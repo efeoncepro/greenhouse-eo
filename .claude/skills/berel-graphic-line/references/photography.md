@@ -123,41 +123,49 @@ node brands/berel/scripts/prompt-plate.mjs \
 - Al prompt del builder se le agrega, en la corrida, el párrafo del chip de color (ver
   [workflow.md](workflow.md) §4 y `ronda-2/run.sh`).
 
-## 5 bis. Tomas y lecho del logo (piloto 2026-11-02, candidato)
+## 5 bis. Tomas fotográficas y banda del titular (2026-11-02, candidato)
 
 El **registro** es el estrato; la **toma** es el tipo de foto. Se eligen por separado:
-`prompt-plate.mjs --registro medio-alto --toma diagnostico [--espacio …] [--lecho …]`.
+`prompt-plate.mjs --registro medio-alto --toma diagnostico [--espacio …]`. Salen de la exploración del OneDrive de
+Berel (registros que ya usa el squad y no estaban codificados).
 
-| Toma | Para qué | Muro de color | Lecho por defecto (familia) |
+| Toma | Para qué | Muro de color | Qué cuida su cámara |
 |---|---|---|---|
-| `espacio` (defecto) | Inspiración de color | Sí | Según espacio: brazo de butaca, pie de cama, esquina de mesa, toalla del lavabo… (mueble/textil) |
-| `antes` | Par antes/después; misma cámara y mismo lecho que el después | No (muro viejo) | Igual que su `espacio` |
-| `diagnostico` | Humedad, salitre, grietas | No | Marco de la puerta desde donde se ve (arquitectura) |
-| `exterior` | Fachadas | Sí | Follaje en sombra (follaje) — **no** bugambilia: sus flores caen bajo el logo |
-| `azotea` | Impermeabilizantes | No | Pretil mojado (arquitectura) |
-| `cenital` | Paletas, muestrarios | Sí (carta mayor) | **Excepción**: tela oscura sobre la mesa, sin desenfoque; solo se juzga el contraste |
-| `proceso` | Tutoriales, manos | Sí | Escalera junto a quien pinta (herramienta) |
-| `taller` | Madera | No | Banco de trabajo (herramienta) |
-| `herreria` | Esmaltes | Sí (reja) | Maceta con follaje (follaje) |
-| `personas` | Cierres, vida en casa | Sí | Respaldo de butaca (mueble) |
-| `nocturna` | Noche, luz cálida | Sí | Sofá en silueta (mueble) |
-| `muestra` | Elegir color: prueba en el muro | Sí (hoja grande) | Banco de madera (mueble) |
+| `espacio` (defecto) | Inspiración de color | Sí | Muro protagonista 40–55 %, tercio superior libre |
+| `antes` | Par antes/después; misma cámara que el después | No (muro viejo) | Mismos muebles que el después |
+| `diagnostico` | Humedad, salitre, grietas | No | Problema legible sin exagerar; luz fría y suave |
+| `exterior` | Fachadas | Sí | La fachada llena la banda alta; árbol, plantas y puerta abajo o a la derecha |
+| `azotea` | Impermeabilizantes | No | Cielo nublado parejo (sin nubes dramáticas arriba); tinacos bajos en el horizonte |
+| `cenital` | Paletas, muestrarios | Sí (carta mayor) | Madera lisa; cartas y objetos en los dos tercios inferiores y la mitad derecha |
+| `proceso` | Tutoriales, manos | Sí | Rodillo y manos en la mitad inferior; arriba muro |
+| `taller` | Madera | No | Silla baja en el cuadro, muro arriba |
+| `herreria` | Esmaltes | Sí (reja) | Reja baja (≈ 1,2 m) frente a un muro liso que llena la mitad superior |
+| `personas` | Cierres, vida en casa | Sí | Familia ficticia, sin mirar a cámara |
+| `nocturna` | Noche, luz cálida | Sí | El muro se sigue leyendo con la luz de lámpara |
+| `muestra` | Elegir color: prueba en el muro | Sí (hoja grande) | Hojas a media altura y a la derecha; sin cuadros en ese muro |
 
-**El lecho** (idea del operador, adaptada de la firma fotográfica de Efeonce): un primer plano oscuro y
-desenfocado, **planeado en el prompt** (bloque `FOREGROUND`), que pertenece a la escena y dice desde dónde se tomó la
-foto; ahí va el logo blanco. Nunca se agrega después ni se oscurece en edición: si no pasa, se regenera.
+**Banda del titular (todas las tomas).** Post y story componen el titular arriba, casi a todo el ancho del
+recorte (post 13–30 % del alto, story 15–29 %). Sobre el plate 4:3 eso es la banda de 10 a 35 % del alto en el
+70 % central, más el cuadrante superior izquierdo. El builder agrega siempre el bloque `TEXT SPACE`: superficie
+calma y pareja, sin objetos, cuadros, lámparas colgantes o de muro, ventanas, plantas, vigas, repisas ni sombras
+duras. **Se mide antes de corregir color o componer**, gratis:
 
-Medición (gratis, apenas sale el plate): `node brands/berel/scripts/medir-lecho.mjs <plate.png> [--focal post=u,v]
-[--toma cenital] [--vista <dir>]`; el compositor deja lo mismo en `qa.logoBed` y avisa si falla. Umbrales del
-contrato: logo blanco ≥ 4,5:1 contra el 1 % más claro de la caja; nitidez p99 ≤ 25 (calibrado con el piloto: lechos
-5–12; esquinas sin lecho 63–630).
+```bash
+node brands/berel/scripts/medir-plate.mjs <plate.png> [--focal post=u,v] [--focal story=u,v] [--vista <dir>]
+```
 
-Piloto (`ai-generations/2026-11-02_berel-lecho-logo/`, 14 generaciones ≈ USD 1,7): las 13 tomas leen el logo a
-10–19:1 (antes, 35 de 38 piezas bajo 4,5:1) y se ven fotográficas. **Pendiente, no producir aún:** el operador
-observó que el lecho ocupa demasiado para el tamaño del logo. Medido: mediana 9 % del cuadro (17× el logo, que ocupa
-0,5–0,7 %), y en post y Pinterest cruza 46–100 % del ancho. Causa: el prompt pide el 45 % izquierdo y un cuarto del
-alto para cubrir tres recortes cuyo logo cae en puntos distintos del plate. Además, 9 de 13 lechos tienen la misma
-forma (masa oscura redondeada): la auditoría de Efeonce advierte que se cuenta la forma, no el objeto.
+Densidad de bordes en la caja del titular de 3 líneas, como el compositor: ≤ 6 limpio (muro limpio 1,5–4,4;
+ventana, lámpara u objetos 8,6–14). Usa el mismo `focal` que pondrás en el job. Si falla, cambia el foco o
+regenera; nunca tapes con un velo. En el piloto de 13 tomas pasaron los interiores con muro y fallaron las tomas
+cuya cámara metía textura arriba (cielo de tormenta, sombras de hojas, reja alta, rodillo, árbol, lámpara
+colgante): de ahí salen las reglas de la columna derecha.
+
+**Lecho del logo: opcional y apagado** (decisión del operador, 2026-11-02: «si no funciona no te compliques con
+el lecho… hasta el momento lo hemos hecho sin él y sin problema»). El contrato conserva el catálogo (`beds`,
+`foreground`) por si se pide: `--lecho <id|auto>` en el builder, `"lecho": true` en el job (ancla los recortes con
+logo abajo a la izquierda) y `--lecho` en `medir-plate.mjs`. Lo que se aprendió en tres rondas: el logo pasa de
+1–2,5:1 a 10–19:1, pero el lecho tiende a crecer (mediana 9 % del cuadro, 17× el logo), se repite como forma, y en
+exterior soleado o con un marco delgado no se sostiene.
 
 ## 6. Recorte social según el registro (`photo.focal`)
 

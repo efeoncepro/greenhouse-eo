@@ -137,6 +137,11 @@ Un job por formato en `projects/berel/<pieza>/jobs/<espacio>-<formato>.json`. Ej
 
 - **Nunca** `at` ni `alt` en un marcador: fallan cerrado; la grilla elige la celda ([marker-grid.md](marker-grid.md)).
 - `focal` solo mueve el recorte ([photography.md](photography.md) §6).
+- **Antes del job, mide el plate**: `node brands/berel/scripts/medir-plate.mjs <plate.png> --focal post=u,v --focal story=u,v`
+  comprueba que la banda del titular esté limpia con el mismo `focal` del job ([photography.md](photography.md) §5 bis).
+- **Plate con lecho** (opcional, apagado por defecto): `"photo": { "file": "…", "lecho": true }` **sin** `focal` en
+  portada, post y Pinterest: el compositor ancla esos recortes a la esquina del logo y falla cerrado si declaras
+  `focal`. `qa.logoBed` (contraste y nitidez bajo el logo) va siempre en el qa; solo avisa con `lecho`.
 - `sample: [u, v]` solo si la foto **no** está corregida al color.
 - No pases tamaños, posiciones, fuentes ni colores: los define la receta.
 
