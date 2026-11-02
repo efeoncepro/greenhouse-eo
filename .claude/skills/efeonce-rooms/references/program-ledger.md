@@ -7,8 +7,12 @@
 
 ## Estado vigente (2026-11-01)
 
-- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis), código listo y ensayado en local:** rama
-  `claude/rooms-agent-cli-bearer` (worktree `/Users/jreye/Documents/rooms-agent-cli`). Verificador del bearer de Efeonce ID
+- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis): PR #22 en producción, APAGADO.** Merge `main@9a4340a`
+  (autorizado por el operador: «Solo hasta Rooms»), deploy `efeonce-rooms-r39y0yi7g` (`dpl_HKTWk2WpdX5hKZLC2TDrPLXQE39q`) con
+  alias reasignado. `vivo` sin sesión: `/rooms` 307 a login, `/auth/error` 200, `/api/auth/session` 401,
+  `/.well-known/oauth-protected-resource` 404 (carril OFF) y un bearer falso 401. `ROOMS_AGENT_LANE_ENABLED` sigue ausente en
+  Vercel; Efeonce ID aún sin la audiencia Rooms (TASK-2095 sin release). Rama `claude/rooms-agent-cli-bearer`
+  (worktree `/Users/jreye/Documents/rooms-agent-cli`). Verificador del bearer de Efeonce ID
   (`src/server/agents/bearer.ts`: JWKS + introspección ≤ 30 s con el cliente `efeonce-rooms-resource`, `azp` de la lista,
   sin `act`, clases por ruta y por operación, `sub` → binding interno con la misma autoridad que la cookie vía
   `internalPrincipalFor`), detrás de `ROOMS_AGENT_LANE_ENABLED` (nace OFF). Con cookie presente el bearer se ignora (contrato
@@ -75,7 +79,7 @@
   respaldo se borra tras esa verificación. Lección: un tope de vida en el código puede tener un CHECK gemelo en la base;
   ampliar uno sin el otro rompe el login del invitado.
 
-- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
+- Producción (`vivo`): `efeonce-rooms.vercel.app` sirvió el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
   inventario de migraciones revisadas). Debajo, en orden: PR #10 `main@449a0cd` (nombre del espacio, `f59d1df`),
   PR #9 `main@97588d3` (307 sin sesión, `1021e75`), PR #8 `main@21b10a9` (casa agentes primero, TASK-2085), PR #7
   `main@d7d6f6b` (TASK-2084 expand) y PR #5/#4. Alias **manual**: tras cada deploy,
