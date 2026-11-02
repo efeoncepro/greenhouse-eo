@@ -32,6 +32,13 @@ Cada clave alterna es un **perfil**: el perfil `personal` vive en el secreto
 
    Para rotarla después, repetir solo la parte de `versions add`.
 
+   Luego dar lectura a la cuenta de servicio con la que corren las CLIs (`greenhouse-portal`, la misma
+   que lee la canónica). Sin este paso la corrida falla con `PERMISSION_DENIED` aunque el secreto exista:
+
+   ```bash
+   gcloud secrets add-iam-policy-binding greenhouse-openai-api-key-personal --project=efeonce-group --member=serviceAccount:greenhouse-portal@efeonce-group.iam.gserviceaccount.com --role=roles/secretmanager.secretAccessor
+   ```
+
 2. **Usarla en una corrida** con el flag:
 
    ```bash
