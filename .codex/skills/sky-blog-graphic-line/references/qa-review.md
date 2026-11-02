@@ -54,6 +54,11 @@ REF usadas (REF-ESTILO-D separada de REF-01 reales) · caja del sujeto y foco de
 
 ## 7. Llevarlo a un canvas de Claude Design (`/design`)
 
+Canvas vigente (privado): «Blog SKY — Línea gráfica», https://claude.ai/artifact/XSXa4MRuNjnyaKmhdLTvUD (8 láminas,
+2026-11-02, sin sistema de diseño: ninguno de la cuenta es de SKY; texto en Assistant, la fuente del tema, porque Metric
+no tiene derechos de distribución). Para actualizarlo: leer el artifact, subir las piezas nuevas como assets y editar sólo
+las láminas que cambian.
+
 Cuando se pida presentar la línea en un canvas:
 
 - El canvas **muestra piezas compuestas por el motor; nunca redibuja a mano** piezas de marca (lección de
