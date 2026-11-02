@@ -258,6 +258,45 @@ se revoque.
 - `ROOMS_AGENT_LANE_ENABLED` (Rooms): sin él, Rooms rechaza todo bearer y la cookie sigue igual.
 - Estado del cliente `efeonce-rooms-cli` (`active | suspended`): suspenderlo corta toda la flota de CLIs.
 
+### Estado de implementación (2026-11-02): en producción, encendida y aceptada
+
+La enmienda no cambia: lo que sigue es el estado del runtime. La decisión de arriba sigue siendo la fuente.
+
+| Parte | Estado | Recibo |
+| --- | --- | --- |
+| Efeonce ID — audiencia Rooms y clientes (TASK-2095) | Audiencia `https://efeonce-rooms.vercel.app/api/v1` y clientes `efeonce-rooms-cli` (público, PKCE) y `efeonce-rooms-resource` (confidencial, solo introspección) en producción. Hotfix acotado PR #267, release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d`, revisión `auth-server-00172-zcn` al 100 % | [Ledger de Auth](../../../.claude/skills/efeonce-auth/references/program-ledger.md) (entrada 2026-11-01 TASK-2095); [contrato OAuth](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) |
+| Rooms — verificador del bearer y CLI (TASK-2087) | PR #22 (`main@9a4340a`, desplegado con el carril OFF) y luego `ROOMS_AGENT_LANE_ENABLED=true` con audiencia y ref del secreto; redeploy `efeonce-rooms-15djjyfz2` con alias. PR #23 (`3434ea8`) agrega las páginas de fin del login | [Ledger de Rooms](../../../.claude/skills/efeonce-rooms/references/program-ledger.md) (entradas 2026-11-02); [flags](../../operations/FEATURE_FLAG_STATE_LEDGER.md) `AUTH_SERVER_ROOMS_AUDIENCE` y `ROOMS_AGENT_LANE_ENABLED` |
+| Aceptación del operador | Un solo `pnpm rooms login`. Sin pedir nada más, el agente creó la sala sintética `demo-volta` en el espacio «Efeonce», subió 5 imágenes, revisó «Ver como» comprador y publicó. 17 acciones atribuidas a `cli/claude-code`, con aviso y reversa, sin invitaciones. `logout` (`revoked: true`) y un segundo `login` verificados | Ledger de Rooms, entrada «aceptación del carril CLI en producción» |
+
+Diferencias con el texto de la decisión, todas dentro de su alcance: el access token de la audiencia Rooms dura
+300 s; la caché de introspección es de 30 s como máximo; el espacio se elige con el header `X-Rooms-Organization`.
+El contrato vigente del bearer está en el [contrato de API y acceso](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md#bearer-de-agentes-carril-cli-d1-bis).
+
+Pendiente: la copy del consentimiento de Efeonce ID (commit `75b40772d`) solo está en `develop` y llega con el
+próximo release completo de Greenhouse; falta ver la sala en el navegador con sesión humana; TASK-2087 y TASK-2095
+siguen `in-progress` hasta su cierre formal. El gateway (TASK-2086 canje, TASK-2088 provider) no cambia.
+
+### Fin del login en el navegador (2026-11-02)
+
+Vigente en producción desde efeonce-rooms PR #23 (merge `3434ea8`, feature `ecf9a32`). El listener loopback de
+`pnpm rooms login` (`scripts/lib/rooms-cli-auth.ts`) ya no pinta una respuesta propia: solo rebota el navegador.
+
+- **Retiene el callback hasta que el login se resuelve.** Valida `state`, `iss` (RFC 9207) y `error`/`code`; si
+  pasa, canjea el código y escribe la credencial. Solo después responde `303` a
+  `roomsCliLandingUrl(origin, outcome)`, con `Cache-Control: no-store` y `Referrer-Policy: no-referrer`.
+- **Outcomes cerrados:** `connected | state | issuer | denied | failed`. `connected` va a `/cli/conectado` y solo se
+  emite tras escribir la credencial; el resto va a `/cli/error?motivo=<outcome>`. Un canje fallido o una escritura
+  fallida aterrizan en `failed`. Si expiran los 5 min, el listener se cierra sin aterrizaje y la CLI falla.
+- **Nada secreto en la URL.** Ni el code ni tokens viajan al origen de Rooms: la dirección solo lleva el outcome.
+- **`motivo` de vocabulario cerrado.** `/cli/error` solo lee claves conocidas de `access.cli.failed.reasons`
+  (`src/lib/copy/invitations.ts`); cualquier otro valor se trata como `failed`. Nunca se renderiza texto libre.
+- **Páginas públicas, sin sesión.** El flujo de la CLI no tiene cookie de Rooms. Ambas páginas son `noindex` y
+  `no-referrer`, y viven en la familia de la órbita en reposo (`OrbitWordStage`, palabras «Listo» y «Casi»), con la
+  fila «Acceso con» y el lockup oficial de Efeonce ID (`/brand/efeonce-id-lockup-negative.svg`, sincronizado por
+  `scripts/sync-brand.mjs` desde `@efeoncepro/axis-brand-assets` 0.4.32), nunca el nombre en texto.
+- **Test:** `tests/agent-cli-login.test.ts` afirma que el loopback responde `303` a `/cli/conectado` después de
+  guardar la credencial, y que la CLI nunca imprime tokens.
+
 ### Qué no cambia
 
 - `--session-file` sigue funcionando para desarrollo y operación local.
@@ -304,7 +343,8 @@ se revoque.
   inmediato y la reversa con un clic.
 - **Se construye ya en Rooms**, sin depender de Efeonce ID: D3, D4, D7 en la parte de Rooms, y la clasificación de
   D2 con su guard. Con la CLI y el MCP local, los agentes ya operan con atribución.
-- D1 depende de la task nueva de EPIC-044 y de liberar la retención de Efeonce ID (PR #263/#264).
+- D1 (gateway) depende de TASK-2086 (canje RFC 8693) y TASK-2088 (provider `rooms`). La retención de Efeonce ID
+  (PR #263/#264) se levantó el 2026-11-01 y la audiencia Rooms ya existe (TASK-2095).
 
 ## Puntuación
 
@@ -321,6 +361,7 @@ se revoque.
 - **NUNCA** aceptar en producción un bearer que no sea el delegado de D1 (con `act` e identidad del gateway) o el directo de la CLI first-party de D1-bis (`azp` en la lista, sin `act`).
 - **NUNCA** dar las clases `efeonce.mcp.rooms.*` a un cliente que no las liste explícitamente, ni a una persona externa.
 - **NUNCA** imprimir, loguear ni pasar al modelo un access o refresh token de la CLI.
+- **NUNCA** poner el code, un token o texto libre en la URL a la que el loopback de `pnpm rooms login` manda el navegador: solo `roomsCliLandingUrl(origin, outcome)` con el vocabulario cerrado, y `connected` solo después de escribir la credencial.
 - **NUNCA** emitir tokens fuera de Efeonce ID, ni reenviar al provider el token del usuario.
 - **NUNCA** URLs firmadas, bytes ni URLs arbitrarias en el contexto del modelo.
 - **NUNCA** leer Greenhouse con una identidad de servicio en nombre de un agente, ni HubSpot directo.
@@ -341,9 +382,10 @@ se revoque.
 
 1. **Rooms, ya:** D3 (actor y aviso), D4 («Actividad de agentes» y reversa), D7 (cuotas y señales) y el guard de
    clasificación de D2.
-2. **EPIC-044:** audiencia Rooms y cliente CLI first-party (D1-bis, TASK-2095); después, el canje para el gateway
-   (TASK-2086).
-3. **Rooms:** verificador del bearer directo y `pnpm rooms login` (TASK-2087); la forma delegada se suma con TASK-2088.
+2. **EPIC-044:** audiencia Rooms y cliente CLI first-party (D1-bis, TASK-2095, en producción desde 2026-11-01);
+   después, el canje para el gateway (TASK-2086).
+3. **Rooms:** verificador del bearer directo y `pnpm rooms login` (TASK-2087, en producción y aceptado el
+   2026-11-02); la forma delegada se suma con TASK-2088.
 4. **`efeonce-mcp`:** provider `rooms` con todas las clases y canary real.
 5. **D5:** fuentes y medios, cada uno con su canary.
 6. **D6:** skill de oficio y eval, antes del primer cliente real.

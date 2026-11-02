@@ -1,9 +1,33 @@
 # EPIC-052 — Efeonce Rooms: experiencia comercial inmersiva y sales enablement
 
+## Delta 2026-11-02 — carril CLI de agentes en producción y aceptado
+
+- **Decisión.** [Enmienda D1-bis](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
+  del carril de agentes («CLI primero, gateway después», 2026-11-01): un agente (Claude Code, Codex) opera Rooms en
+  producción por CLI con el login de una persona interna, sin copiar cookies ni repetir MFA en cada acción.
+- **En producción, encendido (`vivo`).**
+  - [TASK-2095](../../tasks/in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md) (EPIC-044):
+    audiencia Rooms y clientes `efeonce-rooms-cli` / `efeonce-rooms-resource` en Efeonce ID, revisión
+    `auth-server-00172-zcn` (PR #267).
+  - [TASK-2087](../../tasks/in-progress/TASK-2087-rooms-delegated-bearer-verifier.md): verificador del bearer en Rooms y
+    `pnpm rooms login | logout | whoami` (`efeonce-rooms` PR #22 y PR #23), con `ROOMS_AGENT_LANE_ENABLED=true`.
+- **Aceptación del operador (`vivo`).** Un solo `pnpm rooms login`; el agente creó, armó y publicó la sala sintética
+  `demo-volta` en el espacio «Efeonce» (17 acciones `cli/claude-code`, con aviso y reversa, sin invitaciones).
+  `logout` y un segundo `login` verificados. Recibo en el
+  [ledger de la skill Rooms](../../../.claude/skills/efeonce-rooms/references/program-ledger.md).
+- **Sin cerrar.** TASK-2087 y TASK-2095 siguen `in-progress` hasta su cierre formal; falta ver la sala con sesión
+  humana en `/rooms` y que la copy del consentimiento llegue con el próximo release de Greenhouse.
+- **Para después.** El gateway: [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md)
+  (canje RFC 8693) y [TASK-2088](../../tasks/to-do/TASK-2088-efeonce-mcp-rooms-provider.md) (provider `rooms` en
+  `efeonce-mcp`, reutiliza el verificador de TASK-2087). `read.client` sigue sin concederse hasta la revisión de
+  gobierno de datos IA.
+- **R13.** La CLI y el MCP stdio ya operan producción con identidad de Efeonce ID; la federación MCP remota y la
+  certificación de equivalencia UI/CLI/MCP siguen abiertas.
+
 ## Delta 2026-10-31 — Rooms en producción para el equipo
 
 Marcas: `vivo` = readback en producción; `doc` = recibo de otra sesión. Estado completo y trampas en el
-[dossier](../../architecture/rooms/README.md#estado-vigente--2026-10-31-en-producción-para-el-equipo).
+[dossier](../../architecture/rooms/README.md#estado-vigente--2026-11-01-en-producción-para-el-equipo).
 
 - **Producción (`vivo`).** `efeonce-rooms` `main@a2d72c0` en `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`, después del
   [PR #4](https://github.com/efeoncepro/efeonce-rooms/pull/4) (`6f99a6f`, UI aprobada + «Vive el servicio») y del
@@ -115,7 +139,7 @@ Corte local29Oct, autorizado para terminar backend sin UI; construcción en `cod
 - [TASK-2083](../../tasks/in-progress/TASK-2083-rooms-access-issue-page.md): página de error del login «Casi.» con código de solicitud; en producción desde PR #5.
 - [TASK-2084](../../tasks/in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md): atribución de agentes, aviso, reversa y cuotas (carril de agentes).
 - [TASK-2085](../../tasks/to-do/TASK-2085-rooms-agent-activity-surface.md): pantalla «Actividad de agentes» con reversa; reemplaza la administración pausada del canvas.
-- [TASK-2087](../../tasks/to-do/TASK-2087-rooms-delegated-bearer-verifier.md): verificador del token delegado + identidad del gateway (`ROOMS_AGENT_LANE_ENABLED`).
+- [TASK-2087](../../tasks/in-progress/TASK-2087-rooms-delegated-bearer-verifier.md): verificador del bearer de Efeonce ID (`ROOMS_AGENT_LANE_ENABLED`) y `pnpm rooms login`; la forma directa de la CLI (D1-bis) está en producción desde el 2026-11-02; la delegada del gateway llega con TASK-2088.
 - [TASK-2088](../../tasks/to-do/TASK-2088-efeonce-mcp-rooms-provider.md): provider `rooms` en `efeonce-mcp` (MCP remoto).
 - [TASK-2089](../../tasks/to-do/TASK-2089-rooms-content-sources-xray-crm.md): fuentes de contenido: Radiografía AEO y CRM vía Greenhouse.
 - [TASK-2090](../../tasks/to-do/TASK-2090-rooms-governed-media-import.md): importación gobernada de medios.

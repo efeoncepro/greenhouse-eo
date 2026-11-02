@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `En producción 2026-11-02 (auth-server-00172-zcn, hotfix PR #267, release 69b0ba90832c): audiencia Rooms, clientes registrados, secreto en Secret Manager; aceptado con login real y la sala Volta publicada por la CLI. Pendiente: descripciones del consentimiento (75b40772d) con el próximo release completo`
+- Status real: `En producción desde 2026-11-01: hotfix acotado PR #267 (squash 69b0ba9), release 69b0ba90832c released, orquestador 41372622852 success, auth-server-00172-zcn al 100 % con AUTH_SERVER_ROOMS_AUDIENCE=https://efeonce-rooms.vercel.app/api/v1 (readback 2026-11-02). Clientes efeonce-rooms-cli y efeonce-rooms-resource registrados en producción; secreto de introspección en Secret Manager (rooms-production-agent-introspection-client-secret:1). Aceptado 2026-11-02: login real del operador, la sala Volta publicada por la CLI, logout y segundo login verificados. rooms-audience.test.ts: 11 pruebas. Pendiente para el cierre: descripciones del consentimiento (75b40772d, sólo en develop) con el próximo release completo de Greenhouse y gates completos`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `none para el código; producción espera autorización del operador (release Greenhouse a main, variable AUTH_SERVER_ROOMS_AUDIENCE y registro de los dos clientes)`
+- Blocked by: `none; el cierre formal espera que el copy del consentimiento (75b40772d) salga en el próximo release completo de Greenhouse`
 - Branch: `Greenhouse develop (src/lib/auth-server, services/auth-server, scripts/auth-server, .github/workflows/auth-server-deploy.yml, docs); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

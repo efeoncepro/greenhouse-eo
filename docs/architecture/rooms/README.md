@@ -8,12 +8,13 @@ sesión o código.
 
 | Frente | Estado | Marca |
 | --- | --- | --- |
-| Deploy de Rooms | `efeonce-rooms-12zux9578` (PR #11, `8aef9db`), sobre PR #10 `main@449a0cd` (nombre del espacio), PR #9 (entrada sin sesión 307), PR #8 (casa agentes primero, TASK-2085) y PR #7 (atribución de agentes, TASK-2084 expand). Alias reasignado | `vivo` |
+| Deploy de Rooms | `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` (PR #23, `3434ea8`, 2026-11-02), sobre PR #22 (carril CLI, `9a4340a`) y PR #12 a #21 (detalle en el [ledger de Rooms](../../../.claude/skills/efeonce-rooms/references/program-ledger.md)). Antes, `efeonce-rooms-12zux9578` (PR #11, `8aef9db`), sobre PR #10 `main@449a0cd` (nombre del espacio), PR #9 (entrada sin sesión 307), PR #8 (casa agentes primero, TASK-2085) y PR #7 (atribución de agentes, TASK-2084 expand). Alias reasignado | `vivo` |
 | Entrada sin sesión | `/rooms` y `/rooms/:id/actividad` responden 307 a `/login?returnTo=…`; `/login` 302 a Efeonce ID; `/auth/error` 200; `/api/auth/session` 401 | `vivo` |
 | Nombre del espacio | Tabla `rooms.organization_profiles`; el espacio del piloto se llama «Efeonce» (command `organization.rename`). Sin ver todavía con una sesión humana | `vivo` |
 | Flags de Rooms (Vercel Production) | `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED` y `ROOMS_MEDIA_DISPATCH_ENABLED` en `true`; `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false` (releídos 2026-10-31) | `vivo` |
 | Base `rooms_production` | 25 migraciones hasta `1793267000000_rooms-organization-profile` (52 tablas), cada tanda con ensayo en un clon y respaldo lógico previo | `vivo` |
 | Efeonce ID | First-party y código por correo encendidos; desde el release de Greenhouse `935583f88db0` (2026-11-01) la entrada desde Rooms muestra el login V4 «Entra a Rooms» con carrusel de novedades. Detalle en la documentación de Efeonce ID | `doc` |
+| Carril CLI de agentes (D1-bis) | Encendido y aceptado el 2026-11-02. Efeonce ID: audiencia Rooms y clientes `efeonce-rooms-cli` / `efeonce-rooms-resource` en `auth-server-00172-zcn` (PR #267, TASK-2095). Rooms: verificador del bearer y `pnpm rooms login` (PR #22 y #23, TASK-2087), `ROOMS_AGENT_LANE_ENABLED=true`, redeploy `efeonce-rooms-15djjyfz2` y luego `3434ea8`, con alias. Aceptación: un login y el agente armó y publicó la sala sintética `demo-volta` (17 acciones `cli/claude-code`); `logout` y segundo `login` verificados. Sin ver todavía la sala con sesión humana | `vivo` |
 | Acceso del dueño | Administrador con renovación automática. Login humano con MFA: aceptación reportada por Julio vía sesión Auth el 2026-11-01, sin logs ni prueba instrumentada añadidos; no certifica el encabezado ni el QA de la casa | `vivo` / `doc` |
 
 Recibos: [activación](../../audits/rooms/2026-10-31-production-activation.md),
@@ -52,7 +53,9 @@ Producto y plataforma: [ADR consolidado](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECI
 [«Vive el servicio»](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) (en producción desde el PR #4),
 [acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) (TASK-2082 y TASK-2083 en
 producción) y [carril de agentes](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) (Accepted 2026-10-31; en producción la
-atribución, avisos, reversas y cuotas de TASK-2084 y la casa de TASK-2085; sin bearer delegado ni gateway).
+atribución, avisos, reversas y cuotas de TASK-2084 y la casa de TASK-2085; desde el 2026-11-02 también el bearer
+directo de la CLI, [enmienda D1-bis](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
+del 2026-11-01, con TASK-2087 y TASK-2095; el bearer delegado del gateway sigue pendiente).
 El contenido de cada decisión vive en su ADR.
 
 ### Lo que sigue, en orden
@@ -63,9 +66,12 @@ La evidencia instrumentada y la revisión visual de la casa conservan su alcance
 1. Recorrido real de acción, aviso y reversa de agente en producción (TASK-2084/2085); después, slice 6 contract.
 2. QA de la casa nueva: encabezado «Efeonce», captura GVC con scorecard y campos pendientes del reader (TASK-2085).
 3. Medición Live en Vercel (streams y pool).
-4. Task nueva en EPIC-044: delegación interactiva de Efeonce ID para la audiencia de Rooms. Es [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md)
-   (`to-do`); TASK-1917 no la cubre. La retención de Efeonce ID ya se levantó.
-5. Verificador del token delegado en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+4. Cierre formal del carril CLI ([TASK-2087](../../tasks/in-progress/TASK-2087-rooms-delegated-bearer-verifier.md)
+   y [TASK-2095](../../tasks/in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md), en producción
+   y aceptadas): ver la sala con sesión humana y llevar la copy del consentimiento (`75b40772d`) con el próximo
+   release completo de Greenhouse.
+5. Gateway, después: canje RFC 8693 en Efeonce ID ([TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md),
+   la audiencia ya existe) y provider `rooms` en `efeonce-mcp` (TASK-2088, reutiliza el verificador de TASK-2087).
 6. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
 7. Segundo administrador interno; antes de clientes reales, cerrar TASK-1833 y revisar el gobierno de datos IA para
    `read.client`, además de la medición Live y una nueva autorización del operador.
@@ -170,7 +176,7 @@ arriba; su despliegue, el editor/visor nuevos y la certificación conjunta sigue
 - [Sala en vivo: transporte en tiempo real](EFEONCE_ROOMS_LIVE_ROOM_REALTIME_DECISION_V1.md) — **Accepted** 2026-10-30 (TASK-2081).
 - [«Vive el servicio»: escenas como contenido de la sala](EFEONCE_ROOMS_SERVICE_SCENES_DECISION_V1.md) — **Accepted** 2026-10-31; en producción desde el PR #4 (`6f99a6f`).
 - [Acceso interno durable y gobernado](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) — **Accepted** 2026-10-31 (TASK-2082 acceso, TASK-2083 página de error).
-- [Carril de agentes: ciudadanos de primera clase](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) — **Accepted** 2026-10-31; agentes publican, invitan y dan acceso directo con autoridad de la persona, atribución, aviso y reversa.
+- [Carril de agentes: ciudadanos de primera clase](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md) — **Accepted** 2026-10-31; agentes publican, invitan y dan acceso directo con autoridad de la persona, atribución, aviso y reversa. [Enmienda D1-bis](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01) (carril CLI directo, 2026-11-01): en producción y aceptada el 2026-11-02.
 
 ## Contratos de experiencia para revisión
 

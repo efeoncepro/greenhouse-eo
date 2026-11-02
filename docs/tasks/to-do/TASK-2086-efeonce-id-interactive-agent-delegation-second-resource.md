@@ -1,6 +1,6 @@
 # TASK-2086 — Efeonce ID: delegación interactiva de agentes para un segundo resource server
 
-## Delta 2026-11-01 — la audiencia Rooms llega antes, por la CLI (TASK-2095)
+## Delta 2026-11-01, completado 2026-11-02 — la audiencia Rooms ya existe en producción (TASK-2095)
 
 - Enmienda D1-bis del ADR del carril de agentes (decisión del operador: «CLI primero»). La segunda audiencia, las
   clases `efeonce.mcp.rooms.*` (restringidas por cliente) y la introspección por audiencia para el cliente
@@ -8,6 +8,20 @@
   sin canje ni `act`. Esta task conserva **solo** el canje RFC 8693 del gateway, el claim `act` y la cascada de
   revocación de tokens delegados, y debe reutilizar lo de TASK-2095 en lugar de recrearlo (Slice 2 queda cubierto).
 - La retención de PR #263/#264 se levantó el 2026-11-01: ya no bloquea.
+- **2026-11-02 — lo que ya está en producción y esta task reutiliza:** la audiencia Rooms
+  `https://efeonce-rooms.vercel.app/api/v1` (`AUTH_SERVER_ROOMS_AUDIENCE`, variable de repo GitHub) vive en
+  `auth-server-00172-zcn` desde el hotfix PR #267 (release `69b0ba90832c`). La audiencia se deriva de las clases pedidas
+  (`resolveAudienceForScopes` en `src/lib/auth-server/oauth/resources.ts`): un token, una audiencia; mezclar clases da
+  `scope_audience_mixed` y la audiencia apagada da `rooms_audience_disabled`. Las clases `efeonce.mcp.rooms.*` son
+  restringidas (`restricted_scope`) y sólo para personas internas (`rooms_requires_internal`); el access token Rooms dura
+  300 s. Introspección y revocación devuelven el `aud` real y filtran por `metadata.introspection_audience` del cliente
+  `efeonce-rooms-resource` (secreto `rooms-production-agent-introspection-client-secret:1`).
+- El verificador de Rooms (`src/server/agents/bearer.ts` en `efeonce-rooms`, TASK-2087) está en producción con el carril
+  encendido: JWKS, introspección con caché ≤ 30 s y clases por ruta y por operación. Hoy **rechaza** un token con `act`;
+  el token que emita esta task es el que ese verificador aprenderá a aceptar en la forma delegada.
+- **A esta task le queda sólo el canje del gateway:** el grant RFC 8693, el claim `act` y la cascada de revocación de
+  los tokens delegados. Slice 2 está cubierto; TASK-2095 ya no la bloquea. `read.client` sigue sin conceder a ningún
+  cliente hasta la revisión de gobierno de datos IA.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -33,7 +47,7 @@
 - Status real: `Diseno — registrada 2026-10-31 como pieza 2 del orden del ADR del carril de agentes de Rooms (EPIC-052). Sin implementación`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `TASK-2095 (audiencia Rooms y clases) · TASK-1833 (gates de seguridad del emisor que apliquen a un grant nuevo: B15/B20, incidente y señales)`
+- Blocked by: `TASK-1833 (gates de seguridad del emisor que apliquen a un grant nuevo: B15/B20, incidente y señales); TASK-2095 ya entregó la audiencia y las clases (en producción desde 2026-11-01)`
 - Branch: `Greenhouse develop (services/auth-server, src/lib/auth-server, scripts/auth-server, migrations, docs); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -11,6 +11,24 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-02 — Rooms: los agentes trabajan por CLI con Efeonce ID
+
+Un agente (Claude Code, Codex) ya opera Rooms en producción con el login de una persona interna: se corre
+`pnpm rooms login` una vez (Efeonce ID con segundo factor y consentimiento) y la credencial se renueva sola, sin copiar
+cookies. El agente tiene la misma autoridad que la persona, recortada por las clases consentidas, y cada acción queda
+atribuida como `cli/<agente>`, con aviso y reversa. Primera prueba: la sala de demostración «Volta» armada y publicada
+de punta a punta por el agente. `pnpm rooms logout` revoca el acceso
+([manual](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md)). El MCP remoto por el gateway llega después.
+
+## 2026-11-02 — Efeonce ID con La órbita y fin del login de la CLI de Rooms
+
+Las pantallas de Efeonce ID (consentimiento, confirmación con segundo factor, enlaces por correo, invitación, sesión y
+errores) adoptan La órbita: un panel con la órbita alrededor de un ícono o una palabra, titulares editoriales y un campo
+de código de seis casillas. Está en `develop`; llega a producción sólo con un release gobernado
+([manual](docs/manual-de-uso/identity/operar-pantallas-efeonce-id.md)). Al terminar `pnpm rooms login`, el navegador ya no
+queda en una página técnica: muestra «Listo» o «Casi» con el motivo, en producción desde hoy
+([manual](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md)).
+
 ## 2026-11-02 — Botón «Continuar con Efeonce ID»
 
 El botón con el que las aplicaciones de Efeonce ofrecen entrar con Efeonce ID quedó definido: «Continuar con» y la marca
@@ -534,49 +552,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   [Evidencia](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
 - Por instrucción posterior, términos de datos de clientes Ads aceptados/guardados y panel reabierto
   verificado en6862539491. EC OFF; sin publicación GTM ni promoción a main.
-
-## 2026-10-17 — CLI local Meta para agentes
-
-- `pnpm --silent meta`, contrato `meta-agent.v2`: lecturas existentes, catálogo SDK25, consultas por campo
-  y métricas orgánicas; Ads nuevos PAUSED y publicación/respuestas propias con plan/hash/receipt privado,
-  envío único y verificación GET. Resultado ambiguo sin reenvío; sin activación, DM ni nuevo sender CAPI.
-- [Funcional](docs/documentation/growth/meta-agent-cli.md), [manual](docs/manual-de-uso/growth/consultar-meta-con-agentes.md)
-  y [ADR vigente](docs/architecture/GREENHOUSE_META_AGENT_WRITE_CLI_DECISION_V1.md); foundation preservada.
-  105 tests/5 archivos, TS strict y lint global PASS; código completo y lecturas/probes reales,
-  POST públicos no certificados en vivo. Paginación social por fechas y reanudación IG verificadas.
-  Sin integración productiva, MCP, deploy o ampliación IAM.
-- [Rastreo Forms → medición → HubSpot](docs/architecture/GREENHOUSE_META_LEAD_TRACE_CLI_DECISION_V1.md):
-  `leads find/trace` con selector privado y UUID, conexión/store canónicos READ ONLY; ACK local,
-  historial HubSpot y contacto separados. Readback de un envío existente y sus IDs locales, sin mutación;
-  HubSpot correlacionado, procesamiento Meta desconocido. Total actual: 172 tests/9 archivos, TS strict y
-  lint propios PASS. Sin PII, descifrado, redispatch o CRM writes.
-  [Último Performance releído](docs/audits/growth/2026-10-17-performance-latest-lead-trace.md): HubSpot recibido, ACK y un Lead servidor en Meta; sin fallos observados, identidad individual/atribución pendientes.
-- [Recibos nativos HubSpot](docs/architecture/GREENHOUSE_HUBSPOT_FORM_RECEIPT_DECISION_V1.md): marcador
-  server-side, historial exacto, ID persistido por CAS y recuperación GET independiente del POST.
-  Código local probado; SQL parqueado, provisión/mapping y release pendientes. Históricos conservan
-  correlación. [Meta individual](docs/documentation/growth/meta-individual-event-verification.md): sin
-  GET por `event_id`; captura del recibo CAPI implementada localmente en el delta siguiente, sin reenviar eventos.
-  [Cierre local](docs/audits/growth/2026-10-17-native-hubspot-receipt-closure.md): 262 tests/14 archivos,
-  TS strict y lint PASS; SQL ejercitado en PostgreSQL aislado, lecturas reales sin mutaciones.
-- [Recibo CAPI por evento/intento](docs/architecture/GREENHOUSE_META_EVENT_RECEIPT_DECISION_V1.md): sender
-  fijado instrumentado localmente, header backend saneado, historial de hasta cinco observaciones
-  en CAS de finalización y `meta.receipt` en CLI READ ONLY. No agrega sender ni retries por telemetría.
-  Opción del template default OFF y SQL parqueado. Por orden del operador: commit sin activar/desplegar.
-  [Cierre local](docs/audits/growth/2026-10-17-meta-event-receipt-local-closure.md): 402 tests Vitest +36 Node,
-  TS/lint y SQL aislado PASS; sin nuevos eventos ni cambios externos.
-
-- [Revisión final local](docs/audits/growth/2026-10-17-meta-cli-final-review.md): paginación malformada
-  queda parcial, agregación HubSpot por ocurrencia/IDs por destino, fecha SQL protegida y validación
-  de estados/historial de recibos. 426 Vitest +36 Node, TS/lint y SQL aislado PASS; skills espejadas
-  y manuales actualizados. Sin push, activación, migraciones compartidas, eventos ni deploy.
-
-## 2026-10-17 — Landing Performance Marketing en producción (TASK-1865)
-
-- `/servicios/performance-marketing/` (page `251997`) publicada desde el canvas aprobado con el carril source-led de
-  Medios: compilador, paquete scoped `performance-elementor-release.v1`, publicador, Ohio, SEO y migración de la legacy.
-- Legacy `/servicio-gestion-campanas-publicitarias/` privada con 301; menú reapuntado; formulario propio
-  `efeonce-performance-diagnostic` con destino HubSpot directo.
-- Documentación sincronizada: funcional, manual, PRIMITIVES, contrato de forms, TRACKING-PLAN, servicios, PDRs,
-  briefs y skill del sitio público (lecciones del carril de release).
-- Cierre: TASK-1865 `complete`; políticas de medición Meta publicadas para Performance, Medios y HubSpot scope y primer
-  `Lead` de servidor recibido por Meta desde el 14/10.

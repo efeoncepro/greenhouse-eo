@@ -4,6 +4,8 @@
 > [Recibo y gates finales](../../audits/rooms/2026-10-29-backend-local-completion.md).
 > El corte cloud26Oct publicó imágenes V3; no acredita las ampliaciones V4/R09/R11/R14/MCP descritas abajo.
 > Canary único cerrado OFF y Auth retenido en PR, sin merge/deploy ni cambios de flags.
+> Delta 2026-11-02: la CLI y el MCP stdio se autentican con el login de Efeonce ID en producción
+> ([§ Identidad y límites de consumidor](#identidad-y-límites-de-consumidor)); `--session-file` sigue soportado.
 
 Responsabilidades ratificadas por el operador2026-10-26: **Codex backend; Claude Design interfaz**.
 Este documento describe contratos ejecutables, no una composición visual ni una aceptación de la UI.
@@ -285,7 +287,8 @@ Todas exigen sesión y `organizationId`; los readers de listas admiten `limit/cu
 
 Los comandos nuevos conservan POST `/api/v1/commands`; no crear writers dentro de componentes.
 Todos los DTOs se importan type-only desde `src/client`, no desde módulos SQL/worker al bundle del browser.
-MCP local usa el mismo HTTP con sesión existente; no inicia OAuth ni concede autorización MCP remota.
+MCP local usa el mismo HTTP con el login guardado de `pnpm rooms login` (o con `--session-file` si se pasa); no
+inicia OAuth por sí mismo ni concede autorización MCP remota.
 
 ## Identidad y límites de consumidor
 
@@ -299,11 +302,34 @@ conservarlo sólo en memoria y usar el contrato de invitación existente. Abrir 
 un único correo inicial trae enlace+código. Verificación y resend explícito pertenecen al issuer;
 no crear otro mailer. [Manual OTP](../../manual-de-uso/identity/operar-invitacion-rooms-email-otp.md).
 
-CLI acepta `--session-file` privado0600, del operador y sin symlink: JSON
+**CLI y agentes: login de Efeonce ID (camino principal, en producción desde 2026-11-02).** Un agente (Claude Code,
+Codex) opera Rooms con el login de una persona interna:
+
+```bash
+pnpm rooms login    # abre el navegador una vez: Efeonce ID + MFA + consentimiento
+pnpm rooms whoami   # confirma el login guardado; nunca imprime tokens
+pnpm rooms logout   # revoca en Efeonce ID y borra la credencial local
+```
+
+- `login` usa authorization code + PKCE con un listener loopback en `127.0.0.1` y valida `state` e `iss` (RFC 9207).
+  Al terminar, el navegador aterriza en `/cli/conectado` («Listo») o en `/cli/error?motivo=…` («Casi»); ni el código
+  ni tokens viajan en esa dirección.
+- La credencial queda en `~/.config/efeonce-rooms/credentials.json` (modo 0600). El refresh es automático y usa un
+  candado de archivo, así que dos agentes a la vez funcionan. El access token dura 5 minutos.
+- Sin `--session-file`, todos los comandos de la CLI y el MCP stdio (`scripts/rooms-mcp.ts`) usan ese login. Las
+  peticiones viajan con bearer y canal `cli`; el agente se declara con `X-Rooms-Agent`. El espacio se elige con
+  `--organization` (header `X-Rooms-Organization`), siempre dentro de los espacios de la persona.
+- Rooms aplica la autoridad exacta de esa persona; el scope del token solo la recorta. Una operación fuera de las
+  clases concedidas (`read`, `author`, `release`, `access`) responde 403. `read.client` no está concedida.
+- Si una petición trae cookie de sesión de Rooms, gana la cookie. Contrato completo:
+  [§ Bearer de agentes](../../architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md#bearer-de-agentes-carril-cli-d1-bis).
+
+**`--session-file` (sigue soportado).** Archivo privado 0600, del operador y sin symlink: JSON
 `{origin,sessionCookie}` con una sesión existente del origin exacto. Usa Cookie+Origin y el mismo resolver
-canónico; no crea identidad ni evita expiración/revocación. Su obtención/login interactivo no está
-implementado. El modo histórico `ROOMS_ACCESS_TOKEN` sirve para consumers bearer aprobados/fixtures;
-**el resolver productivo actual no acepta bearer nativo**. No anunciar login CLI productivo certificado.
+canónico; no crea identidad ni evita expiración/revocación. Sirve para desarrollo y operación local cuando no se
+quiere usar el login. El modo histórico `ROOMS_ACCESS_TOKEN` sirve para consumers bearer aprobados/fixtures; en local,
+`pnpm integration:up` emite tokens de agente con un emisor propio. En producción solo se acepta el bearer de Efeonce
+ID de la CLI first-party (y, cuando exista, el delegado del gateway).
 
 ## Transporte común
 

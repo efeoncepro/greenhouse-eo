@@ -1,5 +1,22 @@
 # EPIC-044 — Efeonce Identity, Native Authorization Server and MCP Federation
 
+## Delta 2026-11-02 — segunda audiencia (Rooms) y carril CLI de agentes en producción
+
+- [TASK-2095](../../tasks/in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md) (unidad nueva):
+  audiencia Rooms `https://efeonce-rooms.vercel.app/api/v1` (variable de repo `AUTH_SERVER_ROOMS_AUDIENCE`) y
+  clientes `efeonce-rooms-cli` (público, PKCE por loopback, refresh rotativo) y `efeonce-rooms-resource`
+  (confidencial, solo introspección). Hotfix acotado [PR #267](https://github.com/efeoncepro/greenhouse-eo/pull/267),
+  release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d` (`released`), revisión `auth-server-00172-zcn` al 100 %.
+  Contrato: [OAuth §Delta 2026-11-01](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#delta-2026-11-01--segunda-audiencia-rooms-task-2095).
+- Rooms la consume desde el 2026-11-02 ([TASK-2087](../../tasks/in-progress/TASK-2087-rooms-delegated-bearer-verifier.md),
+  EPIC-052) y el operador aceptó el carril ese día: un solo login y el agente armó y publicó una sala sintética.
+  Decisión: [enmienda D1-bis](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01).
+- Sin cerrar: TASK-2095 y TASK-2087 siguen `in-progress`; la copy del consentimiento de las clases Rooms (commit
+  `75b40772d`) está solo en `develop` hasta el próximo release completo de Greenhouse.
+- [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md) queda acotada al
+  canje RFC 8693 del gateway (la audiencia ya existe) y va después, junto con TASK-2088. `read.client` sigue sin
+  concederse.
+
 ## Delta 2026-11-01 — Efeonce ID en `main` con el carrusel del login
 
 - Release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (orquestador run `41284120477`, `released`, tercer intento).
@@ -14,6 +31,7 @@
 - El trabajo de TASK-1833 que vivía en la rama local de Codex quedó en `develop` (`e09d72d70`), sin release a `main`: revocación y
   recuperación atómicas, 413, OTP con fallo cerrado, Job aislado de rotación y verificación post-deploy del tráfico.
 - Siguiente unidad del carril de agentes de Rooms: [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md).
+  (Superado el 2026-11-02: primero fue el carril CLI de TASK-2095; ver delta 2026-11-02.)
 
 ## Delta 2026-10-31 — first-party y OTP en producción para Rooms
 
@@ -55,7 +73,7 @@ El operador ordenó **dejar Auth en PR por ahora**:263→main y264→develop abi
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-11-01: emisor y gateway MCP productivos; Efeonce ID en main (release 935583f88db0, auth-server-00170-qlx al 100 %, tráfico a la última revisión) con first-party/OTP ON y Login V4 con carrusel; Rooms primer RP first-party. Retención levantada y PR #263/#264 cerradas. Abiertos: TASK-1833 assurance, login humano real Rooms, delegación interactiva para Rooms (TASK-2086), privacidad, cloud/recovery y steady; Greenhouse se difiere a TASK-2063.`
+- Status real: `2026-11-01: emisor y gateway MCP productivos; Efeonce ID en main (release 935583f88db0, auth-server-00170-qlx al 100 %, tráfico a la última revisión) con first-party/OTP ON y Login V4 con carrusel; Rooms primer RP first-party. Retención levantada y PR #263/#264 cerradas. Abiertos: TASK-1833 assurance, login humano real Rooms, delegación interactiva para Rooms (TASK-2086), privacidad, cloud/recovery y steady; Greenhouse se difiere a TASK-2063. 2026-11-02: segunda audiencia Rooms y cliente CLI (TASK-2095) en producción en auth-server-00172-zcn y aceptados por el operador; TASK-2095 sigue in-progress hasta su cierre formal.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`
@@ -153,7 +171,8 @@ métodos. Una sesión suficiente puede volver sin UI y el first-party sign-in no
 ## Child Tasks
 
 
-- [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md): delegación interactiva de agentes para un segundo resource server (audiencia de Rooms, canje RFC 8693, `act`, D10 de `efeonce.mcp.rooms.*`); distinta de TASK-1917. Bloqueada por la retención de Efeonce ID.
+- [TASK-2095](../../tasks/in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md): segunda audiencia (Rooms) y cliente first-party de la CLI (enmienda D1-bis); en producción y aceptada el 2026-11-02, cierre formal pendiente.
+- [TASK-2086](../../tasks/to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md): delegación interactiva de agentes para el gateway: canje RFC 8693 con `act` sobre la audiencia Rooms que ya creó TASK-2095; distinta de TASK-1917. La retención de Efeonce ID se levantó el 2026-11-01; va después del carril CLI.
 | Unidad | Task | Entregable y límite de ownership | Depende de |
 |---|---|---|---|
 | **U00** | [TASK-1626](../../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) | Gateway neutral en `mcp.efeonce.org` y federación Globe (en curso). Conserva transporte, discovery, providers. No emite tokens. | — |

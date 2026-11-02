@@ -1,5 +1,21 @@
 # TASK-2088 — efeonce-mcp: provider `rooms`
 
+## Delta 2026-11-02 — carril CLI directo en producción; el verificador de Rooms se reutiliza
+
+- Enmienda D1-bis del ADR del carril (decisión del operador: «CLI primero, gateway después»): un agente local ya opera
+  Rooms en producción por `pnpm rooms login` con el bearer de Efeonce ID de una persona interna
+  ([TASK-2095](../in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md) +
+  [TASK-2087](../in-progress/TASK-2087-rooms-delegated-bearer-verifier.md)). Aceptado el 2026-11-02 con la sala Volta
+  publicada por la CLI. Esta task sigue siendo el camino para clientes remotos y no cambia de alcance.
+- **Reutilizar, no recrear:** el verificador de Rooms (`src/server/agents/bearer.ts` en `efeonce-rooms`) ya hace JWKS,
+  introspección con caché ≤ 30 s por el cliente `efeonce-rooms-resource`, clases por ruta y por operación
+  (`assertBearerOperation`) y resolución del `sub` a la persona interna (`internalPrincipalFor`). El provider `rooms`
+  suma la identidad del gateway y la forma delegada con `act` (que hoy el verificador rechaza), no un verificador nuevo.
+- Ya existen la audiencia Rooms (`https://efeonce-rooms.vercel.app/api/v1`), las cinco clases restringidas, el
+  interruptor `ROOMS_AGENT_LANE_ENABLED` (hoy `true` en producción) y la metadata RFC 9728 en
+  `/.well-known/oauth-protected-resource`. El espacio se elige con `X-Rooms-Organization`; el canal del provider será
+  `gateway`, distinto del `cli` actual. Sigue dependiendo del canje de TASK-2086.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

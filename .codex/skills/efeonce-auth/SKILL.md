@@ -1,23 +1,32 @@
 ---
 name: efeonce-auth
-description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/OIDC authorization server (`auth.efeonce.org`, Cloud Run `auth-server`, EPIC-044) in production since 2026-09-04 and ALREADY the sign-in issuer of the MCP gateway `mcp.efeonce.org` (scopes `efeonce.mcp.*`); Rooms is its first first-party relying party and the Greenhouse portal login converges later (TASK-2063). Use when touching `services/auth-server/**`, `src/lib/auth-server/**`, `scripts/auth-server/**`, first-party login (TASK-1834), Login V4 screens and product context `/login/rooms` (TASK-2064), invitation email OTP (TASK-2067), Greenhouse login convergence (TASK-2063), security review TASK-1833, RP registration, signing keys/KMS rotation, Auth flags (`AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED`), the PR 262 release, or the Rooms+Auth canary. Living skill: read references/program-ledger.md first and update it at every Auth task closure.
+description: Operate and extend Efeonce Auth / Efeonce ID — the native OAuth/OIDC authorization server (`auth.efeonce.org`, Cloud Run `auth-server`, EPIC-044) in production since 2026-09-04 and ALREADY the sign-in issuer of the MCP gateway `mcp.efeonce.org` (scopes `efeonce.mcp.*`); Rooms is its first first-party relying party and the Greenhouse portal login converges later (TASK-2063). Use when touching `services/auth-server/**`, `src/lib/auth-server/**`, `scripts/auth-server/**`, first-party login (TASK-1834), Login V4 screens and product context `/login/rooms` (TASK-2064), invitation email OTP (TASK-2067), Greenhouse login convergence (TASK-2063), security review TASK-1833, RP registration, signing keys/KMS rotation, Auth flags (`AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED`, `AUTH_SERVER_ROOMS_AUDIENCE`), the Rooms audience and Rooms CLI clients (TASK-2095), the PR 262 release, or the Rooms+Auth canary. Living skill: read references/program-ledger.md first and update it at every Auth task closure.
 ---
 
 # Efeonce Auth / Efeonce ID (skill viva)
 
-**Corte vigente 2026-11-01:** la retención humana sobre Efeonce ID se levantó y Auth llegó a `main` con el
+**Corte vigente 2026-11-02:** la retención humana sobre Efeonce ID se levantó y Auth llegó a `main` con el
 release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (`released`, orquestador run `41284120477`, squash PR #262).
 Estado `vivo`:
 
-- **Revisión:** `auth-server-00171-xdd` al 100 %, `GIT_SHA` `60872da` (hotfix PR #266 de ISSUE-190, release
-  `60872da089ed-6925b98e…` `released`); antes `auth-server-00170-qlx` (`935583f88`).
+- **Revisión:** `auth-server-00172-zcn` al 100 %, `GIT_SHA` `69b0ba9` (hotfix acotado PR #267, release
+  `69b0ba90832c-5e4bdd3f…` `released`, audiencia Rooms); antes `auth-server-00171-xdd` (hotfix PR #266 de ISSUE-190) y
+  `auth-server-00170-qlx` (`935583f88`).
+- **Dos audiencias:** el MCP (`efeonce.mcp.*`) y, desde PR #267, **Rooms** (`https://efeonce-rooms.vercel.app/api/v1`,
+  `AUTH_SERVER_ROOMS_AUDIENCE`, vacía = apagada), aceptada el 2026-11-02 con la CLI de Rooms. Un token, una audiencia
+  (derivada de las clases); clases `efeonce.mcp.rooms.*` restringidas, sólo personas internas, access de 300 s. Clientes
+  `efeonce-rooms-cli` (público, PKCE loopback) y `efeonce-rooms-resource` (confidencial, sólo introspección), por
+  `pnpm auth-server:register-rooms-agent-clients --secret-out` (TASK-2095). `read.client` no está concedida a la CLI.
+  El copy del consentimiento de las clases de Rooms (`75b40772d`) sigue **sólo en `develop`**: hasta el próximo release
+  completo la pantalla muestra «Permiso efeonce.mcp.rooms.…». El canje RFC 8693 del gateway queda en TASK-2086 (`to-do`).
 - **Flags:** `AUTH_SERVER_FIRST_PARTY_ENABLED` y `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` ON. Su fuente durable son las
   variables de repo GitHub.
 - **Login V4 con carrusel de novedades** en `/login` y en la entrada desde Rooms («Entra a Rooms»). El carrusel lee el feed
   público de Greenhouse (TASK-2064).
 - **El tráfico va a la última revisión** desde el `update-traffic --to-latest` del 2026-11-01.
 - **Rollback:** `gcloud run services update-traffic auth-server --region us-east4 --project efeonce-group
-  --to-revisions=auth-server-00170-qlx=100`, con readback (deja el tráfico fijado: volver a `--to-latest` después).
+  --to-revisions=auth-server-00171-xdd=100`, con readback (deja el tráfico fijado: volver a `--to-latest` después). Para
+  cortar sólo el carril de agentes de Rooms: suspender `efeonce-rooms-cli` o vaciar `AUTH_SERVER_ROOMS_AUDIENCE` + deploy gobernado.
 - **PR #263/#264** (guard original de Codex) se cerraron el 2026-11-01, superadas por el release; las ramas se conservan.
 - **Sin verificar:** errores de Sentry del release y un login humano completo hacia Rooms.
 - **En `develop`, sin release a `main` (commit `e09d72d70`, 2026-11-01):** el trabajo de TASK-1833 que estaba varado en la rama
@@ -32,9 +41,7 @@ Incidentes del release, ya resueltos: [ISSUE-184](../../../docs/issues/resolved/
 (revisión sin tráfico) e [ISSUE-186](../../../docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md)
 (tests atados al corte ETV, bloqueo de CI). Historia anterior en el ledger, incluida la
 [activación Rooms + Efeonce ID del 31-10](../../../docs/audits/rooms/2026-10-31-production-activation.md).
-**Segundo resource server (Rooms), CLI primero:** TASK-2095 (en producción desde `auth-server-00172-zcn`, hotfix PR #267) agrega la audiencia
-`AUTH_SERVER_ROOMS_AUDIENCE` (vacía = apagada), clases `efeonce.mcp.rooms.*` restringidas y los clientes `efeonce-rooms-cli` /
-`efeonce-rooms-resource`. El canje RFC 8693 para el gateway queda en TASK-2086 (`to-do`), distinta de TASK-1917.
+TASK-2086 (canje del gateway) es distinta de TASK-1917.
 
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
 en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))

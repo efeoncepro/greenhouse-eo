@@ -77,6 +77,27 @@ pantallas Efeonce ID quedaron publicadas y verificadas; el estado mutable de rev
 tasks, no en este ADR. TASK-1832 acreditó clientes externos sintéticos, pero su cleanup y la primera cohorte real
 siguen separados. No se declara aquí cierre de TASK-1831/1832 ni disponibilidad general para clientes externos.
 
+## Delta 2026-11-01 — segunda audiencia: Rooms (TASK-2095)
+
+La decisión fijaba una sola audiencia (`https://mcp.efeonce.org/mcp`). Desde la revisión `auth-server-00172-zcn`
+(hotfix acotado PR #267, 2026-11-01) el emisor tiene una segunda: la API de Rooms
+(`https://efeonce-rooms.vercel.app/api/v1`, variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE`; vacía = apagada).
+La pidió la [enmienda D1-bis del carril de agentes de Rooms](rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01),
+que habilita a un agente a operar Rooms por CLI con el login de una persona interna. El operador la aceptó en
+producción el 2026-11-02.
+
+- **No es un emisor nuevo ni un grant nuevo.** Reutiliza code + PKCE, refresh rotativo con reuso, revocación e
+  introspección. Lo nuevo es la audiencia y dos clientes first-party pre-registrados: `efeonce-rooms-cli` (público)
+  y `efeonce-rooms-resource` (confidencial, solo introspección).
+- **Un token, una audiencia.** El `aud` se deriva de las clases de scope pedidas; mezclar familias se rechaza.
+  Las clases `efeonce.mcp.rooms.*` son restringidas a los clientes que las listan y solo para personas internas.
+- **Rooms sí introspecta.** A diferencia del gateway, Rooms consulta la introspección con caché de 30 s como
+  máximo, así que revocar corta en menos de 30 s. Access token de la audiencia Rooms: 300 s.
+- **La autoridad sobre Rooms la decide Rooms.** El token prueba persona, cliente y clases; Rooms aplica la autoridad
+  de esa persona y el scope solo la recorta.
+
+Contrato técnico: [OAuth Contract §Delta 2026-11-01](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#delta-2026-11-01--segunda-audiencia-rooms-task-2095).
+
 ## Context
 
 El ADR de federación (2026-08-01) dejó la composición en tres vías —WorkOS, broker nativo extraído, híbrido— y

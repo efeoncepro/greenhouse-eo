@@ -1,5 +1,35 @@
 # Handoff
 
+## 2026-11-02 — Carril CLI de agentes para Rooms en producción y aceptado (TASK-2095 + TASK-2087)
+
+Enmienda **D1-bis** al [ADR del carril](docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
+(«CLI primero, gateway después»): un agente opera Rooms en producción con el login de una persona interna, sin MFA por
+acción. **En producción:** Efeonce ID con la audiencia `https://efeonce-rooms.vercel.app/api/v1` y los clientes
+`efeonce-rooms-cli`/`efeonce-rooms-resource` (hotfix PR #267, release `69b0ba90832c`, `auth-server-00172-zcn` al 100 %,
+2026-11-01); Rooms con el verificador del bearer y `pnpm rooms login|logout|whoami` (PR #22 `9a4340a`, carril encendido por
+el operador en `efeonce-rooms-15djjyfz2`, PR #23 `3434ea8` con `/cli/conectado` y `/cli/error`). **Aceptación:** tras un único
+`pnpm rooms login`, el agente creó y publicó la sala `demo-volta` en «Efeonce» (edición `87dd99b7`, 17 acciones
+`cli/claude-code`, sin invitaciones); `logout` y un segundo login verificados por el operador. Interruptores:
+`ROOMS_AGENT_LANE_ENABLED=false`, suspender `efeonce-rooms-cli` o vaciar `AUTH_SERVER_ROOMS_AUDIENCE`
+([manual](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md)). **Pendiente:** copy del consentimiento
+`75b40772d` (sólo `develop`, sale con el próximo release completo); cierre formal de 2095/2087 (siguen in-progress, ver sus
+criterios abiertos); la sala vista con sesión humana en `/rooms`; `read.client` tras la revisión de gobierno de datos IA;
+gateway TASK-2086 (sólo el canje) → TASK-2088. Rama: Greenhouse `develop` (docs y `src/lib/auth-server`), Rooms `main`.
+Siguiente ID libre: TASK-2096.
+
+## 2026-11-02 — Pantallas de Efeonce ID con La órbita (develop, sin release) y fin del login de la CLI de Rooms (vivo)
+
+**Efeonce ID** (commit `d14b786d3`, local, sin push): todas las pantallas salvo el login V4 usan el shell
+`src/lib/auth-server/oauth/pages/orbit-shell.ts` (canvas aprobado por el operador). Órbita canónica alrededor de un ícono
+AXIS en reposo o de una palabra, una esfera por pantalla, titulares Bricolage, código de seis casillas con modo respaldo,
+marca de `efeonce-rooms-cli` por id exacto. Assets por `pnpm auth-server:brand-assets:generate` (drift en
+`orbit-shell.test.ts`). Gates: 784 pruebas de `src/lib/auth-server`, typecheck y contraste verdes. **Pendiente:** `pnpm build`,
+flujo real contra el host y el release gobernado a `main` (mismo servicio que el login MCP; requiere autorización).
+**Rooms** (PR #23, merge `3434ea8`, en producción y verificado por el operador): el callback loopback de `pnpm rooms login`
+responde 303 a `/cli/conectado` («Listo») o `/cli/error` («Casi», motivo cerrado), sin code ni tokens en la URL.
+Manuales y doc técnica: [pantallas Efeonce ID](docs/manual-de-uso/identity/operar-pantallas-efeonce-id.md) ·
+[CLI de Rooms](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md).
+
 ## 2026-11-02 — Botón «Continuar con Efeonce ID» canonizado
 
 «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID con «ID» en la tinta del texto) en
@@ -240,65 +270,5 @@ Auth **permanece en PR263/264 por decisión humana**, sin merge main/develop ni 
 con emisor/login base activos, first-party/OTP OFF. CI263/264 y Vercel PASS en seguimiento posterior; ambas siguen abiertas.
 [Readback](docs/audits/rooms/2026-10-26-docs-skills-state-readback.json),
 [auditoría documental](docs/audits/rooms/2026-10-26-docs-skills-continuity.md).
-
-## 2026-10-26 — Mass Chile: tres personas y cierre por canal
-
-[Expediente](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md): Yuri por email personal
-(excepción expresa) y DM; corporativo inferido rebotó, no reintentar. Guillermo/Judith: alta con Primary
-Company/campos/segmento182 y dos correos personalizados, firma gráfica, CCO y dos brochures originales
-por links nativos; Enviados y EMAIL SENT independientes. Cinco créditos históricos, sin nuevo gasto.
-[Auditoría](docs/audits/commercial/2026-10-26-mass-chile-docs-skills.md); dos skills espejo y dueños
-documentales actualizados. Corte17:04Chile, sin entrega/lectura confirmadas ni cadencia futura autorizada.
-
-## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
-
-- **Pilar publicado:** «Qué es Loop Marketing» (248398) en `/loop-marketing/que-es-loop-marketing/`.
-  - 248483 quedó en borrador, con un 301 de Yoast hacia el pilar.
-  - Portada 252148, `hero` 252149 y tarjeta 252150.
-  - Lleva lo verificado de UNBOUND 2026.
-  - Sin la sección de transparencia, por decisión de Julio.
-- **Detalle y rollback:** [borrador del pilar](docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md) §4 y sus deltas.
-- **Content Factory:** el embed de YouTube lleva la URL en su propia línea.
-- **Reglas nuevas:**
-  - voz de Julio §4.5 y §4.6;
-  - no exponer la caída de un contenido propio (`AGENTIC_BLOGPOST_AUTHORING` §8);
-  - fusión de posts (skill del sitio §16);
-  - Loop 2026 en `hubspot-solutions-partner`.
-- **Casebook cine:** fallas 59–64 de portadas sin persona y dos recetas nuevas en `cine-recetas.json`.
-- **Pendiente:**
-  - indexación en Search Console del pilar y de `/aeo/seo-y-aeo/` (la hace una persona);
-  - 248513, sin decidir;
-  - grabación de UNBOUND (sesión del 17-sep);
-  - [brief Taste Profile/4 Rs](docs/public-site/LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md), por validar demanda.
-- **Coordinación:** las sesiones del blog autorizaron purgar la caché después de republicar contenido sin
-  consultarles, salvo cuando haya despliegues de plugins.
-
-## Antecedentes25–26Oct — Rooms/Auth antes de la conciliación documental
-
-### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
-
-Auth separado: corrección preparada en PR263 (main,5e1fc2554) y264 (develop,aabd6d78d), **retenidas en PR
-por instrucción expresa del operador**, sin merge ni deploy.22Python+14contratosVitest/gates/hook normal
-PASS;CI general de HEAD nuevos pendiente, tras corregir fixture/espejo que fallaron en primera pasada.
-No release262 ni flags/correo/workflows ajenos. Revisar filtros de deploy por src/lib antes de264.
-[Auditoría y límites](docs/audits/rooms/2026-10-26-auth-deploy-control.md).
-
-Disparo automático posterior ya verificado: Rooms main `e4b2e890` (PR3), endpoint de máquina con OIDC
-y Scheduler cada minuto. Vacío200 sin contenedor; demanda sintética en la misma sala archivada202→Job
-`4r9nz` SUCCESS, cola vacía/ack liberado y publicaciones intactas. Ocho migraciones/26tablas, worker
-por digest `d49995de…`,234testsPASS. Flag dispatch ON; flags humanos web OFF; cero correos y ningún
-cambio UI. [Prueba](docs/audits/rooms/2026-10-26-automatic-media-dispatch.json). Claude Design conserva frontend.
-
-Canary real de Auth y una imagen completado; flags OFF: Microsoft/MFA, una sala sintética y PNG físico de 3 MB por GCS→Job→dos WebP; preview de 304 KB con SHA/ETag/SQL coincidentes. Un correo recibido: código correcto200/incorrecto400/replay404, lectura privada200 y revocación401/404. Invitación revocada y sala archivada. Final Rooms main a87852e OFF y Auth00168-vzb OFF, misma imagen; Resend producción v1 y Sentry production corregidos. [Prueba y límites](docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Bootstrap b2f90fa local sólo habilita edición/reapertura de esa sala. Al terminar ese canary quedaban consumidor Claude Design, disparo del Job y workflow Auth staging pendientes (deltas posteriores arriba). Sin full suite repetida ni release de Greenhouse.
-
-Bloque de infraestructura cerrado: bucket GCS privado con IAM/CORS y SA, 7 migraciones/25 tablas cloud, rol worker con límite 2 y secreto v1; Job CPU 1/RAM 1Gi, timeout 240s y cero reintentos, con una ejecución de cola vacía SUCCESS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correos/UI/scheduler ni otro deploy. [DB](docs/audits/rooms/2026-10-26-media-database-infra.json), [storage](docs/audits/rooms/2026-10-26-media-storage-infra.json), [worker](docs/audits/rooms/2026-10-26-media-worker-deployment.json). Canary OIDC y de imagen real, consumidor y disparo del Job quedan para el siguiente bloque. Lint del script y typecheck global PASS; no se repitieron las 225 pruebas anteriores.
-
-Actualización posterior autorizada: backend fusionado en `efeonce-rooms/main@a87852e` vía [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2), sin los doce paths visuales2071.225tests+lint/types/build,53 browserPASS+3skip,CI Docker/previewPASS; flagsOFF sin cambios. [Recibo de despliegue](docs/audits/rooms/2026-10-26-production-backend-release.json). Recursos/migraciones/worker cloud y canary pendientes; no correo ni deploy Auth/Greenhouse.
-
-Asignación humana vigente: Codex backend; Claude Design interfaz. TASK-2072, runtime rama `task/2072-cloud-media-backend`, commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1) draft contra el scaffold rescatado.225/225testsPASS0skip,lint/types/build,PG16/18restore2tenants/6rooms y CI DockerLinux/decoderPASS. GCS/directPUT/generaciones y workerComputeperfilpropio preparados; ningún JSX/layout/motion nuevo. Main20f9fe9 conservado. Bucket/IAM/CORS,rol/SA/secretworker,migracióncloud/canary siguen pendientes;CLI+ADC renovados por runner canónico y verificados vigentes; readback confirma bucket/SA/secret worker aún ausentes, lectura Job no concluyente. [Contrato frontend](docs/documentation/rooms/backend-api-for-claude-design.md), [recovery](docs/audits/rooms/2026-10-26-media-backend-recovery.md). No cerrar2072 por código/fakesSDK ni activarflags por conectar diseño.
-
-
-
-Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa. Segunda auditoría (§6): EPIC-044 tiene 27 unidades, sin repo propio, sin logins nativos desde 26/9 porque faltan los conectores de Codex y Claude (TASK-1904/2000; MCP construido y probado), `develop` despliega el emisor productivo. TASK-1829 cerrada (administrativa). 1828/1830/1832 NO listas (llave v1, passkeys 2 navegadores, muestra steady). PR #262 CI verde sin promover. Medios de Rooms rescatados en rama local `efeonce-rooms` `task/2070-2071-private-media` (`c0facfd`, `2626921`, `7ca5fd3`: limpieza, worker `--loop`, hijo sin `tsx`, DO en migración; verify 207/207), `main` sigue en `20f9fe9`. Demo de Rooms **no aceptada** por Julio (busca algo más inmersivo): Rooms en pausa hasta revisar la dirección con maqueta. Login V4 vivo en `auth.efeonce.org/login`; entrar a Rooms con él sigue OFF. Siguiente (con créditos Codex desde 1/11): release #262 + canary único, conectores Codex/Claude, separar deploy de Auth, higiene de seguridad.
 
 [Historial](Handoff.archive.md).

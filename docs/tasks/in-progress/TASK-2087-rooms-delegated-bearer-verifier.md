@@ -43,11 +43,11 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `Forma directa (D1-bis) en producción y aceptada 2026-11-02: login único del operador; el agente creó y publicó la sala Volta (demo-volta, edición 87dd99b7) en «Efeonce» por bearer, sin pedir nada más. Pendiente: página de éxito del login con diseño de Rooms; forma delegada del gateway (TASK-2086/2088)`
-- Rank: `después de TASK-2086 y TASK-2084; antes de TASK-2088`
+- Status real: `Forma directa (D1-bis) en producción y aceptada 2026-11-02. efeonce-rooms PR #22 (main@9a4340a) + carril encendido por el operador (ROOMS_AGENT_LANE_ENABLED=true, deploy efeonce-rooms-15djjyfz2 con alias) + PR #23 (main@3434ea8, fin del login en /cli/conectado y /cli/error). Login único del operador; el agente creó y publicó la sala Volta (demo-volta, edición 87dd99b7) en «Efeonce» con 17 acciones cli/claude-code; logout (revoked: true) y segundo login verificados por el operador. Suite Rooms 420 pass, 24 skipped, 0 fail. Pendiente: cierre formal con gates completos, ver la sala con sesión humana en /rooms y la forma delegada del gateway (TASK-2086/2088)`
+- Rank: `forma directa entregada; la forma delegada va después de TASK-2086 y antes de TASK-2088`
 - Domain: `platform|identity`
-- Blocked by: `TASK-2086 (delegación interactiva de Efeonce ID para la audiencia de Rooms; retenida con los PR #263/#264 de Efeonce ID) y TASK-2084 (columnas de actor y clasificación D2)`
-- Branch: `efeonce-rooms: rama derivada de main, sin push a main hasta autorización; Greenhouse: docs en develop`
+- Blocked by: `none para la forma directa (TASK-2095 en producción desde 2026-11-01); la forma delegada espera TASK-2086 (canje del gateway) y TASK-2088 (provider rooms)`
+- Branch: `efeonce-rooms: main (PR #22 9a4340a y PR #23 3434ea8, mergeados con autorización del operador); Greenhouse: docs en develop`
 
 ## Summary
 
@@ -401,22 +401,50 @@ ADR deja a la implementación:
 
 ## Acceptance Criteria
 
-- [ ] Con `ROOMS_AGENT_LANE_ENABLED` apagado, ningún bearer produce principal (test).
+Estado al 2026-11-02 (forma directa D1-bis en producción). Los criterios se escribieron para la forma delegada del
+gateway; se tildan sólo los que la evidencia de la forma directa respalda. Los demás quedan abiertos con su razón.
+
+- [x] Con `ROOMS_AGENT_LANE_ENABLED` apagado, ningún bearer produce principal (test).
+      Evidencia: `tests/agent-bearer.test.ts` («lane off, a cookie next to the bearer or a route without bearer scope
+      resolve no principal»); en producción con el carril apagado, metadata 404 y bearer falso 401.
 - [ ] Con el flag encendido, un bearer sin identidad del gateway, sin `act`, con `aud` distinto, con `iss` distinto,
       vencido, con TTL mayor a 5 minutos o con `organizationId` distinto se rechaza (un test por caso).
+      Abierto: la forma directa ya rechaza `aud`, `iss` y cliente distintos, un `act` presente e introspección inactiva
+      (un test agrupado). La identidad del gateway, el `act` obligatorio y el `organizationId` del token son de la forma
+      delegada (TASK-2086/2088); vencido y TTL no tienen caso propio.
 - [ ] Una petición con cookie y bearer a la vez se rechaza (test).
+      Abierto: la enmienda D1-bis decidió otra regla: con cookie presente **gana la cookie** y el bearer se ignora
+      (cubierto por el mismo test). Decidir al cierre si el criterio se reescribe o se mantiene para la forma delegada.
 - [ ] Un `sub` sin binding vigente, con principal externo o vencido se rechaza (tests).
-- [ ] Un token con introspección `active=false` se rechaza; tras revocar, el rechazo ocurre en 30 segundos o menos
+      Abierto: el `sub` resuelve por `internalPrincipalFor` con la misma autoridad que la cookie, pero no hay un test
+      propio de binding ausente, externo o vencido en la suite del carril.
+- [x] Un token con introspección `active=false` se rechaza; tras revocar, el rechazo ocurre en 30 segundos o menos
       (test con reloj controlado).
-- [ ] Una operación cuya clase D2 no está en los scopes del token se rechaza; una operación excluida nunca se ejecuta
+      Evidencia: `tests/agent-bearer.test.ts` (introspección inactiva rechazada; caché de introspección ≤ 30 s por token);
+      `logout` real devolvió `revoked: true`.
+- [x] Una operación cuya clase D2 no está en los scopes del token se rechaza; una operación excluida nunca se ejecuta
       por bearer (tests).
+      Evidencia: `tests/agent-bearer.test.ts` (clases por ruta y por operación, `assertBearerOperation`; las excluidas
+      nunca pasan).
 - [ ] Un comando válido por bearer queda con `principal_id` de la persona, `actor_kind='agent'`, `channel='gateway'` y
       el `agent_client_id` de `act` (test con lectura de filas).
+      Abierto: en la forma directa el canal es `cli` y no hay `act`; en producción las 17 acciones de la sala Volta
+      quedaron atribuidas a la persona como `cli/claude-code`. El canal `gateway` con `act` llega con TASK-2088.
 - [ ] Ninguna respuesta, log ni contador contiene el token o el `sub` completo (test).
+      Abierto: la CLI nunca imprime tokens (`tests/agent-cli-login.test.ts`, `whoami`) y la URL de fin del login no
+      lleva código ni tokens, pero falta un test sobre respuestas, logs y contadores del servidor.
 - [ ] Todos los rechazos devuelven la misma respuesta pública y suman `rooms.agent.bearer_rejected` con su motivo.
-- [ ] El contrato de API refleja la enmienda del ADR y la CLI describe el canal real.
-- [ ] La fila de `ROOMS_AGENT_LANE_ENABLED` está en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` al cerrar.
+      Abierto: la falta de clase responde 403, distinta del 401 de un bearer inválido, y el contador
+      `rooms.agent.bearer_rejected` no está verificado en el verificador del carril.
+- [x] El contrato de API refleja la enmienda del ADR y la CLI describe el canal real.
+      Evidencia: `docs/architecture/rooms/EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md` § «Bearer de agentes (carril CLI,
+      D1-bis)» y ADR del carril § Enmienda D1-bis; `pnpm rooms login|logout|whoami` y el MCP stdio sin
+      `--session-file`.
+- [x] La fila de `ROOMS_AGENT_LANE_ENABLED` está en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` al cerrar.
+      Evidencia: fila en la sección «Rooms / Auth — activación 31Oct2026 (vigente)», `true` desde 2026-11-02.
 - [ ] `LC_ALL=en_US.UTF-8 pnpm verify` pasa en `efeonce-rooms`.
+      Abierto: la evidencia registrada es la suite (420 pass, 24 skipped, 0 fail); falta correr `pnpm verify` completo
+      sobre `main@3434ea8` como gate de cierre.
 
 ## Verification
 
@@ -433,10 +461,10 @@ ADR deja a la implementación:
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Fila de `ROOMS_AGENT_LANE_ENABLED` en el ledger de flags con runtime Vercel `efeonce-rooms`.
-- [ ] Delta en `EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md` y en el ADR del carril con los nombres finales.
+- [x] Fila de `ROOMS_AGENT_LANE_ENABLED` en el ledger de flags con runtime Vercel `efeonce-rooms`.
+- [x] Delta en `EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md` y en el ADR del carril con los nombres finales (forma directa; la delegada suma su delta con TASK-2088).
 - [ ] `references/program-ledger.md` de la skill `efeonce-rooms` actualizado y espejo `.codex` sincronizado.
-- [ ] Estado declarado con honestidad: «code complete, flag apagado; encendido en el canary de TASK-2088».
+- [ ] Estado declarado con honestidad. Desde la enmienda D1-bis: «forma directa en producción con el carril encendido (2026-11-02); forma delegada pendiente del canary de TASK-2088».
 
 ## Follow-ups
 

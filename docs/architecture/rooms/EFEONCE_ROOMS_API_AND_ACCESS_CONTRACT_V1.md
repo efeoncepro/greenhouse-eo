@@ -23,6 +23,7 @@ privadas reautorizadas; omite referencias excluidas/huérfanas. Anclas temporale
 y duración medida. Puertos X-ray/CRM OFF y handoff `pending` no equivalen a proveedor conectado o envío.
 MCP stdio usa una sesión existente y toolsets explícitos; excluye transferencia binaria, OTP/login y
 OAuth/federación remota. La autoridad productiva no acepta un bearer nativo por inferencia de CLI/MCP.
+(Superado el 2026-11-02 para el bearer de Efeonce ID: ver [§ Bearer de agentes](#bearer-de-agentes-carril-cli-d1-bis).)
 
 Las familias de §1 siguen siendo el **contrato objetivo completo**, no nombres de endpoints disponibles;
 escenarios, equivalencia de la UI final y certificación integral conservan sus gates. Los apartados
@@ -62,6 +63,55 @@ de esa organización, no una identidad paralela.
 Gate de migraciones: toda migración nueva entra en `REVIEWED_MIGRATIONS` (`scripts/design-integration/config.ts`) en el
 mismo PR; `tests/integration-env.test.ts` exige que coincida exactamente con `migrations/*.sql`
 ([ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
+
+## Bearer de agentes (carril CLI, D1-bis)
+
+Vigente al 2026-11-02. Contrato en producción y encendido (`efeonce-rooms` PR #22 y PR #23; TASK-2087 del lado Rooms, TASK-2095 del lado
+Efeonce ID). Decisión: [enmienda D1-bis](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01).
+Un agente (Claude Code, Codex) opera Rooms con el login de una persona interna, sin principal propio. La forma
+delegada del gateway (D1 original, con `act`) sigue pendiente: TASK-2086 y TASK-2088.
+
+**Quién emite.** Efeonce ID, segunda audiencia `https://efeonce-rooms.vercel.app/api/v1`, cliente público
+`efeonce-rooms-cli` (authorization code + PKCE S256 por loopback, refresh rotativo con detección de reuso). Access
+token JWT de 300 s. Las clases y la derivación de la audiencia viven en el
+[contrato OAuth de Efeonce ID](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
+
+**Descubrimiento (RFC 9728).** `GET /.well-known/oauth-protected-resource` responde 200 con la audiencia, el emisor y
+el cliente de la CLI cuando el carril está encendido, y 404 cuando está apagado.
+
+**Verificación** (`src/server/agents/bearer.ts`, falla cerrado en cualquier paso):
+
+| Paso | Regla |
+| --- | --- |
+| Firma | JWKS del emisor; `iss`, `aud` (= `ROOMS_AGENT_AUDIENCE`) y `exp` |
+| Cliente | `azp` dentro de `ROOMS_AGENT_CLI_CLIENT_IDS`; un token con `act` se rechaza (la forma delegada todavía no existe) |
+| Introspección | RFC 7662 con el cliente confidencial `efeonce-rooms-resource`, que solo ve activos los tokens de su audiencia. Caché de 30 s como máximo: revocar en Efeonce ID corta en menos de 30 s |
+| Persona | `sub` → `rooms.identity_bindings(issuer, subject)` con principal `internal` (`internalPrincipalFor`). Misma autoridad que la cookie de esa persona; sin binding vigente no hay acceso |
+| Clase | Cada ruta y cada operación exige su clase (`read`, `author`, `release`, `access`; `assertBearerOperation`). El scope recorta la autoridad de la persona, nunca la amplía. Falta de clase = **403** |
+
+**Espacio.** El header `X-Rooms-Organization` (opción `--organization` en la CLI) elige el espacio de trabajo. Solo
+intersecta las organizaciones de la persona; nunca las amplía.
+
+**Canal y precedencia.** Un bearer fuerza el canal `cli` (con `X-Rooms-Agent` para el nombre del agente), así que la
+atribución, los avisos, las reversas y las cuotas de TASK-2084 aplican igual. Si la petición trae cookie de sesión de
+Rooms, **gana la cookie** y el bearer se ignora.
+
+**Variables de entorno de Rooms:**
+
+| Variable | Uso |
+| --- | --- |
+| `ROOMS_AGENT_LANE_ENABLED` | Interruptor. Sin él, Rooms rechaza todo bearer y la metadata responde 404; la cookie sigue igual |
+| `ROOMS_AGENT_AUDIENCE` | Audiencia esperada en `aud` |
+| `ROOMS_AGENT_CLI_CLIENT_IDS` | Lista de `azp` aceptados (`efeonce-rooms-cli`) |
+| `ROOMS_AGENT_INTROSPECTION_CLIENT_ID` | Cliente de introspección (`efeonce-rooms-resource`) |
+| `ROOMS_AGENT_INTROSPECTION_CLIENT_SECRET_SECRET_REF` | En producción, referencia al secreto `rooms-production-agent-introspection-client-secret`. En local se usa el secreto crudo |
+
+Interruptores: `ROOMS_AGENT_LANE_ENABLED=false` en Rooms, suspender `efeonce-rooms-cli` en Efeonce ID o vaciar
+`AUTH_SERVER_ROOMS_AUDIENCE`. Estado por entorno en el
+[ledger de flags](../../operations/FEATURE_FLAG_STATE_LEDGER.md). Pruebas: `tests/agent-bearer.test.ts` y
+`tests/agent-cli-login.test.ts`. En local, `pnpm integration:up` emite tokens con un emisor propio
+(`scripts/design-integration/agent-issuer.ts`). Uso desde la CLI y el MCP stdio:
+[guía de conexión](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## 1. Paridad por capacidad
 
@@ -128,7 +178,7 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 
 ## 4. Identidad y acceso
 
-Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. La federación MCP remota mantiene el gateway como adapter, sin transferirle las políticas Rooms; el adapter stdio local reutiliza sesión HTTP existente (§Corte vigente).
+Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. La federación MCP remota mantiene el gateway como adapter, sin transferirle las políticas Rooms; el adapter stdio local reutiliza el login de `pnpm rooms login` o, si se pasa `--session-file`, la sesión HTTP existente ([§ Bearer de agentes](#bearer-de-agentes-carril-cli-d1-bis)).
 
 Compradores: principal externo limitado a la sala, mediante invitación y sesión verificadas. El canje enlace+código y su sesión local guest se rigen por el [ADR OTP](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md) y el [contrato de invitación](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md); el alcance actual está en la guía de conexión, sin sesión interna ni SSO por OTP. Un vínculo compartido no concede por defecto acceso a toda la cuenta ni a notas privadas. Modo público de muestra exige publicación explícita independiente de una sala privada.
 

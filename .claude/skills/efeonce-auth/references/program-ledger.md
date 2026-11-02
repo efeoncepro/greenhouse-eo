@@ -44,7 +44,12 @@
   [runbook](../../../../docs/operations/runbooks/auth-server.md), [pantallas](../../../../docs/documentation/identity/pantallas-efeonce-id.md),
   [manual](../../../../docs/manual-de-uso/identity/operar-pantallas-efeonce-id.md) y [acceso a productos](../../../../docs/documentation/identity/acceso-a-productos-efeonce.md).
 
-## 2026-11-02 — Audiencia Rooms en producción (`auth-server-00172-zcn`, hotfix PR #267)
+## 2026-11-02 — Audiencia Rooms en producción (`auth-server-00172-zcn`, hotfix PR #267) y aceptada
+
+- `vivo` (aceptación 2026-11-02, ledger de `efeonce-rooms`): el operador corrió `pnpm rooms login` una vez contra producción y el
+  agente armó y publicó la sala `demo-volta` con 17 acciones `cli/claude-code`; `logout` respondió `revoked: true` y un segundo
+  `login` terminó en «Listo». Introspección real con el secreto de Secret Manager verificada. TASK-2095 sigue `in-progress` hasta su
+  cierre formal; el copy del consentimiento sigue sólo en `develop`.
 
 - Operador: «Seguir con Efeonce ID» (variable, hotfix con solo `9ea3b8fd5`, release, clientes, secreto, flags).
 - `vivo`: release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d` (run `41372622852`, success, un intento, break-glass por
@@ -59,7 +64,7 @@
   muestra «Permiso efeonce.mcp.rooms.…». **Rollback:** `update-traffic --to-revisions=auth-server-00171-xdd=100` (y luego `--to-latest`)
   o vaciar la variable + deploy gobernado; suspender `efeonce-rooms-cli` corta todas las CLIs.
 
-## 2026-11-01 — Audiencia Rooms y cliente de la CLI de agentes (TASK-2095): código en `develop`, sin release
+## 2026-11-01 — Audiencia Rooms y cliente de la CLI de agentes (TASK-2095): código en `develop`, sin release (snapshot; en producción y aceptada desde la entrada 2026-11-02)
 
 - Decisión del operador: «CLI primero, gateway después» ([enmienda D1-bis](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)).
 - `local`: commits `23ee051ef` (ADR + tasks) y `9ea3b8fd5` (código) en `develop`, sin push. `src/lib/auth-server/oauth/resources.ts`:

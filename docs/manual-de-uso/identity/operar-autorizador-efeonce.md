@@ -1,11 +1,11 @@
 # Operar el autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-04 por Claude
-> **Última actualización:** 2026-11-01 (release a `main`, tráfico a la última revisión, rollback y guard de deploy)
+> **Última actualización:** 2026-11-02 (audiencia Rooms y clientes de la CLI de agentes, TASK-2095)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
-> **Administración en portal:** operaciones programáticas; la UI pública de login vive en `auth.efeonce.org`. Se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
+> **Administración en portal:** operaciones programáticas; la UI pública de login vive en `auth.efeonce.org`. Se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-rooms-agent-clients`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
 > **Documentacion relacionada:** [Autorizador de Efeonce](../../documentation/identity/autorizador-efeonce.md), [Runbook auth-server](../../operations/runbooks/auth-server.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [Operar el binding de identidad externa](operar-binding-identidad-externa.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 
 ## Para que sirve
@@ -42,6 +42,10 @@ limpiar una familia de prueba ni elimines un CIMD compartido. La certificación 
 - **Revisión:** `auth-server-00170-qlx` sirve el 100 % del tráfico (`GIT_SHA` `935583f88`).
 - **Flags:** first-party y OTP de invitación ON. Su fuente durable son las variables de repo GitHub.
 - **PR:** las PR #263/#264 se cerraron, superadas por el release.
+- **Delta 2026-11-02:** el hotfix acotado PR #267 (release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d`,
+  orquestador `41372622852`) llevó a producción la segunda audiencia, Rooms. La revisión `auth-server-00172-zcn`
+  sirve el 100 % del tráfico; aceptada el 2026-11-02 con la CLI de Rooms. El copy del consentimiento de las clases de
+  Rooms sigue sólo en `develop` (paso 6b).
 
 ### Tráfico: va a la última revisión
 
@@ -212,6 +216,36 @@ Lo que debes saber:
 - `allowedScopes` / `--scopes` acota lo que ese cliente puede pedir; si lo omites, puede pedir cualquier scope
   soportado. Los scopes de escritura igual exigen consentimiento explícito y step-up de la persona.
 - Registrar con el mismo `clientId` responde `200` sin cambios (idempotente); no rota el secreto.
+
+### 6b. Audiencia Rooms y clientes de la CLI de agentes
+
+Efeonce ID emite pases para Rooms sólo si `AUTH_SERVER_ROOMS_AUDIENCE` tiene la audiencia
+(`https://efeonce-rooms.vercel.app/api/v1`, https). Su fuente durable es la variable de repo GitHub del mismo nombre,
+que `auth-server-deploy.yml` y `services/auth-server/deploy.sh` pasan al servicio. Vacía, el emisor responde
+`rooms_audience_disabled` y la CLI de Rooms deja de poder entrar o renovar.
+
+Los dos clientes se registran con un script idempotente (necesita PostgreSQL por el proxy, mismas variables del
+paso 3):
+
+```bash
+pnpm auth-server:register-rooms-agent-clients -- --secret-out /ruta/privada/rooms-introspection.secret
+```
+
+- **`efeonce-rooms-cli`**: público; authorization code + PKCE S256 por loopback y refresh rotativo. Sólo recibe las
+  clases `read`, `author`, `release` y `access` (no `read.client`).
+- **`efeonce-rooms-resource`**: confidencial, sólo introspección; la introspección filtra por su audiencia.
+- `--secret-out` escribe el secreto del cliente de introspección a un archivo `0600`; nunca sale por pantalla. Cárgalo
+  en Secret Manager (`rooms-production-agent-introspection-client-secret`) con `printf %s … | gcloud secrets versions
+  add … --data-file=-` y borra el archivo. Rooms lo lee por `ROOMS_AGENT_INTROSPECTION_CLIENT_SECRET_SECRET_REF`.
+- Volver a correr el script no rota nada.
+
+Para **cortar** el carril de agentes desde Efeonce ID: suspende el cliente `efeonce-rooms-cli` (corta todas las CLIs)
+o vacía `AUTH_SERVER_ROOMS_AUDIENCE` y despliega por el workflow gobernado. El tercer interruptor vive en Rooms
+(`ROOMS_AGENT_LANE_ENABLED`, ver [operar producción de Rooms](../rooms/operar-produccion-rooms.md)). El operador
+humano de la CLI está en [operar Rooms con agentes por CLI](../rooms/operar-rooms-con-agentes-por-cli.md).
+
+Errores que verás: `scope_audience_mixed` (se pidieron clases de Rooms junto con otras), `restricted_scope` (el
+cliente no tiene listadas las clases de Rooms), `rooms_requires_internal` (persona externa).
 
 ### 7. Revocar el consentimiento de una persona
 

@@ -5,7 +5,7 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
-## Estado vigente (2026-11-01)
+## Estado vigente (2026-11-02)
 
 - **2026-11-02 — botón «Continuar con Efeonce ID» definido, no adoptado (`doc` + `local`):** el [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02)
   fija el botón canónico para relying parties: «Continuar con» + `efeonce-id-button-lockup-*` (`axis-brand-assets` 0.4.32), diez
@@ -35,7 +35,7 @@
   secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`; antes `mgod4xbea`)
   con alias. Metadata 200 con audiencia/emisor/cliente; `/rooms` 307, `/auth/error` 200, sesión 401, bearer falso 401. Efeonce ID ya
   sirve la audiencia (`auth-server-00172-zcn`). Falta el primer `pnpm rooms login` del operador y la sala Volta.
-- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis): PR #22 en producción, APAGADO.** Merge `main@9a4340a`
+- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis): PR #22 en producción, APAGADO** (snapshot de 2026-11-01; encendido y aceptado el 2026-11-02, entradas de arriba). Merge `main@9a4340a`
   (autorizado por el operador: «Solo hasta Rooms»), deploy `efeonce-rooms-r39y0yi7g` (`dpl_HKTWk2WpdX5hKZLC2TDrPLXQE39q`) con
   alias reasignado. `vivo` sin sesión: `/rooms` 307 a login, `/auth/error` 200, `/api/auth/session` 401,
   `/.well-known/oauth-protected-resource` 404 (carril OFF) y un bearer falso 401. `ROOMS_AGENT_LANE_ENABLED` sigue ausente en
@@ -107,7 +107,7 @@
   respaldo se borra tras esa verificación. Lección: un tope de vida en el código puede tener un CHECK gemelo en la base;
   ampliar uno sin el otro rompe el login del invitado.
 
-- Producción (`vivo`): `efeonce-rooms.vercel.app` sirvió el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
+- Producción (`vivo`): desde 2026-11-02 `efeonce-rooms.vercel.app` sirve `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` (PR #23, `main@3434ea8`), sobre PR #22 `main@9a4340a` (carril CLI) y PR #16–#21. Antes sirvió el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
   inventario de migraciones revisadas). Debajo, en orden: PR #10 `main@449a0cd` (nombre del espacio, `f59d1df`),
   PR #9 `main@97588d3` (307 sin sesión, `1021e75`), PR #8 `main@21b10a9` (casa agentes primero, TASK-2085), PR #7
   `main@d7d6f6b` (TASK-2084 expand) y PR #5/#4. Alias **manual**: tras cada deploy,
@@ -122,16 +122,17 @@
   `claude-code` por CLI). Sin ver todavía con una sesión humana real.
 - Flags Production (`vivo`, valores releídos 2026-10-31): `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`,
   `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED`, `ROOMS_MEDIA_DISPATCH_ENABLED` = `true`;
-  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`.
-- Efeonce ID (`vivo`): first-party y OTP ON; fuente durable en variables de repo GitHub. Detalle y rollback en el
+  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`. `ROOMS_AGENT_LANE_ENABLED` = `true` desde 2026-11-02 (entrada de arriba).
+- Efeonce ID (`vivo`): first-party y OTP ON, y la audiencia Rooms con los clientes `efeonce-rooms-cli` / `efeonce-rooms-resource`
+  (`auth-server-00172-zcn`, hotfix PR #267); fuente durable en variables de repo GitHub. Detalle y rollback en el
   ledger de `efeonce-auth`.
 - Acceso del dueño: administrador con renovación automática (`vivo` 2026-10-31). Todo acceso vence en máximo un año.
 - Login humano con MFA: **aceptación reportada por el operador** (`doc`, 2026-11-01), transmitida por la sesión Auth:
   «Ya yo lo probé y funciona bien con MFA». Sin logs ni prueba instrumentada añadidos; no certifica el encabezado,
   la casa nueva ni la renovación automática. [Registro](../../../../docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md).
 - Decisiones: ADR de escenas, de acceso interno durable y del carril de agentes, los tres **Accepted**. Del carril,
-  sólo la atribución, avisos, reversas y cuotas de TASK-2084 (expand) y la casa de TASK-2085 están en producción;
-  el bearer delegado y el gateway no existen.
+  están en producción la atribución, avisos, reversas y cuotas de TASK-2084 (expand), la casa de TASK-2085 y, desde el
+  2026-11-02, el bearer por CLI (enmienda D1-bis, aceptado). El gateway delegado no existe todavía.
 - Issues resueltos del corte: [ISSUE-187](../../../../docs/issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)
   (inventario de migraciones revisadas) e [ISSUE-188](../../../../docs/issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)
   (entrada sin sesión por RSC).
@@ -141,13 +142,15 @@
   [acceso durable](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md) ·
   [atribución de agentes](../../../../docs/audits/rooms/2026-10-31-agent-lane-attribution-production.md).
 - Lo que sigue, en orden:
-  1. TASK-2084/2085: recorrido real de acción, aviso y reversa de agente en producción; después, slice 6 (contract).
+  1. TASK-2084/2085: el recorrido real de acción, aviso y reversa de agente quedó hecho con la sala Volta (2026-11-02);
+     falta verla con sesión humana en `/rooms` y, después, slice 6 (contract).
   2. TASK-2085: QA de la casa nueva y encabezado «Efeonce», captura GVC (`pnpm fe:capture rooms-agent-activity`) con
      scorecard y campos que faltan en el reader. El login con MFA ya tiene aceptación reportada.
   3. Medir la sala Live en Vercel (streams y pool), encendida y todavía sin medición.
-  4. Task nueva de EPIC-044: delegación interactiva de Efeonce ID para la audiencia de Rooms (canje RFC 8693, `act`,
-     D10). Es TASK-2086 (`to-do`); TASK-1917 no la cubre. La retención de Efeonce ID ya se levantó (2026-11-01).
-  5. Verificador del bearer en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
+  4. Gateway: canje RFC 8693 de Efeonce ID para la audiencia Rooms (`act`, D10), TASK-2086 (`to-do`); la audiencia ya
+     existe (TASK-2095). TASK-1917 no la cubre.
+  5. Provider `rooms` en `efeonce-mcp` (TASK-2088), que reutiliza el verificador del bearer ya vivo. Cierre formal de
+     TASK-2087 y TASK-2095.
   6. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
   7. Antes de clientes reales: cerrar TASK-1833 y revisar gobierno de datos IA para `read.client`, además de la
      medición Live. Ningún cliente real sin una autorización nueva.
