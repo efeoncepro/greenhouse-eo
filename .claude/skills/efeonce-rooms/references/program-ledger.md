@@ -8,7 +8,7 @@
 ## Estado vigente (2026-11-01)
 
 - **2026-11-02 — carril ENCENDIDO (`vivo`):** `ROOMS_AGENT_LANE_ENABLED=true` (env add del operador), `ROOMS_AGENT_AUDIENCE` y la ref del
-  secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-mgod4xbea` (`dpl_3Fh35WLzBd59WmYjJ6msLcpNcc2z`)
+  secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`; antes `mgod4xbea`)
   con alias. Metadata 200 con audiencia/emisor/cliente; `/rooms` 307, `/auth/error` 200, sesión 401, bearer falso 401. Efeonce ID ya
   sirve la audiencia (`auth-server-00172-zcn`). Falta el primer `pnpm rooms login` del operador y la sala Volta.
 - **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis): PR #22 en producción, APAGADO.** Merge `main@9a4340a`
