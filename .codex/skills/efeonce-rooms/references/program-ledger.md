@@ -7,6 +7,13 @@
 
 ## Estado vigente (2026-11-02)
 
+- **2026-11-02 — skill de oficio actualizada al carril CLI, eval PASS (`local`):** `efeonce-rooms-authoring` ahora enseña
+  el login de la CLI como canal normal (`whoami`, clases, `403`/`401`), `assetRefs: []` al crear, clave nueva ante
+  `409`, el lector `media` como lista, vencimiento real de invitaciones (30 días, tope 90, acotado por el acceso de
+  quien invita), `invitationId` con el `roomId` (es único en todo Rooms; un choque responde `unavailable`) y cómo
+  confirmar destinatarios sin `read.client`. Cuatro rondas del eval por el login local (`integration:up`); recibo
+  `evals/runs/2026-11-02.json`, PASS, hash `sha256:9ff2aff5…`. [Auditoría](../../../../docs/audits/rooms/2026-11-02-authoring-eval-cli-lane-run.md).
+
 - **2026-11-02 — botón «Continuar con Efeonce ID» definido, no adoptado (`doc` + `local`):** el [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02)
   fija el botón canónico para relying parties: «Continuar con» + `efeonce-id-button-lockup-*` (`axis-brand-assets` 0.4.32), diez
   estados, sin primitive todavía en `axis-ui-primitives`. `local`: `main@3434ea8` (PR #23, páginas `/cli/conectado` y `/cli/error`)

@@ -1,0 +1,234 @@
+{
+  "schema": "rooms-authoring-eval-receipt.v1",
+  "kind": "live",
+  "scorer": "rooms-authoring-score.v1",
+  "scoredAt": "2026-11-02T10:40:06.282Z",
+  "verdict": "PASS",
+  "skillBundleHash": "sha256:9ff2aff505f551bcf72e5f19c7ea89c8414bc6d6366f4c7509863f30afc8e487",
+  "bundleFiles": [
+    "SKILL.md",
+    "agents/openai.yaml",
+    "evals/briefs/a-volta-siempre-activo.md",
+    "evals/briefs/b-raiz-protector-solar.md",
+    "evals/cases.json",
+    "evals/expected/a-volta-siempre-activo.json",
+    "evals/expected/b-raiz-protector-solar.json",
+    "evals/score.mjs",
+    "references/reversal-etiquette.md",
+    "references/text-craft.md"
+  ],
+  "signedBy": "Claude (Opus 5.5), sesión «Carril CLI de agentes para Rooms»",
+  "cases": [
+    {
+      "caseId": "a-volta-siempre-activo",
+      "source": "live",
+      "roomId": "sala-volta-2027-d",
+      "editionId": "9c59d35d-9774-44a0-a8f5-0c4e17cd762e",
+      "agentClientId": "claude-code",
+      "dataOrigin": "synthetic",
+      "metrics": {
+        "coverage": {
+          "pass": true,
+          "detail": "1 publicación(es) con cobertura publicable y sin issues de error."
+        },
+        "placeholders": {
+          "pass": true,
+          "informational": true,
+          "detail": "Sala sintética sin marcadores."
+        },
+        "sources": {
+          "pass": true,
+          "detail": "2 prueba(s) con fuente; diagnósticos, cifras y respuestas conectados."
+        },
+        "invitations": {
+          "pass": true,
+          "detail": "3 destinatario(s), todos del deal."
+        },
+        "publishOrder": {
+          "pass": true,
+          "detail": "Cada publicación sigue a una lectura de cobertura limpia de la misma revisión, sin escrituras entre ambas."
+        }
+      },
+      "pass": true,
+      "expectedChecks": [
+        {
+          "id": "roomDataOrigin",
+          "pass": true,
+          "detail": "esperado synthetic, corrida synthetic"
+        },
+        {
+          "id": "profiles",
+          "pass": true,
+          "detail": "perfiles creative, seo-aeo"
+        },
+        {
+          "id": "chapters",
+          "pass": true,
+          "detail": "7 capítulo(s); rango 4–8"
+        },
+        {
+          "id": "scenes",
+          "pass": true,
+          "detail": "escenas según lo esperado"
+        },
+        {
+          "id": "answers",
+          "pass": true,
+          "detail": "answers según lo esperado"
+        },
+        {
+          "id": "cycleTerms",
+          "pass": true,
+          "detail": "términos del ciclo según la propuesta"
+        },
+        {
+          "id": "showcase",
+          "pass": true,
+          "detail": "4 contexto(s); mínimo 2"
+        },
+        {
+          "id": "team",
+          "pass": true,
+          "detail": "3 persona(s); mínimo 3"
+        },
+        {
+          "id": "evidence",
+          "pass": true,
+          "detail": "2 prueba(s), 3 diagnóstico(s)"
+        },
+        {
+          "id": "invitationsComplete",
+          "pass": false,
+          "detail": "sin invitación activa: carla.mendez@volta-bikes.example, tomas.ruiz@volta-bikes.example, andrea.soto@volta-bikes.example"
+        },
+        {
+          "id": "forbidden:https?://",
+          "pass": true,
+          "detail": "Ni URLs ni rutas en la sala."
+        },
+        {
+          "id": "forbidden:(?:\\$\\s?\\d|\\bUF\\s?\\d|\\bCLP\\b)",
+          "pass": true,
+          "detail": "El deal no declara precio: la sala no lo muestra."
+        },
+        {
+          "id": "forbidden:public/demo|\\.webp\\b",
+          "pass": true,
+          "detail": "Las piezas no se nombran por archivo ni ruta."
+        },
+        {
+          "id": "previewBeforePublish",
+          "pass": false,
+          "detail": "hubo vista previa sin rol buyer (la CLI no pasa --as)"
+        },
+        {
+          "id": "agentAttribution",
+          "pass": true,
+          "detail": "11/11 acciones con agente y aviso"
+        }
+      ],
+      "runDir": "../../../../private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/4cd5bd4f-895a-4971-b8d5-da1f5ca95c7b/scratchpad/eval-runs/2026-11-02d/a-volta-siempre-activo",
+      "expectedChecksPassed": false
+    },
+    {
+      "caseId": "b-raiz-protector-solar",
+      "source": "live",
+      "roomId": "raiz-mineral-2027-d",
+      "editionId": "d9578552-3b28-4421-9b98-3ef0ea76b8a5",
+      "agentClientId": "claude-code",
+      "dataOrigin": "real",
+      "metrics": {
+        "coverage": {
+          "pass": true,
+          "detail": "1 publicación(es) con cobertura publicable y sin issues de error."
+        },
+        "placeholders": {
+          "pass": true,
+          "detail": "Sala real sin marcadores ni scene_placeholder."
+        },
+        "sources": {
+          "pass": true,
+          "detail": "2 prueba(s) con fuente; diagnósticos, cifras y respuestas conectados."
+        },
+        "invitations": {
+          "pass": true,
+          "detail": "1 destinatario(s), todos del deal."
+        },
+        "publishOrder": {
+          "pass": true,
+          "detail": "Cada publicación sigue a una lectura de cobertura limpia de la misma revisión, sin escrituras entre ambas."
+        }
+      },
+      "pass": true,
+      "expectedChecks": [
+        {
+          "id": "roomDataOrigin",
+          "pass": true,
+          "detail": "esperado real, corrida real"
+        },
+        {
+          "id": "profiles",
+          "pass": true,
+          "detail": "perfiles seo-aeo"
+        },
+        {
+          "id": "chapters",
+          "pass": true,
+          "detail": "5 capítulo(s); rango 3–7"
+        },
+        {
+          "id": "scenes",
+          "pass": true,
+          "detail": "escenas según lo esperado"
+        },
+        {
+          "id": "answers",
+          "pass": true,
+          "detail": "answers según lo esperado"
+        },
+        {
+          "id": "team",
+          "pass": true,
+          "detail": "2 persona(s); mínimo 2"
+        },
+        {
+          "id": "evidence",
+          "pass": true,
+          "detail": "2 prueba(s), 2 diagnóstico(s)"
+        },
+        {
+          "id": "invitationsComplete",
+          "pass": false,
+          "detail": "sin invitación activa: lucia.herrera@raiz-lab.example"
+        },
+        {
+          "id": "forbidden:https?://",
+          "pass": true,
+          "detail": "Ni URLs ni rutas en la sala."
+        },
+        {
+          "id": "forbidden:(?:\\$\\s?\\d|\\bUF\\s?\\d|\\bCLP\\b)",
+          "pass": true,
+          "detail": "El brief no declara precio: la sala no lo muestra."
+        },
+        {
+          "id": "forbidden:volta|public/demo",
+          "pass": true,
+          "detail": "Sin piezas aprobadas no se usan imágenes de la demo."
+        },
+        {
+          "id": "previewBeforePublish",
+          "pass": false,
+          "detail": "hubo vista previa sin rol buyer (la CLI no pasa --as)"
+        },
+        {
+          "id": "agentAttribution",
+          "pass": true,
+          "detail": "11/11 acciones con agente y aviso"
+        }
+      ],
+      "runDir": "../../../../private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/4cd5bd4f-895a-4971-b8d5-da1f5ca95c7b/scratchpad/eval-runs/2026-11-02d/b-raiz-protector-solar",
+      "expectedChecksPassed": false
+    }
+  ]
+}
