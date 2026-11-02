@@ -259,6 +259,20 @@ Solo el modelo dio 0,05–0,48. Reglas en el contrato (`productInScene`):
 
 Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital y dos logos Berel en la pieza.
 
+**Método vigente: guiado (2026-11-02, decisión del operador).** «Un buen montaje se conoce por NO parecer un
+montaje»: restituir la etiqueta desde el render la deja con aspecto pegado. Flujo:
+1. `producto-en-escena.mjs colocar`: escala calculada por diámetro × **presencia publicitaria 1,4** (por defecto del
+   contrato; `--presencia` 1–1,5, declarada). La física sola se leía chica; Sunburst por su cuenta agrandaba
+   1,35–1,6× de forma dispareja.
+2. `pnpm ai:image --image compuesto.png --image referencia.png --prompt-file prompt.txt` (Sunburst xhigh). El modelo
+   redibuja el producto con el render oficial como referencia, sin moverlo ni cambiarle el tamaño.
+3. `producto-en-escena.mjs verificar`: comprueba alto 0,88–1,12×, corrimiento ≤ 30 px y escena ≤ 8/255, y corre OCR
+   local de los textos clave (macOS Vision en modo rápido; es aviso y no lee logotipos).
+4. `restituir` es respaldo, solo si un texto clave sale mal.
+
+Ronda final con galón, laca 1 L, aerosol y cubeta: alto 0,92–1,10×, escena 3,5–4,4/255, etiquetas correctas al 100 %
+(el texto diminuto sale aproximado). Lo de abajo es la historia que llevó a esto.
+
 **Presencia y renders (ronda final, 2026-11-02).**
 - **Una escala correcta puede verse chica.** Un galón real a 4 m de la cámara se ve chico aunque la escala esté bien
   (operador: «un galón de 4 L jamás se verá así»). El producto protagonista necesita una **superficie de producto
