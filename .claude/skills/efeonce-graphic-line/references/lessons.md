@@ -19,6 +19,32 @@
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
 
+## 2026-11-02 — Pantallas de producto: inventar figuras de órbita «con significado» rompe el canon
+
+**Síntoma:** el operador revisó en el canvas el rediseño de las pantallas de Efeonce ID (step-up, consentimiento,
+segundo factor, enlaces por correo, sesión) y dijo «en muchos no estás usando la órbita como es».
+**Causa:** para que cada panel «dijera algo», el agente dibujó variantes que no existen en el canon:
+- esfera suelta sobre el anillo, sin arco;
+- seis puntos (uno por dígito) y tres puntos de colores (uno por permiso): varias esferas por pieza;
+- una cuenta regresiva que vacía el anillo: un loader;
+- anillo cortado, anillo apagado y anillo completo con check;
+- el isotipo de Rooms dentro de la órbita: un logo fuera de un cierre de marca;
+- íconos dibujados a mano, tanto en la órbita como en los botones.
+
+Ninguna regla automática lo detectó; se vio a ojo.
+**Regla:** en un panel de producto, la órbita hace uno de dos trabajos canónicos y nada más:
+1. **Rodear un ícono de área del catálogo AXIS** (`resolveIcon`, en reposo, voz Trazo), con anillo fino, acento corto
+   arriba a la izquierda con la esfera en la punta y halo. Es la geometría de `canonicalOrbit` de Rooms.
+2. **Rodear una palabra** con la «órbita en reposo» aprobada en Rooms. Ahí el anillo va desnudo y la esfera es el punto
+   de la palabra.
+
+El movimiento es el de entrada (anillo, arco, esfera, halo) y después queda quieto: nunca un loop que finja progreso.
+Sin ícono del catálogo que calce, se usa una palabra o la pieza va sin órbita; el glifo no se dibuja. La UI funcional
+(botones, chips, campos) va sin íconos decorativos dibujados a mano, y lectura y escritura se distinguen con el texto,
+nunca con teal o ámbar. En móvil, sin panel, la esfera vuelve a ser el punto del titular, en el acento oscuro de la
+línea. Antes de publicar, recorre §3.13 («elegir una forma es elegir un trabajo») y la tabla de errores §10 pieza por
+pieza.
+
 ## 2026-11-01 — Una escala redondeada a dos decimales recorta el logo dentro del lockup
 
 **Síntoma:** en el canvas de Efeonce ID, el operador preguntó si el lockup «se ve recortado a propósito»: el borde
