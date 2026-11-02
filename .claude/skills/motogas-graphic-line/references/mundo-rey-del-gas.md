@@ -52,7 +52,13 @@ Los tamaños de cilindro (5, 11, 15, 45 kg) son los formatos reales que vende el
 **Escenario y pieza hero** — `Escenarios/motogas-rdg-mundo-escenario-teatro-4x5-v01.png` (centro vacío, 18 % superior
 libre para el logo) y `Pieza hero/motogas-rdg-bienvenidos-al-reino-4x5-v01.png`.
 
-## 3. Mapa de piezas (por construir desde el kit)
+## 3. Mapa de piezas
+
+El mundo quedó aprobado por el operador el 2026-11-02. Horario, Ubicación y Mesa de ayuda v01 están construidas (canvas
+`ReinoRDG_1_Horario`, `ReinoRDG_2_Ubicacion`, `ReinoRDG_3_MesaAyuda`; generador
+`ai-generations/2026-11-02_motogas-rdg-mundo/tools/corte-rdg.py`). Las tres comparten escenario, logo blanco arriba,
+titular de tres palabras en crema, bajada en mostaza y una placa crema con borde dorado para los datos, que salen de
+`locales.json` con respaldo. La placa se dibuja con `box-sizing:border-box` para que no toque el borde del lienzo.
 
 | Pieza | Escena |
 |---|---|
