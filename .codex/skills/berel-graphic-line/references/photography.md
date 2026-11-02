@@ -229,6 +229,27 @@ reemplaza al primero. El alfa del render se materializa antes de extenderlo, o l
 
 Pendiente: elegir escenas pensadas para producto (una toma arquitectónica lo deja pequeño).
 
+**Piloto por envase (2026-11-02).** Cinco envases sobre las tomas nuevas, mismo método híbrido. Todos pasaron y ninguno se movió:
+
+| Envase | Toma | Fidelidad híbrido | Solo modelo |
+|---|---|---|---|
+| Kover Pro 19 L | azotea, sobre la membrana mojada | 0,987 | 0,27 |
+| Sellador Anti-Salitre 530 19 L | diagnóstico, frente al muro con salitre | 0,973 | 0,33 |
+| Insignia 4 L (97 px de ancho) | comedor, en el piso | 0,990 | 0,22 (reescribió «ECO CONFIABLE») |
+| Mancha Nogal Clásico 1 L | taller, junto a la silla | 0,988 | 0,22 |
+| Aerosol esmalte acrílico | herrería, en la banqueta | 0,986 | 0,48 |
+
+Palancas fijadas en el contrato (`productInScene.levers`):
+- **Render:** el oficial vigente.
+- **Contexto de uso:** el envase va donde se usa.
+- **Escala:** realista, calculada con un objeto de tamaño conocido de la foto.
+- **Ancho mínimo:** unos 60 px en el plate; a 35 px el aerosol no se leía.
+- **Posición:** dentro de los tres recortes verticales, fuera de la banda del titular y de la esquina del logo.
+- **Story:** la base del producto va sobre el 82 % del alto. Los 340 px inferiores son zona de interfaz y ahí cayeron cuatro de cinco.
+
+Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital (los renders son frontales) y dos logos
+Berel en la pieza.
+
 ## 7. Rechazos que no se repiten
 
 | Fecha | Rechazo | Razón | Qué cambió |
