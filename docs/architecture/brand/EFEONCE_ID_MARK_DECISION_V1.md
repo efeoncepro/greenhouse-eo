@@ -40,7 +40,7 @@ tiene O.
 | --- | --- | --- |
 | Lockup **Efeonce \| ID** | `lockup` | Por defecto: encabezado del formulario de entrada, correos, documentos |
 | El monograma en un cuadro | `isotype` | Avatar e ícono de app; nunca junto al nombre |
-| Isotipo chico (anillo 110, esfera 104, aire 30) | `isotype-small` | Sólo a 32 px o menos: favicon y el botón «Continuar con Efeonce ID» |
+| Isotipo chico (anillo 110, esfera 104, aire 30) | `isotype-small` | Sólo a 32 px o menos: el favicon (el botón usa `button-lockup`; su versión «sólo símbolo», el monograma `logo`) |
 | El monograma solo | `logo` | Insumo de las anteriores |
 
 Las cuatro piezas existen en `positive`, `negative` y `white` (12 SVG). Junto a Efeonce, «ID» va en el gris medido de la

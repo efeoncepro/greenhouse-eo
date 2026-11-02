@@ -64,6 +64,11 @@ La diferencia con otras capas de documentacion:
   dónde (lockup Efeonce | Producto por defecto, logotipo solo, isotipo e isotipo chico de Reach y Globe a 24 px o
   menos), variantes `positive`/`negative`/`white`, sin «by efeonce», isotipos todo en blanco sobre oscuro, globo
   frambuesa y la «a» naranja de Reach sobre oscuro sólo en logotipo y lockup, y cómo regenerar los 33 SVG en AXIS. Aceptada el 2026-10-09; paquete 0.4.28 (tag `v0.4.28` publicado); desde 0.4.29, todas las piezas públicas en el Lab.
+- [Usar la marca de Efeonce ID](creative/usar-marca-efeonce-id.md) — la cuenta de Efeonce Auth: qué pieza usar dónde
+  (lockup Efeonce | ID por defecto, isotipo para avatar e ícono de app, isotipo chico sólo a 32 px o menos, lockup del
+  botón), variantes, la pantalla de entrada (sólo favicon y formulario, nunca el isotipo grande en el panel lateral),
+  cómo se arma el botón «Continuar con Efeonce ID» con sus diez estados (aprobado, aún sin implementar) y cómo regenerar
+  los 14 SVG. Marca aprobada el 2026-11-01; paquetes 0.4.31 y 0.4.32 publicados.
 - [Usar las portadas, el avatar y los destacados sociales de Efeonce](creative/usar-portadas-y-destacados-sociales-efeonce.md) —
   qué archivo subir en LinkedIn (página y perfil personal), Facebook, YouTube e Instagram, cómo cambiar una portada,
   el avatar único de las cuatro redes, **crear** un destacado (publicar primero la historia completa 9:16, `v02`) frente

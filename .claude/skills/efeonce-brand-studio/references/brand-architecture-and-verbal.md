@@ -17,6 +17,17 @@ Para cada capa definir owner, promesa, audiencia, autonomía, equity transferido
 
 En Efeonce, el cliente contrata Efeonce. Las líneas y product brands explican capacidades o soluciones; no deben convertirse por accidente en proveedores contractuales separados.
 
+### Marcas de producto que acompañan a Efeonce
+
+Efeonce es la masterbrand y la firma. Las marcas de producto (Insights, SV360/AEO, Creative Studio, Rooms, Wave, Reach,
+Globe y Efeonce ID) junto a Efeonce van en un lockup «Efeonce | Producto» y **nunca firman una pieza**: son contexto.
+
+- **Efeonce ID** (2026-11-01/02): la cuenta con la que personas y agentes entran por Efeonce Auth a todos los
+  productos. Es identidad de acceso, no una línea de negocio. **Nombre verbal: «Efeonce ID»**, siempre completo en
+  copy visible; el CTA canónico es **«Continuar con Efeonce ID»** (patrón «Pagar con PayPal») y, mientras conecta,
+  «Conectando…». Marca visual, piezas y reglas: ADR `docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md` y skill
+  `efeonce-graphic-line` (`references/applications.md` A20).
+
 ## Sistema verbal
 
 Producir, según necesidad:
