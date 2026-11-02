@@ -30,7 +30,23 @@
   cuadros (≤ 5 %), y falla cerrado; lo que no mide (fundidos, objetos flotando) se mira en la hoja de cuadros.
   Higgsfield puede devolver una recomendación de preset en vez del job: se reenvía con `declined_preset_id`.
 - **Dónde quedó:** `contracts/berel-video-reels.json`, `compose/video.mjs`, `scripts/reel.mjs`, `test/video.test.mjs`.
-  **Codificada + prueba**.
+  **Codificada + prueba**. **Reemplazada en parte por la lección siguiente** (motor y compuerta del salto).
+
+## 2026-11-02 · Reel: los objetos se forman en su lugar y frenan suave
+
+- **Citas:** «el efecto de los videos de Berel es como de que saltan a la escena»; tras el rebote, «se ve muy irreal,
+  el efecto es más suave»; «no aparecer por aparecer… es suave, como un salto suave»; y sobre la toma final, «sí, es ese».
+- **Qué pasó:** tres prompts fallaron antes de medir el corpus: fundidos («smooth continuous transformation»), caída y
+  rebote («drops in / hops»: irreal) y aparición seca («appears in place»: el objeto está en un cuadro y no en el
+  anterior). Medido cuadro a cuadro en los reels publicados, cada objeto se **forma** en 0,5–1 s (crece, se despliega,
+  se desenrolla, baja o entra por el borde) con un frenado suave, en cadena solapada. Con esa gramática en el prompt,
+  Seedance 2.0 dio la toma aprobada (salto 4,2 %, ΔE 4,0 → 0,7 con `corregir`).
+- **Regla:** Seedance 2.0 por defecto con la plantilla del contrato; el `--transformacion` nombra cómo se forma cada
+  objeto (nunca *appears*, *drops in*, *hops*, *bounces*). El salto entre cuadros es dato, no compuerta (14 de 29 reels
+  publicados pasan del 5 %); solo el color falla cerrado. Ante una descripción de movimiento ambigua, mirar el corpus
+  cuadro a cuadro antes de reescribir el prompt.
+- **Dónde quedó:** `contracts/berel-video-reels.json` (`effect`, `videoPrompt`, `approvedExample`, `engines`) y una
+  prueba que verifica que la plantilla reproduce letra por letra el prompt aprobado. **Codificada + prueba**.
 
 ## 2026-11-02 · Producto: un buen montaje no parece montaje (método guiado, 1,4×)
 

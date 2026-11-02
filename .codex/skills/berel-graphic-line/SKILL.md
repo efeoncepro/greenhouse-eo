@@ -9,7 +9,7 @@ description: >-
   cualquier banner de Berel (N1–N4, og:image, franjas, pasos, paleta), adaptación social (post,
   story, Pinterest), plate fotográfico (registro y toma, banda del titular), producto en escena
   (render oficial a escala por diámetro, redibujado guiado y verificado), reel de transformación
-  (14 s, FLUX 3 u Omni, tapa y música del mes), marcador de color o revisión visual de una pieza Berel.
+  (14 s, Seedance 2.0 u Omni, tapa y música del mes), marcador de color o revisión visual de una pieza Berel.
   Frontera: berel-content-production decide QUÉ pieza va y CUÁNDO (ciclo editorial, ficha N1–N4,
   Notion, Drupal, voz es-MX); esta skill decide CÓMO SE VE y CÓMO SE PRODUCE en el Creative
   Workbench.
@@ -118,7 +118,7 @@ sustituyen por otra fuente ni por valores aproximados.
 8. **QA visual.** Lee `qa.json`, mira cada pieza al 100 %, arma la hoja de contacto y revisa en el
    canvas → [references/qa-review.md](references/qa-review.md).
 9. **Reel** (si la pieza lleva video): parte del job de la story ya revisada; cuadros antes/después, capas,
-   clip FLUX 3 (u Omni por toma), `reel.mjs qa` y armado con tapa y música del mes →
+   clip Seedance 2.0 (u Omni por toma), `reel.mjs qa` y armado con tapa y música del mes →
    [references/video.md](references/video.md).
 10. **Entrega y revisión humana** (nombres, Frame.io, canvas, respuesta a comentarios) →
    [references/workflow.md](references/workflow.md).
@@ -132,7 +132,7 @@ sustituyen por otra fuente ni por valores aproximados.
 | ¿Qué tipografía, color de sistema o logo uso? ¿Dónde va el logo? | [identity-and-recipes.md](references/identity-and-recipes.md) |
 | Portada, cierre, franjas, pasos, paleta, post, story, Pinterest | [identity-and-recipes.md](references/identity-and-recipes.md) |
 | Señalización o técnica-gráfica | [identity-and-recipes.md](references/identity-and-recipes.md) (declaradas sin render) |
-| Reel de transformación: cuadros, motor (FLUX 3 / Omni), efecto de aparición, QA de color, música y tapa | [video.md](references/video.md) |
+| Reel de transformación: cuadros, objetos que se forman en su lugar, motor (Seedance 2.0 / Omni), QA de color, música y tapa | [video.md](references/video.md) |
 | ¿Por qué el marcador quedó ahí, se eliminó o salió con aviso? | [marker-grid.md](references/marker-grid.md) |
 | El titular social no cabe o se lee mal | [marker-grid.md](references/marker-grid.md) |
 | Foto nueva: estrato, espacio, toma, prompt, remates, banda del titular | [photography.md](references/photography.md) |

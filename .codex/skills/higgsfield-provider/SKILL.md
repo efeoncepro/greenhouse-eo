@@ -142,6 +142,9 @@ Caso fuente: reel Berel 2026-11-02 (antes → después en una toma fija de 8 s),
 - 🔴 **Recomendación de preset en vez del job:** el lote puede devolver `submission_failed` con
   `preset_recommendation` (p. ej. «IN THE DARK») y **no crea job ni cobra**. Se reenvía el mismo pedido con
   `declined_preset_id` = el id recomendado. Ocurrió con un prompt de fachada al sol; los demás ítems sí se enviaron.
+- 🔴 **Corte de conexión al enviar:** si `generate_video` responde «The connector's server isn't responding», el job
+  puede o no existir. Antes de reenviar, `show_generations` con `only_completed:false` y `type:video`: si el job no
+  aparece, se reenvía una sola vez (2026-11-02: no se había creado; reenviar sin mirar arriesga pagar dos veces).
 - **Costos y salidas medidos, 8 s, 9:16:**
 
 | Modelo MCP | Parámetros | Créditos | Salida real |
