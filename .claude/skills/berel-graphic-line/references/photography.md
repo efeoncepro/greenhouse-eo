@@ -259,6 +259,21 @@ Solo el modelo dio 0,05–0,48. Reglas en el contrato (`productInScene`):
 
 Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital y dos logos Berel en la pieza.
 
+**Presencia y renders (ronda final, 2026-11-02).**
+- **Una escala correcta puede verse chica.** Un galón real a 4 m de la cámara se ve chico aunque la escala esté bien
+  (operador: «un galón de 4 L jamás se verá así»). El producto protagonista necesita una **superficie de producto
+  planeada en el plate** desde la toma: en el `--extra`, un bloque `PRODUCT SURFACE` con un aparador o banco en primer
+  plano a ≈ 1,5 m. Con la cámara a 1,2 m de altura el piso cercano queda fuera del cuadro, así que no se puede acercar
+  después. Insignia 4L sobre el aparador: 257 px de alto, 1,6× el de la mesa, fidelidad 0,987.
+- **Encuadre con producto cercano.** El blog se ancla abajo (`focal [x, 1]`) y la story lo deja fuera con su focal.
+  Si el producto está en un costado, post, story y Pinterest corren su focal hacia él, midiendo la banda del titular.
+  El producto nunca toca el logo del post: se mueve el producto, no se corta la viñeta.
+- **Renders maqueta.** Todos los renders de Mancha (y algunos diluyentes) de 1 L tienen forma de aerosol con boquilla,
+  y no existe un aerosol de 1 L (operador: «así no se ve un aerosol»). Están en `productInScene.excludedRenders`.
+  Antes de colocar un render, comprueba que su forma corresponde al contenido. Para madera se usa la lata redonda real:
+  Laca de Nitrocelulosa 1L, Ø 10,5 cm, fidelidad 0,995. A Berel hay que pedirle el empaque real de las Manchas.
+
+
 ## 7. Rechazos que no se repiten
 
 | Fecha | Rechazo | Razón | Qué cambió |
