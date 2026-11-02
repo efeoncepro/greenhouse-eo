@@ -54,20 +54,26 @@ libre para el logo) y `Pieza hero/motogas-rdg-bienvenidos-al-reino-4x5-v01.png`.
 
 ## 3. Mapa de piezas
 
-El mundo quedó aprobado por el operador el 2026-11-02. Horario, Ubicación y Mesa de ayuda v01 están construidas (canvas
-`ReinoRDG_1_Horario`, `ReinoRDG_2_Ubicacion`, `ReinoRDG_3_MesaAyuda`; generador
-`ai-generations/2026-11-02_motogas-rdg-mundo/tools/corte-rdg.py`). Las tres comparten escenario, logo blanco arriba,
-titular de tres palabras en crema, bajada en mostaza y una placa crema con borde dorado para los datos, que salen de
-`locales.json` con respaldo. La placa se dibuja con `box-sizing:border-box` para que no toque el borde del lienzo.
+El mundo quedó aprobado por el operador el 2026-11-02. **v1 (sobre el teatro) fue rechazada**: «todo es un teatro y
+ahí estás pegando todo sin integrar nada… amplía más el mundo», y además las sombras, los tamaños y el texto no se
+veían modernos. **v2 vigente:** cada pieza vive en **su propio lugar del reino**, generado entero (canvas
+`ReinoRDG_1_Horario`, `ReinoRDG_2_Ubicacion`, `ReinoRDG_3_MesaAyuda`; fondos en
+`ai-generations/2026-11-02_motogas-rdg-mundo/lugares/final/`, generador `tools/piezas-v2.py`).
 
-| Pieza | Escena |
-|---|---|
-| Horario | «Su Majestad atiende»: el Rey en el trono + `torre-reloj`; los datos salen del registro |
-| Ubicación | `camino-real` hacia `castillo-rojo` / `castillo-naranjo`, o `mapa-reino` con el pin |
-| Mesa de ayuda | «Audiencias reales»: el `heraldo` anuncia los WhatsApp de los dos locales |
-| Lista del jueves | El edicto: `rey-capa` con `pergamino`; los precios se componen como texto |
-| Invierno | El Rey contra `frio`, con `estufa`, `olla` o `llama` como defensa |
-| Promo | `tesoro` (las monedas solo en piezas de precio o promo, nunca de adorno) |
+| Pieza | Lugar | Personajes |
+|---|---|---|
+| Horario «Su Majestad atiende.» | La plaza: trono sobre tarima, torre del reloj (marca las 10:00), palacio al fondo | Rey en el trono + Paje |
+| Ubicación «Ven al Reino.» | El camino real entre el castillo rojo (Lo Prado) y el naranjo (Cerro Navia), palacio en la colina | Rey con capa sobre la alfombra |
+| Mesa de ayuda «Audiencias reales.» | La puerta del palacio con escalinata | Heraldo en primer plano (pisa la tarjeta) + Rey en la puerta |
+| Lista del jueves (pendiente) | El edicto: Rey con capa y pergamino | — |
+| Invierno (pendiente) | El Rey contra El Frío, con estufa, olla o llama | — |
+
+**Sistema tipográfico v2** (Poppins): logo negro arriba a la izquierda (230 px, opacidad 0,9) · titular de dos
+líneas alineado a la izquierda sobre el cielo, 108 px, peso 800, interletra −0,055 em, interlínea 0,9, primera línea
+en tinta `#2A0B08` y segunda en rojo `#D8261C` cerrando con punto · bajada corta de una línea, 25 px, peso 500 ·
+**datos en una tarjeta blanca** abajo (márgenes 40, radio 30, sombra suave): ícono en cuadro redondeado de color,
+etiqueta de 15 px en versalitas del color del local y valor de 32–40 px en tinta, con un pie de 14 px (locales y
+legal). Nada de placas crema con doble borde dorado ni subtítulos espaciados en mostaza: era lo que se leía antiguo.
 
 ## 4. Cómo generar un elemento nuevo
 
@@ -85,15 +91,32 @@ titular de tres palabras en crema, bajada en mostaza y una placa crema con borde
    distribución de colores: un color que no debería estar es un píxel mal asignado.
 5. **QA:** mirar cada recorte sobre fondo oscuro (halos, partes borradas) antes de entregarlo.
 
-## 5. Composición por capas (receta de la pieza hero)
+## 5. Cómo se arma una pieza (v2: el personaje vive en un lugar)
 
-Generador: `ai-generations/2026-11-02_motogas-rdg-mundo/tools/reino-rdg.py` (canvas `ReinoRDG_Hero`). Orden de atrás
-hacia adelante: escenario → castillos (lejos, chicos) → palacio → camino real → trono → Rey → corte → primer plano
-desenfocado (tesoro, cetro, 7–8 px de desenfoque, cortados por el borde) → degradado superior + logo blanco → titular →
-grano. Cada personaje lleva sombra de contacto elíptica y la capa de luz de escena en *soft-light* enmascarada con
-su propia silueta.
+1. **El lugar, generado entero** con `briefs/rdg-lugar-estilo.txt` + la escena, en modo edición con los objetos 3D
+   del kit como referencia de estilo (`--image` repetible), `gpt-image-2.5-sunburst` `xhigh` `1600x2000`. La escena
+   deja vacío el sitio de cada personaje (el trono vacío, el centro del camino) y declara cielo arriba y suelo calmo
+   abajo. Luz de atardecer desde arriba a la izquierda: las sombras caen a la derecha.
+2. **Poner los 2D** a la escala del lugar (`scripts/rdg-poner-personajes.cjs`): el Rey sentado mide ~0,84 del alto
+   del trono y su base cae 0,27 de ese alto sobre las patas; el Paje ~0,6 del Rey.
+3. **Integrar** (`briefs/rdg-integrar-2d.txt`, edición del compuesto al mismo tamaño): el modelo sólo agrega la sombra
+   proyectada y de contacto de cada personaje con la luz del lugar. **Después se vuelven a poner los vectores
+   originales encima** (no se confía en cómo los redibujó el modelo).
+4. **Ampliar el cielo** si el titular no cabe (`briefs/rdg-ampliar-cielo.txt`): lienzo 1920×2400 con la escena abajo al
+   centro y bandas grises arriba y a los costados, edición a 1920×2400. Se usa **la salida entera del modelo**:
+   reponer el original encima deja un rectángulo visible porque el modelo re-tiñe el cielo
+   (`scripts/rdg-reponer-original.cjs` quedó como intento fallido documentado).
+5. **Hornear la luz en los personajes** (`scripts/rdg-hornear-personajes.cjs`): degradado en *soft-light* recortado
+   por la silueta, cálido arriba a la izquierda y sombra abajo a la derecha. Deja cada personaje suelto para ponerlo
+   por encima del texto cuando hace falta (el Heraldo sobre la tarjeta).
+6. **La pieza** en HTML: fondo horneado + tipografía v2 + grano al 14 %.
 
 ## 6. Lecciones
+
+- **El teatro fue el error de base:** un solo fondo genérico para todo obliga a pegar cada elemento encima, y ninguna
+  sombra dibujada a mano lo arregla. Cada pieza necesita un lugar propio del reino, generado con los objetos dentro.
+- Las sombras de los personajes 2D las pone el modelo con la luz real del lugar; las elipses borrosas a mano se leen
+  pegadas.
 
 - El estilo cómic fue rechazado varias veces: el impacto sale de la profundidad y el material satinado, no del
   rayado, las onomatopeyas ni los fondos de puntos.
