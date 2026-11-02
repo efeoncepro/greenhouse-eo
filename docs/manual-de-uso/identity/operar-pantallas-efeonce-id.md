@@ -1,9 +1,9 @@
 # Revisar y diagnosticar las pantallas de Efeonce ID
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-11-01 (login V4 con carrusel de novedades en producción)
+> **Última actualización:** 2026-11-02 por Claude (favicon y marca de Efeonce ID: de dónde salen, cómo regenerarlos y dónde no va la marca)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Administracion en portal:** ninguna. Estas pantallas viven en `auth.efeonce.org` (servicio Cloud Run `auth-server`), no en el portal, y se revisan con un harness local y dos verificadores de linea de comandos.
 > **Documentacion relacionada:** [Pantallas de Efeonce ID](../../documentation/identity/pantallas-efeonce-id.md) (funcional), [Operar el autorizador de Efeonce](operar-autorizador-efeonce.md) (el servicio, sus llaves y flags), [Operar la autenticacion de clientes externos](operar-autenticacion-clientes-externos.md) (invitar, revocar, canary), [PATTERNS.md § Runtime sin React](../../architecture/ui-platform/PATTERNS.md)
@@ -124,6 +124,36 @@ JavaScript, y con la ceremonia rechazada. Verifica ademas que el boton vaya ante
 y que no haya desplazamiento horizontal en 390px. Imprime `ok` o `FAIL` por comprobacion y un
 recuento al final.
 
+### 5. Regenerar el favicon y los assets de marca
+
+El favicon (`/favicon.svg`) es la teja de Efeonce ID: fondo oscuro de Efeonce (`#001a33`, radio del 22 %) con el isotipo
+chico en negativo al 71,3 % del lado. Nadie lo dibuja: se compone desde el archivo oficial.
+
+1. **De dónde sale.** `public/branding/SVG/efeonce-id-isotype-small-negative.svg`, copia byte a byte del archivo de
+   `@efeoncepro/axis-brand-assets` 0.4.31. Si AXIS publica una versión nueva de ese isotipo, reemplaza la copia con el
+   archivo del paquete, nunca editándola.
+2. **Cómo se compone.** `scripts/auth-server/efeonce-id-favicon.ts` arma la teja; exige que los colores del SVG sean
+   atributos (sin `<style>` ni `class`), porque la política de seguridad del emisor bloquearía un estilo interno.
+3. **Regenera** (no necesita base de datos ni proxy):
+
+   ```bash
+   pnpm auth-server:brand-assets:generate
+   ```
+
+   Reescribe `src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts`; el favicon queda en la constante
+   `EFEONCE_ID_FAVICON_SVG`.
+4. **Verifica:**
+
+   ```bash
+   pnpm vitest run src/lib/auth-server/oauth/pages/brand-assets.test.ts
+   ```
+
+   La guarda compara la constante contra el generador, que `/favicon.svg` sirva exactamente eso y que haya una sola
+   esfera. Con el arnés levantado, abre `http://127.0.0.1:19036/favicon.svg` y mírala chica (16 px) en una pestaña
+   clara y en una oscura.
+5. **Para llegar a `auth.efeonce.org`** hace falta un release gobernado: el favicon de Efeonce ID está en `develop`
+   (commit `04aaba55e`) y producción sigue con el isotipo de Efeonce en azul hasta ese release.
+
 ## Que significan los estados y las señales
 
 | Lo que ves | Que significa |
@@ -135,6 +165,7 @@ recuento al final.
 | `contraste OK en todas las pantallas` | Ningun texto quedo bajo 4.5:1 (o 3:1 si es texto grande) en ninguna de las dos anchuras. |
 | `🔴 1.53:1 (piso 4.5) /consent …` | Un texto concreto no se lee. La linea dice la pantalla, el tamaño, el texto y los dos colores. |
 | Boton de passkey ausente en `/login` | Correcto si el navegador no admite passkeys. Si tu navegador si las admite y el boton no aparece, el controlador quedo bloqueado: revisa la consola. |
+| Favicon azul de Efeonce en `auth.efeonce.org` | Normal mientras no haya release: el favicon de Efeonce ID está en `develop`. En el arnés ya se ve la teja oscura. |
 | Un control pintado que no responde | Casi siempre el permiso del script de esa pagina. El navegador lo bloquea **sin decir nada visible**; el mensaje sale en la consola. |
 
 ## Que no hacer
@@ -151,6 +182,11 @@ recuento al final.
   pantallas. Usa `pnpm auth-server:verify-contrast`.
 - **No armes a mano la respuesta de una pagina con controlador.** Hay una forma canonica de servirla
   que declara el permiso del script; construirla aparte deja el control muerto y la pagina se ve bien.
+- **No pongas el isotipo grande de Efeonce ID en el panel lateral del inicio de sesión.** Ese panel es del carrusel de
+  novedades. La marca va sólo en el favicon y dentro del formulario (lockup del encabezado y botón «Continuar con
+  Efeonce ID» de las aplicaciones; ambos pendientes).
+- **No dibujes ni edites a mano los SVG de Efeonce ID** (ni la copia de `public/branding`, ni el `*.generated.ts`). Salen
+  de `@efeoncepro/axis-brand-assets` y del generador.
 - **No dejes una pantalla nueva sin salida.** Cada pantalla ofrece una accion, salvo las declaradas
   terminales con su razon.
 - **No uses el harness como evidencia de produccion.** Sus datos son ficticios y no autentica a nadie.
@@ -177,4 +213,5 @@ recuento al final.
 - Plantillas: [`src/lib/auth-server/persons/pages.ts`](../../../src/lib/auth-server/persons/pages.ts), [`src/lib/auth-server/persons/step-up-page.ts`](../../../src/lib/auth-server/persons/step-up-page.ts), [`src/lib/auth-server/oauth/pages/render.ts`](../../../src/lib/auth-server/oauth/pages/render.ts).
 - Texto visible: [`src/lib/copy/auth-server.ts`](../../../src/lib/copy/auth-server.ts) y [`src/lib/copy/auth-server-step-up.ts`](../../../src/lib/copy/auth-server-step-up.ts).
 - Harness y verificadores: [`scripts/auth-server/dev-ui-server.ts`](../../../scripts/auth-server/dev-ui-server.ts), [`scripts/auth-server/verify-contrast.mjs`](../../../scripts/auth-server/verify-contrast.mjs), [`scripts/auth-server/verify-passkey-lane.mjs`](../../../scripts/auth-server/verify-passkey-lane.mjs).
+- Marca de Efeonce ID: [ADR](../../architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md); favicon en [`scripts/auth-server/efeonce-id-favicon.ts`](../../../scripts/auth-server/efeonce-id-favicon.ts) y guarda en [`brand-assets.test.ts`](../../../src/lib/auth-server/oauth/pages/brand-assets.test.ts).
 - Revision visual: [`docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md`](../../ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md).

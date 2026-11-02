@@ -78,7 +78,9 @@ Preserve structured failure/recovery output; never overwrite an earlier artifact
 [Logos](https://axis.efeonce.org/references/logos/) and [JSON](https://axis.efeonce.org/references/logos.json)
 project `packages/brand-assets/src/logos.ts`: `AXIS_LOGO_FAMILIES`, `AXIS_LOGO_ASSETS`, `findLogoAsset`,
 `logoAssetUrl`. Source export: `@efeoncepro/axis-brand-assets/logos` (release boundary above).
-At the 2026-10-04 cut: 223 files / 52 brands, 99 own and 124 third-party files. Choose identity,
+At the 2026-11-02 cut (AXIS `0d45749`, brand-assets 0.4.32): 336 files / 59 families, 194 ecosystem and 142
+third-party files (2026-10-04: 223 / 52). It includes the `efeonce-id` family (14 files: the 12 mark pieces plus
+`efeonce-id-button-lockup-{positive,negative}`, used only inside the «Continuar con Efeonce ID» button). Choose identity,
 variant, surface and intended use; download the official bytes, never reconstruct a lockup.
 
 The catalog is a projection of sealed inventories, not another brand registry. Preserve provenance,

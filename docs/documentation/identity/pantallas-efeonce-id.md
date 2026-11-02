@@ -1,9 +1,9 @@
 # Pantallas de Efeonce ID (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-11-01 (login V4 con carrusel de novedades en producción)
+> **Última actualización:** 2026-11-02 por Claude (marca de Efeonce ID: favicon, dónde va en la pantalla de entrada y botón «Continuar con Efeonce ID»)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Documentacion tecnica:** [PATTERNS.md § Runtime sin React — shell «Efeonce ID»](../../architecture/ui-platform/PATTERNS.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 > **Manual de uso:** [Revisar y diagnosticar las pantallas de Efeonce ID](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md)
@@ -37,6 +37,26 @@ acceso sigue igual. Los cambios de pantalla se revisan en el arnés local y lleg
 
 El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
 septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
+
+## La marca de Efeonce ID en estas pantallas — 2026-11-02
+
+Efeonce ID tiene marca propia desde el 2026-11-01: «la órbita vive en la D» (la D es media órbita con la esfera verde a
+la 1:30). Los archivos oficiales están en el paquete de marca de AXIS y nunca se dibujan ni se copian a mano.
+
+| Dónde | Qué va | Estado |
+| --- | --- | --- |
+| **Favicon** (la pestaña del navegador) | Una teja oscura de Efeonce con el isotipo chico de Efeonce ID en negativo: la D blanca con la esfera verde. Se lee igual en una pestaña clara y en una oscura. | Hecho en el código (`develop`), **sin release**: `auth.efeonce.org` sigue mostrando el isotipo de Efeonce en azul hasta el próximo release gobernado. |
+| **Encabezado del formulario** | El lockup «Efeonce \| ID». | Pendiente. |
+| **Botón «Continuar con Efeonce ID»** | El botón con el que las aplicaciones (Rooms, Studio, Greenhouse) ofrecen entrar con Efeonce ID. Su forma y cuándo va se explican en [Acceso a productos con Efeonce ID](acceso-a-productos-efeonce.md). | Definido, sin implementar. |
+
+**Lo que no va:** el isotipo grande en el panel lateral. Ese panel es del carrusel de novedades y se conserva tal cual.
+La maqueta que ponía el monograma grande a la izquierda quedó superada por decisión del operador.
+
+> Detalle técnico: [ADR de la marca de Efeonce ID](../../architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md) (piezas,
+> regla de la pantalla de entrada y botón). El favicon lo compone
+> [`scripts/auth-server/efeonce-id-favicon.ts`](../../../scripts/auth-server/efeonce-id-favicon.ts) y se regenera con
+> `pnpm auth-server:brand-assets:generate`; cómo hacerlo, en el
+> [manual de las pantallas](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md).
 
 ## El marco anterior (baseline TASK-1835)
 

@@ -19,6 +19,24 @@ de deploy sólo despliega desde `main`. El canary único del 26-10 sigue cerrado
 humano completo hacia Rooms con la 00170, TASK-1833 (sin pentest completo) y la regla de ningún cliente real sin una
 autorización nueva. Estado vivo: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
+## Delta 2026-11-02 — marca de Efeonce ID en el login
+
+La [marca de Efeonce ID](brand/EFEONCE_ID_MARK_DECISION_V1.md) (aprobada 2026-11-01) entra al login V4 con una regla del
+operador: en la pantalla de entrada van **sólo el favicon** (`efeonce-id-isotype-small-*`) **y la marca dentro del
+formulario** (lockup `efeonce-id-lockup-*` en el encabezado y el botón «Continuar con Efeonce ID» de las aplicaciones).
+**Nunca el isotipo grande en el panel lateral:** es del carrusel de novedades de este ADR, que se conserva tal cual.
+
+- **Favicon:** `/favicon.svg` es la teja oscura (`#001a33`, radio 22 %, isotipo chico en negativo al 71,3 %), compuesta por
+  `scripts/auth-server/efeonce-id-favicon.ts` desde `public/branding/SVG/efeonce-id-isotype-small-negative.svg` (copia
+  de `axis-brand-assets` 0.4.31) y horneada con `pnpm auth-server:brand-assets:generate`. Commit `04aaba55e` en
+  `develop`, **sin release**: `auth.efeonce.org` sirve el isotipo azul de Efeonce hasta el próximo release gobernado.
+- **Lockup del encabezado del formulario:** pendiente.
+- **Botón para relying parties (aprobado 2026-11-02):** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}`
+  (`axis-brand-assets` 0.4.32), diez estados; anatomía en el ADR de la marca. Sin implementar: falta la primitive en
+  `axis-ui-primitives` y la adopción en cada producto. No sustituye la entrada directa de
+  [D2/D9](EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md): una ruta protegida sigue redirigiendo sin CTA
+  intermedio.
+
 ## Context (baseline de aceptación 2026-10-25)
 
 Auth publica login y OAuth MCP, pero no emite todavía identidad OIDC first-party. El registro y los códigos

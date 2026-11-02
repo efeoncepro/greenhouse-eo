@@ -1,9 +1,9 @@
 # Runbook — Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** Runbook operativo
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-10-31 por Claude (first-party/OTP ON para Rooms, gobernado por variables de repo)
+> **Última actualización:** 2026-11-02 por Claude (regenerar y verificar el favicon de Efeonce ID)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
 
 ## Delta 2026-10-31 — first-party y OTP ON para Rooms
@@ -304,7 +304,8 @@ Para cortar a un solo cliente o persona sin apagar el emisor: revocar el consent
 - No aceptar `localhost` para clientes confidenciales ni `code_challenge_method=plain`; no relajar el anti-SSRF ni
   el TTL de 24 h de CIMD.
 - No editar `src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts` a mano: regenerar con
-  `pnpm auth-server:brand-assets:generate` (hay test de drift contra `public/branding/SVG/isotipo-full-efeonce.svg`).
+  `pnpm auth-server:brand-assets:generate` (hay test de drift contra `public/branding/SVG/isotipo-full-efeonce.svg` y,
+  para el favicon, contra `public/branding/SVG/efeonce-id-isotype-small-negative.svg`).
 - No hacer que el gateway dependa de `/oauth/introspect`: verifica JWT + JWKS + recheck de `gv` (TASK-1831).
 
 ## Qué significan las señales
@@ -335,6 +336,22 @@ pude mirar»: con el fondo en degradado y un `::after`, axe devuelve TODAS las f
 
 Capturas de las 29 pantallas: `AGENT_AUTH_BASE_URL=http://127.0.0.1:19036 pnpm fe:capture
 task1835-runtime-<fixture> --env=local` (la lista sale de `scripts/frontend/scenarios/`).
+
+### Marca de Efeonce ID: regenerar el favicon
+
+`/favicon.svg` es la teja de Efeonce ID ([ADR de la marca](../../architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)):
+`scripts/auth-server/efeonce-id-favicon.ts` la compone desde `public/branding/SVG/efeonce-id-isotype-small-negative.svg`
+(copia byte a byte de `@efeoncepro/axis-brand-assets` 0.4.31) y el generador la hornea en `EFEONCE_ID_FAVICON_SVG`.
+
+```bash
+pnpm auth-server:brand-assets:generate                                  # sin PG ni proxy
+pnpm vitest run src/lib/auth-server/oauth/pages/brand-assets.test.ts   # drift, /favicon.svg servido, una sola esfera, sin <style>
+```
+
+Con el arnés arriba, `http://127.0.0.1:19036/favicon.svg` responde la teja. Estado: commit `04aaba55e` en `develop`,
+sin release; producción sirve el isotipo azul de Efeonce hasta el próximo release gobernado. En la pantalla de entrada
+la marca va sólo en el favicon y dentro del formulario; **nunca** el isotipo grande en el panel lateral, que es del
+carrusel de novedades.
 
 ## Qué no hacer
 

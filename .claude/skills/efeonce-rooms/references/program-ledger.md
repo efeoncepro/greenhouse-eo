@@ -7,6 +7,12 @@
 
 ## Estado vigente (2026-11-01)
 
+- **2026-11-02 — botón «Continuar con Efeonce ID» definido, no adoptado (`doc` + `local`):** el [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02)
+  fija el botón canónico para relying parties: «Continuar con» + `efeonce-id-button-lockup-*` (`axis-brand-assets` 0.4.32), diez
+  estados, sin primitive todavía en `axis-ui-primitives`. `local`: `main@3434ea8` (PR #23, páginas `/cli/conectado` y `/cli/error`)
+  ya fija `axis-brand-assets` 0.4.32 y muestra el lockup de familia `efeonce-id-lockup-negative`: no es el botón. La pantalla de
+  sesión cerrada sigue con un `Button` genérico «Volver a entrar». Adoptarlo: cuando exista la primitive, sólo donde Rooms ya ofrece entrar; la entrada a rutas
+  protegidas sigue directa (D2/D9).
 - **2026-11-02 — aceptación del carril CLI en producción (`vivo`):** el operador corrió `pnpm rooms login` una vez (Efeonce ID + MFA;
   `subject` opaco, principal `rooms-pilot-julio-20261025`, espacio «Efeonce» `org-2df565fb-…`). Sin pedirle nada más, el agente creó
   `demo-volta` («Campaña «Llega antes»», `synthetic`/`fixture`), subió las 5 imágenes (`kv-16x9`, `feed-4x5`, `story-9x16`,

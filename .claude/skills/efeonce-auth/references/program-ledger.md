@@ -4,6 +4,29 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-02 — Botón canónico «Continuar con Efeonce ID» aprobado; favicon sigue sin release
+
+- `doc`: [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02).
+  Botón de Rooms, Studio, Greenhouse y cualquier relying party: «Continuar con» + `efeonce-id-button-lockup-{positive,negative}`
+  («ID» en la tinta del texto). Sello `#001a33` sobre papel, blanco con borde sobre oscuro; 52 px por defecto, 56, compacto 40
+  (sólo la marca, nombre accesible «Continuar con Efeonce ID»), ancho completo y sólo símbolo; diez estados (reposo, cursor con
+  halo teal, presionado, foco con teclado, foco + cursor, cargando con la órbita + «Conectando…» y `aria-busy`, cargando con
+  movimiento reducido, conectado, error «No pudimos conectar. Inténtalo de nuevo.» con `role=alert`, deshabilitado). Nunca el
+  monograma antes del texto, nunca en teja, nunca la órbita sola como símbolo. **Corrige** la entrada del 2026-11-01, que
+  ponía el isotipo chico en el botón.
+- `local`: `button-lockup` en `@efeoncepro/axis-brand-assets` 0.4.32 (release `v0.4.32`, AXIS `0d45749`); el catálogo de logos
+  de AXIS cuenta 336 archivos / 59 familias, 14 de la familia `efeonce-id`.
+- **Sin implementar:** falta la primitive en `axis-ui-primitives` y la adopción en cada relying party. Frontera con el
+  [ADR de entrada de RP](../../../../docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) D2/D9 (sin CTA
+  intermedio ni vestíbulo antes del redirect; TASK-1898 lo repite para Studio): el botón va donde el producto ya ofrece una
+  acción para entrar, nunca entre una ruta protegida y el redirect. Si un producto quiere otra cosa, decide el operador.
+- `local`: favicon de Efeonce ID sigue en `develop` (`04aaba55e`), **sin release**; `auth.efeonce.org` sirve el isotipo azul de
+  Efeonce. Pendientes sin cambio: lockup del encabezado del formulario; copia de `public/branding` a
+  `src/config/efeonce-brand-assets.test.ts` cuando Greenhouse fije `axis-brand-assets` ≥ 0.4.31 (hoy 0.4.25, TASK-2014).
+- `doc`: delta en [login V4](../../../../docs/architecture/EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md#delta-2026-11-02--marca-de-efeonce-id-en-el-login),
+  [runbook](../../../../docs/operations/runbooks/auth-server.md), [pantallas](../../../../docs/documentation/identity/pantallas-efeonce-id.md),
+  [manual](../../../../docs/manual-de-uso/identity/operar-pantallas-efeonce-id.md) y [acceso a productos](../../../../docs/documentation/identity/acceso-a-productos-efeonce.md).
+
 ## 2026-11-02 — Audiencia Rooms en producción (`auth-server-00172-zcn`, hotfix PR #267)
 
 - Operador: «Seguir con Efeonce ID» (variable, hotfix con solo `9ea3b8fd5`, release, clientes, secreto, flags).
