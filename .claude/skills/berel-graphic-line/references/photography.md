@@ -3,7 +3,7 @@
 > Solo Berel. Nada de esto aplica a Efeonce (su fotografía es `efeonce-graphic-line` + brand-photography),
 > a SKY ni a otro cliente.
 > Fuente de verdad de los valores: `creative-workbench/brands/berel/contracts/berel-photo-registers.json`
-> (schema `berel.photo-registers.v0`, estado **candidato**). Lo de abajo es un **snapshot del 2026-11-02**:
+> (schema `berel.photo-registers.v1`, estado **candidato**). Lo de abajo es un **snapshot del 2026-11-02**:
 > si el contrato cambió, manda el contrato.
 
 ## 1. Cómo se fotografía Berel
@@ -46,21 +46,24 @@ recalibró a medio-alto accesible. Ver [lessons.md](lessons.md).
 ## 3. El bloque común, regla por regla
 
 El bloque `common` del contrato entra en **todo** prompt. Cada regla existe por una razón de
-composición o de estrato; no la quites para «dar libertad» al modelo.
+composición o de estrato; no la quites para «dar libertad» al modelo. Desde el 2026-11-02 (schema v1) la cámara y
+las reservas del muro viven en la **toma** (`takes.espacio.camera`, que también usan `personas` y `nocturna`) y el
+bloque común conserva solo realismo, sin texto, sin fraccionamiento y remates; la tabla las mantiene juntas porque
+la toma `espacio` es la de siempre.
 
 | Regla (resumida) | Por qué |
 |---|---|
 | Foto arquitectónica editorial de un hogar real en México, para la revista de inspiración de una marca de pintura | Fija el género: casa real y vivida, no catálogo de muebles ni render |
-| Cámara full frame, lente del registro, altura 1,2 m, verticales corregidas, profundidad de campo amplia | Verticales rectas = muro limpio y frontal; altura 1,2 m es la mirada de revista de interiores; todo enfocado para que el muro se lea entero |
+| (toma `espacio`) Cámara full frame, lente del registro, altura 1,2 m, verticales corregidas, **enfocada en el muro a f/5,6** | Verticales rectas = muro limpio y frontal; altura 1,2 m es la mirada de revista de interiores. Antes decía «profundidad de campo amplia» y el modelo dejaba nítida también la esquina del logo; ahora lo único fuera de foco es el lecho planeado (§5 bis) |
 | Color fiel, rango dinámico realista con detalle en sombras, grano de película muy sutil; materiales reales con imperfecciones honestas | Evita el aspecto de IA y de render; el grano sutil es el que la grilla borra al medir (desenfoque σ=1) |
 | Muro protagonista: superficie mate, lisa, pareja, **40–55 % del cuadro**, frontal; su color debe leerse | El producto es el color. Un muro pequeño o en escorzo no deja leer el color ni da celda al marcador |
 | **Tercio superior del muro libre** de cuadros, repisas, lámparas, espejos u objetos | Ahí va el marcador de color de los banners de blog (objetivo de la grilla en el tercio superior) |
 | **Cuadrante superior izquierdo del cuadro = muro liso** | Ahí va el titular social (post y story). El compositor mide los bordes bajo el titular y avisa sobre 6 |
 | Mucho muro sobre los muebles | Da aire al marcador: el operador pidió «jugar con el aire con elegancia» |
-| **Esquina inferior izquierda tranquila** | Ahí va el logo blanco de Berel |
-| Nada importante a menos de 12 % de los bordes izquierdo y derecho | Los recortes verticales (post, story, Pinterest) comen los costados de un plate 4:3 |
+| **Primer plano desenfocado planeado en la esquina inferior izquierda** (bloque `FOREGROUND`, §5 bis) | Ahí va el logo blanco de Berel. «Esquina tranquila» no bastaba: en 35 de las 38 piezas compuestas el logo quedaba bajo 4,5:1 |
+| Fuera del lecho, nada importante a menos de 12 % de los bordes izquierdo y derecho | Los recortes verticales (post, story, Pinterest) comen los costados de un plate 4:3 |
 | Sin texto, letras, números, señalética, logos, marcas, latas ni títulos de libros | El texto y la marca se componen después con los archivos oficiales; una lata generada falsea el producto |
-| Sin personas ni mascotas | El plate de espacio es para rotular un color; las personas se dirigen aparte (ver nota del libro abajo) |
+| Sin personas ni mascotas, salvo en las tomas que las piden (`personas`; `proceso` solo manos) | El plate de espacio es para rotular un color; las personas tienen su toma |
 | No render, no CGI, no imagen de IA: sin superficies plásticas, simetría perfecta, pisos demasiado brillantes, interiores de suburbio estadounidense, ni el **cliché** de sofá bouclé + mesa de centro redonda + olivo + cuadros de arcos | Es la «sala plantilla» que ya se repitió; el cliché delata la IA y baja la credibilidad |
 | **Nunca fraccionamiento**: sin ventanas de aluminio blanco, mueble laminado barato, sanitarios de plástico ni desorden | Baja el estrato; es exactamente lo que el operador rechazó |
 | **Remates terminados**: el muro pintado se encuentra con plafón, vigas, piso y vanos en líneas rectas y limpias con sombra de remate o moldura; nunca pintura terminando irregular contra concreto o piedra, ni frizo, cornisa o borde de plafón sin terminar | Un encuentro mal terminado se lee como obra barata y no se puede aprobar «por el estrato» (caso terraza, 2026-11-02) |
@@ -71,9 +74,8 @@ catálogo oficial, nunca lo escribes tú. **Pedirlo no basta**: el modelo no cla
 corrector ([color-pipeline.md](color-pipeline.md)).
 
 > **Nota sobre personas.** El libro (§7) describe personas en piezas existentes (manos sin rostro, adulto de
-> perfil en diagnóstico, familias al fondo y desenfocadas; nunca retratos de frente). El contrato de plates
-> de espacio dice «no people, no pets». Para un plate de espacio manda el contrato; una toma con personas es
-> otro encargo y no tiene receta todavía.
+> perfil en diagnóstico, familias al fondo y desenfocadas; nunca retratos de frente). Desde el 2026-11-02 eso
+> tiene toma propia: `personas` (familia sin mirar a cámara) y `proceso` (solo manos y antebrazos).
 
 ## 4. Espacios disponibles
 
@@ -91,9 +93,9 @@ Claves del contrato (`spaces`), snapshot 2026-11-02. Cada una dice dónde está 
 | `estudio` | Detrás del escritorio | Parte alta libre; sin libreros llenos |
 | `terraza` | Muro exterior principal de una terraza cubierta o patio | — |
 
-Un espacio que no está en la lista falla cerrado en el builder. Si el brief pide otro (el libro menciona
-madera, herrería, taller o diagnóstico en piezas antiguas), primero se agrega al contrato en el Workbench,
-con su prueba; no lo improvises con `--extra`.
+Un espacio que no está en la lista falla cerrado en el builder. Madera, herrería, diagnóstico, exterior, azotea,
+cenital, proceso, nocturna y muestra ya no son espacios sino **tomas** (§5 bis). Si el brief pide otra cosa, primero
+se agrega al contrato en el Workbench, con su prueba; no lo improvises con `--extra`.
 
 ## 5. Armar el prompt: siempre con `prompt-plate.mjs`
 
@@ -120,6 +122,42 @@ node brands/berel/scripts/prompt-plate.mjs \
   como evidencia del rechazo: **no lo reutilices**, el vigente está en `ronda-2/v2/specs.tsv`.
 - Al prompt del builder se le agrega, en la corrida, el párrafo del chip de color (ver
   [workflow.md](workflow.md) §4 y `ronda-2/run.sh`).
+
+## 5 bis. Tomas y lecho del logo (piloto 2026-11-02, candidato)
+
+El **registro** es el estrato; la **toma** es el tipo de foto. Se eligen por separado:
+`prompt-plate.mjs --registro medio-alto --toma diagnostico [--espacio …] [--lecho …]`.
+
+| Toma | Para qué | Muro de color | Lecho por defecto (familia) |
+|---|---|---|---|
+| `espacio` (defecto) | Inspiración de color | Sí | Según espacio: brazo de butaca, pie de cama, esquina de mesa, toalla del lavabo… (mueble/textil) |
+| `antes` | Par antes/después; misma cámara y mismo lecho que el después | No (muro viejo) | Igual que su `espacio` |
+| `diagnostico` | Humedad, salitre, grietas | No | Marco de la puerta desde donde se ve (arquitectura) |
+| `exterior` | Fachadas | Sí | Follaje en sombra (follaje) — **no** bugambilia: sus flores caen bajo el logo |
+| `azotea` | Impermeabilizantes | No | Pretil mojado (arquitectura) |
+| `cenital` | Paletas, muestrarios | Sí (carta mayor) | **Excepción**: tela oscura sobre la mesa, sin desenfoque; solo se juzga el contraste |
+| `proceso` | Tutoriales, manos | Sí | Escalera junto a quien pinta (herramienta) |
+| `taller` | Madera | No | Banco de trabajo (herramienta) |
+| `herreria` | Esmaltes | Sí (reja) | Maceta con follaje (follaje) |
+| `personas` | Cierres, vida en casa | Sí | Respaldo de butaca (mueble) |
+| `nocturna` | Noche, luz cálida | Sí | Sofá en silueta (mueble) |
+| `muestra` | Elegir color: prueba en el muro | Sí (hoja grande) | Banco de madera (mueble) |
+
+**El lecho** (idea del operador, adaptada de la firma fotográfica de Efeonce): un primer plano oscuro y
+desenfocado, **planeado en el prompt** (bloque `FOREGROUND`), que pertenece a la escena y dice desde dónde se tomó la
+foto; ahí va el logo blanco. Nunca se agrega después ni se oscurece en edición: si no pasa, se regenera.
+
+Medición (gratis, apenas sale el plate): `node brands/berel/scripts/medir-lecho.mjs <plate.png> [--focal post=u,v]
+[--toma cenital] [--vista <dir>]`; el compositor deja lo mismo en `qa.logoBed` y avisa si falla. Umbrales del
+contrato: logo blanco ≥ 4,5:1 contra el 1 % más claro de la caja; nitidez p99 ≤ 25 (calibrado con el piloto: lechos
+5–12; esquinas sin lecho 63–630).
+
+Piloto (`ai-generations/2026-11-02_berel-lecho-logo/`, 14 generaciones ≈ USD 1,7): las 13 tomas leen el logo a
+10–19:1 (antes, 35 de 38 piezas bajo 4,5:1) y se ven fotográficas. **Pendiente, no producir aún:** el operador
+observó que el lecho ocupa demasiado para el tamaño del logo. Medido: mediana 9 % del cuadro (17× el logo, que ocupa
+0,5–0,7 %), y en post y Pinterest cruza 46–100 % del ancho. Causa: el prompt pide el 45 % izquierdo y un cuarto del
+alto para cubrir tres recortes cuyo logo cae en puntos distintos del plate. Además, 9 de 13 lechos tienen la misma
+forma (masa oscura redondeada): la auditoría de Efeonce advierte que se cuenta la forma, no el objeto.
 
 ## 6. Recorte social según el registro (`photo.focal`)
 
