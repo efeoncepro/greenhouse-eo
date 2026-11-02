@@ -583,11 +583,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Ratificación expresa de Julio: [uso comercial íntegro](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
 - LEEME, canon, manual y skills Codex/Claude/radar dejan de imponer pendientes históricos. Una autorización
   de envío no autoriza modificar el material; la copia Aloja de 38 láminas no se reutiliza.
-
-## 2026-10-16 — Landing HubSpot v2 por los 4 resultados, con dock móvil y agenda nativa
-
-- Landing pública [`/servicios-contratar-hubspot/`](https://efeoncepro.com/servicios-contratar-hubspot/) (página
-  `244079`) rediseñada: 14 widgets compilados del canvas, HubSpot presentado como Agentic Customer Platform, SEO con
-  frase clave «partner hubspot» (Semrush CL/MX/CO), OG propia y Service + FAQPage.
-- Dock móvil con «Agendar reunión» (CTA gobernado `hubspot-discovery-meeting`, scheduler nativo) e «Ir al formulario».
-- Renderer CTA 1.3.1: la cabecera del scheduler ya no se parte en móvil (pendiente de release a producción).

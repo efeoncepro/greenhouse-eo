@@ -18,7 +18,9 @@ sin anclar, `ai-generations/` también atrapaba `scripts/ai-generations/`). Veri
 `gcloud meta list-files-for-upload`: solo salen archivos de esas cuatro carpetas y siguen presentes todas las rutas
 que copian los 8 Dockerfiles de `services/`. No se borra nada del repo. Al empujar a develop, los filtros de ruta de
 `artifact-worker`, `commercial-cost-worker` y `auth-server` disparan un deploy a staging, que es la prueba real
-(code complete, sin push). El operador comprará el descuento de 1 año de Cloud SQL y cancelará Looker Studio Pro.
+(empujado a develop; los 4 deploys de workers a staging salieron verdes). El operador compró el CUD de Cloud SQL
+`greenhouse-pg-dev-us-east4-3y` (3 años, us-east4, USD 0,03/h ≈ 21,60/mes, inicio 2026-11-01 16:00 PT) y canceló
+Looker Studio Pro (verificado). Proyección: ~CLP170k/mes desde diciembre.
 
 ## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP cerrado
 
@@ -73,6 +75,19 @@ y la rama local de Codex `codex/auth-pr-develop-stack` integrada en `develop` (`
 413, OTP con fallo cerrado, Job de rotación (migración sin aplicar) y verificación post-deploy del tráfico. Requiere release a
 `main`; la llave de firma (KMS v1/v2 del 04-09) dispara `auth.keys.rotation_overdue` hacia el 23-11.
 
+## 2026-11-01 — SKY: permisos/contexto locales; puente pendiente
+
+[TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
+[167 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md), 78 nuevas
+sobre cookie/App sessions/recurso Insights reales y contexto candidato PG16. A′ tampoco aísla el listado
+Insights org; ambos bridges cumplen el candidato Space/Service/grant con principal fresco. Revocar SEO
+conserva Diseño del dual. Callback cookie conserva claims de usuario inactivo; App sí rechaza. Son
+reproducciones locales, no fixes ni incidentes confirmados. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
+seguridad requiere contrato común; A′/B se decidirán por compatibilidad/owner/historia. Próximo: routing de
+writers, owner comercial y protección histórica; HTTP/UI/concurrencia/ICO/distribución no certificados.
+Contrato Blog GA4/GSC/AEO sigue candidato; TASK-2033/1960 conservan scope/reporting. Discovery `c618bc662`,
+primer laboratorio `149aed558`. Sin src/producción/provisioning/envíos ni historia de Diseño modificados.
+
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 
 [Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por
@@ -126,19 +141,6 @@ Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia 
 50 personas, presupuesto y proceso comprador sin confirmar; tres adyacentes investigados sin acercamientos.
 [Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
 estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
-
-## 2026-11-01 — SKY: permisos/contexto locales; puente pendiente
-
-[TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
-[167 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md), 78 nuevas
-sobre cookie/App sessions/recurso Insights reales y contexto candidato PG16. A′ tampoco aísla el listado
-Insights org; ambos bridges cumplen el candidato Space/Service/grant con principal fresco. Revocar SEO
-conserva Diseño del dual. Callback cookie conserva claims de usuario inactivo; App sí rechaza. Son
-reproducciones locales, no fixes ni incidentes confirmados. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
-seguridad requiere contrato común; A′/B se decidirán por compatibilidad/owner/historia. Próximo: routing de
-writers, owner comercial y protección histórica; HTTP/UI/concurrencia/ICO/distribución no certificados.
-Contrato Blog GA4/GSC/AEO sigue candidato; TASK-2033/1960 conservan scope/reporting. Discovery `c618bc662`,
-primer laboratorio `149aed558`. Sin src/producción/provisioning/envíos ni historia de Diseño modificados.
 
 ## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
 
@@ -291,20 +293,3 @@ Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/au
 Runtime e72ad65 incorpora autoría V2;66testsPASS0skip, lint/types/build y migración down/up/restore mixto V1/V2 PASS. TASK-2062 cierre local; demo pública sigue bd4b802. TASK-2065 consumerOIDC interno en implementación con peerAuth1834/2064. TASK-2066 prepara invitaciones: UN correo Resend trae enlace tokenizado+código, cliente pega código EN Rooms; issuer2067 verifica/envía y Rooms conserva sesión guest limitada. No SSO global por OTP, no emails reales enviados, sin DB cloud. GoalEPIC-052 abierto. Índices README/registry compartidos coordinados con peerAuth, no mezclar su WIP. [Auditoría](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
 
 [Historial](Handoff.archive.md).
-
-## 2026-10-25 — Rooms: persistencia, motion y primer release
-
-Goal explícito de continuar EPIC-052; GitHub privado y publicación Vercel autorizados. TASK-2058/2060 complete: can y ciclo durable PostgreSQL local con concurrencia, auditoría/outbox y recuperación probada. TASK-2059 incorpora View Transitions y botones/badges AXIS; aceptación visual humana pendiente. TASK-2061 publica [demo sintética](https://efeonce-rooms.vercel.app/demo) en Vercel, commit `bd4b802`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`; [dossier vivo](docs/architecture/rooms/README.md), [manual](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md). Runtime `../efeonce-rooms` main, repo privado `efeoncepro/efeonce-rooms`; docs en develop. Efeonce ID aún depende de TASK-1834: issuer vivo sólo anuncia scopes MCP; API real 401, sin DB cloud ni clientes reales. EPIC-052 continúa abierto.
-
-## 2026-10-25 — UTP Perú: presentación enviada; LinkedIn pendiente
-[Caso y readback](docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company UTP y Contact Gustavo
-Alfaro con Primary y segmentos comprobados; Apollo waterfall autorizado, correo Verified, 2 créditos.
-Enviados y EMAIL `SENT` asociados: dos brochures originales, clientes, firma gráfica y CCO; sin Lead/Deal ni
-nueva secuencia. LinkedIn **no enviado**, faltan créditos de InMail y la invitación previa sigue pendiente;
-texto preparado en nota CRM. Esperar admisión/documentación de Compras; no repetir el correo ni comprar plan.
-
-## 2026-10-25 — Aprendizaje comercial reutilizable y propuesta de pauta
-Prospección, Commercial y Copywriting Codex/Claude cargan el criterio de conversaciones útiles para nuevas
-aperturas, seguimientos e inbound comercial; espejos verificados. [Implementación y cola nativa](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
-[Aplicación nativa verificada](docs/commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md): guía9.705, nueve correos/nueve plantillas ajustados, cinco pausas en cuatro cuentas; cola13→8 el29Oct. QA borrador nuevo pendiente por créditos; sin envío inmediato.
-Pauta propuesta: US$600/mes, Chile, Search/HubSpot, sujeta a demanda/costo y ruta de conversión; sin gasto aprobado.

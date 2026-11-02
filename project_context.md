@@ -303,5 +303,3 @@ corregir router o canon antes de usar memoria histórica.
 - Snapshot íntegro del contexto anterior: [índice 2026-07-19](docs/operations/agent-context-history/2026-07-19/README.md).
 - Los snapshots no gobiernan comportamiento vigente ni se editan.
 - `project_context.md`: sin `## Delta YYYY-MM-DD`; historia en changelog, tasks/issues/ADRs o archivo según ownership.
-
-Globe 2026-11-01: hibernación conserva IP/DNS/datos pero suspende listeners HTTP/HTTPS; `draining` los recrea. Forecast CLP22–23k pendiente de Billing; ver runtime handoff.
