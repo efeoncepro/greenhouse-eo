@@ -62,6 +62,27 @@ try {
   if (!appTable) throw new Error('Real app session table not found; refusing substitute')
   psql('sky_bridge_test', appTable)
   psql('sky_bridge_test', readFileSync(join(here, 'permissions-baseline.sql'), 'utf8'))
+  psql('sky_bridge_test', readFileSync(join(here, 'finance-routing-baseline.sql'), 'utf8'))
+  const allocationSql = readFileSync(join(root, 'migrations/20260507164348236_task-815-direct-service-expense-allocation.sql'), 'utf8')
+  const allocationEnd = allocationSql.indexOf('COMMENT ON TABLE greenhouse_finance.expense_service_allocations')
+  const attributionSql = readFileSync(join(root, 'migrations/20260420123025804_task-452-service-attribution-foundation.sql'), 'utf8')
+
+  if (allocationEnd < 0) throw new Error('Real expense allocation SQL boundary not found')
+  psql('sky_bridge_test', allocationSql.slice(0, allocationEnd))
+
+  for (const table of ['service_attribution_facts', 'service_attribution_unresolved']) {
+    const ddl = attributionSql.match(new RegExp(`CREATE TABLE IF NOT EXISTS greenhouse_serving\\.${table} \\([\\s\\S]*?\\n\\);`))?.[0]
+
+    if (!ddl) throw new Error(`Real attribution table not found: ${table}`)
+    psql('sky_bridge_test', ddl)
+  }
+
+  psql('sky_bridge_test', `CREATE TRIGGER synthetic_fact_failure BEFORE INSERT ON greenhouse_serving.service_attribution_facts
+    FOR EACH ROW EXECUTE FUNCTION sky_experiment.fail_fact_insert();
+    GRANT USAGE ON SCHEMA greenhouse_commercial, greenhouse_delivery TO sky_test_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA greenhouse_commercial, greenhouse_delivery TO sky_test_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON greenhouse_serving.service_attribution_facts,
+      greenhouse_serving.service_attribution_unresolved, greenhouse_serving.commercial_cost_attribution TO sky_test_app;`)
   psql('sky_bridge_test', `GRANT USAGE ON SCHEMA greenhouse_core, greenhouse_finance, greenhouse_serving, greenhouse_insights, greenhouse_client_portal, sky_experiment TO sky_test_app;
     GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA greenhouse_core, greenhouse_finance, greenhouse_insights, greenhouse_client_portal, sky_experiment TO sky_test_app;
     GRANT SELECT ON ALL TABLES IN SCHEMA greenhouse_serving TO sky_test_app;`)

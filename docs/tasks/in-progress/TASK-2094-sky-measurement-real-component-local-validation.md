@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Contrato y 167 pruebas locales PASS; 78 nuevas de permisos/contexto A′/B; ownership/historia integral y decisión pendientes`
+- Status real: `204 pruebas locales PASS; recomendación técnica B por permisos/Finance/routing/historia; integración integral y aceptación ADR pendientes`
 - Rank: `2094`
 - Domain: `identity|data|insights`
 - Blocked by: `none`
@@ -93,7 +93,7 @@ ADR Proposed; Organization/Spaces/Service separados. DB local efímera no sustit
 
 ### Gap
 
-SQL, callbacks de sesión y permisos/contexto candidatos ya ejercitados localmente; integración HTTP/UI, P&L, ICO y delivery integrales pendientes. La validación editorial por módulo no garantiza
+SQL, callbacks, permisos/contexto candidato, P&L y writer de proyectos ya ejercitados localmente; ICO sólo a nivel de llamadas. Integración HTTP/UI, concurrencia, delivery e historia integrales pendientes. La validación editorial por módulo no garantiza
 las tres fuentes requeridas; scope v1 ignora host. Propiedad histórica y distribución siguen sin certificar.
 
 ## Modular Placement Contract
@@ -249,7 +249,8 @@ Ninguna, repo-only. Elección definitiva/rollout después de evidencia suficient
 - [x] Matriz separa resultados actuales, contrato candidato y pruebas pendientes; elección sólo si evidencia basta.
 
 - [x] Usuarios Diseño/SEO/dual, revocación y renovación ejecutados con lógica real y contexto candidato en PG local; 78 casos y límites en auditoría.
-- [ ] Decisión A′/B sustentada por integración de autoridad, ownership e historia completos; aún falta evidencia.
+- [x] Recomendación técnica B sustentada en comparación local: trigger de allocations, P&L, reparto, writer Notion y reconstrucción histórica; 37 casos nuevos.
+- [ ] Decisión definitiva sustentada por integración de autoridad, ownership e historia completos; HTTP/UI, concurrencia, motor ICO y distribución aún sin certificar. No confundir con la recomendación local B ya emitida.
 
 Evidencia de los criterios marcados: [evaluación y recibo](../../audits/client-portal/2026-11-01-sky-real-component-validation/README.md).
 Se cumplen sólo en el alcance sintético declarado; ningún criterio marcado acredita rollout o historia real.
@@ -270,6 +271,13 @@ Typecheck focal con ampliación NextAuth: 0 diagnósticos incluyendo dependencia
 anterior sin esa ampliación; no es typecheck global). No acepta bridge ni corrige src. Próximo: owner/routing de
 writers y preservación histórica; HTTP/UI/refresh concurrente/issuer quedan explícitamente pendientes.
 
+Incremento posterior autorizado «Ok vamos»: **204/204 PASS**, 37 nuevas (20 Finance/PG, 14 writer Notion/PG,
+3 ICO/puerto SQL simulado). [Evidencia, recomendación y límites](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md).
+Se recomienda B; A′ exigiría normalización financiera adicional sin ventaja demostrada de permisos.
+Se preservan períodos previos al calcular el nuevo y se prueba rollback real, pero un rebuild histórico
+usa actividad actual y el writer acepta reasignación/replay antiguo. Próximo: U01 contexto en ruta/reader
+real local, seguido por bindings y protección temporal; no otro discovery general. No cambia src/producción.
+
 ## Closing Protocol
 
 - [x] Status real y checkboxes reflejan evidencia, sin fingir rollout.
@@ -280,6 +288,10 @@ writers y preservación histórica; HTTP/UI/refresh concurrente/issuer quedan ex
 Gates: task lint 0 errores/0 warnings; ESLint y sintaxis PASS; ops lint sin errores con 15 advertencias
 de epics ajenos. Closure focal con 2 advertencias revisadas. Context strict global conserva 3 excesos
 preexistentes; [dictamen actualizado](../../audits/client-portal/2026-11-01-sky-space-context-validation/QA.md).
+
+Corte Finance/routing posterior: typecheck/lint/task PASS; ops sin errores con 17 warnings ajenos.
+Context strict pasa tras rotaciones de otros agentes. [QA actual](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/QA.md)
+registra alcance, gates y continuidad de bitácoras en el checkout compartido. Los recibos anteriores no cambian.
 
 ## Follow-ups
 

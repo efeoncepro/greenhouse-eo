@@ -915,4 +915,8 @@ Siguiente: contexto/grants/refresh reales antes de escoger bridge; ownership e h
 
 Incremento posterior TASK-2094: 78 pruebas permisos/contexto (total167), callbacks cookie/App/resource Insights
 reales y candidato SQL; no cambia src. Evidencia: `docs/audits/client-portal/2026-11-01-sky-space-context-validation/`.
-Siguiente: owner comercial y routing de writers; aislamiento no proviene del client_id, sino del grant/contexto.
+Corte siguiente: 204 PASS, 37 nuevas Finance/routing/historia. Recomendación B: owner comercial único,
+Spaces explícitos; A′ divide P&L si se rekeyean gastos para pasar el trigger. Writer y rebuild requieren
+protección temporal en ambos. ICO probado sólo por llamadas simuladas. Evidencia actual:
+`docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/`. Próximo U01 ruta/reader real local;
+integración integral, aceptación ADR y apertura real pendientes. Sin src/producción/historia real modificados.

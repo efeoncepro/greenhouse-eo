@@ -269,12 +269,16 @@ own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and
 TASK-2094 conserva un [contrato candidato](../../../docs/architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md)
 para host/binding/calidad y tres productores actuales: GA4, GSC y motor AEO nativo. No confundir referrals GA4
 con corrida nativa ni CURRENT GAP PASS con fix. [Evidencia local](../../../docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md):
-89 pruebas, 27 PG16 real; no grants/rollout completo. A′/B pendientes. Reproducir sólo con el
+Corte inicial de 89 pruebas, 27 PG16 real; no grants/rollout completo. Ver recomendación actual abajo. Reproducir sólo con el
 [runner privado](../../../docs/manual-de-uso/insights/validar-blog-y-bridge-localmente.md); nunca contra DB compartida.
 TASK-2033/1960 retienen scope/reporting; no se altera el contrato Berel v1 ni se activa medición SKY productiva.
 
 Incremento TASK-2094 de permisos/contexto: [167 pruebas locales, 78 nuevas](../../../docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md).
 Separar client_id (A′) no recorta el listado real de Insights por departamento. Ambos bridges requieren
 principal vigente + grant Space/verbo + vínculo Service/report. Cookie/App difieren en revocación de usuario;
-no afirmar fix productivo por reproducirlo. Contexto candidato sólo en experiments; elección A′/B pendiente
-de owner/routing/historia e integración completa.
+no afirmar fix productivo por reproducirlo. Contexto candidato sólo en experiments.
+
+Corte actual: [204 pruebas y recomendación B](../../../docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md).
+37 nuevas Finance/routing/historia: conservar owner comercial único y separar Space/Service. A′ exige
+normalización adicional; B aún necesita contexto/routing/protección temporal integrados. ICO sólo prueba
+llamadas con puerto simulado; nunca freeze/rebuild real para reproducir. Siguiente U01 local; ADR Proposed.

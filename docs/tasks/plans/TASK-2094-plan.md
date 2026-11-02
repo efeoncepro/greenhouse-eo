@@ -41,3 +41,16 @@ Añadir contexto candidato con grants departamentales sólo en schema experiment
 permisos de una membership descriptiva. Probar identidad vigente, verbo, relación org/Space/Service, vigencia,
 revocación y selección independiente por request. No implementar ni desplegar autorización productiva.
 Guardar evidencia separada de la corrida anterior; conservar límites de P&L/ICO/delivery y ADR Proposed.
+
+## Incremento autorizado — Finance, routing e historia
+
+El «Ok vamos» del operador acepta comparar localmente owner comercial/financiero, asignación de trabajos,
+sync y preservación histórica. Extender el mismo cluster con dependencies sintéticas, trigger de allocations
+y tablas de facts originales. Ejecutar P&L, materializador y writer Notion reales; ICO se limita al puerto SQL
+simulado y se etiqueta como tal. Probar control externo, reintentos, rollback y actividad cambiada en el pasado.
+Sin cambios de src/migraciones compartidas, datos reales, producción ni historia de Diseño.
+
+Resultado: 204 PASS. Recomendación técnica **B**; aceptación definitiva/integración completas siguen pendientes,
+como exigía el plan original. La comparación local termina con una dirección concreta y gates de implementación.
+Siguiente ejecución: U01 contexto por Space en una ruta real local y su reader; no ampliar automáticamente
+este laboratorio a rollout, backfill, emisión o creación de cuentas.

@@ -2,7 +2,8 @@
 
 **2026-11-01 · SKY, laboratorio local:** [204 pruebas y recomendación B](docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md),
 37 nuevas de Finance, routing e historia. Un cliente comercial con Spaces Diseño/SEO; protección histórica y
-contexto integral aún pendientes. Contrato GA4/GSC/AEO candidato; sin producción ni cambios en historia real.
+contexto integral aún pendientes; siguiente paso: ruta/reader local por Space. Contrato GA4/GSC/AEO candidato;
+sin producción ni cambios en historia real.
 
 **2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
 registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary

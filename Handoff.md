@@ -103,6 +103,7 @@ Rollback PG real probado; ICO sólo orden de llamadas simulado, no BigQuery. [AD
 Próximo: U01 contexto por Space en ruta/reader real local; después bindings/protección temporal. HTTP/UI,
 concurrencia, historia integral y distribución pendientes. Contrato GA4/GSC/AEO candidato; TASK-2033/1960
 conservan scope/reporting. Sin src/producción/provisioning/envíos ni historia real de Diseño modificados.
+Typecheck focal sin diagnósticos, ESLint focal y task lint PASS; recibo conserva hashes de los componentes ejercitados.
 
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 

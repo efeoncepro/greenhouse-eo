@@ -20,3 +20,8 @@ Acceso departamental también propuesto: una persona puede operar Diseño, SEO o
 permiso explícito por Space/Service. [Prueba local](../../audits/client-portal/2026-11-01-sky-space-context-validation/README.md)
 con revocación y renovación confirma ese comportamiento candidato en A′ y B. El listado actual de Insights
 sigue siendo por Organization; la separación todavía no está activa para clientes reales.
+
+La [comparación financiera y operativa](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md)
+recomienda conservar un único cliente comercial SKY y separar Diseño/SEO mediante Spaces (opción B).
+Así, ingresos y costos conservan su dueño comercial y se atribuyen a cada servicio con reglas explícitas.
+Falta implementar contexto, routing estable y protección histórica antes de activar esa separación.

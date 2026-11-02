@@ -1,0 +1,959 @@
+{
+  "task": "TASK-2094",
+  "scope": "Local comparison recommending B; PG execution and explicitly mocked ICO query port. Not ADR acceptance or production readiness.",
+  "baseCommit": "e52cab8fbadfb3801a09bc6763012d2c9ea81140",
+  "startedAtEpochMs": 1793583821797,
+  "success": true,
+  "total": 204,
+  "newCases": {
+    "financeRealPG": 20,
+    "notionProjectsRealPG": 14,
+    "icoMockedSqlPort": 3
+  },
+  "passed": 204,
+  "failed": 0,
+  "packageVersions": {
+    "vitest": "4.1.0",
+    "next-auth": "4.24.13",
+    "jose": "6.2.2",
+    "pg": "8.20.0",
+    "typescript": "5.9.3",
+    "bcryptjs": "3.0.3"
+  },
+  "typecheck": {
+    "owned": 0,
+    "dependency": 0,
+    "includes": "src/types/next-auth.d.ts"
+  },
+  "suites": [
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/aeo-insights.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT GAP: root and Blog collapse into one own_domain row; failed observations do not inflate it",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT LIMIT: provider-declared Blog domain preserves unresolved redirect URL, without proving destination",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior existing protection: failed-only observations produce no evaluable citations, not a measured Blog zero",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT LIMIT: dedupe is exact raw URL; tracking variants remain separate citations",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: asks the owner reader for a run finished inside the resolved UTC window",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: rejects native report readiness insufficient_data",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: rejects native report readiness review_required",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: a reader response outside the requested civil window is rejected",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: missing native AEO plus successful empty GA4 emits ai_sessions=0 and passes current validation",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: GA4 AI-referral query has neither Blog landing rules nor host selection",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: only comparison-window facts satisfy current module presence even with allowPartial=false",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: no current or comparison facts is rejected with allowPartial=false",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing generic policy: allowPartial=true permits an empty module; this is not Blog completeness",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — candidate source gate versus the characterized current gaps requires native AEO even when real adapter has populated the AEO chapter with GA4 referrals",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — candidate source gate versus the characterized current gaps rejects comparison-only native receipt as current evidence, preserving two other valid current sources",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/bridge-postgres.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "isolation of this harness (not product authorization) OS denies IP sockets, including localhost; only owned UNIX PG is used",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes actual session_360 default and module loading, rather than a modeled selector",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes metadata changing the implicit default only for shared-client B",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes revoking memberships not revoking the bridge-derived session",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime preserves the existing Finance owner despite newer SEO metadata",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes incomplete Finance context choosing the most recent bridge",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime rejects a genuinely conflicting profile/client and leaves the profile unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime real commercial instantiation guard rejects another client, without adding a financial profile",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes Account360 aggregating both Spaces while excluding the control organization",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime contrasts explicit Notion Space selection with cardinality hidden by client LIMIT 1",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes a canonical service replay preserving its ID but overwriting ownership",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime exercises the real cron adapter contract mismatch after a valid inbound upsert",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime verifies the real PG transaction helper rolls back a partial replay on error",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime real snapshot store and migration triggers preserve sealed evidence through metadata changes and attempted rewrites",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes actual session_360 default and module loading, rather than a modeled selector",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes metadata changing the implicit default only for shared-client B",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes revoking memberships not revoking the bridge-derived session",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B preserves the existing Finance owner despite newer SEO metadata",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes incomplete Finance context choosing the most recent bridge",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B rejects a genuinely conflicting profile/client and leaves the profile unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B real commercial instantiation guard rejects another client, without adding a financial profile",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes Account360 aggregating both Spaces while excluding the control organization",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B contrasts explicit Notion Space selection with cardinality hidden by client LIMIT 1",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes a canonical service replay preserving its ID but overwriting ownership",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B exercises the real cron adapter contract mismatch after a valid inbound upsert",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B verifies the real PG transaction helper rolls back a partial replay on error",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B real snapshot store and migration triggers preserve sealed evidence through metadata changes and attempted rewrites",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/finance-history.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "real Finance and history with A-prime actual trigger admits the existing commercial owner only when service has the same client",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime cannot bypass expense ownership by explicitly supplying the SEO client",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime both variants reject cross-organization allocation without changing the expense",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime preserves aggregate commercial P&L with canonical owner and real nonzero labor reader",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime characterizes the financial cost of rekeying SEO expenses to make its allocation pass",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime resolves invoice deals to both services while exposing the labor split difference",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime same-input retries preserve semantic attribution without duplicate sources",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime new-period materialization preserves every old-period persisted field",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime actual transaction rolls back fact AND unresolved purge on failed replacement, then retries",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with A-prime characterizes old-period rebuild using current service activity and replacing control rows too",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B actual trigger admits the existing commercial owner only when service has the same client",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B cannot bypass expense ownership by explicitly supplying the SEO client",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B both variants reject cross-organization allocation without changing the expense",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B preserves aggregate commercial P&L with canonical owner and real nonzero labor reader",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B characterizes the financial cost of rekeying SEO expenses to make its allocation pass",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B resolves invoice deals to both services while exposing the labor split difference",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B same-input retries preserve semantic attribution without duplicate sources",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B new-period materialization preserves every old-period persisted field",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B actual transaction rolls back fact AND unresolved purge on failed replacement, then retries",
+          "status": "passed"
+        },
+        {
+          "name": "real Finance and history with B characterizes old-period rebuild using current service activity and replacing control rows too",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/ico-history.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "real ICO call ordering at mocked SQL port (not BigQuery execution) ordinary monthly path reuses locked task snapshot before downstream metrics refresh",
+          "status": "passed"
+        },
+        {
+          "name": "real ICO call ordering at mocked SQL port (not BigQuery execution) explicit freeze forces DELETE then INSERT even if task snapshot was already locked",
+          "status": "passed"
+        },
+        {
+          "name": "real ICO call ordering at mocked SQL port (not BigQuery execution) failed freeze INSERT propagates after a separate DELETE call, without a restore call",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/measurement-contract.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "candidate contract — three independent current producers accepts a complete candidate with explicit top-row GSC controls, without demanding impossible query completeness",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing ga4",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing gsc",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing native_aeo",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers GA4 referrals do not satisfy the native AEO requirement",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers comparison facts cannot fill the current window",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers fails closed on duplicate candidate receipts instead of choosing latest",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong spaceId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong serviceId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong organizationId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong bindingId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects stale binding and scope versions",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers missing/deleted scope never falls back to site total",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers missing/deleted scope never falls back to site total",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations accepts observed zero only with complete verified evidence in all three sources",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps unknown evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps partial evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps unavailable evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations does not promote an unverified empty API response to observed zero",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations refuses partial extraction even with rows on every day",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks controls and policy rather than asserting top-rows are the full population",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations cannot relabel blog activity as entry sessions or infer the entry hostname",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks source calendar close separately from report close",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations recent query cannot certify lagging ga4 data",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations recent query cannot certify lagging gsc data",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects provisional finality even after calendar closes",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects unknown finality even after calendar closes",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects future data-through and an attestation later than the query",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks declared UTC against civil timezone, including a DST-changing comparison month",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations characterizes the canonical midnight-gap result and fails closed rather than inventing a new resolver",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects a shifted producer window and source calendar",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com.evil.invalid/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://sub.blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com@evil.invalid/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://www.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com:444/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: //blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: javascript:alert(1)",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://user:pass@blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel allows root, query and normalized host case without broadening paths",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel unknown redirect destinations cannot silently disappear from native coverage",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel native run must fall inside the half-open current window with a fully accounted panel",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel incompatible comparison panel blocks comparison but not a valid current-only candidate",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel does not certify a comparison when ga4 availability is provisional or late",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel does not certify a comparison when gsc availability is provisional or late",
+          "status": "passed"
+        },
+        {
+          "name": "integration with existing Berel/GA4 pure primitives characterizes host-blind v1 and verifies candidate adds host without changing legacy behavior",
+          "status": "passed"
+        },
+        {
+          "name": "integration with existing Berel/GA4 pure primitives retains the real GA4 path-boundary/query filter while demonstrating it cannot express a host",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/permissions-context.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "permission/context experiment A-prime current cookie: design user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime current cookie: seo user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime current cookie: dual user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: cookie refresh of dual user follows SEO metadata only in B",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: membership revocation does not revoke cookie context after refresh",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real role revocation takes effect after strictly more than five minutes, not at the boundary",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: disabled identity retains old cookie claims after attempted refresh",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: real Insights App resource lists both departments for design despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: real Insights App resource lists both departments for seo despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: real Insights App resource lists both departments for dual despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real Insights gate denies another organization",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real Insights module revocation immediately blocks the resource",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime App refresh rotates token, rejects sequential reuse and preserves the same user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real App session revocation denies existing access and refresh tokens",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime App revocation with another user does not revoke the legitimate session",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real App resolver and refresh deny disabled identity immediately",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime real App resolver denies expired durable session and marks it expired",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime CURRENT GAP: App membership revocation still permits resolve and renewal",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: design-only principal denied the other department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: seo-only principal denied the other department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: dual principal selects both contexts independently without mutating identity or cookie",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: revoked SEO grant rejects previously selected context, keeps dual user Design access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: revoke/regrant cannot resurrect a previously selected grant version",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: expired grant cannot confer access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: future grant cannot confer access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: one department read grant cannot confer create, even to a global manager",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: departmental create grant does not override a revoked global manager role",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: membership alone does not create a grant",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: organization, Space and Service must form one verified tuple",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: inactive SEO Space denies only that selected account",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime App renewal rereads context; persisted session Space does not pin the selected department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime App crypto rejects tampered tokens and durable resolver rejects mismatched user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: active App session cannot restore a revoked SEO grant after token renewal",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: a selected context cannot act as a bearer credential for a different authenticated user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: missing identity is denied without BigQuery fallback",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: identity and permission fields in an untrusted target cannot impersonate another user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: inactive Service cannot be selected under an active Space",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: grant bound to the wrong organization cannot authorize a Space",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment A-prime candidate: metadata changes cannot switch the explicit target",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B current cookie: design user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B current cookie: seo user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B current cookie: dual user has one implicit context, not a selectable grant set",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: cookie refresh of dual user follows SEO metadata only in B",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: membership revocation does not revoke cookie context after refresh",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real role revocation takes effect after strictly more than five minutes, not at the boundary",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: disabled identity retains old cookie claims after attempted refresh",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: real Insights App resource lists both departments for design despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: real Insights App resource lists both departments for seo despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: real Insights App resource lists both departments for dual despite space query",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real Insights gate denies another organization",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real Insights module revocation immediately blocks the resource",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B App refresh rotates token, rejects sequential reuse and preserves the same user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real App session revocation denies existing access and refresh tokens",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B App revocation with another user does not revoke the legitimate session",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real App resolver and refresh deny disabled identity immediately",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B real App resolver denies expired durable session and marks it expired",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B CURRENT GAP: App membership revocation still permits resolve and renewal",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: design-only principal denied the other department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: seo-only principal denied the other department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: dual principal selects both contexts independently without mutating identity or cookie",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: revoked SEO grant rejects previously selected context, keeps dual user Design access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: revoke/regrant cannot resurrect a previously selected grant version",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: expired grant cannot confer access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: future grant cannot confer access",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: one department read grant cannot confer create, even to a global manager",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: departmental create grant does not override a revoked global manager role",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: membership alone does not create a grant",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: organization, Space and Service must form one verified tuple",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: inactive SEO Space denies only that selected account",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B App renewal rereads context; persisted session Space does not pin the selected department",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B App crypto rejects tampered tokens and durable resolver rejects mismatched user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: active App session cannot restore a revoked SEO grant after token renewal",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: a selected context cannot act as a bearer credential for a different authenticated user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: missing identity is denied without BigQuery fallback",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: identity and permission fields in an untrusted target cannot impersonate another user",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: inactive Service cannot be selected under an active Space",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: grant bound to the wrong organization cannot authorize a Space",
+          "status": "passed"
+        },
+        {
+          "name": "permission/context experiment B candidate: metadata changes cannot switch the explicit target",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/routing-history.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "real Notion project writer with A-prime explicit SEO routing adds a new project without changing any Design field",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime retry keeps one stable project identity and semantic payload",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime characterizes the existing upsert accepting ownership reassignment of a Design external ID",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime characterizes an out-of-order event overwriting newer project content",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime characterizes targetSpaceIds controlling deletion but not authorizing incoming writes",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime characterizes partial batch success and explicit failure reporting",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with A-prime explicit SEO-only deletion scope preserves Design when source contains no SEO projects",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B explicit SEO routing adds a new project without changing any Design field",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B retry keeps one stable project identity and semantic payload",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B characterizes the existing upsert accepting ownership reassignment of a Design external ID",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B characterizes an out-of-order event overwriting newer project content",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B characterizes targetSpaceIds controlling deletion but not authorizing incoming writes",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B characterizes partial batch success and explicit failure reporting",
+          "status": "passed"
+        },
+        {
+          "name": "real Notion project writer with B explicit SEO-only deletion scope preserves Design when source contains no SEO projects",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "migrations/20260420123025804_task-452-service-attribution-foundation.sql": "9210072aeddb68f6995a52f1039a5b87dde2008857a16d7916181e4955703d61",
+    "migrations/20260426021650967_task-617-api-platform-app-foundation.sql": "8025e4fbd48e67042d79387e34363c096852fd5b2f93afc55e4924c7968248ca",
+    "migrations/20260507164348236_task-815-direct-service-expense-allocation.sql": "3f5a08036d8b2e7a41861f2574e6b7dcc2a238e5af4e0750eee85fd16b40c2be",
+    "migrations/20260915100154428_task-1845-insights-foundation.sql": "83c2ace72858748cf07fe75509d0b61d86243b5507eb7b072ae60d259503cf44",
+    "scripts/experiments/sky-measurement-bridge/aeo-insights-evidence.md": "517bf35b8996aaeb4ad552d4089f32eb752a4e9da4242b6fd86c477d32b4dc48",
+    "scripts/experiments/sky-measurement-bridge/aeo-insights.local-spec.ts": "a327acd43005b8cf559bc56c90dc49a5e9d7de38efaea11eb83541c1a0bbb6bd",
+    "scripts/experiments/sky-measurement-bridge/baseline.sql": "8171836eb1fcb60db4458264c47bc096731b8464ac564f96a6a0ec85a715d302",
+    "scripts/experiments/sky-measurement-bridge/bridge-postgres.local-spec.ts": "76ba57e645a1040b253eae900630cd3a6e749414ca92057a4cc06d5cb0c5fd86",
+    "scripts/experiments/sky-measurement-bridge/check-types.mjs": "921a2ece4795a46b55ec117ba7c4229ea6be0e1e7102fb073e2db243f5c36530",
+    "scripts/experiments/sky-measurement-bridge/empty.ts": "1f991208cf76e361c607fc7d884a19733cfe6f4efe76117343c7101728c9c266",
+    "scripts/experiments/sky-measurement-bridge/finance-history.local-spec.ts": "3bf6732c53548a07c23bc894a4459bc2a6bb7216216e98d56479d494805b06d8",
+    "scripts/experiments/sky-measurement-bridge/finance-routing-baseline.sql": "3fef1159d063980016d3c40e8425bfc5c31f0309aa9abcea092faebc37c829f6",
+    "scripts/experiments/sky-measurement-bridge/finance-routing-fixtures.ts": "67fbc9cfe94f7adfaa0152ee7eee5a43edf3111b5dde2b077801653be8da6366",
+    "scripts/experiments/sky-measurement-bridge/ico-history.local-spec.ts": "8f0b1fa78c92bffd4a073a2686554d30d342ed21cbdf69cb097c2ec4e3e2985a",
+    "scripts/experiments/sky-measurement-bridge/measurement-contract.local-spec.ts": "03063cefe08c637ba3711e3f801c6258293ea5a15b15ed0e4caedf494a52e848",
+    "scripts/experiments/sky-measurement-bridge/measurement-contract.ts": "f6f0b528bfbb063fb7cc159f8beaa661b1e71dd88ed3eda8df7e3527d7861e6a",
+    "scripts/experiments/sky-measurement-bridge/permissions-baseline.sql": "1da72f01fcd978c3a469ebf5df5cc66c54235aed8cfe8d84dedfdd794f1767a5",
+    "scripts/experiments/sky-measurement-bridge/permissions-context.local-spec.ts": "c63765418e205dab0c1c2400b5d06e435dfa9ee95e08868ed11c653495a833b0",
+    "scripts/experiments/sky-measurement-bridge/routing-history.local-spec.ts": "97f27f5e6c173cd2d40f83a7ab7e68a33217a2d4e890697d673d02fbf2b9cc6b",
+    "scripts/experiments/sky-measurement-bridge/run-local.mjs": "3d537e6d72436866cd1b5b79d26741a9e34ab6b079a080129990756512d3c88c",
+    "scripts/experiments/sky-measurement-bridge/setup.ts": "d8dcaa9fccd2f7a0c0dd3a951283363461c0ee0a693fb8d848430b570f1c5846",
+    "scripts/experiments/sky-measurement-bridge/space-context-candidate.ts": "7802232d1f1be744da1e2fd49f931c1b6c43eba593b4bfcd984e8bfdc7987832",
+    "scripts/experiments/sky-measurement-bridge/vitest.config.ts": "d5ad61c36a1f043990d6d3fa83b3623162ab11fc8db1444199318b782e88aa91",
+    "scripts/setup-postgres-identity-v2.sql": "b72b9dd55e25f634dd67672eb4c85bfce2c27c7da1ceed98abd498e829d65d7a",
+    "src/lib/account-360/resolve-scope.ts": "a6980ba3dfda5d6310058204e9a96fc7245fd5a2788fa0a4cc898ce5863b9d5d",
+    "src/lib/api-platform/core/app-auth.ts": "081d352391672926d273686b9cba9841e478db4b76b3d7ab682b2ead616e6ea7",
+    "src/lib/api-platform/core/app-sessions.ts": "7e680a59f0b0e0fbbfc51ff53a99a053f9080c488b6d4be2700eeb756a4717df",
+    "src/lib/api-platform/resources/app-insights-read.ts": "54ceeea703347017324835538be936a8f945ecd9d76e65c9ae14dfc4cb6c4aa2",
+    "src/lib/api-platform/resources/app-insights-scope.ts": "f3a14c3a844cbea42d91db81c530fb9d579240ea9b2f07680b16f4b8e34ea0e6",
+    "src/lib/auth.ts": "a0248a449187100598776b75a26da7ef80c7fb37ab35cd7bb736aa5818d2a18f",
+    "src/lib/commercial-cost-attribution/member-period-attribution.ts": "af19ca2f724f54cd82094636e6a0c778dc1dd08c1bf8c90c8ca3190159432d07",
+    "src/lib/commercial-cost-attribution/store.ts": "378455f407bfbc35b377f4e0f4b32ef00b18ae63bdcf724bc66a55ce2f4ecd54",
+    "src/lib/commercial/party/commands/instantiate-client-for-party.ts": "75ec7f74d6c3381ef5ef7bb762b0fb83b6ef0bb4471415219a7a2bce1144bc7f",
+    "src/lib/commercial/party/route-entitlement-subject.ts": "0c3e9596445f62db6961439251394cb056d6e8a6433332f34b8c2b00f8877c7f",
+    "src/lib/db.ts": "d3727bbac272b4559636becb4ec2be3338b4406cd6f9cd32fe15b0b36bce1d8f",
+    "src/lib/efeonce-insights/adapters/aeo-adapter.ts": "e847978e4c35036683c0f0837d1a6fa76b78ebd6932512234ad453a31871170f",
+    "src/lib/efeonce-insights/adapters/contract.ts": "1790fb9bc470d5d3a96c259bb05eb5cc6f19c62eda3d00453315a42902f55507",
+    "src/lib/efeonce-insights/authz.ts": "1b0d0271e05004380356b02ee1cffb69603d508dafad445c247d8b49fd983295",
+    "src/lib/efeonce-insights/commands/generation.ts": "a66308b967d2a6ad4d51e613cdb2ca27e5ca9332a67fcc9875d016e66cb824fe",
+    "src/lib/efeonce-insights/contracts/evidence.ts": "6760a908bc821b43da8babb004a6cdab72a0eace21066281a6ab1607875e8493",
+    "src/lib/efeonce-insights/contracts/plan.ts": "c6c565ffa740bd565404a8eef21f2302da4f669d75b590a489fd54f87b111779",
+    "src/lib/efeonce-insights/readers/index.ts": "32bcbbc359c480d5e9f96dea52511590b048fb0de5c972d582e974820d9e5976",
+    "src/lib/efeonce-insights/stores/records.ts": "b9a33b222899257dc9cf10e9d8e12638269458bb40a93325cdf31fc6b45abcba",
+    "src/lib/efeonce-insights/stores/report-store.ts": "b18783d62884f941c04b045a5fb467f5b31258c9578615505d44e95ae83459e5",
+    "src/lib/efeonce-insights/stores/snapshot-store.ts": "a3588ab27e639b97e51d1eaf91b70a749d86f85c97c9cf1d684e1d7561bd312c",
+    "src/lib/efeonce-insights/window.ts": "cc722a3f441a84b083888e27faf9d969b59e8613bb54e655061d7377274d396b",
+    "src/lib/entitlements/runtime.ts": "19cc16f8e2789265b5608619635d940ddfaf731c37360cfedf9bf6882384b53c",
+    "src/lib/finance/canonical.ts": "5b90b1c8bdfbde89ab23be2bdbe91b5dce3bd585d141517a05332519b7fe57c1",
+    "src/lib/finance/expense-service-allocations.ts": "ea9cb1f338adec8bbf9096bcdbb5db045cc724b59dde3efecbdd341f8411e7f2",
+    "src/lib/finance/postgres-store-intelligence.ts": "83fd528d55b472a7de1ddc6a00dffcbc2b2093dfadb3d5018c0a89109d20e7bb",
+    "src/lib/finance/postgres-store-slice2.ts": "dc4041dddde016af9693ebace892a7d93d23524e51d60cb7e44cd7a2b340aafe",
+    "src/lib/growth/ai-visibility/contracts.ts": "04a120b652c13e5511b83042df9640e1c8a637630bfc364c9bd361c6e27adb83",
+    "src/lib/growth/ai-visibility/observation.ts": "a5fefdba26a77dbcfa29bf2bb42bf34b5ef5ca11d8bbf0e081b601ba0d1757f8",
+    "src/lib/growth/ai-visibility/report/citation-breakdown.ts": "b5d2926d9e4b1cb85d391855a51a89fdc0caa424a994e96537d9cf764ef859b8",
+    "src/lib/growth/analytics-ga4/reader.ts": "40ce5024a0d29e022ef88566a8e98fa893449913de2b5bb8c4b367e75dd7cea7",
+    "src/lib/growth/seo/content-scope/contracts.ts": "cbef0ceb34754f2e57bea1487a504ad2a21acff74ee399901a2dd8de3b9cf7d8",
+    "src/lib/i18n/locale-preferences.ts": "93dd3b4f45295dc4fab40e6fc196e7d88305bc2779eff163ad527edeac76d554",
+    "src/lib/ico-engine/materialize.ts": "aea41a90b3edb974767cf54abc872c32be639dbbc398c267b98de30566c8bcc4",
+    "src/lib/ico-engine/shared.ts": "0f3fa0ad5a6f0fdea24331841aed8eb0b8b7156ab5c837764eee03a8913d6153",
+    "src/lib/postgres/client.ts": "9a5e74bda7340202b7b1e49524f57fa020aac321137d53f2b5e95fb9859d9f75",
+    "src/lib/service-attribution/materialize.ts": "cef58c1edc1faa348c9e54f09b90fa53da0fda209c6d024307f2bc3925b6058d",
+    "src/lib/services/service-lifecycle-mapper.ts": "abbf988a43dd5905892f2fcf94020fc96a3a4183ec28620ab7c8b2f4f52005ad",
+    "src/lib/services/service-sync.ts": "61c752dad3b6d49a59c8897b54c172b20bee491d2f1fa97acc1728c50d2c3992",
+    "src/lib/services/upsert-service-from-hubspot.ts": "0e8ddb260d8c92c20330790321551ca44c6a0915ac81ec39b3268990600b8108",
+    "src/lib/space-notion/space-notion-store.ts": "8e09f53b9f798efb7468f6d5f3603349dfcfbb8b497ed5cd04ae57ec3675ac3b",
+    "src/lib/sync/project-notion-delivery-to-postgres.ts": "e9c865d4643f5130915ad6491997e9da9894fad41203e9832cbb1217ce7df8d1",
+    "src/lib/tenant/access.ts": "fed89c22c95867edb183ef768b32771d59890daba50131f6b21c59512838bb12",
+    "src/lib/tenant/identity-store.ts": "a1fb84fa7e5511cff25a830b15426329feb74781a2802c67669682640ea84b56",
+    "src/types/next-auth.d.ts": "db7fa37d013cfdcdf916ef03f6f96ce6a5f183156290b3cb7f93d30c8a315904"
+  }
+}

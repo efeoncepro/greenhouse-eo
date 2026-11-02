@@ -7,11 +7,11 @@
 - Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio decide aceptación y apertura.
 - Scope: cuentas operativas, bridge legacy, contexto autorizado, sync, atribución y reporting por servicio.
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
-- Confidence: `medium`; transacción local acotada verificada; migración, autorización integral y rollout pendientes.
+- Confidence: `medium`; B recomendado con evidencia local de permisos/Finance/routing/historia; integración y rollout pendientes.
 - Validated as of: `2026-11-01`, componentes reales en PostgreSQL efímero (TASK-2094); sin conexión productiva.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
 
-## Revisión 2026-11-01 — Elección del bridge pendiente
+## Revisión inicial 2026-11-01 — Recomendación A′ suspendida
 
 La [revisión crítica con tres subagentes](../audits/client-portal/2026-11-01-sky-bridge-critical-review.md), ampliada
 por la [revisión profunda de seis frentes](../audits/client-portal/2026-11-01-sky-deep-review/README.md),
@@ -42,6 +42,21 @@ A′ no obtiene ventaja de autorización por separar client_id. El contrato requ
 bridge depende ahora de compatibilidad de readers/writers, owner comercial y preservación histórica. No se
 acepta el ADR ni se autoriza provisioning; falta integración HTTP/UI, concurrencia, Finance/ICO y distribución.
 
+## Recomendación actual — B, tras Finance/routing/historia local
+
+[Comparación ejecutada](../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md):
+**204 pruebas PASS**, 37 nuevas. El trigger real de asignación de gastos rechaza A′ cuando el gasto conserva
+el owner comercial y el servicio SEO usa otro client. Cambiar el gasto al client hijo permite asignarlo, pero
+divide P&L. La atribución de costos laborales también cambia por esa identidad. B conserva el owner actual
+y permite asignación explícita al servicio SEO. A′ requeriría normalización aún no implementada en esos puntos.
+
+Se recomienda **B como objetivo técnico**, sin declarar aceptación del ADR ni seguridad productiva. Los
+incrementos anteriores son evidencia histórica, no la recomendación vigente. Los riesgos de replay Notion y
+reconstrucción de períodos existen en ambos modelos; no justifican otro client. La transacción de atribución
+sí revierte una sustitución fallida. ICO fue probado sólo a nivel de llamadas con puerto SQL simulado.
+Siguiente: U01 contexto por Space en una ruta/reader real local; después bindings y protección temporal.
+No se requiere otra ronda de discovery general para formular esta recomendación.
+
 ## Context
 
 SKY tiene una relación histórica de Diseño y suma Blog SEO/AEO con stakeholders distintos. Necesita dos cuentas
@@ -70,10 +85,10 @@ Se propone una Organization con varios Spaces. El Space histórico conserva iden
 indicadores y ediciones de Diseño. La nueva relación Blog SEO/AEO se aloja en un Space propio. Un Space puede
 contener varios Servicios de la misma operación; no se crea una Organization por departamento ni un master Account.
 
-La comparación local del 27-10 recomendó **A′: bridge operativo legacy distinto por Space, con un único owner
-comercial/financiero**. Esa preferencia queda diferida por la revisión del 01-11; no es la selección vigente.
-B (client compartido con contexto Space en todos los consumers) sigue siendo viable si se retiran todos sus
-selectores client-only antes de abrir. Ninguna de las alternativas autoriza insertar filas reales.
+La recomendación técnica actual es **B: client comercial compartido y contexto Space/Service explícito**.
+Sustituye la preferencia A′ del simulador del 27-10. Los caminos departamentales deben retirar selección
+implícita y aislamiento client-only antes de abrir. Los consolidados comerciales conservan su dueño y
+autoridad propios. Recomendación no equivale a aceptación ni autoriza insertar filas reales.
 
 El bridge operativo no representa otra empresa, Company de HubSpot, perfil Finance, factura, pago o persona.
 Su representación persistida —campo/relación de owner y rol del bridge— se diseñará en una unidad posterior.
@@ -135,8 +150,8 @@ puede retrasar apertura, antes que producir indicadores o atribuciones incorrect
 
 ### Orden de transición
 
-1. Mantener ADR Proposed; TASK-2073 conserva su cierre como simulación. Comparar A′/B con implementaciones
-   reales en entorno aislado, incluidos los contratos comunes de los puntos siguientes, antes de aceptar el puente.
+1. Mantener ADR Proposed; TASK-2073 conserva su cierre como simulación. TASK-2094 recomienda B con componentes
+   reales aislados. Integrar y certificar los contratos siguientes antes de aceptar/aplicar el puente en runtime.
 2. U01 contexto/membership/refresh; U02 routing de servicios/fuentes; **U02F owner Finance y selección de
    candidatos**. Estas foundations preceden a U03, incluso si el nuevo Space se pensara crear inactivo.
 3. U03 provisioning hijo idempotente; U04 readers/caches; U05 bindings/historia/ICO/capacidad.
@@ -168,7 +183,7 @@ Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en 
 
 - La prueba no puede garantizar owner comercial único, historia inmutable o rechazo de ambigüedad.
 - Se identifica un consumer client-only que mezcla Finance, cuentas o fuentes y no puede normalizarse.
-- Los consumers ya son íntegramente Space-aware: reevaluar retirada del bridge A′ en favor de B.
+- Aparece evidencia de un consumer que impide B; reevaluar el costo de normalizar A′ con owner canónico.
 - Cambia ownership de los dominios, el modelo legal/comercial o el mecanismo de grants.
 - Antes de cualquier migration/provisioning real: aceptar ADR, validar contrato persistido y obtener evidencia
   de transacciones, concurrencia, recuperación y permiso de rollout en las unidades dueñas.
