@@ -19,6 +19,16 @@
 
 ---
 
+## 2026-11-02 · Producto en escena: la física del modelo, el arte del render
+
+- **Cita:** «la etiqueta se vea realista y no se alteren los textos, tu tendencia va a ser irte a la vía determinística,
+  esa vía sirve pero el acabado debe darlo el modelo porque maneja mejor la física, luces».
+- **Qué pasó:** solo determinista se ve pegado; solo modelo integra bien pero reescribe los textos pequeños (fidelidad
+  0,16–0,23); inpainting con máscara inventó otro producto.
+- **Regla:** vía híbrida: el modelo integra la foto completa y la etiqueta se restituye desde el render oficial
+  transfiriendo solo la luz de baja frecuencia (fidelidad 0,98). Nunca entregar una etiqueta que pasó solo por el modelo.
+- **Dónde quedó:** [photography.md](photography.md) §6 bis. **Documental** (sin script ni prueba todavía).
+
 ## 2026-11-02 · Recortes verticales mal encuadrados (terraza)
 
 - **Cita:** «Regeneraste epro al menos lo que se ve en estos formatos mas verticales es como mal encuadrado».

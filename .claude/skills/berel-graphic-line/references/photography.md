@@ -141,6 +141,41 @@ nunca es una coordenada del marcador.
 - Si la grilla avisa «sin celda de primer nivel», mover `focal` es una de las tres salidas (las otras:
   acortar el titular o aceptar el aviso tras mirar la pieza). Ver [marker-grid.md](marker-grid.md).
 
+## 6 bis. Producto en escena (prueba 2026-11-02, Insignia 4L en la terraza)
+
+Pedido del operador: «Importante que la etiqueta se vea realista y no se alteren los textos, tu tendencia va a ser
+irte a la vía determinística, esa vía sirve pero el acabado debe darlo el modelo porque maneja mejor la física, luces».
+
+Lo que se midió (fidelidad = correlación del detalle de la etiqueta contra el render oficial, 1 = idéntico):
+
+| Vía | Resultado | Fidelidad |
+|---|---|---|
+| Solo colocación determinista | Etiqueta exacta, pero se ve pegada: luz de estudio, sin sombra | 1,00 |
+| Edición completa con GPT Image 2.5 Sunburst | Luz cálida, reflejos en la tapa, sombra real; **reescribe los textos pequeños** | 0,16–0,23 |
+| Inpainting con máscara | **Inventa otro producto** (lata blanca falsa). Descartado | — |
+| **Híbrido** | El modelo pone la física; la etiqueta conserva el arte oficial | **0,98** |
+
+Receta híbrida (validada, todavía sin script canónico en el Workbench):
+
+1. Render oficial desde `02_Recursos/03_Producto PNG` del OneDrive de Berel, **empaque vigente** (las carpetas
+   «Vieja_…» son etiquetas anteriores). Recorta el alfa (`trim`).
+2. Colócalo a escala física plausible sobre una superficie real (piso, repisa) y fuera de las zonas del titular y
+   del logo; comprueba que entra en los recortes que lo van a usar (blog con `focal` y bajo, verticales con `focal` x).
+   Un 4 L a la distancia de una foto arquitectónica mide ~120 px en un plate de 1536 px; se puede exagerar un poco,
+   no inventar un primer plano imposible.
+3. Pide al modelo la integración sobre la foto completa (edición, sin máscara): misma posición y tamaño, luz y
+   dirección de la escena, reflejos en la tapa, sombra de contacto y proyectada, grano; prohíbe tocar la etiqueta y
+   lista sus textos literales.
+4. Transferencia de iluminación: alinea la lata del modelo con la colocada (búsqueda de ±8 px por bordes) y, dentro del
+   alfa del render, multiplica el render original por la razón de baja frecuencia (desenfoque σ 5) modelo/colocado.
+   La tapa (sin texto) se queda con el modelo. Así los textos son los del render y la luz es la del modelo.
+5. Usa la foto completa del modelo como base: pegar solo la zona de la lata deja una costura, porque el modelo
+   cambia la luz del piso en un área mayor. Verifica que el muro no derivó (en la prueba: ΔE 1,98 → 2,02).
+6. Mide la fidelidad de la etiqueta (≥ 0,95) y mira el píxel al 100 %.
+
+Pendiente: script canónico en `brands/berel/scripts/` y prueba propia; elección de escena pensada para producto
+(una toma arquitectónica deja el producto pequeño).
+
 ## 7. Rechazos que no se repiten
 
 | Fecha | Rechazo | Razón | Qué cambió |
