@@ -314,6 +314,14 @@ const mirroredSkills = [
     claude: '.claude/skills/berel-graphic-line',
   },
   {
+    // Blog SKY (servicio SEO / Marca): gate de portada, exportación y banner de ruta del Workbench.
+    // Si Codex y Claude divergen, uno exportaría portadas sin medir o banners con copy comercial.
+    id: 'sky-blog-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/sky-blog-graphic-line',
+    claude: '.claude/skills/sky-blog-graphic-line',
+  },
+  {
     // LicitaLAB expone evidencia comercial y documental sobre licitaciones reales. Si Codex y Claude
     // divergen en tools, estados RAG o límites read-only, uno puede declarar bases leídas cuando siguen
     // indexando o tratar una primera página como historial completo. El bundle debe ser uno solo.

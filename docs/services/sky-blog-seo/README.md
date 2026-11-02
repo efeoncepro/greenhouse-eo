@@ -85,6 +85,10 @@ La [Propuesta Flujo de trabajo + SKILL](https://app.notion.com/p/3ed39c2fefe780e
 es antecedente de producción visual. Para instrucciones de imágenes se siguen las referencias vigentes del
 playbook, que ha evolucionado después de esa propuesta. No copiar aquí dimensiones o reglas de voz.
 
+La producción de imágenes (fotografía editorial, gate de portada contra el hero del tema, exportación y banner de
+ruta) quedó codificada como línea gráfica en la skill `sky-blog-graphic-line` y en el Creative Workbench
+(`brands/sky-airline/blog/`), candidata desde el 02-11-2026 y pendiente de aprobación de Diseño y de Marca SKY.
+
 ## Responsables y dependencias
 
 Equipo Efeonce asignado a la cuenta (confirmado por Julio el 01-11-2026):

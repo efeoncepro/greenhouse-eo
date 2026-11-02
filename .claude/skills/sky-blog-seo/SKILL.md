@@ -83,6 +83,8 @@ Sistema visual de imágenes» de Daniela Ferreira, en SharePoint Sky-Efeonce:
 `Documentos compartidos/General/SKY Blog SEO/01 Onboarding/SKY_Blog_Sistema_Visual.pdf`. Tres imágenes por
 artículo con función propia, sin aviones ni uniformes SKY sin aprobación de Marca; sus fotos IA son pilotos del
 criterio, no del lugar. Su aprobación se pidió a Marca SKY en el kickoff; resumen en los insumos §7.
+Producir o revisar cualquier imagen del blog (prompt, portada, exportación, banner de ruta) es de la skill
+`sky-blog-graphic-line` y del Creative Workbench (`brands/sky-airline/blog/`); esta skill sólo fija la spec.
 Handoff, aprobación, publicación y URL pública verificada son estados diferentes. Publicar por lotes según calendario aprobado.
 
 **Analítica.** Usar readers canónicos y aislar host/período/canal. El top 50 existente ordena sesiones con
