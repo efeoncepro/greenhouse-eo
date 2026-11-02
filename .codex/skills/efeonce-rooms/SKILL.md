@@ -13,8 +13,8 @@ Production están en `true` y `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` en `false`. E
 «Efeonce». Efeonce ID sirve first-party y OTP, y desde el release de Greenhouse `935583f88db0` el login V4 con
 carrusel (skill `efeonce-auth`). Del carril de agentes están en producción la atribución, avisos, reversas y cuotas
 (TASK-2084 expand) y la casa (TASK-2085); no hay bearer delegado ni gateway. El carril CLI con login de Efeonce ID
-(`pnpm rooms login`, enmienda D1-bis, TASK-2087/2095) está en producción desde `main@9a4340a` (PR #22), apagado hasta
-`ROOMS_AGENT_LANE_ENABLED` y hasta que Efeonce ID publique la audiencia Rooms. El login humano con MFA tiene
+(`pnpm rooms login`, enmienda D1-bis, TASK-2087/2095) está en producción y ENCENDIDO desde 2026-11-02 (`main@9a4340a`,
+deploy `efeonce-rooms-mgod4xbea`, `ROOMS_AGENT_LANE_ENABLED=true`; Efeonce ID `auth-server-00172-zcn`). El login humano con MFA tiene
 aceptación reportada por Julio vía la sesión Auth (2026-11-01), sin evidencia instrumentada añadida. Prioridad:
 acción real de agente con aviso y reversa; QA/GVC de la casa nueva; medición Live. Siguen la delegación de Efeonce ID
 para la audiencia Rooms (EPIC-044, TASK-2086 en `to-do`); el verificador del bearer y el provider `rooms` en `efeonce-mcp`.
