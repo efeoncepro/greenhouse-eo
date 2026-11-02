@@ -19,6 +19,17 @@
 
 ---
 
+## 2026-11-02 · Recortes verticales mal encuadrados (terraza)
+
+- **Cita:** «Regeneraste epro al menos lo que se ve en estos formatos mas verticales es como mal encuadrado».
+- **Qué pasó:** el plate nuevo era una escena simétrica con dos sillones; post, story y Pinterest recortaban al centro
+  y partían ambos sillones. Con el foco en el sillón derecho, «terraza» caía sobre la columna de cantera en el post.
+- **Regla:** `photo.focal` por formato para que cada recorte vertical enmarque una viñeta completa, sin muebles
+  principales cortados a la mitad y con el titular sobre muro liso. El aviso de titular sobre fondo cargado delata
+  el foco equivocado.
+- **Dónde quedó:** `berel-recipes.json → grids.framing`, `lessons` de `berel-photo-registers.json`, jobs de la terraza
+  (post 0.27, story 0.64, Pinterest 0.72) y [photography.md](photography.md) §6. **Documental** (sin prueba propia).
+
 ## 2026-11-02 · Frizo mal terminado en la terraza (registro alto)
 
 - **Cita:** «Esto es un frizo mal terminado? si es así no se puede aprobar para Berel por el estrato».

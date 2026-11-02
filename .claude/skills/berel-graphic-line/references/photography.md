@@ -132,6 +132,12 @@ nunca es una coordenada del marcador.
   **Pinterest, que no lleva titular, la muestra**. Caso real (`projects/berel/espacios-gpt-image/jobs/`):
   recámara alta con `focal [0.55, 0.5]` en post y story, `[0.36, 0.5]` en Pinterest.
 - **Nunca pongas el titular sobre concreto o vidrio claro**: no se lee y ensucia el muro.
+- **Viñeta completa en cada recorte vertical** (regla `grids.framing` del contrato de recetas, 2026-11-02): ningún
+  mueble principal cortado a la mitad por el borde. Una escena simétrica (dos sillones) recortada al centro parte
+  los dos; elige `focal` por formato para encuadrar uno entero. Si el recorte deja el titular sobre un objeto
+  (columna, ventana), el aviso «titular sobre fondo cargado» lo delata: usa la otra viñeta. Caso terraza: post
+  `[0.27, 0.5]` (sillón izquierdo y agave, titular sobre muro), story `[0.64, 0.5]` y Pinterest `[0.72, 0.5]`
+  (sillón derecho y cantera). Cita del operador: «lo que se ve en estos formatos más verticales es como mal encuadrado».
 - Si la grilla avisa «sin celda de primer nivel», mover `focal` es una de las tres salidas (las otras:
   acortar el titular o aceptar el aviso tras mirar la pieza). Ver [marker-grid.md](marker-grid.md).
 
