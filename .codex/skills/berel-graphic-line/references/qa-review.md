@@ -3,7 +3,8 @@
 > **Snapshot del 2026-11-02.** El QA mecánico lo escribe `composeBerel` en
 > `brands/berel/compose/render.mjs`; el CLI `brands/berel/scripts/componer.mjs` lo guarda como
 > `runs/<uuid>/qa.json`. El QA del corrector de color lo escribe `ajustar-muro.mjs` (ver
-> `color-pipeline.md`). Nada de esto aprueba una pieza: aprueban personas.
+> `color-pipeline.md`); el del producto en escena, `producto-en-escena.mjs verificar` (§3 bis), y el del
+> reel, `reel.mjs qa` (§3 ter). Nada de esto aprueba una pieza: aprueban personas.
 
 ## 1. Regla base: mirar el píxel real
 
@@ -26,8 +27,13 @@ Revisa cada pieza, en este orden:
 - [ ] **Titular (post, story):** ≤ 3 líneas, balanceado, sobre muro liso del cuadrante superior
       izquierdo, sin ventana, lámpara, concreto ni vidrio claro detrás; tono correcto (ink sobre muros
       claros, blanco sobre medios u oscuros). Marcador y titular no se apilan.
-- [ ] **Logo en zona limpia:** el SVG oficial, uno solo, blanco sobre foto o negro sobre papel, en su
-      posición del formato y sobre una esquina calma (sin objetos detrás). La story no lleva logo.
+- [ ] **Logo en zona limpia:** el SVG oficial, un solo logo compuesto, blanco sobre foto o negro sobre
+      papel, en su posición del formato y sobre una esquina calma (sin objetos detrás). La story no lleva
+      logo. El logo impreso en la etiqueta de un producto en escena no cuenta: la firma se mantiene.
+- [ ] **Producto en escena (si lo hay):** es el render oficial vigente (nunca una maqueta de
+      `excludedRenders` ni una lata generada); se ve fotografiado (luz, sombra de contacto, reflejos) y no
+      pegado; textos de la etiqueta correctos al 100 %; tamaño creíble para su contenido; no toca la banda
+      del titular ni el logo; no lo corta un borde. Ver `photography.md` §6 bis.
 - [ ] **Muro del color declarado:** el muro se ve del color del marcador. Si la foto pasó por el
       corrector, revisa también su máscara (sin costuras, sol y sombra conservados, objetos de tono
       parecido intactos).
@@ -83,6 +89,41 @@ Avisos posibles en `warnings[]`:
 - «`«<nombre>» sin marcador: <razón>`».
 - «`titular sobre fondo cargado (bordes X > 6): reserva el cuadrante superior izquierdo del plate o cambia el foco`».
 
+`qa.logoBed` (contraste del logo blanco contra el 1 % más claro de su caja y nitidez p99) aparece siempre como
+dato; solo avisa («logo sin lecho: …») si el job declara `photo.lecho` (opcional, apagado por defecto). Umbrales
+en `foreground.measure` del contrato de fotografía (contraste 4,5:1, nitidez ≤ 25).
+
+## 3 bis. `qa.json` del producto en escena (`verificar`)
+
+Lo escribe `producto-en-escena.mjs verificar --dir <salida>`; sale con código 1 si falla.
+
+| Campo | Qué dice | Umbral |
+|---|---|---|
+| `heightRatio` | Alto del producto redibujado ÷ el colocado | 0,88–1,12 |
+| `shiftX` | Corrimiento horizontal del producto (px) | ≤ 30 |
+| `sceneDiff` | Diferencia media de la escena fuera del producto (/255) | ≤ 8 |
+| `ocr` / `textosNoLeidos` | Textos clave leídos por OCR local (Vision `.fast`) | Aviso: no lee el logotipo «Berel» ni todo texto estilizado |
+| `ok`, `fallas`, `approval` | Veredicto mecánico; `approval` siempre `pending-human-and-pixel-review` | — |
+
+Si un texto clave quedó mal, el respaldo es `restituir` (etiqueta desde el render; fidelidad ≥ 0,95). Mira siempre la
+etiqueta al 100 %: el texto diminuto sale aproximado.
+
+## 3 ter. QA del reel (`reel.mjs qa`)
+
+Escribe `<modelo>-qa.json` y `<modelo>-hoja.jpg` junto al clip; sale con código 1 si falla
+(`contracts/berel-video-reels.json` → `qa`, snapshot 2026-11-02):
+
+| Campo | Qué mide | Umbral |
+|---|---|---|
+| `deltaE` | ΔE CIE76 del muro en el último cuadro contra el cuadro después, sobre la máscara del muro (o `--zona`) | ≤ 4 |
+| `fluidez.saltoMax` | % del cambio total que ocurre en el salto más brusco entre dos cuadros | ≤ 5 |
+| `fluidez.cuadrosMitadCambio`, `tSaltoMax` | Cuántos saltos concentran la mitad del cambio y cuándo ocurre el mayor | Informativos |
+
+Lo que no mide y se mira en la hoja y en el clip: muebles que entran semitransparentes, objetos flotando, un círculo
+de pintura artificial, cámara que se mueve. En el reel armado revisa además que el marcador (2,5 s) y el titular
+(4,5 s) caigan sobre muro limpio, que la tapa entre limpia a los 8 s y que la música no tape los efectos de la tapa.
+Detalle en `video.md`.
+
 ## 4. Hoja de contacto antes de subir
 
 Antes de subir un lote al canvas, arma una hoja de contacto local con todas las piezas (una fila por
@@ -132,14 +173,15 @@ Antes de declarar validado un cambio de código, contrato o lote:
 ```bash
 cd /Users/jreye/Documents/creative-workbench
 node --test brands/berel/test/*.test.mjs test/surface-color.test.mjs
-pnpm gates
+npm run gates
 git diff --name-only   # todo cambio Berel dentro de brands/berel/** o projects/berel/**
 ```
 
-- 16 pruebas al 2026-11-02 (12 del compositor, 2 del builder de prompts, 2 del corrector neutral).
+- 37 pruebas al 2026-11-02: 12 del compositor, 9 del builder de prompts, 5 del producto en escena, 3 del lecho,
+  6 del reel y 2 del corrector neutral.
   Las del compositor **se saltan** sin Gotham Rounded y el catálogo en
   `clients/berel/.resources-local/`: `skipped` no es verde. En una máquina sin recursos, di que no se
   verificaron.
-- `pnpm gates` corre `managed-drift`, `hygiene`, `piezas` y `native-policy` (`gates/run-all.mjs`).
+- `npm run gates` corre `managed-drift`, `hygiene`, `piezas` y `native-policy` (`gates/run-all.mjs`).
 - Si `git diff --name-only` muestra archivos fuera de `brands/berel/**` o `projects/berel/**`, detente:
   la advertencia del operador es explícita («cuidado dañas el flujo que usamos para efeonce»).

@@ -62,6 +62,14 @@ Higgsfield: `generate_video` con `start_image` (antes) y `end_image` (después),
 Omni: `--staging-uri` y `--gcs-output` en el bucket privado `gs://efeonce-group-greenhouse-private-assets-dev/…`,
 `--max-usd 1.5` para 1080p/8 s, `--yes`, `--out`.
 
+Trampas medidas (2026-11-02):
+- Higgsfield puede responder con una **recomendación de preset** (p. ej. «IN THE DARK») en vez de crear el job: se
+  reenvía la misma solicitud con `declined_preset_id`. `get_cost: true` cotiza sin gastar.
+- `jobs_wait` espera como máximo 15 s por llamada; un clip tarda minutos (Seedance llegó a pasar los 15 min).
+- Salidas: FLUX 3 entrega 1088 × 1920 a 24 fps; Omni 1080 × 1920 a 24 fps **con pista de audio**; MiniMax H3 solo
+  2K (1440 × 2560). `armar` reescala a 1080 × 1920 / 30 fps y descarta el audio del clip (solo música + tapa).
+- Omni con el `--max-usd` por defecto (1) falla antes de enviar a 1080p/8 s: pasa `--max-usd 1.5`.
+
 ## 4. QA
 
 - **Color:** ΔE (CIE76) del muro en el último cuadro contra el cuadro después, medido sobre la máscara del muro que

@@ -37,6 +37,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
+| Producir para Berel: banners, adaptaciones, plates, producto en escena, reels de transformación | Skill Greenhouse `berel-graphic-line` (oficio) + corte Berel en [state-continuity.md](references/state-continuity.md) |
 | Configurar/verificar identidad Git de cada persona, hooks y evitar rechazo de autor en Vercel | [operations-distribution.md](references/operations-distribution.md), sección de identidad Git |
 | Instalar canon, consumir/publicar paquetes, broker, archivo y Vercel | [operations-distribution.md](references/operations-distribution.md) |
 | Identidad Google↔GitHub, App mínima, transporte sin bearer GitHub y gate de rollout | [architecture.md](references/architecture.md), [operations-distribution.md](references/operations-distribution.md) y [state-continuity.md](references/state-continuity.md) |

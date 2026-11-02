@@ -165,6 +165,12 @@ planos son nuestros (0 créditos) y cuáles generativos antes de elegir motor.
 🔴 Seedance por BytePlus rechaza rostros humanos aunque el KYC esté aprobado (2026-10-17); sólo pasan con `asset://` de la
 biblioteca de retratos virtuales (plan Entry gratuito: 50 assets ≈ 25 personajes, compartido con retratos reales; uso documentado como referencia), con fila en el
 [ledger](../../../docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md) antes de subir.
+🔴 **Transformación antes → después con primer + último cuadro: el color del cuadro final no está garantizado**
+(benchmark 2026-11-02, 5 motores × 4 escenas, guía §6.6). Wan 3.0 llevó una terracota a salmón (ΔE 18,3); el resto
+quedó a ΔE ≤ 4,4. FLUX 3 hace aparecer los objetos de forma más fluida y es el default de esa operación [decisión del
+operador]; Gemini Omni es la alternativa cuando arma muebles por partes o FLUX deja un salto; MiniMax H3 mete los objetos
+como fundido semitransparente. Mide siempre: ΔE de la superficie con su máscara y el salto entre cuadros (> ~5 % del
+cambio total = algo aparece de golpe); los fundidos no los mide, se miran.
 
 ### Editar lo que ya existe: otra pregunta, otro árbol
 

@@ -73,6 +73,8 @@ Adaptación a México: español mexicano estándar ..................... modules
 Banners, imágenes y ficha visual ................................... modules/05_BANNERS_IMAGENES.md
 Material de marca Berel (ficha sin diseño) ......................... modules/05_BANNERS_IMAGENES.md
 Derivados sociales ................................................. modules/06_DERIVADOS_SOCIALES.md
+Producto en escena: qué producto y dónde (el cómo: berel-graphic-line) . modules/05_BANNERS_IMAGENES.md
+Reel: formato entregado, música Envato del mes, handoff ............ modules/06_DERIVADOS_SOCIALES.md
 Selección de canales, capacidad y exclusiones reversibles .......... modules/15_DISTRIBUCION_SELECTIVA.md
 Conteo del cupo mensual por archivo y excedente .................... modules/15_DISTRIBUCION_SELECTIVA.md
 Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md

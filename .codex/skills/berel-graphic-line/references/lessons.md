@@ -32,14 +32,89 @@
 - **Dónde quedó:** `contracts/berel-video-reels.json`, `compose/video.mjs`, `scripts/reel.mjs`, `test/video.test.mjs`.
   **Codificada + prueba**.
 
+## 2026-11-02 · Producto: un buen montaje no parece montaje (método guiado, 1,4×)
+
+- **Cita:** «sunburst si le pasas bien la referencia es completamente capaz de poner el producto sin tergiversar su
+  etiqueta… cuando lo pones de forma determinística la etiqueta se nota y se ve un mal montaje… un buen montaje se conoce
+  por NO parecer un montaje». Después, sobre el tamaño: «Publicitario».
+- **Qué pasó:** la vía híbrida (etiqueta restituida desde el render) daba fidelidad 0,96–0,99, pero la etiqueta se veía
+  pegada. Con el render como segunda imagen de referencia, Sunburst redibujó el producto con etiquetas correctas, pero lo
+  agrandaba 1,35–1,6× de forma dispareja; a escala física pura se leía chico.
+- **Regla:** el código fija tamaño y posición (diámetro × presencia 1,4, declarada) y el modelo pone el acabado;
+  `verificar` exige alto 0,88–1,12×, corrimiento ≤ 30 px y escena ≤ 8/255, con OCR como aviso. `restituir` es respaldo.
+- **Dónde quedó:** `berel-photo-registers.json` (`productInScene.method`, `defaultPresence`, `levers.presenceFactor`,
+  `pilotGuided`); `compose/product.mjs` (`integrationPrompt`, `verifyPlacement`); `scripts/producto-en-escena.mjs`
+  (`verificar`); `scripts/ocr-vision.swift`. **Codificada + prueba**.
+
+## 2026-11-02 · Escala ≠ presencia: la superficie del producto se planea en el plate
+
+- **Cita:** «Joven se sigue viendo muy muy pequeño, un galón de 4 Lts jamás se verá así, jamás».
+- **Qué pasó:** con la escala física correcta, un galón a 4 m de la cámara se veía chico. Con la cámara a 1,2 m de
+  altura, el piso cercano queda fuera del cuadro: no se podía acercar después.
+- **Regla:** un producto protagonista necesita una superficie planeada desde la toma (`PRODUCT SURFACE` en el `--extra`:
+  aparador o banco a ≈ 1,5 m); nunca se agranda en su lugar. Recortes: blog anclado abajo, story lo deja fuera, el
+  producto nunca toca el logo del post.
+- **Dónde quedó:** `berel-photo-registers.json` (`levers.presence`, `levers.crops`, `storySafeBaseV`). **Codificada**.
+
+## 2026-11-02 · Renders maqueta: la forma tiene que corresponder al contenido
+
+- **Cita:** «El aerosol de mancha también se ve mal, así no se ve un aerosol, es probable que el render estuviese malo».
+- **Qué pasó:** los renders de Mancha 1 L (y algunos diluyentes) tienen forma de aerosol con boquilla y dicen
+  «CONT. NET. 1L»; no existe un aerosol de 1 L. Eran maquetas.
+- **Regla:** antes de colocar un render, comprueba que su forma corresponde al contenido; las maquetas no se usan. Para
+  madera, la lata redonda real (Laca de Nitrocelulosa 1L). Pedir a Berel el empaque real de las Manchas.
+- **Dónde quedó:** `berel-photo-registers.json` (`productInScene.excludedRenders`). **Codificada**.
+
+## 2026-11-02 · Dos logos con producto en escena
+
+- **Cita:** «Si, que salga dos veces el logo».
+- **Qué pasó:** la regla de un logo por pieza chocaba con la etiqueta del envase, que ya muestra el logo Berel.
+- **Regla:** la etiqueta es producto, no firma; la pieza conserva su logo compuesto. La regla de un solo logo aplica a los
+  logos compuestos.
+- **Dónde quedó:** `berel-recipes.json` (`never`); `productInScene.levers.signature`; libro §8. **Codificada**.
+
+## 2026-11-02 · Lecho del logo: probado y apagado
+
+- **Cita:** «Si no funciona no te compliques con el lecho... hasta el momento lo hemos hecho sin él y sin problema».
+- **Qué pasó:** el primer plano desenfocado subió el logo de 1–2,5:1 a 10–19:1, pero ocupó en mediana el 9 % del cuadro
+  (17× el logo) y el operador lo vio grande. Al achicarlo y anclar los recortes, el exterior soleado y el marco
+  de puerta no lo sostuvieron, y 9 de 13 lechos repetían la misma forma.
+- **Regla:** el lecho queda opcional y apagado (`--lecho`, `photo.lecho`); el esfuerzo va a las tomas y a la banda del titular.
+- **Dónde quedó:** `berel-photo-registers.json` (`foreground.status`, `lessons`). **Codificada + prueba**.
+
+## 2026-11-02 · El titular nunca sobre un objeto
+
+- **Cita:** «asegurarnos de que la foto deje un espacio para que el texto del título sí tenga dónde estar sin que tenga
+  objetos o algo detrás».
+- **Qué pasó:** el titular de post y story ocupa una banda arriba, casi a todo el ancho del recorte, no solo la esquina.
+  En el piloto fallaron las tomas cuya propia cámara metía textura ahí: cielo de tormenta, sombras de hojas, reja alta,
+  rodillo, árbol, lámpara colgante. Con `TEXT SPACE` en el prompt y la cámara de cada toma corregida pasaron 12 de 12
+  (exterior y proceso cambiando el focal del post). Una story con bordes 5,28 pasaba la medición y aun así «calidez»
+  rozaba la ventana.
+- **Regla:** `titleSpace` en todo prompt; `medir-plate.mjs` antes de componer con el focal del job; el umbral 6 no
+  reemplaza mirar: el titular no toca ningún objeto, y ante duda gana el titular limpio sobre la viñeta.
+- **Dónde quedó:** `berel-photo-registers.json` (`titleSpace`, cámaras de `takes`); `scripts/medir-plate.mjs`;
+  pieza `projects/berel/tomas-fotograficas`. **Codificada + prueba**.
+
+## 2026-11-02 · Escala del producto: por diámetro, medida con regla
+
+- **Cita:** «se siguen viendo pequeños… es imposible que una lata de pintura en una mesa se vea así de pequeña».
+- **Qué pasó:** a ojo, los productos salieron entre 25 % chicos y casi el doble. Calculados por el alto, 15–40 % chicos:
+  los renders son más altos que el envase real respecto de su ancho, y la referencia de la mesa estaba mal leída.
+- **Regla:** escala por diámetro (ancho visible del render) y referencia medida con regla a resolución completa; el script
+  no acepta un alto a mano; nunca se agranda para que se lea (se acerca a la cámara o toma `detalle`).
+- **Dónde quedó:** `compose/product.mjs` (`productScale`), `scripts/producto-en-escena.mjs`,
+  `berel-photo-registers.json` (`productInScene`, toma `detalle`). **Codificada + prueba**.
+
 ## 2026-11-02 · Producto en escena: la física del modelo, el arte del render
 
 - **Cita:** «la etiqueta se vea realista y no se alteren los textos, tu tendencia va a ser irte a la vía determinística,
   esa vía sirve pero el acabado debe darlo el modelo porque maneja mejor la física, luces».
 - **Qué pasó:** solo determinista se ve pegado; solo modelo integra bien pero reescribe los textos pequeños (fidelidad
   0,16–0,23); inpainting con máscara inventó otro producto.
-- **Regla:** vía híbrida: el modelo integra la foto completa y la etiqueta se restituye desde el render oficial
-  transfiriendo solo la luz de baja frecuencia (fidelidad 0,98). Nunca entregar una etiqueta que pasó solo por el modelo.
+- **Regla (vigente hasta el método guiado, ver arriba):** vía híbrida: el modelo integra la foto completa y la etiqueta
+  se restituye desde el render oficial transfiriendo solo la luz de baja frecuencia (fidelidad 0,98). Hoy es el respaldo
+  `restituir`; nunca se entrega una etiqueta reescrita por un modelo sin referencia.
 - **Dónde quedó:** Workbench `brands/berel/compose/product.mjs` + `scripts/producto-en-escena.mjs` y [photography.md](photography.md) §6 bis. **Codificada + prueba** (`brands/berel/test/product.test.mjs`).
 
 ## 2026-11-02 · Recortes verticales mal encuadrados (terraza)
@@ -201,41 +276,11 @@
 - **Dónde quedó:** `brands/berel/compose/type.mjs`; `brands/berel/AGENTS.md`. **Codificada** (falla cerrado al cargar; las
   pruebas del compositor la ejercitan cuando hay recursos locales).
 
-## 2026-11-02 · Lecho del logo: probado y apagado
-
-- **Cita:** «Si no funciona no te compliques con el lecho... hasta el momento lo hemos hecho sin él y sin problema».
-- **Qué pasó:** el primer plano desenfocado subió el logo de 1–2,5:1 a 10–19:1, pero ocupó en mediana el 9 % del cuadro
-  (17× el logo) y el operador lo vio grande. Al achicarlo y anclar los recortes, el exterior soleado y el marco
-  de puerta no lo sostuvieron, y 9 de 13 lechos repetían la misma forma.
-- **Regla:** el lecho queda opcional y apagado (`--lecho`, `photo.lecho`); el esfuerzo va a las tomas y a la banda del titular.
-- **Dónde quedó:** `berel-photo-registers.json` (`foreground.status`, `lessons`). **Codificada + prueba**.
-
-## 2026-11-02 · El titular nunca sobre un objeto
-
-- **Cita:** «asegurarnos de que la foto deje un espacio para que el texto del título sí tenga dónde estar sin que tenga
-  objetos o algo detrás».
-- **Qué pasó:** el titular de post y story ocupa una banda arriba, casi a todo el ancho del recorte, no solo la esquina.
-  En el piloto fallaron las tomas cuya propia cámara metía textura ahí: cielo de tormenta, sombras de hojas, reja alta,
-  rodillo, árbol, lámpara colgante. Con `TEXT SPACE` en el prompt y la cámara de cada toma corregida pasaron 12 de 12
-  (exterior y proceso cambiando el focal del post). Una story con bordes 5,28 pasaba la medición y aun así «calidez»
-  rozaba la ventana.
-- **Regla:** `titleSpace` en todo prompt; `medir-plate.mjs` antes de componer con el focal del job; el umbral 6 no
-  reemplaza mirar: el titular no toca ningún objeto, y ante duda gana el titular limpio sobre la viñeta.
-- **Dónde quedó:** `berel-photo-registers.json` (`titleSpace`, cámaras de `takes`); `scripts/medir-plate.mjs`;
-  pieza `projects/berel/tomas-fotograficas`. **Codificada + prueba**.
-
-## 2026-11-02 · Escala del producto: por diámetro, medida con regla
-
-- **Cita:** «se siguen viendo pequeños… es imposible que una lata de pintura en una mesa se vea así de pequeña».
-- **Qué pasó:** a ojo, los productos salieron entre 25 % chicos y casi el doble. Calculados por el alto, 15–40 % chicos:
-  los renders son más altos que el envase real respecto de su ancho, y la referencia de la mesa estaba mal leída.
-- **Regla:** escala por diámetro (ancho visible del render) y referencia medida con regla a resolución completa; el script
-  no acepta un alto a mano; nunca se agranda para que se lea (se acerca a la cámara o toma `detalle`).
-- **Dónde quedó:** `compose/product.mjs` (`productScale`), `scripts/producto-en-escena.mjs`,
-  `berel-photo-registers.json` (`productInScene`, toma `detalle`). **Codificada + prueba**.
-
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
 - Recetas declaradas sin render: señalización y técnica gráfica (el reel tiene su armado: [video.md](video.md)).
 - Aprobación de Daniela, Andrés o Melkin; `qa.approval` sigue en `pending-human-and-pixel-review`.
+- Producto sin probar: abierto o en uso, en mano, familia de tamaños, toma cenital (`productInScene.notTested`).
+- Reel: titular palabra a palabra como el corpus (hoy entra con fundido); revisión de los reels piloto por Berel.
+- Empaque real de las Manchas (sus renders de 1 L son maquetas).

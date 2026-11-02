@@ -91,6 +91,20 @@ no es un faltante; Pendiente conserva su motivo y condición de salida.
 
 Cada tarea lleva un **callout de cabecera** que enlaza al artículo y cita la Modulación por canal.
 
+### Producción del reel (2026-11-02)
+
+Esta skill decide **si** hay reel y su guion o caption; **cómo se produce** vive en
+[`berel-graphic-line`](../../berel-graphic-line/references/video.md). Lo que hoy sabe el sistema:
+- Los 30 reels entregados del corpus (OneDrive, analizados el 2026-11-02) **no** siguen la plantilla de 5 escenas de
+  20–30 s: son una sola toma de transformación de ≈ 8 s (antes → después del espacio pintado) más la tapa roja de
+  cierre de 6 s, 14 s en total, sin voz, con marcador de color y titular. El Workbench ya produce ese formato
+  (`brands/berel/scripts/reel.mjs`), heredando titular, color y focal de la Story 9:16 del artículo.
+- **Conflicto abierto:** la plantilla de este módulo (5 escenas, 20–30 s, guion con VO) frente al formato entregado
+  (14 s, una transformación). No lo resuelvas tú: sigue lo que diga la tarea y avisa del choque al operador.
+- **Música:** una pista por mes que el squad descarga de **Envato Elements con su licencia** (confirmado por el operador
+  el 2026-11-02), en `02_Recursos/11_Musica/Propuesta {n}_{MES}.mp3`. El reel nunca lleva música de otra fuente.
+- Efeonce entrega el MP4; **la agencia de Berel lo publica** (handoff, no parrilla).
+
 **Desde su creación**, todas las tareas sociales llevan `Canal de pieza = Social Media`.
 `Tipo de pieza = Estatico` para Facebook, Pinterest y Stories de imágenes; `Video` para
 Reel/TikTok/Short o una Story efectivamente animada. Guardar estas etiquetas como propiedades

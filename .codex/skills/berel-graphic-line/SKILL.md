@@ -7,7 +7,9 @@ description: >-
   determinista, y QA visual sobre el píxel. NUNCA se usa para Efeonce («La órbita», AXIS,
   Bricolage/Poppins: eso es efeonce-graphic-line), SKY ni ningún otro cliente. Cárgala para
   cualquier banner de Berel (N1–N4, og:image, franjas, pasos, paleta), adaptación social (post,
-  story, Pinterest), plate fotográfico, marcador de color o revisión visual de una pieza Berel.
+  story, Pinterest), plate fotográfico (registro y toma, banda del titular), producto en escena
+  (render oficial a escala por diámetro, redibujado guiado y verificado), reel de transformación
+  (14 s, FLUX 3 u Omni, tapa y música del mes), marcador de color o revisión visual de una pieza Berel.
   Frontera: berel-content-production decide QUÉ pieza va y CUÁNDO (ciclo editorial, ficha N1–N4,
   Notion, Drupal, voz es-MX); esta skill decide CÓMO SE VE y CÓMO SE PRODUCE en el Creative
   Workbench.
@@ -50,21 +52,25 @@ Workbench: repo privado `efeoncepro/creative-workbench`, checkout local
 | Recetas, formatos, grillas, componentes, `never` | `brands/berel/contracts/berel-recipes.json` |
 | Tokens (color, tipografía, logo, eslogan) | `brands/berel/contracts/berel-tokens.json` |
 | Evidencia de color (pares observados, error N41) | `brands/berel/contracts/berel-color-evidence.json` |
-| Registros fotográficos, espacios y lecciones | `brands/berel/contracts/berel-photo-registers.json` |
+| Registros, tomas, banda del titular, lecho opcional, producto en escena (`productInScene`) y lecciones | `brands/berel/contracts/berel-photo-registers.json` |
+| Reel de transformación (formato, línea de tiempo, tapa, música, motores, QA) | `brands/berel/contracts/berel-video-reels.json` |
 | Compositor (`composeBerel`, `placeMarkers`, catálogo, QA) | `brands/berel/compose/render.mjs` |
 | Elementos (logo, marcador, píldora, titular, insignia, etiqueta, tarjeta) | `brands/berel/compose/elements.mjs` |
 | Tipografía a trazos (fontkit) | `brands/berel/compose/type.mjs` |
 | CLI de composición | `brands/berel/scripts/componer.mjs` |
-| Prompt de plate por registro | `brands/berel/scripts/prompt-plate.mjs` |
+| Prompt de plate por registro y toma | `brands/berel/scripts/prompt-plate.mjs` |
+| Banda del titular medida en el plate (antes de corregir o componer) | `brands/berel/scripts/medir-plate.mjs` |
+| Producto en escena (colocar → redibujo guiado → verificar; restituir de respaldo) | `brands/berel/compose/product.mjs` + `scripts/producto-en-escena.mjs` (+ OCR `scripts/ocr-vision.swift`) |
+| Reel (cuadros → capas → qa → armar → comparar) | `brands/berel/compose/video.mjs` + `scripts/reel.mjs` |
 | Corrector de muro (adaptador Berel) | `brands/berel/scripts/ajustar-muro.mjs` → motor neutral `tools/surface-color.mjs` |
 | Sugerencia de color por ΔE (no decide) | `brands/berel/scripts/color-cercano.mjs` |
 | Skill operativa del Workbench | `brands/berel/skills/berel-banners/SKILL.md` |
 | Pruebas | `brands/berel/test/*.test.mjs` + `test/surface-color.test.mjs` |
 | Estado del harness | `docs/operations/HARNESS_STATUS.md` (sección Berel) |
 
-Recursos licenciados **solo locales, nunca en Git**: `clients/berel/.resources-local/{fonts,logos,catalog,photos}`
+Recursos licenciados **solo locales, nunca en Git**: `clients/berel/.resources-local/{fonts,logos,catalog,photos,products,video}`
 (Gotham Rounded, logos SVG, catálogo `RGBs Berel_AGENCIAS_2026.xlsx` → `catalog/berel-colors.json`,
-fotos de trabajo). Sin ellos el compositor falla cerrado y las pruebas se saltan; nunca se
+fotos de trabajo, renders oficiales de producto, tapa de cierre vigente y música del mes). Sin ellos el compositor falla cerrado y las pruebas se saltan; nunca se
 sustituyen por otra fuente ni por valores aproximados.
 
 ## 3. Invariantes duros
@@ -77,9 +83,12 @@ sustituyen por otra fuente ni por valores aproximados.
 - **SIEMPRE** Gotham Rounded (Light/Book/Medium/Bold), sin fallback. Arial Rounded, Poppins,
   Quicksand o DM Sans no entran en piezas producidas aquí.
 - **SIEMPRE** el logo SVG oficial compuesto, uno por pieza; nunca redibujado ni generado por un
-  modelo. `#EA0029` vive solo dentro del logo, nunca como acento de infografía.
+  modelo. El logo impreso en la etiqueta de un producto en escena no cuenta (decisión del operador
+  2026-11-02): la pieza conserva su firma. `#EA0029` vive solo dentro del logo, nunca como acento de infografía.
 - **NUNCA** marca, firma ni elemento de Efeonce en una pieza Berel.
-- **NUNCA** recursos licenciados (fuentes, catálogo, logos, fotos del banco) en Git.
+- **NUNCA** recursos licenciados (fuentes, catálogo, logos, fotos, renders, tapa, música) en Git.
+- **NUNCA** un envase generado por un modelo ni textos de etiqueta alterados: el producto sale del
+  render oficial vigente y el modelo solo lo redibuja con la física de la escena.
 - **Berel está `gated`** en `clients/brands.json` (sin pack sellado; habilitarlo es TASK-1945). Nada
   se entrega al cliente sin aprobación de diseño de Daniela, Andrés o Melkin. Ejecutar no aprueba:
   `qa.approval` es siempre `pending-human-and-pixel-review`.
@@ -95,21 +104,25 @@ sustituyen por otra fuente ni por valores aproximados.
    falta algo, detente.
 3. **Color.** Valida nombre+código contra el catálogo antes de cualquier generación →
    [references/color-pipeline.md](references/color-pipeline.md).
-4. **Plate fotográfico** (si la foto es nueva): registro por estrato, espacio y prompt con
-   `prompt-plate.mjs`, generación y corrección del muro al HEX oficial →
+4. **Plate fotográfico** (si la foto es nueva): registro por estrato, toma, espacio y prompt con
+   `prompt-plate.mjs`, banda del titular medida con `medir-plate.mjs`, generación y corrección del
+   muro al HEX oficial →
    [references/photography.md](references/photography.md) y
    [references/color-pipeline.md](references/color-pipeline.md).
-5. **Receta y job.** Elige la receta y escribe el job sin geometría →
+5. **Producto en escena** (si la pieza lo lleva): render oficial, escala por diámetro × presencia 1,4,
+   redibujo guiado y `verificar` → [references/photography.md](references/photography.md) §6 bis.
+6. **Receta y job.** Elige la receta y escribe el job sin geometría →
    [references/identity-and-recipes.md](references/identity-and-recipes.md).
-6. **Componer.** `node brands/berel/scripts/componer.mjs <job.json> --out projects/berel/<pieza>/runs`;
+7. **Componer.** `node brands/berel/scripts/componer.mjs <job.json> --out projects/berel/<pieza>/runs`;
    el marcador lo coloca la grilla → [references/marker-grid.md](references/marker-grid.md).
-7. **QA visual.** Lee `qa.json`, mira cada pieza al 100 %, arma la hoja de contacto y revisa en el
+8. **QA visual.** Lee `qa.json`, mira cada pieza al 100 %, arma la hoja de contacto y revisa en el
    canvas → [references/qa-review.md](references/qa-review.md).
-8. **Entrega y revisión humana** (nombres, Frame.io, canvas, respuesta a comentarios) →
-   [references/workflow.md](references/workflow.md).
-9. **Reel** (si la pieza lleva video): cuadros antes/después, capas de la story, clip FLUX 3 u Omni, QA y armado →
+9. **Reel** (si la pieza lleva video): parte del job de la story ya revisada; cuadros antes/después, capas,
+   clip FLUX 3 (u Omni por toma), `reel.mjs qa` y armado con tapa y música del mes →
    [references/video.md](references/video.md).
-10. **Lecciones.** Todo error corregido queda registrado →
+10. **Entrega y revisión humana** (nombres, Frame.io, canvas, respuesta a comentarios) →
+   [references/workflow.md](references/workflow.md).
+11. **Lecciones.** Todo error corregido queda registrado →
    [references/lessons.md](references/lessons.md).
 
 ## 5. Elegir la referencia
@@ -122,7 +135,8 @@ sustituyen por otra fuente ni por valores aproximados.
 | Reel de transformación: cuadros, motor (FLUX 3 / Omni), QA de color y fluidez, música y tapa | [video.md](references/video.md) |
 | ¿Por qué el marcador quedó ahí, se eliminó o salió con aviso? | [marker-grid.md](references/marker-grid.md) |
 | El titular social no cabe o se lee mal | [marker-grid.md](references/marker-grid.md) |
-| Foto nueva: estrato, espacio, prompt, remates | [photography.md](references/photography.md) |
+| Foto nueva: estrato, espacio, toma, prompt, remates, banda del titular | [photography.md](references/photography.md) |
+| Producto en escena: render, escala, presencia, recortes, dos logos, `verificar` | [photography.md](references/photography.md) §6 bis |
 | El muro no es del color del catálogo · qué modelo · corrector · ΔE | [color-pipeline.md](references/color-pipeline.md) |
 | Revisar una pieza o un lote antes de subir · leer `qa.json` | [qa-review.md](references/qa-review.md) |
 | Rutas de corridas, canvas, Frame.io, nombres de archivo, handoff | [workflow.md](references/workflow.md) |
@@ -136,7 +150,9 @@ sustituyen por otra fuente ni por valores aproximados.
 | Qué pieza existe y cuándo | ✔ (ficha N1–N4, 🔁, cupo, Notion) | — |
 | Spec de entrega del blog (1408×768, webp, < 200 KB) | ✔ (módulo 05 transcribe la Spec de la wiki; manda la Spec) | la aplica |
 | Texto del artículo, ALT, voz es-MX, copy social | ✔ | — |
+| Si el artículo lleva reel o producto en escena (y cuál producto) | ✔ (ficha) | — |
 | Identidad, receta, grilla, fotografía, color, composición | — | ✔ |
+| Producto en escena (render, escala, presencia, `verificar`) y reel (cuadros, motor, QA, tapa, música) | — | ✔ |
 | QA visual del píxel y estados de revisión | QA editorial y Frame.io (módulo 20) | ✔ (QA del compositor y del plate) |
 
 Si una medida de entrega difiere entre ambas, manda la Spec de imágenes de la wiki de Berel; si
@@ -148,7 +164,7 @@ difiere un valor visual, manda el contrato del Workbench.
   de la adaptación social; el libro de marca y la receta `social.post` usan la escena de la portada o su versión
   «después», no la infografía. Hasta que se decida, sigue lo que diga la ficha del artículo y avisa del choque.
 - **Nombre de archivo.** El módulo 05 pide `.webp` en minúsculas y con guiones; la skill operativa del Workbench
-  nombra `N##_BN_<ROL>.webp` y `N##_SM_<POST|STORIE|PINTEREST>.png`. Para la entrega manda la Spec de la wiki.
+  nombra `N##_BN_<ROL>.webp` y `N##_SM_<POST|STORIE|PINTEREST>.png` (el corpus de reels usa `N##_SM_REEL.mp4`). Para la entrega manda la Spec de la wiki.
 
 ## 7. Mantenimiento (skill viva)
 

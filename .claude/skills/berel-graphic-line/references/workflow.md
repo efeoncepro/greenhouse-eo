@@ -11,8 +11,8 @@
 | Comprobación | Cómo | Si falla |
 |---|---|---|
 | Hay ficha de la pieza | La escribe `berel-content-production` (módulo 05 portada/cierre, 11 infografías). Sin artículo no hay banner | Detente: un banner sin ficha es un placeholder |
-| Recursos locales completos | `ls clients/berel/.resources-local/{fonts,catalog,photos,logos}` en el Workbench | Detente y pídelos al operador; no los reconstruyas |
-| Contratos vigentes | Lee `brands/berel/contracts/berel-photo-registers.json` y `berel-recipes.json` | — |
+| Recursos locales completos | `ls clients/berel/.resources-local/{fonts,catalog,photos,logos}` en el Workbench (+ `products/` si hay producto en escena, `video/` si hay reel) | Detente y pídelos al operador; no los reconstruyas |
+| Contratos vigentes | Lee `brands/berel/contracts/berel-photo-registers.json` y `berel-recipes.json` (+ `berel-video-reels.json` si hay reel) | — |
 | Aislamiento | Vas a tocar solo `brands/berel/**`, `projects/berel/**` y el registro de estado | Si necesitas tocar `tools/` u otra marca, para y consulta al operador |
 
 Berel sigue `gated` en `clients/brands.json` (TASK-1945): nada de este flujo autoriza entregar al cliente sin la
@@ -25,9 +25,11 @@ aprobación de Daniela, Andrés o Melkin.
 2. **Registro** según producto y tema: `medio` (tutoriales, problemas, líneas de entrada), `medio-alto`
    (inspiración de color, paletas, Color del Año), `alto` (premium, acabados especiales, lanzamientos).
    Ver [photography.md](photography.md) §2.
-3. **Espacio**: una clave del contrato (`recamara`, `sala`, `cocina`, `comedor`, `fachada`, `infantil`, `bano`,
+3. **Toma**: el tipo de foto (`espacio` por defecto; `antes`, `diagnostico`, `exterior`, `azotea`, `cenital`,
+   `proceso`, `taller`, `herreria`, `personas`, `nocturna`, `muestra`, `detalle`). Ver [photography.md](photography.md) §5 bis.
+4. **Espacio**: una clave del contrato (`recamara`, `sala`, `cocina`, `comedor`, `fachada`, `infantil`, `bano`,
    `estudio`, `terraza`).
-4. Carpeta de trabajo en Greenhouse: `ai-generations/<AAAA-MM-DD>_berel-<tema>/` (ejemplo real:
+5. Carpeta de trabajo en Greenhouse: `ai-generations/<AAAA-MM-DD>_berel-<tema>/` (ejemplo real:
    `ai-generations/2026-11-01_berel-espacios/`). Nunca dentro de `.captures/` ni en el default de `ai:image`
    (`public/images/generated/`).
 
@@ -160,6 +162,23 @@ done
 Cada corrida escribe `runs/<uuid>/` con la pieza (webp o png), `job.json` y `qa.json`, e imprime `⚠` por cada
 aviso. Las corridas solo pueden escribirse bajo `projects/berel/`.
 
+## 7 bis. Producto en escena (si la pieza lo lleva)
+
+Antes de componer, sobre el plate ya corregido ([photography.md](photography.md) §6 bis):
+
+```bash
+cd /Users/jreye/Documents/creative-workbench
+O=projects/berel/<pieza>/salidas/producto/<slug>
+node brands/berel/scripts/producto-en-escena.mjs colocar --foto <plate> --producto clients/berel/.resources-local/products/<RENDER>.png \
+  --x <u> --base <v> --referencia <metros>:<px> --nombre "<Producto>" --superficie "<superficie>" --textos "<texto|texto>" --out $O
+# colocar imprime el comando de Greenhouse (pnpm ai:image con compuesto.png + referencia.png, Sunburst xhigh)
+node brands/berel/scripts/producto-en-escena.mjs verificar --dir $O     # salida 1 si falla; deja producto-en-escena.png
+```
+
+El job apunta `photo.file` a `$O/producto-en-escena.png` (vive en `projects/berel/**`, ruta admitida) y elige el
+`focal` por formato según la regla de recortes con producto. La pieza conserva su firma aunque la etiqueta muestre el
+logo Berel.
+
 ## 8. Leer `qa.json` y mirar el píxel
 
 - Lee `warnings`: «sin celda de primer nivel», franja de la píldora, aire apretado, fondo cargado bajo el titular.
@@ -174,6 +193,13 @@ aviso. Las corridas solo pueden escribirse bajo `projects/berel/`.
 Antes de subir un lote, arma una hoja de contacto local con sharp: una fila por espacio y los 4 formatos en la
 fila, para ver las piezas de un vistazo (así se revisaron las 40 piezas de `espacios-gpt-image`). No hay script
 canónico: escríbelo en el scratchpad de la sesión, no en el repo.
+
+## 9 bis. Reel (si la pieza lleva video)
+
+Parte del job de la story ya revisada; todo vive en `projects/berel/<pieza>/salidas/video/<toma>/` (ignorado por Git):
+`despues.png`, `antes.png`, `prompt-antes.txt`, `prompt-video.txt`, `reel.json`, `capa-marcador.png`,
+`capa-titulo.png`, `<modelo>.mp4` (`flux3.mp4`, `omni.mp4`), `<modelo>-qa.json`, `<modelo>-hoja.jpg` y
+`reel-<modelo>.mp4`. Comandos, motor y QA: [video.md](video.md).
 
 ## 10. Canvas de revisión y comentarios
 
@@ -190,8 +216,8 @@ canónico: escríbelo en el scratchpad de la sesión, no en el repo.
 
 ```bash
 cd /Users/jreye/Documents/creative-workbench
-node --test brands/berel/test/*.test.mjs test/surface-color.test.mjs   # 16 PASS al 2026-11-01/02
-pnpm gates                                                              # managed-drift, hygiene, piezas, native-policy
+node --test brands/berel/test/*.test.mjs test/surface-color.test.mjs   # 37 PASS al 2026-11-02 (35 Berel + 2 motor)
+npm run gates                                                           # managed-drift, hygiene, piezas, native-policy
 ```
 
 Sin los recursos locales, las pruebas que los necesitan se saltan: un «verde» con saltos no prueba Berel.
@@ -202,15 +228,18 @@ Sin los recursos locales, las pruebas que los necesitan se saltan: un «verde» 
    ignorados) y `docs/operations/HARNESS_STATUS.md`. Si aparece `tools/`, otra marca o `clients/brands.json`, para.
 2. Rama propia, nunca directo a `main`. `git add <rutas>` y `git commit` en la **misma** llamada (el checkout puede
    ser compartido con otras sesiones).
-3. Push y PR solo cuando el operador lo indique. El repo **solo permite squash merge** (merge commit y rebase
+3. Push, PR y merge solo cuando el operador lo indique (el clasificador de permisos bloquea un merge sin su OK
+   explícito en el chat). El repo **solo permite squash merge** (merge commit y rebase
    deshabilitados, verificado con `gh repo view` el 2026-11-01). Referencia: PR #20, squash `5636cb9`, 2026-11-02.
 4. Registra lo hecho en `docs/operations/HARNESS_STATUS.md` (sección Berel): qué cambió, qué se verificó y qué queda
    pendiente.
 
 ## 13. Entregar
 
-- Nombres: `N##_BN_<ROL>.webp` para blog y `N##_SM_<POST|STORIE|PINTEREST>.png` para social, con el número de
-  artículo correcto (ya hubo cruces N30→N38 y N50→N53).
+- Nombres: `N##_BN_<ROL>.webp` para blog, `N##_SM_<POST|STORIE|PINTEREST>.png` para social y
+  `N##_SM_REEL.mp4` para el reel (convención del corpus), con el número de artículo correcto (ya hubo cruces
+  N30→N38 y N50→N53).
+- Reel: MP4 H.264 + AAC, 1080×1920, 14 s, con la música del mes ya mezclada.
 - Blog 1408×768 webp < 200 KB; og:image 1200×630 derivado de la portada.
 - Sube a Frame.io debajo de la versión anterior.
 - **Efeonce no publica para Berel**: el social es insumo para la agencia que opera sus redes. La aprobación es de
@@ -223,6 +252,9 @@ Sin los recursos locales, las pruebas que los necesitan se saltan: un «verde» 
 | Prompts, chips, plates crudos, `specs.tsv`, `zonas.tsv`, `run.sh` | Greenhouse `ai-generations/<fecha>_berel-<tema>/` | Hoy sin trackear (`git status` del 2026-11-01); no los incluyas en commits de Greenhouse sin decisión del operador |
 | Plates corregidos + máscara + `qa.json` | Workbench `clients/berel/.resources-local/photos/espacios/` | **Nunca** (ignorado) |
 | Fuentes Gotham Rounded, catálogo de color, logos, sistema | Workbench `clients/berel/.resources-local/{fonts,catalog,logos,system}` | **Nunca** (licenciados) |
+| Renders oficiales de producto, tapa de cierre y música del mes | Workbench `clients/berel/.resources-local/{products,video}` | **Nunca** (licenciados) |
+| Producto en escena (compuesto, referencia, integrada, `colocacion.json`, `qa.json`) | Workbench `projects/berel/<pieza>/salidas/producto/<slug>/` | **Nunca** (ignorado) |
+| Reel (cuadros, capas, clips, QA, hoja, reel final) | Workbench `projects/berel/<pieza>/salidas/video/<toma>/` | **Nunca** (ignorado) |
 | Jobs, `brief.md`, `pieza.json` | Workbench `projects/berel/<pieza>/` | Sí |
 | Corridas compuestas | Workbench `projects/berel/<pieza>/runs/<uuid>/` | **Nunca** (ignorado) |
 | Contratos, scripts, compositor, pruebas, libro de marca | Workbench `brands/berel/**` | Sí |

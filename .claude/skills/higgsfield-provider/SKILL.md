@@ -128,6 +128,35 @@ websites o secrets no se ejecutan sin adaptar los gates de Efeonce (regla de arr
 - Estado del relight en toda la flota: `ai-model-selection` §Reiluminar; video: `motion-design-studio` →
   `modules/11_VFX_COMPOSITING.md` §6b.
 
+## Video primer/último cuadro por el MCP: operación medida (2026-11-02)
+
+Caso fuente: reel Berel 2026-11-02 (antes → después en una toma fija de 8 s), workspace `Private`
+(plan ultra). Es exploración de sesión Claude, no una ruta Globe.
+
+- **Subida de cuadros locales:** `media_upload` (acepta `files[]` en lote) → `curl -X PUT` a cada `upload_url` con
+  `Content-Type` y **`If-None-Match: *`** (va en las cabeceras firmadas) → `media_confirm` con `media_ids` cuando
+  todos dieron 200. Las URLs firmadas no se imprimen ni se guardan en docs.
+- **Generar:** `generate_video` (o `generate_video_batch`, hasta 12) con `medias` de rol `start_image` y `end_image`;
+  `get_cost:true` cotiza sin cobrar. Esperar con `jobs_wait` (máx. 15 s por llamada; `poll_after_seconds` sugiere el
+  ritmo); el resultado trae `result_url` descargable.
+- 🔴 **Recomendación de preset en vez del job:** el lote puede devolver `submission_failed` con
+  `preset_recommendation` (p. ej. «IN THE DARK») y **no crea job ni cobra**. Se reenvía el mismo pedido con
+  `declined_preset_id` = el id recomendado. Ocurrió con un prompt de fachada al sol; los demás ítems sí se enviaron.
+- **Costos y salidas medidos, 8 s, 9:16:**
+
+| Modelo MCP | Parámetros | Créditos | Salida real |
+| --- | --- | --- | --- |
+| `flux_3_video` | 1080p, `generate_audio:false` | 64 | 1088×1920, 24 fps |
+| `wan3_0` | 1080p | 28 | 1080×1920, 30 fps |
+| `minimax_h3` | solo `2K` | 16 | 1440×2560, 24 fps |
+| `seedance_2_0` | `mode:std`, 1080p, sin audio | 96 | 1080×1920, 24 fps; un job tardó más de 15 min |
+
+- Los cuatro aceptan `start_image` + `end_image`; ninguno garantiza el color exacto del cuadro final (Wan lo corrió a
+  ΔE 18,3): se mide. Benchmark y recomendación: `ai-model-selection` §Video primer/último cuadro.
+- **API vs MCP:** de estos, nuestro catálogo de la API (`higgsfield-capabilities.ts`) solo tiene Seedance 2.0
+  (texto, imagen y referencias a video) y MiniMax H3 (texto a video); `flux_3_video` y `wan3_0` existen solo en el
+  MCP. Que la API tenga el modelo no prueba que acepte `end_image`: revalidar el esquema antes de una ruta.
+
 ## Checklist de ruta
 
 1. Lee `GLOBE_RUNTIME_HANDOFF.md`; respeta hibernación.

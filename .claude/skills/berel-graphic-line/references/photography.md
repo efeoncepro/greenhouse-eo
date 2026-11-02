@@ -187,107 +187,97 @@ nunca es una coordenada del marcador.
 - Si la grilla avisa «sin celda de primer nivel», mover `focal` es una de las tres salidas (las otras:
   acortar el titular o aceptar el aviso tras mirar la pieza). Ver [marker-grid.md](marker-grid.md).
 
-## 6 bis. Producto en escena (prueba 2026-11-02, Insignia 4L en la terraza)
+## 6 bis. Producto en escena (método guiado, 2026-11-02, candidato)
 
-Pedido del operador: «Importante que la etiqueta se vea realista y no se alteren los textos, tu tendencia va a ser
-irte a la vía determinística, esa vía sirve pero el acabado debe darlo el modelo porque maneja mejor la física, luces».
+Fuente de verdad: `productInScene` en `berel-photo-registers.json`; código `compose/product.mjs` +
+`scripts/producto-en-escena.mjs`. Valores de abajo: snapshot del 2026-11-02.
 
-Lo que se midió (fidelidad = correlación del detalle de la etiqueta contra el render oficial, 1 = idéntico):
+Pedido del operador: «la etiqueta se vea realista y no se alteren los textos… el acabado debe darlo el modelo porque
+maneja mejor la física, luces», y después: «un buen montaje se conoce por NO parecer un montaje».
 
-| Vía | Resultado | Fidelidad |
-|---|---|---|
-| Solo colocación determinista | Etiqueta exacta, pero se ve pegada: luz de estudio, sin sombra | 1,00 |
-| Edición completa con GPT Image 2.5 Sunburst | Luz cálida, reflejos en la tapa, sombra real; **reescribe los textos pequeños** | 0,16–0,23 |
-| Inpainting con máscara | **Inventa otro producto** (lata blanca falsa). Descartado | — |
-| **Híbrido** | El modelo pone la física; la etiqueta conserva el arte oficial | **0,98** |
+### Flujo vigente
 
-Receta híbrida, ya como script del Workbench (`brands/berel/compose/product.mjs` + `scripts/producto-en-escena.mjs`):
-
-1. **Render oficial** desde `02_Recursos/03_Producto PNG` del OneDrive de Berel, **empaque vigente** (las carpetas
-   «Vieja_…» son etiquetas anteriores), admitido en `clients/berel/.resources-local/products/` (nunca en Git).
-2. **`colocar`**: lo pone a escala física plausible sobre una superficie real, fuera de las zonas del titular y del
-   logo, y comprobando que entra en los recortes que lo usarán (blog con `focal` y bajo, verticales con `focal` x).
-   Un 4 L a la distancia de una foto arquitectónica mide unos 120 px en un plate de 1536 px: se puede exagerar un
-   poco, no inventar un primer plano imposible. Escribe el compuesto, el prompt y el comando exacto de integración.
+1. **Render oficial.** De `02_Recursos/03_Producto PNG` del OneDrive de Berel, **empaque vigente** (nunca las carpetas
+   «Vieja_…»), admitido en `clients/berel/.resources-local/products/` (nunca en Git). Nunca una lata generada.
+   Antes de colocarlo, comprueba que su forma corresponde al contenido (§ renders maqueta).
+2. **`colocar`.** El código pone el render a su escala **calculada por el diámetro** del envase (`sizes`, su ancho
+   visible en el render frontal), cruzada con una referencia medida con regla a resolución completa, y la multiplica
+   por la **presencia publicitaria** (`defaultPresence` 1,4; `--presencia` 1–1,5, queda en `colocacion.json`).
    ```bash
-   node brands/berel/scripts/producto-en-escena.mjs colocar --foto <plate> --producto clients/berel/.resources-local/products/INSIGNIA_4L.png \
-     --x 0.879 --base 0.911 --alto 240 --nombre "Insignia 4L" --superficie "the cantera stone floor" \
-     --textos "Berel|Insignia|CONT. NET. 4L" --out projects/berel/<pieza>/salidas/producto/<slug>
+   node brands/berel/scripts/producto-en-escena.mjs colocar --foto <plate> \
+     --producto clients/berel/.resources-local/products/INSIGNIA_4L.png --x 0.55 --base 0.80 \
+     (--referencia <metros>:<px> | --suelo <horizonte>:<altura de cámara en m>) --nombre "Insignia 4L" \
+     --superficie "the wooden sideboard" --textos "Berel|Insignia|CONT. NET. 4L" \
+     --out projects/berel/<pieza>/salidas/producto/<slug>
    ```
-3. **Integración con el modelo** (desde Greenhouse, `pnpm ai:image --image compuesto.png --prompt-file prompt.txt
-   --model gpt-image-2.5-sunburst --quality xhigh`): foto completa, sin máscara. El prompt prohíbe tocar la etiqueta
-   y cita sus textos.
-4. **`restituir`**: alinea la lata del modelo (búsqueda ±24 px), multiplica el render original por la luz de baja
-   frecuencia del modelo (σ 5) dentro del alfa del render (la tapa, sin texto, queda del modelo) y usa la foto completa
-   del modelo como base (pegar solo la zona de la lata deja costura).
-5. **Controles que fallan cerrado** (`qa.json`, código de salida 1): fidelidad de la etiqueta ≥ 0,95, desplazamiento
-   del modelo ≤ 8 px (si no, quedaría una lata fantasma) y mínimo de alineación claro (`match` ≥ 0,12). Además, mira
-   el píxel al 100 % y comprueba que el muro no derivó (en la prueba: ΔE 1,98 → 2,02).
+   `--alto` ya no existe (un tamaño a ojo es justo lo que confunde). Falla si el render no tiene diámetro en `sizes`
+   o si el producto queda bajo 60 px de ancho (`minWidthPx`). Escribe `compuesto.png`, `producto.png`,
+   `referencia.png` (render aplanado sobre blanco), `prompt.txt` y `colocacion.json`, e imprime el comando siguiente.
+3. **El modelo redibuja** (desde Greenhouse, una intención ≈ USD 0,12):
+   `pnpm ai:image --image <out>/compuesto.png --image <out>/referencia.png --prompt-file <out>/prompt.txt
+   --model gpt-image-2.5-sunburst --quality xhigh --size <ancho>x<alto> --format png --out <out>/integrada.png`.
+   Dos imágenes: el compuesto fija tamaño y posición; la referencia, el empaque. El prompt prohíbe agrandar, mover o
+   inclinar el producto y cita los textos de la etiqueta.
+4. **`verificar --dir <out>`** (salida 1 si falla): alto 0,88–1,12× el colocado, corrimiento ≤ 30 px, escena fuera
+   del producto ≤ 8/255. Corre OCR local de los textos clave (Swift + Vision en modo `.fast`; `.accurate` falla con
+   `e5rtError`): es **aviso**, no lee el logotipo «Berel» ni algunas palabras estilizadas. Si pasa, copia la foto a
+   `producto-en-escena.png` y deja `qa.json` con `approval: pending-human-and-pixel-review`. Mira la etiqueta al 100 %.
+5. **`restituir`** es **respaldo**, solo si un texto clave quedó mal: alinea la lata del modelo (±24 px) y multiplica
+   el render original por la luz de baja frecuencia del modelo; exige fidelidad ≥ 0,95 (`--min`), desplazamiento
+   ≤ 8 px y alineación clara. Deja la etiqueta con aspecto montado: por eso no es el camino principal.
+
+### Palancas (`levers`)
+
+- **Contexto:** el envase va donde se usa (impermeabilizante en la azotea, sellador frente al muro dañado, galón en el
+  piso del espacio, laca junto al mueble de madera, aerosol frente a la herrería).
+- **Escala ≠ presencia.** A 4 m de la cámara un galón real se ve chico aunque esté a escala (operador: «un galón de
+  4 L jamás se verá así»). Un producto protagonista necesita una **superficie de producto planeada en el plate**
+  desde la toma: bloque `PRODUCT SURFACE` en el `--extra` (aparador o banco en primer plano a ≈ 1,5 m). Con la
+  cámara a 1,2 m de altura el piso cercano queda fuera del cuadro: no se puede acercar después. Nunca se agranda en
+  su lugar.
+- **Envases chicos** (aerosoles, litros, ½ L): solo en la toma `detalle` (cámara a la altura de la superficie). En
+  una toma de espacio a escala real miden 35–40 px y no se leen.
+- **Posición:** dentro de los recortes verticales con foco centrado (u 0,32–0,68); nunca en la banda del titular ni
+  en la esquina del logo.
+- **Recortes con producto cercano** (base > 0,82, `storySafeBaseV`): el blog se ancla abajo (`focal [x, 1]`; su recorte
+  1408×768 corta el 14 % inferior del plate) y la story lo deja fuera con su focal (la story es del titular; sus
+  340 px inferiores son interfaz). Producto lejano (base ≤ 0,82): aparece en los cuatro formatos. Producto en un
+  costado: post, story y Pinterest corren su focal hacia él midiendo la banda del titular. **Nunca toca el logo del
+  post:** se mueve el producto, no se corta la viñeta.
+- **Dos logos permitidos** (operador: «sí, que salga dos veces el logo»): la pieza conserva la firma compuesta (logo
+  blanco abajo a la izquierda) aunque la etiqueta ya muestre el logo Berel. La etiqueta es producto, no firma; la
+  regla de un solo logo aplica a los logos compuestos (`never` en `berel-recipes.json`).
+
+### Renders maqueta (`excludedRenders`)
+
+Un render cuya forma no corresponde a su contenido es una maqueta, no el empaque. Todos los renders de Mancha (y
+algunos diluyentes) de 1 L tienen forma de aerosol con boquilla y «CONT. NET. 1L»; no existe un aerosol de 1 L
+(operador: «así no se ve un aerosol»). Para madera se usa la lata redonda real: Laca de Nitrocelulosa 1L (Ø 10,5 cm).
+A Berel hay que pedirle el empaque real de las Manchas.
+
+Renders con diámetro admitido (`sizes`, snapshot 2026-11-02): INSIGNIA_4L 0,17 m · KOVER_PRO_19L 0,30 m ·
+SELLADOR_ANTISALITRE_530_19L 0,30 m · LACA_NITRO_MEDIANA_DILUCION_SEMIMATE_1L 0,105 m · AEROSOL_BRILLANTE_VERDE_CHILE
+0,065 m. Uno nuevo se agrega con su fuente antes de colocarlo.
+
+### Cómo se llegó aquí (resumen; el detalle está en `pilot` y `pilotGuided` del contrato)
+
+| Vía o ronda | Resultado |
+|---|---|
+| Solo colocación determinista | Etiqueta exacta (fidelidad 1,00), pero se ve pegada: luz de estudio, sin sombra |
+| Edición completa con Sunburst, sin referencia | Luz y sombra reales; **reescribe los textos pequeños** (0,05–0,48) |
+| Inpainting con máscara | **Inventa otro producto**. Descartado |
+| Híbrido (modelo + etiqueta del render) | Fidelidad 0,96–0,99, pero la etiqueta se ve montada → hoy es respaldo |
+| Escala a ojo | Entre 25 % chico y casi el doble |
+| Escala por el alto | 15–40 % chica: los renders son más altos que el envase real respecto de su ancho |
+| Escala por diámetro (física) | Correcta, pero se leía chica |
+| Solo modelo con referencia | Etiquetas correctas, tamaño 1,35–1,6× sin control |
+| **Guiado 1,4×** (vigente) | Insignia en aparador 360 px (alto 1,10×, escena 4,1/255), Laca 1L 207 px (1,00×), aerosol 630 px (0,97×), Kover 19L 294 px (0,92×): todos ok en `verificar` |
+
+Sin probar (`notTested`): producto abierto o en uso, en mano, familia de tamaños en una escena y toma cenital (los
+renders son frontales).
 
 Trampa de implementación (corregida): en sharp, dos `extractChannel` en el mismo pipeline no se encadenan; el último
 reemplaza al primero. El alfa del render se materializa antes de extenderlo, o la «máscara» es el canal rojo.
-
-Pendiente: elegir escenas pensadas para producto (una toma arquitectónica lo deja pequeño).
-
-**Piloto por envase (2026-11-02).** La escala salió mal dos veces antes de quedar bien. Lo que importa:
-
-1. **A ojo:** entre 25 % chico y casi el doble (el aerosol se agrandó para que se leyera).
-2. **Calculada por el alto:** 15–40 % chico. Los renders son más altos que el envase real respecto de su ancho: el
-   Insignia mide 0,71 de ancho por alto y un galón real ≈ 0,88. Además, la mesa se había leído corta (461 px contra
-   510 medidos con regla). El operador: «es imposible que en una mesa se vea así de pequeña».
-3. **Calculada por el diámetro** (el ancho visible del cuerpo en el render frontal), con referencias medidas con regla
-   a resolución completa: quedó bien.
-
-| Envase (Ø) | Toma y referencia | Fidelidad |
-|---|---|---|
-| Insignia 4 L (17 cm) | comedor, sobre la mesa (mesa 0,76 m = 510 px) | 0,982 |
-| Kover Pro 19 L (30 cm) | azotea (suelo: horizonte 0,43, cámara 1,38 m) | 0,989 |
-| Sellador Anti-Salitre 530 19 L (30 cm) | diagnóstico, contra el muro (zoclo 10 cm = 77 px) | 0,965 |
-| Mancha Nogal Clásico 1 L (≈ 8,5 cm, estimado) | taller, junto a la silla (asiento 0,45 m = 380 px) | 0,982 |
-| Aerosol 400 ml (6,5 cm) | toma `detalle` (macetero 0,40 m = 690 px) | 0,984 |
-
-Solo el modelo dio 0,05–0,48. Reglas en el contrato (`productInScene`):
-- `producto-en-escena.mjs colocar` **ya no acepta `--alto`**. Exige `--referencia <metros>:<px>` (objeto conocido a
-  la misma profundidad) o `--suelo <horizonte>:<altura de cámara>`. El diámetro sale de `sizes`, por render, con su
-  fuente; un render sin diámetro falla.
-- Falla bajo 60 px de ancho. **Nunca se agranda un producto para que se lea**: se acerca a la cámara o se usa la
-  toma `detalle`, el banco de trabajo con cámara a ras, para aerosoles, litros y ½ L.
-- Avisa si la base cae en los 340 px inferiores de la story (zona de interfaz).
-- **Escala no es presencia.** Una cubeta lejos en una azotea se lee chica aunque esté a escala; para que sea
-  protagonista se acerca a la cámara.
-- Si el operador ve un producto chico, se revisan las referencias; no se defiende el número.
-
-Sin probar: producto abierto o en uso, en mano, familia de tamaños y cenital. Dos logos (etiqueta + firma): permitido por
-el operador el 2026-11-02; la firma se mantiene.
-
-**Método vigente: guiado (2026-11-02, decisión del operador).** «Un buen montaje se conoce por NO parecer un
-montaje»: restituir la etiqueta desde el render la deja con aspecto pegado. Flujo:
-1. `producto-en-escena.mjs colocar`: escala calculada por diámetro × **presencia publicitaria 1,4** (por defecto del
-   contrato; `--presencia` 1–1,5, declarada). La física sola se leía chica; Sunburst por su cuenta agrandaba
-   1,35–1,6× de forma dispareja.
-2. `pnpm ai:image --image compuesto.png --image referencia.png --prompt-file prompt.txt` (Sunburst xhigh). El modelo
-   redibuja el producto con el render oficial como referencia, sin moverlo ni cambiarle el tamaño.
-3. `producto-en-escena.mjs verificar`: comprueba alto 0,88–1,12×, corrimiento ≤ 30 px y escena ≤ 8/255, y corre OCR
-   local de los textos clave (macOS Vision en modo rápido; es aviso y no lee logotipos).
-4. `restituir` es respaldo, solo si un texto clave sale mal.
-
-Ronda final con galón, laca 1 L, aerosol y cubeta: alto 0,92–1,10×, escena 3,5–4,4/255, etiquetas correctas al 100 %
-(el texto diminuto sale aproximado). Lo de abajo es la historia que llevó a esto.
-
-**Presencia y renders (ronda final, 2026-11-02).**
-- **Una escala correcta puede verse chica.** Un galón real a 4 m de la cámara se ve chico aunque la escala esté bien
-  (operador: «un galón de 4 L jamás se verá así»). El producto protagonista necesita una **superficie de producto
-  planeada en el plate** desde la toma: en el `--extra`, un bloque `PRODUCT SURFACE` con un aparador o banco en primer
-  plano a ≈ 1,5 m. Con la cámara a 1,2 m de altura el piso cercano queda fuera del cuadro, así que no se puede acercar
-  después. Insignia 4L sobre el aparador: 257 px de alto, 1,6× el de la mesa, fidelidad 0,987.
-- **Encuadre con producto cercano.** El blog se ancla abajo (`focal [x, 1]`) y la story lo deja fuera con su focal.
-  Si el producto está en un costado, post, story y Pinterest corren su focal hacia él, midiendo la banda del titular.
-  El producto nunca toca el logo del post: se mueve el producto, no se corta la viñeta.
-- **Renders maqueta.** Todos los renders de Mancha (y algunos diluyentes) de 1 L tienen forma de aerosol con boquilla,
-  y no existe un aerosol de 1 L (operador: «así no se ve un aerosol»). Están en `productInScene.excludedRenders`.
-  Antes de colocar un render, comprueba que su forma corresponde al contenido. Para madera se usa la lata redonda real:
-  Laca de Nitrocelulosa 1L, Ø 10,5 cm, fidelidad 0,995. A Berel hay que pedirle el empaque real de las Manchas.
-
 
 ## 7. Rechazos que no se repiten
 

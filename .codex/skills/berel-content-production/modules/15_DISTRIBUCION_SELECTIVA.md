@@ -12,7 +12,8 @@ declarar hipótesis editorial y responsable de seguimiento: no inventar métrica
 
 Los cuatro formatos existentes son un catálogo, no un paquete obligatorio:
 Facebook 4:5; Instagram Story de 3–4 pantallas 9:16; Reel/TikTok/Short de
-5 escenas y 20–30 segundos; Pinterest Pin 2:3. Un artículo puede generar de cero a cuatro.
+5 escenas y 20–30 segundos (el corpus entregado es otro: transformación de 14 s; ver
+[módulo 06](06_DERIVADOS_SOCIALES.md) § Producción del reel); Pinterest Pin 2:3. Un artículo puede generar de cero a cuatro.
 Mantener las plantillas del módulo 06. No convertir una Story en carrusel ni añadir plataformas.
 
 Evaluar cada combinación artículo/canal con cinco preguntas, sin inventar un score medido:

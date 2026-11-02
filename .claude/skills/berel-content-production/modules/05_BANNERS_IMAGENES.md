@@ -81,7 +81,7 @@ Diseño entrega **master + variantes**:
 | Pin de Pinterest | 2:3 · 1000 × 1500 |
 | Facebook | 4:5 · 1080 × 1350 (apto para carrusel) — ⚠️ era la de Instagram hasta la decisión del cliente del 2026-08-25; Instagram pasó a 9:16 |
 | Historia de Instagram | 9:16 · 1080 × 1920 |
-| Reel | 9:16 (video) |
+| Reel | 9:16 (video) · 1080 × 1920 · ver [módulo 06](06_DERIVADOS_SOCIALES.md) § Producción del reel |
 
 🔴 **Una sola pieza por artículo lleva 🔁.** Dos marcas anulan el propósito: el derivado social
 deja de tener un master único y diseño produce dos veces lo mismo con criterios distintos.
@@ -130,6 +130,17 @@ el **render oficial del empaque**, sin recrearlo ni sustituirlo por un envase ge
 la fuente del asset, la versión confirmada y su ubicación; si falta el render oficial, la pieza queda
 `⚠️ Pendiente` y no se inventa. La escena puede contextualizar el producto, pero el empaque debe ser
 reconocible y coherente con la tabla/producto al que acompaña.
+
+**Producto en escena (desde el 2026-11-02).** La ficha decide **qué** producto aparece y **dónde se usa** (impermeabilizante
+en la azotea, sellador frente al muro dañado, galón en el espacio, laca junto a la madera, aerosol frente a la herrería);
+**cómo** se produce —escala por diámetro, presencia publicitaria, redibujo guiado y verificación de la etiqueta— lo decide
+[`berel-graphic-line`](../../berel-graphic-line/references/photography.md) §6 bis. Tres reglas que tocan a la ficha:
+- Un render cuya forma no corresponde a su contenido es una maqueta y no se usa: hoy los renders de las **Manchas de 1 L**
+  tienen forma de aerosol. Hasta que Berel entregue el empaque real, la pieza que las necesite queda `⚠️ Pendiente`.
+- Aerosoles, litros y ½ L solo se leen en una toma de detalle (cámara a la altura de la superficie); si la ficha pide uno
+  en una vista general de espacio, no se va a leer.
+- La pieza conserva su logo compuesto aunque la etiqueta del envase muestre el logo Berel (decisión del operador
+  2026-11-02).
 
 ## 🔴 ALT, archivo y posición son una sola fuente de verdad
 

@@ -38,6 +38,8 @@
 - [ ] Si es infografía: **formato y variante declarados** (`../modules/10_FORMATOS_DE_INFOGRAFIA.md`) y acento en Rojo Editorial `#B3153A` o la paleta complementaria — nunca el rojo corporativo
 - [ ] Si aparece la Paleta Frida Kahlo, la pieza lleva el **logo de la licencia oficial**
 - [ ] Si es producto nuevo/de awareness, usa el render oficial del empaque o declara el bloqueo
+- [ ] Si el producto va en escena: dice dónde se usa (superficie y espacio), el render no es una maqueta (Manchas 1 L,
+      pendiente) y un envase chico pide toma de detalle; el cómo lo decide `berel-graphic-line`
 
 ## Variante · Ficha de material de marca Berel
 

@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-11-01 por Claude — v1.19: §5.1 suma el flag `--openai-key <perfil>` de `ai:image` y la regla de qué clave de OpenAI paga cada trabajo (empresa para producto/runtime; perfil `personal` explícito para generación creativa operada).
+> **Ultima actualizacion:** 2026-11-02 por Claude — v1.20: benchmark medido de **transformación antes → después en toma fija** (primer + último cuadro, 8 s, 9:16) con FLUX 3, Gemini Omni, MiniMax H3, Seedance 2.0 y Wan 3.0 sobre los mismos cuadros en 4 escenas: color del cuadro final (ΔE) y fluidez medidos; FLUX 3 por defecto, Omni alternativa por escena, Wan descartado por correr el color (§3, §6.6).
+> **Antes (v1.19):** 2026-11-01 por Claude — v1.19: §5.1 suma el flag `--openai-key <perfil>` de `ai:image` y la regla de qué clave de OpenAI paga cada trabajo (empresa para producto/runtime; perfil `personal` explícito para generación creativa operada).
 > **Antes (v1.18):** 2026-10-15 por Codex — v1.18: OmniHuman 2.0 / Vision AI investigado, separado de la CLI BytePlus y de Gemini Omni; contrato API y disponibilidad de cuenta distinguidos.
 > **Antes (v1.17):** BytePlus directo por defecto para Seedream, Layerize, Seedance y Seed Speech; secretos, CLI y evidencia por transporte en su ADR/manual.
 > **Antes (v1.16):** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
@@ -166,6 +167,7 @@ El video se opera con `pnpm ai:fal` para fal/Higgsfield y `pnpm ai:omni` para Ge
 | **4K** | `seedance20-*` base `--resolution 4k` | Único endpoint conectado que entregó 3840×2160 [verificado 2026-09-16] | `h3-*` base 4K (reescalado desde 768P, no nativo) [contrato] | Seedance 2.0 fast/mini/us (techo 720p); Seedance 2.5, Flux 3 y Wan (techo 1080p) [contrato] |
 | **Control de cámara preciso sobre una imagen fija** | `h3max-camera` | Escena congelada, sólo se mueve la cámara, trayectoria de hasta 12 keyframes [contrato] [verificado 2026-09-16] | Describir el movimiento en el prompt de cualquier i2v | Pedir acción del sujeto: el modelo congela la escena [oficial] |
 | **Controlar principio y fin exactos** | `flux3-flf` (ambos cuadros obligatorios) | Contrato explícito primer + último [contrato] | `wan3-i2v`, `seedance25-i2v`, `seedance20-i2v`, `h3*-i2v` con `--end-image` | `flux3-flf --duration auto` (no acepta auto) [contrato] |
+| **Transformación antes → después en una toma fija** (un espacio que se pinta y amuebla) | FLUX 3 con primer + último cuadro (`flux_3_video` en el MCP de Higgsfield, 1080p, 8 s) | Hace aparecer los objetos de forma más fluida (deslizan o crecen) [decisión del operador, 2026-11-02]; color final a ΔE 1,3–3,4 del cuadro de destino [verificado 2026-11-02] | Gemini Omni `--task frames`: arma muebles por partes y pinta con trazo de rodillo; ΔE 0,8–2,9 [verificado 2026-11-02] | Wan 3.0 (corrió el color, ΔE 18,3); MiniMax H3 (objetos en fundido semitransparente); Seedance 2.0 (96 créditos sin ventaja); confiar el color sin medirlo (§6.6) |
 | **Pasar por varios cuadros clave** | `flux3-keyframes` (1–10, `--keyframe img@frame`) | Único con keyframes [contrato] [verificado 2026-09-16] | Encadenar varios flf | Índices fuera del largo del clip (24 fps × segundos) |
 | **Editar un video existente** | `seedance25-r2v --task editing` | Cambió un viñedo a nieve conservando encuadre [verificado 2026-09-16] | `flux3-edit` (también si Seedance rechaza) | Pasar `--duration`/`--aspect` (el CLI los rechaza: el proveedor fuerza auto) [contrato]; con personas o marcas, gastar el clip completo sin una prueba corta: posible rechazo cobrado [verificado 2026-09-16] |
 | **Editar un video con personas o marcas, sin arriesgar un rechazo cobrado** | `flux3-edit` | USD 0,03/s, conserva movimiento y encuadre [contrato] [verificado]; sin rechazos como los de Seedance observados [verificado] | Wan 3.0 r2v usando el video como referencia (no es edición); `seedance25-r2v --task editing` presupuestando el posible rechazo cobrado: dos casos medidos [verificado 2026-09-16], producción del operador con personas y marcas sin problema [operador, 2026-10-04] | Asumir que Seedance siempre rechaza o que nunca rechaza: qué lo dispara [sin dato] |
@@ -1070,6 +1072,35 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 - `wan3-i2v --end-image` 5 s 720p **0,50**.
 - `seedance25-i2v --end-image` 5 s 720p **2,37**.
 - `h3max-i2v --end-image` 6 s 768P **0,24**.
+
+#### Benchmark medido: transformación antes → después en toma fija (2026-11-02)
+
+Mismos dos cuadros (antes = edición GPT Image 2.5 del después; misma cámara) y mismo prompt por escena, 8 s, 9:16, sin
+audio cuando el modelo lo permite. Cuatro escenas: comedor y recámara (pintar + amueblar), fachada (pintar + plantas)
+y reja con muro (óxido → esmalte + muro). Pares **ΔE / salto %** [verificado 2026-11-02]:
+
+| Escena | FLUX 3 | Gemini Omni | MiniMax H3 | Seedance 2.0 | Wan 3.0 |
+|---|---|---|---|---|---|
+| Comedor | 3,4 / 3,9 | 2,3 / 1,9 | 2,4 / 2,4 | 2,8 / 2,9 | **18,3** / — |
+| Recámara | 3,2 / 3,4 | 0,8 / 3,7 | 1,6 / 2,4 | 3,5 / 2,2 | — |
+| Fachada | 1,4 / 1,8 | 2,9 / 1,9 | 2,3 / 2,0 | 3,0 / 2,1 | — |
+| Reja + muro | 1,3 / **7,5** | 1,9 / 1,8 | 0,9 / 1,9 | 4,4 / 3,8 | — |
+| Costo por clip | 64 créditos Higgsfield | ≈ USD 1,22 nominal [cálculo] | 16 créditos (solo 2K) | 96 créditos | 28 créditos |
+
+- **Método.** ΔE (CIE76) del color medio de la superficie pintada en el último cuadro contra el cuadro de destino,
+  medido sobre la máscara de esa superficie (no una caja fija: la caja dio 3,2 donde la máscara dio 3,6). Salto = % del
+  cambio total que ocurre entre dos cuadros consecutivos (gris 108×192, 24 fps); por encima de ~5 % algo aparece de
+  golpe. **Lo que no mide:** objetos que entran como fundido semitransparente o flotan: se mira la hoja de cuadros.
+- **Cómo aparecen los objetos.** FLUX 3: manchas de pintura que se expanden; muebles que deslizan, plantas que crecen;
+  en la reja, reja y muro cambiaron de golpe. Omni: pintura como ola líquida o trazo de rodillo; la cama se arma por
+  partes. MiniMax H3: tono parejo y muebles en fundido semitransparente. Seedance 2.0: arma la mesa y la cama por
+  partes, barrido con borde dentado. Wan 3.0: barrido suave, color final fuera (terracota → salmón).
+- **Elección.** FLUX 3 por defecto, por cómo resuelve la aparición de los elementos [decisión del operador]; Omni
+  cuando la escena arma muebles por partes, pinta un muro largo o FLUX 3 deja un salto. Ningún motor ganó en las
+  cuatro escenas. El primer + último cuadro **no garantiza** el color del cuadro final: siempre se mide.
+- **Carril.** FLUX 3, MiniMax, Seedance y Wan se corrieron por el **MCP de Higgsfield** (sesión Claude), no por
+  `pnpm ai:fal`; Omni por `pnpm ai:omni --task frames` (necesita `--max-usd 1.5` a 1080p/8 s; entrega pista de
+  audio). Operación del MCP y trampas: skill `higgsfield-provider`.
 
 ### 6.7 Keyframes
 

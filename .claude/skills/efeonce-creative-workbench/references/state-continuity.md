@@ -1,5 +1,35 @@
 # Corte de continuidad: 2026-09-30
 
+## Berel en el Workbench — corte 2026-11-02
+
+Segundo cliente con sistema propio, en `brands/berel/**` y `projects/berel/**`; una marca por corrida y
+nada de Efeonce/AXIS/SKY. El canon de oficio vive en la skill Greenhouse `berel-graphic-line`; aquí solo el
+estado del harness. Ocho PR fusionados el 2026-11-02 (el repo admite **solo squash**: `allow_merge_commit`
+y `allow_rebase_merge` en false), `origin/main` en `6756732`:
+
+| PR | Qué dejó |
+| --- | --- |
+| #21 | Remates terminados en fotografía; libro alineado |
+| #22 | Producto en escena por vía híbrida (hoy respaldo `restituir`) |
+| #23 | Tomas fotográficas (`takes`), banda del titular medida (`scripts/medir-plate.mjs`), pieza `tomas-fotograficas` de 48 |
+| #24 | Escala del producto por diámetro real (`--referencia`/`--suelo`, sin `--alto`) y toma `detalle` |
+| #25 | Presencia planeada en el plate; renders maqueta excluidos (`excludedRenders`) |
+| #26 | Método guiado por defecto (GPT Image 2.5 redibuja desde el render) con presencia 1,4×; `verificar` + OCR consultivo |
+| #27 | Dos logos permitidos: el de la etiqueta del producto en escena no cuenta (`berel-recipes.json` → `never`) |
+| #28 | Reel de transformación: `contracts/berel-video-reels.json`, `compose/video.mjs`, `scripts/reel.mjs` |
+
+Contratos: `berel-recipes`, `berel-tokens`, `berel-color-evidence`, `berel-photo-registers` (v1, candidato) y
+`berel-video-reels` (candidato). CLIs: `componer`, `ajustar-muro`, `color-cercano`, `prompt-plate`,
+`medir-plate`, `producto-en-escena` (`colocar`/`verificar`/`restituir`) y `reel`
+(`cuadros`/`capas`/`qa`/`armar`/`comparar`). Pruebas: `node --test brands/berel/test/*.test.mjs` = 35/35;
+`npm run gates` verde. Recursos fuera de Git en `clients/berel/.resources-local/` (fuentes, catálogo, logos,
+fotos, `products/` y, desde #28, `video/`: tapa de cierre vigente y música del mes, Envato Elements con la
+licencia del squad). Los binarios de corridas van en `projects/berel/<pieza>/salidas/` o `runs/`, ignorados.
+
+Sigue `gated` en `clients/brands.json` (sin pack sellado). Nada aprobado por Berel (Daniela, Andrés o Melkin):
+contratos candidatos, piezas y reels piloto sin aprobación de diseño ni del cliente. Los commits de la skill
+Greenhouse `berel-graphic-line` de esta sesión están en develop sin push.
+
 ## Identidad Git — corrección persistente 2026-10-01
 
 El operador exigió resolver los rechazos recurrentes por autor Git. Mac: include condicional

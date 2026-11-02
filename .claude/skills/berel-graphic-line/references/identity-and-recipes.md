@@ -167,9 +167,10 @@ solo mueve el recorte. Nunca pongas el titular sobre concreto o vidrio claro.
 
 ## 7. Declaradas sin render
 
-El contrato las describe en `declaredButNotRendered`; el compositor no las produce. Un job con
-cualquiera de ellas falla cerrado («receta desconocida»). Diseño las produce en Illustrator o After
-Effects.
+El contrato las describe en `declaredButNotRendered`; el compositor estático no las produce. Un job con
+cualquiera de ellas falla cerrado («receta desconocida»). Señalización y técnica-gráfica las produce Diseño en
+Illustrator; el reel tiene su propio armado desde el 2026-11-02 (`scripts/reel.mjs` +
+`contracts/berel-video-reels.json`), que reutiliza las capas de la story.
 
 | Receta | Qué es | Referencias / requisito |
 |---|---|---|
@@ -204,6 +205,7 @@ Del contrato, con su porqué:
 2. Registro fotográfico: hora dorada actual frente a la luz de día del lenguaje histórico.
 3. Leyenda «Imagen ilustrativa. Los tonos pueden variar…»: ¿obligatoria?
 4. Vectores faltantes del logo (2 tintas, horizontal, círculo cromático).
-5. Exportación de reels y stories antiguas a 750 × 1334: ¿decisión o límite?
+5. Exportación de reels y stories antiguas a 750 × 1334: ¿decisión o límite? (El reel nuevo sale a 1080 × 1920.)
+6. Empaque real de las Manchas: sus renders de 1 L son maquetas con forma de aerosol (`excludedRenders`).
 
 Fuente: `brands/berel/system/BEREL_VISUAL_SYSTEM_V1.md` §9.
