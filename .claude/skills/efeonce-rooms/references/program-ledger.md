@@ -19,8 +19,9 @@
   («Casi»); ni el código ni tokens viajan en esa URL. Antes decía «Listo» antes del canje: corregido. Páginas públicas con
   `OrbitWordStage`, fila «Acceso con» + `efeonce-id-lockup-negative` (`axis-brand-assets` 0.4.32 por `sync-brand`) y la nota con el
   comando. Notas del escenario de vuelta a 13 px (también `/salir` y 404). Suite 420 pass, 24 skipped, 0 fail;
-  `tests/agent-cli-login.test.ts` afirma el 303. Readback: `/cli/conectado`, `/cli/error` y el lockup en 200. **Sin verificar:** el
-  recorrido real en el navegador con un `pnpm rooms login` contra producción.
+  `tests/agent-cli-login.test.ts` afirma el 303. Readback: `/cli/conectado`, `/cli/error` y el lockup en 200. **Verificado por el
+  operador (2026-11-02):** `logout` (`revoked: true`) y `login` contra producción terminan en `/cli/conectado` («Listo», «Tu agente
+  ya tiene acceso») y el agente lee el espacio con el refresh nuevo.
 - **2026-11-02 — aceptación del carril CLI en producción (`vivo`):** el operador corrió `pnpm rooms login` una vez (Efeonce ID + MFA;
   `subject` opaco, principal `rooms-pilot-julio-20261025`, espacio «Efeonce» `org-2df565fb-…`). Sin pedirle nada más, el agente creó
   `demo-volta` («Campaña «Llega antes»», `synthetic`/`fixture`), subió las 5 imágenes (`kv-16x9`, `feed-4x5`, `story-9x16`,
