@@ -27,7 +27,7 @@
   0,16–0,23); inpainting con máscara inventó otro producto.
 - **Regla:** vía híbrida: el modelo integra la foto completa y la etiqueta se restituye desde el render oficial
   transfiriendo solo la luz de baja frecuencia (fidelidad 0,98). Nunca entregar una etiqueta que pasó solo por el modelo.
-- **Dónde quedó:** [photography.md](photography.md) §6 bis. **Documental** (sin script ni prueba todavía).
+- **Dónde quedó:** Workbench `brands/berel/compose/product.mjs` + `scripts/producto-en-escena.mjs` y [photography.md](photography.md) §6 bis. **Codificada + prueba** (`brands/berel/test/product.test.mjs`).
 
 ## 2026-11-02 · Recortes verticales mal encuadrados (terraza)
 

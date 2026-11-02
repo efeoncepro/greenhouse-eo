@@ -155,26 +155,33 @@ Lo que se midió (fidelidad = correlación del detalle de la etiqueta contra el 
 | Inpainting con máscara | **Inventa otro producto** (lata blanca falsa). Descartado | — |
 | **Híbrido** | El modelo pone la física; la etiqueta conserva el arte oficial | **0,98** |
 
-Receta híbrida (validada, todavía sin script canónico en el Workbench):
+Receta híbrida, ya como script del Workbench (`brands/berel/compose/product.mjs` + `scripts/producto-en-escena.mjs`):
 
-1. Render oficial desde `02_Recursos/03_Producto PNG` del OneDrive de Berel, **empaque vigente** (las carpetas
-   «Vieja_…» son etiquetas anteriores). Recorta el alfa (`trim`).
-2. Colócalo a escala física plausible sobre una superficie real (piso, repisa) y fuera de las zonas del titular y
-   del logo; comprueba que entra en los recortes que lo van a usar (blog con `focal` y bajo, verticales con `focal` x).
-   Un 4 L a la distancia de una foto arquitectónica mide ~120 px en un plate de 1536 px; se puede exagerar un poco,
-   no inventar un primer plano imposible.
-3. Pide al modelo la integración sobre la foto completa (edición, sin máscara): misma posición y tamaño, luz y
-   dirección de la escena, reflejos en la tapa, sombra de contacto y proyectada, grano; prohíbe tocar la etiqueta y
-   lista sus textos literales.
-4. Transferencia de iluminación: alinea la lata del modelo con la colocada (búsqueda de ±8 px por bordes) y, dentro del
-   alfa del render, multiplica el render original por la razón de baja frecuencia (desenfoque σ 5) modelo/colocado.
-   La tapa (sin texto) se queda con el modelo. Así los textos son los del render y la luz es la del modelo.
-5. Usa la foto completa del modelo como base: pegar solo la zona de la lata deja una costura, porque el modelo
-   cambia la luz del piso en un área mayor. Verifica que el muro no derivó (en la prueba: ΔE 1,98 → 2,02).
-6. Mide la fidelidad de la etiqueta (≥ 0,95) y mira el píxel al 100 %.
+1. **Render oficial** desde `02_Recursos/03_Producto PNG` del OneDrive de Berel, **empaque vigente** (las carpetas
+   «Vieja_…» son etiquetas anteriores), admitido en `clients/berel/.resources-local/products/` (nunca en Git).
+2. **`colocar`**: lo pone a escala física plausible sobre una superficie real, fuera de las zonas del titular y del
+   logo, y comprobando que entra en los recortes que lo usarán (blog con `focal` y bajo, verticales con `focal` x).
+   Un 4 L a la distancia de una foto arquitectónica mide unos 120 px en un plate de 1536 px: se puede exagerar un
+   poco, no inventar un primer plano imposible. Escribe el compuesto, el prompt y el comando exacto de integración.
+   ```bash
+   node brands/berel/scripts/producto-en-escena.mjs colocar --foto <plate> --producto clients/berel/.resources-local/products/INSIGNIA_4L.png \
+     --x 0.879 --base 0.911 --alto 240 --nombre "Insignia 4L" --superficie "the cantera stone floor" \
+     --textos "Berel|Insignia|CONT. NET. 4L" --out projects/berel/<pieza>/salidas/producto/<slug>
+   ```
+3. **Integración con el modelo** (desde Greenhouse, `pnpm ai:image --image compuesto.png --prompt-file prompt.txt
+   --model gpt-image-2.5-sunburst --quality xhigh`): foto completa, sin máscara. El prompt prohíbe tocar la etiqueta
+   y cita sus textos.
+4. **`restituir`**: alinea la lata del modelo (búsqueda ±24 px), multiplica el render original por la luz de baja
+   frecuencia del modelo (σ 5) dentro del alfa del render (la tapa, sin texto, queda del modelo) y usa la foto completa
+   del modelo como base (pegar solo la zona de la lata deja costura).
+5. **Controles que fallan cerrado** (`qa.json`, código de salida 1): fidelidad de la etiqueta ≥ 0,95, desplazamiento
+   del modelo ≤ 8 px (si no, quedaría una lata fantasma) y mínimo de alineación claro (`match` ≥ 0,12). Además, mira
+   el píxel al 100 % y comprueba que el muro no derivó (en la prueba: ΔE 1,98 → 2,02).
 
-Pendiente: script canónico en `brands/berel/scripts/` y prueba propia; elección de escena pensada para producto
-(una toma arquitectónica deja el producto pequeño).
+Trampa de implementación (corregida): en sharp, dos `extractChannel` en el mismo pipeline no se encadenan; el último
+reemplaza al primero. El alfa del render se materializa antes de extenderlo, o la «máscara» es el canal rojo.
+
+Pendiente: elegir escenas pensadas para producto (una toma arquitectónica lo deja pequeño).
 
 ## 7. Rechazos que no se repiten
 
