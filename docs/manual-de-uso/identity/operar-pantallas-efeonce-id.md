@@ -21,6 +21,18 @@ responde, o cuando necesitas revisar un estado que en produccion no se puede pro
 **Este manual no cubre** invitar personas, revocar accesos, rotar llaves ni prender flags: eso esta en
 los dos manuales relacionados de arriba.
 
+## Corte de interfaz — 2026-11-02 (local, sin release)
+
+- **Qué cambió:** todas las pantallas que no son el login V4 usan el shell con la órbita aprobado por el operador:
+  formulario en papel con el lockup «Efeonce | ID» y, en escritorio, un panel oscuro con la órbita. En móvil no hay panel
+  y el punto del titular es la esfera.
+- **Dónde se revisa:** en el arnés (`pnpm auth-server:dev-ui`, abrir `http://127.0.0.1:19036/...`; `localhost` responde
+  421). Rutas útiles: `/consent/multi-org-v2`, `/error/step-up-required`, `/step-up`, `/step-up/enroll`,
+  `/magic-link/sent`, `/invitation/confirm`, `/session/closed`, `/access/revoked`, `/internal-error`.
+- **Segundo factor:** el código se escribe en seis casillas; «Usar un código de respaldo» cambia al campo de texto. Si el
+  controlador no carga, queda el campo de texto y el formulario sigue funcionando.
+- **Producción:** todavía sirve el diseño anterior. Llega sólo con un release gobernado desde `main`.
+
 ## Corte de interfaz — 2026-11-01
 
 - **Qué hay en producción:** login V4 con el carrusel de novedades, servido en `https://auth.efeonce.org/login` desde la

@@ -16,6 +16,7 @@
  * `pnpm auth-server:brand-assets:generate`. NUNCA se redibuja una marca ajena a mano.
  */
 import { CLIENT_MARK_CLAUDE_SVG, CLIENT_MARK_GEMINI_SVG, CLIENT_MARK_GPT_SVG } from './efeonce-isotipo.generated'
+import { ROOMS_ISOTYPE_POSITIVE_SVG } from './orbit-assets.generated'
 
 /**
  * Origen verificado del `client_id` CIMD → marca inline.
@@ -31,6 +32,15 @@ const VERIFIED_CLIENT_MARKS: Readonly<Record<string, string>> = {
   'https://openai.com': CLIENT_MARK_GPT_SVG,
   'https://platform.openai.com': CLIENT_MARK_GPT_SVG,
   'https://gemini.google.com': CLIENT_MARK_GEMINI_SVG
+}
+
+/**
+ * Clientes first-party de Efeonce → su marca. La llave es el `client_id` EXACTO que registra el CLI gobernado
+ * (`pnpm auth-server:register-rooms-agent-clients`); el registro dinámico emite `dcr-…`, así que nadie puede
+ * apropiarse de estos ids por auto-servicio.
+ */
+const FIRST_PARTY_CLIENT_MARKS: Readonly<Record<string, string>> = {
+  'efeonce-rooms-cli': ROOMS_ISOTYPE_POSITIVE_SVG
 }
 
 /** Origen sólo cuando el `client_id` es una URL https absoluta; cualquier otra forma no califica. */
@@ -55,10 +65,15 @@ export type ClientMark = { html: string; verified: boolean }
 
 export const renderClientMark = (input: { clientId: string; clientName: string }): ClientMark => {
   const origin = verifiedOriginOf(input.clientId)
-  const mark = origin && Object.hasOwn(VERIFIED_CLIENT_MARKS, origin) ? VERIFIED_CLIENT_MARKS[origin] : null
+
+  const mark = Object.hasOwn(FIRST_PARTY_CLIENT_MARKS, input.clientId)
+    ? FIRST_PARTY_CLIENT_MARKS[input.clientId]
+    : origin && Object.hasOwn(VERIFIED_CLIENT_MARKS, origin)
+      ? VERIFIED_CLIENT_MARKS[origin]
+      : null
 
   // Decorativo en ambos casos (`aria-hidden`): el nombre de la aplicación ya va escrito al lado.
   return mark
-    ? { html: `<span class="id-client-mark id-client-mark-brand" aria-hidden="true">${mark}</span>`, verified: true }
-    : { html: `<span class="id-client-mark" aria-hidden="true">${initialOf(input.clientName)}</span>`, verified: false }
+    ? { html: `<span class="os-client-mark os-client-mark-brand" aria-hidden="true">${mark}</span>`, verified: true }
+    : { html: `<span class="os-client-mark" aria-hidden="true">${initialOf(input.clientName)}</span>`, verified: false }
 }

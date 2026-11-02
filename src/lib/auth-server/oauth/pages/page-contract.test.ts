@@ -178,7 +178,8 @@ describe('TASK-1835 — anti-enumeración en las pantallas de enlace', () => {
 
   it('los tres desenlaces del enlace comparten título: el detalle no distingue "no existe" de "vencido"', () => {
     const titles = (['invalid', 'expired', 'already_used'] as const).map(
-      kind => /<h1[^>]*>([^<]+)<\/h1>/.exec(renderLinkProblemPage(kind))?.[1]
+      // El titular trae su parte liviana y su punto como elementos propios: se compara el texto visible.
+      kind => /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(renderLinkProblemPage(kind))?.[1]?.replace(/<[^>]+>/g, '').trim()
     )
 
     expect(new Set(titles).size).toBe(1)

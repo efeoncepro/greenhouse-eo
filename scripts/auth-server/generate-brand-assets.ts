@@ -15,6 +15,7 @@ import { generateStepUpController } from './step-up-controller-build'
 import { generateLoginController } from './login-controller-build'
 import { renderLoginStageAssetsModule } from './generate-login-stage-assets'
 import { buildEfeonceIdFavicon, EFEONCE_ID_FAVICON_SOURCE } from './efeonce-id-favicon'
+import { renderOrbitAssetsModule } from './generate-orbit-assets'
 
 const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
@@ -119,3 +120,8 @@ void generateLoginController().catch(() => {
 })
 
 writeFileSync(join(ROOT, 'src/lib/auth-server/oauth/pages/login-stage.generated.ts'), renderLoginStageAssetsModule(ROOT))
+
+const orbitTarget = join(ROOT, 'src/lib/auth-server/oauth/pages/orbit-assets.generated.ts')
+
+writeFileSync(orbitTarget, renderOrbitAssetsModule(ROOT))
+console.log(`[auth-server] orbit panel assets generated → ${orbitTarget}`)

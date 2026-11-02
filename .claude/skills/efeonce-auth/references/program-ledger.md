@@ -4,6 +4,23 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-02 — Pantallas de Efeonce ID con la órbita: implementadas en `develop`, sin release
+
+- `local`: el operador aprobó en el canvas (2026-11-02) el rediseño de todas las pantallas que no son el login V4 y
+  confirmó La órbita como sistema de Efeonce ID. Todas usan el shell de `src/lib/auth-server/oauth/pages/orbit-shell.ts`:
+  consentimiento (también multiorganización y app no verificada), step-up, «Primero, entra a tu cuenta», errores OAuth,
+  error corporativo, segundo factor (seis casillas + modo de respaldo) y su activación en tres pasos, enlaces por correo,
+  invitación, sesión, acceso retirado y límites.
+- Panel: la órbita canónica (geometría de Rooms) rodea un ícono del catálogo AXIS en reposo (`resolveIcon`, generado en
+  `orbit-assets.generated.ts`) o una palabra («Listo», «Hasta pronto», «De nuevo»). Una sola esfera por pantalla.
+- Marca: lockup «Efeonce | ID» y el isotipo de Rooms como copias exactas de `axis-brand-assets` 0.4.32 en
+  `public/branding/SVG/` (Greenhouse fija 0.4.25). El cliente `efeonce-rooms-cli` muestra su marca por id exacto.
+- Fuentes nuevas: Bricolage variable y Poppins 400/500/600 en `fonts.generated.ts` (sube a ~1,6 MB).
+- Gates locales: `vitest src/lib/auth-server` 784/784, `pnpm typecheck`, `pnpm auth-server:verify-contrast` (0 bajo
+  WCAG en 1440 y 390) y revisión en el arnés en claro, oscuro y 390 px.
+- **No desplegado.** Es el mismo servicio del login MCP: llega a producción sólo con release gobernado a `main`. No
+  cubierto: `pnpm build`, GVC de producción y una corrida real de consentimiento/step-up contra el host.
+
 ## 2026-11-02 — Botón canónico «Continuar con Efeonce ID» aprobado; favicon sigue sin release
 
 - `doc`: [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02).

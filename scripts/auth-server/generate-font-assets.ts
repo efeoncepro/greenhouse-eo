@@ -11,8 +11,16 @@ export function buildAuthFontAssets(root: string) {
   const definitions = [
     ['Geist-Regular.ttf', 'geist-400.ttf', 'Geist'],
     ['Geist-SemiBold.ttf', 'geist-600.ttf', 'Geist'],
-    ['Poppins-Bold.ttf', 'poppins-700.ttf', 'Poppins']
+    ['Poppins-Regular.ttf', 'poppins-400.ttf', 'Poppins'],
+    ['Poppins-Medium.ttf', 'poppins-500.ttf', 'Poppins'],
+    ['Poppins-SemiBold.ttf', 'poppins-600.ttf', 'Poppins'],
+    ['Poppins-Bold.ttf', 'poppins-700.ttf', 'Poppins'],
+    // Las pantallas con la órbita titulan en Bricolage con contraste de pesos (≈340 / 740): hace falta la variable.
+    ['BricolageGrotesque-Variable.ttf', 'bricolage-grotesque-variable.ttf', 'Bricolage']
   ] as const
+
+  const licenseFor = (family: string) =>
+    family === 'Bricolage' ? '/fonts/licenses/bricolagegrotesque-web-OFL.txt' : `/fonts/licenses/${family}-OFL.txt`
 
   const fonts = Object.fromEntries(definitions.map(([name, source, family]) => {
     const sourcePath = `${fontRoot}/${source}`
@@ -22,7 +30,7 @@ export function buildAuthFontAssets(root: string) {
 
     return [`/fonts/${name}`, {
       contentType: 'font/ttf', base64: bytes.toString('base64'), sha256: sha256(bytes), sourcePath,
-      licensePath: `/fonts/licenses/${family}-OFL.txt`
+      licensePath: licenseFor(family)
     }]
   }))
 

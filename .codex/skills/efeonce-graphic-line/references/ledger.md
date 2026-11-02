@@ -1,5 +1,15 @@
 # Registro de decisiones y versiones
 
+### 2026-11-02 — Pantallas de Efeonce ID con La órbita (aprobadas e implementadas en local)
+
+- **Decisión del operador:** La órbita es el sistema de todas las pantallas de Efeonce ID (como Rooms, 2026-10-07). El
+  login V4 sigue siendo la excepción documentada en §A12; el resto usa el shell aprobado en el canvas «Rooms — Cerraste
+  tu sesión» (tarjetas `Id*`).
+- **Cómo se usa la órbita:** rodea un ícono del catálogo AXIS (seguridad, correo, integración, reloj) con anillo, acento
+  y esfera, o una palabra con la «órbita en reposo». Nada de medidas, puntos repetidos, anillos cortados ni logos dentro.
+  Corrección del operador del mismo día en [lessons.md](lessons.md).
+- **Código:** `src/lib/auth-server/oauth/pages/orbit-shell.ts` + `scripts/auth-server/orbit-shell-styles.ts`; sin release.
+
 ### 2026-11-02 — Botón «Continuar con Efeonce ID» (aprobado)
 
 - **Canónico:** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (`axis-brand-assets` 0.4.32, publicado en `v0.4.32`, AXIS

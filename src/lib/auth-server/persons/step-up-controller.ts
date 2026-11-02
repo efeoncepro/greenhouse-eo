@@ -17,12 +17,88 @@ export function installStepUpController(
   let busy = false
   let enrolled = false
 
+  /**
+   * Código en seis casillas (operador, 2026-11-02). El campo real sigue siendo `name="code"`: las casillas sólo lo
+   * escriben. Sin este controlador la página queda en modo `backup`, con el campo de texto visible, así que el
+   * formulario nunca depende de que las casillas existan. El código de respaldo no cabe en seis dígitos: tiene su
+   * propio modo, que muestra el campo de texto.
+   */
+  const otp = root.querySelector<HTMLElement>('[data-otp]')
+  const codeField = root.querySelector<HTMLInputElement>('[name="code"]')!
+  const cells = Array.from(root.querySelectorAll<HTMLInputElement>('[data-otp-cell]'))
+  const otpToggle = root.querySelector<HTMLButtonElement>('[data-otp-toggle]')
+  const otpLabel = root.querySelector<HTMLElement>('[data-step-code-label]')
+
+  const syncCode = () => {
+    codeField.value = cells.map(cell => cell.value).join('')
+  }
+
+  const fillFrom = (start: number, digits: string) => {
+    let index = start
+
+    for (const digit of digits) {
+      if (index >= cells.length) break
+      cells[index].value = digit
+      index += 1
+    }
+
+    syncCode()
+    cells[Math.min(index, cells.length - 1)]?.focus()
+  }
+
+  const setOtpMode = (mode: 'digits' | 'backup') => {
+    if (!otp) return
+    otp.dataset.mode = mode
+    codeField.value = ''
+    cells.forEach(cell => {
+      cell.value = ''
+    })
+
+    if (otpLabel) otpLabel.textContent = mode === 'digits' ? copy.digitsLabel : copy.backupLabel
+    if (otpToggle) otpToggle.textContent = mode === 'digits' ? copy.useBackup : copy.useDigits
+  }
+
+  if (otp && cells.length) {
+    setOtpMode('digits')
+    if (otpToggle) otpToggle.hidden = false
+    otpToggle?.addEventListener('click', () => {
+      setOtpMode(otp.dataset.mode === 'digits' ? 'backup' : 'digits')
+      ;(otp.dataset.mode === 'digits' ? cells[0] : codeField).focus()
+    })
+    cells.forEach((cell, index) => {
+      cell.addEventListener('input', () => {
+        const digits = cell.value.replace(/\D/g, '')
+
+        cell.value = ''
+        if (digits) fillFrom(index, digits)
+        else syncCode()
+      })
+      cell.addEventListener('keydown', event => {
+        if (event.key === 'Backspace' && !cell.value && index > 0) {
+          cells[index - 1].value = ''
+          cells[index - 1].focus()
+          syncCode()
+        }
+      })
+      cell.addEventListener('paste', event => {
+        const digits = (event.clipboardData?.getData('text') ?? '').replace(/\D/g, '')
+
+        if (!digits) return
+        event.preventDefault()
+        fillFrom(index, digits)
+      })
+    })
+  }
+
   const clearSecrets = () => {
     root.querySelector<HTMLImageElement>('[data-step-qr]')!.removeAttribute('src')
     root.querySelector<HTMLImageElement>('[data-step-qr]')!.hidden = true
     root.querySelector<HTMLElement>('[data-step-secret]')!.textContent = ''
     root.querySelector<HTMLElement>('[data-step-backups]')!.textContent = ''
-    root.querySelector<HTMLInputElement>('[name="code"]')!.value = ''
+    codeField.value = ''
+    cells.forEach(cell => {
+      cell.value = ''
+    })
     root.querySelector<HTMLInputElement>('[name="saved"]')!.checked = false
   }
 
@@ -154,6 +230,9 @@ export function installStepUpController(
 
         setup.hidden = false
         root.querySelector<HTMLFormElement>('[data-step-code]')!.hidden = false
+        // Al activar sólo vale el código de la aplicación: el de respaldo todavía no existe para la persona.
+        setOtpMode('digits')
+        if (otpToggle) otpToggle.hidden = true
         root.querySelector<HTMLElement>('[data-step-code-label]')!.textContent = copy.setupCode
         root.querySelector<HTMLButtonElement>('[data-step-submit]')!.textContent = copy.confirm
         root.querySelector<HTMLButtonElement>('[data-step-enroll]')!.hidden = true

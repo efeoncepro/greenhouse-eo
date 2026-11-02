@@ -19,19 +19,21 @@ import type { LoginProductContext } from '../oauth/pages/login-v4'
 export type { LoginProductContext } from '../oauth/pages/login-v4'
 
 import { htmlResponse } from '../oauth/http'
-import { ICON_ALERT, ICON_CLOCK, ICON_KEY, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
+import { ICON_ALERT, ICON_KEY, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
+import { AUTH_ORBIT_COPY, headingText } from '@/lib/copy/auth-server-orbit'
+import { orbitFootnote, orbitLink } from '../oauth/pages/orbit-shell'
 import { escapeHtml, layout } from '../oauth/pages/render'
 import { LOGIN_CONTROLLER_SCRIPT } from './login-controller.generated'
 
-const backToLogin = (): string =>
-  `<div class="id-actions" data-capture="id-actions"><a class="id-primary" href="/login">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
+const backToLogin = (tone: 'primary' | 'secondary' = 'primary'): string =>
+  `<div class="id-actions" data-capture="id-actions"><a class="id-${tone}" href="/login">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
 
 /**
  * TASK-1835 — Salida de una pantalla terminal. El copy de estas páginas manda a «pedir uno nuevo
  * desde el inicio de sesión»: sin este control, la instrucción no tiene dónde ejecutarse.
  */
-const exitToLogin = (label: string): string =>
-  `<div class="id-actions" data-capture="id-actions"><a class="id-primary" href="/login">${escapeHtml(label)}</a></div>`
+const exitToLogin = (label: string, tone: 'primary' | 'secondary' = 'primary'): string =>
+  `<div class="id-actions" data-capture="id-actions"><a class="id-${tone}" href="/login">${escapeHtml(label)}</a></div>`
 
 export const PERSON_AUTH_PATHS = {
   login: '/login',
@@ -97,7 +99,7 @@ export const renderLoginPage = (input: LoginPageInput): string => {
     input.productContext ? v4.productTitle(input.productContext.displayName) : v4.neutralTitle,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(input.productContext ? v4.productTitle(input.productContext.displayName) : v4.neutralTitle)}</h1>
   <p class="id-intro">${escapeHtml(input.productContext ? v4.contextualIntro : v4.intro)}</p>
-  ${invalidEmail ? `<p class="id-alert" id="email-error" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
+  ${invalidEmail ? `<p class="os-alert" id="email-error" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
   ${internalMethod}
   <section class="id-section id-v4-credentials">
   <div data-capture="id-passkey">
@@ -143,62 +145,83 @@ export const renderLoginPageResponse = (
   return response
 }
 
-export const renderMagicLinkSentPage = (): string =>
-  layout(
-    GH_AUTH_SERVER.login_sent_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_sent_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.login_sent_body)}</p>
-  <p class="id-note" data-capture="id-status" role="status">${ICON_MAIL}<span>${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</span></p>`
-  )
+export const renderMagicLinkSentPage = (): string => {
+  const copy = AUTH_ORBIT_COPY.magicSent
 
-export const renderRateLimitedPage = (): string =>
-  layout(
-    GH_AUTH_SERVER.login_rate_limited_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_rate_limited_title)}</h1>
-  <p class="id-note" data-capture="id-status" role="status">${ICON_CLOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</span></p>
-  ${exitToLogin(GH_AUTH_SERVER.login_back_cta)}`
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(GH_AUTH_SERVER.login_sent_body)}</p>
+  <p class="os-hint" data-capture="id-status" role="status">${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</p>
+  ${orbitLink('/login', GH_AUTH_SERVER.login_back_cta)}
+  ${orbitFootnote(copy.footnote)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'correo' } }
   )
+}
+
+export const renderRateLimitedPage = (): string => {
+  const copy = AUTH_ORBIT_COPY.rateLimited
+
+  return layout(
+    headingText(copy.heading),
+    `<p data-capture="id-status" role="status">${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</p>
+  ${exitToLogin(GH_AUTH_SERVER.login_back_cta, 'secondary')}
+  ${orbitFootnote(copy.footnote)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'reloj' } }
+  )
+}
 
 /** Página intermedia del magic link: el token viaja en un campo oculto y se consume por POST. */
-export const renderMagicLinkConfirmPage = (token: string): string =>
-  layout(
-    GH_AUTH_SERVER.confirm_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.confirm_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.confirm_body)}</p>
+export const renderMagicLinkConfirmPage = (token: string): string => {
+  const copy = AUTH_ORBIT_COPY.magicConfirm
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(GH_AUTH_SERVER.confirm_body)}</p>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkConsume)}">
     ${hiddenField('token', token)}
-    <div class="actions">
+    <div class="id-actions">
       <button class="primary" type="submit">${escapeHtml(GH_AUTH_SERVER.confirm_cta)}</button>
     </div>
-  </form>`
+  </form>
+  ${orbitFootnote(copy.footnote)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'correo' } }
   )
+}
 
-export const renderInvitationConfirmPage = (token: string): string =>
-  layout(
-    GH_AUTH_SERVER.confirm_invitation_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.confirm_invitation_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.confirm_invitation_body)}</p>
+export const renderInvitationConfirmPage = (token: string): string => {
+  const copy = AUTH_ORBIT_COPY.invitationConfirm
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(GH_AUTH_SERVER.confirm_invitation_body)}</p>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.invitationAccept)}">
     ${hiddenField('token', token)}
-    <div class="actions">
+    <div class="id-actions">
       <button class="primary" type="submit">${escapeHtml(GH_AUTH_SERVER.confirm_invitation_cta)}</button>
     </div>
-  </form>`
+  </form>`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'correo' } }
   )
+}
 
-export const renderInvitationAcceptedPage = (): string =>
-  layout(
-    GH_AUTH_SERVER.invitation_accepted_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.invitation_accepted_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>
-  ${backToLogin()}`
+export const renderInvitationAcceptedPage = (): string => {
+  const copy = AUTH_ORBIT_COPY.invitationAccepted
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>
+  ${backToLogin('secondary')}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'correo' } }
   )
+}
 
 /**
  * Un enlace inválido, vencido o ya usado comparte título: el detalle sólo cambia la línea de ayuda,
  * porque distinguir "no existe" de "vencido" le sirve más a quien sondea que a quien se equivocó.
  */
 export const renderLinkProblemPage = (kind: 'invalid' | 'expired' | 'already_used'): string => {
+  const copy = AUTH_ORBIT_COPY.linkProblem
+
   const body =
     kind === 'expired'
       ? GH_AUTH_SERVER.link_expired_body
@@ -207,32 +230,42 @@ export const renderLinkProblemPage = (kind: 'invalid' | 'expired' | 'already_use
         : GH_AUTH_SERVER.link_invalid_body
 
   return layout(
-    GH_AUTH_SERVER.link_invalid_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.link_invalid_title)}</h1>
-  <p data-capture="id-status">${escapeHtml(body)}</p>
-  ${exitToLogin(GH_AUTH_SERVER.link_request_new_cta)}`
+    headingText(copy.heading),
+    `<p data-capture="id-status">${escapeHtml(body)}</p>
+  ${exitToLogin(GH_AUTH_SERVER.link_request_new_cta)}
+  ${orbitFootnote(copy.footnote)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'correo' } }
   )
 }
 
-export const renderAccessRevokedPage = (): string =>
-  layout(
-    GH_AUTH_SERVER.link_access_revoked_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.link_access_revoked_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.link_access_revoked_body)}</p>`
-  )
+export const renderAccessRevokedPage = (): string => {
+  const copy = AUTH_ORBIT_COPY.revoked
 
-export const renderSessionStartedPage = (input: { direct?: boolean } = {}): string =>
-  layout(
-    GH_AUTH_SERVER.session_started_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_started_title)}</h1>
-  <p>${escapeHtml(input.direct ? GH_AUTH_SERVER.session_direct_body : GH_AUTH_SERVER.session_started_body)}</p>
-  ${input.direct ? `<form method="post" action="${PERSON_AUTH_PATHS.logout}"><div class="id-actions"><button class="id-secondary" type="submit">${escapeHtml(GH_AUTH_SERVER.session_logout_cta)}</button></div></form>` : ''}`
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(GH_AUTH_SERVER.link_access_revoked_body)}</p>`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'seguridad' } }
   )
+}
 
-export const renderSessionClosedPage = (): string =>
-  layout(
-    GH_AUTH_SERVER.session_closed_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_closed_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>
-  ${backToLogin()}`
+export const renderSessionStartedPage = (input: { direct?: boolean } = {}): string => {
+  const copy = AUTH_ORBIT_COPY.sessionStarted
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(input.direct ? GH_AUTH_SERVER.session_direct_body : GH_AUTH_SERVER.session_started_body)}</p>
+  ${input.direct ? `<form method="post" action="${PERSON_AUTH_PATHS.logout}"><div class="id-actions"><button class="secondary" type="submit">${escapeHtml(GH_AUTH_SERVER.session_logout_cta)}</button></div></form>` : ''}`,
+    { heading: copy.heading, panel: { kind: 'word', lines: copy.word } }
   )
+}
+
+export const renderSessionClosedPage = (): string => {
+  const copy = AUTH_ORBIT_COPY.sessionClosed
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(copy.body)}</p>
+  <div class="id-actions" data-capture="id-actions"><a class="id-secondary" href="/login">${escapeHtml(copy.cta)}</a></div>`,
+    { heading: copy.heading, panel: { kind: 'word', lines: copy.word } }
+  )
+}

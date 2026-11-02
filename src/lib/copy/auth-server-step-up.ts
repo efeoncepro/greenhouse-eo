@@ -1,4 +1,5 @@
 import { GH_AUTH_SERVER } from './auth-server'
+import { AUTH_ORBIT_COPY } from './auth-server-orbit'
 
 export const AUTH_STEP_UP_COPY = {
   /**
@@ -10,6 +11,10 @@ export const AUTH_STEP_UP_COPY = {
   backupRemaining: GH_AUTH_SERVER.totp_backup_remaining,
   backupContinue: GH_AUTH_SERVER.totp_backup_continue_cta,
   codeLabel: 'Código de tu aplicación o código de respaldo',
+  digitsLabel: AUTH_ORBIT_COPY.totp.digitsLabel,
+  backupLabel: AUTH_ORBIT_COPY.totp.backupLabel,
+  useBackup: AUTH_ORBIT_COPY.totp.useBackup,
+  useDigits: AUTH_ORBIT_COPY.totp.useDigits,
   setupCode: 'Código de tu aplicación de autenticación',
   verify: 'Verificar código',
   passkey: 'Verificar con mi passkey',

@@ -2,6 +2,7 @@
 import { efeonceTokens, axisRamp } from '@efeoncepro/axis-tokens'
 
 import { createLoginV4Styles } from './login-v4-styles'
+import { createOrbitShellStyles } from './orbit-shell-styles'
 
 import { axisMain, axisNeutral } from '../../src/@core/theme/axis-tokens'
 import spacing from '../../src/@core/theme/spacing'
@@ -330,5 +331,6 @@ form .id-actions { margin-block-start:${s(4)}; }
 }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 ${createLoginV4Styles()}
+${createOrbitShellStyles()}
 `
 }
