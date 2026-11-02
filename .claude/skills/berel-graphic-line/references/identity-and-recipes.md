@@ -61,7 +61,9 @@ Medición de los valores medidos: cuantización de píxeles sobre piezas entrega
 - Archivos oficiales en `clients/berel/.resources-local/logos/`: `Logo_Berel.svg` (rojo + negro),
   `Logo_Berel_Blanco.svg`, `Logo_Berel_Negro.svg`. El compositor los anida intactos como `<svg>`;
   solo decide posición y alto.
-- Blanco sobre foto, negro sobre papel. **Un solo logo por pieza.**
+- Blanco sobre foto, negro sobre papel. **Un solo logo compuesto por pieza.** El logo impreso en la etiqueta de un
+  producto oficial en escena no cuenta: la pieza conserva su firma (decisión del operador 2026-11-02: «sí, que salga dos
+  veces el logo»).
 - Manual: área de protección = ancho de la «e» de Berel alrededor del logo y respecto del borde
   (pág. 8); mínimo digital 50 px (70 px el círculo cromático); prohibido deformar, quitar los 25° o
   cambiar colores.
@@ -189,10 +191,12 @@ Del contrato, con su porqué:
   emparejado es un error de producto, no de diseño (caso N41).
 - **Rojo del logo `#EA0029` como acento de infografía:** el rojo corporativo es la marca; el acento
   de sistema es `editorial-red`.
-- **Logo redibujado, generado o más de uno por pieza:** un modelo no sostiene una marca.
+- **Logo redibujado, generado o más de un logo compuesto por pieza:** un modelo no sostiene una marca. La etiqueta del
+  producto en escena no cuenta como segundo logo.
 - **Marca o firma de Efeonce:** Efeonce entrega insumo; la pieza es de Berel.
 - **Párrafos dentro de la pieza, CTA, precio o hashtag.**
-- Del libro de marca: texto o logos dentro de la foto (el plate nace limpio).
+- Del libro de marca: texto o logos generados dentro de la foto (el plate nace limpio). La excepción es el producto
+  oficial en escena, con su etiqueta.
 
 ## Pendientes de confirmar con Berel
 

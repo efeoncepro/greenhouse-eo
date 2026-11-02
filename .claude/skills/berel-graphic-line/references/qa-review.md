@@ -38,7 +38,8 @@ Revisa cada pieza, en este orden:
 - [ ] **Estrato:** la escena se ve de estrato medio-alto a alto según su registro; nunca
       fraccionamiento genérico, aluminio blanco, laminado, plástico o desorden. Ver `photography.md`.
 - [ ] **Blog sin texto:** sin titular, píldora ni CTA en banners de blog.
-- [ ] **Nada de Efeonce** ni texto o logos dentro de la foto.
+- [ ] **Nada de Efeonce** ni texto o logos generados dentro de la foto (el producto oficial en escena, con su etiqueta, sí;
+      y la pieza mantiene su firma).
 - [ ] **Recortes verticales:** en post, story y Pinterest no entran elementos que el horizontal
       escondía (en la terraza, la viga entraba completa y la píldora caía encima).
 

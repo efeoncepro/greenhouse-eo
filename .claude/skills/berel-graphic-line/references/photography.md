@@ -257,7 +257,8 @@ Solo el modelo dio 0,05–0,48. Reglas en el contrato (`productInScene`):
   protagonista se acerca a la cámara.
 - Si el operador ve un producto chico, se revisan las referencias; no se defiende el número.
 
-Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital y dos logos Berel en la pieza.
+Sin probar: producto abierto o en uso, en mano, familia de tamaños y cenital. Dos logos (etiqueta + firma): permitido por
+el operador el 2026-11-02; la firma se mantiene.
 
 **Método vigente: guiado (2026-11-02, decisión del operador).** «Un buen montaje se conoce por NO parecer un
 montaje»: restituir la etiqueta desde el render la deja con aspecto pegado. Flujo:
