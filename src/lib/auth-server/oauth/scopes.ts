@@ -56,12 +56,37 @@ export const EFEONCE_MCP_SCOPES = [...EFEONCE_MCP_READ_SCOPES, ...EFEONCE_MCP_WR
 
 export type EfeonceMcpScope = (typeof EFEONCE_MCP_SCOPES)[number]
 
-const KNOWN = new Set<string>(EFEONCE_MCP_SCOPES)
-const WRITE = new Set<string>(EFEONCE_MCP_WRITE_SCOPES)
+/**
+ * Clases de la audiencia Rooms (TASK-2095, ADR del carril de agentes D2 + enmienda D1-bis). Viven SOLO en la
+ * audiencia Rooms y son RESTRINGIDAS: solo las recibe un cliente que las liste en `allowed_scopes` (un cliente con
+ * `allowed_scopes` abierto, como CIMD o DCR, nunca). No son scopes del gateway: no entran en la paridad con
+ * `efeonce-mcp` hasta que exista el provider `rooms` (TASK-2088).
+ */
+export const EFEONCE_ROOMS_SCOPES = [
+  'efeonce.mcp.rooms.read',
+  'efeonce.mcp.rooms.read.client',
+  'efeonce.mcp.rooms.author',
+  'efeonce.mcp.rooms.release',
+  'efeonce.mcp.rooms.access'
+] as const
 
-export const isKnownScope = (scope: string): scope is EfeonceMcpScope => KNOWN.has(scope)
+/** Escrituras de Rooms: step-up al consentir, como cualquier clase de escritura. */
+export const EFEONCE_ROOMS_WRITE_SCOPES = ['efeonce.mcp.rooms.author', 'efeonce.mcp.rooms.release', 'efeonce.mcp.rooms.access'] as const
+
+export type EfeonceRoomsScope = (typeof EFEONCE_ROOMS_SCOPES)[number]
+
+const KNOWN = new Set<string>([...EFEONCE_MCP_SCOPES, ...EFEONCE_ROOMS_SCOPES])
+const WRITE = new Set<string>([...EFEONCE_MCP_WRITE_SCOPES, ...EFEONCE_ROOMS_WRITE_SCOPES])
+const ROOMS = new Set<string>(EFEONCE_ROOMS_SCOPES)
+
+export const isKnownScope = (scope: string): scope is EfeonceMcpScope | EfeonceRoomsScope => KNOWN.has(scope)
 
 export const isWriteScope = (scope: string): boolean => WRITE.has(scope)
+
+export const isRoomsScope = (scope: string): scope is EfeonceRoomsScope => ROOMS.has(scope)
+
+/** Restringida = nunca se concede por `allowed_scopes` abierto; el cliente debe listarla. */
+export const isRestrictedScope = (scope: string): boolean => ROOMS.has(scope)
 
 /** Audiencia canónica del recurso MCP (única; nunca un alias). */
 export const EFEONCE_MCP_RESOURCE_AUDIENCE = 'https://mcp.efeonce.org/mcp'
@@ -71,6 +96,13 @@ export const PUBLISHED_SCOPES_SUPPORTED: readonly string[] = EFEONCE_MCP_READ_SC
 
 export const serializeScopes = (scopes: readonly string[]): string => scopes.join(' ')
 
-/** TASK-1844 starts with one consent class; never widen v2 through a different client registration. */
+/**
+ * TASK-1844 starts with one consent class; never widen v2 through a different client registration.
+ * TASK-2095 (D10): the Rooms audience is its own authorization — a v2 context may carry only Rooms classes there,
+ * because Rooms (not Greenhouse) decides the person's authority. The audience split itself is enforced by
+ * `resolveAudienceForScopes`, so a request never mixes both families.
+ */
 export const areInternalContextScopesAllowed = (version: 1 | 2 | undefined, scopes: readonly string[]): boolean =>
-  version !== 2 || (scopes.length === 1 && scopes[0] === EFEONCE_MCP_BASE_SCOPE)
+  version !== 2 ||
+  (scopes.length === 1 && scopes[0] === EFEONCE_MCP_BASE_SCOPE) ||
+  (scopes.length > 0 && scopes.every(isRoomsScope))

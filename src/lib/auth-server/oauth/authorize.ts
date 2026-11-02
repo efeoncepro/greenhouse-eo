@@ -20,6 +20,7 @@ import { htmlResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpRe
 import { OAUTH_ENDPOINT_PATHS } from './metadata'
 import { renderConsentPage, renderErrorPage, renderLoginRequiredPage, renderStepUpRequiredPage } from './pages/render'
 import { generateOpaqueId, generateOpaqueToken, isPkceToken, parseScopeParam, secondsFromNow, sha256Hex } from './primitives'
+import { assertRequestedResource, isKnownAudience, isRoomsAudience, resolveAudienceForScopes } from './resources'
 import { areInternalContextScopesAllowed, EFEONCE_MCP_BASE_SCOPE, isWriteScope } from './scopes'
 import type { OAuthStorePort } from './store/port'
 import type { SubjectSessionPort } from './subject'
@@ -112,7 +113,7 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
 
       const resource = paramOf(url, 'resource')
 
-      if (resource && resource !== deps.config.mcpAudience) {
+      if (resource && !isKnownAudience(deps.config, resource)) {
         throw new OAuthProtocolError('invalid_target', { description: 'unknown resource', reason: 'resource_mismatch', redirectable: true })
       }
 
@@ -120,11 +121,16 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
 
       assertScopesAllowedForClient(client, scopes)
 
+      // TASK-2095: one token, one audience — derived from the scope classes and checked against `resource`.
+      const audience = resolveAudienceForScopes(deps.config, scopes, true)
+
+      assertRequestedResource(deps.config, resource, audience, true)
+
       const prompt = paramOf(url, 'prompt')
       const nonce = paramOf(url, 'nonce')
 
       // 3. Persona autenticada por este emisor (TASK-1830).
-      const subject = await deps.subjectPort.resolve(request, { clientId: client.clientId, audience: deps.config.mcpAudience })
+      const subject = await deps.subjectPort.resolve(request, { clientId: client.clientId, audience })
 
       if (!subject || subject.environmentId !== deps.config.environmentId) {
         await recordOAuthAudit(deps.store, audit, { eventType: 'authorize', outcome: 'rejected', clientId, grantId: null, errorCode: 'login_required' })
@@ -140,8 +146,13 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
         throw new OAuthProtocolError('invalid_scope', { reason: 'internal_context_scope_class', redirectable: true })
       }
 
+      // TASK-2095: Rooms tokens are for internal people only; external or guest identities never get one.
+      if (isRoomsAudience(deps.config, audience) && !subject.authorizationContextId) {
+        throw new OAuthProtocolError('access_denied', { description: 'internal identity required', reason: 'rooms_requires_internal', redirectable: true })
+      }
+
       // 4. Autoridad vigente antes de pedir factor o consentimiento.
-      const grants = await deps.grantsPort.resolve({ environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId, authorizationContextId: subject.authorizationContextId })
+      const grants = await deps.grantsPort.resolve({ environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId, authorizationContextId: subject.authorizationContextId, audience })
 
       if (!grants.bound) {
         throw new OAuthProtocolError('access_denied', { description: 'no organization binding', reason: `unbound:${grants.outcome}`, redirectable: true })
@@ -161,7 +172,7 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
       const consentContext = await deps.consentContextPort.resolve({
         authorizationContextVersion: subject.authorizationContextVersion,
         environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId,
-        audience: deps.config.mcpAudience, authorizationContextId: subject.authorizationContextId
+        audience, authorizationContextId: subject.authorizationContextId
       }).catch(() => ({ outcome: 'unavailable' as const }))
 
       if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0 ||

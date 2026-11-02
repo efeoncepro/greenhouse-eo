@@ -8,6 +8,7 @@ import { createLocalJWKSet, jwtVerify, type JWTPayload } from 'jose'
 
 import { buildPublishedJwks, type SigningKeyRecord } from '../keys'
 import type { AuthServerOAuthConfig } from './config'
+import { knownAudiences } from './resources'
 
 export type VerifiedAccessToken = {
   authorizationContextId: string | null
@@ -38,7 +39,7 @@ export const verifyIssuedAccessToken = async (
   try {
     const result = await jwtVerify(token, jwks, {
       issuer: deps.config.issuer,
-      audience: deps.config.mcpAudience,
+      audience: knownAudiences(deps.config),
       algorithms: ['ES256'],
       currentDate: deps.now
     })

@@ -14,7 +14,8 @@ export type GrantsVersionResolution =
   | { bound: false; outcome: string; profileId: string | null }
 
 export interface GrantsVersionPort {
-  resolve(input: { environmentId: string; subject: string; clientId: string; authorizationContextId?: string | null }): Promise<GrantsVersionResolution>
+  /** `audience` (TASK-2095): the resource the token is for; absent = the MCP gateway. */
+  resolve(input: { environmentId: string; subject: string; clientId: string; authorizationContextId?: string | null; audience?: string }): Promise<GrantsVersionResolution>
 }
 
 export const createExternalAccessGrantsPort = (): GrantsVersionPort => ({

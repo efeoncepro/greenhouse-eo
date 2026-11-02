@@ -3,11 +3,12 @@ import { getInternalOrganizationBindingPresentation } from '@/lib/identity/inter
 import { resolveExternalAccess } from '@/lib/identity/external-access/resolve-external-access'
 import type { ExternalAccessResolution, ExternalOrganizationBinding } from '@/lib/identity/external-access/types'
 import type { AuthServerOAuthConfig } from '../oauth/config'
+import { isKnownAudience } from '../oauth/resources'
 import type { ConsentContextPort, ConsentContextResolution } from '../oauth/consent-context'
 import type { InternalContextRequest, InternalContextResolution } from './context'
 import type { InternalTargetResolution } from '@/lib/identity/internal-access/target-authority'
 
-type Config = Pick<AuthServerOAuthConfig, 'issuer' | 'environmentId' | 'mcpAudience'>
+type Config = Pick<AuthServerOAuthConfig, 'issuer' | 'environmentId' | 'mcpAudience' | 'roomsAudience'>
 type Membership = { bindingId: string; organizationId: string; grantsVersion: number; capabilities: readonly string[] }
 export type ConsentContextDependencies = {
   config: Config
@@ -24,7 +25,7 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
   resolve: async input => {
     if (
       input.environmentId !== deps.config.environmentId ||
-      input.audience !== deps.config.mcpAudience ||
+      !isKnownAudience(deps.config, input.audience) ||
       !input.subject.trim() ||
       !input.clientId.trim()
     )

@@ -17,7 +17,7 @@ import {
   sha256Hex,
   type LoopbackHostPolicy
 } from './primitives'
-import { isKnownScope } from './scopes'
+import { isKnownScope, isRestrictedScope } from './scopes'
 import type { OAuthClientRecord, OAuthStorePort, OAuthTokenEndpointAuthMethod } from './store/port'
 
 export const loopbackPolicyFor = (config: Pick<AuthServerOAuthConfig, 'allowLocalhostAlias'>): LoopbackHostPolicy => ({
@@ -133,6 +133,11 @@ export const assertScopesAllowedForClient = (client: OAuthClientRecord, scopes: 
 
     if (client.allowedScopes && !client.allowedScopes.includes(scope)) {
       throw new OAuthProtocolError('invalid_scope', { description: 'scope not allowed for client', reason: 'scope_not_allowed', redirectable: true })
+    }
+
+    // TASK-2095: a restricted class (Rooms) is never granted by an open allow-list (CIMD/DCR clients).
+    if (!client.allowedScopes && isRestrictedScope(scope)) {
+      throw new OAuthProtocolError('invalid_scope', { description: 'scope not allowed for client', reason: 'restricted_scope', redirectable: true })
     }
   }
 }
@@ -277,4 +282,108 @@ export const registerConfidentialClient = async (
   await deps.store.upsertClient(client)
 
   return { client, clientSecret, created: true }
+}
+
+// ─── Command: clientes del carril CLI de Rooms (TASK-2095) ──────────────────
+
+/** Cliente público first-party de la CLI de Rooms: PKCE por loopback y refresh rotativo; nunca secret. */
+export const ROOMS_CLI_CLIENT_ID = 'efeonce-rooms-cli'
+/** Cliente confidencial de Rooms como resource server: solo introspección de su audiencia. */
+export const ROOMS_RESOURCE_CLIENT_ID = 'efeonce-rooms-resource'
+/** `read.client` queda fuera hasta su revisión de gobierno de datos IA (ADR del carril, D2). */
+export const ROOMS_CLI_ALLOWED_SCOPES = ['efeonce.mcp.rooms.read', 'efeonce.mcp.rooms.author', 'efeonce.mcp.rooms.release', 'efeonce.mcp.rooms.access'] as const
+/** Grant inexistente a propósito: el CHECK exige uno y este cliente no puede pedir tokens. */
+export const RESOURCE_SERVER_GRANT = 'urn:efeonce:resource-server'
+
+/** Audiencia que un cliente puede introspectar; `null` = comportamiento previo (cualquier token propio del emisor). */
+export const introspectionAudienceOf = (client: OAuthClientRecord): string | null => {
+  const value = client.metadata?.introspection_audience
+
+  return typeof value === 'string' && value.length > 0 ? value : null
+}
+
+export type RegisterRoomsAgentClientsResult = {
+  cli: { client: OAuthClientRecord; created: boolean }
+  resource: { client: OAuthClientRecord; clientSecret: string | null; created: boolean }
+}
+
+/**
+ * Registra (idempotente por `client_id`) el cliente público de la CLI y el confidencial de introspección de Rooms.
+ * Exige la audiencia Rooms configurada: sin ella no hay a quién apuntar los tokens. Nunca re-emite el secret.
+ */
+export const registerRoomsAgentClients = async (
+  input: { actor: string; loopbackRedirectUri?: string },
+  deps: { store: OAuthStorePort; config: AuthServerOAuthConfig; now?: () => Date }
+): Promise<RegisterRoomsAgentClientsResult> => {
+  const audience = deps.config.roomsAudience
+
+  if (!audience) {
+    throw new OAuthProtocolError('invalid_target', { description: 'AUTH_SERVER_ROOMS_AUDIENCE is not configured', reason: 'rooms_audience_disabled' })
+  }
+
+  const now = (deps.now ?? (() => new Date()))()
+  const policy = loopbackPolicyFor(deps.config)
+  const loopback = assertRedirectUrisForClientType([input.loopbackRedirectUri ?? 'http://127.0.0.1/callback'], 'public', policy)
+
+  if (!loopback.every(uri => isLoopbackRedirectUri(uri, policy))) {
+    throw new OAuthProtocolError('invalid_redirect_uri', { description: 'the CLI client only accepts loopback redirects', reason: 'cli_non_loopback' })
+  }
+
+  const ensure = async (record: OAuthClientRecord): Promise<{ client: OAuthClientRecord; created: boolean }> => {
+    const existing = await deps.store.getClient(record.clientId)
+
+    if (existing) {
+      if (existing.registrationKind !== 'preregistered' || existing.clientType !== record.clientType) {
+        throw new OAuthProtocolError('invalid_client_metadata', { description: 'client_id taken', reason: 'client_id_taken' })
+      }
+
+      return { client: existing, created: false }
+    }
+
+    await deps.store.upsertClient(record)
+
+    return { client: record, created: true }
+  }
+
+  const cli = await ensure({
+    clientId: ROOMS_CLI_CLIENT_ID,
+    registrationKind: 'preregistered',
+    clientType: 'public',
+    clientName: 'Efeonce Rooms CLI',
+    redirectUris: loopback,
+    grantTypes: ['authorization_code', 'refresh_token'],
+    responseTypes: ['code'],
+    tokenEndpointAuthMethod: 'none',
+    clientSecretHash: null,
+    allowedScopes: [...ROOMS_CLI_ALLOWED_SCOPES],
+    status: 'active',
+    metadata: { registeredBy: input.actor, firstParty: true, product: 'rooms', lane: 'agent_cli' },
+    createdBy: input.actor,
+    createdAt: now,
+    updatedAt: now
+  })
+
+  const existingResource = await deps.store.getClient(ROOMS_RESOURCE_CLIENT_ID)
+  const clientSecret = existingResource ? null : generateOpaqueToken('efs', 32)
+
+  const resource = await ensure({
+    clientId: ROOMS_RESOURCE_CLIENT_ID,
+    registrationKind: 'preregistered',
+    clientType: 'confidential',
+    clientName: 'Efeonce Rooms (resource server)',
+    // El CHECK exige al menos una redirect https; nunca se usa: sin `code` en response_types, authorize lo rechaza.
+    redirectUris: [`${new URL(audience).origin}/`],
+    grantTypes: [RESOURCE_SERVER_GRANT],
+    responseTypes: ['none'],
+    tokenEndpointAuthMethod: 'client_secret_basic',
+    clientSecretHash: clientSecret ? sha256Hex(clientSecret) : 'unused',
+    allowedScopes: [],
+    status: 'active',
+    metadata: { registeredBy: input.actor, firstParty: true, product: 'rooms', introspection_audience: audience },
+    createdBy: input.actor,
+    createdAt: now,
+    updatedAt: now
+  })
+
+  return { cli, resource: { ...resource, clientSecret: resource.created ? clientSecret : null } }
 }
