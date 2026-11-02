@@ -10,6 +10,12 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-02 — Botón «Continuar con Efeonce ID»
+
+El botón con el que las aplicaciones de Efeonce ofrecen entrar con Efeonce ID quedó definido: «Continuar con» y la marca
+Efeonce | ID, como un botón de pago, con sus diez estados ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
+El archivo oficial entra a AXIS en `axis-brand-assets` 0.4.32; falta llevarlo a las aplicaciones.
+
 ## 2026-11-01 — Marca de Efeonce ID
 
 Efeonce ID, la cuenta de Efeonce Auth, tiene marca aprobada: la órbita vive en la D, con la esfera Growth a la 1:30

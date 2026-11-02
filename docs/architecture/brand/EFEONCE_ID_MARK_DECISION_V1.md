@@ -65,7 +65,31 @@ release `v0.4.31` (AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Pa
   `pnpm auth-server:brand-assets:generate`. Reemplaza el isotipo de Efeonce en azul. Llega a `auth.efeonce.org` sólo con
   el próximo release gobernado. Cuando Greenhouse fije `axis-brand-assets` ≥ 0.4.31 (TASK-2014), esa copia entra a la
   guarda `src/config/efeonce-brand-assets.test.ts` contra el paquete.
-- El lockup del encabezado del formulario y el botón «Continuar con Efeonce ID» siguen pendientes.
+- El lockup del encabezado del formulario sigue pendiente. El botón «Continuar con Efeonce ID» está definido (sección
+  siguiente); falta implementarlo.
+
+## El botón «Continuar con Efeonce ID» (aprobado 2026-11-02)
+
+El botón canónico con el que Rooms, Studio, Greenhouse y cualquier relying party entran con Efeonce ID es **«Continuar
+con» + el lockup del botón** (`efeonce-id-button-lockup-{positive,negative}`, `axis-brand-assets` 0.4.32), igual que
+«Pagar con PayPal». En ese lockup «ID» va **en la tinta del texto** (blanco en el sello oscuro, navy en el botón blanco)
+y no en el gris de la familia: el botón nombra la cuenta, no sólo a Efeonce. Sólo la esfera va en el acento.
+
+- **Superficies:** sello oscuro `#001a33` con texto blanco sobre papel o blanco; botón blanco con texto navy y borde
+  sobre oscuro o foto.
+- **Anatomía (52 px por defecto):** píldora, «Continuar con» en Poppins 400 16 px, lockup de 20 px de alto. Grande
+  56 px, compacto 40 px (sólo el lockup, con nombre accesible), ancho completo y sólo el símbolo (el monograma).
+- **Los diez estados:** reposo; cursor (navy o papel, borde teal y halo teal suave, la luz de la línea); presionado;
+  foco con teclado (anillo teal sólido, separado); foco + cursor; cargando (la órbita de la familia girando y
+  «Conectando…»); cargando con movimiento reducido (la órbita quieta); conectado (la esfera completa la vuelta);
+  error (vuelve a reposo con el aviso «No pudimos conectar. Inténtalo de nuevo.» debajo); deshabilitado.
+- **Descartado, con su razón:** el monograma antes del texto (son letras: se lee «ID Continuar con Efeonce ID»); el
+  monograma al final de la frase (la esfera arriba se lee como aviso y la marca queda chica); la órbita sola a la
+  izquierda (a tamaño de botón parece el ícono de recargar); el isotipo en su teja (pesado); el lockup de familia con
+  «ID» en gris (a 1x el nombre de la cuenta pierde fuerza).
+- Anatomía exacta y estados: README de `@efeoncepro/axis-brand-assets` («The «Continuar con Efeonce ID» button»).
+  Canvas de registro: «Efeonce ID — logo», lámina «Botón «Continuar con Efeonce ID» · todos los estados». Falta
+  implementarlo como primitive en `axis-ui-primitives` y adoptarlo en los relying parties.
 
 ## Alternativas descartadas
 

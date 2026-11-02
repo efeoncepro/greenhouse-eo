@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-11-02 — Botón «Continuar con Efeonce ID» canonizado
+
+«Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID con «ID» en la tinta del texto) en
+`axis-brand-assets` 0.4.32 (commit AXIS `0d45749`, sin empujar; 59/59 pruebas del paquete y 179/179 del Lab). Anatomía,
+tamaños y los diez estados en el README del paquete y en el [ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md).
+Pendiente: release `v0.4.32`, primitive en `axis-ui-primitives` y adopción en Rooms, Studio y Greenhouse.
+
 ## 2026-11-01 — Marca de Efeonce ID aprobada y canonizada en AXIS
 
 «La órbita vive en la D»: asta, tramo recto de 110 y media órbita, esfera Growth a la 1:30 ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).

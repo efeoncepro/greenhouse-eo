@@ -805,7 +805,13 @@ Nothing else: a fingerprint with ridges inside the D was rejected as too heavy f
 - **Brand assets** in `@efeoncepro/axis-brand-assets` **`0.4.31`** (published in release `v0.4.31`, AXIS `5a6a597` + `5540a2c`, 2026-11-02, registry readback): 12 SVG
   `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`; brand key `efeonce-id`, logo family
   `efeonce-id` (public in «Logotipos»). `lockup` «Efeonce | ID» is the default; `isotype-small` (ring 110, sphere 104,
-  air 30) only at 32 px or less (favicon, «Continuar con Efeonce ID» button).
+  air 30) only at 32 px or less (favicon).
+- **«Continuar con Efeonce ID» button (approved 2026-11-02, `0.4.32`, AXIS `0d45749`):** «Continuar con» +
+  `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID with «ID» in the text ink, not the family gray). Dark
+  seal on paper, white button on dark; 52 px default, 56/40/full-width/symbol-only; ten states (hover with teal border
+  and halo, loading with the family orbit glyph, connected with the full turn, error with notice below). Spec in the
+  package README; never the monogram before the text (it is letters), never in a tile, never the bare orbit glyph as
+  its symbol (reads as reload). Not yet an `axis-ui-primitives` component.
 - **Sign-in screen rule:** on the Efeonce Auth sign-in screen only the favicon and the in-form pieces (header lockup,
   button); never the large isotype in the side panel, which belongs to the news slider.
 - **Generation:** Greenhouse `scripts/brand/build-efeonce-id-logos.mjs`; copy to `packages/brand-assets/assets/` and

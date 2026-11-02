@@ -1,5 +1,16 @@
 # Registro de decisiones y versiones
 
+### 2026-11-02 — Botón «Continuar con Efeonce ID» (aprobado)
+
+- **Canónico:** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (`axis-brand-assets` 0.4.32, AXIS
+  `0d45749`): el lockup Efeonce | ID con «ID» en la tinta del texto, no en gris. Sello oscuro sobre papel, blanco sobre
+  oscuro; 52 px por defecto, grande 56, compacto 40, ancho completo y sólo símbolo; diez estados (cursor con halo teal,
+  cargando con la órbita, conectado con la vuelta completa, error con aviso debajo). ADR de la marca, sección del botón.
+- **Descartado:** monograma antes del texto («ID Continuar con Efeonce ID»), monograma al final (la esfera arriba se lee
+  como aviso), órbita sola a la izquierda (parece recargar), isotipo en teja («muy pesado»), lockup con «ID» en gris.
+- **Regla que deja:** un símbolo hecho de letras no va antes de un texto que las repite; si tiene que ir, va en su propio
+  lugar con forma de logo (la G de Google), o la marca entra como nombre después de «Continuar con».
+
 ### 2026-11-01 — Marca de Efeonce ID: la órbita vive en la D (aprobada)
 
 Caso: logo de Efeonce ID, la cuenta de Efeonce Auth (canvas `https://claude.ai/code/artifact/4e613ff0-2a09-48c6-8e98-4adffc6da9bd`,

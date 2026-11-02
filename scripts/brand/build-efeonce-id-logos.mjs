@@ -18,6 +18,8 @@
  *  - `efeonce-id-isotype`: el monograma en un cuadro, para avatar e ícono de app.
  *  - `efeonce-id-isotype-small`: para 32 px o menos (favicon): anillo 110, esfera 104 y aire 30, para que la panza no
  *    se pierda.
+ *  - `efeonce-id-button-lockup` (sólo `positive` y `negative`): el lockup del botón «Continuar con Efeonce ID», con
+ *    «ID» en la tinta del texto en vez del gris de la familia.
  *
  * Uso: node scripts/brand/build-efeonce-id-logos.mjs <directorio-de-salida>
  * Canon: @efeoncepro/axis-brand-assets (`efeonce-id-*`). Regenerar = correr esto, copiar a packages/brand-assets/assets/
@@ -174,8 +176,11 @@ const efeonceLogo = variant => {
 const LOCKUP = { efeonceH: 30, gap: 20, ruleW: 1, ruleH: 26 }
 const MARK_PX_PER_UNIT = 21 / 719
 
-function lockupSvg(m, variant) {
-  const v = VARIANTS[variant]
+// `inkMark`: el lockup del botón «Continuar con Efeonce ID» (operador, 2026-11-02). En el lockup de familia «ID» baja
+// al gris para que Efeonce predomine; en el botón, que nombra la cuenta, «ID» va en la tinta del texto (sólo la esfera
+// en el acento). Mismas medidas que el lockup de familia.
+function lockupSvg(m, variant, { inkMark = false } = {}) {
+  const v = inkMark ? { ...VARIANTS[variant], endorsed: VARIANTS[variant].ink } : VARIANTS[variant]
   const source = efeonceLogo(variant)
   const [, , vw, vh] = viewBoxOf(source)
   const ew = (vw * LOCKUP.efeonceH) / vh
@@ -208,6 +213,8 @@ for (const variant of Object.keys(VARIANTS)) {
   write(`efeonce-id-lockup-${variant}.svg`, lockupSvg(regular, variant))
   write(`efeonce-id-isotype-${variant}.svg`, isotypeSvg(regular, v))
   write(`efeonce-id-isotype-small-${variant}.svg`, isotypeSvg(small, v))
+  // El botón sólo existe sobre sello oscuro (negative) y sobre blanco (positive); `white` ya es todo blanco.
+  if (variant !== 'white') write(`efeonce-id-button-lockup-${variant}.svg`, lockupSvg(regular, variant, { inkMark: true }))
 }
 
 console.log(JSON.stringify({ accent: growth.accentOnLight, files: written.length }))
