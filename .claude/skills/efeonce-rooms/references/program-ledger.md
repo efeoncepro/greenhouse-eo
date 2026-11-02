@@ -13,6 +13,14 @@
   ya fija `axis-brand-assets` 0.4.32 y muestra el lockup de familia `efeonce-id-lockup-negative`: no es el botón. La pantalla de
   sesión cerrada sigue con un `Button` genérico «Volver a entrar». Adoptarlo: cuando exista la primitive, sólo donde Rooms ya ofrece entrar; la entrada a rutas
   protegidas sigue directa (D2/D9).
+- **2026-11-02 — páginas de fin de `pnpm rooms login` en producción (`vivo`):** efeonce-rooms PR #23, merge `3434ea8`, deploy
+  `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` con alias (diseño: sesión «Diseño UI Rooms efeonce», a pedido del operador). El loopback espera a
+  que la credencial quede guardada y responde 303 a `/cli/conectado` («Listo») o `/cli/error?motivo=state|issuer|denied|failed`
+  («Casi»); ni el código ni tokens viajan en esa URL. Antes decía «Listo» antes del canje: corregido. Páginas públicas con
+  `OrbitWordStage`, fila «Acceso con» + `efeonce-id-lockup-negative` (`axis-brand-assets` 0.4.32 por `sync-brand`) y la nota con el
+  comando. Notas del escenario de vuelta a 13 px (también `/salir` y 404). Suite 420 pass, 24 skipped, 0 fail;
+  `tests/agent-cli-login.test.ts` afirma el 303. Readback: `/cli/conectado`, `/cli/error` y el lockup en 200. **Sin verificar:** el
+  recorrido real en el navegador con un `pnpm rooms login` contra producción.
 - **2026-11-02 — aceptación del carril CLI en producción (`vivo`):** el operador corrió `pnpm rooms login` una vez (Efeonce ID + MFA;
   `subject` opaco, principal `rooms-pilot-julio-20261025`, espacio «Efeonce» `org-2df565fb-…`). Sin pedirle nada más, el agente creó
   `demo-volta` («Campaña «Llega antes»», `synthetic`/`fixture`), subió las 5 imágenes (`kv-16x9`, `feed-4x5`, `story-9x16`,
@@ -21,8 +29,7 @@
   (revisión 22). Sin invitaciones. Actividad: 17 acciones, todas `cli/claude-code`, aviso y reversa (`rooms.archive`) disponibles.
   Introspección real con el secreto de Secret Manager verificada por la primera lectura. **Sin verificar:** la sala vista en el
   navegador con sesión humana en `/rooms`.
-  - Pendiente de diseño: la página de éxito del callback loopback de `pnpm rooms login` es HTML sin estilo (el operador: «está
-    pantalla está horrible»); debe terminar en una página de Rooms de la familia de la órbita, aprobada en canvas.
+  - La página de éxito del callback era HTML sin estilo (el operador: «está pantalla está horrible»); resuelto en PR #23 (arriba).
 - **2026-11-02 — carril ENCENDIDO (`vivo`):** `ROOMS_AGENT_LANE_ENABLED=true` (env add del operador), `ROOMS_AGENT_AUDIENCE` y la ref del
   secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`; antes `mgod4xbea`)
   con alias. Metadata 200 con audiencia/emisor/cliente; `/rooms` 307, `/auth/error` 200, sesión 401, bearer falso 401. Efeonce ID ya
