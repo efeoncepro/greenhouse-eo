@@ -11,6 +11,13 @@ forma, una sola transformación generada por IA de 8 s, sin cortes, más la tapa
 color entra hacia los 2–3 s y el titular hacia los 4–5 s. No hay voz; hay 4 pistas de música en todo el corpus. Las
 fuentes de esos clips eran Firefly/Magnific a 720p.
 
+**El efecto Berel: los objetos saltan a la escena** (operador, 2026-11-02, revisado en los 29 reels publicados). Llegan
+uno tras otro, sólidos y opacos, con un rebote corto al apoyarse y su sombra de contacto: lámparas que bajan del techo
+(cocina), mesas que se despliegan y alfombras que se desenrollan (N31), cubetas o piezas que caen y rebotan (N20, N42).
+La pintura se extiende en manchas orgánicas que se juntan, no en un barrido parejo. **Nunca** fundidos ni objetos
+semitransparentes. El prompt anterior («smooth continuous transformation… settle into place») producía fundidos: FLUX 3
+barría el muro y la lámpara entraba difuminada; Omni metía una ola de pintura rosada y una silla transparente.
+
 El reel nuevo sale a **1080 × 1920, 30 fps, 14 s**: clip de 8 s + marcador (2,5 s, fundido 0,6) + titular (4,5 s,
 fundido 0,8) + tapa vigente (`Tapa de Cierre_3._9.16-DOS.mp4`, nunca la carpeta «Viejo»).
 
@@ -22,6 +29,7 @@ node $R cuadros --job projects/berel/<pieza>/jobs/<toma>-story.json --out $O --l
   --cambios "<cómo era antes>" --transformacion "<qué pasa en el video>" [--conservar "…"] [--luz "Sunny daylight"]
 node $R capas --dir $O
 node $R qa --dir $O --clip $O/flux3.mp4
+node $R corregir --dir $O --clip $O/flux3.mp4 --out $O/flux3-color.mp4   # solo si el muro falla por color; luego qa otra vez
 node $R armar --dir $O --clip $O/flux3.mp4 --out $O/reel-flux3.mp4 --mes NOV
 node $R comparar --out $O/../comparar.mp4 --modelos "flux3 omni" <dir> [<dir>…]
 ```
@@ -32,9 +40,15 @@ node $R comparar --out $O/../comparar.mp4 --modelos "flux3 omni" <dir> [<dir>…
    Nombra lo que no cambia (ventanas, puerta, piedra, reja) para que el modelo lo conserve. **Mira antes y después
    juntos**: si la cámara se movió, el video lo delata.
 2. **Capas.** `capas` compone la story sobre el cuadro después y separa marcador y titular en dos PNG transparentes.
-3. **Clip.** Motor según §3. Guárdalo como `<toma>/<modelo>.mp4`.
-4. **QA.** `qa` falla cerrado (salida 1). Además, **mira la hoja de cuadros**: un mueble que entra semitransparente
-   no lo mide el salto.
+3. **Clip.** Motor según §3. Guárdalo como `<toma>/<modelo>.mp4`. El `--transformacion` describe la pintura en manchas
+   y nombra cada objeto con su forma de entrar (*drops in*, *hops into place*, *pops onto*, *unrolls*, *swings down from
+   the ceiling*) en el orden en que aparece; la plantilla del contrato añade que todo entra sólido y saltando.
+4. **QA.** `qa` falla cerrado (salida 1) solo por color. Además, **mira la hoja de cuadros** (3 por segundo): cada
+   objeto entra sólido y saltando, la pintura en manchas, nada semitransparente. Si solo falla el color, `corregir`
+   aplica al clip una ganancia por canal que lleva el muro del último cuadro al plate, **solo en los píxeles con el
+   tono del muro** (los muebles y los blancos quedan intactos), y se vuelve a correr `qa` sobre la salida. Caso fuente:
+   estudio Ultravioleta 2026-11-02, FLUX 3 saturó el muro (ΔE 7,2; L −2, a +4, b −5) y quedó en ΔE 0,6 sin tocar madera
+   ni tapiz. No sirve si el muro cambia de tono a mitad del clip ni si el modelo pintó otro color.
 5. **Armado.** `armar` pone capas, tapa y música. La pista del mes suena bajo los 14 s y los efectos de la tapa van
    encima a partir de los 8 s; mezcla a −14 LUFS (el corpus del squad va a −12).
 
@@ -74,11 +88,13 @@ Trampas medidas (2026-11-02):
 
 - **Color:** ΔE (CIE76) del muro en el último cuadro contra el cuadro después, medido sobre la máscara del muro que
   dejó `ajustar-muro` (`<plate>.mascara.png`, recortada igual). Máximo 4. Sin máscara, `--zona x,y,w,h`.
-- **Fluidez:** diferencia media entre cuadros consecutivos (gris 108 × 192, 24 fps); el salto más brusco no puede
-  pasar del 5 % del cambio total. Detecta apariciones de golpe (FLUX 3 en herrería: 7,5 %, la reja y el muro de un
-  cuadro a otro).
-- **Lo que no mide:** muebles que entran semitransparentes (MiniMax, a veces Omni en el comedor), un círculo de pintura
-  que crece de forma artificial o una mesa flotando. Eso se ve en la hoja de cuadros y en el clip.
+- **Salto y reparto: dato, no compuerta.** Diferencia media entre cuadros consecutivos (gris 108 × 192, 24 fps): el
+  salto más brusco como % del cambio total y cuántos cuadros concentran la mitad del cambio. El umbral del 5 % se retiró
+  el 2026-11-02: el efecto Berel *es* una aparición de golpe. En los 29 reels publicados (0,5–7,7 s, mitad inferior) el
+  salto tiene mediana 4,7 %, rango 1,4–21,6 %, y 14 de 29 pasan del 5 %. El área que cambia de golpe tampoco separa lo
+  bueno de lo malo (reels publicados hasta 41 %).
+- **Lo que se mira:** objetos que entran semitransparentes (MiniMax; Omni en el estudio Ultravioleta), un barrido de
+  pintura parejo, un objeto flotando o la cámara que se mueve. Eso se ve en la hoja de cuadros y en el clip.
 
 ## 5. Música y tapa
 
@@ -91,4 +107,5 @@ nueva en `music.tracks` del contrato.
 
 - Revisión de Berel (Daniela, Andrés o Melkin) de los reels piloto.
 - El titular entra con fundido, no palabra a palabra como en el corpus.
+- La evidencia de motores de §3 se midió con el prompt anterior (fundidos); falta repetirla con el efecto de salto.
 - Si la exportación antigua a 750 × 1334 era decisión o límite (el reel nuevo sale a 1080 × 1920).

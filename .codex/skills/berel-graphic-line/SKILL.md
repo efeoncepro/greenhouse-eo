@@ -132,7 +132,7 @@ sustituyen por otra fuente ni por valores aproximados.
 | ¿Qué tipografía, color de sistema o logo uso? ¿Dónde va el logo? | [identity-and-recipes.md](references/identity-and-recipes.md) |
 | Portada, cierre, franjas, pasos, paleta, post, story, Pinterest | [identity-and-recipes.md](references/identity-and-recipes.md) |
 | Señalización o técnica-gráfica | [identity-and-recipes.md](references/identity-and-recipes.md) (declaradas sin render) |
-| Reel de transformación: cuadros, motor (FLUX 3 / Omni), QA de color y fluidez, música y tapa | [video.md](references/video.md) |
+| Reel de transformación: cuadros, motor (FLUX 3 / Omni), efecto de salto, QA de color, música y tapa | [video.md](references/video.md) |
 | ¿Por qué el marcador quedó ahí, se eliminó o salió con aviso? | [marker-grid.md](references/marker-grid.md) |
 | El titular social no cabe o se lee mal | [marker-grid.md](references/marker-grid.md) |
 | Foto nueva: estrato, espacio, toma, prompt, remates, banda del titular | [photography.md](references/photography.md) |
