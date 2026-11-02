@@ -17,6 +17,7 @@ import { OAuthProtocolError, isOAuthProtocolError } from './errors'
 import type { GrantsVersionPort, GrantsVersionResolution } from './grants'
 import { isFormContentType, jsonResponse, parseFormBody, type OAuthHttpRequest, type OAuthHttpResponse } from './http'
 import { sha256Hex, verifyPkceS256 } from './primitives'
+import { isRoomsAudience, resolveAudienceForScopes } from './resources'
 import type { OAuthClientRecord, OAuthStorePort } from './store/port'
 import { issueInitialTokenSet, prepareTokenSet, toTokenResponseBody, type AccessTokenSigner } from './tokens'
 
@@ -73,13 +74,20 @@ const assertConsentAndBinding = async (
   // A previously granted scope does not bypass the client's current issuance policy.
   assertScopesAllowedForClient(input.client, input.scopes)
 
+  // TASK-2095: the audience comes from the persisted classes; Rooms only for internal contexts.
+  const audience = resolveAudienceForScopes(deps.config, input.scopes)
+
+  if (isRoomsAudience(deps.config, audience) && !input.authorizationContextId) {
+    throw new OAuthProtocolError('invalid_grant', { description: 'internal identity required', reason: 'rooms_requires_internal' })
+  }
+
   const consents = await deps.store.listActiveConsents({ subject: input.subject, environmentId: input.environmentId, clientId: input.client.clientId, authorizationContextId: input.authorizationContextId })
 
   if (missingConsentScopes(consents, input.scopes).length > 0) {
     throw new OAuthProtocolError('invalid_grant', { description: 'consent missing', reason: 'consent_missing' })
   }
 
-  const grants = await deps.grantsPort.resolve({ environmentId: input.environmentId, subject: input.subject, clientId: input.client.clientId, authorizationContextId: input.authorizationContextId })
+  const grants = await deps.grantsPort.resolve({ environmentId: input.environmentId, subject: input.subject, clientId: input.client.clientId, authorizationContextId: input.authorizationContextId, audience })
 
   if (!grants.bound) throw new OAuthProtocolError('invalid_grant', { description: 'no organization binding', reason: `unbound:${grants.outcome}` })
 

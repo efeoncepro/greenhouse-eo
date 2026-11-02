@@ -23,6 +23,14 @@ class RoomsConfigDriftTests(unittest.TestCase):
     def test_complete_enabled_registration_matches(self):
         self.assertTrue(drift.config_matches(*self.configured()))
 
+    def test_rooms_audience_change_requires_deploy(self):
+        revision, desired = self.configured()
+        self.assertTrue(drift.config_matches(revision, desired))
+        desired['AUTH_SERVER_ROOMS_AUDIENCE'] = 'https://rooms.example.invalid/api/v1'
+        self.assertFalse(drift.config_matches(revision, desired))
+        revision['spec']['containers'][0]['env'].append({'name': 'AUTH_SERVER_ROOMS_AUDIENCE', 'value': desired['AUTH_SERVER_ROOMS_AUDIENCE']})
+        self.assertTrue(drift.config_matches(revision, desired))
+
     def test_flag_only_enable_requires_deploy(self):
         self.assertFalse(drift.config_matches({'spec': {'containers': [{'env': []}]}}, {drift.FLAGS[0]: 'true'}))
 

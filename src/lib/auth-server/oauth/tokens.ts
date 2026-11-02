@@ -9,6 +9,7 @@
 
 import type { AuthServerOAuthConfig } from './config'
 import { generateOpaqueId, generateOpaqueToken, secondsFromNow, sha256Hex } from './primitives'
+import { accessTokenTtlFor, resolveAudienceForScopes } from './resources'
 import { serializeScopes } from './scopes'
 import type { AccessTokenRecord, OAuthClientRecord, OAuthStorePort, RefreshTokenRecord } from './store/port'
 
@@ -62,18 +63,20 @@ export type IssueTokenSetInput = {
 
 export const buildAccessTokenClaims = (config: AuthServerOAuthConfig, input: IssueTokenSetInput, jti: string): AccessTokenClaims => {
   const iat = Math.floor(input.now.getTime() / 1000)
+  // TASK-2095: `aud` and lifetime follow the scope classes (one token, one audience).
+  const audience = resolveAudienceForScopes(config, input.scopes)
 
   return {
     ...(input.authorizationContextId ? { authorization_context_id: input.authorizationContextId, authorization_context_version: input.authorizationContextVersion ?? 1 } : {}),
     iss: config.issuer,
     sub: input.subject,
-    aud: config.mcpAudience,
+    aud: audience,
     azp: input.client.clientId,
     client_id: input.client.clientId,
     scope: serializeScopes(input.scopes),
     gv: input.grantsVersion,
     iat,
-    exp: iat + config.accessTokenTtlSeconds,
+    exp: iat + accessTokenTtlFor(config, audience),
     jti,
     auth_time: Math.floor(input.authTime.getTime() / 1000)
   }
@@ -131,7 +134,7 @@ export const prepareTokenSet = async (
     tokens: {
       access_token: accessToken,
       token_type: 'Bearer',
-      expires_in: config.accessTokenTtlSeconds,
+      expires_in: claims.exp - claims.iat,
       refresh_token: refreshToken,
       scope: claims.scope,
       jti,

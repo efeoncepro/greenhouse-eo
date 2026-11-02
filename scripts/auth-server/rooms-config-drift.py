@@ -6,6 +6,8 @@ import sys
 
 FLAGS = ('AUTH_SERVER_FIRST_PARTY_ENABLED', 'AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED')
 VALUES = ('AUTH_SERVER_INVITATION_EMAIL_OTP_CLIENT_ID', 'AUTH_SERVER_INVITATION_EMAIL_OTP_ROOMS_ORIGIN')
+# Independent of the OTP rollout; empty means off (TASK-2095 Rooms audience for the agent CLI lane).
+OPTIONAL_VALUES = ('AUTH_SERVER_ROOMS_AUDIENCE',)
 SECRETS = ('AUTH_SERVER_INVITATION_EMAIL_OTP_HMAC_SECRET', 'ROOMS_INVITATION_AUTHORITY_TOKEN')
 # Mounted env name -> reference input, exactly as auth-server-deploy.yml and deploy.sh name it.
 SECRET_REFS = {
@@ -37,7 +39,7 @@ def config_matches(revision, desired):
         wanted = desired.get(name, 'false')
         if wanted not in ('true', 'false') or env.get(name, {}).get('value', 'false') != wanted:
             return False
-    for name in VALUES:
+    for name in VALUES + OPTIONAL_VALUES:
         if env.get(name, {}).get('value', '') != desired.get(name, ''):
             return False
     if desired.get('AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED', 'false') == 'true':

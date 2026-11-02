@@ -16,11 +16,18 @@ export type AuthServerOAuthConfig = {
   firstPartyEnabled?: boolean
   /** `environment_id` del emisor en `external_identity_environments` (TASK-1631). */
   environmentId: string
-  /** Audiencia única del recurso MCP. */
+  /** Audiencia del recurso MCP (gateway). */
   mcpAudience: string
+  /**
+   * Segunda audiencia: la API de Rooms (TASK-2095, enmienda D1-bis del carril de agentes). `null` = apagada:
+   * `resource` Rooms responde `invalid_target` y las clases `efeonce.mcp.rooms.*` no se emiten.
+   */
+  roomsAudience?: string | null
   /** TTLs (segundos). */
   authorizationCodeTtlSeconds: number
   accessTokenTtlSeconds: number
+  /** Access token de la audiencia Rooms: más corto que el del gateway (lo usa una CLI en el equipo). */
+  roomsAccessTokenTtlSeconds?: number
   refreshTokenSlidingTtlSeconds: number
   refreshTokenAbsoluteTtlSeconds: number
   cimdCacheTtlSeconds: number
@@ -35,6 +42,7 @@ export type AuthServerOAuthConfig = {
 export const AUTH_SERVER_OAUTH_DEFAULTS = {
   authorizationCodeTtlSeconds: 5 * 60,
   accessTokenTtlSeconds: 15 * 60,
+  roomsAccessTokenTtlSeconds: 5 * 60,
   refreshTokenSlidingTtlSeconds: 30 * 24 * 60 * 60,
   refreshTokenAbsoluteTtlSeconds: 90 * 24 * 60 * 60,
   cimdCacheTtlSeconds: 24 * 60 * 60,
@@ -59,6 +67,21 @@ const parseOrigin = (value: string | undefined, fallback: string): string => {
   return url.pathname === '/' ? url.origin : `${url.origin}${url.pathname.replace(/\/$/, '')}`
 }
 
+/** Audiencia de recurso opcional: https exacto, sin query, fragmento ni userinfo; vacía = apagada. */
+const parseOptionalAudience = (value: string | undefined, name: string): string | null => {
+  const raw = value?.trim()
+
+  if (!raw) return null
+
+  const url = new URL(raw)
+
+  if (url.protocol !== 'https:' || url.search || url.hash || url.username || url.password) {
+    throw new Error(`${name} must be an https URL without query, fragment or userinfo`)
+  }
+
+  return url.pathname === '/' ? url.origin : `${url.origin}${url.pathname.replace(/\/$/, '')}`
+}
+
 export const readAuthServerOAuthConfig = (env: EnvSource = process.env): AuthServerOAuthConfig => {
   const environmentId = env.AUTH_SERVER_ENVIRONMENT_ID?.trim() || 'efeonce-auth'
 
@@ -72,6 +95,7 @@ export const readAuthServerOAuthConfig = (env: EnvSource = process.env): AuthSer
     firstPartyEnabled: parseFlag(env.AUTH_SERVER_FIRST_PARTY_ENABLED),
     environmentId,
     mcpAudience: env.AUTH_SERVER_MCP_AUDIENCE?.trim() || EFEONCE_MCP_RESOURCE_AUDIENCE,
+    roomsAudience: parseOptionalAudience(env.AUTH_SERVER_ROOMS_AUDIENCE, 'AUTH_SERVER_ROOMS_AUDIENCE'),
     ...AUTH_SERVER_OAUTH_DEFAULTS,
     allowLocalhostAlias: true
   }
