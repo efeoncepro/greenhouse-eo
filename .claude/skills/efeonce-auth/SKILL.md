@@ -30,7 +30,7 @@ Incidentes del release, ya resueltos: [ISSUE-184](../../../docs/issues/resolved/
 (revisión sin tráfico) e [ISSUE-186](../../../docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md)
 (tests atados al corte ETV, bloqueo de CI). Historia anterior en el ledger, incluida la
 [activación Rooms + Efeonce ID del 31-10](../../../docs/audits/rooms/2026-10-31-production-activation.md).
-**Segundo resource server (Rooms), CLI primero:** TASK-2095 (`in-progress`, código en `develop` sin release) agrega la audiencia
+**Segundo resource server (Rooms), CLI primero:** TASK-2095 (en producción desde `auth-server-00172-zcn`, hotfix PR #267) agrega la audiencia
 `AUTH_SERVER_ROOMS_AUDIENCE` (vacía = apagada), clases `efeonce.mcp.rooms.*` restringidas y los clientes `efeonce-rooms-cli` /
 `efeonce-rooms-resource`. El canje RFC 8693 para el gateway queda en TASK-2086 (`to-do`), distinta de TASK-1917.
 

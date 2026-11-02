@@ -4,6 +4,21 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-02 — Audiencia Rooms en producción (`auth-server-00172-zcn`, hotfix PR #267)
+
+- Operador: «Seguir con Efeonce ID» (variable, hotfix con solo `9ea3b8fd5`, release, clientes, secreto, flags).
+- `vivo`: release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d` (run `41372622852`, success, un intento, break-glass por
+  `cloud_release`). `auth-server-00172-zcn` al 100 %, `GIT_SHA=69b0ba9`, `AUTH_SERVER_ROOMS_AUDIENCE=https://efeonce-rooms.vercel.app/api/v1`
+  (variable de repo, fuente durable), first-party/OTP siguen `true`; `/healthz`, `/readyz`, metadata, JWKS y `/login` en 200. Watchdog `ok` 6/6.
+- `vivo`: canary de contrato. `authorize` de `efeonce-rooms-cli` con `resource` Rooms → 401 (login requerido: la audiencia existe);
+  las mismas clases con `resource` del gateway → `invalid_target`.
+- `vivo`: clientes registrados en la base compartida (`efeonce-rooms-cli` público loopback; `efeonce-rooms-resource` confidencial).
+  Secreto `rooms-production-agent-introspection-client-secret:1` (47 bytes, sin salto, comparado por hash) con `secretAccessor` para
+  `rooms-runtime-production`; archivo local borrado.
+- **Pendiente en `develop`:** descripciones del consentimiento (`75b40772d`) con el próximo release completo; hasta entonces la pantalla
+  muestra «Permiso efeonce.mcp.rooms.…». **Rollback:** `update-traffic --to-revisions=auth-server-00171-xdd=100` (y luego `--to-latest`)
+  o vaciar la variable + deploy gobernado; suspender `efeonce-rooms-cli` corta todas las CLIs.
+
 ## 2026-11-01 — Audiencia Rooms y cliente de la CLI de agentes (TASK-2095): código en `develop`, sin release
 
 - Decisión del operador: «CLI primero, gateway después» ([enmienda D1-bis](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)).
