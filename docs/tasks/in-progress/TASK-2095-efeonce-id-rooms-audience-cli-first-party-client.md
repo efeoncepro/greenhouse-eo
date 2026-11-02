@@ -218,11 +218,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -330,15 +330,15 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Sin `AUTH_SERVER_ROOMS_AUDIENCE`, `resource` Rooms responde `invalid_target` y los tests existentes pasan sin cambio de expectativa.
-- [ ] Con la variable, `efeonce-rooms-cli` obtiene un access token con `aud` Rooms y `expires_in` 300 para una persona interna.
-- [ ] Un cliente sin las clases en `allowed_scopes` recibe `invalid_scope` al pedirlas.
-- [ ] Pedir clases de dos audiencias responde `invalid_scope`.
-- [ ] Una persona sin contexto interno no obtiene un token Rooms.
-- [ ] Reusar un refresh revoca la familia.
-- [ ] `efeonce-rooms-resource` ve activo un token Rooms y `active:false` un token del gateway; el `aud` de la respuesta es el real.
-- [ ] Los dos clientes se registran por command de forma idempotente.
-- [ ] Variable declarada en `deploy.sh`, en el workflow y en el ledger de flags; nada aplicado con `--update-env-vars`.
+- [x] Sin `AUTH_SERVER_ROOMS_AUDIENCE`, `resource` Rooms responde `invalid_target` y los tests existentes pasan sin cambio de expectativa.
+- [x] Con la variable, `efeonce-rooms-cli` obtiene un access token con `aud` Rooms y `expires_in` 300 para una persona interna.
+- [x] Un cliente sin las clases en `allowed_scopes` recibe `invalid_scope` al pedirlas.
+- [x] Pedir clases de dos audiencias responde `invalid_scope`.
+- [x] Una persona sin contexto interno no obtiene un token Rooms.
+- [x] Reusar un refresh revoca la familia.
+- [x] `efeonce-rooms-resource` ve activo un token Rooms y `active:false` un token del gateway; el `aud` de la respuesta es el real.
+- [x] Los dos clientes se registran por command de forma idempotente.
+- [x] Variable declarada en `deploy.sh`, en el workflow y en el ledger de flags; nada aplicado con `--update-env-vars`.
 
 ## Verification
 
