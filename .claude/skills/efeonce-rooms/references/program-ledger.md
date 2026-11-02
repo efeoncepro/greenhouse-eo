@@ -7,6 +7,16 @@
 
 ## Estado vigente (2026-11-01)
 
+- **2026-11-02 — aceptación del carril CLI en producción (`vivo`):** el operador corrió `pnpm rooms login` una vez (Efeonce ID + MFA;
+  `subject` opaco, principal `rooms-pilot-julio-20261025`, espacio «Efeonce» `org-2df565fb-…`). Sin pedirle nada más, el agente creó
+  `demo-volta` («Campaña «Llega antes»», `synthetic`/`fixture`), subió las 5 imágenes (`kv-16x9`, `feed-4x5`, `story-9x16`,
+  `story-9x16-b`, `dooh-3x1`), las adjuntó por referencia, dejó la cobertura en cero (revisión 21), revisó «Ver como» comprador
+  (6 capítulos, sin marcadores, URLs, nombres de archivo ni pruebas) y publicó la edición `87dd99b7-6cc9-4a5c-a0a4-7edab30ea1da`
+  (revisión 22). Sin invitaciones. Actividad: 17 acciones, todas `cli/claude-code`, aviso y reversa (`rooms.archive`) disponibles.
+  Introspección real con el secreto de Secret Manager verificada por la primera lectura. **Sin verificar:** la sala vista en el
+  navegador con sesión humana en `/rooms`.
+  - Pendiente de diseño: la página de éxito del callback loopback de `pnpm rooms login` es HTML sin estilo (el operador: «está
+    pantalla está horrible»); debe terminar en una página de Rooms de la familia de la órbita, aprobada en canvas.
 - **2026-11-02 — carril ENCENDIDO (`vivo`):** `ROOMS_AGENT_LANE_ENABLED=true` (env add del operador), `ROOMS_AGENT_AUDIENCE` y la ref del
   secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`; antes `mgod4xbea`)
   con alias. Metadata 200 con audiencia/emisor/cliente; `/rooms` 307, `/auth/error` 200, sesión 401, bearer falso 401. Efeonce ID ya

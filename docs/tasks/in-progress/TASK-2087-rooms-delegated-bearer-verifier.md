@@ -43,7 +43,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-052`
-- Status real: `En curso 2026-11-01 — forma directa (D1-bis) code complete en efeonce-rooms PR #22 (pnpm verify verde, ensayo integral en integration:up con la sala Volta publicada por bearer). Merge, flags de Vercel y producción esperan autorización; la forma delegada del gateway sigue pendiente (TASK-2086/2088)`
+- Status real: `Forma directa (D1-bis) en producción y aceptada 2026-11-02: login único del operador; el agente creó y publicó la sala Volta (demo-volta, edición 87dd99b7) en «Efeonce» por bearer, sin pedir nada más. Pendiente: página de éxito del login con diseño de Rooms; forma delegada del gateway (TASK-2086/2088)`
 - Rank: `después de TASK-2086 y TASK-2084; antes de TASK-2088`
 - Domain: `platform|identity`
 - Blocked by: `TASK-2086 (delegación interactiva de Efeonce ID para la audiencia de Rooms; retenida con los PR #263/#264 de Efeonce ID) y TASK-2084 (columnas de actor y clasificación D2)`

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `En curso 2026-11-01 — enmienda D1-bis del ADR del carril de agentes (decisión del operador: CLI primero). Código local en develop; release a main, variable de repo y registro de clientes en producción esperan autorización explícita del operador`
+- Status real: `En producción 2026-11-02 (auth-server-00172-zcn, hotfix PR #267, release 69b0ba90832c): audiencia Rooms, clientes registrados, secreto en Secret Manager; aceptado con login real y la sala Volta publicada por la CLI. Pendiente: descripciones del consentimiento (75b40772d) con el próximo release completo`
 - Rank: `TBD`
 - Domain: `identity|platform`
 - Blocked by: `none para el código; producción espera autorización del operador (release Greenhouse a main, variable AUTH_SERVER_ROOMS_AUDIENCE y registro de los dos clientes)`
