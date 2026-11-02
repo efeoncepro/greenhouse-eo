@@ -1,7 +1,7 @@
 # Alternar la clave de OpenAI en las CLIs de imagen
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-11-01 por Claude (sesión con Julio Reyes)
 > **Ultima actualizacion:** 2026-11-01 por Claude
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) · código `src/lib/ai/openai-api-key.ts`
@@ -15,6 +15,21 @@ siempre para todo lo demás, incluidos Vercel y los workers.
 
 Cada clave alterna es un **perfil**: el perfil `personal` vive en el secreto
 `greenhouse-openai-api-key-personal` de Secret Manager (proyecto `efeonce-group`).
+
+## Cuándo usar cada clave (regla para agentes y operadores)
+
+| Trabajo | Clave |
+|---|---|
+| Producto y runtime: Vercel, workers, `pnpm dev`, flujos canónicos del portal | **Empresa** (`greenhouse-openai-api-key`), siempre |
+| Generación creativa operada por un agente u operador con `pnpm ai:image` o `pnpm ai:inpaint` (piezas, conceptos, pruebas, iteraciones) | **Personal** (`--openai-key personal`), mientras quede crédito |
+
+- El perfil personal se pasa **explícito en cada comando**. **NUNCA** se deja como default en
+  `.env.local`: ese archivo lo leen todos los procesos locales, incluido `pnpm dev`, y el flujo canónico
+  terminaría pagado por la cuenta personal.
+- **NUNCA** se declara `OPENAI_API_KEY_PROFILE` en Vercel, workers ni CI.
+- Si OpenAI responde **429 / `insufficient_quota`** con el perfil personal, el crédito se acabó: avisar
+  al operador y volver a la clave de la empresa quitando el flag. No hace falta tocar código.
+- Al reportar una generación, decir qué clave pagó: la CLI lo imprime al final de cada imagen.
 
 ## Antes de empezar
 
