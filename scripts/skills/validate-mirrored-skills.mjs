@@ -39,6 +39,13 @@ const mirroredSkills = [
     claude: '.claude/skills/efeonce-b2b-prospecting',
   },
   {
+    // Motogas (cliente): biblia de sus tres personajes y línea gráfica de sus cuatro cuentas. Skill viva de cliente.
+    id: 'motogas-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/motogas-graphic-line',
+    claude: '.claude/skills/motogas-graphic-line',
+  },
+  {
     // La línea gráfica «La órbita» es una skill viva: si Codex y Claude componen con criterios distintos, la marca
     // sale con dos gramáticas bajo la misma firma. Nace byte-identical.
     id: 'efeonce-graphic-line',
