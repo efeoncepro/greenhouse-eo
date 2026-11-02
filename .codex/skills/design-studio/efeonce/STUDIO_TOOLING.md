@@ -103,7 +103,9 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
   `pnpm ai:image` conserva `gpt-image-2` por defecto. Para cine, ficha y `foto:prompt` primero y gates después con
   cualquier motor; la prueba Nexa 2.1 quedó APROBABLE, no es un alta en el banco aprobado ([casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable)).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
-- **OpenAI → directo.**
+- **OpenAI → directo.** La producción creativa que corres con `pnpm ai:image` lleva `--openai-key personal`
+  (en `ai:inpaint` y `foto:*`, `OPENAI_API_KEY_PROFILE=personal` delante) mientras quede crédito; producto y runtime
+  pagan con la clave de la empresa. Al reportar, di qué clave pagó: [manual](../../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - **Post/composición exacta → runtime determinístico/humano.**
 
 Antes de elegir, cargar `../modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md` y leer el registry

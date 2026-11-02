@@ -49,6 +49,10 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 - **Caché por hash** de la entrada (incluye la revisión del adaptador): repetir no vuelve a pagar; `--force` repite.
 - **Tope de costo:** `--max-usd` (default USD 1; env `AI_COST_CONFIRM_USD`); `--yes` lo supera.
 - **`--dry-run` es gratis:** máscara, recorte, payload y costo estimado, sin llamar al proveedor. Úsalo primero.
+- **Qué clave OpenAI paga:** `ai:inpaint` no tiene flag propio; para trabajo creativo antepón
+  `OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint …` (crédito personal, desde 2026-11-01). Sin la variable paga la
+  clave de la empresa; nunca la dejes en `.env.local`. Regla y manual:
+  [`alternar-clave-openai.md`](../../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - `--count <n>` (1–8) = N pedidos pagados, con `contact-sheet.png`.
 
 ## 2. Intención → comando → modelo

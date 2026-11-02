@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.18
+> **Version:** 1.19
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-15 por Codex — v1.18: OmniHuman 2.0 / Vision AI investigado, separado de la CLI BytePlus y de Gemini Omni; contrato API y disponibilidad de cuenta distinguidos.
+> **Ultima actualizacion:** 2026-11-01 por Claude — v1.19: §5.1 suma el flag `--openai-key <perfil>` de `ai:image` y la regla de qué clave de OpenAI paga cada trabajo (empresa para producto/runtime; perfil `personal` explícito para generación creativa operada).
+> **Antes (v1.18):** 2026-10-15 por Codex — v1.18: OmniHuman 2.0 / Vision AI investigado, separado de la CLI BytePlus y de Gemini Omni; contrato API y disponibilidad de cuenta distinguidos.
 > **Antes (v1.17):** BytePlus directo por defecto para Seedream, Layerize, Seedance y Seed Speech; secretos, CLI y evidencia por transporte en su ADR/manual.
 > **Antes (v1.16):** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
 > **Antes (v1.15):** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
@@ -486,7 +487,18 @@ pnpm ai:image --batch conceptos.json --model gpt-image-2.5-flare --quality mediu
 pnpm ai:image:rmbg
 ```
 
-Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `--image` (repetible), `--mask`, `--input-fidelity`, `--out`, `--out-dir`, `--concept`, `--task`, `--size`, `--quality`, `--background`, `--format`, `--model`, `--count`, `--timeout` (default 280000 ms), `--open`, `--help`. Defaults: `gpt-image-2` · `1536x1024` · `high` · `opaque` · `public/images/generated`.
+Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `--image` (repetible), `--mask`, `--input-fidelity`, `--out`, `--out-dir`, `--concept`, `--task`, `--size`, `--quality`, `--background`, `--format`, `--model`, `--openai-key`, `--count`, `--timeout` (default 280000 ms), `--open`, `--help`. Defaults: `gpt-image-2` · `1536x1024` · `high` · `opaque` · `public/images/generated`.
+
+**Qué clave de OpenAI paga (desde 2026-11-01)** [contrato]. Sin perfil, `ai:image` y `ai:inpaint` usan la clave de la
+empresa (`greenhouse-openai-api-key`). `--openai-key personal` en `ai:image` —o la variable
+`OPENAI_API_KEY_PROFILE=personal` en `ai:inpaint` y en cualquier script del cliente canónico, que no tienen flag
+propio— carga el gasto al secreto `greenhouse-openai-api-key-personal`; si el perfil no resuelve, la corrida **falla**
+y nunca cae a la clave de la empresa. Al final de cada imagen, `ai:image` imprime `· clave personal` o `· clave default`; los resultados del helper traen `keyProfile` junto a `secretSource`.
+Regla [decisión]: producto y runtime (Vercel, workers, `pnpm dev`, flujos del portal) usan **siempre** la clave de la
+empresa; la generación creativa operada por un agente u operador pasa el perfil `personal` **explícito en cada
+comando** mientras quede crédito, nunca como default en `.env.local` ni en Vercel, workers o CI. Un 429 /
+`insufficient_quota` con el perfil significa crédito agotado: avisar y quitar el flag. Manual:
+[alternar la clave de OpenAI](../manual-de-uso/ai-tooling/alternar-clave-openai.md).
 
 **Trampas.** 🔴 **Sunburst con `--mask` devuelve la zona totalmente editable como un PANEL NEGRO PLANO** [verificado 3 de 3: 2026-09-23 y dos pasadas el 2026-10-02 con máscara de RGB negro y con el RGB de la imagen bajo el alfa]; Flare, con la misma máscara y el mismo prompt, colocó el objeto. `pnpm ai:inpaint image` usa Flare por defecto, edita con Sunburst sin máscara (`--provider-mask auto`) y marca `suspectFlatPanel` si la salida cruda vuelve negra. 🔴 **`--mask` no sirve para MOVER material que ya está en la foto** [verificado 2026-09-23]: sobre una franja de primer plano oscuro y desenfocado (subir el lecho de un plate), Sunburst llenó toda la zona transparente con un panel plano de borde superior recto justo en el límite de la máscara y borró el apoyabrazos que había en ella, aunque el prompt pedía conservar lo que quedaba sobre el nuevo borde; los dos candidatos, igual: se lee como un velo. Para desplazar material fotográfico existente no uses inpainting generativo: mueve los píxeles de la propia foto (caso y script: `ai-generations/2026-09-23_v07-lecho-04-elegida/`). Ver §8.1: `--count` = N pedidos pagados; `--input-fidelity` rechazado antes de gastar (desde 2026-09-27); sin `--moderation`; default de salida en `public/`. Ya no son trampas (commit `17196ead1`): `--size` se valida en local (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400; 1.5/1/mini: sólo `1024x1024`, `1536x1024`, `1024x1536` o `auto`), `--background` se valida y existe `--format`. Deprecaciones de modelos anteriores que el CLI aún acepta: `gpt-image-1` retira 2026-10-23; `gpt-image-1.5` y `gpt-image-1-mini` 2026-12-01 [oficial].
 

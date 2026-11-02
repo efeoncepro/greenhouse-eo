@@ -3,7 +3,8 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-10-06 por Codex: CLI Nano Banana 2.1 y evidencia Nexa 4K/high; contrato separado de OpenAI/producto/Globe.
+> **Ultima actualizacion:** 2026-11-01 por Claude: regla de qué clave de OpenAI paga cada trabajo (§Qué clave de OpenAI paga) y el reporte de cierre la declara.
+> **Antes:** 2026-10-06 por Codex: CLI Nano Banana 2.1 y evidencia Nexa 4K/high; contrato separado de OpenAI/producto/Globe.
 > **Antes:** 2026-09-16 por Claude (brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1`: estimación de costo previa, `--yes`/`--max-usd` en `ai:fal`, resolución barata por defecto, `--format` en `ai:image`, validaciones locales; antes: puntero a la guía canónica de selección de modelos; correcciones: el costo de GPT Image 2.5 sí se estima antes, 2.5 publica rate limits, OpenAI recomienda 2.5 para integraciones nuevas, precios de fal por escalón de resolución, Wan 3.0 Prime más cara, fórmula de tokens de Seedance válida, Seedream 5 Pro tope 2048², brechas conocidas de ambos CLIs; antes, `pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
@@ -493,6 +494,28 @@ console.log(result)
 Para flujos de referencia/máscara hay dos caminos: `pnpm ai:image --image <base> --mask <mask> --prompt "…"`
 desde la terminal, o importar `./src/lib/ai/openai-image` cuando el flujo vive en código.
 
+### Qué clave de OpenAI paga (desde 2026-11-01)
+
+La key la resuelve un único módulo, `src/lib/ai/openai-api-key.ts`, para texto (`openai.ts`) e imagen
+(`openai-image.ts`). Sin perfil usa la clave de la empresa (`OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF` →
+`greenhouse-openai-api-key`); con perfil usa el secreto alterno `greenhouse-openai-api-key-<perfil>`. Hoy existe el
+perfil `personal`.
+
+| Trabajo | Clave | Cómo |
+|---|---|---|
+| Producto y runtime: Vercel, workers, `pnpm dev`, `generateImage()` desde flujos del portal | **Empresa**, siempre | Sin flag ni variable |
+| Generación creativa que opera un agente u operador (piezas, conceptos, pruebas, iteraciones) | **Personal**, mientras quede crédito | `pnpm ai:image --openai-key personal …`; `OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint …` (sin flag propio) |
+
+- Pasar el perfil **explícito en cada comando**. **NUNCA** dejarlo como default en `.env.local` (lo lee `pnpm dev`) ni
+  declarar `OPENAI_API_KEY_PROFILE` en Vercel, workers o CI.
+- Si el perfil no resuelve, la corrida falla («La clave OpenAI del perfil … no está disponible … No se usó la clave
+  canónica.»); nunca cae a la de la empresa. El secreto lo lee la cuenta de servicio `greenhouse-portal`
+  (necesita `roles/secretmanager.secretAccessor` sobre ese secreto; las CLIs no usan el ADC del usuario).
+- **429 / `insufficient_quota`** con el perfil = crédito agotado: avisar al operador y volver a la clave de la
+  empresa quitando el flag. No reintentar en bucle ni cambiar código.
+- Sólo afecta motores OpenAI; `pnpm ai:fal` (Fal, Flux, Seedream) tiene sus propias cuentas.
+- Runbook completo: `docs/manual-de-uso/ai-tooling/alternar-clave-openai.md`.
+
 ### Generate via fal CLI (`pnpm ai:fal`)
 
 CLI hermano de `pnpm ai:image` para Seedream 5 (imagen, edición y capas) y video con Seedance 2.5/2.0, Minimax H3 y
@@ -719,6 +742,7 @@ When reporting back, include:
 
 - asset path(s);
 - provider/model and fallback reason if present;
+- for OpenAI, which key paid (`clave personal` or `clave default`, as the CLI prints it; `keyProfile` in the helper result);
 - whether transparency was verified;
 - visual QA performed;
 - any limitations or human review needed.

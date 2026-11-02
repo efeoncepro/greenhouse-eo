@@ -7,6 +7,16 @@
 tamaños y los diez estados en el README del paquete y en el [ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md).
 Pendiente: release `v0.4.32`, primitive en `axis-ui-primitives` y adopción en Rooms, Studio y Greenhouse.
 
+## 2026-11-01 — Perfil de clave OpenAI `personal` para generación creativa
+
+Resolver único `src/lib/ai/openai-api-key.ts` para `openai.ts` y `openai-image.ts` (commit `60a53958b`, sin push):
+`OPENAI_API_KEY_PROFILE=<perfil>` / `pnpm ai:image --openai-key <perfil>` → secreto `greenhouse-openai-api-key-<perfil>`;
+falla cerrado, nunca cae a la canónica; resultados con `keyProfile`. Secreto `greenhouse-openai-api-key-personal` creado
+por el operador (cuenta personal, 200 USD) con `secretAccessor` para `greenhouse-portal`; prueba real `low` 1024² →
+`clave personal`, ≈ USD 0,006. Regla: generación creativa de agentes con el perfil explícito; producto/runtime/`pnpm dev`
+con la clave de empresa; nunca default en `.env.local` ni en Vercel/workers. Manual
+[alternar-clave-openai.md](docs/manual-de-uso/ai-tooling/alternar-clave-openai.md). Typecheck, lint y 58 pruebas verdes.
+
 ## 2026-11-01 — Marca de Efeonce ID aprobada y canonizada en AXIS
 
 «La órbita vive en la D»: asta, tramo recto de 110 y media órbita, esfera Growth a la 1:30 ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
@@ -82,18 +92,17 @@ y la rama local de Codex `codex/auth-pr-develop-stack` integrada en `develop` (`
 413, OTP con fallo cerrado, Job de rotación (migración sin aplicar) y verificación post-deploy del tráfico. Requiere release a
 `main`; la llave de firma (KMS v1/v2 del 04-09) dispara `auth.keys.rotation_overdue` hacia el 23-11.
 
-## 2026-11-01 — SKY: permisos/contexto locales; puente pendiente
+## 2026-11-01 — SKY: B recomendado tras pruebas locales
 
 [TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
-[167 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md), 78 nuevas
-sobre cookie/App sessions/recurso Insights reales y contexto candidato PG16. A′ tampoco aísla el listado
-Insights org; ambos bridges cumplen el candidato Space/Service/grant con principal fresco. Revocar SEO
-conserva Diseño del dual. Callback cookie conserva claims de usuario inactivo; App sí rechaza. Son
-reproducciones locales, no fixes ni incidentes confirmados. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
-seguridad requiere contrato común; A′/B se decidirán por compatibilidad/owner/historia. Próximo: routing de
-writers, owner comercial y protección histórica; HTTP/UI/concurrencia/ICO/distribución no certificados.
-Contrato Blog GA4/GSC/AEO sigue candidato; TASK-2033/1960 conservan scope/reporting. Discovery `c618bc662`,
-primer laboratorio `149aed558`. Sin src/producción/provisioning/envíos ni historia de Diseño modificados.
+[204 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md), 37 nuevas
+Finance/routing/historia. Recomendación B: un owner comercial, Spaces Diseño/SEO separados. El trigger real
+rechaza el owner común con client SEO separado; rekeyear gastos divide P&L. Grants/contexto son necesarios
+en ambos. Writer Notion admite reasignación/eventos antiguos; rebuild histórico usa actividad actual.
+Rollback PG real probado; ICO sólo orden de llamadas simulado, no BigQuery. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md).
+Próximo: U01 contexto por Space en ruta/reader real local; después bindings/protección temporal. HTTP/UI,
+concurrencia, historia integral y distribución pendientes. Contrato GA4/GSC/AEO candidato; TASK-2033/1960
+conservan scope/reporting. Sin src/producción/provisioning/envíos ni historia real de Diseño modificados.
 
 ## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
 
@@ -290,13 +299,5 @@ Asignación humana vigente: Codex backend; Claude Design interfaz. TASK-2072, ru
 
 
 Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa. Segunda auditoría (§6): EPIC-044 tiene 27 unidades, sin repo propio, sin logins nativos desde 26/9 porque faltan los conectores de Codex y Claude (TASK-1904/2000; MCP construido y probado), `develop` despliega el emisor productivo. TASK-1829 cerrada (administrativa). 1828/1830/1832 NO listas (llave v1, passkeys 2 navegadores, muestra steady). PR #262 CI verde sin promover. Medios de Rooms rescatados en rama local `efeonce-rooms` `task/2070-2071-private-media` (`c0facfd`, `2626921`, `7ca5fd3`: limpieza, worker `--loop`, hijo sin `tsx`, DO en migración; verify 207/207), `main` sigue en `20f9fe9`. Demo de Rooms **no aceptada** por Julio (busca algo más inmersivo): Rooms en pausa hasta revisar la dirección con maqueta. Login V4 vivo en `auth.efeonce.org/login`; entrar a Rooms con él sigue OFF. Siguiente (con créditos Codex desde 1/11): release #262 + canary único, conectores Codex/Claude, separar deploy de Auth, higiene de seguridad.
-
-## 2026-10-25 — Auth: Rooms primero y login V4
-
-1834/2064/2067 y consumer Rooms verificados localmente; Greenhouse diferido2063. Goal de producción controlada autorizado con único correo a jreyes@efeoncepro.com; migraciones1834/2067+registroRP+secretosv1 aplicados y verificados, aún sin deploy/envío real.1833 en ejecución: Julio sustituyó pentest contratado por evaluación propia; openredirect magiclink corregido y146testsPASS separados, señales5nuevas/PGaislado, workflow flags+secretrefs y senderOTP trackingOFF. Revisión ofensiva CIMD bloqueada automáticamente; patchdefensivo+magiclink192PASS/tscPASS, no pentest completo. [Rollout](docs/audits/identity/2026-10-25-auth-rooms-controlled-rollout.md), [evaluación](docs/audits/auth-server/2026-10-25-independent-protocol-review.md), [preflight](docs/audits/identity/TASK-2067-production-preflight-2026-10-25.md), [base local](docs/audits/identity/2026-10-25-auth-rooms-first-local.md). Peer «Mira el epic de rooms» posee2068UI/WAF/cloud; coordinación continua, sin activar antes de readiness común. Harness OIDC+OTP19336 activo sólo para QA UI3210 del peer; cleanup al terminar. Release en preparación: contención duradera correos Growth OFF, lint gráfico mecánico corregido; fullsuite detectó mirror de rutas Auth incompleto, corregido con2paths y13retestPASS;21598testsPASS/383skip. Lint heredado21whitespace corregido conASTidéntico; lintglobal0errors; tsc del toolingRooms falló y fue corregido d4a1d16e0, nueva pasada globalPASS. PR262 remoto; CI/build/smoke pendientes. Recibos completos pasan a .auth0600 por repo público; resúmenes mínimos, historia previa no borrada.
-
-## 2026-10-25 — Rooms: autoría V2 verificada y acceso coordinado
-
-Runtime e72ad65 incorpora autoría V2;66testsPASS0skip, lint/types/build y migración down/up/restore mixto V1/V2 PASS. TASK-2062 cierre local; demo pública sigue bd4b802. TASK-2065 consumerOIDC interno en implementación con peerAuth1834/2064. TASK-2066 prepara invitaciones: UN correo Resend trae enlace tokenizado+código, cliente pega código EN Rooms; issuer2067 verifica/envía y Rooms conserva sesión guest limitada. No SSO global por OTP, no emails reales enviados, sin DB cloud. GoalEPIC-052 abierto. Índices README/registry compartidos coordinados con peerAuth, no mezclar su WIP. [Auditoría](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
 
 [Historial](Handoff.archive.md).

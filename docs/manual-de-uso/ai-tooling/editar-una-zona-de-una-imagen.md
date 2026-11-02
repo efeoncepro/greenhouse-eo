@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.1
+> **Version:** 2.2
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-03 por Claude — (2.1, TASK-1965 + TASK-1973) nueva seccion «Para agentes»: arbol de decision por intencion con los ganadores medidos, lineas de comando, codigos de salida y que hacer con cada uno, regla del tope de costo y checklist de revision al 100 %; codigo 1 y tope de costo en la tabla de senales; tabla de tecnicas hermanas (borrar, expandir, mover, incorporar, fondo, detalle). Antes (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
+> **Ultima actualizacion:** 2026-11-01 por Claude — (2.2) en «Preparacion», cargar el gasto de los adaptadores OpenAI al credito personal con `OPENAI_API_KEY_PROFILE=personal`. Antes (2.1, TASK-1965 + TASK-1973) nueva seccion «Para agentes»: arbol de decision por intencion con los ganadores medidos, lineas de comando, codigos de salida y que hacer con cada uno, regla del tope de costo y checklist de revision al 100 %; codigo 1 y tope de costo en la tabla de senales; tabla de tecnicas hermanas (borrar, expandir, mover, incorporar, fondo, detalle). Antes (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:mask`, `pnpm ai:inpaint image` (tecnicas hermanas: `pnpm ai:inpaint erase|expand|move|place|background`, `pnpm ai:layers`) (antes: `pnpm ai:image --image ... --mask ...`, que sigue funcionando pero no recompone), `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** [editar una zona de un video](editar-una-zona-de-un-video.md), [expandir, separar en capas, borrar, mover, incorporar y cambiar fondo](expandir-y-separar-en-capas.md), `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-10-02_task-1965-canary/`, `ai-generations/2026-10-03_task-1973-canary/`
@@ -42,6 +42,11 @@ Image. Ver [expandir, separar en capas, borrar…](expandir-y-separar-en-capas.m
 - La mascara mide **exactamente** lo mismo que la imagen; `pnpm ai:mask --base` la construye ya del tamaño correcto.
 - La mascara debe cubrir el **objeto entero con margen**: lo que el modelo dibuje fuera de la zona se funde con la base
   y queda cortado (en el canario, las hojas de la planta que salian del borde quedaron difuminadas).
+- Quien paga: con el adaptador `openai` (Flare o Sunburst), anteponer `OPENAI_API_KEY_PROFILE=personal` al comando
+  (`OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint image …`) carga el gasto al credito de la cuenta personal mientras
+  quede; sin la variable paga la clave de la empresa. `ai:inpaint` no tiene flag propio. No aplica a `fal:*`. Nunca la
+  dejes en `.env.local`; si OpenAI responde 429 / `insufficient_quota`, el credito se acabo: quita la variable. Ver
+  [alternar la clave de OpenAI](alternar-clave-openai.md).
 
 ## Paso a paso
 

@@ -1,9 +1,9 @@
 # Expandir, separar en capas, borrar, mover, incorporar, cambiar fondo y rehacer detalle
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-10-03 por Claude (TASK-1973)
-> **Ultima actualizacion:** 2026-10-03 por Claude — (1.2) seccion «Para agentes» (arbol de decision con los ganadores medidos, lineas de comando, codigos de salida, regla del tope de costo y checklist al 100 %); resultados medidos por tecnica con costo; expandir: Flux Fill vs GPT Image con la banca inventada en 9:16; Layerize cobra la base como una capa (USD 0,03375 c/u); seleccion de capa: el nombre gana sobre la descripcion; `foto:expandir` → TASK-1925. Antes (1.1) canario real: clean plate con las demas capas, sombra proyectada, `place`
+> **Ultima actualizacion:** 2026-11-01 por Claude — (1.3) en «Antes de empezar», cargar el gasto de las tecnicas con OpenAI al credito personal con `OPENAI_API_KEY_PROFILE=personal`. Antes (1.2) seccion «Para agentes» (arbol de decision con los ganadores medidos, lineas de comando, codigos de salida, regla del tope de costo y checklist al 100 %); resultados medidos por tecnica con costo; expandir: Flux Fill vs GPT Image con la banca inventada en 9:16; Layerize cobra la base como una capa (USD 0,03375 c/u); seleccion de capa: el nombre gana sobre la descripcion; `foto:expandir` → TASK-1925. Antes (1.1) canario real: clean plate con las demas capas, sombra proyectada, `place`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:layers`, `pnpm ai:mask --from-layer`, `pnpm ai:inpaint expand|erase|move|place|background`, `pnpm ai:inpaint image --zone-resolution`
 > **Documentacion relacionada:** [editar una zona de una imagen](editar-una-zona-de-una-imagen.md), [editar una zona de un video](editar-una-zona-de-un-video.md), [guia de seleccion de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md), [generador visual](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
@@ -35,6 +35,12 @@ cambio fuera de lo que se debia tocar, sale con codigo 2.
   clean plate si hay capas, si no Sunburst; **expandir** → Flux Fill, nunca GPT Image; **agregar o cambiar** en una
   zona → Flare para el dia a dia y Sunburst (el mas potente, edita sin mascara y recibe la zona como guia) para la pieza
   final. Los defaults de cada comando ya siguen esa regla.
+- Quien paga: cuando la tecnica usa un modelo OpenAI (Flare o Sunburst, por ejemplo borrar sin capas o agregar en
+  una zona), anteponer `OPENAI_API_KEY_PROFILE=personal` al comando (`OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint
+  erase …`) carga el gasto al credito de la cuenta personal mientras quede; sin la variable paga la clave de la
+  empresa. No aplica a Fal (Flux Fill, Seedream) ni a `pnpm ai:layers`. Nunca la dejes en `.env.local`; si OpenAI
+  responde 429 / `insufficient_quota`, el credito se acabo: quita la variable. Ver
+  [alternar la clave de OpenAI](alternar-clave-openai.md).
 
 ## Separar en capas: `pnpm ai:layers`
 

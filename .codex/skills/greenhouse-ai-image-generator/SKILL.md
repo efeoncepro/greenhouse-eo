@@ -207,6 +207,9 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
   Tabla derivada de la fórmula [inferencia sobre oficial]. `auto` no es estimable. Un tamaño no cuadrado mayor
   puede costar menos que uno cuadrado menor. Editar suma la imagen base como entrada (2,3× en `low`, ~1,04× en
   `max`) [verificado]. Sigue la regla: ninguna cifra entra a una propuesta sin re-medir.
+- **Quién paga no cambia el precio ni el modelo:** la generación creativa operada por ti se carga al perfil
+  `personal` (`--openai-key personal`) mientras quede crédito; producto y runtime, a la clave de la empresa. Regla
+  completa en §CLI `pnpm ai:image`.
 - **Rate limits de 2.5 publicados, iguales a `gpt-image-2`** [oficial 2026-09-16]: Tier 1 100 000 TPM / 5 IPM ·
   T2 250 000 / 20 · T3 800 000 / 50 · T4 3 000 000 / 150 · T5 8 000 000 / 250.
 - **Seedream en fal** [oficial fal, 2026-09-16]: Pro USD 0,0675 (área ≤ 1536²) · 0,135 (hasta 2048²) + 0,0045 por
@@ -416,12 +419,30 @@ For terminal/operator-driven generation — `product-design-loop` concepts, mock
 pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x1152|WxH] \
               [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] \
               [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] \
-              [--count N] [--timeout 280000] [--open]
+              [--count N] [--timeout 280000] [--open] [--openai-key personal]
 pnpm ai:image --prompt-file <path>          # long prompts
 pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
+- 🔴 **Qué clave paga (desde 2026-11-01).** La clave sale de un resolver único (`src/lib/ai/openai-api-key.ts`), el
+  mismo para texto e imagen. Sin perfil paga la **clave de la empresa** (`greenhouse-openai-api-key`); con
+  `--openai-key personal` (o `OPENAI_API_KEY_PROFILE=personal` en el entorno) paga el secreto
+  `greenhouse-openai-api-key-personal`: cuenta OpenAI personal de Julio Reyes, 200 USD de crédito cargados el
+  2026-11-01, que la CLI lee con la cuenta de servicio `greenhouse-portal` (no con tu ADC). **Regla del operador:**
+  - **Generación creativa que corres tú** (piezas, conceptos, pruebas, iteraciones con `ai:image` / `ai:inpaint`, y los
+    wrappers `foto:*` que llaman a `ai:image`) → pasa `--openai-key personal` **explícito en cada comando** mientras
+    quede crédito. `ai:inpaint` y los wrappers no tienen flag: antepón `OPENAI_API_KEY_PROFILE=personal`.
+  - **Producto y runtime** (Vercel, workers, `pnpm dev`, flujos canónicos del portal) → **siempre** la de la empresa.
+    **NUNCA** dejes el perfil como default en `.env.local` (lo leen todos los procesos locales, `pnpm dev` incluido) ni
+    declares `OPENAI_API_KEY_PROFILE` en Vercel, workers o CI.
+  - Si el perfil no resuelve, la corrida **falla** («La clave OpenAI del perfil … no está disponible … No se usó la
+    clave canónica.»): nunca cae a la de la empresa en silencio. Si OpenAI responde **429 / `insufficient_quota`** con
+    el perfil personal, se acabó el crédito: avisa al operador y vuelve a la de la empresa quitando el flag.
+  - Cada imagen termina con `· clave personal` o `· clave default` (y el resultado del helper trae `keyProfile` junto
+    a `secretSource`). **Al reportar una generación, di qué clave pagó.** Probado en real: `--openai-key personal
+    --quality low --size 1024x1024` → `gpt-image-2 · 1024x1024 · low · clave personal`, ≈ USD 0,006. Manual:
+    [`alternar-clave-openai.md`](../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - ✅ **El helper YA transporta la familia 2.5** (delta 2026-09-16, TASK-1851). Queda **superseded** la
   advertencia anterior de esta skill, que decía que 2.5 no se podía probar por ningún camino. Contrato real,
   verificado en `src/lib/ai/openai-image.ts`:

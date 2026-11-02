@@ -198,6 +198,12 @@ pnpm foto:isotipo <plate.png> --centro x,y --ancho w --acabado   # compone el is
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
 
+**Qué clave OpenAI paga (desde 2026-11-01):** el `ai:image` que imprime `foto:prompt` se corre con
+`--openai-key personal`; `foto:isotipo`, `foto:lanyard` y `foto:generar` llaman a `ai:image` sin pasar el flag, así que
+se anteponen con `OPENAI_API_KEY_PROFILE=personal` (el hijo hereda el entorno). Nunca en `.env.local`. Si el perfil
+falla o responde 429, avisa y vuelve a la clave de la empresa:
+[manual](../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
+
 **Piezas con CTA: `foto:componer:cta` + `foto:cta:gate`.** Contrato:
 [`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§16–§18);
 oficio y receta del plan en la skill `efeonce-advertising-creative`. Lo que un agente no puede saltarse:

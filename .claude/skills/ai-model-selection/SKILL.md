@@ -105,6 +105,10 @@ contradicción por accidente y pagando de más: la mitad barata era una prueba d
 5. **Estima antes de gastar.** `--estimate` en `pnpm ai:fal` valida e imprime el costo **sin encolar**.
    `--list`, `--balance` y `--status` son gratis. En `pnpm ai:omni`, `--estimate` tampoco envía, pero
    estima sólo el video output nominal: input, texto y redondeo se suman. Cada POST exige `--yes`.
+   El gasto OpenAI de generación creativa operada por un agente (`ai:image`, `ai:inpaint`) puede cargarse al
+   perfil personal (`--openai-key personal` u `OPENAI_API_KEY_PROFILE=personal`, desde 2026-11-01); producto y
+   runtime pagan con la clave de la empresa. **Quién paga no cambia la elección de modelo ni su precio.** Regla en
+   `greenhouse-ai-image-generator` §CLI y en el [manual](../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 6. **Comando** desde la ficha o la receta.
 
 **Omni 1.1, corte 2026-09-24:** `pnpm ai:omni` usa el ID Cloud

@@ -1,8 +1,8 @@
 # changelog.md
 
-**2026-11-01 · SKY, laboratorio local:** [contrato Blog y 167 pruebas](docs/audits/client-portal/2026-11-01-sky-space-context-validation/README.md),
-78 nuevas de revocación, renovación y contexto por Space para Diseño/SEO/dual. GA4/GSC/AEO y PostgreSQL efímero;
-TASK-2094 en progreso, A′/B pendientes. Sin runtime productivo ni cambios en la historia de Diseño.
+**2026-11-01 · SKY, laboratorio local:** [204 pruebas y recomendación B](docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md),
+37 nuevas de Finance, routing e historia. Un cliente comercial con Spaces Diseño/SEO; protección histórica y
+contexto integral aún pendientes. Contrato GA4/GSC/AEO candidato; sin producción ni cambios en historia real.
 
 **2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
 registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary
@@ -15,6 +15,13 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 El botón con el que las aplicaciones de Efeonce ofrecen entrar con Efeonce ID quedó definido: «Continuar con» y la marca
 Efeonce | ID, como un botón de pago, con sus diez estados ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
 El archivo oficial entra a AXIS en `axis-brand-assets` 0.4.32; falta llevarlo a las aplicaciones.
+
+## 2026-11-01 — OpenAI: clave personal para generación creativa
+
+Las CLIs de imagen pueden pagar con una cuenta OpenAI alterna sin tocar la de la empresa:
+`pnpm ai:image --openai-key personal` u `OPENAI_API_KEY_PROFILE=personal` (200 USD de crédito). Producto y runtime siguen
+con la clave de empresa; si el perfil no resuelve, la corrida falla en vez de cobrarle a la canónica
+([manual](docs/manual-de-uso/ai-tooling/alternar-clave-openai.md)).
 
 ## 2026-11-01 — Marca de Efeonce ID
 
@@ -572,20 +579,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
   briefs y skill del sitio público (lecciones del carril de release).
 - Cierre: TASK-1865 `complete`; políticas de medición Meta publicadas para Performance, Medios y HubSpot scope y primer
   `Lead` de servidor recibido por Meta desde el 14/10.
-
-## 2026-10-17 — BytePlus: retratos activos y pruebas completadas en la cuenta correcta
-
-- [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y [ledger por cuenta](docs/operations/creative-production/BYTEPLUS_VIRTUAL_PORTRAIT_LEDGER_V1.md)
-  fijan Google SSO `jreyes@efeoncepro.com` / **3004839361**; la cuenta histórica incorrecta queda excluida de operación.
-- KYC aprobado y carta aceptada por mandato de Julio; Entry Free activo. Chrome resuelto con permiso de archivos
-  habilitado por Julio: **12 assets Active en 6 grupos**, sólo los PNG autorizados. Antonio primero; referencia y
-  primer cuadro exitosos, luego el resto en orden. Videos, recibos y metadatos fuera del repo; IDs y cupos en el ledger.
-- Documentación técnica, funcional, manual y skills Codex/Claude sincronizadas: verificar Active por respuesta y
-  GroupId, conservar evidencia sin secretos, evitar cargas/tareas duplicadas y separar Entry gratuito del consumo API.
-  Sin compras, cambio de plan, credenciales ni promoción a Globe; factura de inferencia aún sin conciliar.
-
-## 2026-10-17 — Brochures aprobados, sin recortes ni validaciones adicionales
-
-- Ratificación expresa de Julio: [uso comercial íntegro](docs/operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md).
-- LEEME, canon, manual y skills Codex/Claude/radar dejan de imponer pendientes históricos. Una autorización
-  de envío no autoriza modificar el material; la copia Aloja de 38 láminas no se reutiliza.

@@ -29,6 +29,18 @@
 - Legacy ID: `TASK-1850`
 - GitHub Issue: `none`
 
+## Delta 2026-11-01
+
+- La resolución de la API key de OpenAI salió de `src/lib/ai/openai-image.ts` (y de `src/lib/ai/openai.ts`) a un
+  resolver único, `src/lib/ai/openai-api-key.ts`, con perfiles: sin perfil usa la clave canónica
+  `greenhouse-openai-api-key`; con `OPENAI_API_KEY_PROFILE=<perfil>` (o `pnpm ai:image --openai-key <perfil>`) usa
+  `greenhouse-openai-api-key-<perfil>` y falla si no resuelve, sin caer a la canónica. Las dos copias locales de
+  `resolveOpenAIApiKey` se eliminaron.
+- Los resultados de `generateOpenAIImage` y de las ediciones exponen el campo nuevo `keyProfile` junto a
+  `secretSource`.
+- Commit `60a53958b` en `develop`. Sin cambio del contrato de modelos (defaults, validaciones, catálogo y costos
+  siguen igual). Runbook: `docs/manual-de-uso/ai-tooling/alternar-clave-openai.md`.
+
 ## Delta 2026-09-16 — ejecución
 
 Ejecutada en cinco slices sobre `develop`, local-first, sin push. Commits: `aeb55503c` (Slice 1),
