@@ -115,6 +115,7 @@ interface CliArgs {
   timeoutMs: number
   open: boolean
   help: boolean
+  openaiKey?: string
 }
 
 const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-image-2)
@@ -144,6 +145,11 @@ Concept mode:
   --task <id>        Tag de work-item (TASK-###/ISSUE-###) registrado en el manifest.
 
 Defaults: model gpt-image-2 · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
+Clave OpenAI:
+  --openai-key <perfil>  Paga con el secreto greenhouse-openai-api-key-<perfil> (p. ej. personal)
+                         en vez de la canónica. También vale OPENAI_API_KEY_PROFILE=<perfil> en el
+                         entorno o en .env.local. "default" = canónica. Si el perfil no resuelve, falla.
+
 Requires OPENAI_API_KEY_SECRET_REF (or OPENAI_API_KEY) — resolved server-side, never printed.`
 
 // Editar una imagen sin declarar `--size` devolvía el default horizontal (1536x1024) y CAMBIABA la
@@ -272,6 +278,9 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       case '--open':
         args.open = true
+        break
+      case '--openai-key':
+        args.openaiKey = next()
         break
       case '--help':
       case '-h':
@@ -420,7 +429,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
 
     const fallback = result.modelFallbackReason ? ` (fallback: ${result.requestedModel} → ${result.model}: ${result.modelFallbackReason})` : ''
 
-    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size} · ${result.quality}${fallback}\n`)
+    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size} · ${result.quality}${fallback} · clave ${result.keyProfile}\n`)
 
     // `usage` es la medida real; la estimación previa (fórmula oficial) se imprime antes de gastar en main().
     if (result.usage) {
@@ -444,6 +453,9 @@ const main = async () => {
     process.stdout.write(`${HELP}\n`)
     process.exit(args.help ? 0 : 1)
   }
+
+  // El flag gana sobre el entorno; el resolver canónico lo lee de OPENAI_API_KEY_PROFILE.
+  if (args.openaiKey) process.env.OPENAI_API_KEY_PROFILE = args.openaiKey
 
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.

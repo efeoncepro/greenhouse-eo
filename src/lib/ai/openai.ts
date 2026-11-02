@@ -1,6 +1,8 @@
 import 'server-only'
 
-import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
+import type { SecretResolutionSource } from '@/lib/secrets/secret-manager'
+
+import { resolveOpenAIApiKey, resolveOpenAIApiKeyForProfile } from './openai-api-key'
 
 // Canonical OpenAI TEXT client (TASK-1226). Sibling of openai-image.ts (images),
 // anthropic.ts (Claude) y google-genai.ts (Gemini/Vertex). NEVER instantiate a
@@ -32,24 +34,12 @@ export interface OpenAIResponsesWebSearchResult {
 
 export const isOpenAIConfigured = async (): Promise<boolean> => {
   try {
-    const resolution = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
+    const resolution = await resolveOpenAIApiKeyForProfile()
 
     return Boolean(resolution.value)
   } catch {
     return false
   }
-}
-
-const resolveOpenAIApiKey = async () => {
-  const resolution = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
-
-  if (!resolution.value) {
-    throw new Error(
-      'OpenAI no está configurado. Define OPENAI_API_KEY o OPENAI_API_KEY_SECRET_REF (greenhouse-openai-api-key).'
-    )
-  }
-
-  return { ...resolution, value: resolution.value }
 }
 
 interface OpenAIOutputContent {

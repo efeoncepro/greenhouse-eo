@@ -5,9 +5,11 @@ import { basename, extname } from 'node:path'
 
 import sharp from 'sharp'
 
-import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
+import type { SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
 import type { EnvSource } from '@/types/env-source'
+
+import { resolveOpenAIApiKey } from './openai-api-key'
 
 export type OpenAIImageModel =
   | 'gpt-image-2.5-sunburst'
@@ -60,6 +62,8 @@ export interface GenerateOpenAIImageOutput {
   revisedPrompt: string | null
   usage: OpenAIImageUsage | null
   secretSource: SecretResolutionSource
+  /** Perfil de clave que pagó la llamada (`default` = greenhouse-openai-api-key). */
+  keyProfile: string
 }
 
 export interface EditOpenAIImageInput {
@@ -136,6 +140,8 @@ export interface RunOpenAIImageToolOutput {
   background: OpenAIImageBackground | null
   usage: OpenAIImageUsage | null
   secretSource: SecretResolutionSource
+  /** Perfil de clave que pagó la llamada (`default` = greenhouse-openai-api-key). */
+  keyProfile: string
 }
 
 interface OpenAIImageUsage {
@@ -512,20 +518,6 @@ const assertBackgroundFormatCompatibility = (
   }
 }
 
-const resolveOpenAIApiKey = async () => {
-  const resolution = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
-  const value = resolution.value
-
-  if (!value) {
-    throw new Error('OpenAI image generation is not configured. Set OPENAI_API_KEY or OPENAI_API_KEY_SECRET_REF.')
-  }
-
-  return {
-    ...resolution,
-    value
-  }
-}
-
 const mimeTypeFromFilename = (filename: string): string => {
   switch (extname(filename).toLowerCase()) {
     case '.jpg':
@@ -783,7 +775,8 @@ export const generateOpenAIImage = async ({
     background: payload.background ?? resolvedBackground,
     revisedPrompt: generated.revisedPrompt,
     usage: payload.usage ?? null,
-    secretSource: apiKeyResolution.source
+    secretSource: apiKeyResolution.source,
+    keyProfile: apiKeyResolution.profile
   }
 }
 
@@ -887,7 +880,8 @@ export const editOpenAIImage = async ({
     background: payload.background ?? resolvedBackground,
     revisedPrompt: edited.revisedPrompt,
     usage: payload.usage ?? null,
-    secretSource: apiKeyResolution.source
+    secretSource: apiKeyResolution.source,
+    keyProfile: apiKeyResolution.profile
   }
 }
 
@@ -973,6 +967,7 @@ export const runOpenAIImageTool = async ({
     format,
     background: background ?? null,
     usage: payload.usage ?? null,
-    secretSource: apiKeyResolution.source
+    secretSource: apiKeyResolution.source,
+    keyProfile: apiKeyResolution.profile
   }
 }
