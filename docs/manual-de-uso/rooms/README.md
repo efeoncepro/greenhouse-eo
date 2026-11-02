@@ -18,6 +18,7 @@ de Efeonce y todavía no tiene clientes reales.
 |---|---|
 | [Operar Rooms en producción](operar-produccion-rooms.md) | Deploy activo y alias manual, interruptores, migraciones con respaldo y gate de migraciones revisadas, rollback e `identity_unbound`. |
 | [Administrar el acceso interno](administrar-acceso-interno.md) | Dar, renovar y revocar acceso del equipo; atender un código de solicitud de la página «Casi.». |
+| [Operar Rooms con agentes por CLI](operar-rooms-con-agentes-por-cli.md) | `pnpm rooms login` una vez con Efeonce ID; después el agente opera sin pedir MFA (`whoami`, `logout`, MCP stdio sin `--session-file`). |
 | [Nombrar el espacio de trabajo](nombrar-espacio-de-trabajo.md) | Poner o cambiar el nombre legible de una organización (`organization.rename`), con sesión o con la herramienta administrativa. |
 | [Operar el worker privado de imágenes](operar-worker-medios.md) | Scheduler/Job, leases, comprobación y rollback. |
 

@@ -4,6 +4,21 @@
 > `doc` (lo afirma un documento) o `local` (check en el workspace).
 > Las entradas fechadas previas son snapshots: no ejecutar sus secuencias pendientes cuando la entrada actual las haya superado.
 
+## 2026-11-01 — Audiencia Rooms y cliente de la CLI de agentes (TASK-2095): código en `develop`, sin release
+
+- Decisión del operador: «CLI primero, gateway después» ([enmienda D1-bis](../../../../docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)).
+- `local`: commits `23ee051ef` (ADR + tasks) y `9ea3b8fd5` (código) en `develop`, sin push. `src/lib/auth-server/oauth/resources.ts`:
+  segunda audiencia `AUTH_SERVER_ROOMS_AUDIENCE` (vacía = apagada, `invalid_target` como antes); `aud` derivado de las clases;
+  clases `efeonce.mcp.rooms.*` **restringidas** (solo clientes que las listan); solo contexto interno; access de 300 s;
+  introspección por `metadata.introspection_audience`. Clientes por `pnpm auth-server:register-rooms-agent-clients`
+  (`efeonce-rooms-cli` público loopback; `efeonce-rooms-resource` confidencial, secreto a archivo 0600).
+- `local`: 758 tests de `src/lib/auth-server` + `scripts/auth-server` PASS (11 nuevos en `rooms-audience.test.ts`), typecheck PASS,
+  drift y contrato de deploy PASS. **No es un grant nuevo:** reutiliza code + PKCE, refresh rotativo con reuso, revoke e introspect.
+- **Pendiente con autorización del operador:** release a `main` (o hotfix enfocado), variable de repo `AUTH_SERVER_ROOMS_AUDIENCE`,
+  deploy gobernado + readback, registro de los dos clientes en la base compartida y el secreto del cliente de introspección en
+  Secret Manager (`rooms-production-agent-introspection-client-secret`) con `secretAccessor` para `rooms-runtime-production`.
+- Lado Rooms (verificador y `pnpm rooms login`): TASK-2087, ledger de `efeonce-rooms`.
+
 ## 2026-11-01 — Marca de Efeonce ID aprobada (archivos en AXIS; adopción en Auth pendiente)
 
 - `doc`: [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md). «La órbita vive en la D»:

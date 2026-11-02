@@ -30,8 +30,9 @@ Incidentes del release, ya resueltos: [ISSUE-184](../../../docs/issues/resolved/
 (revisión sin tráfico) e [ISSUE-186](../../../docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md)
 (tests atados al corte ETV, bloqueo de CI). Historia anterior en el ledger, incluida la
 [activación Rooms + Efeonce ID del 31-10](../../../docs/audits/rooms/2026-10-31-production-activation.md).
-Pendiente de EPIC-044, TASK-2086 (`to-do`): delegación interactiva para un **segundo resource server** (audiencia Rooms, canje
-RFC 8693), distinta de TASK-1917.
+**Segundo resource server (Rooms), CLI primero:** TASK-2095 (`in-progress`, código en `develop` sin release) agrega la audiencia
+`AUTH_SERVER_ROOMS_AUDIENCE` (vacía = apagada), clases `efeonce.mcp.rooms.*` restringidas y los clientes `efeonce-rooms-cli` /
+`efeonce-rooms-resource`. El canje RFC 8693 para el gateway queda en TASK-2086 (`to-do`), distinta de TASK-1917.
 
 Efeonce ID es el **autorizador propio** de Efeonce: OAuth 2.1/OIDC servido por Cloud Run `auth-server`
 en `auth.efeonce.org`. Se decidió el 2026-09-03 en lugar de WorkOS ([ADR nativo](../../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))

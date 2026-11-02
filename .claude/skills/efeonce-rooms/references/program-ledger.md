@@ -7,6 +7,25 @@
 
 ## Estado vigente (2026-11-01)
 
+- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis), código listo y ensayado en local:** rama
+  `claude/rooms-agent-cli-bearer` (worktree `/Users/jreye/Documents/rooms-agent-cli`). Verificador del bearer de Efeonce ID
+  (`src/server/agents/bearer.ts`: JWKS + introspección ≤ 30 s con el cliente `efeonce-rooms-resource`, `azp` de la lista,
+  sin `act`, clases por ruta y por operación, `sub` → binding interno con la misma autoridad que la cookie vía
+  `internalPrincipalFor`), detrás de `ROOMS_AGENT_LANE_ENABLED` (nace OFF). Con cookie presente el bearer se ignora (contrato
+  previo). Metadata RFC 9728 en `/.well-known/oauth-protected-resource` (404 con el carril apagado). `pnpm rooms
+  login|logout|whoami` (`scripts/lib/rooms-cli-auth.ts`: PKCE por loopback, `~/.config/efeonce-rooms/credentials.json` 0600,
+  refresh con candado de archivo) y MCP stdio sin `--session-file`. `local`: ensayo completo en `pnpm integration:up` con el
+  emisor de prueba extendido (`scripts/design-integration/agent-issuer.ts`): login, sala Volta creada, 5 imágenes subidas
+  (`synthetic`/`fixture`) y adjuntas, cobertura limpia, «Ver como» comprador limpio, publicada y atribuida a `claude-code`
+  por `cli` con aviso y reversa; rechazos de `live`, `read.client`, bearer falso y otra organización.
+  - Lección: el manifiesto Volta traía `assetRefs` con versiones de marcador (`av-…`); `content.attachAsset` da `conflict`
+    si la referencia ya tiene otra versión. Crear sin `assetRefs` y dejar que cada adjunto agregue la suya.
+  - Lección: el procesamiento de imágenes avanza la revisión del borrador en segundo plano; cada comando lee la revisión
+    vigente y ante `409` relee y rehace con una clave nueva.
+  - Lección: un worktree bajo `/private/tmp` rompe `integration:up` (socket de PG > 103 bytes y resolución de módulos de
+    Next); usar una ruta corta junto al repo.
+  - El entorno de integración del checkout principal se detuvo para este ensayo; se levanta de nuevo con `pnpm integration:up`.
+
 - **PR #17 + #18 (`main@5533dcd`), en producción desde 2026-11-01:** causa de
   [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md) encontrada: cada conexión
   nueva del conector de Cloud SQL usa el certificado temporal guardado sin revisar si venció, y su refresco (temporizador)
