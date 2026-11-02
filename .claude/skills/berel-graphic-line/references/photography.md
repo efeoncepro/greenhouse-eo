@@ -229,26 +229,35 @@ reemplaza al primero. El alfa del render se materializa antes de extenderlo, o l
 
 Pendiente: elegir escenas pensadas para producto (una toma arquitectónica lo deja pequeño).
 
-**Piloto por envase (2026-11-02).** Cinco envases sobre las tomas nuevas, mismo método híbrido. Todos pasaron y ninguno se movió:
+**Piloto por envase (2026-11-02).** La escala salió mal dos veces antes de quedar bien. Lo que importa:
 
-| Envase | Toma | Fidelidad híbrido | Solo modelo |
-|---|---|---|---|
-| Kover Pro 19 L | azotea, sobre la membrana mojada | 0,987 | 0,27 |
-| Sellador Anti-Salitre 530 19 L | diagnóstico, frente al muro con salitre | 0,973 | 0,33 |
-| Insignia 4 L (97 px de ancho) | comedor, en el piso | 0,990 | 0,22 (reescribió «ECO CONFIABLE») |
-| Mancha Nogal Clásico 1 L | taller, junto a la silla | 0,988 | 0,22 |
-| Aerosol esmalte acrílico | herrería, en la banqueta | 0,986 | 0,48 |
+1. **A ojo:** entre 25 % chico y casi el doble (el aerosol se agrandó para que se leyera).
+2. **Calculada por el alto:** 15–40 % chico. Los renders son más altos que el envase real respecto de su ancho: el
+   Insignia mide 0,71 de ancho por alto y un galón real ≈ 0,88. Además, la mesa se había leído corta (461 px contra
+   510 medidos con regla). El operador: «es imposible que en una mesa se vea así de pequeña».
+3. **Calculada por el diámetro** (el ancho visible del cuerpo en el render frontal), con referencias medidas con regla
+   a resolución completa: quedó bien.
 
-Palancas fijadas en el contrato (`productInScene.levers`):
-- **Render:** el oficial vigente.
-- **Contexto de uso:** el envase va donde se usa.
-- **Escala:** realista, calculada con un objeto de tamaño conocido de la foto.
-- **Ancho mínimo:** unos 60 px en el plate; a 35 px el aerosol no se leía.
-- **Posición:** dentro de los tres recortes verticales, fuera de la banda del titular y de la esquina del logo.
-- **Story:** la base del producto va sobre el 82 % del alto. Los 340 px inferiores son zona de interfaz y ahí cayeron cuatro de cinco.
+| Envase (Ø) | Toma y referencia | Fidelidad |
+|---|---|---|
+| Insignia 4 L (17 cm) | comedor, sobre la mesa (mesa 0,76 m = 510 px) | 0,982 |
+| Kover Pro 19 L (30 cm) | azotea (suelo: horizonte 0,43, cámara 1,38 m) | 0,989 |
+| Sellador Anti-Salitre 530 19 L (30 cm) | diagnóstico, contra el muro (zoclo 10 cm = 77 px) | 0,965 |
+| Mancha Nogal Clásico 1 L (≈ 8,5 cm, estimado) | taller, junto a la silla (asiento 0,45 m = 380 px) | 0,982 |
+| Aerosol 400 ml (6,5 cm) | toma `detalle` (macetero 0,40 m = 690 px) | 0,984 |
 
-Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital (los renders son frontales) y dos logos
-Berel en la pieza.
+Solo el modelo dio 0,05–0,48. Reglas en el contrato (`productInScene`):
+- `producto-en-escena.mjs colocar` **ya no acepta `--alto`**. Exige `--referencia <metros>:<px>` (objeto conocido a
+  la misma profundidad) o `--suelo <horizonte>:<altura de cámara>`. El diámetro sale de `sizes`, por render, con su
+  fuente; un render sin diámetro falla.
+- Falla bajo 60 px de ancho. **Nunca se agranda un producto para que se lea**: se acerca a la cámara o se usa la
+  toma `detalle`, el banco de trabajo con cámara a ras, para aerosoles, litros y ½ L.
+- Avisa si la base cae en los 340 px inferiores de la story (zona de interfaz).
+- **Escala no es presencia.** Una cubeta lejos en una azotea se lee chica aunque esté a escala; para que sea
+  protagonista se acerca a la cámara.
+- Si el operador ve un producto chico, se revisan las referencias; no se defiende el número.
+
+Sin probar: producto abierto o en uso, en mano, familia de tamaños, cenital y dos logos Berel en la pieza.
 
 ## 7. Rechazos que no se repiten
 

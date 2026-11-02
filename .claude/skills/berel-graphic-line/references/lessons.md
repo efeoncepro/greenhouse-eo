@@ -211,6 +211,16 @@
 - **Dónde quedó:** `berel-photo-registers.json` (`titleSpace`, cámaras de `takes`); `scripts/medir-plate.mjs`;
   pieza `projects/berel/tomas-fotograficas`. **Codificada + prueba**.
 
+## 2026-11-02 · Escala del producto: por diámetro, medida con regla
+
+- **Cita:** «se siguen viendo pequeños… es imposible que una lata de pintura en una mesa se vea así de pequeña».
+- **Qué pasó:** a ojo, los productos salieron entre 25 % chicos y casi el doble. Calculados por el alto, 15–40 % chicos:
+  los renders son más altos que el envase real respecto de su ancho, y la referencia de la mesa estaba mal leída.
+- **Regla:** escala por diámetro (ancho visible del render) y referencia medida con regla a resolución completa; el script
+  no acepta un alto a mano; nunca se agranda para que se lea (se acerca a la cámara o toma `detalle`).
+- **Dónde quedó:** `compose/product.mjs` (`productScale`), `scripts/producto-en-escena.mjs`,
+  `berel-photo-registers.json` (`productInScene`, toma `detalle`). **Codificada + prueba**.
+
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
