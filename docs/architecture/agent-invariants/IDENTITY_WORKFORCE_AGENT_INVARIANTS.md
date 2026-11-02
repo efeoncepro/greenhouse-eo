@@ -734,7 +734,13 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
   es fail-closed por diseño, no un bug.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
   `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
-  `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
+  `pages/efeonce-isotipo.generated.ts` ni `pages/orbit-assets.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`;
+  drift en `brand-assets.test.ts` y `orbit-shell.test.ts`).
+- **Pantallas del emisor con La órbita (2026-11-02, local en `develop`, sin release).** Toda pantalla salvo el login V4
+  se compone con `pages/orbit-shell.ts` (contrato en `docs/architecture/ui-platform/PATTERNS.md` § Runtime sin React):
+  una sola esfera por pantalla, sin logo dentro de la órbita, sin `style=` (CSP `default-src 'none'`, estilos por
+  hash). La marca de la aplicación en el consentimiento sale de un origen CIMD verificado o de un `client_id`
+  first-party **exacto** (`FIRST_PARTY_CLIENT_MARKS`), **NUNCA** del `client_name` ni de un id de DCR parecido.
 
 **Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
 `retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,

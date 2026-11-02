@@ -65,7 +65,12 @@ release `v0.4.31` (AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Pa
   `pnpm auth-server:brand-assets:generate`. Reemplaza el isotipo de Efeonce en azul. Llega a `auth.efeonce.org` sólo con
   el próximo release gobernado. Cuando Greenhouse fije `axis-brand-assets` ≥ 0.4.31 (TASK-2014), esa copia entra a la
   guarda `src/config/efeonce-brand-assets.test.ts` contra el paquete.
-- El lockup del encabezado del formulario sigue pendiente. El botón «Continuar con Efeonce ID» está definido (sección
+- **Lockup del encabezado adoptado en código (2026-11-02, sin release):** las pantallas de Efeonce Auth con La órbita
+  (todas salvo el login V4) llevan el lockup «Efeonce | ID» arriba del formulario, positivo sobre papel y negativo en
+  modo oscuro, desde copias exactas de `axis-brand-assets` 0.4.32 (`public/branding/SVG/efeonce-id-lockup-{positive,negative}.svg`)
+  regeneradas en `src/lib/auth-server/oauth/pages/orbit-assets.generated.ts` con `pnpm auth-server:brand-assets:generate`
+  (drift en `orbit-shell.test.ts`). El lockup nunca va dentro de la órbita. El login V4 todavía no lo lleva. Llega a
+  `auth.efeonce.org` sólo con un release gobernado. El botón «Continuar con Efeonce ID» está definido (sección
   siguiente); falta implementarlo.
 
 ## El botón «Continuar con Efeonce ID» (aprobado 2026-11-02)
@@ -105,8 +110,9 @@ y no en el gris de la familia: el botón nombra la cuenta, no sólo a Efeonce. S
 
 - Efeonce ID entra a la familia con el mismo patrón que Rooms: archivo cerrado en AXIS, generador en Greenhouse.
 - Riesgo abierto: a 16 px la panza se reduce a una curva fina; el isotipo chico lo mitiga, pero no hay prueba sin contexto.
-- Pendiente: la adopción en `auth-server` y en los botones de las aplicaciones; Greenhouse fija `axis-brand-assets`
-  0.4.25 (adopción de versiones nuevas: TASK-2014).
+- Pendiente: el release de la adopción en `auth-server` (favicon y lockup ya en código, en `develop`), el lockup en el
+  login V4 y los botones de las aplicaciones; Greenhouse fija `axis-brand-assets` 0.4.25 (adopción de versiones nuevas:
+  TASK-2014), por eso las copias de 0.4.31/0.4.32 viven en `public/branding/SVG/`.
 
 ## Referencias
 

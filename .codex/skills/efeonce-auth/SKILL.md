@@ -24,6 +24,8 @@ Estado `vivo`:
   local de Codex. Incluye revocación atómica de consentimiento y tokens, recuperación atómica, 413, OTP con fallo cerrado, Job
   aislado de rotación (migración sin aplicar; gate `AUTH_KEY_MAINTENANCE_PROVISIONED` ausente), retiro del trigger `push:main`
   y verificación post-deploy de la revisión activa. Nada de esto corre en producción hasta el próximo release.
+- **En `develop`, sin push ni release (commit `d14b786d3`, 2026-11-02):** todas las pantallas de Efeonce ID salvo el login V4
+  pasan al shell de La órbita (aprobado por el operador en el canvas). `auth.efeonce.org` sigue sirviendo el diseño anterior.
 
 Incidentes del release, ya resueltos: [ISSUE-184](../../../docs/issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)
 (guard vs squash), [ISSUE-185](../../../docs/issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)
@@ -82,10 +84,12 @@ esta skill dice qué hay que saber para trabajar sin repetir lo que ya costó un
 | Servicio Cloud Run (entrypoint, Dockerfile, `deploy.sh`) | `services/auth-server/` |
 | Dominio | `src/lib/auth-server/{oauth,persons,internal,first-party,email-otp,keys,maintenance}` |
 | Scripts operativos | `scripts/auth-server/*`: registro de clientes/RP/issuer, rotación de llave, canaries, smoke, drift de config Rooms (`rooms-config-drift.py`) |
+| Shell de pantallas con La órbita (todas salvo el login V4) | `src/lib/auth-server/oauth/pages/orbit-shell.ts` (`renderOrbitPanel`, `orbitHeading`, `orbitBrand`, `orbitFootnote`/`orbitHint`/`orbitLink`) + `orbit-geometry.ts` (constantes desde `efeonceGraphicLine.orbit`) + `orbit-assets.generated.ts` (lockups de Efeonce ID, isotipo de Rooms, `ORBIT_ICONS`; NUNCA editarlo a mano, test de drift en `orbit-shell.test.ts`). Estilos `os-*` en `scripts/auth-server/orbit-shell-styles.ts` (anexados en `styles.ts`); copy en `src/lib/copy/auth-server-orbit.ts`. `layout()` de `render.ts` recibe `state/heading/panel/align`; el estado login conserva V4 |
 | Deploy | `.github/workflows/auth-server-deploy.yml`: sólo despliega SHAs publicados en `main` (push a `main`, `workflow_call` desde `production-release.yml` o dispatch productivo); exige una única revisión con 100 % del tráfico y que el commit servido sea ancestro del objetivo o, en un release por squash, de la coincidencia de árbol más antigua en `origin/develop`. Tests del guard: `scripts/auth-server/test_deploy_contract.py` |
 
 Comandos útiles:
-- `pnpm auth-server:dev-ui`: arnés visual con renderers reales y DTOs ficticios, sin auth ni comandos. Puerto por defecto 19036; se cambia con `AUTH_SERVER_DEV_UI_PORT`. Rutas: `/login`, `/login/rooms`, `/login/external`, `/magic-link/*`, `/invitation/*`, `/session/*`, `/error/*` y `/consent/multi-org-v2`.
+- `pnpm auth-server:dev-ui`: arnés visual con renderers reales y DTOs ficticios, sin auth ni comandos. Puerto por defecto 19036; se cambia con `AUTH_SERVER_DEV_UI_PORT`. Rutas: `/login`, `/login/rooms`, `/login/external`, `/consent*`, `/step-up`, `/step-up/enroll`, `/magic-link/*`, `/invitation/*`, `/access/revoked`, `/session/*`, `/error/*` e `/internal-error`. Abrirlo por `127.0.0.1` (por nombre `localhost` responde 421).
+- `pnpm auth-server:brand-assets:generate`: regenera isotipo, favicon, estilos, fuentes (Poppins + Bricolage), controladores y también `orbit-assets.generated.ts`.
 - `pnpm auth-server:verify-contrast`, `pnpm auth-server:verify-passkey`.
 - `pnpm auth-server:register-first-party-client`, `pnpm auth-server:rotate-key`, `pnpm auth-server:person-auth:canary`.
 
@@ -113,6 +117,7 @@ Comandos útiles:
   OAuth ni concede consentimiento MCP remoto. Un arnés con protocolo/store Auth reales no certifica
   `services/auth-server/server.ts` completo, dos productos RP, HTTPS, Microsoft/MFA o dispatch gateway.
 - **Marca de Efeonce ID (aprobada 2026-11-01):** en la pantalla de entrada sólo van el favicon (`efeonce-id-isotype-small-*`) y la marca dentro del formulario (lockup `efeonce-id-lockup-*`, botón «Continuar con Efeonce ID»). Nunca el isotipo grande en el panel lateral: es del carrusel de novedades, que se conserva. Archivos sólo desde `@efeoncepro/axis-brand-assets` (≥ 0.4.31), nunca copias a mano. [ADR](../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md). El favicon ya está en código (teja de `scripts/auth-server/efeonce-id-favicon.ts`, regenerar con `pnpm auth-server:brand-assets:generate`); lockup del formulario pendiente. **Botón canónico «Continuar con Efeonce ID» (aprobado 2026-11-02):** «Continuar con» + `efeonce-id-button-lockup-*` (≥ 0.4.32, «ID» en la tinta del texto), sello oscuro sobre papel / blanco sobre oscuro, diez estados en el README de `axis-brand-assets` y en el ADR; nunca el monograma antes del texto, nunca en teja, nunca la órbita sola como símbolo. Sin implementar todavía.
+- **Las pantallas de Efeonce ID siguen el canon de La órbita** (skill `efeonce-graphic-line`, `references/applications.md` §A21): una sola esfera por pantalla; la órbita rodea un ícono AXIS en reposo (`resolveIcon`) o una palabra; nunca medida, loader, puntos repetidos, logo dentro de la órbita ni figuras o íconos dibujados a mano. Su cambio sólo llega a producción por release gobernado: es el mismo servicio que el login MCP.
 - **Una UI nueva se itera en el arnés local** (`pnpm auth-server:dev-ui`; `/login/public-feed-preview` dibuja el carrusel con el feed real de producción). Llegar a `auth.efeonce.org` exige release gobernado: no hay deploy de Auth fuera de `main`.
 - **El repo `greenhouse-eo` es PÚBLICO.** Los recibos con identificadores del operador viven fuera de git (`.auth/…`), nunca en `docs/`. Lo que ya se commiteó sigue en el historial.
 - **Seguridad (TASK-1833):** hay evaluación propia y revisión entre agentes, **sin pentest completo**; la cobertura ofensiva quedó bloqueada. No declarar «pentest hecho».

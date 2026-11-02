@@ -1,9 +1,9 @@
 # Pantallas de Efeonce ID (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-11-02 por Claude (marca de Efeonce ID: favicon, dónde va en la pantalla de entrada y botón «Continuar con Efeonce ID»)
+> **Última actualización:** 2026-11-02 por Claude (pantallas con La órbita: panel, titulares, código en seis casillas, activación en tres pasos y marca de Rooms; marca de Efeonce ID)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Documentacion tecnica:** [PATTERNS.md § Runtime sin React — shell «Efeonce ID»](../../architecture/ui-platform/PATTERNS.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 > **Manual de uso:** [Revisar y diagnosticar las pantallas de Efeonce ID](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md)
@@ -38,6 +38,49 @@ acceso sigue igual. Los cambios de pantalla se revisan en el arnés local y lleg
 El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
 septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
 
+## Las pantallas con La órbita — 2026-11-02 (en desarrollo, sin release)
+
+El operador aprobó un rediseño de **todas las pantallas de Efeonce ID salvo la de entrada** (el login V4 con el carrusel
+se queda como está). Ya está hecho en el código, en la rama de desarrollo, pero **todavía no llegó a
+`auth.efeonce.org`**: hoy producción muestra el diseño anterior. Como este servicio es también el login de todas las
+herramientas de IA conectadas a Efeonce, el cambio llega sólo con un release gobernado, que aún no está autorizado.
+
+Qué pantallas cambian: autorizar acceso (también con varias organizaciones y con aplicación no verificada), «Primero,
+entra a tu cuenta», «Confirma que eres tú», los errores de la autorización y del acceso corporativo, el segundo factor y
+su activación, los enlaces por correo, la invitación, el acceso retirado, «Demasiados intentos» y la sesión iniciada o
+cerrada.
+
+**Cómo se ven ahora:**
+
+| Elemento | Qué es |
+| --- | --- |
+| **Formulario en papel** | Fondo claro con el lockup «Efeonce \| ID» arriba. Si el navegador está en modo oscuro, el formulario y el lockup se invierten. Las pantallas cortas van centradas. |
+| **Titular con dos pesos** | Una parte liviana que introduce y otra pesada que manda: «Revisa **tu correo**», «Confirma **que eres tú**», «Autoriza **el acceso**». |
+| **Panel con la órbita** | Sólo en pantallas anchas (escritorio). Un panel oscuro donde la órbita rodea un ícono que dice de qué trata la pantalla —seguridad, correo, conexión con una aplicación o reloj— o una palabra: «Listo» al entrar, «Hasta pronto» al cerrar sesión, «De nuevo» en los errores. Siempre hay una sola esfera verde. |
+| **En el teléfono** | No hay panel: son pantallas rápidas y el formulario ocupa todo. El punto final del titular se convierte en la esfera. |
+
+**El código del segundo factor.** Se escribe en seis casillas, una por dígito. Si la persona prefiere un código de
+respaldo, «Usar un código de respaldo» cambia a un campo de texto, y puede volver con «Usar el código de la
+aplicación». Si por algún motivo el navegador no carga el pequeño programa de la página, queda el campo de texto y el
+formulario funciona igual.
+
+**Activar el segundo factor** se presenta en tres pasos: escanear el código con la aplicación de autenticación, guardar
+los códigos de respaldo y confirmar con un código. Las reglas de siempre siguen: los códigos se ven una sola vez y la
+casilla «Guardé mis códigos de respaldo» es obligatoria.
+
+**La ficha de la aplicación** en «Autorizar acceso» muestra el logo de la aplicación sólo cuando su origen es
+comprobable. La CLI de Rooms, que es de Efeonce, muestra el isotipo de Rooms **sólo si su identificador es exactamente
+el registrado por Efeonce**. Una aplicación que se registre por su cuenta con un nombre o identificador parecido no
+hereda ese logo: queda con su inicial y el aviso «No verificada».
+
+> Detalle técnico: shell en [`orbit-shell.ts`](../../../src/lib/auth-server/oauth/pages/orbit-shell.ts) y
+> [`render.ts`](../../../src/lib/auth-server/oauth/pages/render.ts); textos en
+> [`auth-server-orbit.ts`](../../../src/lib/copy/auth-server-orbit.ts); marca de la ficha en
+> [`client-marks.ts`](../../../src/lib/auth-server/oauth/pages/client-marks.ts); lockups, isotipo de Rooms e íconos
+> generados en `orbit-assets.generated.ts` por `pnpm auth-server:brand-assets:generate`. Patrón técnico en
+> [PATTERNS.md § Runtime sin React](../../architecture/ui-platform/PATTERNS.md). Cómo revisarlas en el arnés, en el
+> [manual de las pantallas](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md).
+
 ## La marca de Efeonce ID en estas pantallas — 2026-11-02
 
 Efeonce ID tiene marca propia desde el 2026-11-01: «la órbita vive en la D» (la D es media órbita con la esfera verde a
@@ -46,7 +89,7 @@ la 1:30). Los archivos oficiales están en el paquete de marca de AXIS y nunca s
 | Dónde | Qué va | Estado |
 | --- | --- | --- |
 | **Favicon** (la pestaña del navegador) | Una teja oscura de Efeonce con el isotipo chico de Efeonce ID en negativo: la D blanca con la esfera verde. Se lee igual en una pestaña clara y en una oscura. | Hecho en el código (`develop`), **sin release**: `auth.efeonce.org` sigue mostrando el isotipo de Efeonce en azul hasta el próximo release gobernado. |
-| **Encabezado del formulario** | El lockup «Efeonce \| ID». | Pendiente. |
+| **Encabezado del formulario** | El lockup «Efeonce \| ID». | Hecho en las pantallas con La órbita (en desarrollo, sin release). El login V4 todavía no lo lleva. |
 | **Botón «Continuar con Efeonce ID»** | El botón con el que las aplicaciones (Rooms, Studio, Greenhouse) ofrecen entrar con Efeonce ID. Su forma y cuándo va se explican en [Acceso a productos con Efeonce ID](acceso-a-productos-efeonce.md). | Definido, sin implementar. |
 
 **Lo que no va:** el isotipo grande en el panel lateral. Ese panel es del carrusel de novedades y se conserva tal cual.
@@ -58,7 +101,7 @@ La maqueta que ponía el monograma grande a la izquierda quedó superada por dec
 > `pnpm auth-server:brand-assets:generate`; cómo hacerlo, en el
 > [manual de las pantallas](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md).
 
-## El marco anterior (baseline TASK-1835)
+## El marco anterior (baseline TASK-1835, aún en producción)
 
 Todas las pantallas comparten el mismo marco:
 
