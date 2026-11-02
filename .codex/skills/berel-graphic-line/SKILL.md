@@ -107,7 +107,9 @@ sustituyen por otra fuente ni por valores aproximados.
    canvas → [references/qa-review.md](references/qa-review.md).
 8. **Entrega y revisión humana** (nombres, Frame.io, canvas, respuesta a comentarios) →
    [references/workflow.md](references/workflow.md).
-9. **Lecciones.** Todo error corregido queda registrado →
+9. **Reel** (si la pieza lleva video): cuadros antes/después, capas de la story, clip FLUX 3 u Omni, QA y armado →
+   [references/video.md](references/video.md).
+10. **Lecciones.** Todo error corregido queda registrado →
    [references/lessons.md](references/lessons.md).
 
 ## 5. Elegir la referencia
@@ -116,7 +118,8 @@ sustituyen por otra fuente ni por valores aproximados.
 |---|---|
 | ¿Qué tipografía, color de sistema o logo uso? ¿Dónde va el logo? | [identity-and-recipes.md](references/identity-and-recipes.md) |
 | Portada, cierre, franjas, pasos, paleta, post, story, Pinterest | [identity-and-recipes.md](references/identity-and-recipes.md) |
-| Señalización, técnica-gráfica o reel | [identity-and-recipes.md](references/identity-and-recipes.md) (declaradas sin render) |
+| Señalización o técnica-gráfica | [identity-and-recipes.md](references/identity-and-recipes.md) (declaradas sin render) |
+| Reel de transformación: cuadros, motor (FLUX 3 / Omni), QA de color y fluidez, música y tapa | [video.md](references/video.md) |
 | ¿Por qué el marcador quedó ahí, se eliminó o salió con aviso? | [marker-grid.md](references/marker-grid.md) |
 | El titular social no cabe o se lee mal | [marker-grid.md](references/marker-grid.md) |
 | Foto nueva: estrato, espacio, prompt, remates | [photography.md](references/photography.md) |

@@ -19,6 +19,19 @@
 
 ---
 
+## 2026-11-02 · Reel: el color del muro se mide y el motor se elige por toma
+
+- **Cita:** «el efecto de los elementos lo resuelve mejor flux 3, es más fluido».
+- **Qué pasó:** con los mismos cuadros antes/después, Wan 3.0 llevó la terracota a salmón (ΔE 18,3); MiniMax H3 clavó el
+  color pero metió los muebles como fundido semitransparente; FLUX 3 dejó la herrería de golpe (reja y muro de un cuadro
+  a otro); Omni armó la cama por partes y pintó el muro con rodillo. Ningún motor ganó en las cuatro tomas. Medir ΔE en
+  una caja fija del muro daba otro número que la máscara (recámara 3,2 vs 3,6).
+- **Regla:** FLUX 3 por defecto y Omni por toma; el QA mide el color sobre la máscara del muro (ΔE ≤ 4) y el salto entre
+  cuadros (≤ 5 %), y falla cerrado; lo que no mide (fundidos, objetos flotando) se mira en la hoja de cuadros.
+  Higgsfield puede devolver una recomendación de preset en vez del job: se reenvía con `declined_preset_id`.
+- **Dónde quedó:** `contracts/berel-video-reels.json`, `compose/video.mjs`, `scripts/reel.mjs`, `test/video.test.mjs`.
+  **Codificada + prueba**.
+
 ## 2026-11-02 · Producto en escena: la física del modelo, el arte del render
 
 - **Cita:** «la etiqueta se vea realista y no se alteren los textos, tu tendencia va a ser irte a la vía determinística,
@@ -224,5 +237,5 @@
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
-- Recetas declaradas sin render: señalización, técnica gráfica, reel.
+- Recetas declaradas sin render: señalización y técnica gráfica (el reel tiene su armado: [video.md](video.md)).
 - Aprobación de Daniela, Andrés o Melkin; `qa.approval` sigue en `pending-human-and-pixel-review`.

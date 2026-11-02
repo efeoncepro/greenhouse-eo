@@ -175,7 +175,7 @@ Effects.
 |---|---|---|
 | `blog.senalizacion` | Señalización con tarjetas translúcidas + ícono + línea guía | N41_BN_SEÑALIZACION_2, N39_BN_INFOGRAFIA_2 |
 | `blog.tecnica-grafica` | Tabla o tarjetas sobre papel con latas | N42_BN_INFOGRAFIA_2/3. Requiere renders oficiales de producto |
-| `social.reel` | 14 s: escena animada ≈ 8 s + tapa roja de 6 s (`02_Recursos/08_TapasCierre`) | Fuera del compositor estático |
+| `social.reel` | 14 s: transformación ≈ 8 s + tapa roja de 6 s | Fuera del compositor estático: lo arma `scripts/reel.mjs` → [video.md](video.md) |
 
 Además, el formato `og` (1200 × 630) está declarado como derivado de `blog.portada`, pero ninguna
 receta lo compone hoy: `composeBerel` siempre usa el formato de la receta (`blog`). Verificado en
