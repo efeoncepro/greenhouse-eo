@@ -1,0 +1,174 @@
+# Lecciones Berel — registro fechado de aprendizajes y correcciones
+
+> Solo Berel. Más reciente primero. Cada entrada: cita textual del operador (cuando la hubo), qué pasó, la regla que
+> quedó y dónde quedó codificada. Las rutas son del Workbench (`/Users/jreye/Documents/creative-workbench`) salvo
+> que se diga otra cosa.
+>
+> **Sobre las fechas:** todo ocurrió en una sola sesión que cruzó del 2026-11-01 al 2026-11-02. Cuando las fuentes no
+> registran el día exacto, la entrada dice «2026-11-01/02» y el orden sigue el de `docs/operations/HARNESS_STATUS.md`.
+>
+> **Cómo agregar una lección:** arriba de todo, con el mismo formato; codifica la regla en el contrato, el código o
+> una prueba (una lección que solo vive aquí se olvida) y anota dónde. Si es de fotografía, agrégala también a
+> `lessons` de `brands/berel/contracts/berel-photo-registers.json`.
+
+| Estado | Significa |
+|---|---|
+| **Codificada + prueba** | La regla está en contrato o código y una prueba la cubre |
+| **Codificada** | Está en contrato o código, sin prueba propia |
+| **Documental** | Solo en docs o skills: depende de que el agente la lea |
+
+---
+
+## 2026-11-02 · Frizo mal terminado en la terraza (registro alto)
+
+- **Cita:** «Esto es un frizo mal terminado? si es así no se puede aprobar para Berel por el estrato».
+- **Qué pasó:** la terraza (Terra Nova 1-3605D, registro alto) tenía una viga de concreto aparente que terminaba
+  irregular contra el muro pintado. Se leía como obra mal terminada y bajaba el estrato; además, en los recortes
+  verticales la viga entraba completa y la píldora caía encima.
+- **Regla:** todo encuentro muro-plafón, viga, piso o vano va terminado con línea limpia y sombra de remate o
+  moldura; nunca pintura terminando irregular contra concreto o piedra. En `alto`, concreto aparente **solo como
+  elemento terminado**.
+- **Resultado:** plate regenerado (Sunburst + chip, USD 0,12; plafón liso con remate; prompt en
+  `greenhouse-eo/ai-generations/2026-11-01_berel-espacios/ronda-2/v3/prompt-terraza.txt`), corregido de ΔE 7,22 a 0,19.
+- **Dónde quedó:** bloque `common` y registro `alto` de `brands/berel/contracts/berel-photo-registers.json`; caso en su
+  arreglo `lessons`. **Codificada** (sin prueba: ningún test mira el píxel de un plate).
+
+## 2026-11-02 · Aislamiento de Efeonce
+
+- **Cita:** «OJO! esto es solo para Berel cuidado dañas el flujo que usamos para efeonce». Y sobre la skill: «esto no
+  debe confundir a los agentes, esto es solo para cuando trabajemos con Berel».
+- **Qué pasó:** al ajustar el compositor y el corrector para Berel había riesgo de tocar motores compartidos que usa
+  Efeonce.
+- **Regla:** todo cambio Berel vive en `brands/berel/**` y `projects/berel/**`. Los motores neutrales
+  (`tools/surface-color.mjs`, `tools/marca-color-superficie.mjs`) se consumen sin modificarlos; lo propio de Berel va
+  en el adaptador (`brands/berel/scripts/ajustar-muro.mjs`). Antes de commitear: `git diff --name-only`. Esta skill
+  nunca se carga para Efeonce, SKY u otro cliente.
+- **Dónde quedó:** `brands/berel/AGENTS.md` («Nunca importar identidad Efeonce, AXIS o SKY»); nota en
+  `HARNESS_STATUS.md` («Solo afecta `brands/berel/**`; el flujo de Efeonce no cambia»); `description` de esta skill.
+  **Documental** (no hay gate que bloquee un diff fuera de `brands/berel/**`).
+
+## 2026-11-02 · Textura de estuco confundida con objetos
+
+- **Qué pasó:** al medir «objetos bajo el marcador» por densidad de bordes, el grano del estuco del muro (foto `port-3`)
+  daba 9,7, igual que un objeto, y la grilla descartaba muro perfectamente válido.
+- **Regla:** medir los bordes **tras un desenfoque σ=1** (a 1408 px de ancho), que borra el grano y deja los objetos.
+  Calibración: muro liso 1,0; estuco 1,4–2,2; lámpara 5,0; cuadro 10,2. Umbral `busyMax` 3, en 4 tramos tomando el peor.
+- **Dónde quedó:** `brands/berel/contracts/berel-recipes.json → grids.shared` (`grain`, `busyMax`, `slices`, `busyNote`).
+  **Codificada + prueba** (`compose.test.mjs`: «el marcador no se posa sobre objetos»).
+
+## 2026-11-02 · Grilla por formato
+
+- **Cita:** «armar una grilla para cada tipo de formato donde delimites espacios y longitud de texto».
+- **Qué pasó:** el marcador anclado a coordenadas de la foto (con anclas alternativas `alt`) caía sobre objetos, quedaba
+  apretado o se cortaba según el recorte. El operador propuso la grilla; se aceptó y construyó.
+- **Regla:** los jobs no llevan coordenadas (`at`/`alt` fallan cerrado). Cada formato declara márgenes, celdas, objetivo,
+  zonas intocables y presupuestos de texto; el motor elige la celda sobre el muro de **su** color, sin objetos y con más
+  aire. Con foto sin corregir se declara `sample: [u, v]`.
+- **Errores corregidos en el camino:** con filas gruesas (120 px) la cocina no tenía celda; con un sesgo «más arriba» todo
+  se pegaba al borde superior (se cambió a un objetivo por formato); la zona intocable del titular era de ancho completo
+  (ahora usa el ancho real del titular).
+- **Resultado:** 40 piezas recompuestas, 37 en primer nivel; post del estudio y de la cocina en la franja de la píldora y
+  story de la cocina apretada bajo la repisa, las tres con aviso en `qa.warnings`.
+- **Dónde quedó:** `berel-recipes.json → grids` (shared + blog/post/story/pinterest); `brands/berel/compose/render.mjs`;
+  `brands/berel/AGENTS.md`. **Codificada + prueba** («el marcador ya no acepta coordenadas», «sin celda bajo el titular,
+  el segundo nivel usa la franja de la píldora y lo avisa», «story: el marcador respeta titular y zonas seguras»).
+  Detalle: [marker-grid.md](marker-grid.md).
+
+## 2026-11-02 · Aire alrededor del marcador
+
+- **Cita:** «podías subirlo más porque tienes mucho muro, donde no se vea todo apretado sino que juegues con el aire con
+  elegancia».
+- **Regla:** el marcador busca el objetivo del formato (tercio superior, nunca pegado al borde) y prefiere la celda con más
+  aire: se mide la densidad de bordes en un margen de 6 % del ancho alrededor (`air`, `airMax` 3,5); el puntaje suma aire +
+  3 × distancia vertical al objetivo + 1 × distancia horizontal. Sobre `airMax`, la celda solo entra en segundo nivel y con aviso.
+- **Dónde quedó:** `grids.shared` (`air`, `airMax`, `crowdedFactor`, `pull`). **Codificada + prueba** («en un muro liso el
+  marcador va al objetivo del formato, nunca al borde»).
+
+## 2026-11-01/02 · Marcador sobre objetos
+
+- **Cita:** «Necesitamos reglas para que esto no se ponga sobre objetos así porque pierde limpieza y no se lee bien el texto»
+  (casos: estudio, lámpara).
+- **Regla:** una celda solo vale si ≥ 85 % de los píxeles bajo el marcador son muro de su color (ΔE(a,b) ≤ 12, ΔL ≤ 28 contra
+  el HEX) y la densidad de bordes, con un respiro de 2,5 %, es ≤ 3. Desde el plate: tercio superior del muro libre y objetos a
+  la derecha.
+- **Dónde quedó:** `grids.shared` (`wall`, `busyMax`, `breath`); bloque `common` de `berel-photo-registers.json`. **Codificada +
+  prueba** («el marcador sólo va sobre el muro de su color», «no se posa sobre objetos»).
+
+## 2026-11-01/02 · Estrato bajo en el registro medio
+
+- **Cita:** «las fotos de berel son como de gente más de dinero» (Berel se vende a medio, medio-alto y alto).
+- **Qué pasó:** la primera versión de `medio` (ronda 2) salió de estrato bajo: fachada de fraccionamiento, ventanas de aluminio
+  blanco. El `--extra` de la fachada lo pedía explícitamente (sigue en `greenhouse-eo/ai-generations/2026-11-01_berel-espacios/ronda-2/specs.tsv`
+  como evidencia; no reutilizarlo).
+- **Regla:** el registro más bajo es **medio-alto accesible**. Nunca fraccionamiento genérico, aluminio blanco, mueble laminado,
+  sanitarios de plástico ni desorden visible. Se regeneraron fachada, infantil, baño y comedor (`ronda-2/v2/`).
+- **Dónde quedó:** `berel-photo-registers.json` (`status`, `rule`, `common`, `registers.medio`); libro
+  `brands/berel/system/BEREL_VISUAL_SYSTEM_V1.md` §7. **Codificada** (la prueba del builder verifica que el prompt se arme, no
+  el estrato del resultado).
+
+## 2026-11-01/02 · Titular ilegible sobre muro claro
+
+- **Qué pasó:** el titular social en blanco no se leía sobre muros claros (Maíz, pasteles), y sobre ventanas o lámparas el
+  fondo cargado lo ensuciaba.
+- **Regla:** el titular y su regla vertical pasan a `ink` cuando el blanco no alcanza 3:1 con el fondo del bloque. Aviso en
+  `qa.warnings` si la densidad de bordes bajo el titular supera 6 (sin desenfoque; muro limpio 1,5–4,4; ventanas o lámpara
+  8,6–14). El plate reserva el cuadrante superior izquierdo como muro liso. Titular ≤ 3 líneas, falla cerrado si no cabe
+  (caso comedor en 4 líneas); ≤ 14 palabras.
+- **Dónde quedó:** `brands/berel/compose/render.mjs` (`titleTone`); bloque `common` del contrato de fotografía. **Codificada +
+  prueba** («titular social en tinta sobre muro claro y en blanco sobre muro medio u oscuro»).
+
+## 2026-11-01/02 · Marcador en blanco cuando alcanza 3:1
+
+- **Cita:** «Acá no debería ir en blanco??» (sobre Bien y de Buenas, `#B37A75`: blanco 3,5:1, ink 4,0:1).
+- **Qué pasó:** el marcador elegía el tono de mayor contraste (ink), pero Berel usa blanco sobre tonos medios (pieza N46).
+- **Regla:** blanco si el contraste WCAG con el muro es ≥ 3:1 (texto Bold grande); si no, ink.
+- **Dónde quedó:** `render.mjs` (cálculo de `tone`, comentario «Blanco cuando alcanza 3:1…»). **Codificada + prueba** («tono
+  automático: marcador blanco sobre muro oscuro, tinta sobre muro claro»).
+
+## 2026-11-01 · Marcador cortado por el borde
+
+- **Qué pasó:** en la story del registro alto, el marcador quedó cortado por el borde del formato.
+- **Regla:** un marcador debe caber entero; si no cabe, se prueba otra celda y, si ninguna sirve, se elimina (nunca se
+  dibuja cortado).
+- **Dónde quedó:** primero en el compositor de anclas («descarta un marcador que no cabe entero y prueba la siguiente
+  ancla», `HARNESS_STATUS.md`); hoy en la grilla (`render.mjs`: «una celda vale si el marcador cabe entero dentro de los
+  márgenes»). **Codificada** (sin prueba específica del caso de corte).
+
+## 2026-11-01 · Flare vs Sunburst: ninguno clava el color
+
+- **Cita:** «Sunburst y Flare no son capaces de poner el color que eliges? debes pintarlo de forma determinística?».
+- **Qué pasó:** con el mismo método (mediana del muro contra el HEX), el HEX en texto dio ΔE 8,5–14,2 (rango global de la
+  primera prueba 7,7–14,6); el chip como referencia, Sunburst 5,4 (7,9 en alto; 2,4–6,9 en la ronda 2) y Flare 9,7; editar
+  el plate con el chip no mejoró (Flare 11,4, Sunburst 8,4).
+- **Regla:** la respuesta es **sí, determinista**. Plate final con Sunburst `xhigh` + chip (mismo costo que Flare, ≈ USD
+  0,12; respeta mejor las reservas) y después el corrector, que deja ΔE ≤ 3 con máscara y QA. Nunca rotular un color que el
+  muro no tiene.
+- **Dónde quedó:** `tools/surface-color.mjs` + adaptador `brands/berel/scripts/ajustar-muro.mjs` (**codificada + prueba**:
+  `test/surface-color.test.mjs`); la elección de modelo y del chip es **documental** (`brands/berel/skills/berel-banners/SKILL.md`,
+  libro §7, [color-pipeline.md](color-pipeline.md)).
+
+## 2026-11-01 · Blog horizontal, social vertical
+
+- **Cita:** «los del blog son los horizontales».
+- **Regla:** dos familias. Blog horizontal (1408×768 webp < 200 KB; og:image 1200×630) con foto o infografía y logo blanco
+  abajo a la izquierda, **sin titular, píldora ni CTA**. Social vertical (post 1080×1350, story 1080×1920 con zonas seguras,
+  Pinterest 1000×1500) con titular y regla vertical (post y story) y píldora `berel.com/inspiracion` (solo post).
+- **Dónde quedó:** `berel-recipes.json` (`families`, `formats`, `never`); `brands/berel/AGENTS.md`. **Codificada + prueba**
+  («portada de blog: 1408×768 webp bajo 200 KB, sin titular», «el post social lleva píldora y titular; Pinterest no lleva
+  titular»).
+
+## 2026-11-01 · Gotham Rounded
+
+- **Cita:** «Usa gotham rounded es la tipografía de Berel».
+- **Qué pasó:** la Light declara `familyName` «Gotham Rounded Light», así que una comparación exacta con «Gotham Rounded» la
+  rechazaba.
+- **Regla:** Gotham Rounded (Light, Book, Medium, Bold) es la familia de producción, **sin fallback**; el texto se compone a
+  trazos. El loader valida `/^Gotham Rounded( |$)/` y falla cerrado con cualquier otra fuente. Las fuentes nunca van a Git.
+- **Dónde quedó:** `brands/berel/compose/type.mjs`; `brands/berel/AGENTS.md`. **Codificada** (falla cerrado al cargar; las
+  pruebas del compositor la ejercitan cuando hay recursos locales).
+
+## Pendientes que no son lecciones todavía
+
+- Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
+- Recetas declaradas sin render: señalización, técnica gráfica, reel.
+- Aprobación de Daniela, Andrés o Melkin; `qa.approval` sigue en `pending-human-and-pixel-review`.

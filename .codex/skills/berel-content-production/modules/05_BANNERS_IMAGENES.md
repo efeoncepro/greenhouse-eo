@@ -6,6 +6,10 @@
 > —incluido el Playbook de Producción— difiere de la Spec, **manda la Spec** y hay que corregir
 > el documento que divergió.
 
+> **Cómo se ve y cómo se produce** cada banner (identidad, recetas, grilla del marcador, fotografía por
+> estrato, color de catálogo, QA visual) vive en la skill [`berel-graphic-line`](../../berel-graphic-line/SKILL.md).
+> Este módulo decide qué pieza existe, cuándo y con qué ficha.
+
 ## Principio rector: ninguna imagen es decorativa ni intercambiable
 
 Cada imagen nace del contenido específico de **ese** artículo y se empareja con un elemento real

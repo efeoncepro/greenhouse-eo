@@ -302,6 +302,18 @@ const mirroredSkills = [
     claude: '.claude/skills/berel-content-production',
   },
   {
+    /*
+     * Entra el 2026-11-02. Linea grafica de Berel (identidad, recetas, grilla del marcador, fotografia
+     * por estrato, pipeline de color, QA visual), exclusiva de ese cliente. Un espejo que diverge haria
+     * que un agente produzca piezas de Berel con umbrales o reglas de fotografia distintos, o que pierda
+     * la advertencia de aislamiento que impide aplicar estas reglas a Efeonce u otra marca.
+     */
+    id: 'berel-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/berel-graphic-line',
+    claude: '.claude/skills/berel-graphic-line',
+  },
+  {
     // LicitaLAB expone evidencia comercial y documental sobre licitaciones reales. Si Codex y Claude
     // divergen en tools, estados RAG o límites read-only, uno puede declarar bases leídas cuando siguen
     // indexando o tratar una primera página como historial completo. El bundle debe ser uno solo.
