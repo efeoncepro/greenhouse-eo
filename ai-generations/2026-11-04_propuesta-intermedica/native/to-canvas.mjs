@@ -5,7 +5,7 @@ import path from 'node:path';
 const [SRC, ROOT] = process.argv.slice(2);
 const BUBBLE = '/_blob/40e09a0874c56f6b637ff8e6fbd198e4', LOGO = '/_blob/7f619c1e9582ec8670098ba49e11f63d';
 const IMG = {
-  '01-portada': ['/_blob/5139a816f7501bcf60225fa634edfedb', 'Portada · Performance comercial'],
+  '01-portada': ['/_blob/b904774971afee236d4d3d0499c34bc7', 'Portada · Performance comercial'],
   '12-medicion': ['/_blob/ac9626e2df6b7cd58fcea920e5bdcfac', 'Medición (brochure Agencia de Medios)'],
   '15-senal': ['/_blob/411772c9e1f6b2ea9db10b65af3cdb42', 'Señal hasta ventas (brochure Agencia de Medios)'],
   '16-plan': ['/_blob/e5dfec9a8cda9ef35fb65745cf1abeb1', 'Plan de trabajo'],
