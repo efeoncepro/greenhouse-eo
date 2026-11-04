@@ -100,6 +100,11 @@ export const GH_INSIGHTS = {
    * TASK-2033 — alcance de contenido: el informe mide sólo la parte del sitio que Efeonce trabaja. Las poblaciones
    * son trazabilidad del snapshot (no se imprimen); la línea y la lectura sí llegan al documento.
    */
+  /** ISSUE-191 — total de Search Console sin la dimensión consulta (incluye las consultas que Google no muestra). */
+  seoControl: {
+    population: 'Clics e impresiones de Search Console de la propiedad conectada (total del período)'
+  },
+
   contentScope: {
     gscPopulation: 'Consultas de Search Console hacia el contenido medido',
     rankPopulation: 'Keywords monitoreadas que posicionan con el contenido medido',
@@ -295,6 +300,8 @@ export const GH_INSIGHTS = {
     driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
     driversEntityColumn: 'Consulta o página',
     driversRestLabel: 'Resto de consultas',
+    /** ISSUE-191 — paso de la cascada: el cambio de los clics cuya consulta Google no informa (total menos detalle). */
+    driversHiddenLabel: 'Consultas que Google no muestra',
     driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
     /** TASK-1975 — lectura de la cascada: la cifra es el aporte de la consulta que más cambió (un hecho, no una resta). */
     waterfallCaption: (gained: boolean, label: string, period: string) => `clics ${gained ? 'más' : 'menos'} en «${label}» que en ${period}`,
@@ -516,6 +523,8 @@ export const GH_INSIGHTS = {
    */
   sources: {
     gsc_window_aggregate: 'Google Search Console',
+    // ISSUE-191 — total de Search Console pedido sin la dimensión consulta: incluye las consultas que Google no muestra.
+    gsc_search_control: 'Google Search Console (total del período, con las consultas que Google no muestra)',
     seo_work_queue: 'cola de trabajo SEO priorizada',
     gsc_window_movers: 'Google Search Console',
     dataforseo_serp_rank: 'posiciones en buscadores',

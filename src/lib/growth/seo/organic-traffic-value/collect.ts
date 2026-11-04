@@ -5,8 +5,7 @@ import { getSearchConsoleConnection } from '../../search-console/connection-stor
 import type { SearchConsoleAnalyticsParams, SearchConsoleAnalyticsRow } from '../../search-console/contracts'
 import { normalizeMarketKeyword } from '../keyword-market-data'
 import { isPathInContentScope, type SeoContentScopeRuleV1 } from '../content-scope/contracts'
-
-const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+import { searchConsolePageExpression } from '../search-control/page-expression'
 
 /**
  * Host de la propiedad: una propiedad por URL (`https://blog.x.com/`) fija el host exacto; una propiedad de dominio
@@ -25,30 +24,8 @@ const assertHostBelongsToProperty = (siteUrl: string, hostname: string) => {
   if (new URL(siteUrl).hostname !== hostname) throw new Error('site_hostname_mismatch')
 }
 
-/**
- * TASK-2033 — expresión de página para la API de Search Console (RE2) con la MISMA semántica que
- * `isPathInContentScope`: la ruta, sin query ni fragmento ni barras finales, es la regla (`exact`) o empieza por la
- * regla seguida de `/` (`prefix`). Sin alcance, todo el host. El recorte lo hace Google: este módulo no filtra filas.
- */
-export const organicValuePageExpression = (
-  hostname: string,
-  rules?: readonly SeoContentScopeRuleV1[],
-  options: { includeSubdomains?: boolean } = {}
-): string => {
-  // Una propiedad de dominio pedida por su dominio raíz mide todos sus hosts (`berel.com`, `www.berel.com`), igual que
-  // la serie diaria de Search Console que lee el capítulo: así los dos totales son el mismo universo.
-  const host = `^https?://${options.includeSubdomains ? '([^/?#]+\\.)?' : ''}${escapeRegex(hostname)}`
-
-  if (!rules || rules.length === 0) return `${host}/`
-
-  const tail = '/*([?#].*)?$'
-
-  const alternatives = rules.map(rule =>
-    rule.kind === 'prefix' ? `${escapeRegex(rule.path)}(/.*|[?#].*)?$` : `${escapeRegex(rule.path)}${tail}`
-  )
-
-  return `${host}(${alternatives.join('|')})`
-}
+/** Compatibilidad: la expresión vive en el módulo de control de Search Console. */
+export const organicValuePageExpression = searchConsolePageExpression
 
 /** Extrae evidencia. No compra CPC, no cambia tracking ni crea una edición de Insights. */
 export const collectOrganicTrafficValueInputs = async (input: {

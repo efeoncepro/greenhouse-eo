@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type * as AiVisibilityContracts from '@/lib/growth/ai-visibility/contracts'
+import type * as SearchControl from '@/lib/growth/seo/search-control/read-search-control'
 import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
 
 import { questionOfMetric } from '../presentation/content-contract'
@@ -28,23 +29,27 @@ vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 const seoMocks = vi.hoisted(() => ({
   isSeoModuleEnabled: vi.fn(() => true),
   resolveUnambiguousSeoTarget: vi.fn(),
-  readSeoOverviewKpisForWindow: vi.fn(),
+  readSeoSearchControlForWindow: vi.fn(),
   readRankEvolution: vi.fn(),
   readDomainOverviewForTarget: vi.fn(),
   readSeoWindowMovers: vi.fn(),
   readSeoWorkQueue: vi.fn(),
-  readSeoOverviewConnection: vi.fn(),
   readSeoContentScope: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
 vi.mock('@/lib/growth/seo/resolve-target', () => ({ resolveUnambiguousSeoTarget: seoMocks.resolveUnambiguousSeoTarget }))
-vi.mock('@/lib/growth/seo/overview/read-overview-kpis', () => ({ readSeoOverviewKpisForWindow: seoMocks.readSeoOverviewKpisForWindow }))
+// ISSUE-191 — los totales del capítulo salen del control de Search Console (sin dimensión consulta). El ranking de
+// páginas es una selección pura del dominio SEO: se usa la implementación real.
+vi.mock('@/lib/growth/seo/search-control/read-search-control', async () => {
+  const actual = await vi.importActual<typeof SearchControl>('@/lib/growth/seo/search-control/read-search-control')
+
+  return { ...actual, readSeoSearchControlForWindow: seoMocks.readSeoSearchControlForWindow }
+})
 vi.mock('@/lib/growth/seo/rank-evolution-reader', () => ({ readRankEvolution: seoMocks.readRankEvolution }))
 vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewForTarget: seoMocks.readDomainOverviewForTarget }))
 vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
 vi.mock('@/lib/growth/seo/work-queue/reader', () => ({ readSeoWorkQueue: seoMocks.readSeoWorkQueue }))
-vi.mock('@/lib/growth/seo/overview/read-overview-connection', () => ({ readSeoOverviewConnection: seoMocks.readSeoOverviewConnection }))
 vi.mock('@/lib/growth/seo/content-scope/store', () => ({ readSeoContentScope: seoMocks.readSeoContentScope }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
@@ -71,8 +76,15 @@ const month = (start: string, end: string, comparison: 'none' | 'previous_period
   resolveInsightWindows({ start, endExclusive: end, timeZone: 'UTC' }, { kind: comparison }, NOW)
 
 const gscWindow = (clicks: number, impressions: number, coveredDays: number, asOf: string | null) => ({
+  ok: true as const,
+  siteUrl: 'sc-domain:x.cl',
+  aggregation: 'byPage' as const,
+  dataState: 'final' as const,
   totals: { clicks, impressions, position: impressions > 0 ? 12.345 : null, ctr: impressions > 0 ? clicks / impressions : null },
   series: [],
+  // La portada concentra el 60 % de los clics del control (500 → 300; 400 → 240).
+  pages: clicks > 0 ? [{ page: 'https://x.cl/', clicks: Math.round(clicks * 0.6), impressions }] : [],
+  capturedAt: asOf ?? '2026-09-01T00:00:00.000Z',
   servedFrom: asOf ? '2026-08-01' : null,
   servedTo: asOf,
   coveredDays,
@@ -90,7 +102,6 @@ describe('SEO adapter', () => {
       { keyword: 'c', points: [{ date: '2026-09-01', position: 1, url: null }] }
     ], provenance: [] })
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
-    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'connected', dataAsOf: '2026-08-31' })
     // Sin alcance declarado por defecto: el informe mide el sitio completo, como antes de TASK-2033.
     seoMocks.readSeoContentScope.mockResolvedValue(null)
     seoMocks.readSeoWorkQueue.mockResolvedValue({
@@ -114,7 +125,7 @@ describe('SEO adapter', () => {
   })
 
   it('TASK-1962 — con v2 y período anterior, las consultas y páginas que más movieron los clics son hechos con su comparable', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
     const { seoReportAdapter, pageLabelOf } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01', 'previous_period')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
@@ -132,7 +143,9 @@ describe('SEO adapter', () => {
     // Aportes al cambio de clics: cada consulta más el resto suman exactamente el cambio total (500 − 400).
     const deltas = result.facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.window.start === '2026-08-01')
 
-    expect(deltas.map(fact => [fact.label, fact.value])).toEqual([['pintura 19 litros', 60], ['x marca', -20], ['Resto de consultas', 60]])
+    // ISSUE-191 — aquí el detalle (500 − 400) explica todo el cambio del control (500 − 400): las consultas que Google
+    // no muestra no aportan cambio, y su paso existe igual con 0 medido.
+    expect(deltas.map(fact => [fact.label, fact.value])).toEqual([['pintura 19 litros', 60], ['x marca', -20], ['Resto de consultas', 60], ['Consultas que Google no muestra', 0]])
     expect(deltas.reduce((sum, fact) => sum + fact.value!, 0)).toBe(100)
     // Bloques de 7 días: agosto tiene 5 (1–7 … 29–31), cada uno con su par del período anterior.
     const weeks = result.facts.filter(fact => fact.metricId.startsWith('clicks_week.') && fact.window.start >= '2026-08-01')
@@ -150,7 +163,7 @@ describe('SEO adapter', () => {
   })
 
   it('TASK-1962 — oportunidades de la cola SEO (sólo orígenes propios) como hechos de plan, y Search Console sin conectar', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
@@ -163,26 +176,58 @@ describe('SEO adapter', () => {
     expect(result.facts.some(fact => fact.factId === 'seo.opportunity.2.ceiling')).toBe(false)
     expectContentContract(result.facts)
 
-    // Sin la conexión OAuth, la ausencia de capturas es `not_connected` (una petición), no «sin datos».
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(0, 0, 0, null))
-    seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'not_connected', dataAsOf: null })
+    // Sin la conexión OAuth, la ausencia de datos es `not_connected` (una petición), no «sin datos».
+    seoMocks.readSeoSearchControlForWindow.mockResolvedValue({ ok: false, errorCode: 'not_connected' })
     const disconnected = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
 
     expect(disconnected.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'gsc', reason: 'not_connected' })]))
   })
 
   it('TASK-1962 — un reader de causas sin datos se declara como límite, no como silencio', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async () => gscWindow(500, 20000, 31, '2026-08-31'))
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
     seoMocks.readSeoWindowMovers.mockResolvedValue({ ok: false, errorCode: 'no_data' })
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01', 'previous_period')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
 
-    expect(result.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'driver.query', reason: 'insufficient_data' }), expect.objectContaining({ metricId: 'driver.page', reason: 'insufficient_data' })]))
+    expect(result.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'driver.query', reason: 'insufficient_data' })]))
+    // Las páginas salen del control, no del detalle: siguen presentes aunque el detalle por consulta no responda.
+    expect(result.facts.some(fact => fact.metricId === 'driver.page.clicks')).toBe(true)
+    expect(result.facts.some(fact => fact.metricId === 'driver.query.delta')).toBe(false)
+  })
+
+  it('ISSUE-191 — los totales salen del control de Search Console y la cascada cuadra con las consultas que Google no muestra', async () => {
+    // Control: 4.094 vs 3.540 clics. Detalle por consulta (lo que Google muestra): 500 vs 400.
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(4094, 241113, 31, '2026-08-31') : gscWindow(3540, 168690, 31, '2026-07-31'))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    const clicks = result.facts.find(fact => fact.factId === 'seo.clicks.2026-08-01_2026-09-01')!
+
+    expect(clicks).toMatchObject({ value: 4094, method: { name: 'gsc_search_control' }, source: 'gsc:sc-domain:x.cl' })
+    const deltas = result.facts.filter(fact => fact.metricId === 'driver.query.delta' && fact.window.start === '2026-08-01')
+    const hidden = deltas.find(fact => fact.dimension?.rank === 'hidden')!
+
+    // 554 de cambio total = 100 del detalle (60 − 20 + 60) + 454 de consultas no visibles.
+    expect(hidden).toMatchObject({ label: 'Consultas que Google no muestra', value: 454, method: { name: 'gsc_search_control' } })
+    expect(deltas.reduce((sum, fact) => sum + fact.value!, 0)).toBe(4094 - 3540)
+    // Nunca se lee la tabla materializada como total: el reader del control es la fuente de los clics.
+    expect(result.sources.filter(source => source.reader === 'readSeoSearchControlForWindow').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('ISSUE-191 — si el control de Search Console falla, el capítulo declara el límite y NO cae a la tabla materializada', async () => {
+    seoMocks.readSeoSearchControlForWindow.mockResolvedValue({ ok: false, errorCode: 'token_unhealthy' })
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(result.facts.some(fact => fact.metricId === 'clicks')).toBe(false)
+    expect(result.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'gsc', reason: 'insufficient_data' })]))
   })
 
   it('produce hechos GSC/rank/ETV con unidad, población, cobertura, asOf, método y comparisonFactId', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01', 'previous_period')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [] })
@@ -193,13 +238,13 @@ describe('SEO adapter', () => {
     const pageOne = result.facts.find(fact => fact.factId === 'seo.page_one_keywords.2026-08-01_2026-09-01')!
     const etv = result.facts.find(fact => fact.factId === 'seo.organic_etv.2026-08-01_2026-09-01.2026-08')!
 
-    expect(clicks).toMatchObject({ value: 500, unit: 'count', comparisonFactId: prevClicks.factId, freshness: { asOf: '2026-08-31' }, coverage: { kind: 'complete' }, method: { version: 'seo_measurement_v1' } })
+    expect(clicks).toMatchObject({ value: 500, unit: 'count', comparisonFactId: prevClicks.factId, freshness: { asOf: '2026-08-31' }, coverage: { kind: 'complete' }, method: { version: 'gsc_search_control_v1' } })
     expect(ctr).toMatchObject({ value: 2.5, unit: 'percent', numerator: 500, denominator: 20000 })
     // rank: sólo puntos DENTRO de la ventana; keyword c (sept) queda fuera; a=8 (≤10), b=14
     expect(pageOne).toMatchObject({ value: 1, numerator: 1, denominator: 2 })
     expect(etv).toMatchObject({ value: 1200, unit: 'visits_estimated', observation: 'estimated', method: { version: 'improved_layout_clickstream_v2' }, comparisonFactId: 'seo.organic_etv.2026-07-01_2026-08-01.2026-07' })
     expect(result.rejections).toEqual([])
-    expect(result.sources.map(source => source.reader)).toEqual(['readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget', 'readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget'])
+    expect(result.sources.map(source => source.reader)).toEqual(['readSeoSearchControlForWindow', 'readRankEvolution', 'readDomainOverviewForTarget', 'readSeoSearchControlForWindow', 'readRankEvolution', 'readDomainOverviewForTarget'])
     // TASK-1888 — Search Console, ranking y ETV miden Google: todo hecho SEO lleva el canal.
     expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
     // Sin v2, ningún hecho lleva dirección (evidencia v1 idéntica).
@@ -208,7 +253,7 @@ describe('SEO adapter', () => {
   })
 
   it('SEO con v2: la posición media (y su comparable) lleva lower_is_better; las demás métricas quedan neutras', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01', 'previous_period')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
@@ -220,7 +265,7 @@ describe('SEO adapter', () => {
   })
 
   it('ventana no mensual: ETV declara unsupported_window con alternativa mensual; GSC sí sirve', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockResolvedValue(gscWindow(10, 100, 10, '2026-08-20'))
+    seoMocks.readSeoSearchControlForWindow.mockResolvedValue(gscWindow(10, 100, 10, '2026-08-20'))
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-10', '2026-08-20')
     const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
@@ -235,7 +280,7 @@ describe('SEO adapter', () => {
   })
 
   it('sin capturas GSC en la ventana es no_data (nunca cero), sin target es not_connected, módulo apagado es module_disabled', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockResolvedValue(gscWindow(0, 0, 0, null))
+    seoMocks.readSeoSearchControlForWindow.mockResolvedValue(gscWindow(0, 0, 0, null))
     seoMocks.resolveUnambiguousSeoTarget.mockResolvedValue({ target: null, conflict: null })
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01')
@@ -258,7 +303,7 @@ describe('SEO adapter', () => {
     }
 
     const scopedGsc = () =>
-      seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }, options?: { scope?: unknown }) => {
+      seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }, options?: { scope?: unknown }) => {
         const current = window.from === '2026-08-01'
 
         // Con alcance, el reader devuelve la población recortada; sin él, la propiedad completa.
@@ -271,7 +316,7 @@ describe('SEO adapter', () => {
       const windows = month('2026-08-01', '2026-09-01', 'previous_period')
       const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
 
-      expect(seoMocks.readSeoOverviewKpisForWindow.mock.calls.every(call => !call[2]?.scope)).toBe(true)
+      expect(seoMocks.readSeoSearchControlForWindow.mock.calls.every(call => !call[2]?.scope)).toBe(true)
       expect(seoMocks.readSeoWindowMovers.mock.calls.every(call => !call[1].scope)).toBe(true)
       expect(seoMocks.readSeoWorkQueue.mock.calls.every(call => !call[1].scope)).toBe(true)
       expect(result.sources.every(source => source.contentScope === undefined)).toBe(true)
@@ -307,7 +352,7 @@ describe('SEO adapter', () => {
       expect(clicks.evidenceRef.endsWith(':scope_v3')).toBe(true)
 
       // El alcance llega a los readers dueños: el adapter no filtra filas por su cuenta.
-      const scopedReads = seoMocks.readSeoOverviewKpisForWindow.mock.calls.filter(call => call[2]?.scope)
+      const scopedReads = seoMocks.readSeoSearchControlForWindow.mock.calls.filter(call => call[2]?.scope)
 
       expect(scopedReads.map(call => call[1].from).sort()).toEqual(['2026-07-01', '2026-08-01'])
       expect(scopedReads.every(call => call[2].scope.rules === SCOPE.rules)).toBe(true)
@@ -416,12 +461,12 @@ describe('SEO adapter', () => {
       const windows = month('2026-08-01', '2026-09-01')
 
       await expect(seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })).rejects.toThrow('relation does not exist')
-      expect(seoMocks.readSeoOverviewKpisForWindow).not.toHaveBeenCalled()
+      expect(seoMocks.readSeoSearchControlForWindow).not.toHaveBeenCalled()
     })
   })
 
   it('ETV con método no disponible declara method_mismatch; mes sin snapshot es insufficient_data', async () => {
-    seoMocks.readSeoOverviewKpisForWindow.mockResolvedValue(gscWindow(10, 100, 31, '2026-08-31'))
+    seoMocks.readSeoSearchControlForWindow.mockResolvedValue(gscWindow(10, 100, 31, '2026-08-31'))
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: false, reason: 'not_available_for_method' })
     const { seoReportAdapter } = await import('./seo-adapter')
     const windows = month('2026-08-01', '2026-09-01')

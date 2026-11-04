@@ -730,12 +730,14 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
     const previousTotal = totalClicks?.comparisonFactId ? byId.get(totalClicks.comparisonFactId) : undefined
 
     if (deltas.length >= 2 && totalClicks?.value != null && previousTotal?.value != null && canProduceFamily('waterfall', moduleKey)) {
-      const ordered = [...deltas].sort((a, b) => (a.dimension?.rank === 'rest' ? 1 : b.dimension?.rank === 'rest' ? -1 : Number(a.dimension?.rank) - Number(b.dimension?.rank)))
+      // Orden: consultas por rango, luego el resto de las visibles y al final (ISSUE-191) las que Google no muestra.
+      const stepOrder = (fact: EvidenceFactV1) => (fact.dimension?.rank === 'hidden' ? Number.MAX_SAFE_INTEGER : fact.dimension?.rank === 'rest' ? Number.MAX_SAFE_INTEGER - 1 : Number(fact.dimension?.rank))
+      const ordered = [...deltas].sort((a, b) => stepOrder(a) - stepOrder(b))
       const chartId = `chart.${moduleKey}.drivers.${dimension}`
 
       // TASK-1975 — la cascada tiene su propia lectura (sin ella, la página repetía la conclusión de las cifras): la cifra
       // principal es el aporte de la consulta que más cambió (un hecho medido) y la conclusión la nombra, sin cifras nuevas.
-      const named = ordered.filter(fact => fact.dimension?.rank !== 'rest')
+      const named = ordered.filter(fact => fact.dimension?.rank !== 'rest' && fact.dimension?.rank !== 'hidden')
       const top = [...named].sort((a, b) => Math.abs(b.value!) - Math.abs(a.value!))[0]
 
       if (top) {

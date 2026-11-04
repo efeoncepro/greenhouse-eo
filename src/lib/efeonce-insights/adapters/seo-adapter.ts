@@ -11,9 +11,8 @@ import { type SeoContentScopeV1, isContentScopeActive, isPathInContentScope } fr
 import { readSeoContentScope } from '@/lib/growth/seo/content-scope/store'
 import { readDomainOverviewForTarget } from '@/lib/growth/seo/domain-overview/reader'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
-import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-overview-kpis'
-import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
 import { type SeoMoverDimension, readSeoWindowMovers } from '@/lib/growth/seo/overview/read-window-movers'
+import { SEO_SEARCH_CONTROL_METHOD, type SeoSearchControlPage, rankSearchControlPageMovers, readSeoSearchControlForWindow } from '@/lib/growth/seo/search-control/read-search-control'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readSeoWorkQueue } from '@/lib/growth/seo/work-queue/reader'
@@ -27,7 +26,7 @@ import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 import { ga4OrganicFacts, readGa4ChannelWindow } from './ga4-site-facts'
 
-export const SEO_ADAPTER_VERSION = 'seo_report_adapter_v1'
+export const SEO_ADAPTER_VERSION = 'seo_report_adapter_v2'
 
 /**
  * TASK-2033 — alcance de contenido. Cuando la organización declaró qué parte de su sitio trabaja Efeonce, el informe
@@ -41,7 +40,6 @@ const sealedScopeOf = (scope: SeoContentScopeV1): EvidenceContentScopeV1 => ({ v
 
 const scopeRef = (scope: ActiveScope): string => (scope ? `:scope_v${scope.version}` : '')
 
-const GSC_METHOD = { name: 'gsc_window_aggregate', version: 'seo_measurement_v1' }
 const RANK_METHOD = { name: 'dataforseo_serp_rank', version: 'seo_rank_v1' }
 
 const daysBetween = (from: string, to: string): number => Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000)
@@ -72,61 +70,73 @@ const weekBlocksOf = (window: ResolvedInsightWindow, locale = 'es-CL') => {
   return blocks
 }
 
+/**
+ * ISSUE-191 — los totales del capítulo (clics, impresiones, CTR, posición y la serie semanal) salen del CONTROL de
+ * Search Console (`readSeoSearchControlForWindow`: pedido sin la dimensión consulta, en vivo, con el reader autorizado
+ * de la organización). La tabla materializada `seo_gsc_daily` guarda `query × page` y Google omite ahí las consultas
+ * anonimizadas: su suma era un subconjunto del total (Berel, blog, octubre de 2026: 1.065 de 4.094). Esa tabla sigue
+ * siendo la fuente del DETALLE por consulta, cuya parte no visible entra a la cascada como paso propio.
+ */
 const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false, scope: ActiveScope = null) => {
-  // Sin alcance la llamada es idéntica a la de siempre (sin tercer argumento).
-  const kpis = scope
-    ? await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive }, { scope })
-    : await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
+  const control = await readSeoSearchControlForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive }, scope ? { scope } : {})
 
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
-  const asOf = kpis.provenance[0]?.capturedAt ?? null
-  const coverageRatio = window.days > 0 ? kpis.coveredDays / window.days : 0
+
+  if (!control.ok) {
+    // Sin conexión es una fuente que el cliente tiene que conectar; cualquier otra falla es un límite de la edición.
+    // NUNCA se cae a la tabla materializada: imprimiría un subconjunto como si fuera el total.
+    const reason = control.errorCode === 'not_connected' ? 'not_connected' : control.errorCode === 'disabled' ? 'module_disabled' : 'insufficient_data'
+
+    rejections.push({ module: 'seo', metricId: 'gsc', reason, detail: reason === 'not_connected' ? 'Search Console no está conectado para la organización' : `Search Console (total del período): ${control.errorCode}` })
+
+    return { facts, rejections, source: null as EvidenceSourceV1 | null, pages: null as SeoSearchControlPage[] | null }
+  }
+
+  const asOf = control.capturedAt
+  const coverageRatio = window.days > 0 ? control.coveredDays / window.days : 0
 
   const coverage = {
     kind: coverageRatio >= 0.999 ? ('complete' as const) : coverageRatio >= 0.5 ? ('partial' as const) : coverageRatio > 0 ? ('sparse' as const) : ('none' as const),
     ratio: Number(coverageRatio.toFixed(4)),
-    populationSize: kpis.coveredDays
+    populationSize: control.coveredDays
   }
 
-  if (kpis.coveredDays === 0) {
-    // TASK-1962 — sin la conexión OAuth de Search Console no es «sin datos»: es una fuente que el cliente tiene que
-    // conectar, y el plan lo convierte en petición. Con conexión y sin capturas en la ventana sigue siendo `no_data`.
-    const connection = await readSeoOverviewConnection(organizationId)
-    const notConnected = connection.state === 'not_connected'
+  if (control.coveredDays === 0) {
+    rejections.push({ module: 'seo', metricId: 'gsc', reason: 'no_data', detail: `Search Console no tiene datos finales en ${window.start}–${window.endInclusive}${scope ? ` para el alcance de contenido v${scope.version}` : ''}` })
 
-    rejections.push({ module: 'seo', metricId: 'gsc', reason: notConnected ? 'not_connected' : 'no_data', detail: notConnected ? 'Search Console no está conectado para la organización' : `Search Console no tiene capturas materializadas en ${window.start}–${window.endInclusive}${scope ? ` para el alcance de contenido v${scope.version}` : ''}` })
-
-    return { facts, rejections, source: null as EvidenceSourceV1 | null }
+    return { facts, rejections, source: null as EvidenceSourceV1 | null, pages: null as SeoSearchControlPage[] | null }
   }
 
   const base = {
     factVersion: 'evidence_fact_v1' as const,
     module: 'seo' as const,
-    population: scope ? `${GH_INSIGHTS.contentScope.gscPopulation}: ${scope.label}` : 'Consultas de Search Console de la propiedad conectada',
-    source: 'greenhouse_growth.seo_gsc_daily',
-    method: GSC_METHOD,
+    population: scope ? `${GH_INSIGHTS.contentScope.gscPopulation}: ${scope.label}` : GH_INSIGHTS.seoControl.population,
+    source: `gsc:${control.siteUrl}`,
+    method: SEO_SEARCH_CONTROL_METHOD,
     coverage,
     freshness: { asOf },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`,
+    evidenceRef: `gsc_control:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`,
     // TASK-1888 — Search Console, el ranking y el ETV miden Google.
     channelId: SEO_SEARCH_CHANNEL
   }
 
+  const totals = control.totals
+
   facts.push(
-    { ...base, factId: factId('seo', 'clicks', window), metricId: 'clicks', label: 'Clics orgánicos', value: kpis.totals.clicks, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds.clicks ?? null },
-    { ...base, factId: factId('seo', 'impressions', window), metricId: 'impressions', label: 'Impresiones', value: kpis.totals.impressions, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds.impressions ?? null },
-    { ...base, factId: factId('seo', 'ctr', window), metricId: 'ctr', label: 'CTR', value: kpis.totals.ctr === null ? null : Number((kpis.totals.ctr * 100).toFixed(2)), unit: 'percent', numerator: kpis.totals.clicks, denominator: kpis.totals.impressions, comparisonFactId: comparisonIds.ctr ?? null },
-    { ...base, factId: factId('seo', 'position', window), metricId: 'position', label: 'Posición media (ponderada por impresiones)', value: kpis.totals.position === null ? null : Number(kpis.totals.position.toFixed(2)), unit: 'position', numerator: null, denominator: null, comparisonFactId: comparisonIds.position ?? null }
+    { ...base, factId: factId('seo', 'clicks', window), metricId: 'clicks', label: 'Clics orgánicos', value: totals.clicks, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds.clicks ?? null },
+    { ...base, factId: factId('seo', 'impressions', window), metricId: 'impressions', label: 'Impresiones', value: totals.impressions, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds.impressions ?? null },
+    { ...base, factId: factId('seo', 'ctr', window), metricId: 'ctr', label: 'CTR', value: totals.ctr === null ? null : Number((totals.ctr * 100).toFixed(2)), unit: 'percent', numerator: totals.clicks, denominator: totals.impressions, comparisonFactId: comparisonIds.ctr ?? null },
+    { ...base, factId: factId('seo', 'position', window), metricId: 'position', label: 'Posición media (ponderada por impresiones)', value: totals.position === null ? null : Number(totals.position.toFixed(2)), unit: 'position', numerator: null, denominator: null, comparisonFactId: comparisonIds.position ?? null }
   )
 
-  // TASK-1962 — clics por bloque de 7 días (suma de los días medidos del MISMO reader): la evolución dentro del mes.
-  // Un bloque sin días medidos queda sin valor (ausente ≠ 0). Sólo con contrato v2.
+  // TASK-1962 — clics por bloque de 7 días (suma de los días del MISMO control): la evolución dentro del mes.
+  // Un bloque sin días con datos queda sin valor (ausente ≠ 0). Sólo con contrato v2.
   if (editorialV2) {
     for (const block of weekBlocksOf(window)) {
-      const points = kpis.series.filter(point => point.date >= block.start && point.date < block.endExclusive)
+      const points = control.series.filter(point => point.date >= block.start && point.date < block.endExclusive)
       const metricId = `clicks_week.${block.index}`
 
       facts.push({
@@ -146,12 +156,12 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
   }
 
   // TASK-2033 — con alcance, el sitio completo entra SÓLO como referencia: una lectura lo cita para dar contexto, pero
-  // no es hallazgo, no va a tablas y no compite con las cifras del contenido medido. Mismo reader, sin recorte.
+  // no es hallazgo, no va a tablas y no compite con las cifras del contenido medido. Mismo control, sin recorte.
   if (scope) {
-    const site = await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
+    const site = await readSeoSearchControlForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
 
-    if (site.coveredDays > 0) {
-      const siteBase = { ...base, population: 'Consultas de Search Console de la propiedad conectada', evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`, role: 'reference' as const, numerator: null, denominator: null, unit: 'count' as const }
+    if (site.ok && site.coveredDays > 0) {
+      const siteBase = { ...base, population: GH_INSIGHTS.seoControl.population, evidenceRef: `gsc_control:${organizationId}:${window.start}_${window.endExclusive}`, role: 'reference' as const, numerator: null, denominator: null, unit: 'count' as const }
 
       facts.push(
         { ...siteBase, factId: factId('seo', 'site_total.clicks', window), metricId: 'site_total.clicks', label: GH_INSIGHTS.metrics['site_total.clicks']!, value: site.totals.clicks, comparisonFactId: comparisonIds['site_total.clicks'] ?? null },
@@ -163,14 +173,14 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
   const source: EvidenceSourceV1 = {
     module: 'seo',
     adapterVersion: SEO_ADAPTER_VERSION,
-    reader: 'readSeoOverviewKpisForWindow',
+    reader: 'readSeoSearchControlForWindow',
     asOf,
-    method: GSC_METHOD,
+    method: SEO_SEARCH_CONTROL_METHOD,
     coverage,
-    servedWindow: kpis.servedFrom && kpis.servedTo ? { start: kpis.servedFrom, endExclusive: kpis.servedTo, granularity: 'day', partial: window.partial } : null
+    servedWindow: control.servedFrom && control.servedTo ? { start: control.servedFrom, endExclusive: control.servedTo, granularity: 'day', partial: window.partial } : null
   }
 
-  return { facts, rejections, source }
+  return { facts, rejections, source, pages: control.pages }
 }
 
 const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, scope: ActiveScope = null) => {
@@ -451,6 +461,8 @@ const moverFacts = async (
   window: ResolvedInsightWindow,
   previous: ResolvedInsightWindow,
   current: EvidenceFactV1 | undefined,
+  previousClicks: EvidenceFactV1 | undefined,
+  controlPages: { current: SeoSearchControlPage[] | null; previous: SeoSearchControlPage[] | null },
   scope: ActiveScope = null
 ): Promise<{ facts: EvidenceFactV1[]; rejections: EvidenceRejectionV1[]; sources: EvidenceSourceV1[] }> => {
   const facts: EvidenceFactV1[] = []
@@ -459,70 +471,91 @@ const moverFacts = async (
 
   if (!current || current.value === null) return { facts, rejections, sources }
 
-  for (const dimension of ['query', 'page'] as SeoMoverDimension[]) {
-    const metricId = `driver.${dimension}.clicks`
+  const baseFor = (dimension: SeoMoverDimension, fromControl: boolean) => ({
+    factVersion: 'evidence_fact_v1' as const,
+    module: 'seo' as const,
+    metricId: `driver.${dimension}.clicks`,
+    population: `${dimension === 'query' ? 'Consultas con texto de Search Console' : 'Páginas de Search Console'}${scope ? ` (${scope.label})` : ''}`,
+    source: fromControl ? current.source : 'greenhouse_growth.seo_gsc_daily',
+    method: fromControl ? SEO_SEARCH_CONTROL_METHOD : MOVERS_METHOD,
+    coverage: current.coverage,
+    freshness: current.freshness,
+    observation: 'observed' as const,
+    unit: 'count' as const,
+    numerator: null,
+    denominator: null,
+    channelId: SEO_SEARCH_CHANNEL
+  })
 
-    const result = await readSeoWindowMovers(organizationId, {
-      window: { from: window.start, toExclusive: window.endExclusive },
-      previous: { from: previous.start, toExclusive: previous.endExclusive },
-      dimension,
-      limit: MOVERS_LIMIT,
-      ...(scope ? { scope } : {})
-    })
+  const pushMovers = (dimension: SeoMoverDimension, movers: ReadonlyArray<{ key: string; clicks: number; previousClicks: number }>, fromControl: boolean) => {
+    const base = baseFor(dimension, fromControl)
+    const metricId = base.metricId
+    const ref = fromControl ? 'gsc_control:movers' : 'seo_gsc_daily:movers'
+    const pageLabels = dimension === 'page' ? uniquePageLabels(movers.map(mover => mover.key)) : []
 
-    if (!result.ok) {
-      rejections.push({ module: 'seo', metricId: `driver.${dimension}`, reason: result.errorCode === 'disabled' ? 'module_disabled' : 'insufficient_data', detail: `Movers ${dimension}: ${result.errorCode}` })
-      continue
-    }
-
-    if (result.movers.length === 0) continue
-
-    const base = {
-      factVersion: 'evidence_fact_v1' as const,
-      module: 'seo' as const,
-      metricId,
-      population: `${dimension === 'query' ? 'Consultas con texto de Search Console' : 'Páginas de Search Console'}${scope ? ` (${scope.label})` : ''}`,
-      source: 'greenhouse_growth.seo_gsc_daily',
-      method: MOVERS_METHOD,
-      coverage: current.coverage,
-      freshness: current.freshness,
-      observation: 'observed' as const,
-      unit: 'count' as const,
-      numerator: null,
-      denominator: null,
-      channelId: SEO_SEARCH_CHANNEL
-    }
-
-    const pageLabels = dimension === 'page' ? uniquePageLabels(result.movers.map(mover => mover.key)) : []
-
-    result.movers.forEach((mover, index) => {
+    movers.forEach((mover, index) => {
       const rank = String(index + 1)
       const label = dimension === 'page' ? pageLabels[index]! : mover.key
       const dims = { [dimension]: label, rank }
       const previousId = factId('seo', metricId, previous, rank)
 
       facts.push(
-        { ...base, factId: factId('seo', metricId, window, rank), label, value: mover.clicks, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: previousId, dimension: dims },
-        { ...base, factId: previousId, label, value: mover.previousClicks, window: evidenceWindow(previous, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${previous.start}_${previous.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: dims }
+        { ...base, factId: factId('seo', metricId, window, rank), label, value: mover.clicks, window: evidenceWindow(window, 'period'), evidenceRef: `${ref}:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: previousId, dimension: dims },
+        { ...base, factId: previousId, label, value: mover.previousClicks, window: evidenceWindow(previous, 'period'), evidenceRef: `${ref}:${organizationId}:${previous.start}_${previous.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: dims }
       )
     })
+  }
 
-    // TASK-1962 — aportes de cada consulta al cambio total de clics, y el resto, para la cascada «qué explica el cambio».
-    // La suma por consulta es exactamente el total del informe (misma tabla), así que el resto es medido, no estimado.
-    if (dimension === 'query') {
-      let explained = 0
+  // Consultas: el detalle `query × page` es la única fuente con el texto de la consulta.
+  const queries = await readSeoWindowMovers(organizationId, {
+    window: { from: window.start, toExclusive: window.endExclusive },
+    previous: { from: previous.start, toExclusive: previous.endExclusive },
+    dimension: 'query',
+    limit: MOVERS_LIMIT,
+    ...(scope ? { scope } : {})
+  })
 
-      result.movers.forEach((mover, index) => {
-        const delta = mover.clicks - mover.previousClicks
+  if (!queries.ok) {
+    rejections.push({ module: 'seo', metricId: 'driver.query', reason: queries.errorCode === 'disabled' ? 'module_disabled' : 'insufficient_data', detail: `Movers query: ${queries.errorCode}` })
+  } else if (queries.movers.length > 0) {
+    pushMovers('query', queries.movers, false)
 
-        explained += delta
-        facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, String(index + 1)), metricId: 'driver.query.delta', label: mover.key, value: delta, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: { query: mover.key, rank: String(index + 1) } })
-      })
+    // TASK-1962 — aportes de cada consulta al cambio total de clics, el resto de las consultas visibles y (ISSUE-191) el
+    // cambio de los clics cuya consulta Google no informa: total del control menos la suma del detalle, en cada ventana.
+    // Los tres suman exactamente el cambio de los clics del capítulo, así que la cascada cuadra con cifras medidas.
+    const base = { ...baseFor('query', false), metricId: 'driver.query.delta' }
+    const deltaRef = `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`
+    let explained = 0
 
-      facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, 'rest'), metricId: 'driver.query.delta', label: GH_INSIGHTS.figures.driversRestLabel, value: result.totalClicks - result.previousTotalClicks - explained, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversRestLabel, rank: 'rest' } })
+    queries.movers.forEach((mover, index) => {
+      const delta = mover.clicks - mover.previousClicks
+
+      explained += delta
+      facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, String(index + 1)), label: mover.key, value: delta, window: evidenceWindow(window, 'period'), evidenceRef: deltaRef, comparisonFactId: null, dimension: { query: mover.key, rank: String(index + 1) } })
+    })
+
+    facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, 'rest'), label: GH_INSIGHTS.figures.driversRestLabel, value: queries.totalClicks - queries.previousTotalClicks - explained, window: evidenceWindow(window, 'period'), evidenceRef: deltaRef, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversRestLabel, rank: 'rest' } })
+
+    if (previousClicks?.value != null) {
+      const hidden = current.value - previousClicks.value - (queries.totalClicks - queries.previousTotalClicks)
+
+      facts.push({ ...base, source: current.source, method: SEO_SEARCH_CONTROL_METHOD, factId: factId('seo', 'driver.query.delta', window, 'hidden'), label: GH_INSIGHTS.figures.driversHiddenLabel, value: hidden, window: evidenceWindow(window, 'period'), evidenceRef: `gsc_control:hidden:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversHiddenLabel, rank: 'hidden' } })
     }
 
     sources.push({ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoWindowMovers', asOf: current.freshness.asOf, method: MOVERS_METHOD, coverage: current.coverage, servedWindow: null })
+  }
+
+  // Páginas (ISSUE-191): del control por página, que cuenta todos los clics de cada página, no sólo los de consultas
+  // visibles. Sin el control de las dos ventanas no hay comparación honesta: se declara como límite.
+  if (controlPages.current && controlPages.previous) {
+    const movers = rankSearchControlPageMovers(controlPages.current, controlPages.previous, MOVERS_LIMIT)
+
+    if (movers.length > 0) {
+      pushMovers('page', movers, true)
+      sources.push({ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoSearchControlForWindow', asOf: current.freshness.asOf, method: SEO_SEARCH_CONTROL_METHOD, coverage: current.coverage, servedWindow: null })
+    }
+  } else {
+    rejections.push({ module: 'seo', metricId: 'driver.page', reason: 'insufficient_data', detail: 'Search Console (total por página) no disponible en las dos ventanas' })
   }
 
   return { facts, rejections, sources }
@@ -537,6 +570,7 @@ const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsi
   const site = input.editorialV2 === true ? ga4OrganicFacts(input.organizationId, window, await readGa4ChannelWindow(input.organizationId, window, scope?.rules), comparisonIds, scope ? `${GH_INSIGHTS.contentScope.ga4Population}: ${scope.label}` : undefined) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
 
   return {
+    pages: gsc.pages,
     facts: [...gsc.facts, ...rank.facts, ...etv.facts, ...site.facts],
     rejections: [...gsc.rejections, ...rank.rejections, ...etv.rejections, ...site.rejections],
     sources: [gsc.source, rank.source, etv.source, site.source].filter((source): source is EvidenceSourceV1 => source !== null)
@@ -591,7 +625,7 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
     const opportunities = input.editorialV2 === true && seoTargetId ? await opportunityFacts(seoTargetId, scope) : { facts: [], sources: [] }
 
     const movers = input.editorialV2 === true && input.comparison
-      ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'), scope)
+      ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'), comparison?.facts.find(fact => fact.metricId === 'clicks'), { current: current.pages, previous: comparison?.pages ?? null }, scope)
       : { facts: [], rejections: [], sources: [] }
 
     // TASK-2033 — toda fuente SEO de la edición sella el alcance con el que se leyó (las de la comparación incluidas).
