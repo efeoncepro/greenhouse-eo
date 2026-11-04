@@ -1,5 +1,19 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-11-04 · TASK-2033 · Una guía que cambió de URL se leyó como «la página que más cambió» (+2.660 %).**
+  Síntoma (vista previa de Berel, sólo blog, octubre 2026): la guía de pintura y barniz pasó de la raíz a
+  `/articulos/…` entre el 25 y el 27 de septiembre. Las dos URLs están en el alcance (regla exacta + prefijo), así que el
+  total del capítulo cuadra (799 → 1.065), pero el reader de movimientos las cuenta como dos páginas: una sube de 5 a
+  138 y la otra cae de 82 a 0. El planner eligió la primera como hallazgo de la página de comparación, de lo esencial y
+  de la cifra principal de las tablas de respaldo. La guía real pasó de 87 a 138 (+58,6 %). Además, las dos rutas se
+  abrevian igual y el sufijo « ·2» llevaba el nombre a 43 caracteres: el deck fallaba cerrado (slot de 40). Corregido
+  el sufijo (`uniquePageLabels` le hace lugar abreviando la base); la migración de URL NO tiene corrección en código
+  todavía. Regla: antes de entregar, mirar la página de movimientos de páginas; un par «sube desde casi 0 / cae a 0»
+  con el mismo slug es una migración, no un hallazgo, y la edición no se entrega así al cliente.
+- **2026-11-04 · `preview-edition.ts` acepta `--modules=seo` y `--title="…"`.** Para un informe «sólo blog» sobre un
+  reporte titulado SEO + AEO: `--modules` toma un subconjunto de los módulos del encargo (nunca agrega) y `--title`
+  rotula sólo el PDF local. Sin `--title`, la portada decía «… y en motores de respuesta» sin capítulo AEO.
+
 - **2026-10-12 · TASK-2033 · Cargar el logo para fondo oscuro cambió la portada y borró la línea del alcance.**
   Síntoma: al cargar la variante `on_dark` del logo de Berel, la regla `auto` pasó la portada de blanca a navy, y la
   portada navy no tiene la zona «Qué mide este informe»: el PDF dejó de decir en la portada qué contenido mide.

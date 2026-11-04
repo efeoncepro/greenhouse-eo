@@ -361,7 +361,18 @@ export const uniquePageLabels = (urls: readonly string[]): string[] => {
 
     seen.set(label, count)
 
-    return count === 1 ? label : `${label} ·${count}`
+    if (count === 1) return label
+
+    // El sufijo también ocupa la columna: un nombre ya abreviado a 40 más « ·2» no cabía en el slot del deck (43
+    // caracteres, el render fallaba cerrado; Berel con alcance, octubre de 2026). Se abrevia la base para hacerle lugar,
+    // conservando el final que distingue el slug.
+    const suffix = ` ·${count}`
+
+    if (label.length + suffix.length <= PAGE_LABEL_MAX) return `${label}${suffix}`
+
+    const budget = PAGE_LABEL_MAX - suffix.length
+
+    return `${label.slice(0, budget - PAGE_LABEL_TAIL - 1)}…${label.slice(-PAGE_LABEL_TAIL)}${suffix}`
   })
 }
 

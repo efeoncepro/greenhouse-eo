@@ -400,7 +400,13 @@ describe('SEO adapter', () => {
       ])
 
       expect(new Set(twins).size).toBe(3)
-      expect(twins[1]).toBe(`${twins[0]} ·2`)
+      expect(twins[1]!.endsWith(' ·2')).toBe(true)
+      expect(twins[1]!.endsWith(`${twins[0]!.slice(-12)} ·2`)).toBe(true)
+      // El sufijo cabe en la columna (Berel con alcance, octubre de 2026: « ·2» llevaba el nombre a 43 y el deck fallaba).
+      for (const label of twins) expect(label.length).toBeLessThanOrEqual(40)
+
+      // Una ruta corta conserva su nombre entero con el sufijo.
+      expect(uniquePageLabels(['https://x.cl/a?x=1', 'https://x.cl/a'])).toEqual(['/a', '/a ·2'])
     })
 
     it('si el alcance no se puede leer, el adapter falla: nunca mide el sitio completo en silencio', async () => {
