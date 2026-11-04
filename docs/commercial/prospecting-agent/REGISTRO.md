@@ -1,5 +1,15 @@
 # Registro de búsquedas comerciales
 
+**Delta focal 04/11 · Paula / Cristian:** [expediente y evidencia](runs/2026-11-04-paula-cristian-contextual.md).
+Dos InMail enviados/releídos y un email a Cristian con landing, brochure HubSpot original, firma gráfica y
+CCO; Enviados de Outlook y EMAIL `120319391872` `SENT` corroborados por separado. Contact `260252351138`,
+Company `60546887588` y Primary verificados. Paula: sólo LinkedIn para pedir correo laboral; alta CRM,
+brochure personalizado y email pendientes de respuesta, sin usar su correo personal. InMail: 2 créditos,
+saldo observado 151 → 149; Apollo: 2 créditos previos, sin repetir enriquecimiento. Sin seguimientos
+automáticos ni entrega/lectura acreditadas. No renueva el radar. Workflow reutilizable en
+[Codex](../../../.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md) y
+[Claude](../../../.claude/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md).
+
 **Delta focal 31/10 · Wequips/Mambrino:** [Mayra](runs/2026-10-30-wequips-mayra.md) conserva envío al buzón
 publicado e InMail, waterfall sin email/0 créditos y NDR del envío individual inferido, sin reintento.
 [Dayanna](runs/2026-10-31-mambrino-dayanna.md): waterfall autorizado/2 créditos, email Verified, Contact

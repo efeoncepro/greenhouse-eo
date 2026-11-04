@@ -11,6 +11,14 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-04 — Prospección contextual reutilizable en Codex y Claude
+
+El [workflow compartido](.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md)
+convierte señales de LinkedIn en investigación, CRM y mensajes contextualizados dentro del mandato,
+con landings, brochures originales y verificación independiente por canal. [Primera aplicación](docs/commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md):
+dos InMail y un email enviados; Paula pendiente de correo laboral, sin utilizar su correo personal.
+Skills espejo y manual actualizados; sin cadencia automática ni nuevo runtime.
+
 ## 2026-11-02 — Rooms: los agentes trabajan por CLI con Efeonce ID
 
 Un agente (Claude Code, Codex) ya opera Rooms en producción con el login de una persona interna: se corre
@@ -525,30 +533,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Publicado en WordPress con snapshot independiente `eo_footer_compat_20261018`, cache purge y readback PASS.
   Home y landing HubSpot verificadas a 1440/390 sin overflow ni errores de consola.
 - [Evidencia y rollback](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).
-
-## 2026-10-17 — Google Ads: arquitectura y prueba API de lectura
-
-- Checkpoint18/10:499 tests y32 escenarios Chromium/API PASS; [paquete previo al release](docs/operations/releases/google-ads-2026-10-18/README.md), propuestas/hashes/rollback. Sin publicación ni deploy; hosts/protocolo real/EC/CI y alcance general pendientes.
-
-- Revisión18/10:1.445 archivos de89d70ec13 auditados; CI/build PASS; Deep corregido localmente, revalidación remota pendiente. Reparación SQL HubSpot/Meta autorizada, versionada y verificada; dispatcher existente200 y dos submissions delivered al ledger sin destinos directos. [Auditoría](docs/audits/releases/2026-10-18-candidate-89d70ec13-review.md). Sin deploy ni publicación GTM.
-
-- [ADR adoptado](docs/architecture/GREENHOUSE_GOOGLE_ADS_INTEGRATION_DECISION_V1.md) y
-  [arquitectura](docs/architecture/GREENHOUSE_GOOGLE_ADS_MEASUREMENT_ARCHITECTURE_V1.md): OAuth/binding,
-  GTM web/server, identidad comercial, consentimiento, HubSpot/Data Manager, reporting y rollout.
-- [Probe API v26](docs/audits/growth/2026-10-17-google-ads-api-discovery.md) PASS para `6862539491`
-  vía manager `9531478329`; dos acciones GA4 ocultas, tracking inactivo y cuenta nueva. Doce consultas,
-  ninguna mutación; conexión y sender de producto pendientes. Funcional y manual documentados.
-- Ratificación del operador: OAuth de producción **Efeonce** y CLI de consulta obligatoria en la primera
-  unidad de lectura; catálogo y aceptación documentados. Rebranding y CLI pendientes de implementación.
-- Unidad posterior: `pnpm google-ads` local implementada, con gestión ampliada por el operador. Lecturas
-  reales PASS, planes create/update cerrados, validateOnly, hash, journal durable y readback por campo.
-  Marca Efeonce guardada y grant Ads en secreto propio; regresión GA4/GSC y auth PASS. Ninguna escritura
-  publicitaria ejecutada; verificación Google y conexión de producto pendientes.
-  [Evidencia](docs/audits/growth/2026-10-17-google-ads-cli-oauth-implementation.md).
-
-- Delta online: backend y renderers Forms/Meetings con recibo Ads postcommit, consentimiento explícito,
-  capture de IDs y EC reservado. Dos acciones secundarias creadas/verificadas; workspaces Web8/Server12
-  compilan por API. Sin publish/deploy/flag ON ni conversiones enviadas.
-  [Evidencia](docs/audits/growth/2026-10-17-google-ads-online-conversions.md).
-- Por instrucción posterior, términos de datos de clientes Ads aceptados/guardados y panel reabierto
-  verificado en6862539491. EC OFF; sin publicación GTM ni promoción a main.

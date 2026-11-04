@@ -1,5 +1,19 @@
 # Handoff
 
+[Historial de sesiones](Handoff.archive.md).
+
+## 2026-11-04 — Prospección contextual: envíos verificados y workflow guardado
+
+[Paula / Cristian](docs/commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md): **2 InMail y 1 email enviados**;
+conversaciones LinkedIn, Enviados de Outlook y EMAIL `120319391872` `SENT` verificados por separado.
+Cristian: Contact `260252351138`, Company `60546887588` y Primary confirmados; landing, brochure original,
+firma gráfica y CCO preservados. Paula: sólo LinkedIn, se pidió correo laboral; **CRM, brochure personalizado
+y email pendientes de respuesta**, sin usar su correo personal. Owner: Julio / Commercial. Esperar respuestas;
+no duplicar altas, enriquecimiento ni envíos, ni programar seguimientos. Envío no acredita entrega/lectura.
+[Workflow Codex](.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md) y
+[espejo Claude](.claude/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md), accesibles desde
+sus skills y el manual. Invocación: «Aplica el workflow de prospección contextual a estas personas».
+
 ## 2026-11-02 — Carril CLI de agentes para Rooms en producción y aceptado (TASK-2095 + TASK-2087)
 
 Enmienda **D1-bis** al [ADR del carril](docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
@@ -258,17 +272,3 @@ Playwright53PASS/3skip. [Manual](docs/manual-de-uso/rooms/integrar-claude-design
 Queda conectar/aceptar UI Claude Design, entorno cloud si se decide y activación separada. AuthPR263/264
 OPEN sinmerge; producción no cambiada, sincorreo/push/deploy. Caché Next local puede regenerar archivos
 de tipos: revisar sólo sus cambios generados antes de commitear. Runtime limpio al checkpoint; entorno activo.
-
-## 2026-10-26 — Rooms/Auth: continuidad documental y conexión Claude Design
-
-Estado y pendientes reconciliados en [dossier Rooms](docs/architecture/rooms/README.md),
-[contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y skills Rooms/Auth
-espejadas. Main Rooms e4b2e890 publicado: GCS/DB8/26tablas, worker automático y canary único comprobados;
-flags humanos OFF. Falta entorno aislado/datos/permisos, conexión UI same-origin, recorrido nuevo y
-activación general separada; restore8 no se infiere del ensayo histórico7. Claude Design conserva UI.
-Auth **permanece en PR263/264 por decisión humana**, sin merge main/develop ni deploy; revisión00168-vzb
-con emisor/login base activos, first-party/OTP OFF. CI263/264 y Vercel PASS en seguimiento posterior; ambas siguen abiertas.
-[Readback](docs/audits/rooms/2026-10-26-docs-skills-state-readback.json),
-[auditoría documental](docs/audits/rooms/2026-10-26-docs-skills-continuity.md).
-
-[Historial](Handoff.archive.md).

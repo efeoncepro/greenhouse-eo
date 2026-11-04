@@ -27,6 +27,19 @@ Se opera con [efeonce-b2b-prospecting](../../../.codex/skills/efeonce-b2b-prospe
 
 ## Qué entrega
 
+### Prospección contextual desde una publicación
+
+«Aplica el workflow de prospección contextual» con personas concretas activa el
+[recorrido compartido Codex/Claude](../../../.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md):
+investigación de la solicitud y empresa, correo laboral verificable, CRM sin duplicados y mensajes
+por los canales autorizados, con landing pertinente y brochure original mediante enlace HubSpot.
+Cada canal conserva su estado: enviado, respuesta y entrega no son equivalentes. Cuando falta correo
+admisible, se puede pedir por LinkedIn; el alta CRM y el email quedan pendientes. Si Documents exige
+email para generar el enlace, también se reserva el brochure. El método no crea seguimiento automático.
+[Aplicación verificada del 04/11](../../commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md).
+
+### Investigación y acceso con Sales Navigator
+
 Sales Navigator aporta identidad profesional declarada, empleo, actividad y rutas de conexión desde la
 sesión abierta del operador. El [recorrido probado](../../manual-de-uso/comercial/prospectar-sales-navigator-con-agentes.md)
 filtra cuentas por industria/sede/tamaño y empleados por función/país/rol; permite leer perfiles y paginar.
