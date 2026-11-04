@@ -117,9 +117,10 @@ bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada 
 - **HPH** (1200×1200, 300×600, 300×250 y 728×90) parte de las referencias `HPH_<formato>_GENERICO.svg` de la carpeta
   `KV X HM/HPH`. El genérico es de Chile internacional, con banderas y sin precio. Si el 728×90 trae las banderas en
   blanco, se reponen desde el 1200×1200. El botón «Ver vuelos» usa Source Sans 3.
-- **HPH por mercado:** misma distribución con el logo, el destino y el precio del KV de cada mercado. En los formatos
-  chicos el legal va corto («Aplican TyC en …»). Confirma con el operador si lleva precio y las traducciones del botón
-  antes de entregar.
+- **HPH por mercado:** genérico y sin precio. Se adapta el **SVG de referencia** (no se recompone desde el KV): se quita
+  la lista de banderas de Chile, se traducen los textos y la URL del legal y, en Brasil y EE. UU., se cambian el logo y
+  el sello de puntualidad. El bloque «Vuela / Internacional» baja al centro del espacio que deja la lista. Confirma
+  las traducciones de la flecha y del botón antes de entregar.
 
 ### 8. Revisar con comentarios en el canvas
 

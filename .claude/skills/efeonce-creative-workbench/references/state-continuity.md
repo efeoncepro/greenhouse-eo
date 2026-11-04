@@ -32,9 +32,9 @@ Pendientes sin confirmar por el operador:
   unificados). Logos de alianza y URL no están puestos en ningún KV. Derechos de la foto del KV
   y de la medalla de Puntualidad (generadas con IA) sin validar antes de pautar.
 - «Internacional» en AR, UY, BR y US: corregido el 2026-11-04 en los 24 estáticos y en las 4 animaciones.
-- HPH por mercado: confirmar con el operador que lleve precio (el genérico de Chile no lo lleva),
-  las traducciones del botón («Ver voos», «See flights») y que Perú use el KV internacional. El
-  legal de 300×600 y 300×250 queda a ~6 px: legible sólo como mención.
+- HPH por mercado: rehecho genérico y sin precio desde la referencia (decisión del operador). Falta
+  confirmar las traducciones «COM GRANDES DESCONTOS», «WITH BIG DISCOUNTS», «Ver voos» y «See
+  flights».
 
 ## Berel en el Workbench — corte 2026-11-02
 

@@ -248,14 +248,18 @@ DESCUENTOS», sin precio, botón «Ver vuelos» en Source Sans 3):
   banderas venían en blanco (rasters enmascarados vacíos): se reponen recortándolas del render
   del 1200×1200 (orden BR, PE, AR, DO, US, UY) con máscara circular sobre los círculos blancos.
   Las imágenes de estas referencias son raster a tamaño 1x: el 2x no agrega detalle.
-- **Por mercado** (PE INTER, AR, UY, BR, US): misma distribución que el genérico, pero con el
-  contenido del KV de cada mercado (logo en su idioma, destino, flecha de precio con badge) en
-  vez de la lista de banderas, que sólo existe para Chile. Legal: el completo del KV en el
-  1200×1200; en 300×600 y 300×250 la versión corta «Aplican TyC en …» con la URL del legal del
-  KV (como el genérico); el 728×90 va sin legal, como el genérico. Botón: «Ver vuelos» (ES),
-  «Ver voos» (PT) y «See flights» (EN); las dos últimas son traducción propia, sin confirmar.
-- En el 728×90 el rostro llena el alto entre el badge y el botón; el badge va a la derecha de la
-  flecha porque en su posición del KV queda fuera del alto.
+- **Por mercado** (PE, AR, UY, BR, US), **genérico y sin precio** (decisión del operador
+  2026-11-04): se parte del **SVG genérico de referencia**, no de las partes del KV. Se ocultan
+  la lista de destinos y sus banderas (sólo existe para Chile), se traducen los textos y se cambia
+  la URL del legal corto. En BR y US además se reemplazan el logo (raster de la referencia) y el
+  sello de puntualidad por los del KV del mercado, ajustados a la caja visible del genérico. El
+  bloque «Vuela / Internacional» baja al centro del espacio libre entre el logo y la flecha (en el
+  728×90, al centro del alto). Textos: VUELA → VOLÁ (AR/UY), VOE A (BR), FLY + International (US);
+  flecha «COM GRANDES / DESCONTOS» (PT) y «WITH BIG / DISCOUNTS» (EN); botón «Ver voos» y «See
+  flights». Las traducciones de flecha y botón son propias, sin confirmar. Script:
+  `scripts/hph-market.cjs`.
+- Primer intento descartado: componer el HPH por mercado con las partes del KV (precio incluido).
+  El operador lo rechazó porque no respetaba la referencia, sobre todo en el 728×90.
 
 ## Lecciones de la plataforma Claude Design
 

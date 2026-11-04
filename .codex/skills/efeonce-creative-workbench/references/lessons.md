@@ -64,6 +64,7 @@ nunca en el archivo del cliente.
 | La animación CSS no se mueve en el canvas | Claude Design muestra los artboards como «Static artboards» y congela CSS | Renderizar cuadro a cuadro a MP4 y publicar `<video>`; el MP4 va como asset (`/_blob/<id>`), no como archivo del proyecto |
 | El GIF/MP4 arranca con cuadros que no corresponden a t=0 | La captura llega con 2 cuadros de retraso | Descartar los 2 primeros cuadros capturados antes de codificar |
 | La bandera o el logo usado no es el del mercado | Archivos del kit mal nombrados: `BANDERA CL (CIRCULO)_1.svg` es Argentina, `SKY-13.svg` es Brasil, logo BR con nombre «Mesa de trabajo 1 copia 2» | Identificar cada asset por lo que muestra, no por su nombre; reportar el error a la fuente sin renombrar en OneDrive |
+| HPH por mercado rechazado: «¿usaste la referencia?» | Se recompuso cada formato con las partes del KV en vez de adaptar el SVG de referencia que el cliente dejó | Si el kit trae una referencia del formato, adaptar **esa** pieza (ocultar, traducir, reemplazar) y no recomponer desde el KV |
 | Franja clara arriba en el clúster internacional | El oscurecido izquierdo (Raster 4, opacidad .67, con máscara) empieza en y=6 | Estirarlo hasta el borde en el render; pedir a la fuente subir la capa a y=0. Revisar los bordes de toda capa de oscurecido |
 
 ## Propuestas rechazadas o retiradas
