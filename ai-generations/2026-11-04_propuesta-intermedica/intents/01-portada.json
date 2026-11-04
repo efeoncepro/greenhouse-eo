@@ -10,11 +10,11 @@
   "layout": "orbit",
   "line": "voice",
   "voice": {
-    "eyebrow": "Marketing digital y performance · Noviembre 2026",
+    "eyebrow": "Propuesta comercial · Noviembre 2026",
     "question": "¿Performance comercial?",
     "answer": ["Performance", "comercial"]
   },
-  "body": "Preparada para **Intermedica** · Perú · Confidencial",
+  "body": "Preparada para **Intermedica** · Confidencial",
   "selection": { "target": "client-logo", "label": "Efeonce", "participantKind": "role" },
   "clientLogo": {
     "path": "ai-generations/2026-11-04_propuesta-intermedica/logos/intermedica-blanco.png",
