@@ -4,6 +4,10 @@
 Estructura y decisiones: `docs/commercial/accounts/intermedica/ESTRUCTURA-OFERTA-2026-11-04.md`.
 Costeo: `docs/commercial/accounts/intermedica/pricing-v3-intermedio-2026-11-04/INTERMEDIO.md` (`requires_review`).
 
+**Canvas de diseño:** https://claude.ai/artifact/2E76BjuHQyB8JvvAx72myh (24 mesas de 1920×1080; versión con cifras V3;
+nativas editables, recetas y reutilizadas como imagen). Regenerar: `node native/to-canvas.mjs native/html-montos <root>`
+y publicar `project/` en ese canvas.
+
 ## Archivos
 
 | PDF | Para quién |
