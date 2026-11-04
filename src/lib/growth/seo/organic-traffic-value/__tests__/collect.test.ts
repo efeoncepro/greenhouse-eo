@@ -59,6 +59,50 @@ describe('GSC organic value collection', () => {
     )
   })
 
+  it('accepts a domain property and asks Google only for the declared content scope', async () => {
+    const domain = { ...input, siteUrl: 'sc-domain:berel.com', hostname: 'berel.com' }
+
+    const rules = [
+      { kind: 'prefix' as const, path: '/articulos' },
+      { kind: 'exact' as const, path: '/pintura-y-barniz-para-madera-como-elegir' }
+    ]
+
+    mocks.connection.mockResolvedValue({ status: 'active', siteUrl: domain.siteUrl })
+    const ok = (rows: ReturnType<typeof row>[]) => ({ ok: true, siteUrl: domain.siteUrl, rows })
+
+    mocks.read
+      .mockResolvedValueOnce(ok([row([], 7)]))
+      .mockResolvedValueOnce(ok([row(['https://berel.com/articulos/a'], 7)]))
+      .mockResolvedValueOnce(ok([row(['https://berel.com/articulos/a', 'pintura', 'MEX'], 2)]))
+    const result = await collectOrganicTrafficValueInputs({ ...domain, scopeRules: rules })
+
+    expect(result.scope).toEqual({ rules })
+    const expression = mocks.read.mock.calls[0][1].dimensionFilterGroups[0].filters[0].expression
+
+    expect(expression.startsWith('^https?://([^/?#]+\\.)?berel\\.com(')).toBe(true)
+  })
+
+  it('fails visibly when Google returns a page outside the requested scope', async () => {
+    const domain = { ...input, siteUrl: 'sc-domain:berel.com', hostname: 'berel.com' }
+    const ok = (rows: ReturnType<typeof row>[]) => ({ ok: true, siteUrl: domain.siteUrl, rows })
+
+    mocks.connection.mockResolvedValue({ status: 'active', siteUrl: domain.siteUrl })
+    mocks.read
+      .mockResolvedValueOnce(ok([row([], 7)]))
+      .mockResolvedValueOnce(ok([row(['https://berel.com/productos/x'], 7)]))
+      .mockResolvedValueOnce(ok([]))
+    await expect(
+      collectOrganicTrafficValueInputs({ ...domain, scopeRules: [{ kind: 'prefix', path: '/articulos' }] })
+    ).rejects.toThrow('page_outside_content_scope')
+  })
+
+  it('rejects a host that does not belong to the domain property', async () => {
+    await expect(
+      collectOrganicTrafficValueInputs({ ...input, siteUrl: 'sc-domain:berel.com', hostname: 'otro.com' })
+    ).rejects.toThrow('site_hostname_mismatch')
+    expect(mocks.read).not.toHaveBeenCalled()
+  })
+
   it('propagates revocation instead of substituting zero rows', async () => {
     mocks.read.mockResolvedValue({ ok: false, errorCode: 'token_unhealthy', status: 'revoked' })
     await expect(collectOrganicTrafficValueInputs(input)).rejects.toThrow('search_console_token_unhealthy')

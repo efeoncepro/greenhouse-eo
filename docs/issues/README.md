@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-191`
+`ISSUE-192`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-191` | [La serie diaria de Search Console cuenta sólo los clics con consulta visible](open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md) | producción (Insights + SEO) | 2026-11-04 | open — `seo_gsc_daily` materializa sólo `query × page`; Google omite las consultas anonimizadas. Berel blog octubre: Insights imprime 1.065 clics, el control GSC da 4.094. Solución pendiente de decisión. |
 | `ISSUE-189` | [El login de Rooms responde «Espera.» (`unavailable`) de forma intermitente](open/ISSUE-189-rooms-login-unavailable-on-cold-start.md) | producción (Rooms) | 2026-11-01 | open — causa sin confirmar (tope de conexiones del rol o arranque en frío); instrumentación en producción desde Rooms PR #13, esperando el próximo registro. |
 | `ISSUE-182` | [La captura diaria de rankings pierde keywords por timeout y no lo avisa](open/ISSUE-182-seo-rank-capture-partial-days-silent.md) | producción (ops-worker) | 2026-10-12 | open — code complete, rollout pendiente: segunda pasada `ops-seo-rank-capture-retry` y aviso de parciales salen con el próximo deploy del worker. Recuperación del 12-oct pendiente del operador. |
 | `ISSUE-181` | [El regrade recurrente AEO reclama mercados que el contrato no declara](open/ISSUE-181-aeo-regrade-claims-markets-outside-contract.md) | producción (ops-worker) | 2026-10-12 | open — dato aplicado (Sky declara 7 mercados); fix de scheduler y command code complete, rollout pendiente. Cierre: `failed=0` el 2026-10-13. |

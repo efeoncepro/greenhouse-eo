@@ -4,6 +4,51 @@ import { readSearchConsoleAnalytics } from '../../search-console/reader'
 import { getSearchConsoleConnection } from '../../search-console/connection-store'
 import type { SearchConsoleAnalyticsParams, SearchConsoleAnalyticsRow } from '../../search-console/contracts'
 import { normalizeMarketKeyword } from '../keyword-market-data'
+import { isPathInContentScope, type SeoContentScopeRuleV1 } from '../content-scope/contracts'
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * Host de la propiedad: una propiedad por URL (`https://blog.x.com/`) fija el host exacto; una propiedad de dominio
+ * (`sc-domain:x.com`) cubre el dominio y sus subdominios, así que el host pedido debe pertenecerle.
+ */
+const assertHostBelongsToProperty = (siteUrl: string, hostname: string) => {
+  if (siteUrl.startsWith('sc-domain:')) {
+    const domain = siteUrl.slice('sc-domain:'.length).toLowerCase()
+    const host = hostname.toLowerCase()
+
+    if (host !== domain && !host.endsWith(`.${domain}`)) throw new Error('site_hostname_mismatch')
+
+    return
+  }
+
+  if (new URL(siteUrl).hostname !== hostname) throw new Error('site_hostname_mismatch')
+}
+
+/**
+ * TASK-2033 — expresión de página para la API de Search Console (RE2) con la MISMA semántica que
+ * `isPathInContentScope`: la ruta, sin query ni fragmento ni barras finales, es la regla (`exact`) o empieza por la
+ * regla seguida de `/` (`prefix`). Sin alcance, todo el host. El recorte lo hace Google: este módulo no filtra filas.
+ */
+export const organicValuePageExpression = (
+  hostname: string,
+  rules?: readonly SeoContentScopeRuleV1[],
+  options: { includeSubdomains?: boolean } = {}
+): string => {
+  // Una propiedad de dominio pedida por su dominio raíz mide todos sus hosts (`berel.com`, `www.berel.com`), igual que
+  // la serie diaria de Search Console que lee el capítulo: así los dos totales son el mismo universo.
+  const host = `^https?://${options.includeSubdomains ? '([^/?#]+\\.)?' : ''}${escapeRegex(hostname)}`
+
+  if (!rules || rules.length === 0) return `${host}/`
+
+  const tail = '/*([?#].*)?$'
+
+  const alternatives = rules.map(rule =>
+    rule.kind === 'prefix' ? `${escapeRegex(rule.path)}(/.*|[?#].*)?$` : `${escapeRegex(rule.path)}${tail}`
+  )
+
+  return `${host}(${alternatives.join('|')})`
+}
 
 /** Extrae evidencia. No compra CPC, no cambia tracking ni crea una edición de Insights. */
 export const collectOrganicTrafficValueInputs = async (input: {
@@ -12,13 +57,16 @@ export const collectOrganicTrafficValueInputs = async (input: {
   hostname: string
   range: { startDate: string; endDate: string }
   maxPages?: number
+  /** Reglas del alcance de contenido (TASK-2033): controles y detalle miden sólo ese contenido. */
+  scopeRules?: readonly SeoContentScopeRuleV1[]
 }) => {
-  if (new URL(input.siteUrl).hostname !== input.hostname) throw new Error('site_hostname_mismatch')
+  assertHostBelongsToProperty(input.siteUrl, input.hostname)
   const connection = await getSearchConsoleConnection(input.organizationId)
 
   if (!connection || connection.status !== 'active' || connection.siteUrl !== input.siteUrl)
     throw new Error('connected_site_does_not_match')
-  const escapedHost = input.hostname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  const scopeRules = input.scopeRules && input.scopeRules.length > 0 ? input.scopeRules : undefined
 
   const common: SearchConsoleAnalyticsParams = {
     range: input.range,
@@ -28,7 +76,15 @@ export const collectOrganicTrafficValueInputs = async (input: {
     dimensionFilterGroups: [
       {
         groupType: 'and',
-        filters: [{ dimension: 'page', operator: 'includingRegex', expression: `^https?://${escapedHost}/` }]
+        filters: [
+          {
+            dimension: 'page',
+            operator: 'includingRegex',
+            expression: organicValuePageExpression(input.hostname, scopeRules, {
+              includeSubdomains: input.siteUrl === `sc-domain:${input.hostname.toLowerCase()}`
+            })
+          }
+        ]
       }
     ]
   }
@@ -61,7 +117,12 @@ export const collectOrganicTrafficValueInputs = async (input: {
   const pageRows = await read(['page'], true)
   const queryRows = await read(['page', 'query', 'country'], true)
 
+  // Defensa: si Google devolviera una página fuera del alcance pedido, el resultado no mide lo que dice medir.
+  if (scopeRules && [...pageRows, ...queryRows].some(row => !isPathInContentScope(row.keys[0]!, scopeRules)))
+    throw new Error('page_outside_content_scope')
+
   return {
+    scope: scopeRules ? { rules: [...scopeRules] } : null,
     organizationId: input.organizationId,
     siteUrl: input.siteUrl,
     hostname: input.hostname,
