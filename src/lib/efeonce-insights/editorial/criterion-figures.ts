@@ -33,6 +33,9 @@ const STAT_ORDER = [
   'organic_etv',
   'site.organic_sessions',
   'site.organic_engaged_sessions',
+  'site.social_sessions',
+  'organic_value_usd',
+  'organic_value.valued_clicks',
   'ai_sessions',
   'share_of_model',
   'citation_share',
@@ -98,7 +101,8 @@ export const statFigureFor = ({ moduleKey, facts, byId, targetMetrics, takenFact
     question: 'value_change',
     title: GH_INSIGHTS.stat.boardTitle[moduleKey] ?? GH_INSIGHTS.stat.figureTitle,
     items,
-    ...(noteMetric ? { note: { claimId: `stats.${moduleKey}.note`, text: GH_INSIGHTS.stat.notes[noteMetric.metricId]!, factIds: [] } } : {})
+    // La nota cita el hecho de la cifra que explica: el render la imprime sólo en la página que contiene esa cifra.
+    ...(noteMetric ? { note: { claimId: `stats.${moduleKey}.note`, text: GH_INSIGHTS.stat.notes[noteMetric.metricId]!, factIds: [noteMetric.factId] } } : {})
   }
 }
 

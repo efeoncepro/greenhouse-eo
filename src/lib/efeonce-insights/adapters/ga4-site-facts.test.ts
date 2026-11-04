@@ -40,10 +40,42 @@ describe('ga4-site-facts', () => {
     expect(rejections).toEqual([])
     expect(source?.reader).toBe('readGa4Analytics')
     // TASK-1974 — el complemento «sin interacción» llega como hecho (suma por fila), nunca como resta en el render.
-    expect(facts.map(fact => [fact.metricId, fact.value])).toEqual([['site.organic_sessions', 43575], ['site.organic_engaged_sessions', 29636], ['site.organic_unengaged_sessions', 13939]])
+    // Sin visitas desde redes en el fixture: el total de redes es 0 medido y no hay partes por red. El pago (Paid
+    // Social, 187.849 sesiones) nunca entra.
+    expect(facts.map(fact => [fact.metricId, fact.value])).toEqual([['site.organic_sessions', 43575], ['site.organic_engaged_sessions', 29636], ['site.organic_unengaged_sessions', 13939], ['site.social_sessions', 0]])
     expect(facts[1]!.value! + facts[2]!.value!).toBe(facts[0]!.value)
     expect(facts[0]!.comparisonFactId).toBe('seo.site.organic_sessions.prev')
     expect(facts.every(fact => fact.channelId === undefined)).toBe(true)
+    expect(facts.every(fact => questionOfMetric('seo', fact.metricId) === 'outcome')).toBe(true)
+  })
+
+  it('cuenta las visitas desde redes sociales sin pago (Organic Social + Organic Video) y las reparte por red', () => {
+    const social = {
+      ...ok,
+      rows: [
+        ...ok.rows,
+        row('Organic Social', 'lm.facebook.com / referral', 361, 200),
+        row('Organic Social', 'facebook.com / referral', 233, 150),
+        row('Organic Social', 'm.facebook.com / referral', 127, 60),
+        row('Organic Social', 'l.instagram.com / referral', 72, 40),
+        row('Organic Social', 'pinterest.com / referral', 32, 20),
+        row('Organic Social', 'ow.ly / referral', 5, 1),
+        row('Organic Video', 'youtube.com / referral', 14, 9)
+      ]
+    }
+
+    const { facts } = ga4OrganicFacts('org-1', window, social, {})
+    const total = facts.find(fact => fact.metricId === 'site.social_sessions')!
+
+    expect(total.value).toBe(844)
+    // Facebook (721) e Instagram (72) por su nombre; Pinterest, YouTube y el resto, sumados en «Otras redes».
+    expect(facts.filter(fact => fact.metricId.startsWith('social_source.')).map(fact => [fact.metricId, fact.label, fact.value, fact.channelId])).toEqual([
+      ['social_source.facebook', 'Facebook', 721, 'facebook'],
+      ['social_source.instagram', 'Instagram', 72, 'instagram'],
+      ['social_source.other', 'Otras redes', 51, undefined]
+    ])
+    expect(facts.filter(fact => fact.metricId.startsWith('social_source.')).reduce((sum, fact) => sum + fact.value!, 0)).toBe(844)
+    expect(total.population).toContain('Organic Social y Organic Video')
     expect(facts.every(fact => questionOfMetric('seo', fact.metricId) === 'outcome')).toBe(true)
   })
 

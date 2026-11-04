@@ -12,6 +12,7 @@ import { readSeoContentScope } from '@/lib/growth/seo/content-scope/store'
 import { readDomainOverviewForTarget } from '@/lib/growth/seo/domain-overview/reader'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { type SeoMoverDimension, readSeoWindowMovers } from '@/lib/growth/seo/overview/read-window-movers'
+import { readOrganicTrafficValueForWindow } from '@/lib/growth/seo/organic-traffic-value/read-for-window'
 import { SEO_SEARCH_CONTROL_METHOD, type SeoSearchControlPage, rankSearchControlPageMovers, readSeoSearchControlForWindow } from '@/lib/growth/seo/search-control/read-search-control'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
@@ -561,7 +562,76 @@ const moverFacts = async (
   return { facts, rejections, sources }
 }
 
-const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>, scope: ActiveScope) => {
+/**
+ * Valor publicitario equivalente estimado (método `gsc_clicks_country_cpc_v1`, el del piloto SKY): clics observados de
+ * consultas visibles × CPC del mismo país capturado en DataForSEO. Lo calcula el reader dueño del dominio SEO, sobre el
+ * alcance de contenido si existe, y SÓLO con precios ya capturados (nunca compra). Es un estimado parcial: viaja con los
+ * clics valorados sobre el total del control, nunca se extrapola, y sin ningún CPC no hay valor (no es US$ 0).
+ */
+const ORGANIC_VALUE_METHOD = { name: 'gsc_clicks_country_cpc', version: 'gsc_clicks_country_cpc_v1' }
+
+type SeoTargetForValue = { rootDomain: string; locationCode: string; languageCode: string; market: string | null }
+
+const organicValueFacts = async (organizationId: string, window: ResolvedInsightWindow, target: SeoTargetForValue, comparisonIds: Record<string, string | null>, scope: ActiveScope) => {
+  const facts: EvidenceFactV1[] = []
+  const rejections: EvidenceRejectionV1[] = []
+
+  if (!target.market) {
+    rejections.push({ module: 'seo', metricId: 'organic_value', reason: 'insufficient_data', detail: 'El target SEO no declara mercado: no hay CPC de un país para valorar' })
+
+    return { facts, rejections, source: null as EvidenceSourceV1 | null }
+  }
+
+  const result = await readOrganicTrafficValueForWindow({
+    organizationId,
+    window: { from: window.start, toExclusive: window.endExclusive },
+    market: { code: target.market, locationCode: target.locationCode, languageCode: target.languageCode },
+    rootDomain: target.rootDomain,
+    ...(scope ? { scope } : {})
+  })
+
+  if (!result.ok) {
+    rejections.push({ module: 'seo', metricId: 'organic_value', reason: result.errorCode === 'not_connected' ? 'not_connected' : 'insufficient_data', detail: `Valor estimado: ${result.errorCode}` })
+
+    return { facts, rejections, source: null as EvidenceSourceV1 | null }
+  }
+
+  const summary = result.summary
+
+  if (summary.estimatedValueUsd === null || summary.totalClicks === null || summary.totalClicks === 0) {
+    rejections.push({ module: 'seo', metricId: 'organic_value', reason: 'no_data', detail: 'Ninguna consulta con clics tiene CPC capturado del mercado' })
+
+    return { facts, rejections, source: null as EvidenceSourceV1 | null }
+  }
+
+  const coverage = { kind: 'partial' as const, ratio: summary.coverageOfTotal === null ? null : Number(summary.coverageOfTotal.toFixed(4)), populationSize: summary.totalClicks }
+
+  const base = {
+    factVersion: 'evidence_fact_v1' as const,
+    module: 'seo' as const,
+    population: scope ? `${GH_INSIGHTS.organicValue.population}: ${scope.label}` : GH_INSIGHTS.organicValue.population,
+    source: `gsc:${result.siteUrl}+dataforseo_labs:keyword_overview:${result.country}`,
+    method: ORGANIC_VALUE_METHOD,
+    coverage,
+    freshness: { asOf: result.cpcAsOf },
+    window: evidenceWindow(window, 'period'),
+    evidenceRef: `organic_value:${organizationId}:${result.country}:${window.start}_${window.endExclusive}${scopeRef(scope)}`,
+    channelId: SEO_SEARCH_CHANNEL
+  }
+
+  facts.push(
+    { ...base, factId: factId('seo', 'organic_value_usd', window), metricId: 'organic_value_usd', label: GH_INSIGHTS.metrics.organic_value_usd!, value: summary.estimatedValueUsd, unit: 'usd', observation: 'estimated', numerator: summary.valuedClicks, denominator: summary.totalClicks, comparisonFactId: comparisonIds.organic_value_usd ?? null },
+    { ...base, factId: factId('seo', 'organic_value.valued_clicks', window), metricId: 'organic_value.valued_clicks', label: GH_INSIGHTS.metrics['organic_value.valued_clicks']!, value: summary.valuedClicks, unit: 'count', observation: 'observed', numerator: summary.valuedClicks, denominator: summary.totalClicks, comparisonFactId: comparisonIds['organic_value.valued_clicks'] ?? null }
+  )
+
+  return {
+    facts,
+    rejections,
+    source: { module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readOrganicTrafficValueForWindow', asOf: result.cpcAsOf, method: ORGANIC_VALUE_METHOD, coverage, servedWindow: null } as EvidenceSourceV1
+  }
+}
+
+const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>, scope: ActiveScope, valueTarget: SeoTargetForValue | null = null) => {
   const gsc = await gscFacts(input.organizationId, window, comparisonIds, input.editorialV2 === true, scope)
   const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds, scope) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
   const etv = seoTargetId ? await etvFacts(seoTargetId, window, comparisonIds, scope) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
@@ -569,11 +639,14 @@ const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsi
   // TASK-2033 — con alcance, sólo las sesiones cuya página de entrada pertenece al contenido medido.
   const site = input.editorialV2 === true ? ga4OrganicFacts(input.organizationId, window, await readGa4ChannelWindow(input.organizationId, window, scope?.rules), comparisonIds, scope ? `${GH_INSIGHTS.contentScope.ga4Population}: ${scope.label}` : undefined) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
 
+  // Valor estimado del tráfico orgánico: sólo contrato v2, con target y con Search Console respondiendo.
+  const value = input.editorialV2 === true && valueTarget && gsc.source ? await organicValueFacts(input.organizationId, window, valueTarget, comparisonIds, scope) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
+
   return {
     pages: gsc.pages,
-    facts: [...gsc.facts, ...rank.facts, ...etv.facts, ...site.facts],
-    rejections: [...gsc.rejections, ...rank.rejections, ...etv.rejections, ...site.rejections],
-    sources: [gsc.source, rank.source, etv.source, site.source].filter((source): source is EvidenceSourceV1 => source !== null)
+    facts: [...gsc.facts, ...rank.facts, ...etv.facts, ...site.facts, ...value.facts],
+    rejections: [...gsc.rejections, ...rank.rejections, ...etv.rejections, ...site.rejections, ...value.rejections],
+    sources: [gsc.source, rank.source, etv.source, site.source, value.source].filter((source): source is EvidenceSourceV1 => source !== null)
   }
 }
 
@@ -610,7 +683,7 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
     let comparison: Awaited<ReturnType<typeof collectForWindow>> | null = null
 
     if (input.comparison) {
-      comparison = await collectForWindow(input, input.comparison, seoTargetId, {}, scope)
+      comparison = await collectForWindow(input, input.comparison, seoTargetId, {}, scope, target.target)
 
       const etvOrder = comparison.facts.filter(fact => fact.metricId === 'organic_etv')
 
@@ -620,7 +693,7 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
       })
     }
 
-    const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds, scope)
+    const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds, scope, target.target)
 
     const opportunities = input.editorialV2 === true && seoTargetId ? await opportunityFacts(seoTargetId, scope) : { facts: [], sources: [] }
 

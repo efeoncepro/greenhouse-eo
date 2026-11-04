@@ -34,7 +34,8 @@ const seoMocks = vi.hoisted(() => ({
   readDomainOverviewForTarget: vi.fn(),
   readSeoWindowMovers: vi.fn(),
   readSeoWorkQueue: vi.fn(),
-  readSeoContentScope: vi.fn()
+  readSeoContentScope: vi.fn(),
+  readOrganicTrafficValueForWindow: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
@@ -51,6 +52,7 @@ vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewFo
 vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
 vi.mock('@/lib/growth/seo/work-queue/reader', () => ({ readSeoWorkQueue: seoMocks.readSeoWorkQueue }))
 vi.mock('@/lib/growth/seo/content-scope/store', () => ({ readSeoContentScope: seoMocks.readSeoContentScope }))
+vi.mock('@/lib/growth/seo/organic-traffic-value/read-for-window', () => ({ readOrganicTrafficValueForWindow: seoMocks.readOrganicTrafficValueForWindow }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
 
@@ -104,6 +106,8 @@ describe('SEO adapter', () => {
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
     // Sin alcance declarado por defecto: el informe mide el sitio completo, como antes de TASK-2033.
     seoMocks.readSeoContentScope.mockResolvedValue(null)
+    // Sin CPC capturado por defecto: el valor estimado es un límite (nunca US$ 0).
+    seoMocks.readOrganicTrafficValueForWindow.mockResolvedValue({ ok: false, errorCode: 'collection_failed' })
     seoMocks.readSeoWorkQueue.mockResolvedValue({
       ok: true,
       snapshot: { snapshotId: 'seowqs-1', organizationId: 'org', seoTargetId: 'tgt-1', priorityScoreVersion: 'v2', windowDays: 28, itemCount: 40, computedAt: '2026-09-02T13:00:00.000Z', expiresAt: '2026-09-03T13:00:00.000Z' },
@@ -214,6 +218,38 @@ describe('SEO adapter', () => {
     expect(deltas.reduce((sum, fact) => sum + fact.value!, 0)).toBe(4094 - 3540)
     // Nunca se lee la tabla materializada como total: el reader del control es la fuente de los clics.
     expect(result.sources.filter(source => source.reader === 'readSeoSearchControlForWindow').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('valor publicitario estimado: hecho estimado en USD con sus clics valorados sobre el total, y su comparable', async () => {
+    seoMocks.readSeoSearchControlForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(4094, 241113, 31, '2026-08-31') : gscWindow(3540, 168690, 31, '2026-07-31'))
+    seoMocks.readOrganicTrafficValueForWindow.mockImplementation(async (input: { window: { from: string } }) => ({
+      ok: true,
+      methodology: 'gsc_clicks_country_cpc_v1',
+      siteUrl: 'sc-domain:x.cl',
+      country: 'chl',
+      summary: input.window.from === '2026-08-01' ? { totalClicks: 4094, valuedClicks: 661, estimatedValueUsd: 85.08, coverageOfTotal: 661 / 4094 } : { totalClicks: 3540, valuedClicks: 542, estimatedValueUsd: 81.45, coverageOfTotal: 542 / 3540 },
+      gscCapturedAt: '2026-11-04T00:00:00.000Z',
+      cpcAsOf: '2026-11-04T18:47:00.000Z'
+    }))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+    const value = result.facts.find(fact => fact.factId === 'seo.organic_value_usd.2026-08-01_2026-09-01')!
+
+    expect(value).toMatchObject({ value: 85.08, unit: 'usd', observation: 'estimated', numerator: 661, denominator: 4094, comparisonFactId: 'seo.organic_value_usd.2026-07-01_2026-08-01', method: { version: 'gsc_clicks_country_cpc_v1' } })
+    expect(value.coverage).toMatchObject({ kind: 'partial', populationSize: 4094 })
+    expect(result.facts.find(fact => fact.factId === 'seo.organic_value.valued_clicks.2026-08-01_2026-09-01')).toMatchObject({ value: 661, observation: 'observed' })
+    // El mercado del target es el único que se valora: el reader recibe el del target (CL, 2152).
+    expect(seoMocks.readOrganicTrafficValueForWindow.mock.calls[0]![0]).toMatchObject({ market: { code: 'CL', locationCode: '2152', languageCode: 'es' }, rootDomain: 'x.cl' })
+    expectContentContract(result.facts)
+
+    // Sin ningún CPC no hay valor (nunca US$ 0): se declara como límite.
+    seoMocks.readOrganicTrafficValueForWindow.mockResolvedValue({ ok: true, methodology: 'gsc_clicks_country_cpc_v1', siteUrl: 'sc-domain:x.cl', country: 'chl', summary: { totalClicks: 4094, valuedClicks: 0, estimatedValueUsd: null, coverageOfTotal: 0 }, gscCapturedAt: 'x', cpcAsOf: null })
+    const noCpc = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(noCpc.facts.some(fact => fact.metricId === 'organic_value_usd')).toBe(false)
+    expect(noCpc.rejections).toEqual(expect.arrayContaining([expect.objectContaining({ metricId: 'organic_value', reason: 'no_data' })]))
   })
 
   it('ISSUE-191 — si el control de Search Console falla, el capítulo declara el límite y NO cae a la tabla materializada', async () => {

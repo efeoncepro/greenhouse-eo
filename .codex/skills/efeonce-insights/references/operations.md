@@ -457,3 +457,21 @@ Analytics 4: sin datos suficientes» y cuatro páginas menos.
 
 **Pruebas en vivo (sólo lectura):** `pnpm test:live src/lib/growth/seo/content-scope`. Leer `passed`: sin credenciales
 se saltan en silencio.
+
+## Valor estimado, redes sociales y control de Search Console (2026-11-04, `develop` local)
+
+- **Control de Search Console (ISSUE-191).** El capítulo SEO lee `readSeoSearchControlForWindow`
+  (`src/lib/growth/seo/search-control/`): Search Console en vivo sin la dimensión consulta. Necesita
+  `GROWTH_SEARCH_CONSOLE_ENABLED=true` + `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` + `…_CLIENT_SECRET_SECRET_REF` en el
+  runtime que genera la edición: ON en Vercel Production y staging y en el `ops-worker` (`deploy.sh`). Sin ellos el
+  capítulo declara el límite (no cae a la tabla). Para la vista previa local, exportarlos además de los de GA4.
+- **Valor publicitario estimado** (`gsc_clicks_country_cpc_v1`, reader `readOrganicTrafficValueForWindow`): mercado del
+  target SEO, alcance de contenido, CPC ya capturados; nunca compra. Para subir cobertura: CLI
+  `scripts/seo/organic-traffic-value.ts --content-scope --markets=mex:2484 …` para ver qué consultas no tienen CPC y
+  compra única por `pnpm dataforseo -- run …keyword_overview/live` con org, `--consumer seo`, estimado y techo; después
+  persistir con `parseKeywordOverviewItem` + `persistKeywordMarketData`, con filas NULL para lo que el proveedor no
+  tiene (manual `docs/manual-de-uso/growth/valorar-trafico-organico.md`). Berel 2026-11-04: 508 consultas MX, tarea
+  `11041847-1987-0607-0000-0e19efc03a45`, USD 0,04836 real, 230 con CPC.
+- **Visitas desde redes** (`site.social_sessions` + `social_source.*`): GA4 Organic Social + Organic Video sobre la misma
+  población que las orgánicas. Nunca se presentan como búsqueda social ni como efecto del SEO.
+- **Vista previa «sólo blog»:** `preview-edition.ts --modules=seo --title="…"`.

@@ -1,5 +1,20 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-11-04 · ISSUE-191 · El capítulo SEO imprimía un subconjunto de los clics.** Síntoma: al valorizar el blog de
+  Berel, el control de Search Console sin la dimensión consulta daba 4.094 clics en octubre y el informe 1.065 (sitio:
+  32.790 vs 14.899). `seo_gsc_daily` guarda `query × page` y Google omite ahí las consultas anonimizadas. Corregido en
+  Insights: los totales, la serie semanal, la referencia del sitio y las páginas salen de
+  `readSeoSearchControlForWindow` (en vivo, `byPage`, `final`, alcance por expresión de página); las consultas siguen
+  del detalle y la cascada suma un paso medido «Consultas que Google no muestra». Si el control falla, límite — nunca
+  la tabla materializada. Regla: un total de Search Console se pide SIN `query`; la suma de `query × page` es detalle con
+  cobertura, no un total. El tablero SEO sigue leyendo la tabla (ISSUE-191 abierto por esa parte).
+- **2026-11-04 · Los textos de fuente compuestos fallan cerrado en el molde (96/90 caracteres).** Nombres de fuente
+  largos («Google Search Console (total del período, con…)») rompieron tarjeta, cascada y tablas, porque el render une
+  las fuentes de cada figura con « · ». Regla: un nombre en `GH_INSIGHTS.sources` cabe junto a los otros de su figura;
+  medir la combinación más larga, no el nombre solo. La nota de una tarjeta admite 120 en el plan y 96 en el deck.
+- **2026-11-04 · La nota de la tarjeta se imprimía en todas sus páginas.** La del valor estimado aparecía junto a los
+  clics. Ahora la nota cita el hecho de su métrica y el render la imprime sólo en la página que lo contiene.
+
 - **2026-11-04 · TASK-2033 · Una guía que cambió de URL se leyó como «la página que más cambió» (+2.660 %).**
   Síntoma (vista previa de Berel, sólo blog, octubre 2026): la guía de pintura y barniz pasó de la raíz a
   `/articulos/…` entre el 25 y el 27 de septiembre. Las dos URLs están en el alcance (regla exacta + prefijo), así que el

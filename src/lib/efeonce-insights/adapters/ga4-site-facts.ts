@@ -33,6 +33,42 @@ const ORGANIC_SEARCH = 'Organic Search'
 const AI_ASSISTANT = 'AI Assistant'
 
 /**
+ * Visitas desde redes sociales sin pago: los canales «Organic Social» y «Organic Video» (YouTube) de GA4. Son visitas que
+ * llegan desde publicaciones, perfiles y enlaces compartidos en redes; GA4 NO distingue si el usuario buscó dentro de la
+ * red o vio la publicación en su feed, así que estos hechos nunca se presentan como «búsqueda social» ni se atribuyen al
+ * SEO. El pago (Paid Social) queda fuera.
+ */
+const SOCIAL_CHANNELS: ReadonlySet<string> = new Set(['Organic Social', 'Organic Video'])
+
+/** Fuente de GA4 → red (isotipo). Un host desconocido se agrupa en «otras redes». */
+const SOCIAL_SOURCE_CHANNELS: ReadonlyArray<{ match: RegExp; channelId: InsightChannelId; label: string }> = [
+  { match: /(^|\.)facebook\.com$|^fb$|^facebook$|^meta$/, channelId: 'facebook', label: 'Facebook' },
+  { match: /(^|\.)instagram\.com$|^instagram$|^ig$/, channelId: 'instagram', label: 'Instagram' },
+  { match: /(^|\.)youtube\.com$|^youtube$/, channelId: 'youtube', label: 'YouTube' },
+  { match: /(^|\.)tiktok\.com$|^tiktok$/, channelId: 'tiktok', label: 'TikTok' },
+  { match: /(^|\.)linkedin\.com$|^lnkd\.in$|^linkedin$/, channelId: 'linkedin', label: 'LinkedIn' },
+  { match: /(^|\.)threads\.(net|com)$/, channelId: 'threads', label: 'Threads' },
+  { match: /^t\.co$|(^|\.)(x|twitter)\.com$/, channelId: 'x', label: 'X' }
+]
+
+/** Redes sin isotipo en el documento, nombradas por su marca. */
+const SOCIAL_SOURCE_LABELS: ReadonlyArray<{ match: RegExp; label: string }> = [{ match: /(^|\.)pinterest\.[a-z.]+$|^pinterest$/, label: 'Pinterest' }]
+
+export const socialSourceOf = (sourceMedium: string): { key: string; label: string; channelId?: InsightChannelId } => {
+  const host = sourceMedium.split(' / ')[0]!.trim().toLowerCase()
+  const channel = SOCIAL_SOURCE_CHANNELS.find(entry => entry.match.test(host))
+
+  if (channel) return { key: channel.channelId, label: channel.label, channelId: channel.channelId }
+
+  const named = SOCIAL_SOURCE_LABELS.find(entry => entry.match.test(host))
+
+  return named ? { key: named.label.toLowerCase(), label: named.label } : { key: 'other', label: GH_INSIGHTS.ga4.otherNetworks }
+}
+
+/** Como las visitas desde IA: hasta 3 redes por su nombre; con más, las 2 que más traen y el resto sumado. */
+const SOCIAL_SOURCE_PARTS_MAX = 3
+
+/**
  * TASK-1974 — partes de las visitas desde IA: hasta 3 asistentes por su nombre; con más, los 2 que más traen y el resto
  * SUMADO como «otros asistentes» (suma de filas de GA4, no una resta de cifras impresas). Así las partes son un todo de
  * 2–3 porciones que suman el total: la dona del criterio (§5, «más de 3 partes: nunca dona»).
@@ -154,6 +190,38 @@ export const ga4OrganicFacts = (organizationId: string, window: ResolvedInsightW
     { ...base, factId: factId('seo', 'site.organic_engaged_sessions', window), metricId: 'site.organic_engaged_sessions', label: GH_INSIGHTS.metrics['site.organic_engaged_sessions']!, value: engaged, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_engaged_sessions'] ?? null },
     { ...base, factId: factId('seo', 'site.organic_unengaged_sessions', window), metricId: 'site.organic_unengaged_sessions', label: GH_INSIGHTS.metrics['site.organic_unengaged_sessions']!, value: unengaged, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.organic_unengaged_sessions'] ?? null }
   ]
+
+  // Visitas desde redes sociales (sin pago) que entraron por la MISMA población (con alcance, el contenido medido).
+  const socialRows = result.rows.filter(row => SOCIAL_CHANNELS.has(row.dimensions.sessionDefaultChannelGroup ?? ''))
+  const socialTotal = socialRows.reduce((sum, row) => sum + (row.metrics.sessions ?? 0), 0)
+  const socialBase = { ...base, population: population.replace(GH_INSIGHTS.ga4.organicChannelName, GH_INSIGHTS.ga4.socialChannelName) }
+
+  facts.push({ ...socialBase, factId: factId('seo', 'site.social_sessions', window), metricId: 'site.social_sessions', label: GH_INSIGHTS.metrics['site.social_sessions']!, value: socialTotal, unit: 'count', numerator: null, denominator: null, comparisonFactId: comparisonIds['site.social_sessions'] ?? null })
+
+  if (socialTotal > 0) {
+    const byNetwork = new Map<string, { label: string; channelId?: InsightChannelId; sessions: number }>()
+
+    for (const row of socialRows) {
+      const network = socialSourceOf(row.dimensions.sessionSourceMedium ?? '')
+      const entry = byNetwork.get(network.key) ?? { label: network.label, channelId: network.channelId, sessions: 0 }
+
+      entry.sessions += row.metrics.sessions ?? 0
+      byNetwork.set(network.key, entry)
+    }
+
+    // «Otras redes» siempre va al final y nunca ocupa el lugar de una red con nombre.
+    const named = [...byNetwork.entries()].filter(([key, entry]) => key !== 'other' && entry.sessions > 0).sort((a, b) => b[1].sessions - a[1].sessions || (a[0] < b[0] ? -1 : 1))
+    const otherSessions = byNetwork.get('other')?.sessions ?? 0
+    const keep = named.length + (otherSessions > 0 ? 1 : 0) <= SOCIAL_SOURCE_PARTS_MAX ? named : named.slice(0, SOCIAL_SOURCE_PARTS_MAX - 1)
+    const rest = named.slice(keep.length).reduce((sum, [, entry]) => sum + entry.sessions, 0) + otherSessions
+    const parts: Array<[string, { label: string; channelId?: InsightChannelId; sessions: number }]> = rest > 0 ? [...keep, ['other', { label: GH_INSIGHTS.ga4.otherNetworks, sessions: rest }]] : keep
+
+    for (const [key, entry] of parts) {
+      const metricId = `social_source.${key}`
+
+      facts.push({ ...socialBase, factId: factId('seo', metricId, window), metricId, label: entry.label, value: entry.sessions, unit: 'count', numerator: entry.sessions, denominator: socialTotal, comparisonFactId: comparisonIds[metricId] ?? null, dimension: { network: entry.label }, ...(entry.channelId ? { channelId: entry.channelId } : {}) })
+    }
+  }
 
   return { facts, rejections: [], source: sourceFor('seo', window, base.freshness.asOf) }
 }

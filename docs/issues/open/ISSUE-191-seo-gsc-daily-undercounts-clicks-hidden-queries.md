@@ -43,7 +43,13 @@ del control sin consulta; la implementación vigente no lo hace.
 
 ## Solución
 
-Pendiente de decisión. Dirección propuesta: materializar además una serie diaria por página SIN consulta (control)
+**Insights (code complete local, 2026-11-04, sin release):** reader `readSeoSearchControlForWindow`
+(`src/lib/growth/seo/search-control/`) lee el control en vivo (totales, serie diaria y páginas, `byPage`, `final`,
+alcance por expresión de página) y el adapter SEO (`seo_report_adapter_v2`) toma de ahí clics, impresiones, CTR,
+posición, bloques semanales, referencia del sitio y páginas. Las consultas siguen del detalle y la cascada agrega el
+paso «Consultas que Google no muestra». Si el control falla, límite; nunca la tabla. Ediciones selladas no cambian.
+
+**Tablero SEO y demás readers de `seo_gsc_daily`:** pendiente. Dirección propuesta: materializar además una serie diaria por página SIN consulta (control)
 — o por propiedad — y que los totales de clics/impresiones/CTR salgan de esa serie, dejando `query × page` como detalle
 con cobertura declarada (clics con consulta visible / total). Cambia las cifras históricas impresas: requiere versión
 del método en el snapshot de Insights y aviso al cliente cuando la serie corregida reemplace a la anterior.

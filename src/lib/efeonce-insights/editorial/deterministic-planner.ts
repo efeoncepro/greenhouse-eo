@@ -623,6 +623,27 @@ const aiSourceFinding = (facts: EvidenceFactV1[], locale: string): PlanClaimV1 |
   }
 }
 
+/**
+ * Visitas desde redes sociales sin pago: qué red trae más, con el total. Misma forma que el hallazgo de asistentes de IA
+ * (el total primero, para que «Lo esencial» no lea la cifra de la red como si fuera el total).
+ */
+const socialSourceFinding = (facts: EvidenceFactV1[], locale: string): PlanClaimV1 | null => {
+  const total = facts.find(fact => fact.metricId === 'site.social_sessions')
+  const top = facts.filter(fact => fact.metricId.startsWith('social_source.') && fact.metricId !== 'social_source.other' && fact.value !== null).sort((a, b) => b.value! - a.value!)[0]
+
+  if (!total || !top || total.value === null || total.value <= 0 || top.value === null || top.value <= 0) return null
+
+  const R = GH_INSIGHTS.reading
+  const lead = top.value * 2 > total.value ? R.socialTopSourceMost : R.socialTopSource
+
+  return {
+    claimId: `claim.${top.factId}.top`,
+    text: `${top.label} ${lead} ${formatFactValue(top.value, 'count', locale)} ${R.of} ${formatFactValue(total.value, 'count', locale)}.`,
+    factIds: [total.factId, top.factId],
+    role: 'finding'
+  }
+}
+
 /** TASK-1962 — hechos de GA4 (visitas al sitio): su propia tabla, no la de Search Console ni la del Grader. */
 const isGa4Fact = (fact: EvidenceFactV1): boolean => fact.method.name === 'ga4_channel_sessions'
 
@@ -901,12 +922,15 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // método, no indicadores para el cliente: no se dicen ni van como tarjeta; quedan en la tabla de respaldo.
     const factClaims = facts
       .filter(fact => !(moduleKey === 'aeo' && (fact.metricId.startsWith('dimension.') || isAeoSourceFact(fact) || fact.metricId.startsWith('ai_source.'))))
+      // Las visitas por red se dicen en su hallazgo (`socialSourceFinding`) y quedan en la tabla de GA4.
+      .filter(fact => !fact.metricId.startsWith('social_source.'))
       .map(fact => claimFor(fact, byId, input.locale, v2Context))
       // TASK-1962 — con v2, el Share of Voice de la marca lo dice la frase que lo compara con el líder: la cifra suelta
       // («Tu marca: 25,0 %») queda como respaldo.
       .map(claim => (editorialV2 && moduleKey === 'aeo' && claim.factIds.length === 1 && byId.get(claim.factIds[0]!)?.metricId === 'sov.brand' ? { ...claim, role: 'backing' as const } : claim))
       .concat(moduleKey === 'aeo' && editorialV2 ? aeoSourceFindings(facts, input.locale) : [])
       .concat(moduleKey === 'aeo' && editorialV2 ? ((claim => (claim ? [claim] : []))(aiSourceFinding(facts, input.locale))) : [])
+      .concat(moduleKey === 'seo' && editorialV2 ? ((claim => (claim ? [claim] : []))(socialSourceFinding(facts, input.locale))) : [])
 
     const uniformClaims: PlanClaimV1[] = []
     const charts: ChartSpecV1[] = []
@@ -923,6 +947,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       if (inStat.has(fact.factId) || targetMetrics.has(fact.metricId)) continue
       // Con v2 las visitas por asistente son la figura de composición de su total (`compositionChartsFor`) o su tablero.
       if (editorialV2 && fact.metricId.startsWith('ai_source.')) continue
+      // Las visitas por red no son una figura propia: van al hallazgo y a la tabla de GA4.
+      if (fact.metricId.startsWith('social_source.')) continue
 
       const key = chartGroupKeyOf(moduleKey, fact)
 
