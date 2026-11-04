@@ -12,8 +12,7 @@ y publicar `project/` en ese canvas.
 
 | PDF | Para quién |
 | --- | --- |
-| `pdf/BORRADOR-INTERNO - Propuesta completa - Intermedica - Efeonce (con cifras V3).pdf` | Julio: revisión con montos del V3 |
-| `pdf/1. Propuesta completa - Intermedica - Efeonce.pdf` | Forma cliente, montos en `[MONTO]` hasta aprobar |
+| `pdf/1. Propuesta completa - Intermedica - Efeonce.pdf` | Cliente, con cifras aprobadas por Julio el 04/11/2026 (`bash build-deck.sh montos` + `build-pdf.cjs deck-montos`) |
 
 ## Cómo se produce cada lámina (25)
 
@@ -30,7 +29,7 @@ Rehacer todo: `bash build-deck.sh montos && bash build-deck.sh cliente`, luego `
 
 ## Pendientes antes de enviar
 
-1. **Precios:** aprobar o ajustar las cinco líneas del V3 (Performance 3.640/mes · Medición 940/mes · Creatividad
+1. **Precios:** ✅ aprobados por Julio el 04/11/2026 — las cinco líneas del V3 (Performance 3.640/mes · Medición 940/mes · Creatividad
    590/mes · Preparación 2.270 · Landings 2.140). Un cambio se corre de nuevo en el V3; nunca se edita a mano.
 2. **Logo de Intermedica:** tomado de intermedica.pe y pasado a blanco (`logos/`). Falta autorizar su uso.
 3. **Registro mixto:** las láminas reutilizadas (12, 15, 20, 21, 22) tutean («mi pauta», «tu venta»); las nativas usan

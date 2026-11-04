@@ -128,6 +128,7 @@ en Perú como piloto opcional.
    Creatividad, Conversión web opcional) + preparación. Julio decide el precio final.
 3. **Registro:** «ustedes» formal.
 4. **Producción:** deck completo ahora (copy v2 + deck 16:9 Voice), montos en `[MONTO]` hasta aprobación.
+5. **Precios aprobados (04/11/2026):** Julio aprueba las cinco líneas del escenario intermedio V3 tal como salieron del cotizador: Performance USD 3.640/mes, Medición 940/mes, Creatividad 590/mes, Preparación 2.270 único, Landings 2.140 opcional. El PDF del cliente va con cifras.
 
 ### Escenario intermedio a costear
 

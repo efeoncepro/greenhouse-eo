@@ -1,5 +1,7 @@
 # Intermedica Perú · escenario intermedio (Cotizador V3)
 
+> **Delta 04/11/2026 — aprobado.** Julio aprueba las cinco líneas tal como salieron del cotizador (sin ajustes). La cotización formal A4 se emite con `compose document` cuando se pida.
+
 **04/11/2026 · INTERNO.** Cinco cotizaciones V3 separadas, una por servicio, para que Julio apruebe cifras. Todas
 `binding:false`, `reviewStatus: requires_review`, exit **3** (calculada en revisión) y replay `verified:true`.
 Catálogo `operating-review-2026-10-27-v14`, policy `operating-review-2026-10-22-v12`, créditos v1; `current show`
