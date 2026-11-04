@@ -1,0 +1,463 @@
+{
+  "schemaVersion": "pricing-v3-composition-summary/1",
+  "version": "pricing-v3-resource-composition/1",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "calculationId": "composition-b6d4e1274b7348dc0329080e",
+  "replayDigest": "b6d4e1274b7348dc0329080ebdbe94bfe263917136b889e578628b2314d1d6a3",
+  "calculationStatus": "calculated",
+  "reviewStatus": "requires_review",
+  "quoteReviewStatus": "requires_review",
+  "engineVersion": "pricing-v3-local/1.4.0",
+  "totals": {
+    "cost": "954.98",
+    "contingencyReserve": "85.20",
+    "contingencyBase": "710.00",
+    "contingencyReserveWaived": "0.00",
+    "marketAdjustment": "-78.88",
+    "engagementAdjustment": "204.33",
+    "undiscountedPrice": "2270.00",
+    "roundingAdjustment": "22.40",
+    "discount": "0.00",
+    "uplift": "0.00",
+    "net": "2270.00",
+    "marginAmount": "1315.02",
+    "marginRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+    "thirdPartyCost": "0.00",
+    "thirdPartyNet": "0.00",
+    "ownWorkMarginRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+    "tax": null,
+    "grandTotal": null,
+    "cashCommitment": "869.78",
+    "averageMonthlyNet": "2270.00",
+    "currency": "USD"
+  },
+  "commercialAdjustments": [],
+  "priceRounding": {
+    "currency": "USD",
+    "multiple": "10",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "rounding:USD",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marketFactor": {
+    "country": "PE",
+    "factor": "0.95",
+    "floorBasis": "base_market",
+    "recordId": "market:PE",
+    "revision": 3,
+    "sourceStatus": "confirmed"
+  },
+  "engagementForm": {
+    "form": "on_demand",
+    "priceRatio": "1.10",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "engagement:on_demand",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marginRateRoundedDown": "0.579303",
+  "ownWork": {
+    "cost": "954.98",
+    "net": "2270.00",
+    "marginAmount": "1315.02",
+    "marginRateRoundedDown": "0.579303"
+  },
+  "contingencyReserve": {
+    "rate": "0.12",
+    "base": "human",
+    "amount": "85.20",
+    "baseAmount": "710.00",
+    "shareOfNet": "0.037533",
+    "waived": false,
+    "recordId": "contingency:performance-commerce-distribution:on_demand",
+    "revision": 1,
+    "scope": {
+      "offerId": "performance-commerce-distribution",
+      "engagementForm": "on_demand"
+    },
+    "sourceStatus": "estimated"
+  },
+  "diagnostics": [],
+  "assumptions": [
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.tracking.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.web.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.lead.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    }
+  ],
+  "periods": [
+    {
+      "periodId": 1,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "954.98",
+        "contingencyReserve": "85.20",
+        "contingencyBase": "710.00",
+        "contingencyReserveWaived": "0.00",
+        "marketAdjustment": "-78.88",
+        "engagementAdjustment": "204.33",
+        "undiscountedPrice": "2270.00",
+        "roundingAdjustment": "22.40",
+        "discount": "0.00",
+        "uplift": "0.00",
+        "net": "2270.00",
+        "marginAmount": "1315.02",
+        "marginRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+        "thirdPartyCost": "0.00",
+        "thirdPartyNet": "0.00",
+        "ownWorkMarginRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "869.78",
+        "uniformMonthlyNet": "2270.00"
+      }
+    }
+  ],
+  "reviewSignals": [
+    {
+      "code": "ESTIMATED_SOURCE",
+      "severity": "review",
+      "count": 10,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [
+        "tracking",
+        "web",
+        "lead"
+      ],
+      "paths": [
+        "snapshot.contingencyReserve",
+        "request.lines.0.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-0",
+        "snapshot.resources.fee:ECG-031",
+        "request.lines.1.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-1",
+        "snapshot.resources.fee:ECG-012",
+        "request.lines.2.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-2",
+        "snapshot.resources.fee:ECG-008"
+      ]
+    },
+    {
+      "code": "HISTORICAL_ONLY",
+      "severity": "review",
+      "count": 1,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [],
+      "paths": [
+        "snapshot.mode"
+      ]
+    }
+  ],
+  "marginFloor": {
+    "source": "kernel:MARGIN_BELOW_FLOOR",
+    "flaggedLinePeriods": 0,
+    "lines": []
+  },
+  "toolSelections": {
+    "counts": {
+      "rows": 105,
+      "included": 6,
+      "clientProvided": 0,
+      "explicitlyExcluded": 0,
+      "notRequiredForWork": 99
+    },
+    "included": [
+      {
+        "lineId": "tracking",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "tracking",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "web",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "web",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lead",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lead",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ],
+    "clientProvided": [],
+    "explicitlyExcluded": []
+  },
+  "attributions": [
+    {
+      "toolId": "notion",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "3",
+      "serviceShare": "0.11",
+      "fullMonthlyCost": "72",
+      "attributedMonthlyCost": "7.92",
+      "unallocatedMonthlyCost": "64.08",
+      "consumerCount": 3,
+      "lineIds": [
+        "tracking",
+        "web",
+        "lead"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "3",
+      "serviceShare": "0.11",
+      "fullMonthlyCost": "44.1",
+      "attributedMonthlyCost": "4.851",
+      "unallocatedMonthlyCost": "39.249",
+      "consumerCount": 3,
+      "lineIds": [
+        "tracking",
+        "web",
+        "lead"
+      ],
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "creditBudgets": [],
+  "resourceIncrementalCash": [],
+  "cashLedger": [
+    {
+      "key": "human-monthly-and-once",
+      "amount": "869.78",
+      "currency": "USD",
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "cashMeaning": "Kernel cashCommitment is attributed modeled commitment, not incremental purchase or an invoice. Incremental cash here covers only declared credit top-ups; seat procurement is not inferred.",
+  "estimateExposure": {
+    "basis": "Shares of the frozen cost components; nothing is recalculated. marginRateLostIfTenPctHigher = 0.10 x costAtRisk / net.",
+    "currency": "USD",
+    "totalCost": "954.98",
+    "net": "2270.00",
+    "estimatedCost": "942.20",
+    "confirmedCost": "12.78",
+    "estimatedShareOfCost": "0.986618",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0.00",
+      "shareOfCost": "0.000000"
+    },
+    "priceInputs": [],
+    "estimatedRules": [
+      {
+        "kind": "contingency_reserve",
+        "side": "cost",
+        "ids": [
+          "contingency:performance-commerce-distribution:on_demand"
+        ],
+        "lineIds": [
+          "tracking",
+          "web",
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "kind": "allocation_policy",
+        "side": "cost",
+        "ids": [
+          "allocation:shared"
+        ],
+        "lineIds": [
+          "tracking",
+          "web",
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ],
+        "humanCostGoverned": "710.00",
+        "billedFteSetByRuleOn": []
+      },
+      {
+        "kind": "pricing_policy",
+        "side": "price",
+        "ids": [
+          "pricing:ECG-031:performance-commerce-distribution",
+          "pricing:ECG-012:performance-commerce-distribution",
+          "pricing:ECG-008:performance-commerce-distribution"
+        ],
+        "lineIds": [
+          "tracking",
+          "web",
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ],
+    "costInputs": [
+      {
+        "kind": "dedication",
+        "id": "lead",
+        "label": "Paid Media Manager",
+        "lineIds": [
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "347.20",
+        "shareOfCost": "0.363568",
+        "marginRateLostIfTenPctHigher": "0.015296"
+      },
+      {
+        "kind": "dedication",
+        "id": "tracking",
+        "label": "Analista de Implementación GA4/GTM/Looker",
+        "lineIds": [
+          "tracking"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "322.56",
+        "shareOfCost": "0.337766",
+        "marginRateLostIfTenPctHigher": "0.014210"
+      },
+      {
+        "kind": "dedication",
+        "id": "web",
+        "label": "Desarrollador WordPress",
+        "lineIds": [
+          "web"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "125.44",
+        "shareOfCost": "0.131354",
+        "marginRateLostIfTenPctHigher": "0.005526"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-008",
+        "label": "Historical generic platform fee — ECG-008",
+        "billing": "month",
+        "recordId": "fee:ECG-008",
+        "lineIds": [
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "49.00",
+        "shareOfCost": "0.051310",
+        "marginRateLostIfTenPctHigher": "0.002159"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-012",
+        "label": "Historical generic platform fee — ECG-012",
+        "billing": "month",
+        "recordId": "fee:ECG-012",
+        "lineIds": [
+          "web"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "49.00",
+        "shareOfCost": "0.051310",
+        "marginRateLostIfTenPctHigher": "0.002159"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-031",
+        "label": "Historical generic platform fee — ECG-031",
+        "billing": "month",
+        "recordId": "fee:ECG-031",
+        "lineIds": [
+          "tracking"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "49.00",
+        "shareOfCost": "0.051310",
+        "marginRateLostIfTenPctHigher": "0.002159"
+      }
+    ]
+  },
+  "fullDetail": "Derived from the frozen composition artifact. Every selection row, attribution assignment, kernel line with its cost components, per-period diagnostic and credit plan lives in that file under semantic.result."
+}

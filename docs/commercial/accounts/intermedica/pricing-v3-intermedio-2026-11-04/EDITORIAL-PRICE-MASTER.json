@@ -1,0 +1,354 @@
+{
+  "schemaVersion": "intermedica-pricing-editorial-summary/1",
+  "scenario": "intermedio",
+  "preparedOn": "2026-11-04",
+  "currency": "USD",
+  "binding": false,
+  "reviewStatus": "requires_review",
+  "taxTreatment": "not_resolved",
+  "internalOnly": [
+    "cost",
+    "marginRateRoundedDown",
+    "estimatedShareOfCost",
+    "lineFte",
+    "hours"
+  ],
+  "quotes": {
+    "i-performance": {
+      "artifact": "i-performance.artifact.json",
+      "offerId": "performance-commerce-distribution",
+      "engagementForm": "on_going",
+      "periods": 3,
+      "net": "10920.00",
+      "averageMonthlyNet": "3640.00",
+      "cost": "5097.84",
+      "contingencyReserve": null,
+      "marginRateRoundedDown": "0.533164",
+      "policy": {
+        "target": "0.55",
+        "floor": "0.45"
+      },
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedShareOfCost": "0.987477",
+      "replayDigest": "d1566b4b1ca7c57d65e42002fef9265ca13539c595907f71176e90087d50d95b",
+      "replayExitCode": 3,
+      "quoteExitCode": 3,
+      "runNotices": null,
+      "gaps": [
+        "ALLOCATION_EVIDENCE_REQUIRED",
+        "COMMERCIAL_APPROVAL_REQUIRED",
+        "DEDICATION_EVIDENCE_REVIEW",
+        "PROVISION_COST_EVIDENCE_REQUIRED",
+        "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+        "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+        "TAX_AND_ENTITY_REQUIRED",
+        "THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED",
+        "USER_ASSIGNMENT_REQUIRED"
+      ],
+      "lineFte": [
+        {
+          "lineId": "lead",
+          "profile": "ECG-008",
+          "fte": "0.3",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "buyer",
+          "profile": "ECG-009",
+          "fte": "0.25",
+          "talentCountry": "CL"
+        }
+      ],
+      "hoursPerMonth": {
+        "lead-direction": "10",
+        "lead-strategy": "6",
+        "lead-hypotheses": "9",
+        "lead-reading": "10",
+        "lead-optimization": "10",
+        "buyer-checks": "16",
+        "buyer-campaigns": "15",
+        "buyer-variants": "6.5"
+      }
+    },
+    "i-measurement": {
+      "artifact": "i-measurement.artifact.json",
+      "offerId": "performance-commerce-distribution",
+      "engagementForm": "on_going",
+      "periods": 3,
+      "net": "2820.00",
+      "averageMonthlyNet": "940.00",
+      "cost": "1303.74",
+      "contingencyReserve": null,
+      "marginRateRoundedDown": "0.537680",
+      "policy": {
+        "target": "0.55",
+        "floor": "0.45"
+      },
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedShareOfCost": "0.984859",
+      "replayDigest": "074728e3e2b30b046c201f1057adeaaf337ccf68219a23590e1b3e5c02a2b696",
+      "replayExitCode": 3,
+      "quoteExitCode": 3,
+      "runNotices": null,
+      "gaps": [
+        "ALLOCATION_EVIDENCE_REQUIRED",
+        "COMMERCIAL_APPROVAL_REQUIRED",
+        "DEDICATION_EVIDENCE_REVIEW",
+        "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+        "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+        "TAX_AND_ENTITY_REQUIRED",
+        "USER_ASSIGNMENT_REQUIRED"
+      ],
+      "lineFte": [
+        {
+          "lineId": "analyst",
+          "profile": "ECG-019",
+          "fte": "0.12",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "tracking",
+          "profile": "ECG-031",
+          "fte": "0.05",
+          "talentCountry": "CL"
+        }
+      ],
+      "hoursPerMonth": {
+        "analyst-dashboard": "12",
+        "analyst-reading": "6",
+        "tracking-maintenance": "7.5"
+      }
+    },
+    "i-creative": {
+      "artifact": "i-creative.artifact.json",
+      "offerId": "creative-managed-service",
+      "engagementForm": "on_going",
+      "periods": 3,
+      "net": "1770.00",
+      "averageMonthlyNet": "590.00",
+      "cost": "978.54",
+      "contingencyReserve": null,
+      "marginRateRoundedDown": "0.447152",
+      "policy": {
+        "target": "0.45",
+        "floor": "0.45"
+      },
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedShareOfCost": "0.938745",
+      "replayDigest": "e3ce24d27f0102e85dee6b92c92581ee885d6e431fb24e7ba361708fc066728a",
+      "replayExitCode": 3,
+      "quoteExitCode": 3,
+      "runNotices": {
+        "priceDates": {
+          "withinDays": 30,
+          "reviewDue": [],
+          "dueSoon": [
+            {
+              "subject": "tool_price",
+              "ref": "adobe:current",
+              "toolId": "adobe",
+              "priceId": "current",
+              "label": "Adobe Creative Cloud Pro",
+              "kind": "review",
+              "date": "2026-11-16",
+              "blocksWith": null,
+              "daysLeft": 12
+            }
+          ],
+          "expired": []
+        }
+      },
+      "gaps": [
+        "ALLOCATION_EVIDENCE_REQUIRED",
+        "COMMERCIAL_APPROVAL_REQUIRED",
+        "DEDICATION_EVIDENCE_REVIEW",
+        "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+        "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+        "TAX_AND_ENTITY_REQUIRED",
+        "USER_ASSIGNMENT_REQUIRED"
+      ],
+      "lineFte": [
+        {
+          "lineId": "design",
+          "profile": "ECG-003",
+          "fte": "0.12",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "copy",
+          "profile": "ECG-011",
+          "fte": "0.06",
+          "talentCountry": "CL"
+        }
+      ],
+      "hoursPerMonth": {
+        "design-masters": "12",
+        "design-adaptations": "6",
+        "copy-concepts": "9"
+      }
+    },
+    "i-web-conversion": {
+      "artifact": "i-web-conversion.artifact.json",
+      "offerId": "performance-commerce-distribution",
+      "engagementForm": "on_demand",
+      "periods": 1,
+      "net": "2140.00",
+      "averageMonthlyNet": "2140.00",
+      "cost": "891.96",
+      "contingencyReserve": "66.93",
+      "marginRateRoundedDown": "0.583196",
+      "policy": {
+        "target": "0.55",
+        "floor": "0.45"
+      },
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedShareOfCost": "0.975089",
+      "replayDigest": "801c51385f3a073cc436984af1d68b8e327ecc5295bc5b31b30cda977236cab7",
+      "replayExitCode": 3,
+      "quoteExitCode": 3,
+      "runNotices": {
+        "priceDates": {
+          "withinDays": 30,
+          "reviewDue": [],
+          "dueSoon": [
+            {
+              "subject": "tool_price",
+              "ref": "adobe:current",
+              "toolId": "adobe",
+              "priceId": "current",
+              "label": "Adobe Creative Cloud Pro",
+              "kind": "review",
+              "date": "2026-11-16",
+              "blocksWith": null,
+              "daysLeft": 12
+            }
+          ],
+          "expired": []
+        }
+      },
+      "gaps": [
+        "ALLOCATION_EVIDENCE_REQUIRED",
+        "COMMERCIAL_APPROVAL_REQUIRED",
+        "DEDICATION_EVIDENCE_REVIEW",
+        "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+        "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+        "TAX_AND_ENTITY_REQUIRED",
+        "USER_ASSIGNMENT_REQUIRED"
+      ],
+      "lineFte": [
+        {
+          "lineId": "lead",
+          "profile": "ECG-008",
+          "fte": "0.03",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "copy",
+          "profile": "ECG-011",
+          "fte": "0.06",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "design",
+          "profile": "ECG-003",
+          "fte": "0.08",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "web",
+          "profile": "ECG-012",
+          "fte": "0.14",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "tracking",
+          "profile": "ECG-031",
+          "fte": "0.04",
+          "talentCountry": "CL"
+        }
+      ],
+      "hoursPerMonth": {
+        "lead-brief": "4",
+        "copy-landing": "8",
+        "design-landing": "12",
+        "web-build": "20",
+        "tracking-landing": "6"
+      }
+    },
+    "i-preparation": {
+      "artifact": "i-preparation.artifact.json",
+      "offerId": "performance-commerce-distribution",
+      "engagementForm": "on_demand",
+      "periods": 1,
+      "net": "2270.00",
+      "averageMonthlyNet": "2270.00",
+      "cost": "954.98",
+      "contingencyReserve": "85.20",
+      "marginRateRoundedDown": "0.579303",
+      "policy": {
+        "target": "0.55",
+        "floor": "0.45"
+      },
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedShareOfCost": "0.986618",
+      "replayDigest": "b6d4e1274b7348dc0329080ebdbe94bfe263917136b889e578628b2314d1d6a3",
+      "replayExitCode": 3,
+      "quoteExitCode": 3,
+      "runNotices": null,
+      "gaps": [
+        "ALLOCATION_EVIDENCE_REQUIRED",
+        "COMMERCIAL_APPROVAL_REQUIRED",
+        "DEDICATION_EVIDENCE_REVIEW",
+        "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+        "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+        "TAX_AND_ENTITY_REQUIRED",
+        "USER_ASSIGNMENT_REQUIRED"
+      ],
+      "lineFte": [
+        {
+          "lineId": "tracking",
+          "profile": "ECG-031",
+          "fte": "0.16",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "web",
+          "profile": "ECG-012",
+          "fte": "0.07",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "lead",
+          "profile": "ECG-008",
+          "fte": "0.1",
+          "talentCountry": "CL"
+        }
+      ],
+      "hoursPerMonth": {
+        "tracking-prep": "24",
+        "web-prep": "10",
+        "lead-prep": "14"
+      }
+    }
+  },
+  "totals": {
+    "monthlyWithoutCreative": "4580.00",
+    "monthlyWithCreative": "5170.00",
+    "preparationOnce": "2270.00",
+    "webConversionOnceOptional": "2140.00",
+    "prepPlus3MonthsWithoutCreative": "16010.00",
+    "prepPlus3MonthsWithCreative": "17780.00",
+    "prepPlus3MonthsWithCreativeAndWeb": "19920.00",
+    "mediaCeilingMonthlyClientDirect": "2000.00",
+    "mediaCeiling3MonthsClientDirect": "6000.00",
+    "internal": {
+      "costPrepPlus3MonthsWithCreative": "8335.10",
+      "aggregateMarginWithCreative": "0.5312"
+    }
+  }
+}

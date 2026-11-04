@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-04",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "intermedica-pe-intermedio-2026-11-04",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "lead",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [
+        {
+          "requirementId": "assurance",
+          "resourceId": "provision-backfill-coverage"
+        }
+      ]
+    },
+    {
+      "lineId": "buyer",
+      "profile": "ECG-009",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  },
+  "thirdPartyCosts": [
+    {
+      "costId": "media-client-direct",
+      "category": "media",
+      "label": "Techo de planificacion de medios; requiere aprobacion del cliente",
+      "supplier": "Plataformas publicitarias; mix por validar",
+      "settlement": "client_direct",
+      "amount": "2000",
+      "currency": "USD",
+      "quantity": "1",
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "evidence": {
+        "reference": "intermedica:plan-intermedio-04nov:medios-client-direct-sin-compromiso",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ]
+}

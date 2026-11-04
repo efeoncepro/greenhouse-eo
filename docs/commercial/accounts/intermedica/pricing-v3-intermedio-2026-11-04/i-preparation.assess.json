@@ -1,0 +1,216 @@
+{
+  "calculationStatus": "calculated",
+  "commercialStatus": "requires_review",
+  "binding": false,
+  "gapOccurrences": 11,
+  "gaps": [
+    {
+      "code": "COMMERCIAL_APPROVAL_REQUIRED",
+      "path": "quote",
+      "owner": "Commercial/Finance",
+      "action": "Review scope, complete costs, terms and the selling policy before issuing a quote."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.notion",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.notion",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "tools.microsoft-365",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "ALLOCATION_EVIDENCE_REQUIRED",
+      "path": "tools.microsoft-365",
+      "owner": "Operations",
+      "action": "The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "code": "USER_ASSIGNMENT_REQUIRED",
+      "path": "work.assigneeIds",
+      "owner": "Operations",
+      "action": "3 of the people the tools of this quote are attributed to are planning slots (ids that start with planned-): nobody is assigned to them yet. A slot stays as it is until a specific person is assigned; then replace it with a stable anonymous id and confirm the licensed access of that person to each tool."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.tracking.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.web.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "DEDICATION_EVIDENCE_REVIEW",
+      "path": "lines.lead.dedicationEvidence",
+      "owner": "Practice/Operations",
+      "action": "The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover."
+    },
+    {
+      "code": "TAX_AND_ENTITY_REQUIRED",
+      "path": "quote",
+      "owner": "Finance",
+      "action": "Resolve contractual entity, currency and applicable tax treatment."
+    },
+    {
+      "code": "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+      "path": "commercialUnit",
+      "owner": "Practice/Commercial",
+      "action": "Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract."
+    }
+  ],
+  "costEvidencePriority": {
+    "currency": "USD",
+    "estimatedCost": "942.20",
+    "confirmedCost": "12.78",
+    "estimatedShareOfCost": "0.986618",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0.00",
+      "shareOfCost": "0.000000"
+    },
+    "confirmFirst": [
+      {
+        "kind": "dedication",
+        "id": "lead",
+        "label": "Paid Media Manager",
+        "lineIds": [
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "347.20",
+        "shareOfCost": "0.363568",
+        "marginRateLostIfTenPctHigher": "0.015296"
+      },
+      {
+        "kind": "dedication",
+        "id": "tracking",
+        "label": "Analista de Implementación GA4/GTM/Looker",
+        "lineIds": [
+          "tracking"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "322.56",
+        "shareOfCost": "0.337766",
+        "marginRateLostIfTenPctHigher": "0.014210"
+      },
+      {
+        "kind": "dedication",
+        "id": "web",
+        "label": "Desarrollador WordPress",
+        "lineIds": [
+          "web"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "125.44",
+        "shareOfCost": "0.131354",
+        "marginRateLostIfTenPctHigher": "0.005526"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-008",
+        "label": "Historical generic platform fee — ECG-008",
+        "billing": "month",
+        "recordId": "fee:ECG-008",
+        "lineIds": [
+          "lead"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "49.00",
+        "shareOfCost": "0.051310",
+        "marginRateLostIfTenPctHigher": "0.002159"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-012",
+        "label": "Historical generic platform fee — ECG-012",
+        "billing": "month",
+        "recordId": "fee:ECG-012",
+        "lineIds": [
+          "web"
+        ],
+        "periodIds": [
+          1
+        ],
+        "costAtRisk": "49.00",
+        "shareOfCost": "0.051310",
+        "marginRateLostIfTenPctHigher": "0.002159"
+      }
+    ]
+  },
+  "margin": {
+    "modeledRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+    "ownWorkRate": "0.57930396475770925110132158590308370044052863436123348017621145374449339207048458",
+    "approved": false,
+    "pricingPolicies": [
+      {
+        "offerId": "performance-commerce-distribution",
+        "engagementCode": "monthly",
+        "method": "target_margin",
+        "rate": "0.55",
+        "basis": "all_costs",
+        "minimumMargin": "0.45",
+        "sourceStatus": "estimated",
+        "lineIds": [
+          "tracking",
+          "web",
+          "lead"
+        ]
+      }
+    ],
+    "belowPolicyFloor": false,
+    "policyFloor": {
+      "source": "kernel:MARGIN_BELOW_FLOOR",
+      "marketFactor": {
+        "country": "PE",
+        "factor": "0.95",
+        "floorBasis": "base_market",
+        "recordId": "market:PE",
+        "revision": 3,
+        "sourceStatus": "confirmed"
+      },
+      "engagementForm": {
+        "form": "on_demand",
+        "priceRatio": "1.10",
+        "scope": "general",
+        "offerId": null,
+        "recordId": "engagement:on_demand",
+        "revision": 1,
+        "sourceStatus": "confirmed"
+      },
+      "linesBelowFloor": []
+    }
+  }
+}

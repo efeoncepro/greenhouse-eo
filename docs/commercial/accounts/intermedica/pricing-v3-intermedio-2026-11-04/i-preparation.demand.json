@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-11-04",
+    "offerId": "performance-commerce-distribution",
+    "engagementCode": "monthly",
+    "engagementForm": "on_demand",
+    "accountId": "intermedica-pe-intermedio-2026-11-04",
+    "offerMarketCountry": "PE",
+    "outputCurrency": "USD",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "tracking",
+        "profile": "ECG-031",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.16"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-i-preparation-2026-11-04-v1",
+          "effectiveFrom": "2026-11-04",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "web",
+        "profile": "ECG-012",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.07"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-i-preparation-2026-11-04-v1",
+          "effectiveFrom": "2026-11-04",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "lead",
+        "profile": "ECG-008",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-i-preparation-2026-11-04-v1",
+          "effectiveFrom": "2026-11-04",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "tracking",
+      "assigneeIds": [
+        "planned-tracking-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "web",
+      "assigneeIds": [
+        "planned-web-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "lead",
+      "assigneeIds": [
+        "planned-lead-1"
+      ],
+      "tasks": [
+        "digital-strategy"
+      ],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.11",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "3",
+        "allocatedUnits": "0.33"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-i-preparation;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.11",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "3",
+        "allocatedUnits": "0.33"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-i-preparation;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

@@ -1,5 +1,11 @@
 # Intermedica — expediente de propuesta
 
+> **Delta 04/11/2026 — v2 vigente.** Estructura nueva que responde a las cuatro preguntas de Nikol, con portafolio en
+> tres capas, equipo por funciones y tarifa por servicio: [ESTRUCTURA-OFERTA-2026-11-04.md](ESTRUCTURA-OFERTA-2026-11-04.md).
+> Escenario intermedio V3 (`requires_review`): [pricing-v3-intermedio-2026-11-04/INTERMEDIO.md](pricing-v3-intermedio-2026-11-04/INTERMEDIO.md).
+> Deck de 24 láminas en línea Voice: `ai-generations/2026-11-04_propuesta-intermedica/` (LEEME con pendientes).
+> Decisiones de Julio: Efeonce no gestiona hoy a Technogym; registro «ustedes». La propuesta del 28/10 queda como insumo.
+
 Punto de entrada actual: [Propuesta completa para Claude Design](PROPUESTA-INTERMEDICA-PARA-CLAUDE-DESIGN.md) · [Caso profundizado interno](CASO-DE-NEGOCIO-PROFUNDIZADO-INTERNO.md) · [Instrucciones de diseño](INSTRUCCIONES-CLAUDE-DESIGN-INTERNO.md).
 
 Preparado el 28/10/2026 por mandato de Julio Reyes. **Prospección previa confirmada en LinkedIn: Julio, 5 OCT20:39, «Agencia de contenido360°»**; Nikol ahora solicita propuesta para Intermedica. Investigación de Intermedica Solutions Perú; Technogym separado. Propuesta económica y capacidad aún por revisar.

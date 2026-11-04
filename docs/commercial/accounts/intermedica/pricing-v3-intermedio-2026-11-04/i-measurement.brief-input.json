@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-04",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "intermedica-pe-intermedio-2026-11-04",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "analyst",
+      "profile": "ECG-019",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "tracking",
+      "profile": "ECG-031",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}
