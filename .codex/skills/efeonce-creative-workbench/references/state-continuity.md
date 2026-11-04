@@ -10,12 +10,13 @@ revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cóm
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 21; seis páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 23; siete páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH |
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
 (`~/Downloads/SKY-CyberSky-Peru-adaptaciones.pdf`, 23 MB); BLACK con 12 KV fijos, 12 animados
-(GIF, MP4 y MP4 con audio) y 24 estáticos popup/story. Entregables locales no versionados en
+(GIF, MP4 y MP4 con audio), 24 estáticos popup/story, PMAX de los 12 KV (con el 1200×628 nuevo) y HPH
+genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos. Entregables locales no versionados en
 `ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; sus
 scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. OneDrive no se modificó.
 
@@ -31,6 +32,9 @@ Pendientes sin confirmar por el operador:
   unificados). Logos de alianza y URL no están puestos en ningún KV. Derechos de la foto del KV
   y de la medalla de Puntualidad (generadas con IA) sin validar antes de pautar.
 - «Internacional» en AR, UY, BR y US: corregido el 2026-11-04 en los 24 estáticos y en las 4 animaciones.
+- HPH por mercado: confirmar con el operador que lleve precio (el genérico de Chile no lo lleva),
+  las traducciones del botón («Ver voos», «See flights») y que Perú use el KV internacional. El
+  legal de 300×600 y 300×250 queda a ~6 px: legible sólo como mención.
 
 ## Berel en el Workbench — corte 2026-11-02
 

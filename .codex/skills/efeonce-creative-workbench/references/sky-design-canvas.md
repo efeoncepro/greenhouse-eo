@@ -44,6 +44,7 @@ en el DS** aunque las piezas la usan; en los renders locales se toma de OneDrive
 | 4 | KV Black · HM | 12 KV BLACK como imagen fija 1080×1350 (render del SVG original con Metric) |
 | 5 | KV Black · Animación GIF | 12 KV animados (`<video>` MP4 en bucle, autoplay muted, poster = KV fijo), las 6 referencias del kit como video y una previa MP4 con audio |
 | 6 | KV Black · Popup y Story | 24 estáticos: 12 popup 1080×1080 + 12 story 1080×1920 |
+| 7 | KV Black · PMAX y HPH | PMAX por KV (1080×1080, 1080×1350, 1080×1920 y 1200×628: 48 artboards) y HPH (genérico Chile + PE INTER, AR, UY, BR, US en 1200×1200, 300×600, 300×250 y 728×90: 24 artboards) |
 
 Los 12 KV BLACK: PE DOM, PE DOM-RUTA, PE INTER, PE INTER-RUTA, CL DOM, CL INTER, AR, UY, BR, US,
 CL DOM CLUSTER (regiones) y CL INTER CLUSTER (banderas). La previa con audio de la página 5 es
@@ -222,6 +223,40 @@ más abajo.
 golpe en 1,37 s coincide con el precio quedando fijo. Viene a −10,9 LUFS con true peak +0,6 dBFS;
 en los MP4 se bajó **−3 dB con limitador** (pico −0,3 dBFS).
 
+## PMAX y HPH (banners)
+
+**PMAX** (Google Performance Max: 1080×1080, 1080×1350, 1080×1920 y 1200×628) se arma para los 12
+KV. Los tres primeros reusan el popup, el KV fijo y la story; sólo el **1200×628** es nuevo. Se
+compone en HTML (Playwright, render a 2x, entrega 1x y `_2x`) desde las partes del KV y la foto
+fuente:
+
+| KV | Foto | Elementos (escala) |
+| --- | --- | --- |
+| Estándar | Fuente a 1,0, centro de la mujer en x=960, fila v=160 arriba | Logo 0,8 arriba a la izquierda; destino 0,8 a la izquierda; precio + badge 0,8 al centro; pie 0,8 abajo |
+| Clúster nacional | Fuente a 1,05, centro en x=1000 | Logo 0,62; lista en 3 columnas a 0,56 a la derecha del logo; destino 0,66; precio 0,66 bajo la lista |
+| Clúster internacional | Fuente a 1,05, centro en x=980 | Logo 0,72; lista de banderas 0,47; precio 0,72 |
+
+La mujer se corre a la derecha para que el badge no le tape la cara (con el centro en x=900 la
+tapaba). Degradado inferior para el legal y oscurecido izquierdo en los clústeres.
+
+**HPH** (1200×1200, 300×600, 300×250, 728×90). Las referencias están en
+`KV X HM/HPH/HPH_<formato>_GENERICO.svg` (Chile internacional con banderas, «CON GRANDES
+DESCUENTOS», sin precio, botón «Ver vuelos» en Source Sans 3):
+
+- **Genérico Chile:** se renderiza el SVG tal cual con Metric y **Source Sans 3** (descargada con
+  autorización del operador desde el repo oficial de Adobe, licencia OFL). En el 728×90 las 6
+  banderas venían en blanco (rasters enmascarados vacíos): se reponen recortándolas del render
+  del 1200×1200 (orden BR, PE, AR, DO, US, UY) con máscara circular sobre los círculos blancos.
+  Las imágenes de estas referencias son raster a tamaño 1x: el 2x no agrega detalle.
+- **Por mercado** (PE INTER, AR, UY, BR, US): misma distribución que el genérico, pero con el
+  contenido del KV de cada mercado (logo en su idioma, destino, flecha de precio con badge) en
+  vez de la lista de banderas, que sólo existe para Chile. Legal: el completo del KV en el
+  1200×1200; en 300×600 y 300×250 la versión corta «Aplican TyC en …» con la URL del legal del
+  KV (como el genérico); el 728×90 va sin legal, como el genérico. Botón: «Ver vuelos» (ES),
+  «Ver voos» (PT) y «See flights» (EN); las dos últimas son traducción propia, sin confirmar.
+- En el 728×90 el rostro llena el alto entre el badge y el botón; el badge va a la derecha de la
+  flecha porque en su posición del KV queda fuera del alto.
+
 ## Lecciones de la plataforma Claude Design
 
 | Comportamiento | Qué hacer |
@@ -235,13 +270,15 @@ en los MP4 se bajó **−3 dB con limitador** (pico −0,3 dBFS).
 | Ver un artboard en vivo | Vista «play» (`#play-<id>`) |
 | Comentarios | Llegan como hilos anclados a un artboard; responder en el mismo hilo |
 
+- Un archivo publicado con «@» en el nombre (`x@2x.png`) no carga en el artboard; usar `x_2x.png`.
+
 ## Entregables y scripts locales
 
 Fuera de Git (no versionados), en el checkout de Greenhouse:
 
 | Ruta | Contenido |
 | --- | --- |
-| `ai-generations/2026-11-04_sky-black-gif/` | 12 GIF, 12 MP4 sin audio, 12 `*_audio.mp4`; `estaticos/` con los 24 PNG; `scripts/` (render, partes, animación, frames, composición de formatos, páginas del canvas) |
+| `ai-generations/2026-11-04_sky-black-gif/` | 12 GIF, 12 MP4 sin audio, 12 `*_audio.mp4`; `estaticos/` con los 24 PNG; `pmax/` (48 PNG, más los 1200×628 `_2x`); `hph/` (24 piezas en 1x y `_2x`); `scripts/` (render, partes, animación, frames, formatos, `banners.cjs`, `generic.cjs`, páginas del canvas) |
 | `ai-generations/2026-11-04_sky-cybersky-peru/` | Selfies generadas, grado de color y scripts |
 
 Los scripts (`patches.cjs`, `parts.cjs`, `grado.cjs` y los de render/animación) tienen rutas

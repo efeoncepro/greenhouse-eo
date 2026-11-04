@@ -1,7 +1,7 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-11-04 por Claude
 > **Ultima actualizacion:** 2026-11-04 por Claude
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
@@ -110,7 +110,18 @@ Usa la foto **original** del KV re-encuadrada para el nuevo formato; no inventes
 bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada formato están en la
 [doc funcional](../../documentation/creative/adaptaciones-sky-en-claude-design.md#popup-y-story).
 
-### 7. Revisar con comentarios en el canvas
+### 7. Armar PMAX y HPH
+
+- **PMAX** (1080×1080, 1080×1350, 1080×1920 y 1200×628) va para cada KV. Los tres primeros son el popup, el KV y la
+  story que ya existen; sólo se arma el **1200×628**, con la mujer a la derecha para que el badge no le tape la cara.
+- **HPH** (1200×1200, 300×600, 300×250 y 728×90) parte de las referencias `HPH_<formato>_GENERICO.svg` de la carpeta
+  `KV X HM/HPH`. El genérico es de Chile internacional, con banderas y sin precio. Si el 728×90 trae las banderas en
+  blanco, se reponen desde el 1200×1200. El botón «Ver vuelos» usa Source Sans 3.
+- **HPH por mercado:** misma distribución con el logo, el destino y el precio del KV de cada mercado. En los formatos
+  chicos el legal va corto («Aplican TyC en …»). Confirma con el operador si lleva precio y las traducciones del botón
+  antes de entregar.
+
+### 8. Revisar con comentarios en el canvas
 
 - El operador comenta sobre la pieza; cada comentario llega como un hilo anclado a un artboard. Responde en el mismo
   hilo qué cambiaste.
@@ -118,14 +129,14 @@ bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada 
 - Corrige en la plantilla o en los datos cuando el cambio aplica a todos los destinos, y en la pieza sólo cuando es
   propio de ella.
 
-### 8. Exportar
+### 9. Exportar
 
 | Entregable | Cómo se obtuvo en el caso fuente |
 |---|---|
 | **PDF** de adaptaciones | Render local con las mismas plantillas del canvas. CyberSky: 66 páginas, JPEG calidad 90, primero internacionales y luego nacionales, en orden popup → post → story |
 | **GIF** | Render local cuadro a cuadro, 25 fps, en bucle, con paleta por archivo |
 | **MP4** | Render local; una versión sin audio y otra con audio (`*_audio.mp4`) |
-| **PNG** | Los estáticos de popup y story, en `estaticos/` |
+| **PNG** | Los estáticos de popup y story, en `estaticos/`; PMAX en `pmax/` y HPH en `hph/`, en 1x y `_2x` |
 
 Los entregables quedan en `ai-generations/` (por ejemplo, `ai-generations/2026-11-04_sky-black-gif/`) y no se
 versionan en el repo.
@@ -140,6 +151,7 @@ versionan en el repo.
 | **KV Black · HM** | Los 12 KV de BLACK como imagen fija 1080×1350 |
 | **KV Black · Animación GIF** | Los 12 KV animados (video en bucle), las 6 referencias de animación del kit y una previa MP4 con audio |
 | **KV Black · Popup y Story** | 24 estáticos: 12 popup 1080×1080 y 12 story 1080×1920 |
+| **KV Black · PMAX y HPH** | El paquete PMAX de cada KV (4 formatos) y el HPH genérico de Chile más PE, AR, UY, BR y US (4 formatos) |
 
 ## Qué no hacer
 
@@ -167,6 +179,8 @@ versionan en el repo.
 | El legal queda sobre la ropa en popup o story | Se agrega un degradado oscuro inferior detrás del pie |
 | La foto generada trae un aro negro en las esquinas | Es el lente ojo de pez del celular. Pide en el prompt «no circular frame, no black ring, no vignette» y revisa el encuadre |
 | Ojos saltones o pecas en todos | Pide tamaño de iris y párpados naturales, que la sorpresa se lea en cejas, boca y manos, y describe la piel de cada persona sin pecas salvo que se pidan |
+| Una imagen del artboard aparece rota | Si su nombre tiene «@» (`x@2x.png`) el canvas no la sirve. Renómbrala sin «@» (`x_2x.png`) |
+| Las banderas del HPH 728×90 salen en blanco | Vienen como imágenes vacías en el SVG. Repón las banderas recortadas del 1200×1200 con máscara circular |
 | Un cambio del Design System no se ve en el canvas | El DS va instalado por copia dentro del canvas; hay que actualizar esa copia |
 
 ## Referencias técnicas
