@@ -101,6 +101,34 @@ FILL del photo slot. Proyectar reservas al encuadre efectivo. Una foto 1536×102
 No cambiar texto blanco, paints, coordenadas o añadir scrim para esconder un fondo incompatible.
 Elegir/admitir foto o formato adecuados al brief y medir contraste en la composición final.
 
+## Excepción de evento: selfies generadas de CyberSky Perú — 2026-11-04
+
+Fotografía **generada para una campaña de evento**, adaptada en Claude Design
+([sky-design-canvas.md](sky-design-canvas.md)). Se desvía de las reglas de SKY Performance de
+esta guía: selfie de celular con ojo de pez en vez de gramática editorial documental, sorpresa
+actuada («viajeros sorprendidos por precios que sorprenden»), modelo distinto del piloto admitido
+y prompt fuera del pack (no pasó por `compose.py` ni por admisión). Es una excepción de esa pieza:
+no cambia el canon ni sirve de receta para Personas.
+
+Producción: 21 selfies con GPT Image (`gpt-image-2.5-flare`, 1536×1536, quality high, clave
+personal del operador vía `pnpm ai:image --openai-key personal` y autorización explícita), una
+persona o grupo distinto por destino; Río usa la foto del KV original. Costo aproximado en la
+sesión: ~USD 5,3 (rondas previas ~3,4 + piloto v3 ~0,3 + 21 v4 ~1,6).
+
+| Falla observada | Causa | Corrección en el prompt v4 |
+| --- | --- | --- |
+| Aro negro circular en las esquinas | Lente ojo de pez del celular, sin imagen de referencia | «no circular frame, no black ring, no vignette»; en Río se ajustó el encuadre para que no asome el aro |
+| Ojos saltones | Pedir «ojos abiertos con el blanco visible» | «natural iris size and natural eyelids, never bulging»; la sorpresa se lee por cejas, boca y manos |
+| Pecas en todas las personas | Sin indicación, el modelo las pone por defecto | Describir la piel por persona y «Do not add freckles unless stated» |
+| Piel plástica o retocada | Falta de instrucciones de realismo | Poros, asimetrías, pelos sueltos, dientes naturales, «no beauty filter, no plastic skin» |
+
+**Luz:** dos recetas con bokeh redondo, **DUSK** (hora azul) y **GOLD** (hora dorada). Tercio
+superior de cielo limpio para el lockup; rostros en el tercio inferior derecho.
+
+**Grado común:** para que las 21 fotos convivan con la del KV, cada una se acerca en media y
+desviación por canal RGB a la foto de referencia del KV, con intensidad parcial (script
+`grado.cjs`, en `ai-generations/2026-11-04_sky-cybersky-peru/`).
+
 ## Evaluar y corregir
 
 Abrir PNG real. Informar por criterio cumple / requiere ajuste / no verificable / no aplica:
@@ -114,7 +142,8 @@ negative de generación “sky replacement” no se reutiliza a ciegas para una 
 El soporte efectivo de edición depende del adapter/pack actual: no usar API cruda para obtenerlo.
 Las restricciones de costo del harness prevalecen sobre un bucle de correcciones sugerido.
 
-Una excepción explícita para una pieza no modifica permanentemente la marca. Cambiar reglas
+Una excepción explícita para una pieza no modifica permanentemente la marca (caso: la
+excepción de evento de CyberSky, arriba). Cambiar reglas
 o maestros requiere companion de mantenimiento, alcance, evidencia y revisión. Conservar
 fuentes originales y rechazos. Confirmación del estilo de una foto no aprueba texto/contraste
 ni publicación del KV resultante.

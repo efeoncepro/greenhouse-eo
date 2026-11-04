@@ -2,6 +2,7 @@
 
 Registro de causas verificadas durante el onboarding SKY, hasta 2026-09-30. Aplicar a la variante/
 contrato que respalda cada caso, sin transformar un ejemplo en excepción general de marca.
+Los casos de Claude Design y del kit BLACK (2026-11-04) están en su propia sección, más abajo.
 
 | Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
 | --- | --- | --- |
@@ -49,6 +50,21 @@ contrato que respalda cada caso, sin transformar un ejemplo en excepción genera
 | Primer token válido se extiende a todos los miembros | Canary9/9 probó sólo al operador, scope de un repo y revocación de cuatro tokens | Separar mint/token/identidad positiva del operador y admisión individual del resto |
 | Canary sin pago se presenta como readiness para gastar | IA OFF y quotes0 no prueban quote/budget o ruta pagada | OAuth propio, presupuesto admitido y autorización del pago antes de cualquier canary de costo |
 | Fusionar nueva CLI para probar endpoint aún ausente | Cliente requiere contrato que runtime no admite | PR draft, backend admitido/readback IA OFF antes de merge; sin broad-token fallback |
+
+## Claude Design y kit «Despliegue Base» BLACK — 2026-11-04
+
+Casos de la sesión SKY en el canvas de Claude Design ([sky-design-canvas.md](sky-design-canvas.md)).
+Son bocetos de revisión, no corridas de Workbench; las correcciones se hicieron sobre el render,
+nunca en el archivo del cliente.
+
+| Síntoma o afirmación | Causa / evidencia útil | Acción correcta |
+| --- | --- | --- |
+| Línea fina en la flecha morada del KV renderizado | SVG de Illustrator con piezas adyacentes (cola, rectángulo 537,61–918,96, punta): el antialias deja una junta de 1 px | En el render, ensanchar 1 px por lado la pieza central; pedir a la fuente unir las 3 formas. Misma familia que «Línea blanca en unión de flecha» (arriba) |
+| «Internacional» desaparece en popup/story de AR, UY, BR y US | El elemento es más ancho que la región en que se descompone el KV y queda fuera de su parte; la suma base + partes = KV no lo delata | Comparar la foto separada contra la foto fuente recolocada: lo que difiere es un elemento que quedó atrás. Se amplió la región de destino de x=420 a x=530 y se rehicieron los 24 estáticos y las 4 animaciones |
+| La animación CSS no se mueve en el canvas | Claude Design muestra los artboards como «Static artboards» y congela CSS | Renderizar cuadro a cuadro a MP4 y publicar `<video>`; el MP4 va como asset (`/_blob/<id>`), no como archivo del proyecto |
+| El GIF/MP4 arranca con cuadros que no corresponden a t=0 | La captura llega con 2 cuadros de retraso | Descartar los 2 primeros cuadros capturados antes de codificar |
+| La bandera o el logo usado no es el del mercado | Archivos del kit mal nombrados: `BANDERA CL (CIRCULO)_1.svg` es Argentina, `SKY-13.svg` es Brasil, logo BR con nombre «Mesa de trabajo 1 copia 2» | Identificar cada asset por lo que muestra, no por su nombre; reportar el error a la fuente sin renombrar en OneDrive |
+| Franja clara arriba en el clúster internacional | El oscurecido izquierdo (Raster 4, opacidad .67, con máscara) empieza en y=6 | Estirarlo hasta el borde en el render; pedir a la fuente subir la capa a y=0. Revisar los bordes de toda capa de oscurecido |
 
 ## Propuestas rechazadas o retiradas
 

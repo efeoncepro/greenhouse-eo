@@ -2,6 +2,21 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-04 — SKY en Claude Design: CyberSky Perú y kit BLACK
+
+**Artifacts privados:** DS [«SKY Airline — Performance»](https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei) (desde las
+126 adaptaciones del pack SKY 0.1.0; Metric Regular/Semibold/Bold/Black, **sin Medium**) y canvas
+[«SKY CyberSky Perú — Adaptaciones»](https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee) (v21; DS instalado por copia).
+Páginas: Internacionales + Nacionales (66 piezas CyberSky, 22 destinos × popup/post/story), Plantillas, KV Black · HM
+(12 KV fijos), KV Black · Animación GIF (12 videos en bucle + 6 referencias + previa con audio), KV Black · Popup y
+Story (24 estáticos). **Local, sin versionar:** PDF de 66 páginas en `~/Downloads/`; `ai-generations/2026-11-04_sky-black-gif/`
+(12 GIF, 12 MP4, 12 MP4 con audio, `estaticos/`, `scripts/`) y `ai-generations/2026-11-04_sky-cybersky-peru/` (21 selfies
+GPT Image, ~USD 5,3 con clave personal autorizada). **Sin confirmar por el operador:** «S/» vs «$/», miles con coma, origen
+Lima, tramo del legal y elementos sólo de Cusco. **A corregir en la fuente (OneDrive no se tocó):** bandera CL que es AR,
+`SKY-13.svg` es Brasil, derechos de medalla y foto con marcas de IA, flecha en 3 piezas, clúster internacional
+desalineado y con franja, textos DCTO/«tramo»/«Stock» inconsistentes, legales trazados, sin logos de alianza ni URL.
+[Manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) · [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
+
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 
 **SEO (en producción):** GSC avisó «Falta el campo "item" (en "itemListElement")» (3 correos idénticos; que vengan
@@ -238,13 +253,3 @@ Margen modelado59,28%, sin líneas bajo piso;1.860testsPASS/3skip. Sustituye21.0
 Próximo: Julio/Operations revisar valor/alcance/capacidad, accesos y Finance entidad/tributos/cobro;
 propuesta29–30/10, terna4/11 sin selección acreditada. Datos de Kommo, documentación técnica y regla de canal
 pendientes. Sin aprobación, envío, nuevo cambio CRM, commit o deploy.
-
-## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
-
-Pipeline (246045 → `/hubspot/pipeline-de-ventas/` con 301) y marketing de contenidos (244883, misma URL, 22:44 UTC)
-publicados con portada, hero, tarjeta e infografía «Una idea, cada formato» (adjuntos 252169/252170, sólo claras).
-Copias privadas 252161/252171 en la papelera; indexación de ambos pedida por la sesión de Analytics con OK directo de
-Julio. Registro, QA y rollback en [Pipeline §11](docs/public-site/HUBSPOT_PIPELINE_REFRESH_DRAFT_V1.md) y
-[marketing de contenidos §9–§10](docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md). Receta de refresh y
-trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría principal de la copia) en la skill del sitio
-público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).

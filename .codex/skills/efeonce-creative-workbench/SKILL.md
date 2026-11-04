@@ -36,6 +36,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Componer por módulos, corregir logo/flecha/CTA/texto/máscara/círculos | [components.md](references/components.md) |
 | Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
+| Adaptar un KV SKY en el canvas de Claude Design: plantillas por destino, kit «Despliegue Base», popup/story, animación GIF/MP4 | [sky-design-canvas.md](references/sky-design-canvas.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Producir para Berel: banners, adaptaciones, plates, producto en escena, reels de transformación | Skill Greenhouse `berel-graphic-line` (oficio) + corte Berel en [state-continuity.md](references/state-continuity.md) |
 | Configurar/verificar identidad Git de cada persona, hooks y evitar rechazo de autor en Vercel | [operations-distribution.md](references/operations-distribution.md), sección de identidad Git |

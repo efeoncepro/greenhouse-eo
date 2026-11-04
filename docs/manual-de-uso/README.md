@@ -163,6 +163,10 @@ La diferencia con otras capas de documentacion:
   banda de X), ficha cine con la cara en x 795–900, composición centrada sin firma, JPEG 2400 × 1260, subida con guardas y
   respaldo, QA en vivo y cómo volver atrás.
   Cuántas imágenes lleva cada artículo y para qué posición: [inventario de imágenes por artículo](../operations/public-site-content-factory/BLOG_ARTICLE_IMAGE_INVENTORY_V1.md).
+- [Adaptar un KV de SKY en Claude Design](creative/adaptar-kv-sky-en-claude-design.md) — Design System «SKY Airline —
+  Performance» y canvas de adaptaciones: pasar el KV, generar piezas por destino con plantilla y datos, leer un kit
+  «Despliegue Base», KV fijos, animación GIF/MP4 con audio, popup y story, revisión con comentarios y exportación local.
+  Caso fuente: CyberSky Perú (66 piezas) y kit BLACK, 2026-11-04.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a

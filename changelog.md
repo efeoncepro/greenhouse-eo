@@ -11,6 +11,13 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-04 — SKY: adaptaciones en Claude Design (CyberSky Perú y kit BLACK)
+
+Nuevo Design System «SKY Airline — Performance» y canvas de adaptaciones en Claude Design (artifacts privados): 66 piezas
+de CyberSky Perú por plantilla y datos, y del kit BLACK los 12 KV fijos, sus animaciones GIF/MP4 con audio y 24 popup y
+story. Entregables locales en `ai-generations/`, sin publicar; datos y derechos pendientes de confirmar. Cómo operarlo:
+[manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) y [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
+
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 
 Google Search Console avisó «Falta el campo "item"» porque Yoast emitía en la portada un BreadcrumbList de un solo
@@ -517,12 +524,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Tracing HubSpot y captura Meta configurados; flag true y companion ER5 del mainEC READY. Health200, watchdog6/6 y canarios PASS.
 - Snapshots GTM sin drift y plan offline actualizado. Primera ocurrencia/recibo/atribución pendientes; cero negocio ficticio o replay.
 - [Auditoría, evidencia y rollback](docs/audits/growth/2026-10-18-google-ads-activation.md). Cambios ajenos preservados.
-
-## 2026-10-18 — Release completo de develop y cierre de recibos
-
-[Historial interno](docs/changelog/internal/README.md).
-
-- PR #256 incorpora los 1.583 archivos del candidato develop a main `ec317c928`, sin exclusiones.
-- Orquestador `39159325900` SUCCESS; manifest released, salud HTTP 200 y watchdog ok 6/6, sin drift ni datos faltantes.
-- Migraciones aditivas de recibos HubSpot/Meta verificadas; código Forms/Meetings desplegado y canarios PASS. Ads sigue OFF y GTM sin publicar.
-- [Evidencia y rollback](docs/audits/releases/2026-10-18-full-develop-production-release.md); WIP ajeno preservado y cierre documentado sólo sobre los cambios propios.

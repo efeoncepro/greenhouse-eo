@@ -101,6 +101,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   genera la IA, quién aparece (elenco 2D como cliente; nunca el elenco fotográfico), etapas y quién aprueba qué,
   límites y pendientes. Caso fuente «Sparks × Efeonce AEO», aprobado el 2026-10-03;
   [manual](../manual-de-uso/creative/producir-spot-animado.md).
+- [Adaptaciones SKY en Claude Design](creative/adaptaciones-sky-en-claude-design.md) — qué son el Design System
+  «SKY Airline — Performance» y el canvas de adaptaciones, cómo se adapta un KV por destino con plantilla y datos, cómo
+  se descompone un KV, reglas de popup y story y animación GIF/MP4; caso fuente CyberSky Perú y kit BLACK, 2026-11-04;
+  [manual](../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Sistema de canales propios y love brand](social/sistema-de-canales-y-love-brand.md) — las tres familias de canales

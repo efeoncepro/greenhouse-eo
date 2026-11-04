@@ -1,5 +1,37 @@
 # Corte de continuidad: 2026-09-30
 
+## SKY en Claude Design — corte 2026-11-04
+
+Trabajo hecho fuera del harness, en el canvas de Claude Design: bocetos y adaptaciones para
+revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cómo operarlo en
+[sky-design-canvas.md](sky-design-canvas.md); fotografía de evento en
+[sky-photography.md](sky-photography.md); casos en [lessons.md](lessons.md).
+
+| Artifact (privado del operador) | Estado al cierre |
+| --- | --- |
+| Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 21; seis páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story |
+
+Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
+(~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
+(`~/Downloads/SKY-CyberSky-Peru-adaptaciones.pdf`, 23 MB); BLACK con 12 KV fijos, 12 animados
+(GIF, MP4 y MP4 con audio) y 24 estáticos popup/story. Entregables locales no versionados en
+`ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; sus
+scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. OneDrive no se modificó.
+
+Pendientes sin confirmar por el operador:
+
+- CyberSky: «S/» (el KV dice «$/»), separador de miles con coma (1,043), origen Lima y la
+  contradicción del legal (tramo Lima–X vs X–Lima); elementos sólo del KV de Cusco omitidos en
+  el resto (upsell Tarifa Light, logos PromPerú/«Y tú qué planes», crédito de foto).
+- BLACK: las inconsistencias del kit listadas en
+  [sky-design-canvas.md](sky-design-canvas.md#inconsistencias-del-kit-black-a-corregir-en-la-fuente)
+  siguen en la fuente (banderas y logos mal nombrados, legales trazados, «tramo» en CL INTER,
+  PE DOM-RUTA invertido, URL sin «www», «FROM [ORIGEN]» sin traducir, verdes/morados no
+  unificados). Logos de alianza y URL no están puestos en ningún KV. Derechos de la foto del KV
+  y de la medalla de Puntualidad (generadas con IA) sin validar antes de pautar.
+- «Internacional» en AR, UY, BR y US: corregido el 2026-11-04 en los 24 estáticos y en las 4 animaciones.
+
 ## Berel en el Workbench — corte 2026-11-02
 
 Segundo cliente con sistema propio, en `brands/berel/**` y `projects/berel/**`; una marca por corrida y
