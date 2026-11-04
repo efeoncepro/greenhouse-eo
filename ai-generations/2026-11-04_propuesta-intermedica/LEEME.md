@@ -4,7 +4,7 @@
 Estructura y decisiones: `docs/commercial/accounts/intermedica/ESTRUCTURA-OFERTA-2026-11-04.md`.
 Costeo: `docs/commercial/accounts/intermedica/pricing-v3-intermedio-2026-11-04/INTERMEDIO.md` (`requires_review`).
 
-**Canvas de diseño:** https://claude.ai/artifact/2E76BjuHQyB8JvvAx72myh (24 mesas de 1920×1080; versión con cifras V3;
+**Canvas de diseño:** https://claude.ai/artifact/2E76BjuHQyB8JvvAx72myh (25 mesas de 1920×1080; versión con cifras V3;
 nativas editables, recetas y reutilizadas como imagen). Regenerar: `node native/to-canvas.mjs native/html-montos <root>`
 y publicar `project/` en ese canvas.
 
@@ -15,7 +15,10 @@ y publicar `project/` en ese canvas.
 | `pdf/BORRADOR-INTERNO - Propuesta completa - Intermedica - Efeonce (con cifras V3).pdf` | Julio: revisión con montos del V3 |
 | `pdf/1. Propuesta completa - Intermedica - Efeonce.pdf` | Forma cliente, montos en `[MONTO]` hasta aprobar |
 
-## Cómo se produce cada lámina (24)
+## Cómo se produce cada lámina (25)
+
+Desde el 04/11 incluye **10 · Vívelo** (receta `content-day-live-progress`, `intents/10-vivelo.json`, pieza en revisión = `assets/landing-dermatoestetica.png`). Copia de los PDF en OneDrive: `Licitaciones/Intermedica/1. Marketing digital y performance/05. Diseño y revisión/`.
+
 
 | Tipo | Láminas | Cómo |
 | --- | --- | --- |

@@ -71,9 +71,9 @@ const slides = {};
 {
   const items = [
     ['01', 'Análisis de Intermedica', 'Presencia digital, comunicación, campañas y oportunidades', '03 – 07'],
-    ['02', 'Equipo de performance', 'Cuántas personas y qué función asume cada una', '08 – 09'],
-    ['03', 'Portafolio de servicios', 'Soluciones, alcance, entregables y valor', '10 – 16'],
-    ['04', 'Propuesta económica', 'Tarifa mensual por servicio y por equipo', '17 – 19']
+    ['02', 'Equipo de performance', 'Cuántas personas y qué función asume cada una', '08 – 10'],
+    ['03', 'Portafolio de servicios', 'Soluciones, alcance, entregables y valor', '11 – 17'],
+    ['04', 'Propuesta económica', 'Tarifa mensual por servicio y por equipo', '18 – 20']
   ];
   let inner = voice({ eyebrow: 'Propuesta para Intermedica', question: '¿Qué nos pidieron?', answer: ['Cuatro', 'respuestas'], size: 116, body: 'Esta propuesta sigue, en su orden, las cuatro preguntas de su solicitud. Cada capítulo responde a una, con su <b>sustento</b>.' });
   items.forEach(([n, t, d, l], i) => {
@@ -268,7 +268,7 @@ const slides = {};
 // 19 · Technogym por separado — dos marcas, dos propuestas
 {
   let inner = voice({ eyebrow: '04 · Alcance', question: '¿Y Technogym?', answer: ['Por', 'separado'], body: 'Esta propuesta cubre sólo a Intermedica. Su equipo, su alcance y su tarifa no se comparten ni se descuentan con <b>otra cuenta</b>.' });
-  inner += panel(880, 140, 440, 600, `<div style="padding:40px 38px;height:100%;box-sizing:border-box;display:flex;flex-direction:column">${kicker('Esta propuesta', '#fff')}<div style="flex:1;display:flex;align-items:center"><img src="${LOGO}" alt="Intermedica" style="width:360px;height:auto"></div><div style="font-family:${ST};font-size:19px;font-weight:300;line-height:1.45;color:#fff">Cuatro líneas en Perú, con el equipo de la lámina 08 y la tarifa de la lámina 17.</div></div>`, true);
+  inner += panel(880, 140, 440, 600, `<div style="padding:40px 38px;height:100%;box-sizing:border-box;display:flex;flex-direction:column">${kicker('Esta propuesta', '#fff')}<div style="flex:1;display:flex;align-items:center"><img src="${LOGO}" alt="Intermedica" style="width:360px;height:auto"></div><div style="font-family:${ST};font-size:19px;font-weight:300;line-height:1.45;color:#fff">Cuatro líneas en Perú, con el equipo de la lámina 08 y la tarifa de la lámina 18.</div></div>`, true);
   inner += `<div style="position:absolute;left:1328px;top:400px;width:44px;height:44px;border-radius:50%;background:${BG};border:1.5px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;font-family:${ID};font-size:26px;color:#fff;z-index:3">≠</div>`;
   inner += panel(1340, 140, 440, 600, `<div style="padding:40px 38px;height:100%;box-sizing:border-box;display:flex;flex-direction:column">${kicker('Propuesta aparte')}<div style="flex:1;display:flex;align-items:center"><div style="font-family:${ID};font-size:72px;font-weight:780;letter-spacing:-0.04em;color:#fff">Technogym</div></div><div style="font-family:${ST};font-size:19px;font-weight:300;line-height:1.45;color:${SOFT}">Si lo desean, preparamos una propuesta independiente, con diagnóstico, equipo y economía propios.</div></div>`);
   inner += facts([['checklist', 'Alcance', 'Una propuesta por marca'], ['finanzas', 'Economía', 'Tarifas independientes'], ['reunion', 'Equipo', 'Asignado a cada cuenta']]);

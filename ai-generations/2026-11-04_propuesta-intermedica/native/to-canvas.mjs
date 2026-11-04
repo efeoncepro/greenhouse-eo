@@ -6,6 +6,7 @@ const [SRC, ROOT] = process.argv.slice(2);
 const BUBBLE = '/_blob/40e09a0874c56f6b637ff8e6fbd198e4', LOGO = '/_blob/7f619c1e9582ec8670098ba49e11f63d';
 const EVID = { home: '/_blob/6fbc948411902c7673716e552790d9f3', contacto: '/_blob/37cfbe8ff00ecdab6efec8d3c7658df4', 'academy-404': '/_blob/32a3814e22edda5a4cd08cd8cbfac9c8' };
 const IMG = {
+  '09b-vivelo': ['/_blob/f1d643d26dd469e9df630c62c1ceeee4', 'Vívelo · Notion y Frame.io'],
   '01-portada': ['/_blob/b904774971afee236d4d3d0499c34bc7', 'Portada · Performance comercial'],
   '12-medicion': ['/_blob/ac9626e2df6b7cd58fcea920e5bdcfac', 'Medición (brochure Agencia de Medios)'],
   '15-senal': ['/_blob/411772c9e1f6b2ea9db10b65af3cdb42', 'Señal hasta ventas (brochure Agencia de Medios)'],
@@ -15,7 +16,7 @@ const IMG = {
   '22-partners': ['/_blob/510828e517701451f87a8f8785ed8802', 'Partners (brochure Agencia de Medios)'],
   '24-contraportada': ['/_blob/6a7143f7d4bd10b3e86cdab9f175d130', 'Contraportada Voice']
 };
-const ORDER = ['01-portada','02-encargo','03-quienes','04-presencia','05-comunicacion','06-oportunidades','07-recorrido','08-equipo','09-ritmo','10-portafolio','11-nucleo','12-medicion','13-recomendado','14-expansion','15-senal','16-plan','17-tarifa','18-total','19-technogym','20-caso-sky','21-caso-berel','22-partners','23-pasos','24-contraportada'];
+const ORDER = ['01-portada','02-encargo','03-quienes','04-presencia','05-comunicacion','06-oportunidades','07-recorrido','08-equipo','09-ritmo','09b-vivelo','10-portafolio','11-nucleo','12-medicion','13-recomendado','14-expansion','15-senal','16-plan','17-tarifa','18-total','19-technogym','20-caso-sky','21-caso-berel','22-partners','23-pasos','24-contraportada'];
 const FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:wght@300;400;500;600&amp;display=swap">';
 const dc = (title, inner) => `<!doctype html>
 <html lang="es">
@@ -59,7 +60,7 @@ ORDER.forEach((k, i) => {
     if (inner.includes('file://')) throw new Error(`ruta local sin reemplazar en ${k}`);
     title = titleOf(k);
   }
-  const n = k.slice(0, 2);
+  const n = String(i + 1).padStart(2, '0');
   fs.writeFileSync(path.join(project, file), dc(`${n} · ${title}`, inner));
   boards[file] = { x: (i % 4) * 2000, y: Math.floor(i / 4) * 1300, w: 1920, h: 1080, title: `${n} · ${title}` };
   order.push(file);

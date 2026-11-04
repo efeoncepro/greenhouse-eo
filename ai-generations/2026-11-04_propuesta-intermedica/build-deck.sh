@@ -9,6 +9,7 @@ node native/shot-all.cjs $H $L >/dev/null
 rm -rf $DK; mkdir -p $DK
 cp out/01-portada/01-deck-cover-proposal.png $DK/01-portada.png
 for n in 02-encargo 03-quienes 04-presencia 05-comunicacion 06-oportunidades 07-recorrido 08-equipo 09-ritmo 10-portafolio 11-nucleo; do cp $L/$n.png $DK/$n.png; done
+cp out/10-vivelo/01-deck-content-day.png $DK/09b-vivelo.png
 cp $R/2026-10-13_brochure-agencia-medios/laminas/M-medicion.png $DK/12-medicion.png
 cp $L/13-recomendado.png $DK/13-recomendado.png
 cp $L/14-expansion.png $DK/14-expansion.png
