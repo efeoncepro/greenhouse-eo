@@ -158,15 +158,15 @@ const slides = {};
   let inner = voice({ eyebrow: '02 · Equipo de performance', question: '¿Cuántas personas?', answer: ['Cinco', 'personas'], body: 'Un equipo asignado a su cuenta, con un solo responsable frente a ustedes. La preparación suma especialistas de <b>medición y web</b> durante su fase.' });
   const cx = 1330, cy = 500;
   const roles = [
-    ['Referente de la cuenta', 'Líder de performance', 'Prioridades, pruebas y comité mensual', 1330, 120, true],
+    ['Referente de la cuenta', 'Líder de performance', 'Pruebas y comité mensual', 1330, 110, true],
     ['Operación diaria', 'Especialista de medios', 'Google, Meta y LinkedIn', 1620, 360],
     ['Datos', 'Analista de medición', 'Eventos, tablero y avance', 1560, 720],
     ['Creatividad', 'Redactor', 'Mensajes por necesidad', 1100, 720],
     ['Creatividad', 'Diseñador', 'Piezas para cada prueba', 1040, 360]
   ];
-  inner += `<svg width="1920" height="1080" style="position:absolute;inset:0;pointer-events:none">${roles.map(([, , , x, y, lit]) => { const [ex, ey] = y < cy - 200 ? [x, y + 124] : y > cy + 150 ? [x, y] : [x < cx ? x + 150 : x - 150, y + 62]; return `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="${lit ? ACC : 'rgba(255,255,255,0.22)'}" stroke-width="${lit ? 3 : 1.5}" stroke-dasharray="${lit ? '0' : '6 8'}"/>`; }).join('')}</svg>`;
+  inner += `<svg width="1920" height="1080" style="position:absolute;inset:0;pointer-events:none">${roles.map(([, , , x, y, lit]) => { const [ex, ey] = y < cy - 200 ? [x, y + 150] : y > cy + 150 ? [x, y] : [x < cx ? x + 150 : x - 150, y + 75]; return `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="${lit ? ACC : 'rgba(255,255,255,0.22)'}" stroke-width="${lit ? 3 : 1.5}" stroke-dasharray="${lit ? '0' : '6 8'}"/>`; }).join('')}</svg>`;
   inner += `<div style="position:absolute;left:${cx - 140}px;top:${cy - 140}px;width:280px;height:280px;border-radius:50%;box-sizing:border-box;border:1.5px solid rgba(255,255,255,0.3);background:radial-gradient(circle at 50% 35%,rgba(27,79,122,0.95),rgba(0,26,51,0.95));box-shadow:0 30px 90px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px"><img src="${LOGO}" alt="Intermedica" style="height:46px;width:auto"><div style="font-family:${ST};font-size:15px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:${SOFT}">Su cuenta</div></div>`;
-  roles.forEach(([k, t, d, x, y, lit]) => { inner += panel(x - 150, y, 300, 124, `<div style="padding:18px 22px">${kicker(k, lit ? '#fff' : MUTE)}<div style="margin-top:6px;font-family:${ID};font-size:26px;font-weight:760;letter-spacing:-0.02em;line-height:1.05;color:#fff">${t}</div><div style="margin-top:6px;font-family:${ST};font-size:16px;font-weight:300;color:${SOFT}">${d}</div></div>`, !!lit); });
+  roles.forEach(([k, t, d, x, y, lit]) => { inner += panel(x - 150, y, 300, 150, `<div style="padding:18px 22px">${kicker(k, lit ? '#fff' : MUTE)}<div style="margin-top:6px;font-family:${ID};font-size:26px;font-weight:760;letter-spacing:-0.02em;line-height:1.05;color:#fff">${t}</div><div style="margin-top:6px;font-family:${ST};font-size:16px;font-weight:300;color:${SOFT}">${d}</div></div>`, !!lit); });
   inner += facts([['reunion', 'Interlocutor', 'Un responsable de cuenta'], ['calendario', 'Ritmo', 'Chequeos dos veces por semana'], ['talent', 'Respaldo', '+89 profesionales en Latinoamérica']]);
   slides['08-equipo'] = page(inner);
 }
