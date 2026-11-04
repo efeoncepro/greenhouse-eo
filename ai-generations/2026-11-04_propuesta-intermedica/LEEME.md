@@ -31,7 +31,7 @@ Rehacer todo: `bash build-deck.sh montos && bash build-deck.sh cliente`, luego `
 
 1. **Precios:** ✅ aprobados por Julio el 04/11/2026 — las cinco líneas del V3 (Performance 3.640/mes · Medición 940/mes · Creatividad
    590/mes · Preparación 2.270 · Landings 2.140). Un cambio se corre de nuevo en el V3; nunca se edita a mano.
-2. **Logo de Intermedica:** tomado de intermedica.pe y pasado a blanco (`logos/`). Falta autorizar su uso.
+2. **Logo de Intermedica:** ✅ tomado de intermedica.pe y pasado a blanco (`logos/`); uso autorizado por Julio el 04/11/2026.
 3. **Registro mixto:** las láminas reutilizadas (12, 15, 20, 21, 22) tutean («mi pauta», «tu venta»); las nativas usan
    «ustedes». Decidir si se aceptan tal cual (precedente ARMOR) o se reemplazan por nativas.
 4. **Contraportada:** dice «Empower your Voice» (salida del compositor en línea Voice, como ARMOR).

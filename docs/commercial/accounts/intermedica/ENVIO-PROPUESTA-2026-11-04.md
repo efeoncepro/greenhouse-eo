@@ -1,7 +1,7 @@
 # Intermedica · envío de la propuesta a Nikol Suarez (borradores, 04/11/2026)
 
 **Estado:** borradores listos. Nada enviado. Precios del escenario intermedio V3 **aprobados por Julio el 04/11/2026**;
-el PDF del cliente ya va con cifras. Falta autorizar el logo de Intermedica.
+el PDF del cliente ya va con cifras. Logo de Intermedica autorizado por Julio el 04/11/2026. Listo para enviar.
 
 Reglas aplicadas: inversión por partes y sin total en el correo (el total vive en el deck, lámina 19); sin pedir RUC ni
 razón social; tuteo con Nikol, como en su conversación por LinkedIn; la propuesta habla a Intermedica de «ustedes».
@@ -63,5 +63,5 @@ seguimiento de HubSpot si el PDF pesa demasiado)
 
 1. ~~Julio aprueba los cinco precios~~ — aprobados el 04/11/2026.
 2. ~~Regenerar el PDF para el cliente con cifras~~ — hecho (`pdf/1. Propuesta completa - Intermedica - Efeonce.pdf`, copia en OneDrive).
-3. Autorización del uso del logo de Intermedica en el deck.
+3. ~~Autorización del uso del logo de Intermedica en el deck~~ — autorizado el 04/11/2026.
 4. Enviar desde Outlook con firma y CCO HubSpot; registrar el envío en el deal 67004458418.
