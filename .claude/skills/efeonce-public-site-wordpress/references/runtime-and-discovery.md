@@ -561,3 +561,12 @@ Yoast lo volvía a escapar en el schema); `og:locale` = `es_LA` por el mu-plugin
 Tagline actualizado el mismo día por decisión del operador a «Agencia de marketing 360°» (alineado al brochure
 oficial; `scripts/public-website/set-site-tagline.php`, snapshot `_gh_site_tagline_before_20261016_194309`).
 
+
+Breadcrumb de la portada (2026-11-04): Search Console avisó «Falta el campo "item" (en "itemListElement")». Yoast emite
+en la portada un `BreadcrumbList` de un solo `ListItem` sin `item`; al ser primero y último a la vez, Google lo marca como
+crítico (en las rutas de varios niveles el último sin `item` sí es válido). Lo corrige el mu-plugin versionado
+`wp-content/mu-plugins/efeonce-breadcrumb-single-item.php` (filtro `wpseo_schema_breadcrumb`: completa `item` con la URL
+del `@id` del breadcrumb, sólo si la lista tiene un elemento). Instalación:
+`scripts/public-website/install-breadcrumb-single-item-mu-plugin.php` (input file, sha256, crea sólo si falta o es
+idéntico). Rollback: borrar el archivo y purgar. Antes de tocar schema de Yoast, barrer el sitemap entero: el error
+apareció en 1 de 113 URLs.
