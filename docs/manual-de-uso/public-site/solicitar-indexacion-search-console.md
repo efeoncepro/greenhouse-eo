@@ -134,5 +134,7 @@ Los códigos de salida: `1` uso o tope diario, `2` no hay Chrome en el puerto, `
 - Qué puede y qué no puede hacer la API de Search Console:
   [`google-search-console-api-indexing.md`](../../../.claude/skills/seo-aeo/references/google-search-console-api-indexing.md).
 - Dónde entra en la publicación de un post: [`agentic-blogpost-end-to-end.md`](../../../.claude/skills/efeonce-public-site-wordpress/references/agentic-blogpost-end-to-end.md).
+- Si Search Console avisa un problema de datos estructurados (por ejemplo «Falta el campo "item"»), corrígelo antes de
+  pedir la indexación: [responder un aviso de datos estructurados](responder-aviso-datos-estructurados-search-console.md).
 - Conectar la lectura de Search Console por OAuth (otra cosa: leer datos, no pedir indexación):
   [`conectar-search-console.md`](../growth/conectar-search-console.md).

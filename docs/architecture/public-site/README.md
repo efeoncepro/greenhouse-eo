@@ -34,6 +34,12 @@ Use this folder when a reusable public landing component, Elementor widget, host
 
 ## Shared surfaces
 
+- Schema de Yoast en todo el sitio — Yoast es dueño del grafo; dos mu-plugins versionados en el runtime lo ajustan
+  sin agregar nodos: `efeonce-og-locale.php` (`og:locale` = `es_LA`, 2026-10-16) y
+  `efeonce-breadcrumb-single-item.php` (completa `item` en un `BreadcrumbList` de un solo elemento, 2026-11-04).
+  Contrato, instalación y rollback del segundo: [Home §Delta 2026-11-04](HOME_INICIO_ELEMENTOR_MODULES_V1.md#delta-2026-11-04--breadcrumblist-de-un-solo-elemento);
+  identidad SEO del sitio: `.claude/skills/efeonce-public-site-wordpress/references/runtime-and-discovery.md`
+  §Identidad SEO del sitio.
 - [Public Site Miscellaneous Surfaces V1](PUBLIC_MISCELLANEOUS_SURFACES_V1.md) — ownership propuesto para
   404, búsqueda, no-results y archivos; separa recovery, search, editorial archives y chrome global sin
   confundir composición visual con HTTP/SEO. Aún no implementado.

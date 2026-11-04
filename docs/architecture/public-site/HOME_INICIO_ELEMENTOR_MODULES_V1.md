@@ -1,9 +1,9 @@
 # Home Inicio Elementor Modules V1
 
 > **Tipo de documento:** Contrato técnico (public site)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-29 por Claude (rediseño de la home «La órbita × Pingback»)
-> **Ultima actualizacion:** 2026-10-29 por Claude
+> **Ultima actualizacion:** 2026-11-04 por Claude (breadcrumb de un solo elemento en la portada)
 > **Documentacion funcional:** [home-efeonce-la-orbita.md](../../documentation/public-site/home-efeonce-la-orbita.md)
 > **Manual:** [operar-home-efeonce.md](../../manual-de-uso/public-site/operar-home-efeonce.md)
 > **Audit del rollout y SEO:** [2026-10-29-home-orbita-rediseno-y-seo.md](../../audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md)
@@ -157,6 +157,40 @@ y Vender a la derecha) para sobrevivir al recorte cuadrado de las apps de chat y
 Se importa siempre como **adjunto nuevo** (las redes cachean por URL) y queda también en
 `_elementor_page_settings.post_featured_image`, porque Elementor reescribe la featured image al guardar desde el
 editor. La anterior (`248149`, arte 2025, WebP 2000×960) sigue en la biblioteca.
+
+### Delta 2026-11-04 — `BreadcrumbList` de un solo elemento
+
+**Síntoma.** El 2026-11-04 07:53 UTC Search Console envió tres avisos idénticos (tipo WNC-10030322) por
+`efeoncepro.com`: «Datos estructurados de Rutas de exploración — Falta el campo "item" (en "itemListElement")». Que
+sean tres se explica *probablemente* por varias propiedades de GSC del mismo sitio (inferencia, no verificada).
+
+**Causa.** Yoast SEO Premium 27.7 / Yoast SEO 28.6 emite en la portada un `BreadcrumbList` con un único `ListItem`
+(«Portada») sin `item`. Google exige `item` en todo elemento salvo el último de una ruta de varios niveles; un elemento
+único es primero y último a la vez, y Google lo trata como error crítico. Barrido de las 113 URLs del sitemap (`post`,
+`page`, `eo_project`, `category`, `author`): sólo la portada fallaba; las otras 111 con breadcrumb dejan sin `item` el
+último elemento de una lista de varios niveles, que es válido.
+
+**Corrección (mu-plugin del sitio, no de esta landing).** El filtro vive fuera del cuerpo de `251731` y aplica a todo
+el sitio, aunque hoy sólo cambia la portada:
+
+| Dato | Valor |
+| --- | --- |
+| Archivo | `wp-content/mu-plugins/efeonce-breadcrumb-single-item.php` (repo runtime `efeoncepro/efeonce-public-site-runtime`, commit `64d8c59` en `main`) |
+| Hook | `wpseo_schema_breadcrumb` |
+| Contrato | Si `itemListElement` tiene **exactamente un** elemento y éste no trae `item`, lo completa con la URL de la propia página: el `@id` del breadcrumb (`<url>#breadcrumb`) sin el sufijo `#breadcrumb`; si el `@id` no sirve y es la portada, `home_url('/')`. Sólo escribe si la URL pasa `wp_http_validate_url`. Las listas de dos o más elementos, o con `item` ya presente, salen intactas. |
+| Instalador | `scripts/public-website/install-breadcrumb-single-item-mu-plugin.php` (Greenhouse, commit `fa3f57dbf`): crea sólo si el archivo falta o es idéntico, verifica sha256 `f3a6fd1e72e3cc5a80d88d6f018c7d5c30ea93195f5e52e78cdcbc12f4ecef06`, hace `wp cache flush` y `wp kinsta cache purge --all` |
+| Comando | `pnpm public-website:wpcli -- --eval-file ./scripts/public-website/install-breadcrumb-single-item-mu-plugin.php --input-file <runtime>/wp-content/mu-plugins/efeonce-breadcrumb-single-item.php --wp-user 12` |
+| Instalado | 2026-11-04 en Kinsta |
+| Evidencia en vivo | La portada sirve `{"@type":"ListItem","position":1,"name":"Portada","item":"https://efeoncepro.com/"}`; re-barrido de las 113 URLs: 0 problemas |
+| Rollback | Borrar `wp-content/mu-plugins/efeonce-breadcrumb-single-item.php` en Kinsta, `wp cache flush`, `wp kinsta cache purge --all` |
+
+Yoast sigue siendo dueño del grafo: el mu-plugin sólo completa un campo del nodo que Yoast ya emite; no agrega nodos
+ni JSON-LD propio. Si una actualización de Yoast pasa a emitir `item` en la lista de un elemento, el filtro no hace nada
+(la condición deja de cumplirse) y puede retirarse con el rollback.
+
+Pendiente del operador: «Validar corrección» en el informe de Rutas de exploración de cada propiedad de GSC que avisó
+(opcional: solicitar la indexación de la portada). No se corrió la Prueba de resultados enriquecidos de Google.
+Procedimiento: [responder un aviso de datos estructurados](../../manual-de-uso/public-site/responder-aviso-datos-estructurados-search-console.md).
 
 ## Móvil y tablet (pasada 2026-10-29)
 

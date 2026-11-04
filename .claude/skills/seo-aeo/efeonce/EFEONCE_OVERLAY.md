@@ -125,6 +125,12 @@
 
 - Yoast posee `WebPage`, `WebSite`, `BreadcrumbList` y `Organization`; el JSON-LD page-scoped sólo completa tipos
   ausentes como `Service` o `FAQPage` y referencia los mismos `@id`. Nunca dupliques el breadcrumb o la entidad.
+- Yoast (Premium 27.7 / free 28.6) emitía en la portada un `BreadcrumbList` de un solo `ListItem` sin `item` (error
+  crítico en GSC, 2026-11-04). Lo corrige el mu-plugin versionado `efeonce-breadcrumb-single-item.php` (filtro
+  `wpseo_schema_breadcrumb`, sólo listas de un elemento; las rutas largas no cambian). Ante cualquier aviso de datos
+  estructurados: barrer las 113+ URLs del sitemap antes de tocar nada. Contrato y rollback:
+  `docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Delta 2026-11-04; barrido y cierre en GSC:
+  `docs/manual-de-uso/public-site/responder-aviso-datos-estructurados-search-console.md`.
 - Deriva `OfferCatalog` y FAQ de contenido visible, valida paridad exacta de conteo/texto y usa el anchor que existe en
   el runtime, no uno supuesto.
 - Cada landing indexable usa un raster Open Graph/Twitter dedicado de `1200×630`, title social y description social;

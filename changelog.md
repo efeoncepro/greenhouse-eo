@@ -11,6 +11,20 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
+
+Google Search Console avisó «Falta el campo "item"» porque Yoast emitía en la portada un BreadcrumbList de un solo
+elemento sin `item`. Un mu-plugin del runtime público (`efeonce-breadcrumb-single-item.php`, commit `64d8c59`) lo
+corrige, instalado en Kinsta con `scripts/public-website/install-breadcrumb-single-item-mu-plugin.php`. Verificado en
+vivo; las 113 URLs del sitemap, sin problemas. Falta que el operador marque «Validar corrección» en GSC.
+
+## 2026-11-04 — CLAUDE.md vuelve bajo el presupuesto de 35.000 tokens
+
+Las filas nuevas del router (Motogas, Berel, Blog SKY) dejaron `CLAUDE.md` en 35.321 tokens y el check de gobernanza
+falló en `develop`. Se compactaron filas cuyo detalle ya vive en su doc o skill: 34.652 tokens, 0 huérfanos y check
+verde (margen ~350). Regla: una fila nueva del router es un puntero corto a su skill, y una línea del baseline sólo se
+compacta si su texto exacto ya vive en su destino ([lección](docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md)).
+
 ## 2026-11-04 — Prospección contextual reutilizable en Codex y Claude
 
 El [workflow compartido](.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md)
@@ -512,24 +526,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Orquestador `39159325900` SUCCESS; manifest released, salud HTTP 200 y watchdog ok 6/6, sin drift ni datos faltantes.
 - Migraciones aditivas de recibos HubSpot/Meta verificadas; código Forms/Meetings desplegado y canarios PASS. Ads sigue OFF y GTM sin publicar.
 - [Evidencia y rollback](docs/audits/releases/2026-10-18-full-develop-production-release.md); WIP ajeno preservado y cierre documentado sólo sobre los cambios propios.
-
-## 2026-10-18 — Negocios compartidos HubSpot
-
-- Julio ordenó verificar adjudicación, contrato y fechas antes de recomendar/invertir/crear Deal. Gate guardado en el prompt real del radar y skills/playbooks, con readback y horario/permisos preservados. [Evidencia](docs/commercial/prospecting-agent/runs/2026-10-18-1128-control-adjudicacion-automatizacion.md).
-
-- Flujo observado y preferencia de Julio **liderazgo Partner** documentados en [manual](docs/manual-de-uso/hubspot/convertir-negocio-compartido.md) y skill de Solutions Partner. Esenttia convertido y leído; cierre local31/12/2026, discrepancia tarjeta30/12 registrada. Sin nuevas altas o envíos separados.
-
-> Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
-> [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
-> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
->
-> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-> `pnpm docs:context-rotate --apply`.
-
-## 2026-10-18 — Footer público: selector compatible con monitores legacy
-
-- `widget_block[34]` reemplaza únicamente el `querySelector(...:has(...))` del bootstrap por marcador simple +
-  `closest('#colophon')`; CSS, composición, copy, enlaces, formulario y assets permanecen idénticos.
-- Publicado en WordPress con snapshot independiente `eo_footer_compat_20261018`, cache purge y readback PASS.
-  Home y landing HubSpot verificadas a 1440/390 sin overflow ni errores de consola.
-- [Evidencia y rollback](docs/audits/public-site/2026-10-14-footer-composition-v2.md#compatibilidad-del-bootstrap-2026-10-18).

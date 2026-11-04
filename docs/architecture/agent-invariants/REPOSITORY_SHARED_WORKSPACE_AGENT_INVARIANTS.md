@@ -18,6 +18,11 @@ Activo desde 2026-08-01. Esta es la fuente canónica para el manejo del checkout
   La única excepción es una autorización explícita del operador que nombre su ruta exacta y la acción concreta
   (por ejemplo, remover un temporal identificado).
 - La regla aplica por igual a Codex, Claude, subagentes, scripts, skills y automatizaciones locales.
+- **Delta 2026-11-04:** **NUNCA** mover archivos del usuario fuera del repo (scratchpad de la sesión, `/tmp`) para
+  destrabar un hook o un push: el scratchpad se borra si la sesión se reinicia, y así se perdió una carpeta local
+  no versionada. Lo resuelve el operador. Carril de push desde la shell del agente (SSH, scope `workflow`, errores
+  transitorios, pre-push sobre archivos sin seguimiento): delta 2026-11-04 de
+  [`LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`](../../operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md).
 
 ## Integración
 

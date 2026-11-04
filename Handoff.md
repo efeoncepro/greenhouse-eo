@@ -2,6 +2,23 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
+
+**SEO (en producción):** GSC avisó «Falta el campo "item" (en "itemListElement")» (3 correos idénticos; que vengan
+de varias propiedades de GSC es inferencia). Causa: Yoast emite en la portada un BreadcrumbList de un solo ListItem
+sin `item`. Fix: mu-plugin `wp-content/mu-plugins/efeonce-breadcrumb-single-item.php` (repo
+`efeoncepro/efeonce-public-site-runtime`, commit `64d8c59`), instalado en Kinsta con
+`scripts/public-website/install-breadcrumb-single-item-mu-plugin.php` (commit `fa3f57dbf`). Verificado en vivo;
+re-barrido de 113 URLs del sitemap con 0 problemas. Detalle técnico, funcional y manual en `docs/public-site/`.
+**Pushes:** runtime `main` `29bf792..64d8c59` (39 commits pendientes, incluido el fix); `develop`
+`985f84d3c..fa3f57dbf` (61 pendientes) y luego `fa3f57dbf..0992618ea`. **CLAUDE.md:** las filas nuevas del router
+(Motogas, Berel, Blog SKY) lo dejaron en 35.321 tokens y falló «CLAUDE.md governance»; `0992618ea` compactó filas cuyo
+detalle ya vive en su doc o skill: 34.652 tokens, 0 huérfanos, check en `success`
+([lección](docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md)). Lecciones del carril de push desde la shell del
+agente: delta 2026-11-04 de [local-first](docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md).
+**Pendiente:** el operador marca «Validar corrección» en GSC. CLAUDE.md queda con ~350 tokens de margen: la próxima
+fila del router es un puntero corto o exige compactar antes.
+
 ## 2026-11-04 — Prospección contextual: envíos verificados y workflow guardado
 
 [Paula / Cristian](docs/commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md): **2 InMail y 1 email enviados**;
@@ -231,44 +248,3 @@ Julio. Registro, QA y rollback en [Pipeline §11](docs/public-site/HUBSPOT_PIPEL
 [marketing de contenidos §9–§10](docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md). Receta de refresh y
 trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría principal de la copia) en la skill del sitio
 público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).
-
-## 2026-10-26 — Rooms: entorno local y conectores listos
-
-01Nov: [MFA aceptado por reporte de Julio vía sesión Auth](docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md),
-sin logs ni prueba instrumentada añadidos. Prioridad: acción/aviso/reversa de agente, QA de la casa nueva y medición
-Live; gates de clientes separados. Ledger/skill espejo, dossier y TASK-2082/2085 conciliados; sin cambio de runtime.
-
-29Oct: [conciliación completa docs/skills](docs/audits/rooms/2026-10-29-docs-skills-full-reconciliation.md)
-con3subagentes: arquitectura/manuales/Rooms/Auth/MCP, tasks y routers. Fuente3c7 intacta;
-AGENTS runtime actualizado en de38af5. Recovery8 PG16/18 ya ejecutado ahora tiene recibos versionados.
-Sin repetir pruebas, correo o servicios; UI/externos/rollout y retención Auth se conservan.
-
-29Oct: [backend local listo para conectar](docs/audits/rooms/2026-10-29-backend-local-completion.md),
-Código Rooms3c7bcb5 sin push:337tests0skip, lint/types/build, Chrome18+23 y restore PG16/18
-(13migraciones/43tablas,23archivos/14pins) PASS. Colaboración/presentación, V4 mixto y MCPstdio;
-[contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y manual listos.
-Cierre local2070/2074–2078; UI2071/2072, Linux/cloud, conectores reales y rollout separados.
-Entorno detenido; Auth retenido en PR, sin producción/correo.
-
-[Dos RP/adapters locales, retest](docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md): Rooms8750750 + fuentes Authca97eecd1,35checks/Chrome/PGPASS. Checkout avanzó sólo docs a0ab888728; issuerQA, no server.ts completo. RP2 mismo consumer; sin rollout/HTTPS/MFA. Bases retiradas.
-
-[Aislamiento RP focal](docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md):3PASS/0skip, servicios/persistencia con PG efímero; Rooms e0edf1e intacto, DB retirada. Dos aplicaciones RP/browser integral sigue pendiente.
-
-B10 reader real: [Auth8d027f747→Rooms e0edf1e](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md),16checks+8gruposPASS y SQLv7; datos/proyección sintéticos, sin revocación browser binding ni dispatch/MFA. Bases efímeras retiradas, sin publicar.
-
-B10 ampliado: [MCP PostgreSQL y dos bases efímeras](docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md),16checks+8gruposPASS y SQL read-only; Rooms intacto e0edf1e. Límites grants/contexto/dispatch/MFA separados; procesos retirados.
-
-B10 local28Oct: Rooms→MCP en el mismo navegador, consentimiento explícito/tokenread/write-stepup,16checksMCP+8gruposRoomsPASS;
-[recibo y límites](docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md). Roomse0edf1e, Auth1136ac273; procesos cerrados, sin publicar.
-
-B18 local28Oct: invitado OTP sin sesión interna/SSO;51checks,lint/typesPASS;
-[prueba](docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md). Commit Rooms3b1b7b2, procesos detenidos; sin push/flags/deploy. Nueva UI pendiente de Claude Design.
-
-Rama runtime `codex/rooms-design-integration@2cddc98a`, sólo commit local. Next3216, PG55433 propio,
-issuer fixture19338 y datos/permisos sintéticos; SDKbrowser same-origin para DTO/commands/media/sesión.
-250testsPASS,lint/types/build y18checksAPIenChrome (imagen→publicación→guest,conflicto/replay/denegaciones);
-Playwright53PASS/3skip. [Manual](docs/manual-de-uso/rooms/integrar-claude-design-local.md),
-[evidencia](docs/audits/rooms/2026-10-26-local-design-integration.json).
-Queda conectar/aceptar UI Claude Design, entorno cloud si se decide y activación separada. AuthPR263/264
-OPEN sinmerge; producción no cambiada, sincorreo/push/deploy. Caché Next local puede regenerar archivos
-de tipos: revisar sólo sus cambios generados antes de commitear. Runtime limpio al checkpoint; entorno activo.

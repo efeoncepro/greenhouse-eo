@@ -569,4 +569,6 @@ crítico (en las rutas de varios niveles el último sin `item` sí es válido). 
 del `@id` del breadcrumb, sólo si la lista tiene un elemento). Instalación:
 `scripts/public-website/install-breadcrumb-single-item-mu-plugin.php` (input file, sha256, crea sólo si falta o es
 idéntico). Rollback: borrar el archivo y purgar. Antes de tocar schema de Yoast, barrer el sitemap entero: el error
-apareció en 1 de 113 URLs.
+apareció en 1 de 113 URLs. Barrido, clasificación (último de ruta larga sin `item` = válido; único o intermedio = inválido) y cierre
+en GSC: `docs/manual-de-uso/public-site/responder-aviso-datos-estructurados-search-console.md`; contrato y evidencia:
+`docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md` §Delta 2026-11-04.
