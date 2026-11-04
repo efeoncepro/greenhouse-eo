@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const [SRC, ROOT] = process.argv.slice(2);
 const BUBBLE = '/_blob/40e09a0874c56f6b637ff8e6fbd198e4', LOGO = '/_blob/7f619c1e9582ec8670098ba49e11f63d';
+const EVID = { home: '/_blob/6fbc948411902c7673716e552790d9f3', contacto: '/_blob/37cfbe8ff00ecdab6efec8d3c7658df4', 'academy-404': '/_blob/32a3814e22edda5a4cd08cd8cbfac9c8' };
 const IMG = {
   '01-portada': ['/_blob/b904774971afee236d4d3d0499c34bc7', 'Portada · Performance comercial'],
   '12-medicion': ['/_blob/ac9626e2df6b7cd58fcea920e5bdcfac', 'Medición (brochure Agencia de Medios)'],
@@ -53,7 +54,8 @@ ORDER.forEach((k, i) => {
     const html = fs.readFileSync(path.join(SRC, `${k}.html`), 'utf8');
     inner = html.slice(html.indexOf('<body>') + 6, html.lastIndexOf('</body>')).trim()
       .replace(/file:\/\/[^"]*url-bubble-baked-dark\.svg"([^>]*)style="[^"]*"/, `${BUBBLE}"$1style="position:absolute;left:135px;top:993px;width:162px;height:auto"`)
-      .replace(/file:\/\/[^"]*intermedica-blanco\.png/g, LOGO);
+      .replace(/file:\/\/[^"]*intermedica-blanco\.png/g, LOGO)
+      .replace(/file:\/\/[^"]*evidencia\/(home|contacto|academy-404)\.png/g, (_, n) => EVID[n]);
     if (inner.includes('file://')) throw new Error(`ruta local sin reemplazar en ${k}`);
     title = titleOf(k);
   }
