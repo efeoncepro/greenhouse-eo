@@ -636,6 +636,14 @@ y `$S/canvas/pub*.json` tienen la forma `{"project/<ruta>": "project/<ruta>"}`).
 - Verificar en la vista «play» del artboard (`#play-<id>`). Los artboards rayados a zoom bajo son carga
   perezosa, no error.
 
+### Línea blanca en el borde (corregida 2026-11-05)
+
+En 13 SVG del kit (HPH 1200×1200, 300×600 y 300×250; los 3 TikTok; los 2 DAT; PMAX 1080×1080 y 1200×628),
+la máscara de la foto `Raster 1` no cubre el borde inferior y deja una línea clara de 1 a 4 px. `foto-base.cjs`
+(`fotoBase(svg)`) inserta una copia sin máscara de la foto después de `Layer 0`; en el 300×600 la estira 2 px
+porque la foto viene subida. `hph/generic.cjs`, `hph/market.cjs` y `chile-refs.cjs` la aplican al leer el SVG.
+Verificado con un diff por SVG (sólo cambian píxeles a ≤ 6 px del borde) y con un escaneo de bordes de toda la entrega.
+
 ## 14. Entrega
 
 **Local (`OUT`, no versionado):** raíz = `render-gif.sh`; `story-video/` = `story-video.cjs`. El resto se
