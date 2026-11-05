@@ -262,3 +262,30 @@ permiso del operador.
 scratchpad (enlazando `node_modules`, `salidas/`, `runs/` y las fuentes locales) y correr los scripts desde ahí.
 
 **Dónde.** **Documental.**
+
+## 2026-11-05 · El borde de una máscara que cruza un objeto lo borra
+
+**Qué pasó.** Andrés vio en el N14 los pies de los peatones transparentes y en el N13 la rueda de la maleta a medio
+borrar: el borde de la máscara de inpaint pasaba por los pies y por las ruedas. Al oscurecer el cielo del N14 IMG3 con
+una máscara rectangular, el modelo además borró la cabeza de un chico que caía dentro, y la zona protegida de la
+torre conservó el cielo azul como un rectángulo visible.
+
+**Regla.** Una máscara nunca termina sobre un objeto: lo cubre entero (personas con pies y vereda, maletas con ruedas
+y la cinta) o no lo toca. Si un retoque anterior dejó intacto lo que se borró, se restituye desde
+`salidas/<id>/anteriores/` con máscaras pequeñas, sin generar. Un cambio global (el cielo, la hora, la luz) no se
+hace con máscaras ni curvas de color: se hace con una edición de la imagen completa (`ai:image --image <maestro>`,
+«cambia sólo X, mantén todo idéntico») y se revisa al 100 % que personas, cabezas y edificios sigan iguales. Lo que
+pide «enfocar» una zona desenfocada se repinta; el límite entre lo nítido y lo desenfocado sigue la silueta del
+objeto, nunca una línea recta.
+
+**Dónde.** **Documental.**
+
+## 2026-11-05 · El CTA del banner de ruta escritorio va centrado bajo la ruta
+
+**Qué pasó.** Melkin pidió alinear el botón con la ruta dibujada en todos los banners: el CTA iba pegado al margen
+derecho y el arco tiene su propio centro.
+
+**Regla.** En `ruta.color` escritorio el CTA comparte el eje vertical de la ruta (sin pasar el margen derecho).
+
+**Dónde.** `contracts/sky-blog-recipes.json → ruta.color.cta.align = "route"`, `compose/route-banner.mjs`,
+prueba en `test/route-banner.test.mjs` (`layout.ctaAxis`). **Codificada + prueba** (Workbench `d5281de`).
