@@ -2,6 +2,25 @@
 
 Formato: qué pasó → regla → dónde quedó codificada → estado (Codificada + prueba / Codificada / Documental).
 
+## 2026-11-05 · Lote de noviembre: la caja del sujeto empieza en la coronilla y el zoom deja margen arriba
+
+**Qué pasó.** En el lote de 54 artículos, muchas portadas generadas dejaban al sujeto bajo; se «alejó la cámara»
+expandiendo el maestro con `ai:inpaint` (Flare) y subiendo la escena para que el sujeto quedara entre 13 % y 49 %
+del alto. Tres portadas (noticia-talara, noticia-gol-cl, noticia-puntual-cl) pasaron `medir-portada` y aun así
+mostraban la cabeza cortada en la vista de escritorio: la caja declarada empezaba en los hombros y la coronilla
+quedaba en 13 %, justo encima de donde empieza la ventana del tema (~13,3 % del maestro). En Catacaos el arco de
+entrada salió con letras falsas («ETTCGOUNTE»). En Paraty, «Santiago → Río de Janeiro» ocupa dos líneas en la
+receta B de escritorio y el titular choca con el CTA.
+
+**Regla.** La caja del sujeto parte en la coronilla (incluye pelo y sombrero), nunca en los hombros; si un zoom
+sube la escena, el sujeto queda desde ≥ 18 % del alto. Toda letra legible dentro de la foto se retoca con máscara
+antes de exportar (herrería, carteles, toldos). Si la ruta no cabe en la receta B de escritorio, ese formato pasa a
+receta A; nunca se achica la letra (se probó y se revirtió por la regla aprobada del 2026-11-05).
+
+**Dónde.** Documental; el zoom del lote vive en el scratchpad de la sesión (`zoomout.mjs`, `ZOOM_TOP`), no en el
+contrato. Pendiente: llevar el margen a `HERO SPACE` / `medir-portada` como advertencia cuando la caja toca el borde
+superior de la ventana. **Documental.**
+
 ## 2026-11-05 · Ruta primero, titular sin repetir el H1, avión que se lea como avión
 
 **Qué pasó.** Julio revisó el banner del kickoff: «el avión no es un avión, son 2 palitos» (un trazo de líneas a
