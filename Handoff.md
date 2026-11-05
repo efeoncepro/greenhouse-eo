@@ -76,8 +76,9 @@ popup, KV y story en local y en OneDrive (`cmp` idéntico). Scripts, `bbox.json`
 persistidos en `ai-generations/2026-11-04_sky-black-gif/scripts/` (el scratchpad es temporal).
 **Tercera ronda (2026-11-05, Teams):** las 15 rutas foco del CSV de Daniela llevan su foto aprobada, legal, ubicación
 y crédito; «Vuela por el Perú» y AR Santiago/Lima llevan foto del destino (`destinos.cjs`, `fotos-destino.json`). Todo
-quedó ordenado en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en GIF + POPUP, `organizar.cjs`); canvas en versión 35, con
-encuadre por foto y cielo prolongado detrás del logo (la sombra detrás del logo fue rechazada). **Pendiente:**
+quedó ordenado en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en GIF + POPUP, `organizar.cjs`); canvas en versión 38: foto
+completa con degradado superior del 20 % a 0 (sombra y cielo prolongado rechazados), créditos arriba a la izquierda y story
+con PromPerú entre precio y pie. **Pendiente:**
 fotos de Chiclayo y Talara; ubicación del CSV ≠ foto en Pucallpa y Trujillo; «DESDE LIMA» deducido; CL «Encuentra destinos».
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto

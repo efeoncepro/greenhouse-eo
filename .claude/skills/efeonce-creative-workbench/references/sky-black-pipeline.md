@@ -277,24 +277,25 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   Cajamarca) y AR «Volá a Santiago» (`01_CHILE/SCL/santiago-679695892-original 1.png`) y «Volá a Lima»
   (`02_PERU/LIM/Imagen de Codex 30 sept 2026, 11_48_10 a.m..png`).
 - **`destinos.cjs`** (correr después de `variantes` y `rutas`; todo junto: `./rehacer-destinos.sh`): en el SVG
-  de `src2/` reemplaza la foto del kit por `<image id="lf-foto-destino">` 1080×1350, agrega `lf-piso`
-  (degradado inferior #2a1608 0,8 desde y=760), `lf-sombra` lateral si la pieza lleva lista (como el oscurecido
-  del clúster del kit) y el crédito vertical en el borde derecho (Metric 13, blanco al 80 %, y=560). **La foto
-  del kit es un `<use href="#image">` y en las variantes aparece varias veces en grupos recortados**: se
-  reemplaza la copia cuyo recorte cubre más lienzo y se ocultan las demás que lo tocan.
-- **Encuadre (`cubrir(n, W, H, fmt)`):** el sujeto `s` va a la zona libre del formato (tercio derecho, entre el
-  logo y el bloque de precio): KV t=[0,74;0,47], popup [0,74;0,44], story [0,70;0,50]. Cada foto puede
-  ajustar por formato `f.<kv|popup|story> = { src, s, t, z, drop }`. **`drop`** baja la foto esa fracción del
-  alto y completa arriba con **el cielo de la propia foto**: color medio de los píxeles azulados y claros de
-  su franja superior (12 %), llevado hacia el azul medio del KV (#6a8fae) si es nube, y más profundo hacia
-  arriba como el cénit, con 18 % de fundido. Así el logo queda sobre cielo limpio, como en el KV original.
-  Usado en Arequipa, Pucallpa, Juliaca, Tarapoto, Cusco (con la foto horizontal `CUSCO_H.png`, que trae
-  cielo), Piura, Tumbes, Jauja, Iquitos, Tacna y AR Santiago/Lima; story hasta 0,3.
-- **Rechazado por Julio y Daniela (2026-11-05):** sombra radial oscura detrás del logo, velo superior y halo
-  detrás de PromPerú. Se veían como una mancha. Si el logo no se lee, se resuelve con el encuadre o el cielo
-  prolongado, o con otra foto con más aire. Si el cielo no alcanza, hace falta relleno generativo, que se paga.
-- **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')` en lugar de `foto-fuente.png` para esas piezas, más
-  un piso más alto (popup desde 560, story 1000–1720) y el crédito (popup y=430, story y=900).
+  de `src2/` reemplaza la foto del kit por `<image id="lf-foto-destino">` 1080×1350 con la foto completa, agrega
+  `lf-cielo` (**degradado superior #0b1a2e del 20 % a 0** en los primeros 620 px, pedido de Daniela), `lf-piso`
+  (degradado inferior #2a1608 0,8 desde y=760), `lf-sombra` lateral si lleva lista y el crédito. **La foto del
+  kit es un `<use href="#image">` y en las variantes aparece varias veces en grupos recortados**: se reemplaza la
+  copia cuyo recorte cubre más lienzo y se ocultan las demás que lo tocan.
+- **Crédito (marca de agua):** horizontal, Metric 12, blanco al 75 %, **sin sombra**, esquina superior izquierda
+  (x=40, y=34 en KV y popup; y=250 en la story, bajo la barra de Instagram). En el KV lleva `data-capa="base"`
+  para que no entre en la capa del logo (salía duplicado en popup y story).
+- **Encuadre (`cubrir(n, W, H, fmt)`):** el sujeto `s` va a la zona libre del formato (tercio derecho): KV
+  t=[0,74;0,47], popup [0,74;0,44], story [0,70;0,50]; ajuste por foto en `f.<kv|popup|story> = { src, s, t, z }`.
+  Cusco usa la foto vertical con la catedral bajo el logo (t y 0,60 / 0,64 / 0,56).
+- **Rechazado (2026-11-05):** sombra radial detrás del logo, velo fuerte y halo detrás de PromPerú («mancha
+  negra», Julio y Daniela), y luego el `drop` con cielo prolongado de la propia foto («se siente como una mancha»,
+  cortaba la palmera de Piura). `cubrir` conserva la opción `drop`, pero no se usa en ninguna pieza.
+- **Story con PromPerú (rutas y «Vuela por el Perú»):** la ubicación es una capa aparte (`data-capa="ubicacion"`)
+  y va sola arriba a la derecha (y=228, al 110 %); PromPerú va entre la franja de precio y el pie, centrado bajo
+  el precio y al 120 %, y el pie (puntualidad y legales) baja 115 px. En KV y popup siguen juntos arriba a la derecha.
+- **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')`, el mismo degradado superior (popup 0–500, story 0–880),
+  un piso más alto (popup desde 560, story 1000–1720) y el crédito.
 - **`parts.cjs` / `layers.cjs`**: lista de rutas desde el CSV; región `ALIANZA_UBIC = [560,0,1080,330]` y capa
   forzada por `data-capa` (la ubicación larga y su pin caían en la caja del logo y en la story quedaban
   separados del texto).

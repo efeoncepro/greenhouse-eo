@@ -409,9 +409,9 @@ Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/
 
 Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la foto aprobada de su destino y el
 legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
-Los créditos van en pequeño, en vertical sobre el borde derecho. Para que el logo se lea, cada foto se
-encuadra con el lugar a la derecha y, cuando hace falta, se baja y se completa arriba con el cielo de la misma
-foto: el logo queda sobre cielo limpio, como en el KV original, sin sombras detrás. Chiclayo y Talara todavía no tienen foto
+Los créditos van en pequeño, en horizontal y sin sombra, en la esquina superior izquierda. Para que el
+logo se lea, la foto va completa con un degradado suave arriba, del 20 % a cero. En la story, la ubicación va
+arriba a la derecha y el logo de PromPerú entre el precio y el pie. Chiclayo y Talara todavía no tienen foto
 aprobada. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá a
 Lima» (Argentina) llevan una foto de cada ciudad.
 

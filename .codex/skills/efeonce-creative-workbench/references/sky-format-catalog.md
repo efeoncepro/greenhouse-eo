@@ -495,7 +495,9 @@ AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GI
 **Rutas foco (tercera ronda):** 15 rutas del CSV con la foto aprobada de `FOTOS PARA PROMPERU/` (versión
 vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima. Tasas incluidas», ubicación
 del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
-PROMPERÚ). Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
+PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, un degradado
+suave del 20 % a 0; en la story, la ubicación va arriba a la derecha y PromPerú entre el precio y el pie.
+Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
 en placeholder. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
 y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» y «Volá a Lima» llevan foto del destino.
 
