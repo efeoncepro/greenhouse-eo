@@ -49,6 +49,8 @@ Quedaron documentados cada formato SKY (tamaños, nombres, mercados, GIF y story
 ([catálogo](docs/documentation/creative/catalogo-formatos-sky.md)). 6 PMAX de rutas Perú con la fecha vieja se corrigieron.
 Tercera ronda: rutas foco con la foto aprobada de cada destino (15, desde el CSV de Daniela), fotos de destino en
 «Vuela por el Perú» y Argentina, y entrega ordenada por mercado y formato en «BLACK SKY 2026».
+Cuarta ronda: el logo se lee en todas las fotos sin apagarlas, la flecha de precio queda cerca de destinos cortos,
+Chile Travel va pegado a la esquina, Santiago para Argentina es de verano y las banderas tienen un borde fino.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

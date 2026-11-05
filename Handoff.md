@@ -80,6 +80,12 @@ quedó ordenado en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en G
 completa con degradado superior del 20 % a 0 (sombra y cielo prolongado rechazados), créditos arriba a la izquierda y story
 con PromPerú entre precio y pie. **Pendiente:**
 fotos de Chiclayo y Talara; ubicación del CSV ≠ foto en Pucallpa y Trujillo; «DESDE LIMA» deducido; CL «Encuentra destinos».
+**Cuarta ronda (2026-11-05, 11 comentarios del canvas, versión 40):** velo diagonal del logo con intensidad medida por
+foto (reemplaza al degradado plano 20 %), regla destino ↔ flecha de precio a 40 px (`brecha.cjs` en el SVG y
+`compose.cjs` en popup/story; también corre los popups de los KV del kit), Chile Travel pegado a la esquina, AR
+Santiago con foto de verano, story de Tacna reencuadrada, stories con PromPerú centrado y marca de agua y ubicación
+pegadas arriba, aro de banderas de 2 px (KV, GIF, story en video y HPH por mercado). Actualizado en canvas,
+`BLACK SKY 2026` y ENTREGABLES. **Por confirmar:** que la regla de la flecha valga también para los popups del kit.
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

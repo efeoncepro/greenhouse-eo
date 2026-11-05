@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (fotos de destino, CSV de rutas y orden «BLACK SKY 2026»)
+> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda: velo del logo, regla de la flecha, alianzas y encuadres)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -281,10 +281,19 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 
 Si el logo se pierde sobre la foto, ajusta el encuadre en `fotos-destino.json` (`f.<formato>.t`, o `src` para
 usar otra versión de la foto) y vuelve a correr `./rehacer-destinos.sh`. El único apoyo detrás del logo es el
-degradado superior suave (20 % a 0). No pongas sombras, velos, halos ni cielos inventados: se ven como mancha.
+velo diagonal que calcula `destinos.cjs` según la luz de cada foto (nace arriba a la izquierda y se apaga antes del
+lado derecho). No pongas sombras radiales, halos ni cielos inventados: se ven como mancha. Si la flecha o el badge
+tapan a una persona, usa `z` y `t` del formato (como la story de Tacna). Elige fotos de la temporada del mercado:
+en noviembre, verano en Argentina y Chile.
+
+La regla de la flecha la aplican `brecha.cjs` (KV) y `compose.cjs` (popup y story): si el destino es corto, la
+flecha y el badge se acercan hasta 40 px del bloque del destino. Después de cambiar un texto de destino, corre
+`./rehacer-destinos.sh` y `node compose.cjs` (sin nombres, para todas).
 
 Qué revisar: el sujeto queda a la derecha, sin tapar el logo ni el precio; el antetítulo, las fechas y
-«Vuela a…» se leen sobre la foto; PromPerú, el pin y la ubicación van juntos; el crédito se ve pequeño, horizontal,
+«Vuela a…» se leen sobre la foto; en KV y popup PromPerú, el pin y la ubicación van juntos (en la story, la
+marca de agua y la ubicación van pegadas arriba, una en cada esquina, y PromPerú centrado entre el precio y el pie);
+el aro blanco de las banderas es fino (2 px, como el kit); el crédito se ve pequeño, horizontal,
 arriba a la izquierda; el legal dice «Final tramo <Ciudad>-Lima. Tasas incluidas».
 
 ### 7g. Ordenar la entrega en «BLACK SKY 2026»

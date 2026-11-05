@@ -1,9 +1,9 @@
 # Catálogo de formatos SKY — Qué pieza es cada una, su tamaño y cómo se nombra
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-11-05 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (fotos de destino en las rutas, orden de carpetas «BLACK SKY 2026»)
+> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda: velo del logo, regla de la flecha de precio, alianzas y encuadres)
 > **Documentacion tecnica:** [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [Canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
@@ -297,12 +297,16 @@ con la fecha nueva.
 
 ### Banderas y alianzas
 
-- **Banderas:** círculo con borde blanco y el nombre del destino al lado. La lista de cada mercado sale de cinco
+- **Banderas:** círculo con un borde blanco fino (2 px, como en el kit) y el nombre del destino al lado. La lista de cada mercado sale de cinco
   referencias que mandó Daniela. Ojo con el kit: el archivo «BANDERA CL (CIRCULO)_1» muestra la bandera de
   **Argentina**, y «PUJ» es Punta Cana (República Dominicana).
 - **Alianzas:** Chile Travel acompaña a Brasil «Voe a Santiago» (es la versión «fuera de Chile»); PromPerú «otros HM»
   acompaña a Brasil «Voe para Peru»; PromPerú «solo HM Perú» va en las rutas foco. El logo de alianza va arriba a la
-  derecha en KV y popup, y en la story va debajo del avión para no montarse con él.
+  derecha en KV y popup, y en la story va debajo del avión para no montarse con él. **Chile Travel** es una pestaña
+  que cuelga del borde: va pegada a la esquina superior derecha, sin margen, en todas las piezas.
+- **Flecha de precio:** es una regla que la flecha quede cerca del destino. Si el destino es corto («Peru», «Lima»),
+  la flecha y el badge se acercan hasta dejar 40 px después del bloque del destino. Con destinos largos se queda
+  donde la puso el kit.
 
 ## Cómo es un GIF
 
@@ -410,10 +414,13 @@ Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/
 Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la foto aprobada de su destino y el
 legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
 Los créditos van en pequeño, en horizontal y sin sombra, en la esquina superior izquierda. Para que el
-logo se lea, la foto va completa con un degradado suave arriba, del 20 % a cero. En la story, la ubicación va
-arriba a la derecha y el logo de PromPerú entre el precio y el pie. Chiclayo y Talara todavía no tienen foto
+logo se lea, la foto va completa con un velo suave que nace en la esquina del logo y se apaga antes del lado
+derecho, para no tapar nada de la foto. Su intensidad depende de cada foto: casi nada si el fondo ya es oscuro y
+más cuando el cielo es claro. En la story, la marca de agua y la ubicación van pegadas arriba, una en cada esquina, y
+el logo de PromPerú va centrado entre el precio y el pie. Chiclayo y Talara todavía no tienen foto
 aprobada. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá a
-Lima» (Argentina) llevan una foto de cada ciudad.
+Lima» (Argentina) llevan una foto de cada ciudad; la de Santiago es de verano (en noviembre allá es
+primavera-verano), con una pareja en el Parque Bicentenario y la Costanera de fondo.
 
 > Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [scripts, §4.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)

@@ -278,12 +278,12 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   (`02_PERU/LIM/Imagen de Codex 30 sept 2026, 11_48_10 a.m..png`).
 - **`destinos.cjs`** (correr después de `variantes` y `rutas`; todo junto: `./rehacer-destinos.sh`): en el SVG
   de `src2/` reemplaza la foto del kit por `<image id="lf-foto-destino">` 1080×1350 con la foto completa, agrega
-  `lf-cielo` (**degradado superior #0b1a2e del 20 % a 0** en los primeros 620 px, pedido de Daniela), `lf-piso`
+  `lf-cielo` (velo del logo; desde la cuarta ronda es diagonal y adaptativo, ver §4.5), `lf-piso`
   (degradado inferior #2a1608 0,8 desde y=760), `lf-sombra` lateral si lleva lista y el crédito. **La foto del
   kit es un `<use href="#image">` y en las variantes aparece varias veces en grupos recortados**: se reemplaza la
   copia cuyo recorte cubre más lienzo y se ocultan las demás que lo tocan.
 - **Crédito (marca de agua):** horizontal, Metric 12, blanco al 75 %, **sin sombra**, esquina superior izquierda
-  (x=40, y=34 en KV y popup; y=250 en la story, bajo la barra de Instagram). En el KV lleva `data-capa="base"`
+  (x=40, y=34 en todos los formatos; la story bajaba a y=250 hasta la cuarta ronda, §4.5). En el KV lleva `data-capa="base"`
   para que no entre en la capa del logo (salía duplicado en popup y story).
 - **Encuadre (`cubrir(n, W, H, fmt)`):** el sujeto `s` va a la zona libre del formato (tercio derecho): KV
   t=[0,74;0,47], popup [0,74;0,44], story [0,70;0,50]; ajuste por foto en `f.<kv|popup|story> = { src, s, t, z }`.
@@ -292,9 +292,9 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   negra», Julio y Daniela), y luego el `drop` con cielo prolongado de la propia foto («se siente como una mancha»,
   cortaba la palmera de Piura). `cubrir` conserva la opción `drop`, pero no se usa en ninguna pieza.
 - **Story con PromPerú (rutas y «Vuela por el Perú»):** la ubicación es una capa aparte (`data-capa="ubicacion"`)
-  y va sola arriba a la derecha (y=228, al 110 %); PromPerú va entre la franja de precio y el pie, centrado bajo
-  el precio y al 120 %, y el pie (puntualidad y legales) baja 115 px. En KV y popup siguen juntos arriba a la derecha.
-- **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')`, el mismo degradado superior (popup 0–500, story 0–880),
+  y va sola arriba a la derecha (desde §4.5: en la esquina, margen 48, al 110 %); PromPerú va entre la franja de
+  precio y el pie, al 120 % (desde §4.5: centrado en x=540), y el pie (puntualidad y legales) baja 115 px. En KV y popup siguen juntos arriba a la derecha.
+- **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')`, el velo del logo (§4.5),
   un piso más alto (popup desde 560, story 1000–1720) y el crédito.
 - **`parts.cjs` / `layers.cjs`**: lista de rutas desde el CSV; región `ALIANZA_UBIC = [560,0,1080,330]` y capa
   forzada por `data-capa` (la ubicación larga y su pin caían en la caja del logo y en la story quedaban
@@ -309,6 +309,54 @@ Orden de esta ronda: `variantes` → `rutas` → `destinos` → `render` → `pa
 `recrop` → `anim-css-gen` → `render-gif.sh` → `story-video` para las que tienen GIF) → `sync-canvas` →
 `new-pages` (rutas desde el CSV) → subir los videos nuevos como asset y actualizar `vid-blobs.json` →
 publicar → copiar a `OUT` → `organizar.cjs`.
+
+### 4.5 Cuarta ronda (2026-11-05): velo del logo, regla destino ↔ flecha, alianzas y encuadres
+
+Ocho comentarios de Daniela en el canvas. Todo se reconstruye con `./rehacer-destinos.sh`, que ahora corre
+`brecha.cjs` sobre variantes y rutas antes de `render`, y luego `node compose.cjs` sobre **todas** las piezas
+(la regla de la flecha cambia también los popups de los KV originales).
+
+- **Velo del logo (`destinos.cjs` → `veloAlfa`, `veloSvg`, `velo`).** El degradado plano 20 % → 0 cruzaba todo el
+  ancho, apagaba elementos de la foto a la derecha (faro de Lima) y no aseguraba el contraste con cielo claro
+  (Cajamarca). Ahora es **diagonal**: `linearGradient` en `userSpaceOnUse` desde la esquina superior izquierda
+  hasta (0,9 W; 0,5 H) en KV, (0,9 W; 0,55 H) en popup y de (0; 0,08 H) a (0,95 W; 0,55 H) en story, con caída
+  suavizada (paradas a, 0,62 a, 0,2 a, 0 en 0 / 0,38 / 0,72 / 1). La intensidad `a` se calcula por foto y formato:
+  percentil 80 de la luminancia dentro de la caja del logo (KV y popup `[60,40,700,330]`, story `[60,250,870,600]`)
+  y `a = (L − 105) / (L − 22)` acotado a 0,16–0,50 (ej. Santiago L=190 → 0,50). Al re-correr `destinos.cjs` sobre
+  un KV ya procesado, el velo se recalcula. No es una sombra radial (rechazada como «mancha»).
+- **Regla destino ↔ flecha de precio (`brecha.cjs`, `BRECHA = 40`).** «Es una regla»: con destinos cortos
+  («Peru», «Lima») la flecha quedaba lejos del bloque. La flecha y el badge se corren a la izquierda hasta dejar
+  40 px entre el borde derecho del bloque de destino (título, antetítulo o píldora, lo más ancho) y la esquina de
+  la flecha; **nunca a la derecha**. En el SVG mide con `getBoundingClientRect` y regiones de `parts`, antepone
+  `translate(-d 0)` a cada hoja de precio y badge y les pone `data-capa` (si no, `parts`/`layers` las dejarían en
+  la base al salir de la región de precio). Corridas: AR Lima y Santiago 16, BR Perú 52, BR Santiago 44; las rutas
+  ya cumplen (la píldora «DESDE LIMA» mide lo mismo en todas). En popup el bloque se reescala alrededor de anclas
+  distintas (destino en x=62, precio en x=1044, ambos al 0,88), así que `compose.cjs` vuelve a medir sobre las
+  partes y corre `precio`/`badge` con el mismo umbral (también en los KV originales: «Internacional» 41 px,
+  «Calama» ~108); en la story (escala 1) usa `correStory`.
+- **Chile Travel (Marca Chile) pegado a la esquina** (`variantes.cjs`): es una pestaña que cuelga del borde;
+  `x = 1080 − ancho`, `y = 0` en el KV (alto 150). Popup lo hereda; en la story (`compose.cjs`) toda alianza que
+  en el KV toque el borde superior derecho se ancla a (1080, 0) al 110 %. PromPerú «otros HM» sigue con margen.
+- **Story con PromPerú:** ubicación de la foto **completa en la esquina superior derecha, pegada arriba**
+  (borde derecho en x=1040, borde superior en y=22; antes y=228) y PromPerú **centrado en x=540** (antes centrado
+  bajo el precio), en todas las stories.
+- **Marca de agua pegada arriba en todos los formatos:** en la story el crédito ya no baja a y=250; va en (40, 34)
+  como en KV y popup, a la misma altura que la ubicación del lado derecho («los watermark siempre arriba pegado y
+  la ubicación de al lado igual»).
+- **Aro de las banderas (`banderas.cjs`, `hph/market.cjs`):** sumaba ~5 px (disco blanco de fondo + aro propio del
+  SVG con trazo 14 + aro de 2 px). Ahora `banderas.cjs` quita el aro del SVG (`stroke="#fff"` → `none`), recorta la
+  bandera a su círculo por la caja de opacidad (`flags-circ/<K>.png`, 160 px) y dibuja un solo aro blanco de 2 px a
+  r − 1, como la lista del clúster internacional del kit. El HPH por mercado dibuja ese PNG al 93 % de su caja con
+  un aro de 3 % del diámetro (mín. 1 px). Después de `banderas.cjs` hay que correr `variantes.cjs`
+  (`HM_PE_KV_ENCUENTRA` nace de `HM_PE_KV_INTER_BANDERAS`) y `hph/market.cjs`.
+- **AR «Volá a Santiago» en verano:** en Argentina es primavera-verano; la foto con nieve chocaba. Ahora
+  `santiago-1129335236` (pareja en el Parque Bicentenario con la Costanera): `original 3.png` para KV
+  (z 1,12, t [0,50; 0,41]) y popup (z 1,15, t [0,48; 0,40]) y la versión 1080×1920 para la story. El zoom sube
+  las caras sobre la flecha y el badge. La de nieve queda como `fotos-destino/AR_SANTIAGO_NIEVE.png`.
+- **Tacna story:** la flecha tapaba a la persona; `f.story = { z: 1,25, t: [0,36; 0,5] }` la deja entera a la
+  izquierda de la flecha.
+- Se regeneraron GIF de AR Lima, AR Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con
+  banderas (AR, PE, BR, US, UY y PE «Encuentra»), y la story en video de las nueve que la tienen entre ellas.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 

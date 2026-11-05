@@ -130,7 +130,7 @@ Columnas de piezas: **B** = KV fijo + popup + story estática + GIF + MP4 + MP4 
 | `HM_UY_KV` | Kit | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | — | ✓ | ✓ | ✓ | — |
 | `HM_UY_KV_BANDERAS` | Efeonce | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | Fila de 4 banderas (DO, CL, BR, US) en lugar de la píldora de origen | ✓ | — | — | ✓ |
 | `HM_BR_KV` | Kit | VOE A / Internacional | A PARTIR DE | COM ATÉ 00% OFF | — | ✓ | ✓ | ✓ | — |
-| `HM_BR_KV_SANTIAGO` | Efeonce | VOE A / Santiago | A PARTIR DE | COM ATÉ 00% OFF | Chile Travel arriba a la derecha | ✓ | — | — | ✓ |
+| `HM_BR_KV_SANTIAGO` | Efeonce | VOE A / Santiago | A PARTIR DE | COM ATÉ 00% OFF | Chile Travel pegado a la esquina superior derecha | ✓ | — | — | ✓ |
 | `HM_BR_KV_PERU` | Efeonce | VOE PARA / Peru | A PARTIR DE | COM ATÉ 00% OFF | PromPerú «otros HM» arriba a la derecha | ✓ | — | — | ✓ |
 | `HM_BR_KV_BANDERAS` | Efeonce (extra) | VOE A / Internacional | A PARTIR DE | COM ATÉ 00% OFF | Santiago e conexões para 15 destinos · Lima e conexões para 16 destinos · Argentina · Miami · Uruguai | ✓ | — | — | — |
 | `HM_US_KV` | Kit | FLY / International | ROUND TRIP FROM | WITH UP TO 00% OFF | — | ✓ | ✓ | ✓ | — |
@@ -406,7 +406,7 @@ Cada SVG circular pesa ~1,78 MB porque embebe las 7 banderas raster y muestra un
 | PromPerú, sólo HM Perú | `ALIANZAS/PROMPERU/PROMPERU (SOLO HM PERU)@72x.png` (1928×724; no hay SVG) | Rutas de Perú: alto 68 px, arriba a la derecha (margen 48, y=56) |
 | PromPerú, otros HM | `ALIANZAS/PROMPERU/OTROS HM FUERA DE PERU/LOGO_PROMPE_OTROS-HM_{BLANCO,COLOR}.svg` (236×145) | `HM_BR_KV_PERU`: versión blanca, alto 104 px, arriba a la derecha (y=52) |
 | SKY + PromPerú, otros HM | `…/SKY+PROMPE_OTROS-HM_{BLANCO,COLOR}.svg` (249×54) | No se usó |
-| Chile Travel (fuera de Chile) | `ALIANZAS/SERNATURE/CHILE TRAVEL (FUERA DE CHILE).svg` (146×171) | `HM_BR_KV_SANTIAGO`: alto 150 px, arriba a la derecha (y=52) |
+| Chile Travel (fuera de Chile) | `ALIANZAS/SERNATURE/CHILE TRAVEL (FUERA DE CHILE).svg` (146×171) | `HM_BR_KV_SANTIAGO`: alto 150 px, **pegado a la esquina superior derecha** (x = 1080 − ancho, y = 0; Daniela 2026-11-05); en la story, anclado a (1080, 0) al 110 % |
 | Chile es tuyo (sólo HM Chile) | `ALIANZAS/SERNATURE/CHILE ES TUYO (SOLO HM CHILE).svg` (145×171) | No se usó (ningún KV chileno lleva alianza) |
 
 Ubicación de la foto en rutas: `[Ubicación de la foto]`, Metric Bold 18, blanco con contorno suave, alineado
@@ -495,11 +495,13 @@ AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GI
 **Rutas foco (tercera ronda):** 15 rutas del CSV con la foto aprobada de `FOTOS PARA PROMPERU/` (versión
 vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima. Tasas incluidas», ubicación
 del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
-PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, un degradado
-suave del 20 % a 0; en la story, la ubicación va arriba a la derecha y PromPerú entre el precio y el pie.
+PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, desde la cuarta
+ronda, un velo diagonal adaptativo (pipeline §4.5); en la story, la ubicación va completa en la esquina superior
+derecha (margen 48) y PromPerú centrado (x=540) entre el precio y el pie. Regla de la flecha de precio: 40 px
+después del bloque del destino cuando el destino es corto, en KV, popup y story.
 Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
 en placeholder. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
-y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» y «Volá a Lima» llevan foto del destino.
+y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» (de verano desde la cuarta ronda: `santiago-1129335236`) y «Volá a Lima» llevan foto del destino.
 
 ## 6. Inconsistencias y pendientes
 
@@ -543,7 +545,8 @@ de Adri dice «cluster inter de Perú»; AR mantiene «DESDE [ORIGEN]».
 | CL «Encuentra destinos» | Se hizo desde el clúster internacional de Chile; su nota decía «cluster inter de Perú» |
 | Frases del brandlift INTER y traducciones (AR, PT, EN) | Propuestas propias |
 | Traducciones de flecha y botón HPH (PT, EN) | Propuestas propias |
-| Ubicación de la foto en rutas | Placeholder `[Ubicación de la foto]` |
+| Ubicación de la foto en rutas | Del CSV; Chiclayo y Talara siguen con `[Ubicación de la foto]` (sin foto aprobada) |
+| Regla de la flecha en popups de KV originales | Se aplicó a todos los popups (p. ej. «Internacional» se corre 41 px, «Calama» ~108); confirmar que la regla también vale para las piezas del kit |
 | Tapa vertical en español | Recortada de la horizontal |
 | Precios, descuentos, orígenes y fechas de vuelo | Placeholder en todas las piezas |
 | Derechos de la foto del KV y de la medalla | Archivos con rastro de generación por IA: validar antes de pautar |

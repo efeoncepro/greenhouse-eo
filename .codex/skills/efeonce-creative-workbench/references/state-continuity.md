@@ -31,6 +31,11 @@ Tercera ronda (2026-11-05): fotos aprobadas en las 15 rutas foco (CSV de Daniela
 Santiago/Lima; foto completa con degradado superior del 20 % a 0, créditos arriba a la izquierda y story con
 PromPerú entre precio y pie; orden y nomenclatura en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en
 GIF + POPUP); canvas versión 38.
+Cuarta ronda (2026-11-05, 11 comentarios del canvas): velo diagonal adaptativo del logo (reemplaza al degradado plano),
+regla destino ↔ flecha de precio a 40 px (`brecha.cjs` y `compose.cjs`, también en popups de los KV del kit), Chile
+Travel pegado a la esquina, AR Santiago en verano, story de Tacna reencuadrada, stories con PromPerú centrado y
+marca de agua y ubicación pegadas arriba, aro de banderas de 2 px (KV, GIF y HPH por mercado). Detalle en
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40.
 Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3.
 
 Pendientes sin confirmar por el operador:
