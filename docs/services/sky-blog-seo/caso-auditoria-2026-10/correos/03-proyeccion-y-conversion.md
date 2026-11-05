@@ -7,7 +7,7 @@ recordó en Teams el 05-11 («por fa tu ayuda con lo pendiente de la reu del lun
 ([política](../../../../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md)).
 
 **Adjuntos:**
-- el PDF «Efeonce - Proyección Blog SKY (06-11-2026).pdf»;
+- el PDF «Efeonce - Proyección Blog SKY (05-11-2026).pdf»;
 - la planilla del desglose de búsquedas valorizadas.
 
 Ambos quedan en OneDrive › Alineación › 1. Clientes (Interno) › Sky - SEO-AEO › Proyección 2026-11.
