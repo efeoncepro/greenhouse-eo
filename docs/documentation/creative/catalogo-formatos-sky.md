@@ -393,13 +393,13 @@ CyberSky Perú se entregó aparte, como un PDF de 66 páginas (22 destinos × po
 
 ### Carpeta ordenada para el equipo: «BLACK SKY 2026»
 
-Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`. Ahí quedaron 177 archivos:
+Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`. Ahí quedaron 155 archivos:
 
 - **Una carpeta por mercado:** `HM CL`, `HM PE`, `HM AR`, `HM UY`, `HM BR` y `HM USA`.
 - **Dentro, una carpeta por formato:** `HPH`, `PMAX` y `GIF + POPUP`. Chile suma `BANNER TIKTOK` y `DAT`, y
   Perú suma `RUTAS FOCO`.
 - **En `GIF + POPUP`, una carpeta por pieza confirmada**, por ejemplo «VUELA POR CHILE». Cada una trae el
-  popup, la story, el GIF (en GIF y en MP4, con y sin audio) y la story en video.
+  popup, la story, el GIF y la story en video.
 - **PMAX:** si un mercado tiene más de una agrupación, cada una va en su carpeta («PMAX DOM», «PMAX INTER»…)
   con sus 4 tamaños.
 - **Nombres:** `BS_` + formato o medida + pieza. Por ejemplo `BS_POPUP_DOM`, `BS_GIF_INTER`,
@@ -409,7 +409,9 @@ Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/
 
 Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la foto aprobada de su destino y el
 legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
-Los créditos van en pequeño, en vertical sobre el borde derecho. Chiclayo y Talara todavía no tienen foto
+Los créditos van en pequeño, en vertical sobre el borde derecho. Para que el logo se lea, cada foto se
+encuadra con el lugar a la derecha y, cuando hace falta, se baja y se completa arriba con el cielo de la misma
+foto: el logo queda sobre cielo limpio, como en el KV original, sin sombras detrás. Chiclayo y Talara todavía no tienen foto
 aprobada. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá a
 Lima» (Argentina) llevan una foto de cada ciudad.
 

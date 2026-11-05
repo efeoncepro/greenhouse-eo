@@ -279,6 +279,10 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 3. Revisa una hoja de contacto con KV, popup y story **de cada pieza**. El popup y la story no usan la foto
    del SVG: que se vean bien no prueba que el KV también esté bien.
 
+Si el logo se pierde sobre la foto, ajusta el encuadre en `fotos-destino.json` (`f.<formato>.t`, `drop` para
+bajar la foto y prolongar el cielo, o `src` para usar otra versión de la foto) y vuelve a correr
+`./rehacer-destinos.sh`. No pongas sombras, velos ni halos detrás del logo: se ven como una mancha.
+
 Qué revisar: el sujeto queda a la derecha, sin tapar el logo ni el precio; el antetítulo, las fechas y
 «Vuela a…» se leen sobre la foto; PromPerú, el pin y la ubicación van juntos; el crédito se ve pequeño en el
 borde derecho; el legal dice «Final tramo <Ciudad>-Lima. Tasas incluidas».

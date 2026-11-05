@@ -473,7 +473,7 @@ por script). URL y lecciones de la plataforma: [sky-design-canvas.md](sky-design
 
 ### 5.4 «BLACK SKY 2026» (orden pedido por Daniela, 2026-11-05)
 
-Ruta: `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (estaba vacía). 177 archivos, 380 MB, copiados con
+Ruta: `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (estaba vacía). 155 archivos, copiados con
 `organizar.cjs` y verificados con `diff -rq`. Nomenclatura `BS_<MEDIDA o FORMATO>_<PIEZA>`: genéricos
 `INTER` / `DOM` / `DESTINOS`; destinos y rutas foco con IATA (SCL, LIM, AQP, AYP, CJA, CIX, CUZ, IQT, JAU,
 JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_INTER`).
@@ -487,8 +487,8 @@ JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_
 | `HM BR` | BR | 4 sueltas | `VOE A SANTIAGO` (SCL, con Chile Travel) | |
 | `HM USA` | US | 4 sueltas | `FLY INTERNATIONAL` (US_BANDERAS) | |
 
-Cada carpeta de pieza trae `BS_POPUP_`, `BS_STORY_`, `BS_GIF_` (.gif y .mp4), `BS_GIF_…_AUDIO.mp4` y
-`BS_STORYVIDEO_` (.mp4). Con una sola agrupación de PMAX, las 4 imágenes van sueltas en `PMAX/`. Sólo 1x.
+Cada carpeta de pieza trae `BS_POPUP_`, `BS_STORY_`, `BS_GIF_` (sólo .gif: el MP4 con el mismo nombre se
+leía como duplicado) y `BS_STORYVIDEO_` (.mp4). El GIF en MP4, con y sin audio, sigue en la entrega anterior. Con una sola agrupación de PMAX, las 4 imágenes van sueltas en `PMAX/`. Sólo 1x.
 Fuera de la carpeta por no estar en la lista confirmada por Adri: BR «Voe para Peru», los KV con banderas de
 AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GIF.
 

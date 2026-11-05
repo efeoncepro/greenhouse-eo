@@ -276,24 +276,33 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   (0-1), `cred` (crédito), `promperu` y `sombra`. Cubre las 13 rutas con foto, «Vuela por el Perú» (foto de
   Cajamarca) y AR «Volá a Santiago» (`01_CHILE/SCL/santiago-679695892-original 1.png`) y «Volá a Lima»
   (`02_PERU/LIM/Imagen de Codex 30 sept 2026, 11_48_10 a.m..png`).
-- **`destinos.cjs`** (correr después de `variantes` y `rutas`): en el SVG de `src2/` reemplaza la foto del kit
-  por `<image id="lf-foto-destino">` 1080×1350 (recorte que deja el sujeto en x≈0,62, y≈0,45), agrega
-  `lf-cielo` (velo superior #0b1a2e 0,38), `lf-piso` (degradado inferior #2a1608 0,8 desde y=760) y, si
-  corresponde, `lf-sombra` lateral y el crédito vertical en el borde derecho (Metric 13, blanco al 80 %,
-  centrado en y=560). **La foto del kit es un `<use href="#image">` y en las variantes aparece varias veces
-  en grupos recortados**: se reemplaza la copia cuyo recorte cubre más lienzo y se ocultan las demás que lo
-  tocan. Reemplazar «la primera» dejó el KV en blanco en AR y «Vuela por el Perú». Para «Vuela por el
-  Perú» también aplica legal, origen, PromPerú y ubicación con `PAGE`. Exporta `cubrir()` y `credito()`.
-- **`compose.cjs`** usa `cubrir(n, W, H, t)` en vez de `foto-fuente.png` para esas piezas (popup t=[0,62;0,40],
-  story t=[0,60;0,42]) y agrega velo superior, un piso más alto (popup desde 560, story 1000–1720), el
-  crédito (popup y=430, story y=900) y un halo radial oscuro detrás de PromPerú y la ubicación (nubes).
+- **`destinos.cjs`** (correr después de `variantes` y `rutas`; todo junto: `./rehacer-destinos.sh`): en el SVG
+  de `src2/` reemplaza la foto del kit por `<image id="lf-foto-destino">` 1080×1350, agrega `lf-piso`
+  (degradado inferior #2a1608 0,8 desde y=760), `lf-sombra` lateral si la pieza lleva lista (como el oscurecido
+  del clúster del kit) y el crédito vertical en el borde derecho (Metric 13, blanco al 80 %, y=560). **La foto
+  del kit es un `<use href="#image">` y en las variantes aparece varias veces en grupos recortados**: se
+  reemplaza la copia cuyo recorte cubre más lienzo y se ocultan las demás que lo tocan.
+- **Encuadre (`cubrir(n, W, H, fmt)`):** el sujeto `s` va a la zona libre del formato (tercio derecho, entre el
+  logo y el bloque de precio): KV t=[0,74;0,47], popup [0,74;0,44], story [0,70;0,50]. Cada foto puede
+  ajustar por formato `f.<kv|popup|story> = { src, s, t, z, drop }`. **`drop`** baja la foto esa fracción del
+  alto y completa arriba con **el cielo de la propia foto**: color medio de los píxeles azulados y claros de
+  su franja superior (12 %), llevado hacia el azul medio del KV (#6a8fae) si es nube, y más profundo hacia
+  arriba como el cénit, con 18 % de fundido. Así el logo queda sobre cielo limpio, como en el KV original.
+  Usado en Arequipa, Pucallpa, Juliaca, Tarapoto, Cusco (con la foto horizontal `CUSCO_H.png`, que trae
+  cielo), Piura, Tumbes, Jauja, Iquitos, Tacna y AR Santiago/Lima; story hasta 0,3.
+- **Rechazado por Julio y Daniela (2026-11-05):** sombra radial oscura detrás del logo, velo superior y halo
+  detrás de PromPerú. Se veían como una mancha. Si el logo no se lee, se resuelve con el encuadre o el cielo
+  prolongado, o con otra foto con más aire. Si el cielo no alcanza, hace falta relleno generativo, que se paga.
+- **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')` en lugar de `foto-fuente.png` para esas piezas, más
+  un piso más alto (popup desde 560, story 1000–1720) y el crédito (popup y=430, story y=900).
 - **`parts.cjs` / `layers.cjs`**: lista de rutas desde el CSV; región `ALIANZA_UBIC = [560,0,1080,330]` y capa
   forzada por `data-capa` (la ubicación larga y su pin caían en la caja del logo y en la story quedaban
   separados del texto).
 - **`organizar.cjs <OUT> <BLACK SKY 2026>`**: copia (sin borrar) a
   `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` con la estructura y la nomenclatura de Daniela
   (detalle en [sky-format-catalog.md](sky-format-catalog.md) §5.4). Falla si falta una fuente o si dos
-  destinos coinciden; deja `organizar-plan.json` con las 177 rutas.
+  destinos coinciden; deja `organizar-plan.json`. En `GIF + POPUP` va sólo el `.gif` (el MP4 con el mismo nombre
+  se veía «exportado dos veces»): 155 archivos.
 
 Orden de esta ronda: `variantes` → `rutas` → `destinos` → `render` → `parts` → `compose` → (`layers` →
 `recrop` → `anim-css-gen` → `render-gif.sh` → `story-video` para las que tienen GIF) → `sync-canvas` →
