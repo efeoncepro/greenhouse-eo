@@ -225,3 +225,40 @@ ver la lección «Ruta primero».)
 **Regla.** Ninguna regla de esas páginas aplica al Blog SKY; esta skill no las cita como fuente.
 
 **Dónde.** [sources.md](sources.md) §3. **Documental** (mover las páginas es decisión del operador).
+
+## 2026-11-05 · Corregir un comentario de revisión: arreglar la zona, no regenerar la portada
+
+**Qué pasó.** Melkin observó en Frame.io la portada del N45 (una isla y objetos que vuelan y flotan en el horizonte) y la
+del N47 (público uniforme). Regenerar desde cero dejó al sujeto enorme y la mitad inferior clara: ninguna de las dos
+candidatas pasó `medir-portada`. La portada ya instalada sí pasaba el gate.
+
+**Regla.** Si el comentario apunta a una zona, se repinta sólo esa zona sobre el maestro instalado (`ai:inpaint` con
+máscara, clave personal por `OPENAI_API_KEY_PROFILE=personal`) y se vuelve a medir. La máscara cubre los pies y la vereda
+de las personas que repinta (si corta a la altura de los tobillos, los pies salen transparentes) y nunca toca un primer
+plano desenfocado: si lo toca, la silueta se restituye desde el original. Un horizonte repintado puede quedar más alto o
+más bajo que el original: medirlo por columna y alinearlo con un remuestreo vertical de la franja. Objetos pequeños que
+quedan (boyas) se tapan clonando agua vecina. Siempre se revisa la unión al 100 % antes de instalar.
+
+**Dónde.** Procedimiento en esta lección y en el informe de la pieza `projects/sky/blog-lote-2026-11`. **Documental.**
+
+## 2026-11-05 · Los comentarios de Frame.io se leen desde los correos de resumen
+
+**Qué pasó.** El token de Frame.io no servía y la grilla del enlace compartido no carga con el panel oculto. El texto de
+cada comentario venía completo en los correos «N Notifications on SKY Airline - Blog» (notifications@frame.io); cuando
+el correo sólo dice «left N comments», el texto se lee en la vista directa del asset compartido.
+
+**Regla.** Barrer los correos de resumen por fecha (Outlook) y el chat interno antes de dar la revisión por resuelta;
+un comentario sin texto legible queda como pendiente con nombre, no se adivina. Responder en Frame o Teams requiere
+permiso del operador.
+
+**Dónde.** **Documental.**
+
+## 2026-11-05 · El checkout del Workbench es compartido: nunca cambiar de rama para producir
+
+**Qué pasó.** Mientras se corregía el lote, otra sesión dejó el checkout en una rama de Berel con trabajo sin commitear;
+`specs/` y los scripts del blog desaparecieron del disco y el instalador falló a mitad.
+
+**Regla.** No cambiar de rama ni tocar el árbol ajeno. Extraer la rama del blog con `git archive` a una copia en el
+scratchpad (enlazando `node_modules`, `salidas/`, `runs/` y las fuentes locales) y correr los scripts desde ahí.
+
+**Dónde.** **Documental.**
