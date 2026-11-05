@@ -1,8 +1,6 @@
 # KSB Chile — correo de solicitud de bases (borrador, 05/11/2026)
 
-Estado: **borrador, sin enviar**. Falta el enlace nativo de HubSpot del brochure Agencia de Marketing
-360° completo (documento 357361299, 84 láminas) para `cl.ksb@ksb.com`: la sesión de HubSpot del
-navegador integrado expiró. Envío por Outlook con firma gráfica y CCO HubSpot, sólo con OK de Julio.
+Estado: **borrador, sin enviar**. Enlace nativo HubSpot creado el 05/11/2026 desde Chrome para `cl.ksb@ksb.com` sobre el documento 357361299 (Agencia de Marketing 360° completo, 84 láminas), con email requerido y descarga: https://hubs.ly/Q04DvcpK0 (resuelve a hubspotdocuments.com, HTTP 200). Envío por Outlook con firma gráfica y CCO HubSpot, sólo con OK de Julio.
 
 Landings comprobadas en vivo el 05/11/2026 (HTTP 200): inicio, performance marketing, marketing de
 contenidos, redes sociales, inbound marketing y agenda.
@@ -50,7 +48,7 @@ En la práctica, trabajaríamos con un responsable de cuenta como contraparte ú
 prioridades por línea, validaciones de cada pieza con su equipo y una revisión mensual de resultados
 frente a los KPIs acordados.
 
-Les comparto nuestro brochure de [Agencia de Marketing 360°](ENLACE_HUBSPOT_PENDIENTE). Es la presentación
+Les comparto nuestro brochure de [Agencia de Marketing 360°](https://hubs.ly/Q04DvcpK0). Es la presentación
 completa de la agencia: ahí verán todos nuestros servicios y cómo trabajamos, lo que les puede servir
 para evaluarnos frente a los requisitos de la licitación.
 
