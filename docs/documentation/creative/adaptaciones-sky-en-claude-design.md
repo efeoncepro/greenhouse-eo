@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-04 por Claude
+> **Ultima actualizacion:** 2026-11-04 por Claude (segunda ronda de Daniela)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
 > **Manual de uso:** [Adaptar un KV de SKY en Claude Design](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md)
 > **Documentacion relacionada:** [Creative Workbench — Design System Lab](./creative-workbench-lab.md)
@@ -136,11 +136,32 @@ En el canvas las animaciones se ven como videos, porque Claude Design muestra lo
 | KV Black · HM | Los 12 KV de BLACK como imagen fija |
 | KV Black · Animación GIF | Los 12 KV animados, las referencias del kit y una previa con audio |
 | KV Black · Popup y Story | 24 piezas estáticas: 12 popup y 12 story |
+| KV Black · PMAX y HPH | PMAX de los 12 KV y HPH genérico de Chile más cinco mercados con sus banderas |
+| KV Black · Grilla por mercado | Los 12 mensajes por mercado: KV, popup, GIF, story y story en video |
+| KV Black · Rutas foco Perú | 13 rutas con popup y story |
+| KV Black · Chile KV listo | Banner TikTok, DAT y PMAX de Chile a partir de los editables del kit |
 
 El operador revisa dejando **comentarios anclados a cada pieza**; las respuestas y correcciones quedan en el mismo
 hilo.
 
 > Detalle técnico: [manual, páginas del canvas](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#qué-significan-las-páginas-del-canvas)
+
+## Cambios del cliente y piezas nuevas (segunda ronda)
+
+- **Un cambio que toca todas las piezas se hace una sola vez, en la fuente.** Cuando Sky cambió la fecha del logo BLACK
+  («del 25 de noviembre al 2 de diciembre»), pidió que la fecha fuera más grande, que la línea del marco se acortara lo
+  necesario y que el resplandor bajara. Se corrigieron las fuentes (KV, logos y referencias) y todas las piezas se
+  rehicieron desde ellas: no se retocó pieza por pieza.
+- **Cada mercado tiene sus destinos.** Las piezas internacionales llevan la lista de banderas del mercado (Argentina,
+  Perú, Brasil, Estados Unidos) o una fila de banderas (Uruguay); el HPH por mercado usa esa misma lista.
+- **La grilla define los mensajes.** Por mercado se producen los mensajes que pide la grilla («Vuela por Chile»,
+  «Volá a Santiago», «Voe para Peru», etc.), cada uno con popup, GIF y story en video.
+- **Las alianzas tienen su logo por mercado:** Chile Travel fuera de Chile y PromPerú (versión «solo HM Perú» en Perú y
+  «otros HM» fuera de Perú).
+- **Lo que no tenemos queda marcado.** La ubicación de la foto de las rutas foco va como placeholder; la lista de
+  regiones de Perú es una propuesta sin fotos; las frases y traducciones propias quedan por confirmar.
+
+> Detalle técnico: [referencia de la skill, segunda ronda](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md#segunda-ronda-de-daniela-2026-11-04-chat-de-teams)
 
 ## Reglas que se cumplen siempre
 

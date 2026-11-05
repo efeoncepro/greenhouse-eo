@@ -17,6 +17,8 @@ Nuevo Design System «SKY Airline — Performance» y canvas de adaptaciones en 
 de CyberSky Perú por plantilla y datos, y del kit BLACK los 12 KV fijos, sus animaciones GIF/MP4 con audio y 24 popup y
 story. Entregables locales en `ai-generations/`, sin publicar; datos y derechos pendientes de confirmar. Cómo operarlo:
 [manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) y [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
+Segunda ronda: logo BLACK con la fecha nueva en todas las piezas, grilla por mercado (12 mensajes con popup, GIF y
+story en video), 13 rutas foco de Perú, formatos Chile «KV listo» y HPH por mercado con sus banderas.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

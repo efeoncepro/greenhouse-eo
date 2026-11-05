@@ -66,6 +66,13 @@ nunca en el archivo del cliente.
 | La bandera o el logo usado no es el del mercado | Archivos del kit mal nombrados: `BANDERA CL (CIRCULO)_1.svg` es Argentina, `SKY-13.svg` es Brasil, logo BR con nombre «Mesa de trabajo 1 copia 2» | Identificar cada asset por lo que muestra, no por su nombre; reportar el error a la fuente sin renombrar en OneDrive |
 | HPH por mercado rechazado: «¿usaste la referencia?» | Se recompuso cada formato con las partes del KV en vez de adaptar el SVG de referencia que el cliente dejó | Si el kit trae una referencia del formato, adaptar **esa** pieza (ocultar, traducir, reemplazar) y no recomponer desde el KV |
 | Franja clara arriba en el clúster internacional | El oscurecido izquierdo (Raster 4, opacidad .67, con máscara) empieza en y=6 | Estirarlo hasta el borde en el render; pedir a la fuente subir la capa a y=0. Revisar los bordes de toda capa de oscurecido |
+| Un cambio del cliente afecta todas las piezas (fecha del logo BLACK) | Las piezas derivan de varias fuentes distintas: KV vectoriales y referencias raster por capas | Corregir una vez en una copia de las fuentes (`src2/`), apuntar todos los scripts ahí y rehacer en cascada; nunca retocar pieza por pieza |
+| El logo de las referencias no se puede editar como texto | En los SVG exportados por capas el logo es un PNG del tamaño del lienzo | Detectar la capa del logo (la de más verde BLACK en el tercio superior), ocultarla y montar el logo vectorial corregido en su caja alfa |
+| Idioma detectado mal (PT en un archivo en español) | Se buscó «VOE» en el SVG crudo y apareció dentro del base64 de una imagen | Detectar el idioma sólo por el texto de los `<tspan>` |
+| MP4/GIF salen negros | Se renderizó desde el artboard del canvas, que ya es `<video>` con `/_blob/` (no carga fuera del canvas) | Renderizar desde la animación CSS local (`anim-css-<KV>.html`) |
+| Un render en paralelo falla o mezcla cuadros | Los dos procesos escribían el mismo HTML temporal | Un temporal por archivo; ante la duda, rehacer todo en secuencia |
+| Las imágenes del chat de Teams no se pueden leer | La API de Teams entrega el texto pero no las imágenes alojadas (403 también con token de az) | Abrir Teams web en el navegador integrado (sesión del operador) y leerlas en el visor |
+| Falta la tapa de cierre vertical en español | El kit sólo trae la horizontal en ES (PT y EN sí traen vertical) | Recortar el centro de la horizontal sobre blanco y avisar para pedir la vertical a la fuente |
 
 ## Propuestas rechazadas o retiradas
 

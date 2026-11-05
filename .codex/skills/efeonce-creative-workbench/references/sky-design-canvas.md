@@ -249,17 +249,99 @@ DESCUENTOS», sin precio, botón «Ver vuelos» en Source Sans 3):
   del 1200×1200 (orden BR, PE, AR, DO, US, UY) con máscara circular sobre los círculos blancos.
   Las imágenes de estas referencias son raster a tamaño 1x: el 2x no agrega detalle.
 - **Por mercado** (PE, AR, UY, BR, US), **genérico y sin precio** (decisión del operador
-  2026-11-04): se parte del **SVG genérico de referencia**, no de las partes del KV. Se ocultan
-  la lista de destinos y sus banderas (sólo existe para Chile), se traducen los textos y se cambia
-  la URL del legal corto. En BR y US además se reemplazan el logo (raster de la referencia) y el
-  sello de puntualidad por los del KV del mercado, ajustados a la caja visible del genérico. El
-  bloque «Vuela / Internacional» baja al centro del espacio libre entre el logo y la flecha (en el
-  728×90, al centro del alto). Textos: VUELA → VOLÁ (AR/UY), VOE A (BR), FLY + International (US);
-  flecha «COM GRANDES / DESCONTOS» (PT) y «WITH BIG / DISCOUNTS» (EN); botón «Ver voos» y «See
-  flights». Las traducciones de flecha y botón son propias, sin confirmar. Script:
-  `scripts/hph-market.cjs`.
-- Primer intento descartado: componer el HPH por mercado con las partes del KV (precio incluido).
-  El operador lo rechazó porque no respetaba la referencia, sobre todo en el 728×90.
+  2026-11-04): se parte del **SVG genérico de referencia**, no de las partes del KV. La lista de
+  banderas de Chile se **reemplaza por la del mercado** (pedido de Daniela, mismos destinos y
+  textos que los KV con banderas; ver más abajo): en 1200×1200, 300×600 y 300×250 va en la caja de
+  la lista de Chile con paso = alto de la caja / 6, bandera 0,73 del paso y texto 0,36 (Metric
+  Medium blanca), centrada si hay menos filas; en el 728×90 y en Uruguay, fila de banderas sin
+  texto. Se traducen los textos y se cambia la URL del legal corto. En BR y US además se reemplazan
+  el logo y el sello de puntualidad por los del KV del mercado, ajustados a la caja visible del
+  genérico. Textos: VUELA → VOLÁ (AR/UY), VOE A (BR), FLY + International (US); flecha
+  «COM GRANDES / DESCONTOS» (PT) y «WITH BIG / DISCOUNTS» (EN); botón «Ver voos» y «See flights».
+  Las traducciones de flecha y botón son propias, sin confirmar. Script: `scripts/hph-market.cjs`.
+- Intentos descartados: (1) componer el HPH por mercado con las partes del KV (precio incluido):
+  el operador lo rechazó porque no respetaba la referencia, sobre todo en el 728×90; (2) quitar la
+  lista y centrar el bloque «Vuela / Internacional»: Daniela pidió poner las banderas del mercado.
+
+## Segunda ronda de Daniela (2026-11-04, chat de Teams)
+
+Pedidos leídos del chat 1:1 con Daniela (texto con la API de Teams; las imágenes adjuntas no las
+entrega la API: se vieron en Teams web desde el navegador integrado). Todo publicado en el canvas.
+
+**1. Logo BLACK (pedido de Sky vía Adriana Contreras).** Fecha nueva «del 25 de noviembre al 2 de
+diciembre», más grande; la línea del marco se retrae lo necesario («flexible»); menos resplandor
+(«se ve medio borroso»). `logofix.cjs` genera fuentes corregidas en `src2/` (misma ruta relativa
+que OneDrive; el original no se toca) y **todos los scripts leen de `src2/`**:
+
+- **Vectorial** (los 12 KV y `LOGO BLACK/*.svg`): en el DOM se reemplaza el `<text>` de la fecha por
+  uno centrado en el marco (`text-anchor=middle`), con el mayor tamaño que deja ≥ 8 px de tramo
+  recto en cada esquina (ES 25,5 · PT 27 · EN 28,9 px; la fecha anterior era 29 px pero más corta);
+  el trazo del marco se regenera desde su caja con el hueco = ancho del texto + 10 px por lado; el
+  brillo de la esquina inferior derecha se recorta si invade el hueco; los filtros `outer-glow*`
+  bajan a 0,5 × `stdDeviation` y 0,6 × `flood-opacity`. Textos: ES «DEL 25 DE NOVIEMBRE AL 2 DE
+  DICIEMBRE», PT «DE 25 DE NOVEMBRO A 2 DE DEZEMBRO», EN «FROM NOVEMBER 25 TO DECEMBER 2».
+- **Raster por capas** (clústeres, PMAX, TikTok, DAT, HPH: exportados de Illustrator con cada capa
+  como PNG del tamaño del lienzo): la capa del logo es la `*_Imagen` con más verde BLACK en el
+  tercio superior; se oculta (`display=none` sobre su `<image>` en línea) y se monta el logo
+  vectorial corregido como `<svg>` anidado (ids con prefijo `lf-`), escalado a la caja alfa de la
+  capa vieja. El idioma se detecta por el texto de los `<tspan>`, **nunca por el SVG crudo**: en el
+  base64 aparecen secuencias como «VOE».
+
+**2. KV con banderas por mercado** (`banderas.cjs`, referencias = 5 imágenes de Daniela): al KV del
+mercado se le suma bajo el logo la lista de destinos con bandera, con el estilo del clúster
+internacional de Chile (círculo 67 px con borde blanco 2 px, Metric Medium 33, interlínea 31,35,
+paso 92–98). Banderas circulares de `GRAFICOS/BANDERAS` renderizadas a PNG transparente:
+**«BANDERA CL (CIRCULO)_1.svg» es Argentina** y «BANDERA PUJ (CIRCULO)» es República Dominicana
+(no hay círculo de AR con ese nombre).
+
+| KV | Lista |
+| --- | --- |
+| `HM_AR_KV_BANDERAS` | Perú y conexión con 16 destinos · Santiago y conexión con 15 destinos · Miami · Río de Janeiro, São Paulo y Florianópolis |
+| `HM_PE_KV_INTER_BANDERAS` | Punta Cana · Santiago y conexión con 15 destinos · Buenos Aires · Río de Janeiro y São Paulo · Miami (título del KV: «Vuela a Calama», como la referencia) |
+| `HM_BR_KV_BANDERAS` | Santiago e conexões para 15 destinos · Lima e conexões para 16 destinos · Argentina · Miami · Uruguai |
+| `HM_US_KV_BANDERAS` | Santiago and connect to 15 destinations · Lima and connect to 16 destinations |
+| `HM_UY_KV_BANDERAS` | Fila de 4 banderas (DO, CL, BR, US) bajo «Internacional», en lugar de la píldora de origen |
+
+**3. Grilla «popup y GIF por mercado»** (12 mensajes; por cada uno popup, GIF y story video).
+`variantes.cjs` cambia antetítulo/título del bloque de destino y suma alianza o regiones:
+
+| Mercado | Mensaje | KV |
+| --- | --- | --- |
+| CL | Vuela por Chile · Vuela internacional · Encuentra destinos | `HM_CL_KV_DOM_CLUSTER` · `HM_CL_KV_INTER_CLUSTER` · `HM_CL_KV_ENCUENTRA` (clúster internacional con «ENCUENTRA / Destinos») |
+| PE | Vuela por Perú · Vuela internacional · Encuentra destinos | `HM_PE_KV_DOM_REGIONES` (rutas foco en 2 columnas, sin fotos: propuesta) · `HM_PE_KV_INTER_BANDERAS` · `HM_PE_KV_ENCUENTRA` |
+| AR | Volá a Santiago · Volá a Lima | `HM_AR_KV_SANTIAGO` · `HM_AR_KV_LIMA` |
+| UY | Volá internacional | `HM_UY_KV_BANDERAS` |
+| BR | Voe a Santiago (+ Chile Travel, `SERNATURE/CHILE TRAVEL (FUERA DE CHILE)`) · Voe para Peru (+ PromPerú «otros HM»; Daniela debe confirmar si va con piezas de alianza o KV) | `HM_BR_KV_SANTIAGO` · `HM_BR_KV_PERU` |
+| US | Fly international | `HM_US_KV_BANDERAS` |
+
+El logo de alianza va arriba a la derecha en KV y popup (capa `alianza` [740,0,1080,330]); en la
+story, bajo el avión (con el logo al 130 % el avión llega a x≈925). En `parts.cjs`/`layers.cjs` las
+listas nuevas usan la región `lista` [40,320,720,890]; en el popup se escalan para caber entre el
+logo (~322) y el destino (~684).
+
+**4. Rutas foco Perú** (`rutas.cjs`): Tumbes, Jauja, Cusco, Tacna, Pucallpa (venía repetida),
+Chiclayo, Piura, Trujillo, Iquitos, Cajamarca, Arequipa, Tarapoto y Juliaca. Por ruta, KV desde
+`HM_PE_KV_DOM-RUTA` con el destino (ajustado a ≤ 430 px), logo **PromPerú «solo HM Perú»** (PNG,
+no hay SVG) arriba a la derecha y, debajo, el texto de ubicación de la foto con pin verde:
+`[Ubicación de la foto]` (placeholder; no tenemos fotos por destino). Entregables: popup y story.
+
+**5. Chile «KV listo»** (BLACK SKY CL 26, lista de Notion): Banner TikTok 1920×1080 (precio,
+descuento, precio + descuento), DAT 1080×1080 (nacional e internacional) y PMAX precio+dcto en los
+4 formatos se entregan **renderizando las referencias editables de Daniela** con el logo corregido
+(`chile-refs.cjs`). Precios y descuentos siguen como placeholder (`000.000`, `00%`) hasta la grilla.
+
+**6. Story video** (`story-video.cjs`, 1080×1920, 30 fps, 15,7 s), estructura de Daniela:
+intro (foto con acercamiento + logo) 2,8 s → precios (story estático) 4,8 s → brandlift (tarjeta
+blanca, frase y píldora) 3,3 s → «Completa tu viaje» (gráfico del kit sobre `STORY AVION.mp4`)
+3,3 s → tapa de cierre 2,7 s, con fundidos de 0,3 s. Música `SONIC BRAND-3-STORY_1.mp3` a −3 dB con
+fundido entre 12,4 y 13,3 s para no chocar con la tapa, que conserva su audio. El kit **no trae
+tapa vertical en español**: se recorta el centro de la horizontal (1080×1080) sobre blanco. Frase
+DOM de la referencia BLACK XL; las INTER y sus traducciones (AR voseo, PT, EN) son propias.
+
+**Render de GIF:** `render-gif.sh` renderiza desde `anim-css-<KV>.html` (animación CSS en
+`kvhm-canvas/`), **no desde los artboards del canvas**, que ahora son `<video>` con `/_blob/` y
+dan cuadros negros. `frames.cjs` usa un HTML temporal por archivo (`_frames-<file>.html`): dos
+renders en paralelo con el mismo temporal mezclaron cuadros y uno falló.
 
 ## Lecciones de la plataforma Claude Design
 
@@ -282,7 +364,7 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 
 | Ruta | Contenido |
 | --- | --- |
-| `ai-generations/2026-11-04_sky-black-gif/` | 12 GIF, 12 MP4 sin audio, 12 `*_audio.mp4`; `estaticos/` con los 24 PNG; `pmax/` (48 PNG, más los 1200×628 `_2x`); `hph/` (24 piezas en 1x y `_2x`); `scripts/` (render, partes, animación, frames, formatos, `banners.cjs`, `generic.cjs`, páginas del canvas) |
+| `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; `scripts/` (incluye `logofix`, `banderas`, `variantes`, `rutas`, `chile-refs`, `story-video`, `render-gif.sh`) |
 | `ai-generations/2026-11-04_sky-cybersky-peru/` | Selfies generadas, grado de color y scripts |
 
 Los scripts (`patches.cjs`, `parts.cjs`, `grado.cjs` y los de render/animación) tienen rutas

@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-04 por Claude
+> **Ultima actualizacion:** 2026-11-04 por Claude (segunda ronda de Daniela: logo, grilla por mercado, rutas, Chile KV listo y story video)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -117,10 +117,35 @@ bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada 
 - **HPH** (1200×1200, 300×600, 300×250 y 728×90) parte de las referencias `HPH_<formato>_GENERICO.svg` de la carpeta
   `KV X HM/HPH`. El genérico es de Chile internacional, con banderas y sin precio. Si el 728×90 trae las banderas en
   blanco, se reponen desde el 1200×1200. El botón «Ver vuelos» usa Source Sans 3.
-- **HPH por mercado:** genérico y sin precio. Se adapta el **SVG de referencia** (no se recompone desde el KV): se quita
-  la lista de banderas de Chile, se traducen los textos y la URL del legal y, en Brasil y EE. UU., se cambian el logo y
-  el sello de puntualidad. El bloque «Vuela / Internacional» baja al centro del espacio que deja la lista. Confirma
-  las traducciones de la flecha y del botón antes de entregar.
+- **HPH por mercado:** genérico y sin precio. Se adapta el **SVG de referencia** (no se recompone desde el KV): la lista
+  de banderas de Chile se cambia por la **lista del mercado** (mismos destinos y textos que el KV con banderas), se
+  traducen los textos y la URL del legal y, en Brasil y EE. UU., se cambian el logo y el sello de puntualidad. En el
+  728×90 y en Uruguay va una fila de banderas sin texto. Confirma las traducciones de la flecha y del botón antes de
+  entregar.
+- **Chile «KV listo»:** si el kit trae el editable del formato (Banner TikTok, DAT, PMAX precio+dcto), la pieza es esa
+  referencia renderizada con el logo vigente; no se recompone.
+
+### 7b. Aplicar un cambio del cliente a todo el despliegue
+
+Cuando Sky cambia algo que aparece en todas las piezas (caso 2026-11-04: fecha del logo BLACK, línea del marco y
+resplandor), se corrige **una vez en las fuentes** y se rehace todo desde ahí:
+
+1. `logofix.cjs` escribe las fuentes corregidas en `src2/` con la misma ruta relativa que OneDrive (que no se toca).
+2. Todos los scripts leen de `src2/`. Se rehacen en orden: KV (`render.cjs`), partes (`parts.cjs`), capas y recortes de
+   animación (`layers.cjs`, `recrop.cjs`), popup/story (`compose.cjs`), GIF/MP4 (`render-gif.sh`), HPH (`generic.cjs`,
+   `hph-market.cjs`), PMAX 1200×628 (`banners.cjs pmax`) y las referencias de Chile (`chile-refs.cjs`).
+3. Se sincroniza el proyecto del canvas (`sync-canvas.cjs`), se suben de nuevo los videos como assets y se republica.
+
+### 7c. Grilla por mercado, rutas foco y story video
+
+- **Grilla «popup y GIF por mercado»:** por cada mensaje (por ejemplo «Volá a Santiago», «Voe para Peru», «Encuentra
+  destinos») se arma un KV variante (`variantes.cjs`, `banderas.cjs`) y de él salen popup, GIF y story. Los logos de
+  alianza (Chile Travel fuera de Chile, PromPerú) van arriba a la derecha y, en la story, bajo el avión.
+- **Rutas foco:** una variante por ruta con el destino, el logo de la alianza y el texto de ubicación de la foto
+  (placeholder si no está). Entrega popup y story.
+- **Story video (5 slides):** intro → precios → brandlift → «Completa tu viaje» sobre el video del avión → tapa de
+  cierre con su música. La música del kit hace fundido al terminar el slide 4. Si falta la tapa vertical del idioma,
+  se recorta la horizontal sobre blanco.
 
 ### 8. Revisar con comentarios en el canvas
 
@@ -137,7 +162,8 @@ bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada 
 | **PDF** de adaptaciones | Render local con las mismas plantillas del canvas. CyberSky: 66 páginas, JPEG calidad 90, primero internacionales y luego nacionales, en orden popup → post → story |
 | **GIF** | Render local cuadro a cuadro, 25 fps, en bucle, con paleta por archivo |
 | **MP4** | Render local; una versión sin audio y otra con audio (`*_audio.mp4`) |
-| **PNG** | Los estáticos de popup y story, en `estaticos/`; PMAX en `pmax/` y HPH en `hph/`, en 1x y `_2x` |
+| **PNG** | Los estáticos de popup y story, en `estaticos/`; KV en `kv/`; rutas en `rutas-peru/`; Chile en `chile-kv-listo/`; PMAX en `pmax/` y HPH en `hph/`, en 1x y `_2x` |
+| **Story video** | MP4 1080×1920 con audio, en `story-video/` |
 
 Los entregables quedan en `ai-generations/` (por ejemplo, `ai-generations/2026-11-04_sky-black-gif/`) y no se
 versionan en el repo.
@@ -152,7 +178,10 @@ versionan en el repo.
 | **KV Black · HM** | Los 12 KV de BLACK como imagen fija 1080×1350 |
 | **KV Black · Animación GIF** | Los 12 KV animados (video en bucle), las 6 referencias de animación del kit y una previa MP4 con audio |
 | **KV Black · Popup y Story** | 24 estáticos: 12 popup 1080×1080 y 12 story 1080×1920 |
-| **KV Black · PMAX y HPH** | El paquete PMAX de cada KV (4 formatos) y el HPH genérico de Chile más PE, AR, UY, BR y US (4 formatos) |
+| **KV Black · PMAX y HPH** | El paquete PMAX de cada KV (4 formatos) y el HPH genérico de Chile más PE, AR, UY, BR y US con sus banderas (4 formatos) |
+| **KV Black · Grilla por mercado** | Los 12 mensajes de la grilla (CL, PE, AR, UY, BR, US) con KV, popup, GIF, story y story video; más los KV con banderas de AR y BR |
+| **KV Black · Rutas foco Perú** | 13 rutas con popup y story, PromPerú y ubicación de la foto |
+| **KV Black · Chile KV listo** | Banner TikTok (3), DAT (2) y PMAX (4) desde las referencias editables |
 
 ## Qué no hacer
 

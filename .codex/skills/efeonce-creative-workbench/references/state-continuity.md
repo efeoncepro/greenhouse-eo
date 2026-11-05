@@ -10,17 +10,25 @@ revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cóm
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 23; siete páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
 (`~/Downloads/SKY-CyberSky-Peru-adaptaciones.pdf`, 23 MB); BLACK con 12 KV fijos, 12 animados
 (GIF, MP4 y MP4 con audio), 24 estáticos popup/story, PMAX de los 12 KV (con el 1200×628 nuevo) y HPH
-genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos. Entregables locales no versionados en
+genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos (con la lista de banderas del mercado). Segunda ronda
+(pedidos de Daniela por Teams): logo BLACK corregido en todas las fuentes (fecha 25 nov–2 dic, línea flexible, menos
+resplandor) y todo rehecho desde `src2/`; 12 mensajes de la grilla por mercado con KV, popup, GIF y story video (12 MP4
+de 15,7 s); 13 rutas foco de Perú con popup y story; Chile «KV listo» (TikTok 3, DAT 2, PMAX 4) desde los editables. Entregables locales no versionados en
 `ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; sus
 scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. OneDrive no se modificó.
 
 Pendientes sin confirmar por el operador:
+
+- Segunda ronda BLACK: BR «Voe para Peru» (¿piezas de alianza PromPerú o KV?), «Vuela por Perú» con regiones sin
+  fotos (propuesta), «Encuentra destinos» de Chile hecho con el clúster internacional (el pedido decía «clúster inter
+  de Perú»), frases INTER del brandlift y sus traducciones AR/PT/EN, ubicación de la foto en las rutas (placeholder),
+  tapa vertical en español (recortada de la horizontal).
 
 - CyberSky: «S/» (el KV dice «$/»), separador de miles con coma (1,043), origen Lima y la
   contradicción del legal (tramo Lima–X vs X–Lima); elementos sólo del KV de Cusco omitidos en

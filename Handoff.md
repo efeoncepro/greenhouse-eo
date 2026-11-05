@@ -16,6 +16,14 @@ Lima, tramo del legal y elementos sólo de Cusco. **A corregir en la fuente (One
 `SKY-13.svg` es Brasil, derechos de medalla y foto con marcas de IA, flecha en 3 piezas, clúster internacional
 desalineado y con franja, textos DCTO/«tramo»/«Stock» inconsistentes, legales trazados, sin logos de alianza ni URL.
 [Manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) · [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
+**Segunda ronda (pedidos de Daniela por Teams, 2026-11-04):** logo BLACK corregido en todas las fuentes (fecha
+«25 de noviembre al 2 de diciembre» en ES/PT/EN, línea del marco flexible, menos resplandor) con `logofix.cjs` → `src2/`
+y todo rehecho en cascada (KV, partes, popup/story, GIF, PMAX, HPH). Nuevas páginas del canvas: «Grilla por mercado»
+(12 mensajes CL/PE/AR/UY/BR/US con KV, popup, GIF, story y story video de 5 slides con audio), «Rutas foco Perú»
+(13 rutas, popup + story, PromPerú y ubicación placeholder) y «Chile KV listo» (TikTok ×3, DAT ×2, PMAX ×4 desde los
+editables). HPH por mercado con la lista de banderas del mercado. **Por confirmar:** BR «Voe para Peru» (alianza o KV),
+«Vuela por Perú» sin fotos, «Encuentra destinos» CL hecho con el clúster internacional, frases INTER del brandlift y
+traducciones, tapa vertical ES recortada de la horizontal (falta en el kit).
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 
