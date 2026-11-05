@@ -28,6 +28,11 @@ traducciones, tapa vertical ES recortada de la horizontal (falta en el kit).
 `Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/` (GIF Y VIDEO KV, KV ESTATICOS, POPUP Y STORY, RUTAS FOCO
 PERU, CHILE KV LISTO, STORY VIDEO 5 SLIDES, PMAX, HPH; 626 MB), verificados byte a byte con `diff -rq`/`cmp`. El kit
 no se tocó; la subida a la nube depende de la sincronización de OneDrive.
+**Documentación completa (2026-11-05):** catálogo técnico de formatos y taxonomía (`sky-format-catalog.md`), pipeline
+script por script (`sky-black-pipeline.md`), catálogo funcional (`docs/documentation/creative/catalogo-formatos-sky.md`)
+y manual v1.4. Se encontraron 6 PMAX 1080 de DOM-RUTA/INTER-RUTA con la fecha vieja del logo: se recopiaron desde su
+popup, KV y story en local y en OneDrive (`cmp` idéntico). Scripts, `bbox.json`, manifiesto e inventarios quedaron
+persistidos en `ai-generations/2026-11-04_sky-black-gif/scripts/` (el scratchpad es temporal).
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

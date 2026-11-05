@@ -1,14 +1,17 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (entrega de los entregables BLACK en una carpeta nueva de OneDrive)
+> **Ultima actualizacion:** 2026-11-05 por Claude (paso a paso por tipo de pieza de la segunda ronda, «qué revisar» por formato, señales y problemas nuevos)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
-> **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
-> **Documentacion relacionada:** [Adaptaciones SKY en Claude Design (funcional)](../../documentation/creative/adaptaciones-sky-en-claude-design.md) ·
+> **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
+> [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
+> [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+> **Documentacion relacionada:** [Catálogo de formatos SKY](../../documentation/creative/catalogo-formatos-sky.md) ·
+> [Adaptaciones SKY en Claude Design (funcional)](../../documentation/creative/adaptaciones-sky-en-claude-design.md) ·
 > [Usar el Creative Workbench Lab](./usar-creative-workbench-lab.md) ·
 > [Preflight de marca del Creative Workbench](./creative-workbench-brand-preflight.md)
 
@@ -24,6 +27,14 @@ Cubre tres trabajos que se hicieron el 2026-11-04 y que sirven de caso fuente:
   3 formatos = 66 piezas).
 - **Leer un kit de despliegue** del cliente y montar sus KV fijos (campaña BLACK, kit «Despliegue Base»).
 - **Animar** esos KV (GIF y MP4 con audio) y llevarlos a **popup** y **story**.
+
+Y la segunda ronda (2026-11-04/05, pedidos de Daniela por Teams): logo con fecha nueva en todo el despliegue, grilla
+de 12 mensajes por mercado, KV con banderas, rutas foco de Perú, Chile «KV listo» (TikTok, DAT, PMAX), PMAX y HPH por
+mercado y story en video de 5 slides.
+
+Qué es cada formato, su tamaño, cuántos se hicieron, dónde quedaron y cómo se lee su nombre de archivo está en el
+**[Catálogo de formatos SKY](../../documentation/creative/catalogo-formatos-sky.md)**. Este manual explica cómo se
+hace cada uno y qué revisar.
 
 El canvas sirve para revisar y aprobar. **No es la producción final**: los archivos que se entregan (PDF, GIF, MP4,
 PNG) se renderizan en local con las mismas plantillas.
@@ -93,6 +104,10 @@ Cada SVG del kit se renderiza en local a PNG 1080×1350 con la fuente Metric car
 desalineado, una franja clara), se corrige **sobre el render**, en memoria, y se anota la recomendación para la
 fuente. El SVG de OneDrive no se toca.
 
+Nombre: el mismo del SVG del kit (`HM_<MERCADO>_KV_<TIPO>.png`). Resultado en BLACK: los 12 KV del kit más los 12
+nuevos de la segunda ronda (24 KV de mercado) y las 13 rutas de Perú, 37 PNG en `kv/`. La matriz completa está en el
+[catálogo](../../documentation/creative/catalogo-formatos-sky.md#mercados-y-mensajes-la-matriz-de-24-kv).
+
 ### 5. Animar: GIF y MP4 con audio
 
 1. Toma como plantilla de movimiento las referencias de animación del kit (carpeta «FORMATO GIF/REFERENCIA
@@ -104,6 +119,16 @@ fuente. El SVG de OneDrive no se toca.
    con el precio quedando fijo. La pista viene muy alta: en los MP4 de BLACK se bajó 3 dB con limitador.
 4. En el canvas, cada animación va como un **video** en bucle (página «KV Black · Animación GIF»), con el KV fijo como
    imagen de espera.
+5. Renderiza desde el HTML de animación de cada KV (`anim-css-<KV>.html`, con `render-gif.sh`), **nunca desde los
+   artboards del canvas**: como ahora son videos, salen cuadros negros. Si renderizas varios a la vez, cada uno necesita
+   su propio archivo temporal; con uno compartido se mezclan cuadros.
+
+Resultado en BLACK: por cada uno de los 24 KV de mercado, un GIF (1080×1350, 25 fps, 99 cuadros, 3,96 s, de 3,8 a
+7,7 MB), un MP4 sin audio y un MP4 con audio (`_audio`, 3,94 s). 72 archivos en total.
+
+**Qué revisar:** míralo en bucle varias vueltas. Que el movimiento termine antes de ~1,4 s y luego todo quede quieto;
+que el primer cuadro no salga en blanco ni negro; que ninguna parte (por ejemplo «Internacional») quede fija en la foto
+mientras su copia se mueve; que el MP4 con audio no sature y el golpe caiga cuando el precio se detiene.
 
 ### 6. Llevar el KV a popup y story
 
@@ -111,20 +136,58 @@ Usa la foto **original** del KV re-encuadrada para el nuevo formato; no inventes
 bloque comercial y pie respetando las zonas seguras. Las reglas medidas de cada formato están en la
 [doc funcional](../../documentation/creative/adaptaciones-sky-en-claude-design.md#popup-y-story).
 
+Nombre: `HM_<MERCADO>_KV_<TIPO>__popup.png` y `__story.png`. Resultado en BLACK: 24 popup y 24 story en `estaticos/`.
+
+**Qué revisar:** popup: que el legal no quede sobre la ropa (degradado inferior) y que el precio termine sobre el pie;
+story: que logo, precio y pie queden fuera de los ~270 px de arriba y abajo que tapa Instagram; en los clústeres, que
+la lista no choque con el logo ni con el destino.
+
 ### 7. Armar PMAX y HPH
 
-- **PMAX** (1080×1080, 1080×1350, 1080×1920 y 1200×628) va para cada KV. Los tres primeros son el popup, el KV y la
-  story que ya existen; sólo se arma el **1200×628**, con la mujer a la derecha para que el badge no le tape la cara.
-- **HPH** (1200×1200, 300×600, 300×250 y 728×90) parte de las referencias `HPH_<formato>_GENERICO.svg` de la carpeta
-  `KV X HM/HPH`. El genérico es de Chile internacional, con banderas y sin precio. Si el 728×90 trae las banderas en
-  blanco, se reponen desde el 1200×1200. El botón «Ver vuelos» usa Source Sans 3.
-- **HPH por mercado:** genérico y sin precio. Se adapta el **SVG de referencia** (no se recompone desde el KV): la lista
-  de banderas de Chile se cambia por la **lista del mercado** (mismos destinos y textos que el KV con banderas), se
-  traducen los textos y la URL del legal y, en Brasil y EE. UU., se cambian el logo y el sello de puntualidad. En el
-  728×90 y en Uruguay va una fila de banderas sin texto. Confirma las traducciones de la flecha y del botón antes de
-  entregar.
-- **Chile «KV listo»:** si el kit trae el editable del formato (Banner TikTok, DAT, PMAX precio+dcto), la pieza es esa
-  referencia renderizada con el logo vigente; no se recompone.
+**PMAX (Google Performance Max).** Va para los 12 KV originales del kit, en 1080×1080, 1080×1350, 1080×1920 y 1200×628.
+
+1. Los tres primeros tamaños **no se rediseñan**: son el popup, el KV y la story que ya existen.
+2. Sólo se compone el **1200×628**, desde la foto fuente y las partes del KV, con la persona corrida a la derecha para
+   que el badge no le tape la cara. Se renderiza al doble y se entrega en 1x y `_2x` (2400×1256).
+3. Nombre: `HM_<MERCADO>_KV_<TIPO>__pmax-<ancho>x<alto>.png`. Resultado en BLACK: 60 archivos en `pmax/`.
+
+**HPH.** Juego de 4 banners: 1200×1200, 300×600, 300×250 y 728×90.
+
+1. Parte de las referencias `HPH_<formato>_GENERICO.svg` del kit, en la carpeta
+   `FORMATO HPH`. El genérico es Chile internacional, con banderas, «CON GRANDES DESCUENTOS», **sin precio** y botón
+   «Ver vuelos» en Source Sans 3.
+2. **Genérico Chile:** se renderiza tal cual con el logo vigente. Si el 728×90 trae las banderas en blanco, se reponen
+   recortándolas del 1200×1200.
+3. **Por mercado (PE, AR, UY, BR, US), genérico y sin precio:** se adapta el **SVG de referencia**, nunca se recompone
+   desde las partes del KV (el operador rechazó esa versión porque el 728×90 no respetaba la referencia).
+   - Cambia la lista de banderas de Chile por la **lista del mercado** (mismos destinos y textos que el KV con
+     banderas del mercado).
+   - En el 728×90 y en Uruguay va una **fila de banderas sin texto**.
+   - Traduce los textos y la URL del legal corto: VUELA → VOLÁ (AR/UY, copy del cliente), VOE A (BR), FLY +
+     International (US); flecha «COM GRANDES / DESCONTOS» y «WITH BIG / DISCOUNTS»; botón «Ver voos» y «See flights».
+   - En Brasil y EE. UU. cambia también el logo y el sello de puntualidad por los del KV del mercado.
+4. Entrega en 1x y `_2x`. Nombre: `HM_<MERCADO>_KV__hph-<ancho>x<alto>.png` y `HPH_<ancho>x<alto>_GENERICO.png`.
+   Resultado en BLACK: 48 archivos en `hph/`.
+
+**Qué revisar:** que el 728×90 se vea igual que la referencia (proporciones, flecha, botón y banderas legibles); que
+cada mercado tenga sus banderas y no las de Chile; que la URL del legal sea la del mercado; que las traducciones de
+flecha y botón estén confirmadas antes de pautar.
+
+### 7a. Chile «KV listo»
+
+Cuando el kit trae el **editable** del formato, la pieza es esa referencia renderizada con el logo vigente; no se
+recompone. En BLACK (lista «BLACK SKY CL 26» de Notion) fueron 9 piezas, cada una en 1x y `_2x`:
+
+| Formato | Tamaño | Variantes | Nombre |
+|---|---|---|---|
+| Banner TikTok | 1920×1080 | Precio, descuento, precio + descuento | `CL_BANNER-TIKTOK_<PRECIO, DCTO o PRECIO-DCTO>_1920x1080` |
+| DAT | 1080×1080 | Nacional, internacional | `CL_DAT_<DOM o INTER>` |
+| PMAX precio+dcto | 1080×1080, 1080×1350, 1080×1920, 1200×628 | Una por tamaño | `CL_PMAX_<ancho>x<alto>` |
+
+Script: `chile-refs.cjs`. Resultado: 18 archivos en `chile-kv-listo/`.
+
+**Qué revisar:** logo con la fecha nueva; precios y descuentos todavía como marcador (`000.000`, `00%`), que se
+reemplazan con la grilla de precios antes de pautar.
 
 ### 7b. Aplicar un cambio del cliente a todo el despliegue
 
@@ -132,21 +195,102 @@ Cuando Sky cambia algo que aparece en todas las piezas (caso 2026-11-04: fecha d
 resplandor), se corrige **una vez en las fuentes** y se rehace todo desde ahí:
 
 1. `logofix.cjs` escribe las fuentes corregidas en `src2/` con la misma ruta relativa que OneDrive (que no se toca).
+   Fecha nueva: ES «DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT «DE 25 DE NOVEMBRO A 2 DE DEZEMBRO», EN «FROM NOVEMBER 25
+   TO DECEMBER 2», centrada y al mayor tamaño que permite el marco; la línea del marco deja un hueco del ancho del
+   texto y el resplandor baja.
 2. Todos los scripts leen de `src2/`. Se rehacen en orden: KV (`render.cjs`), partes (`parts.cjs`), capas y recortes de
    animación (`layers.cjs`, `recrop.cjs`), popup/story (`compose.cjs`), GIF/MP4 (`render-gif.sh`), HPH (`generic.cjs`,
    `hph-market.cjs`), PMAX 1200×628 (`banners.cjs pmax`) y las referencias de Chile (`chile-refs.cjs`).
 3. Se sincroniza el proyecto del canvas (`sync-canvas.cjs`), se suben de nuevo los videos como assets y se republica.
 
-### 7c. Grilla por mercado, rutas foco y story video
+**Qué revisar:** que el idioma de la fecha corresponda al mercado (PT en Brasil, EN en EE. UU., ES en el resto) y que
+la fecha no toque el marco.
 
-- **Grilla «popup y GIF por mercado»:** por cada mensaje (por ejemplo «Volá a Santiago», «Voe para Peru», «Encuentra
-  destinos») se arma un KV variante (`variantes.cjs`, `banderas.cjs`) y de él salen popup, GIF y story. Los logos de
-  alianza (Chile Travel fuera de Chile, PromPerú) van arriba a la derecha y, en la story, bajo el avión.
-- **Rutas foco:** una variante por ruta con el destino, el logo de la alianza y el texto de ubicación de la foto
-  (placeholder si no está). Entrega popup y story.
-- **Story video (5 slides):** intro → precios → brandlift → «Completa tu viaje» sobre el video del avión → tapa de
-  cierre con su música. La música del kit hace fundido al terminar el slide 4. Si falta la tapa vertical del idioma,
-  se recorta la horizontal sobre blanco.
+### 7c. Grilla por mercado
+
+La grilla define **qué mensaje lleva cada mercado**. Son 12 mensajes y cada uno tiene KV, popup, GIF, story estática y
+story en video:
+
+| Mercado | Mensajes | KV |
+|---|---|---|
+| CL | Vuela por Chile · Vuela internacional · Encuentra destinos | `HM_CL_KV_DOM_CLUSTER` · `HM_CL_KV_INTER_CLUSTER` · `HM_CL_KV_ENCUENTRA` |
+| PE | Vuela por Perú · Vuela internacional · Encuentra destinos | `HM_PE_KV_DOM_REGIONES` · `HM_PE_KV_INTER_BANDERAS` · `HM_PE_KV_ENCUENTRA` |
+| AR | Volá a Santiago · Volá a Lima | `HM_AR_KV_SANTIAGO` · `HM_AR_KV_LIMA` |
+| UY | Volá internacional | `HM_UY_KV_BANDERAS` |
+| BR | Voe a Santiago · Voe para Peru | `HM_BR_KV_SANTIAGO` · `HM_BR_KV_PERU` |
+| US | Fly international | `HM_US_KV_BANDERAS` |
+
+1. Arma el KV variante con `variantes.cjs`: cambia antetítulo y título del bloque de destino y suma la alianza o la
+   lista de regiones. «Encuentra destinos» de Chile sale del clúster internacional; el de Perú, del KV internacional
+   con banderas.
+2. Logos de alianza: Chile Travel (`SERNATURE/CHILE TRAVEL (FUERA DE CHILE)`) en Brasil «Voe a Santiago» y PromPerú
+   «otros HM» en Brasil «Voe para Peru». Van arriba a la derecha en KV y popup; en la story, bajo el avión (a escala
+   1,1, sin montarse con él).
+3. Separa el KV en capas (`layers.cjs`; las listas nuevas usan la región `[40,320,720,890]` y la alianza
+   `[740,0,1080,330]`) y arma popup y story (`compose.cjs`): en el popup la lista se ajusta entre el logo y el destino.
+4. Anima (paso 5) y arma el story en video (paso 7f).
+5. Aparte, `HM_AR_KV_BANDERAS` y `HM_BR_KV_BANDERAS` son KV extra con banderas, base del HPH de esos mercados: llevan
+   KV, popup, story, GIF y MP4, pero no story en video.
+
+**Qué revisar:** el verbo y la moneda del mercado (VOLÁ y `USD 000` en AR/UY, VOE A y `R$ 0.000` en BR, FLY y `USD 000`
+en US); el logo de alianza correcto según el mercado; que el título no choque con la flecha del precio; que las piezas
+«propuesta» (Perú sin fotos, Brasil «Voe para Peru») estén marcadas como tales al mostrarlas.
+
+### 7d. KV con banderas por mercado
+
+1. Toma el KV del mercado y suma, bajo el logo, la lista de destinos con bandera, con el estilo del clúster
+   internacional de Chile: círculo de 67 px con borde blanco y el texto en Metric Medium 33 (`banderas.cjs`).
+2. Las listas salen de las 5 referencias que mandó Daniela:
+
+| KV | Lista |
+|---|---|
+| `HM_AR_KV_BANDERAS` | Perú y conexión con 16 destinos · Santiago y conexión con 15 destinos · Miami · Río de Janeiro, São Paulo y Florianópolis |
+| `HM_PE_KV_INTER_BANDERAS` | Punta Cana · Santiago y conexión con 15 destinos · Buenos Aires · Río de Janeiro y São Paulo · Miami |
+| `HM_BR_KV_BANDERAS` | Santiago e conexões para 15 destinos · Lima e conexões para 16 destinos · Argentina · Miami · Uruguai |
+| `HM_US_KV_BANDERAS` | Santiago and connect to 15 destinations · Lima and connect to 16 destinations |
+| `HM_UY_KV_BANDERAS` | Fila de 4 banderas (República Dominicana, Chile, Brasil, EE. UU.) en lugar de la píldora de origen |
+
+3. Las banderas circulares se renderizan a PNG transparente desde `GRAFICOS/BANDERAS`.
+
+**Qué revisar:** **mirar cada bandera, no fiarse del nombre del archivo.** En el kit, `BANDERA CL (CIRCULO)_1.svg`
+muestra la bandera de Argentina y `BANDERA PUJ (CIRCULO).svg` es República Dominicana (Punta Cana). Que cada bandera
+corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
+
+### 7e. Rutas foco Perú
+
+1. Por cada ruta, parte de `HM_PE_KV_DOM-RUTA` y cambia el destino por la ciudad; el título se ajusta para no pasar de
+   430 px de ancho (`rutas.cjs`).
+2. Pon el logo **PromPerú «solo HM Perú»** (PNG; no hay SVG) arriba a la derecha.
+3. Debajo, el texto de ubicación de la foto con el pin verde: `[Ubicación de la foto]` como marcador mientras no haya
+   foto por destino.
+4. Entrega KV (`HM_PE_RUTA_<CIUDAD>.png`), popup y story. Las 13 rutas de BLACK: Arequipa, Cajamarca, Chiclayo, Cusco,
+   Iquitos, Jauja, Juliaca, Piura, Pucallpa, Tacna, Tarapoto, Trujillo y Tumbes. Si una ciudad viene repetida en la
+   lista (Pucallpa), se hace una sola vez.
+
+**Qué revisar:** que la ciudad quepa sin chocar con la flecha; que el logo sea la versión «solo HM Perú» (no la de
+«otros HM»); que el marcador de ubicación se reemplace antes de pautar.
+
+### 7f. Story en video (5 slides)
+
+Estructura de Daniela, en 1080×1920 a 30 cuadros por segundo, 15,7 s en total, con fundidos de 0,3 s:
+
+| # | Slide | Duración | Contenido |
+|---|---|---|---|
+| 1 | Intro | 2,8 s | Foto con acercamiento + logo |
+| 2 | Precios | 4,8 s | La story estática del mensaje |
+| 3 | Brandlift | 3,3 s | Tarjeta blanca con frase y píldora |
+| 4 | Completa tu viaje | 3,3 s | Gráfico del kit sobre `STORY AVION.mp4` |
+| 5 | Tapa de cierre | 2,7 s | Tapa de SKY del idioma, con su audio |
+
+1. Arma los slides con `story-video.cjs` (idioma y tipo por mensaje: ES nacional o internacional, AR, PT, EN).
+2. Música: `SONIC BRAND-3-STORY_1.mp3` a −3 dB, con fundido entre 12,4 y 13,3 s; el audio de la tapa entra en 13 s.
+3. Si falta la tapa vertical del idioma (en BLACK falta la de español), recorta el centro de la horizontal sobre blanco
+   y avísalo como pendiente.
+4. Nombre: `HM_<MERCADO>_KV_<TIPO>__story-video.mp4`. Resultado: 12 videos en `story-video/`.
+
+**Qué revisar:** míralo entero con sonido. Que la música no choque con la tapa; que la frase del brandlift esté en el
+idioma del mercado y marcada como propuesta si no viene de una referencia; que el logo y el precio no queden bajo la
+interfaz de Instagram (zonas de ~270 px arriba y abajo).
 
 ### 8. Revisar con comentarios en el canvas
 
@@ -155,6 +299,10 @@ resplandor), se corrige **una vez en las fuentes** y se rehace todo desde ahí:
 - Para ver un artboard en vivo (por ejemplo, un video corriendo), abre su vista «play» (`#play-<id>`).
 - Corrige en la plantilla o en los datos cuando el cambio aplica a todos los destinos, y en la pieza sólo cuando es
   propio de ella.
+- El canvas es **privado** del operador. Si alguien del equipo pregunta si es colaborativo (Daniela lo preguntó): se
+  comparte desde «Compartir» y quien lo recibe puede verlo y comentar.
+- Publica por lotes: una versión admite como máximo 512 archivos. Primero las imágenes, luego los artboards; los
+  videos van como assets.
 
 ### 9. Exportar
 
@@ -234,6 +382,45 @@ done
 `diff -rq` sin salida y ningún «DIFIERE» significan que la entrega es idéntica a lo local. En BLACK todo dio idéntico
 y el kit original no se tocó.
 
+## Qué revisar por formato (QA visual)
+
+Antes de entregar, mira cada pieza al 100 % (no sólo la miniatura). Cinco controles valen para **todas**:
+
+| Control | Qué mirar |
+|---|---|
+| **Logo y fecha** | Logo BLACK con la fecha vigente en el idioma del mercado («DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT en Brasil, EN en EE. UU.), sin tocar el marco y sin resplandor borroso |
+| **Banderas** | Cada bandera corresponde al destino escrito a su lado; se mira la imagen, no el nombre del archivo |
+| **Alianzas** | El logo que toca: Chile Travel fuera de Chile, PromPerú «otros HM» fuera de Perú, PromPerú «solo HM Perú» en las rutas; arriba a la derecha y, en la story, sin montarse con el avión |
+| **Precio placeholder** | `000.000`, `00%`, `USD 000`, `R$ 0.000` son marcadores: la pieza no se pauta hasta reemplazarlos con la grilla de precios |
+| **Textos del mercado** | Verbo, moneda, etiqueta de precio y badge literales del kit para ese mercado (VOLÁ sólo en AR/UY) |
+
+Y por formato:
+
+| Formato | Qué revisar además |
+|---|---|
+| KV 1080×1350 | Junta de la flecha morada cerrada; en el clúster internacional, precio alineado y sin franja clara arriba |
+| Popup 1080×1080 | Legal sobre el degradado, no sobre la ropa; lista de clúster entre logo y destino |
+| Story 1080×1920 | Nada importante en los ~270 px de arriba y abajo |
+| GIF y MP4 | Movimiento hasta ~1,4 s y luego quieto; primer cuadro correcto; ninguna parte duplicada en la foto |
+| MP4 con audio | No satura; el golpe cae cuando el precio se detiene |
+| Story en video | Visto entero con sonido; música apagada antes de la tapa; tapa del idioma correcto |
+| PMAX 1200×628 | La cara de la persona libre (el badge no la tapa) |
+| HPH | El **728×90** igual a la referencia y legible; banderas del mercado, no las de Chile; URL del mercado |
+| TikTok y DAT de Chile | Idénticos a la referencia editable salvo el logo |
+| Rutas foco Perú | Ciudad dentro de 430 px; PromPerú «solo HM Perú»; marcador `[Ubicación de la foto]` pendiente |
+
+## Qué significan las señales
+
+| Señal en la pieza | Qué significa |
+|---|---|
+| `000.000`, `00%`, `USD 000`, `R$ 0.000`, `US$000 o S/ 0,000` | Marcador de precio o descuento: falta la grilla de precios |
+| `[Ubicación de la foto]` con pin verde | Marcador: no hay foto ni ubicación por ruta todavía |
+| «(propuesta)» o «por confirmar» en el título del artboard | Decisión pendiente con Daniela (ver catálogo) |
+| Artboard rayado en el canvas a poca distancia | Carga perezosa: todavía no cargó, no es un error |
+
+Lo pendiente con Daniela, uno por uno, está en el
+[catálogo](../../documentation/creative/catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
+
 ## Qué significan las páginas del canvas
 
 | Página | Qué contiene |
@@ -280,11 +467,24 @@ y el kit original no se tocó.
 | Una imagen del artboard aparece rota | Si su nombre tiene «@» (`x@2x.png`) el canvas no la sirve. Renómbrala sin «@» (`x_2x.png`) |
 | Las banderas del HPH 728×90 salen en blanco | Vienen como imágenes vacías en el SVG. Repón las banderas recortadas del 1200×1200 con máscara circular |
 | Un cambio del Design System no se ve en el canvas | El DS va instalado por copia dentro del canvas; hay que actualizar esa copia |
+| GIF o MP4 sale negro | Se renderizó desde un artboard del canvas (ahora son videos). Renderiza desde `anim-css-<KV>.html` |
+| Cuadros mezclados entre dos GIF, o un render falla con «no existe el archivo» | Dos renders en paralelo compartían el mismo HTML temporal. Usa uno por archivo o renderiza en secuencia |
+| Un texto («Internacional») falta en popup, story o GIF | Era más ancho que su región y quedó en la foto. Amplía la región y rehaz las piezas; compara la foto separada contra la fuente |
+| La fecha del logo sale en portugués en un KV en español | El idioma se detectó en el SVG crudo (el contenido codificado tiene secuencias como «VOE»). Detéctalo sólo por el texto visible |
+| El HPH 728×90 por mercado fue rechazado | Se compuso desde las partes del KV. Rehazlo desde el SVG de referencia del kit |
+| El logo de alianza se monta con el avión en la story | Bájalo bajo el avión (escala 1,1, borde derecho 1032, tope y 500) |
+| La publicación del canvas falla con error 422 | Superaste 512 archivos en la versión. Quita con `null` lo que ya no se usa (en BLACK, las capas `anim/`) y publica por lotes |
+| Una ciudad aparece dos veces en las rutas | La lista venía repetida (Pucallpa). Hazla una sola vez y avísalo |
+| Falta la tapa de cierre vertical de un idioma | No viene en el kit (en BLACK, español). Recorta la horizontal sobre blanco y déjalo como pendiente |
 
 ## Referencias técnicas
 
 - [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
   — formato de los artifacts, publicación de assets y lecciones de la plataforma.
+- [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md)
+  y [scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md).
+- [Catálogo de formatos SKY (funcional)](../../documentation/creative/catalogo-formatos-sky.md) — qué es cada formato,
+  tamaños, nombres de archivo, matriz de 24 KV y pendientes.
 - [Skill del Creative Workbench](../../../.claude/skills/efeonce-creative-workbench/SKILL.md) y sus referencias de
   fotografía y producción SKY.
 - [Adaptaciones SKY en Claude Design (funcional)](../../documentation/creative/adaptaciones-sky-en-claude-design.md).

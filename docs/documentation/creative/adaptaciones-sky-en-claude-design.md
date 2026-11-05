@@ -1,12 +1,15 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (entrega de las piezas BLACK en una carpeta nueva junto al kit)
-> **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
+> **Ultima actualizacion:** 2026-11-05 por Claude (catálogo de formatos, story en video, fecha nueva del logo y pendientes con Daniela)
+> **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
+> [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
+> [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 > **Manual de uso:** [Adaptar un KV de SKY en Claude Design](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md)
-> **Documentacion relacionada:** [Creative Workbench — Design System Lab](./creative-workbench-lab.md)
+> **Documentacion relacionada:** [Catálogo de formatos SKY](./catalogo-formatos-sky.md) ·
+> [Creative Workbench — Design System Lab](./creative-workbench-lab.md)
 
 ## Qué es
 
@@ -27,6 +30,15 @@ posteriores.
 
 > Detalle técnico: [referencia de la skill](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
 > [Creative Workbench Lab](./creative-workbench-lab.md)
+
+## Formatos
+
+Cada pieza tiene un formato con nombre, tamaño y uso propios: KV (1080×1350), post (1080×1350), popup (1080×1080),
+story (1080×1920), GIF, MP4 con y sin audio, story en video, PMAX, HPH, banner TikTok, DAT y rutas foco. Qué es cada
+uno, cuántos se hicieron, dónde quedaron, cómo se leen los nombres de archivo (`HM_<MERCADO>_KV_<TIPO>`) y qué siglas
+no tienen un significado registrado está en el **[Catálogo de formatos SKY](./catalogo-formatos-sky.md)**.
+
+> Detalle técnico: [taxonomía técnica de formatos](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md)
 
 ## Qué no es
 
@@ -69,7 +81,8 @@ Para la campaña BLACK, SKY entregó un kit en OneDrive («SKY Campañas/2026/10
 en Illustrator, un SVG por mercado, banderas, logos, badges, referencias de animación y un audio. Antes de producir se
 hace un **inventario** de todo el kit y se anotan sus reglas:
 
-- **Fechas:** del 25 al 29 de noviembre (con su versión en portugués e inglés).
+- **Fechas:** el kit decía del 25 al 29 de noviembre (con su versión en portugués e inglés). En la segunda ronda SKY
+  la cambió a «del 25 de noviembre al 2 de diciembre» (ver [Cambios del cliente](#cambios-del-cliente-y-piezas-nuevas-segunda-ronda)).
 - **Reglas por mercado:** cada país cambia la etiqueta de precio, la moneda, el badge y el verbo de acción. Por
   ejemplo, Chile dice «CON 00% DCTO.», Brasil «COM ATÉ 00% OFF», Estados Unidos «WITH UP TO 00% OFF», y Argentina y
   Uruguay usan el voseo del propio cliente («VOLÁ»). Perú agrega tipo de cambio y stock mínimo.
@@ -141,15 +154,33 @@ El kit trae seis **referencias de animación** de campañas anteriores, que func
 destino sube con un fundido, la flecha de precio entra desde la izquierda, el badge aparece creciendo y todo queda
 quieto a partir de ~1,4 s hasta el final (~4 s). No hay salida: el bucle vuelve a empezar.
 
-Cada KV de BLACK se anima así y se entrega en dos versiones:
+Cada uno de los 24 KV de mercado de BLACK se anima así (1080×1350, 25 cuadros por segundo, 3,96 s por vuelta) y se
+entrega en tres archivos:
 
 - **GIF**: en bucle y sin sonido.
-- **MP4**: sin audio y con audio. El audio es la pista del kit, cuyo golpe coincide con el momento en que el precio
-  queda fijo; se bajó de volumen porque venía demasiado alto.
+- **MP4**: la misma animación, sin sonido.
+- **MP4 con audio** (`_audio`): con la pista del kit, cuyo golpe coincide con el momento en que el precio queda fijo;
+  se bajó de volumen porque venía demasiado alto.
+
+Sólo se mueven las partes del mensaje (badge, destino, precio y, si la hay, la lista); la foto, el logo y el pie quedan
+quietos. Detalle cuadro a cuadro en el [catálogo](./catalogo-formatos-sky.md#cómo-es-un-gif).
 
 En el canvas las animaciones se ven como videos, porque Claude Design muestra los artboards como imágenes quietas.
 
 > Detalle técnico: [manual, paso 5](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#5-animar-gif-y-mp4-con-audio)
+
+## Story en video
+
+Cada uno de los 12 mensajes de la grilla por mercado tiene además un **story en video** (1080×1920, 15,7 s, con
+música), armado en cinco partes: intro con la foto y el logo, precios, una tarjeta blanca con una frase («brandlift»),
+«Completa tu viaje» sobre el video del avión del kit y la tapa de cierre de SKY. La música del kit se apaga antes de la
+tapa, que trae su propio sonido.
+
+El kit no trae tapa vertical en español: se armó desde la horizontal y queda por confirmar, igual que las frases
+propias de los mensajes internacionales y sus traducciones. Partes y tiempos en el
+[catálogo](./catalogo-formatos-sky.md#cómo-es-el-story-en-video).
+
+> Detalle técnico: [scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 
 ## Qué hay en el canvas
 
@@ -167,7 +198,8 @@ En el canvas las animaciones se ven como videos, porque Claude Design muestra lo
 | KV Black · Chile KV listo | Banner TikTok, DAT y PMAX de Chile a partir de los editables del kit |
 
 El operador revisa dejando **comentarios anclados a cada pieza**; las respuestas y correcciones quedan en el mismo
-hilo.
+hilo. El canvas es privado del operador: para que otra persona (por ejemplo Daniela) lo vea y comente, se comparte
+desde «Compartir». Al cierre de la segunda ronda está en la versión 28.
 
 > Detalle técnico: [manual, páginas del canvas](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#qué-significan-las-páginas-del-canvas)
 
@@ -185,6 +217,17 @@ hilo.
   «otros HM» fuera de Perú).
 - **Lo que no tenemos queda marcado.** La ubicación de la foto de las rutas foco va como placeholder; la lista de
   regiones de Perú es una propuesta sin fotos; las frases y traducciones propias quedan por confirmar.
+- **Chile tiene piezas «KV listo».** Cuando el kit trae el editable del formato (banner TikTok, DAT, PMAX), la pieza
+  es esa referencia con el logo vigente, sin recomponerla. Los precios y descuentos siguen como marcador (`000.000`,
+  `00%`) hasta que llegue la grilla de precios.
+
+### Pendientes con Daniela
+
+Quedan por confirmar: si Brasil «Voe para Peru» va como pieza de alianza o como KV; la propuesta «Vuela por Perú» sin
+fotos; la base de Chile «Encuentra destinos» (su nota hablaba del clúster internacional de Perú); las frases y
+traducciones del story en video y del HPH; la ubicación de la foto de las rutas foco, y la tapa vertical en español.
+La lista completa, con lo que hay hoy en cada caso, está en el
+[catálogo](./catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
 
 > Detalle técnico: [referencia de la skill, segunda ronda](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md#segunda-ronda-de-daniela-2026-11-04-chat-de-teams)
 

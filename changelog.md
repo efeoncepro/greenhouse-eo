@@ -21,6 +21,8 @@ Segunda ronda: logo BLACK con la fecha nueva en todas las piezas, grilla por mer
 story en video), 13 rutas foco de Perú, formatos Chile «KV listo» y HPH por mercado con sus banderas.
 El 2026-11-05 los 321 entregables se entregaron en OneDrive, en la carpeta nueva «ENTREGABLES BLACK (Efeonce
 2026-11-05)» junto al kit, verificados contra el original; el kit no se modificó.
+Quedaron documentados cada formato SKY (tamaños, nombres, mercados, GIF y story en video) y el pipeline de producción
+([catálogo](docs/documentation/creative/catalogo-formatos-sky.md)). 6 PMAX de rutas Perú con la fecha vieja se corrigieron.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

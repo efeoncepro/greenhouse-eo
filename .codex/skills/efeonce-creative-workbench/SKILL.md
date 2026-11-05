@@ -37,6 +37,8 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Inspeccionar cada capa, tokens/bindings, descomponer, extraer o reconstruir SKY por receta | [autonomous-components.md](references/autonomous-components.md) |
 | Identificar una composición nombrada, leer su receta y producir adaptaciones por lotes de agentes | [recipes.md](references/recipes.md) |
 | Adaptar un KV SKY en el canvas de Claude Design: plantillas por destino, kit «Despliegue Base», popup/story, animación GIF/MP4 | [sky-design-canvas.md](references/sky-design-canvas.md) |
+| Saber qué formato SKY es cada pieza (KV HM, popup, post, story, GIF, story en video, PMAX, HPH, DAT, TikTok, rutas), su tamaño, nombre y mercado | [sky-format-catalog.md](references/sky-format-catalog.md) |
+| Reproducir o modificar la producción local BLACK: logofix, capas, GIF/MP4, story en video, HPH/PMAX, canvas y entrega | [sky-black-pipeline.md](references/sky-black-pipeline.md) |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Producir para Berel: banners, adaptaciones, plates, producto en escena, reels de transformación | Skill Greenhouse `berel-graphic-line` (oficio) + corte Berel en [state-continuity.md](references/state-continuity.md) |
 | Configurar/verificar identidad Git de cada persona, hooks y evitar rechazo de autor en Vercel | [operations-distribution.md](references/operations-distribution.md), sección de identidad Git |

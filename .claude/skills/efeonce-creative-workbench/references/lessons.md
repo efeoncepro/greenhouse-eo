@@ -74,6 +74,7 @@ nunca en el archivo del cliente.
 | Las imágenes del chat de Teams no se pueden leer | La API de Teams entrega el texto pero no las imágenes alojadas (403 también con token de az) | Abrir Teams web en el navegador integrado (sesión del operador) y leerlas en el visor |
 | Falta la tapa de cierre vertical en español | El kit sólo trae la horizontal en ES (PT y EN sí traen vertical) | Recortar el centro de la horizontal sobre blanco y avisar para pedir la vertical a la fuente |
 | «No modificar el kit en OneDrive» se lee como no escribir en OneDrive | La regla protege las carpetas del kit (`FORMATO GIF`, `KV X HM`, etc.), no prohíbe entregar ahí (caso 2026-11-05: 321 archivos) | Entregar en una carpeta nueva, fechada y con autoría dentro de `Despliegue Base`; verificar antes que no exista, copiar sin `--delete` y comparar byte a byte. Sin scripts de trabajo. La copia local no prueba que OneDrive ya subió |
+| 6 PMAX de rutas Perú entregados con la fecha vieja del logo | Los PMAX 1080 son copias del popup, KV y story; tras el logofix se recopiaron todos menos DOM-RUTA/INTER-RUTA, y la entrega copió lo que había | Tras rehacer una fuente, recopiar sus derivados y antes de entregar buscar archivos más viejos que la corrección (`find ! -newermt`) y comparar cada derivado con su fuente (`cmp`). Corregido 2026-11-05 en local y OneDrive |
 
 ## Propuestas rechazadas o retiradas
 

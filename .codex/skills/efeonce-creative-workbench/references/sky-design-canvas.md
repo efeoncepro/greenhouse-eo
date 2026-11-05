@@ -4,7 +4,10 @@ Estado al 2026-11-04: dos artifacts privados del operador en claude.ai (un Desig
 canvas), la campaña CyberSky Perú adaptada a 66 piezas y la campaña BLACK (kit «Despliegue Base»)
 con 12 KV fijos, 12 animados y 24 estáticos popup/story. Nada de esto pasó por una corrida
 gobernada de Workbench ni registra aprobación del cliente. Continuidad y pendientes en
-[state-continuity.md](state-continuity.md), sección del corte 2026-11-04.
+[state-continuity.md](state-continuity.md), sección del corte 2026-11-04. La segunda ronda (2026-11-04/05)
+sumó la grilla por mercado, rutas de Perú, Chile «KV listo», HPH por mercado y story en video. Cada formato, su
+tamaño, su nombre y su mercado están en [sky-format-catalog.md](sky-format-catalog.md). Cada script y sus
+parámetros (GIF, MP4, story en video, logofix) están en [sky-black-pipeline.md](sky-black-pipeline.md).
 
 ## Frontera
 
@@ -242,7 +245,7 @@ La mujer se corre a la derecha para que el badge no le tape la cara (con el cent
 tapaba). Degradado inferior para el legal y oscurecido izquierdo en los clústeres.
 
 **HPH** (1200×1200, 300×600, 300×250, 728×90). Las referencias están en
-`KV X HM/HPH/HPH_<formato>_GENERICO.svg` (Chile internacional con banderas, «CON GRANDES
+`FORMATO HPH/HPH_<formato>_GENERICO.svg` (Chile internacional con banderas, «CON GRANDES
 DESCUENTOS», sin precio, botón «Ver vuelos» en Source Sans 3):
 
 - **Genérico Chile:** se renderiza el SVG tal cual con Metric y **Source Sans 3** (descargada con

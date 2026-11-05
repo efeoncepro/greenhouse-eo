@@ -166,7 +166,9 @@ La diferencia con otras capas de documentacion:
 - [Adaptar un KV de SKY en Claude Design](creative/adaptar-kv-sky-en-claude-design.md) — Design System «SKY Airline —
   Performance» y canvas de adaptaciones: pasar el KV, generar piezas por destino con plantilla y datos, leer un kit
   «Despliegue Base», KV fijos, animación GIF/MP4 con audio, popup y story, revisión con comentarios y exportación local.
-  Caso fuente: CyberSky Perú (66 piezas) y kit BLACK, 2026-11-04.
+  Desde la v1.4: grilla por mercado, KV con banderas, rutas foco Perú, Chile «KV listo», PMAX, HPH, story en video,
+  «qué revisar» por formato y entrega en OneDrive. Caso fuente: CyberSky Perú (66 piezas) y kit BLACK, 2026-11-04/05.
+  Qué es cada formato: [catálogo de formatos SKY](../documentation/creative/catalogo-formatos-sky.md).
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19. Desde el 2026-10-03 (v1.1): pedir personas del roster, del elenco y a

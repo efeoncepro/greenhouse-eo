@@ -4,7 +4,9 @@
 
 Trabajo hecho fuera del harness, en el canvas de Claude Design: bocetos y adaptaciones para
 revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cómo operarlo en
-[sky-design-canvas.md](sky-design-canvas.md); fotografía de evento en
+[sky-design-canvas.md](sky-design-canvas.md); formatos, tamaños y nombres en
+[sky-format-catalog.md](sky-format-catalog.md); scripts y parámetros en [sky-black-pipeline.md](sky-black-pipeline.md);
+fotografía de evento en
 [sky-photography.md](sky-photography.md); casos en [lessons.md](lessons.md).
 
 | Artifact (privado del operador) | Estado al cierre |

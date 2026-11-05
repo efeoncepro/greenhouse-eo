@@ -105,6 +105,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   «SKY Airline — Performance» y el canvas de adaptaciones, cómo se adapta un KV por destino con plantilla y datos, cómo
   se descompone un KV, reglas de popup y story y animación GIF/MP4; caso fuente CyberSky Perú y kit BLACK, 2026-11-04;
   [manual](../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md).
+- [Catálogo de formatos SKY](creative/catalogo-formatos-sky.md) — qué es cada pieza de SKY (KV, post, popup, story,
+  GIF, MP4 con audio, story en video, PMAX, HPH, banner TikTok, DAT, rutas foco), su tamaño, cuántas se hicieron y dónde
+  están; cómo leer los nombres `HM_<MERCADO>_KV_<TIPO>`, la matriz de 24 KV por mercado, cómo es un GIF y un story en
+  video, las 10 páginas del canvas y lo pendiente con Daniela; campaña BLACK, entrega del 2026-11-05.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Sistema de canales propios y love brand](social/sistema-de-canales-y-love-brand.md) — las tres familias de canales
