@@ -88,7 +88,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **Veo 3.1 / Fast** (Google Vertex) | ruta premium/broadcast y ruta de escala GCP | costo/cupo y duración por endpoint | premium y scale; nunca vía Fal |
 | **Kling 3 Pro/4K** (Fal) | first/last frame, elements, multi-shot y 4K | audio/idioma y concurrencia por endpoint | especialista 4K/control |
 | **PixVerse V6** (Fal) | 1080p, audio, camera controls y buen costo/volumen | límites 1080p/duración | variantes social a escala |
-| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni`) | texto/imagen/cuadros/referencias a video; edit y extend desde MP4, audio integrado | Preview; seis modos verificados en CLI sólo a 360p/16:9/3 s (extend 6 s acumulados); 720p/1080p/4K, 9:16 y cadena stateful sin probar | generación técnica local con `--estimate` y `--yes`; QA temporal y de audio antes de usar |
+| **Gemini Omni 1.2 Flash** (Google Cloud, `pnpm ai:omni`, default desde 2026-11-05) | lo mismo que 1.1 con clips de hasta 15 s y upscale 360p/720p → 1080p/4K | GA; sin clip 1.2 generado aún en la CLI | borrador barato a 360p/720p y upscale sólo de la toma elegida |
+| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni --model 1.1`) | texto/imagen/cuadros/referencias a video; edit y extend desde MP4, audio integrado | Preview; seis modos verificados en CLI sólo a 360p/16:9/3 s (extend 6 s acumulados); 720p/1080p/4K, 9:16 y cadena stateful sin probar | generación técnica local con `--estimate` y `--yes`; QA temporal y de audio antes de usar |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO** — API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** basar nada nuevo en él |
 
 ### 2.3 Post-proceso y herramientas de mano
@@ -132,7 +133,7 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
   duración/4K/costo en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`).
 - **Broadcast / cine** → Veo 3.1.
 - **Simple y barato** → Kling 3.0.
-- **Editar un MP4 mediante instrucción** → Gemini Omni 1.1 por `pnpm ai:omni --task edit`; la preservación fina y la cadena conversacional stateful aún no se han verificado.
+- **Editar un MP4 mediante instrucción** → Gemini Omni (1.2 por defecto) por `pnpm ai:omni --task edit`; la preservación fina y la cadena conversacional stateful aún no se han verificado.
 - **Nada nuevo sobre Sora 2** (deprecado).
 
 > **Doctrina 2026 (repetida porque es load-bearing):** los profesionales que hacen el mejor

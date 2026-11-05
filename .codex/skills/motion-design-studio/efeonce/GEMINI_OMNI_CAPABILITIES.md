@@ -1,11 +1,20 @@
-# Gemini Omni Flash — catálogo de capacidades + mapa de sinergia con el estudio
+> **Corte vigente 2026-11-05 — Omni 1.2 Flash es el modelo por defecto de `pnpm ai:omni`.** Este catálogo conserva
+> capacidades y experimentos del `gemini-omni-flash-preview` original y de 1.1. Para operar usa `pnpm ai:omni --help`
+> y `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`; contrato y precios de 1.2 en
+> `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»). No extrapolar los checks ✅ históricos a 1.2 ni a Globe.
 
-> **Corte vigente 2026-09-24:** este catálogo conserva capacidades y experimentos del modelo anterior
-> `gemini-omni-flash-preview`. Para operar **Omni 1.1 Cloud** usa `pnpm ai:omni` y
-> `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. Los seis modos CLI completaron pruebas técnicas
-> a 360p/16:9/3 s (extend 6 s acumulados); una edición desde MP4 fuente no prueba cadena conversacional
-> stateful. 720p/1080p/4K, 9:16, fidelidad temporal, C2PA y factura real siguen sin verificar. No
-> extrapolar los checks ✅ históricos a 1.1 ni a Globe.
+> **Delta 2026-11-05 — qué cambia para el oficio con 1.2 (📄 proveedor salvo que se indique).**
+> - **Clips de hasta 15 s** en texto, imagen y referencias (first/last frame y extensión siguen en 3–10 s). Una toma
+>   de 15 s alcanza para un spot social completo sin coser dos generaciones.
+> - **Borrador → upscale:** iterar a 360p (≈ USD 0,023/s) o 720p (≈ USD 0,07/s) y subir **sólo** la toma elegida a
+>   1080p o 4K con `--task upscale`. Cambia la economía de exploración: diez borradores de 15 s a 360p cuestan menos
+>   que un clip de 15 s a 4K. El upscale no inventa un plano nuevo; parte del clip aprobado.
+> - **Edición conversacional:** `--previous <id>` encadena edit o upscale sobre el clip del turno anterior (retención
+>   7 días). Sin canary live en nuestra CLI.
+> - **Extensión desde cualquier largo:** usa los últimos 10 s del fuente y entrega hasta 40 s totales.
+> - **Claims de Google (📣, no verificados):** mejor adherencia a referencias, consistencia de primer a último cuadro,
+>   lip-sync multi-hablante más claro, menos cortes de salto. Débil en acción deportiva rápida y física compleja.
+> - Precio de video output: USD 12/1M tokens (1.1: USD 17,50). Referencias de audio con allowlist. SynthID + C2PA.
 
 > **Tipo de documento:** Catálogo de capacidades + mapa de sinergia (agent-facing).
 > **Hermano de:** `GEMINI_OMNI_VERTEX.md` (contrato operativo: endpoint, auth, pricing, gotchas). **Este doc NO repite el contrato** — si necesitas invocarlo, lee ese. Acá está TODO lo que Omni *puede hacer* y **cómo combinarlo** con las skills de la familia "studio" para exprimirlo.
@@ -197,7 +206,7 @@ Omni **genera imagen y sonido juntos en un solo pase de difusión** — el audio
 
 ## PARTE B — Mapa de sinergia con las skills "studio" (lo más importante)
 
-La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, dura ≤10 s y su audio es scratch. Cada una de esas debilidades la **cubre una skill hermana**, y cada fortaleza de Omni **alimenta a las demás**. Acá está el cruce capacidad-por-capacidad.
+La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p nativo (1080p/4K sólo por upscale), dura ≤15 s en 1.2 (≤10 s en 1.1) y su audio es scratch. Cada una de esas debilidades la **cubre una skill hermana**, y cada fortaleza de Omni **alimenta a las demás**. Acá está el cruce capacidad-por-capacidad.
 
 ### B.1 Tabla de sinergia — Capacidad Omni → skill que aporta/refina → cómo → resultado
 
@@ -212,7 +221,7 @@ La tesis: **Omni casi nunca trabaja solo.** Deforma texto/logos, tapa a 720p, du
 | **deforma texto / logos / UI** | Playwright (UI crisp) + `../workflows/ui-without-after-effects.md` + `../workflows/hybrid-world-plus-ui.md` | Omni pinta el **plate cinematográfico de fondo** (atmósfera/cámara/profundidad); el **texto/logo/UI exacto** se compone encima como asset real (HTML+Playwright a 1280×720, o mograph AE) | Fondo cine + **micro-texto y logo nítidos y exactos** — nunca confías la exactitud al modelo |
 | **cámara solo por texto (sin presets)** | Higgsfield Cinema Studio (`../STUDIO_TOOLING.md`) | Si necesitas **cámara nombrada y repetible** (dolly, crash-zoom, orbit, focal length) → produces esa toma en Higgsfield; Omni queda para edición/mundo | Movimiento de cámara **dirigido y consistente** entre tomas |
 | **consistencia de personaje limitada** | Higgsfield **Soul ID** + `design-studio` | Entrenas el rostro en Soul ID (3–5 fotos) o generas un still canónico del personaje → lo pasas a Omni como referencia en cada toma | Personaje **reconocible** aun con el límite de Omni |
-| **duración ≤10 s** | este estudio (`../workflows/reference-chaining.md`) + `../modules/06` | Encadenas clips de 3–10 s (cada uno partiendo del frame anterior) y los montas | Piezas **más largas** hiladas por continuidad + corte |
+| **duración ≤15 s (1.2) / ≤10 s (1.1)** | este estudio (`../workflows/reference-chaining.md`) + `../modules/06` | Encadenas clips de 3–15 s (cada uno partiendo del frame anterior) y los montas | Piezas **más largas** hiladas por continuidad + corte |
 | **formato/entrega** | `social-media-studio` | Tomas el master y adaptas duración, **safe-zones y aspecto por red** (9:16 vertical, 1:1, 16:9); Omni ya puede salir 9:16 de fábrica para acortar el paso | Corte **por red**, listo para publicar |
 | **VFX / composite** | `../modules/11_VFX_COMPOSITING.md` (Nuke/Fusion/AE, Mocha, Runway roto, Beeble relight) | Omni da el plate; el composite integra CGI, keying, cleanup, relight | Integración de precisión que Omni no hace |
 | **dirección / storyboard** | `../modules/04_STORYBOARD_ANIMATIC.md` + `templates/` | Validas ritmo en **animatic barato** ANTES de gastar créditos en tomas Omni | Menos quema de créditos; ritmo aprobado antes de producir |

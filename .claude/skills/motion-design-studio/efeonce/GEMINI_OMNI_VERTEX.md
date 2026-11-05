@@ -1,11 +1,72 @@
-# Gemini Omni Flash — referencia operativa (Interactions API)
+> **Ruta CLI vigente (2026-11-05): Gemini Omni 1.2 Flash por defecto.** `pnpm ai:omni --help` y
+> `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. La CLI Cloud usa `gemini-omni-1.2-flash` (GA, `global`,
+> PayGo estándar; `launchStage: GA` leído en vivo del Model Garden el 2026-11-05) y conserva 1.1 con `--model 1.1`
+> (`gemini-omni-1.1-flash-preview`, Preview, cuota fija). El cuerpo de este documento conserva evidencia y recetas del
+> `gemini-omni-flash-preview` original y de 1.1: sus IDs, límites y cuerpos de request **no** son el contrato de 1.2.
+> No inferir disponibilidad de Globe de esta CLI.
 
-> **Ruta CLI vigente para 1.1 (2026-09-24):** `pnpm ai:omni --help` y
-> `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. Este documento conserva evidencia y recetas del
-> `gemini-omni-flash-preview` anterior; sus IDs, límites, superficies de edición y cuerpos de request no son
-> el contrato de 1.1. La CLI Cloud usa `gemini-omni-1.1-flash-preview` y tiene seis modos técnicos probados
-> a 360p, 16:9, 3 s (extensión: 6 s acumulados). La cadena stateful `previous_interaction_id` sigue sin
-> probarse en 1.1. No inferir disponibilidad de Globe de esta CLI.
+> **Actualización 2026-11-05 — Gemini Omni 1.2 Flash (GA).** Mismo transporte que 1.1: Interactions API Cloud
+> `POST https://aiplatform.googleapis.com/v1beta1/projects/{project}/locations/global/interactions` con ADC; GET al
+> mismo recurso para consultar. GenerateContent, Live API y Chat Completions **no** están soportados. Developer API:
+> `gemini-omni-1.2-flash` en `generativelanguage.googleapis.com/v1beta/interactions` con API key.
+>
+> | Tarea (`video_config.task`) | 1.2 Flash | 1.1 Preview |
+> |---|---|---|
+> | `text_to_video`, `image_to_video` (1 imagen), `reference_to_video` | 3–15 s | 3–10 s |
+> | `image_to_video` con first + last frame (2 imágenes) | 3–10 s | 3–10 s |
+> | `extend` | extensión de 3–10 s; acepta un video fuente de **cualquier largo**, usa sus últimos 10 s y concatena sobre hasta los últimos 30 s (salida total ≤ 40 s); hasta 2 imágenes de referencia | fuente ≤ 10 s |
+> | `edit` | fuente ≤ 15 s; la duración de salida = la del fuente; hasta 2 imágenes de referencia | fuente ≤ 10 s |
+> | `upscale` (nuevo) | 360p→720p/1080p y 720p→1080p/4K; fuente ≤ 15 s, 16:9 o 9:16, 24 fps conservados; 360p→4K y 1080p→4K no existen | no soportado |
+>
+> - **Referencias:** la guía Developer API dice hasta 6 imágenes (3 por personaje, 2 personajes); la ficha Cloud dice
+>   hasta 10 imágenes y 3 videos por prompt. Videos de referencia de ≤ 3 s; con clips de 11–15 s sólo 1 video de
+>   referencia, con 3–10 s hasta 3. La CLI aplica el techo conservador (6 imágenes en 1.2).
+> - **Resoluciones:** 360p, 720p (por defecto), 1080p y 4K; Google etiqueta 1080p/4K como *upscaled*. `aspect_ratio`
+>   16:9 o 9:16 (si se omite, Cloud lo infiere del prompt). Duración como string `"Ns"`.
+> - **Upscale:** `generation_config.video_config.task:"upscale"` es obligatorio; sin él la API lo interpreta como
+>   `edit`. La resolución objetivo es obligatoria. Fuente: un video en `input` **o** `previous_interaction_id` del turno
+>   stateful inmediatamente anterior. Tokens de salida por segundo: 2.896 (360p→720p y 720p→1080p), 5.792
+>   (360p→1080p), 11.584 (720p→4K); tokens de entrada 0. Esto habilita el flujo **borrador a 360p/720p → upscale de
+>   la toma elegida**.
+> - **Multi-turno:** `store:true` + `previous_interaction_id`; el turno de seguimiento envuelve sus partes en
+>   `{"type":"user_input","content":[...]}`. Interacciones guardadas o async se retienen hasta 7 días;
+>   `store:false` es stateless (compatible con ZDR). En la CLI: `--previous <interaction-id>` para `edit` y
+>   `upscale`. **Sin canary live todavía.**
+> - **Precio:** USD 12 por 1M tokens de video de salida (1.1: USD 17,50), con las mismas tasas de tokens por segundo:
+>   ≈ USD 0,023/s a 360p, 0,07/s a 720p, 0,104/s a 1080p y 0,209/s a 4K. Un clip de 15 s a 720p ≈ USD 1,04. La tabla
+>   de precios Cloud no se pudo leer (página renderizada en JS); el USD 12 sale de la página de precios Developer API y
+>   cuadra con el USD 0,07/s a 720p que publica el blog de Google Cloud. Input: USD 1,50/1M.
+> - **Lo que Google afirma (claims, no verificado por nosotros):** mejor adherencia a referencias de imagen y video,
+>   consistencia de personaje/objeto de primer a último cuadro, diálogo más natural con lip-sync más claro y
+>   condicionamiento multi-hablante, menos cortes de salto no pedidos. Google reconoce debilidad en acción deportiva
+>   rápida, cambios de guion rápidos y física compleja.
+> - **Procedencia:** SynthID invisible + C2PA. Las referencias de audio están detrás de allowlist.
+> - **Ciclo de vida:** en la Developer API, `gemini-omni-1.1-flash` se enruta automáticamente a 1.2 desde el
+>   2026-12-03. En Cloud, `gemini-omni-1.1-flash-preview` sigue listado y sin fecha de retiro publicada.
+> - Fuentes (as-of 2026-11-05): [ficha Cloud 1.2](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-2-flash),
+>   [upscale](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/upscale-videos),
+>   [extend](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/extend-videos),
+>   [edit](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/edit-videos),
+>   [blog Cloud GA](https://cloud.google.com/blog/products/ai-machine-learning/gemini-omni-1-2-flash-generally-available),
+>   [blog Google](https://blog.google/innovation-and-ai/technology/developers-tools/introducing-gemini-omni-1-2-flash/),
+>   [guía Developer API](https://aistudio.google.com/docs/omni), [precios Developer API](https://aistudio.google.com/docs/pricing).
+>
+> ```bash
+> # Borrador barato a 360p, 15 s (≈ USD 0,35 de video output)
+> pnpm ai:omni --task text --prompt-file shot.txt --resolution 360p --duration 15 \
+>   --gcs-output gs://<bucket>/omni/out/ --yes --out borrador.mp4
+> # Upscale de la toma elegida desde el archivo (720p → 4K)
+> pnpm ai:omni --task upscale --video gs://<bucket>/omni/out/toma.mp4 --source-resolution 720p \
+>   --resolution 4k --duration 10 --gcs-output gs://<bucket>/omni/up/ --max-usd 2 --yes --out toma-4k.mp4
+> # Upscale encadenado al turno anterior (sin --video; sin canary live)
+> pnpm ai:omni --task upscale --previous <interaction-id> --source-resolution 360p --resolution 1080p \
+>   --duration 15 --gcs-output gs://<bucket>/omni/up/ --max-usd 2 --yes
+> # Repetir con el contrato 1.1
+> pnpm ai:omni --model 1.1 --task text --prompt "..." --duration 10 --gcs-output gs://<bucket>/omni/out/ --yes
+> ```
+>
+> `--max-usd` vale 1 por defecto y bloquea un clip de 15 s a 720p (≈ USD 1,04) o cualquier upscale a 4K: súbelo
+> de forma explícita.
 
 > **Tipo de documento:** Referencia técnica agent-facing (para operar Gemini Omni sin volver a investigar).
 > **Verificado as-of:** migración a Interactions API **2026-07-20** (`efeonce-globe`, Vertex keyless `global` + Gemini API con key) + edit cross-model / multi-referencia combinada **2026-07-20** (TASK-1490, live-verificado por el seam en ambas superficies); runtime histórico `generateContent` 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, `global`), **ya no vigente**.

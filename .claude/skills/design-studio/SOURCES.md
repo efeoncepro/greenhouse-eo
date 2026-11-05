@@ -138,7 +138,8 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 - Storytool — Best AI Image Generators 2026 — https://storytool.io/blogs/best-ai-image-generators-2026
 
 **Modelos IA de video**
-- Google Cloud — Gemini Omni 1.1 Flash Preview (CLI vigente) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash
+- Google Cloud — Gemini Omni 1.2 Flash (GA; default de la CLI desde 2026-11-05) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-2-flash · upscale: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/upscale-videos · blog GA: https://cloud.google.com/blog/products/ai-machine-learning/gemini-omni-1-2-flash-generally-available
+- Google Cloud — Gemini Omni 1.1 Flash Preview (`--model 1.1`) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash
 - Google Cloud — Gemini Omni Flash Preview (modelo anterior, evidencia histórica) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-flash-preview
 - Google AI — Gemini video generation / Omni — https://ai.google.dev/gemini-api/docs/video
 - Google DeepMind — Gemini Omni — https://deepmind.google/models/gemini-omni/
@@ -201,7 +202,8 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 | **Kling 3 Pro/4K** (Fal) — **evaluado, no conectado a `pnpm ai:fal`** (2026-09-16) | start/end, elements con voz, multi-shot, motion-control y 4K | límites de audio/idioma y concurrencia; O3 0,14 USD/s, 4k 0,42/s | especialista premium/4K si el operador lo conecta; Kling vía Higgsfield es otro carril |
 | **Grok Imagine video v1.5** (xAI, Fal) — **evaluado, no conectado** (2026-09-16) | exploración masiva a USD 0,01/s; 1–15 s hasta 1080p | #10 en OpenArt Arena; sin control de audio | candidato de exploración barata |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |
-| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni`) | generación por texto/imagen/cuadros/referencias; edit y extend desde MP4; audio en MP4 | Preview; sólo 360p/16:9/3 s verificados en CLI; 720p/1080p/4K, 9:16 y edición stateful sin probar | tooling local directo, nunca Fal; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
+| **Gemini Omni 1.2 Flash** (Google Cloud, `pnpm ai:omni`, default desde 2026-11-05) | lo mismo que 1.1 con clips de hasta 15 s, upscale de borradores 360p/720p a 1080p/4K y edición multi-turno; ≈ USD 0,07/s a 720p | GA; identidad confirmada en vivo, sin clip 1.2 generado aún; upscale y cadena sin canary | tooling local directo, nunca Fal; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
+| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni --model 1.1`) | generación por texto/imagen/cuadros/referencias; edit y extend desde MP4; audio en MP4 | Preview; sólo 360p/16:9/3 s verificados en CLI; 720p/1080p/4K, 9:16 y edición stateful sin probar | tooling local directo, nunca Fal; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
 | **Flux 3** (Black Forest Labs, Fal) | video con audio: T2V/I2V, primer-último cuadro, keyframes, edit que conserva movimiento, extend, draft barato → enhance; 5–20 s, 720p/1080p | en Fal no genera imágenes; más lento que H3; `extend` exige audio en el origen y entrega sólo la continuación | explorar movimiento en draft, fijar trayectoria con cuadros, video a video verificado; detalle en `motion-design-studio` |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO**: API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** usar para proyectos nuevos |
 
@@ -215,7 +217,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
   GPT Image 2.5 Flare; edición precisa/pieza final → 2.5 Sunburst; Batch → GPT Image 2; SVG o GIF desde un prompt → GPT Image 2.6 Flare por `pnpm ai:image --format svg|gif`; pieza final → comparar 2.5 vs 2.6 Sunburst en la toma**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
-  **broadcast/cine → Veo**; **económico simple → Kling**; **edición de un MP4 con instrucción → Gemini Omni 1.1 CLI** (cadena conversacional stateful sin probar);
+  **broadcast/cine → Veo**; **económico simple → Kling**; **edición de un MP4 con instrucción → Gemini Omni CLI (1.2 por defecto)** (cadena conversacional stateful sin probar);
   **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;
   **toma de hasta 30 s con duración inteligente o video desde una web/documento → Wan 3.0 (Fal)**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

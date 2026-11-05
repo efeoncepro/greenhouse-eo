@@ -346,9 +346,13 @@ del catálogo/OpenAPI de fal el 2026-09-16, sin corridas.
 
 Estos datos de Kling vía fal son un carril distinto de Kling vía Higgsfield (MCP): no los mezcles.
 
-**Gemini Omni 1.1 Flash va directo por Google, nunca por fal.** Para producción local usa
-`pnpm ai:omni --help` y `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
-La CLI Cloud separa `text|image|frames|reference|edit|extend`; los seis modos completaron un canary técnico
+**Gemini Omni va directo por Google, nunca por fal.** Para producción local usa
+`pnpm ai:omni --help` y `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. Desde 2026-11-05 la CLI usa por
+defecto **Omni 1.2 Flash** (`gemini-omni-1.2-flash`, GA): clips de hasta 15 s, `upscale` de borradores 360p/720p a
+1080p/4K y video output a USD 12/1M tokens (≈ USD 0,023/s a 360p · 0,07/s a 720p · 0,104/s a 1080p · 0,209/s a 4K,
+30 % menos que 1.1). Árbol de costo: explorar a 360p/720p y subir con `--task upscale` sólo la toma elegida. Ningún
+clip 1.2 se generó aún en esta CLI. Lo que sigue describe la evidencia de 1.1 (`--model 1.1`).
+La CLI Cloud separa `text|image|frames|reference|edit|extend` (más `upscale` en 1.2); los seis modos de 1.1 completaron un canary técnico
 en `efeonce-group` a 360p/16:9/3 s (extensión: 6 s acumulados) el 2026-09-24. `edit` recibe video fuente
 e imágenes opcionales; no implica edición conversacional stateful. Ni 720p/1080p/4K ni 9:16 ni la
 fidelidad fina, C2PA o factura real se verificaron en esa prueba. SKY posterior sí verificó edición1080×1920/24fps: piloto9,5s rechazado y ventana6,5s integrada; ver companion de posproducción. Esa evidencia no certifica4K ni preservación general. `--estimate` no envía; `--yes` autoriza

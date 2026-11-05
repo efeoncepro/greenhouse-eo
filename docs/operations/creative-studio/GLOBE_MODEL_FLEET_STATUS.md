@@ -138,6 +138,15 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
 
 ## Identidades exactas de video auditadas (2026-08-04)
 
+### Gemini Omni 1.2 Flash — publicado por Google, NO promovido en Globe (2026-11-05)
+
+Google publicó `gemini-omni-1.2-flash` como GA en Cloud el 2026-11-05 (clips de hasta 15 s, upscale, ~30 % más
+barato). Sólo la CLI local `pnpm ai:omni` lo usa (ver
+[decisión](../../architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md)); **no cambia la flota, las rutas ni la
+promoción de Globe**. Integrarlo exige el mismo ciclo de identidad, canary facturable, readback y promoción que
+`TASK-1781` define para 1.1. La Developer API enruta `gemini-omni-1.1-flash` a 1.2 desde el 2026-12-03; la
+identidad Cloud `gemini-omni-1.1-flash-preview` sigue sin retiro anunciado.
+
 ### Gemini Omni 1.1 Flash — candidato de migración (2026-08-27)
 
 Google lanzó Gemini Omni 1.1 Flash el 2026-08-27 y anunció shutdown de `gemini-omni-flash-preview` para el

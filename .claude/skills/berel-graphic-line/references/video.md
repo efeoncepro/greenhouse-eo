@@ -81,7 +81,7 @@ node $R comparar --out $O/../comparar.mp4 --modelos "seedance omni" <dir> [<dir>
 | Motor | Uso | Costo | Por qué |
 |---|---|---|---|
 | **Seedance 2.0** (`seedance_2_0`, Higgsfield, `std`) | **Por defecto** (desde 2026-11-02) | 96 créditos / clip 1080p 8 s; tarda unos 10 min | Aprobado por el operador con la plantilla vigente: los objetos se forman y frenan suave |
-| **Gemini Omni 1.1** (`pnpm ai:omni --task frames`, Greenhouse) | Alternativa por toma | ≈ USD 1,22 nominales (1080p reescalado) | Arma muebles por partes (cama: estructura → colchón → cojines), pinta muros largos con trazo de rodillo. Sin probar con la plantilla vigente |
+| **Gemini Omni** (`pnpm ai:omni --task frames`, Greenhouse; probado con 1.1) | Alternativa por toma | ≈ USD 1,22 nominales con 1.1 (1080p reescalado, 8 s); ≈ USD 0,83 con 1.2, el default desde 2026-11-05 (first/last frame sigue en 3–10 s) | Arma muebles por partes (cama: estructura → colchón → cojines), pinta muros largos con trazo de rodillo. Sin probar con la plantilla vigente |
 | FLUX 3 (`flux_3_video`) | Candidato | 64 créditos | Fue el motor por defecto hasta el 2026-11-02. Sin probar con la plantilla vigente; satura el muro (ΔE 7,2–7,5 en el estudio) |
 | Wan 3.0 | Descartado | 28 créditos | Corre el color: ΔE 18,3 (terracota → salmón) |
 | MiniMax H3 | Descartado | 16 créditos (2K) | Fiel al color, pero los muebles entran como fundido semitransparente |

@@ -112,14 +112,14 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 |---|---|---|
 | OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare, y GPT Image 2.6 Sunburst y Flare (2026-11-04; en la CLI desde 2026-11-05 con `complexity`, SVG, GIF y `markup`) [contrato] |
 | Google directo (Vertex, `global`) | `pnpm ai:nano` local; runtime `generateImage` independiente | CLI: **Nano Banana 2.1** (`gemini-nano-banana-2.1`, default). Runtime conserva Nano Banana 2; Pro sigue sin superficie. [Manual y cobertura](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) |
-| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
+| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.2 Flash `gemini-omni-1.2-flash` (GA, default desde 2026-11-05; 1.1 Preview con `--model 1.1`): texto, imagen, cuadros inicial/final, referencias, edición, extensión y upscale de video, clips de hasta 15 s |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
 | BytePlus directo (operador local) | `pnpm ai:byteplus`, `pnpm ai:layers` | Ruta por defecto para Seedream, Layerize, Seedance y Seed Speech del contrato Johor; tarifas de cuenta, secretos en Secret Manager. Manual `docs/manual-de-uso/creative-studio/byteplus-directo.md` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
-Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video 1.1
-usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiable. Recraft por fal
+Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video
+usa Cloud (1.2 por defecto); las identidades Developer API no son intercambiables con las Cloud. Recraft por fal
 (23 endpoints) no está conectado.
 
 ### Árbol de decisión — imagen
@@ -233,9 +233,10 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
 Toda elección de video se hace con `motion-design-studio` → `workflows/engine-selection-by-fidelity-contract.md`
 (contrato de fidelidad por toma). Lo mínimo que debes saber desde esta skill:
 
-**Gemini Omni 1.1 Flash:** `pnpm ai:omni --help` y
-`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo.
-Los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
+**Gemini Omni Flash:** `pnpm ai:omni --help` y
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo. Desde
+2026-11-05 el default es **1.2 Flash** (`gemini-omni-1.2-flash`, GA): clips de hasta 15 s, `--task upscale`
+(borrador 360p/720p → 1080p/4K) y `--previous <id>`; sin clip 1.2 generado todavía. Para 1.1 (`--model 1.1`), los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
 `efeonce-group` el 2026-09-24 a 360p, 16:9 y 3 s; `extend` devolvió 6 s acumulados. `edit` recibe video
 fuente e imagen opcional; **no** se ha probado la cadena `previous_interaction_id`/edición stateful en 1.1.
 720p/1080p/4K, 9:16, continuidad fina, C2PA y factura real siguen sin verificar. La CLI sólo produce
@@ -1116,7 +1117,7 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por
   pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni van **directo por Google, nunca por
-  fal** (decisión del operador). La CLI Omni 1.1 Cloud es `pnpm ai:omni`; el slug fal del modelo anterior
+  fal** (decisión del operador). La CLI Omni Cloud es `pnpm ai:omni` (1.2 por defecto); el slug fal del modelo anterior
   (`google/gemini-omni-flash/*`) no es su transporte. Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
   Nano Banana 2 #5.
 - **Grok Imagine imagen v2.0 (xAI): evaluado, no conectado.** `xai/grok-imagine-image/v2.0/{text-to-image,edit}`
