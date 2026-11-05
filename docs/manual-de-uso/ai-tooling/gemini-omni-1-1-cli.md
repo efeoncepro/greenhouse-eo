@@ -164,7 +164,8 @@ El GCS privado es la autoridad de recuperación de salida para esta CLI. Definir
 
 - **Verificado en vivo (sólo lectura):** `GET https://aiplatform.googleapis.com/v1beta1/publishers/google/models/gemini-omni-1.2-flash` respondió 200 con `launchStage: "GA"`; el mismo GET para `gemini-omni-1.1-flash-preview` también respondió 200.
 - **Verificado en local:** 17 pruebas del contrato (`src/lib/ai/gemini-omni-cli.test.ts`) y `--estimate` de la CLI para texto 15 s, upscale por archivo y por `--previous`, transición inválida y límites de frames/1.1.
-- **Sin verificar en vivo:** ninguna generación 1.2 se ha ejecutado todavía. Faltan canaries de las siete tareas, en especial `upscale` y `--previous`, 15 s, 9:16, límites de referencias, factura real y C2PA en bytes.
+- **Verificado en vivo (generación, 2026-11-05):** canary `text` de 1.2 con `pnpm ai:omni --task text --resolution 360p --aspect 16:9 --duration 3 --yes`. La interacción `ChAyMDUyOTYwMjdiNmM4YmU4EAgaAjJhKgRtYWlu` terminó `completed` y declaró `gemini-omni-1.2-flash`. El MP4 (1.318.461 bytes) quedó en `gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/omni-1-2-smoke-2026-11-05/449499589896650503.mp4` y se descargó con `--out`: H.264 640×360 a 24 fps, 3,029 s, con audio AAC estéreo de 48 kHz (ambiente suave, media −38,5 dB). Uso declarado: 41 tokens de entrada, **5.793 tokens de video** (= 1.931/s × 3, la tasa de 360p) y 557 de razonamiento. A USD 12/1M, el video cuesta ≈ USD 0,070, igual que la estimación de la CLI. El razonamiento se cobra aparte y la estimación no lo incluye. La imagen es coherente: una bolita de vidrio rueda sobre un escritorio de madera con luz de mañana, en una toma continua.
+- **Sin verificar en vivo:** las otras seis tareas de 1.2, en especial `upscale` y `--previous`; también 15 s, 9:16, los límites de referencias, la factura real y C2PA en bytes.
 
 ## 8. Evidencia histórica de Omni 1.1 (2026-09-24)
 

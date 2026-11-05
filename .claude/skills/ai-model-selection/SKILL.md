@@ -122,8 +122,8 @@ contradicción por accidente y pagando de más: la mitad barata era una prueba d
 Developer API, otra superficie). Clips de 3–15 s (first/last frame y extend 3–10 s), `--task upscale` de borrador
 360p/720p a 1080p/4K y `--previous <id>` para encadenar edit/upscale. Video output USD 12/1M tokens: ≈ USD 0,023/s a
 360p, 0,07/s a 720p, 0,104/s a 1080p, 0,209/s a 4K (1.1: USD 17,50/1M). `--max-usd` vale 1 por defecto: un clip de
-15 s a 720p (≈ USD 1,04) lo supera. Identidad GA confirmada en vivo; ningún clip 1.2, upscale ni cadena se ha
-generado aún en la CLI. Developer API enruta `gemini-omni-1.1-flash` a 1.2 desde 2026-12-03; la Preview Cloud de 1.1
+15 s a 720p (≈ USD 1,04) lo supera. Identidad GA confirmada en vivo y canary `text` 360p/3 s completado (2026-11-05, tokens = estimación);
+upscale, cadena y las demás tareas siguen sin canary. Developer API enruta `gemini-omni-1.1-flash` a 1.2 desde 2026-12-03; la Preview Cloud de 1.1
 no tiene retiro publicado.
 
 **Omni 1.1, corte 2026-09-24 (`--model 1.1`):** la CLI usa el ID Cloud

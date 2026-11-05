@@ -73,8 +73,9 @@ no reenvíes a ciegas. Contrato, flags y recetas:
 4K ni edición stateful con `previous_interaction_id`. SKY sí añadió pilotos de edición 1080×1920/24 fps: uno de 9,5 s rechazado por continuidad y otro de 6,5 s integrado con empalmes revisados; ver `../companions/video-postproduction-and-delivery.md`. Siguen sin acreditarse de forma general continuidad temporal fina,
 escucha de audio, C2PA ni factura real. `edit` usa un MP4 fuente y puede llevar imágenes de referencia;
 `extend` usa un MP4 fuente. Ninguna corrida habilita Globe ni aprueba un entregable comercial.
-**1.2:** identidad GA confirmada en vivo en Model Garden el 2026-11-05; ningún clip generado todavía con 1.2 en
-esta CLI (ni upscale ni `--previous`). Contrato y fuentes: `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»).
+**1.2:** identidad GA confirmada en vivo en Model Garden el 2026-11-05 y canary `text` 360p/16:9/3 s completado ese mismo
+día: MP4 640×360 a 24 fps con audio, 5.793 tokens de video ≈ USD 0,070, igual a `--estimate`. Sin canary todavía: upscale,
+`--previous` ni las demás tareas. Contrato y fuentes: `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»).
 
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 

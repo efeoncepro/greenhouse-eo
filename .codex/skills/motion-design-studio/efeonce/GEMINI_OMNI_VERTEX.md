@@ -31,7 +31,7 @@
 > - **Multi-turno:** `store:true` + `previous_interaction_id`; el turno de seguimiento envuelve sus partes en
 >   `{"type":"user_input","content":[...]}`. Interacciones guardadas o async se retienen hasta 7 días;
 >   `store:false` es stateless (compatible con ZDR). En la CLI: `--previous <interaction-id>` para `edit` y
->   `upscale`. **Sin canary live todavía.**
+>   `upscale`. **Sin canary live todavía** (el único canary 1.2 es `text` 360p/3 s, completado el 2026-11-05).
 > - **Precio:** USD 12 por 1M tokens de video de salida (1.1: USD 17,50), con las mismas tasas de tokens por segundo:
 >   ≈ USD 0,023/s a 360p, 0,07/s a 720p, 0,104/s a 1080p y 0,209/s a 4K. Un clip de 15 s a 720p ≈ USD 1,04. La tabla
 >   de precios Cloud no se pudo leer (página renderizada en JS); el USD 12 sale de la página de precios Developer API y

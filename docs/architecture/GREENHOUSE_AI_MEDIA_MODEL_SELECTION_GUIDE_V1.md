@@ -295,7 +295,7 @@ cuando se mida el valor del crédito (TASK-1986); hasta entonces se comparan ent
 | | Flux 3 · `flux3-t2v` (+ `-draft`) | [verificado 2026-09-16] | no | 0,17 · 0,29 (draft 0,06) | ≤ 20 s |
 | | Wan 3.0 / Prime · `wan3-t2v`, `wan3prime-t2v` | [verificado 2026-09-16] | no | 0,10 · 0,20 (Prime 0,14 · 0,28) | 30 fps; ≤ 30 s, puede cortar entre encuadres |
 | | MiniMax H3 base/Max/Turbo · `h3-t2v`, `h3max-t2v`, `h3turbo-t2v` | [verificado 2026-09-16] | no | base 0,06 (768P) · 0,13 (2K reesc.); Max 0,04 · 0,08; Turbo 0,02 · 0,04 | audio siempre, sin toggle |
-| | Gemini Omni 1.2 · `ai:omni` modo texto (por defecto) | [oficial] (sin canary) | no | 0,070 · 0,104 (output nominal) | 3–15 s; 16:9/9:16 |
+| | Gemini Omni 1.2 · `ai:omni` modo texto (por defecto) | [verificado 2026-11-05: canary 360p/3 s, tokens = estimación] | no | 0,070 · 0,104 (output nominal) | 3–15 s; 16:9/9:16 |
 | | Gemini Omni 1.1 · `ai:omni --model 1.1` modo texto | [verificado 2026-09-24, 360p] | no | 0,101 · 0,152 (output nominal) | 3–10 s; 16:9/9:16 |
 | | Higgsfield API · Kling 3.0 std/pro/4K/Turbo, Kling 2.6, LTX 2.5, PixVerse 6, Happy Horse, Hailuo 2.3, Wan 2.6/2.7, H3 2K | [contrato] (sólo `--estimate`) | no | por `--estimate` (§5.8) | ninguna capacidad de video corrida en salida |
 | `gen.i2v` | Seedance 2.5 · `seedance25-i2v` | [verificado 2026-09-16]; 1080×1920 entregado 2026-09-22 | no | 0,473 · 1,164 | posible rechazo cobrado con personas reales o marcas (riesgo puntual, no sistemático) |

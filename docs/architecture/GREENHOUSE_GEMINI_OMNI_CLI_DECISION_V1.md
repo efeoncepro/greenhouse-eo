@@ -4,8 +4,8 @@
 - **Owner:** AI tooling / producción de video
 - **Scope:** `pnpm ai:omni`, `scripts/ai/gemini-omni.ts`, `src/lib/ai/gemini-omni-cli.ts`
 - **Reversibility:** two-way
-- **Confidence:** 1.1: high para los seis modos probados a 360p/16:9. 1.2: contrato tomado de la documentación oficial + verificación en vivo del modelo (GA); generación sin canary propio
-- **Validated as of:** 2026-09-24 (1.1, respuestas reales y MP4 inspeccionados); 2026-11-05 (1.2, documentación + GET del modelo publicado)
+- **Confidence:** 1.1: high para los seis modos probados a 360p/16:9. 1.2: contrato tomado de la documentación oficial + modelo GA verificado en vivo + canary `text` 360p/3 s completado; las demás tareas sin canary propio
+- **Validated as of:** 2026-09-24 (1.1, respuestas reales y MP4 inspeccionados); 2026-11-05 (1.2, documentación + GET del modelo publicado + canary `text` con MP4 inspeccionado)
 
 ## Context
 
@@ -38,7 +38,7 @@ Google publicó **Gemini Omni 1.2 Flash** (`gemini-omni-1.2-flash`) como GA en C
 - **Costo:** USD 12/1M tokens de video para 1.2 (derivado del USD 0,07/s a 720p publicado; la tabla Cloud no se pudo leer) frente a USD 17,50 de 1.1. Los tokens por segundo no cambiaron.
 - **Identidad de respuesta:** un modelo inesperado en la respuesta ahora se **marca y avisa** en vez de lanzar error. Lanzar después de un submit pagado ocultaba el interaction ID necesario para recuperar el clip; la identidad sigue fijada en el request.
 
-**Evidencia:** `GET .../publishers/google/models/gemini-omni-1.2-flash` respondió `launchStage: "GA"` el 2026-11-05; 17 pruebas del contrato en verde y `--estimate` ejercitado. Ninguna generación 1.2 se ha ejecutado. Detalle y recetas: [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
+**Evidencia:** `GET .../publishers/google/models/gemini-omni-1.2-flash` respondió `launchStage: "GA"` el 2026-11-05; 17 pruebas del contrato en verde y `--estimate` ejercitado. Canary `text` 360p/16:9/3 s completado (interacción `ChAyMDUyOTYwMjdiNmM4YmU4EAgaAjJhKgRtYWlu`): MP4 H.264 640×360 a 24 fps con audio AAC y 5.793 tokens de video, que coinciden con la estimación de la CLI (≈ USD 0,070). Las otras seis tareas, incluidas `upscale` y `--previous`, siguen sin canary. Detalle y recetas: [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
 
 **Revisit:** cuando Google publique retiro de `gemini-omni-1.1-flash-preview` en Cloud (la Developer API enruta 1.1 → 1.2 desde el 2026-12-03), cuando un canary confirme o refute `--previous`, o cuando la tabla de precios Cloud difiera del valor derivado.
 
