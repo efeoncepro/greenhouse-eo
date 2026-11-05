@@ -178,6 +178,10 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **Un carril depende del saldo de su proveedor, no sólo del modelo** (2026-10-19): `pnpm ai:inpaint expand` corre
   Flux Fill por fal y no salió con `FAL_API_KEY_B` en «User is locked. Exhausted balance». Antes de planear una ruta
   por fal, `pnpm ai:fal --balance`; ten una alternativa (allí, extensión determinística del fondo vacío).
+  Alternativa medida para expandir con las dos cuentas fal bloqueadas (2026-11-05):
+  `--adapter openai --model gpt-image-2.6-flare --quality medium` (perfil `personal`), 7 de 7 PASS a 9:16 con cielo
+  o follaje en el área nueva, ≈ USD 0,024–0,038 c/u [verificado 2026-11-05, n=7]. Sólo área simple: no refuta el
+  canario de GPT Image del 2026-10-03 (guía §2.2).
 - 🔴 **Un acabado generativo sobre una escena compuesta puede borrar detalles finos** (2026-10-19: Sunburst borró el
   contorno de tinta de una mascota). Elegir Sunburst para el acabado no exime de comparar al 100 % y reponer lo
   exacto; el oficio vive en `greenhouse-ai-image-generator` §«Acabado Sunburst sobre una escena compuesta».

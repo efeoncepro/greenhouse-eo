@@ -9,8 +9,9 @@ sumó la grilla por mercado, rutas de Perú, Chile «KV listo», HPH por mercado
 tamaño, su nombre y su mercado están en [sky-format-catalog.md](sky-format-catalog.md). Cada script y sus
 parámetros (GIF, MP4, story en video, logofix) están en [sky-black-pipeline.md](sky-black-pipeline.md). La tercera
 y la cuarta ronda (2026-11-05: fotos de destino, velo del logo, regla destino ↔ flecha, alianzas, marca de agua,
-aro de banderas) están en ese pipeline, §4.4 y §4.5; las rondas siguientes se llevan en la sesión derivada «SKY
-BLACK: siguientes rondas de ajustes del canvas».
+aro de banderas) están en ese pipeline, §4.4 y §4.5; la quinta, la sexta y la séptima (gradiente de Daniela,
+revisión en Frame.io, degradado inferior negro y carpetas de estado), en §4.6 a §4.8 y en «Rondas quinta a séptima»
+más abajo. Las rondas siguientes se llevan en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del canvas».
 
 ## Frontera
 
@@ -32,7 +33,7 @@ sigue en Creative Workbench ([SKILL.md](../SKILL.md), invariantes; [sky-producti
 | Artifact | URL | Tipo | Estructura |
 | --- | --- | --- | --- |
 | Design System «SKY Airline — Performance» | https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Design System | `project/design-system.json` v3, `tokens.json` (forma de lista), `tokens.css`, `components/<Comp>/README.md` + `preview.html`, `bundle.js` mínimo; `index.d.ts` se sube como text/plain |
-| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; versión 40 al cierre de la cuarta ronda (2026-11-05) |
+| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; 40 tras la cuarta ronda, 44 tras la quinta y 47 tras la sexta; **vigente: versión 51** (séptima ronda, 2026-11-05), con las mismas 10 páginas |
 
 **Design System.** Se construyó desde las 126 adaptaciones (37 composiciones) del pack SKY
 `0.1.0` de Workbench, consultadas con `pnpm marca:recetas sky` ([recipes.md](recipes.md)).
@@ -339,7 +340,8 @@ Chiclayo, Piura, Trujillo, Iquitos, Cajamarca, Arequipa, Tarapoto y Juliaca. Por
 no hay SVG) arriba a la derecha y, debajo, el texto de ubicación de la foto con pin verde:
 `[Ubicación de la foto]` (placeholder; no tenemos fotos por destino). Entregables: popup y story. Desde
 la tercera ronda son 15 rutas con foto aprobada y ubicación del CSV de Daniela (sin foto: Chiclayo y Talara);
-ver pipeline §4.4.
+ver pipeline §4.4. Chiclayo y Talara tienen foto desde la quinta ronda, y Talara y Piura cambiaron de foto en la
+séptima (pipeline §4.6 y §4.8).
 
 **5. Chile «KV listo»** (BLACK SKY CL 26, lista de Notion): Banner TikTok 1920×1080 (precio,
 descuento, precio + descuento), DAT 1080×1080 (nacional e internacional) y PMAX precio+dcto en los
@@ -358,6 +360,43 @@ DOM de la referencia BLACK XL; las INTER y sus traducciones (AR voseo, PT, EN) s
 `kvhm-canvas/`), **no desde los artboards del canvas**, que ahora son `<video>` con `/_blob/` y
 dan cuadros negros. `frames.cjs` usa un HTML temporal por archivo (`_frames-<file>.html`): dos
 renders en paralelo con el mismo temporal mezclaron cuadros y uno falló.
+
+## Rondas quinta a séptima (2026-11-05: Teams y Frame.io)
+
+Resumen para operar el canvas; el detalle técnico (parámetros, scripts y comandos) está en
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.6 a §4.8. Todo quedó publicado en el canvas (versión 51).
+
+- **Gradiente del logo.** Reemplaza al velo diagonal de la cuarta ronda: es el SVG de referencia de Daniela (negro
+  puro, 69 % → 0, dos paradas), acotado bajo el logo: termina en el 42 % del alto en KV, el 50 % en popup y el 46 %
+  en story. Ojo con los nombres de los archivos de referencia: `Fade_img_horizontal` es oscuro arriba.
+- **Degradado inferior negro** en las piezas con foto de destino (popup, story y KV de las rutas); los KV del kit
+  siguen con el marrón `#2a1608`. Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y
+  «Vuela por el Perú».
+- **Fotos de destino.** Talara y Chiclayo tienen foto; Iquitos, Talara y Chiclayo se reencuadraron con `lift`. Las
+  stories en video con foto de destino la usan también en la intro y el brandlift (antes mostraban a la mujer del
+  kit). En la séptima ronda Talara pasó a «Playa Las Pocitas, Piura.png» y Piura a «Playa Vichayito, Piura.png»:
+  **el nombre del archivo es la ubicación y manda sobre el CSV**. Daniela reordena fotos entre carpetas sin avisar,
+  así que conviene revisar las carpetas antes de cada ronda.
+- **Expansiones con IA** (cielo arriba en las stories de Piura, Arequipa, Juliaca, Pucallpa y Tarapoto). Gasto
+  aprobado por Julio hasta USD 1; usado ≈ USD 0,19 entre la sexta y la séptima ronda. Corrieron con GPT Image porque
+  las dos cuentas de fal estaban sin saldo (pipeline §4.7).
+
+**Revisión en Frame.io.** Desde la sexta ronda Daniela revisa en Frame.io (`https://f.io/VZlcCQta`, una carpeta por
+ruta, estado y comentario por activo). El enlace abre sin login en el navegador integrado; los activos se abren con
+doble clic (un script en la página recorre las tarjetas) y, si el panel del navegador está oculto, Frame no pinta.
+Respaldo: los avisos de `notifications@frame.io` en el Outlook de Julio traen todos los comentarios y estados.
+**No se puede responder en Frame**: no hay herramienta para escribir ahí, sólo para leer. Método completo en
+pipeline §4.7.
+
+**Decisiones y rechazos.**
+
+| Tema | Decisión |
+| --- | --- |
+| Gradiente a todo el alto, como la maqueta de Daniela | Rechazado por Julio: oscurecía caras y monumentos. Vigente: acotado bajo el logo |
+| Ballena de Talara | Fuera: según Daniela, venía de un banco que «ya no usan» |
+| Ayacucho con personas (pedido de Daniela) | Reencuadre sin IA, personas fuera del cuadro |
+| Centrar y subir el logo | Sugerencia de Daniela, no pedido: queda a criterio de SKY |
+| Ayacucho, Chiclayo y story de Pucallpa | Sin visto bueno todavía: siguen en revisión |
 
 ## Lecciones de la plataforma Claude Design
 
@@ -413,7 +452,20 @@ comparar contenido lee el destino y un archivo de OneDrive que está sólo en la
 el proceso se colgaba. Tras la cuarta ronda quedó al día. El orden pedido por Daniela vive aparte en
 `10_Noviembre/BLACK SKY 2026/`, armado con `organizar.cjs` (compara por tamaño y fecha, sin leer el destino):
 155 archivos, 73 actualizados en la cuarta ronda. Estructura y nomenclatura en
-[sky-format-catalog.md](sky-format-catalog.md) §5.4.
+[sky-format-catalog.md](sky-format-catalog.md) §5.4. Tras la séptima ronda, «BLACK SKY 2026» y «ENTREGABLES BLACK
+(Efeonce 2026-11-05)» quedaron al día. Nunca leer el destino en OneDrive: se cuelga.
+
+**Carpetas de estado (séptima ronda).** En `SKY Campañas/2026/10_Noviembre/` hay dos carpetas nuevas, con la
+estructura `HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`:
+
+| Carpeta | Contenido |
+| --- | --- |
+| `BLACK SKY 2026 - APROBADO` | 19 piezas con visto bueno |
+| `BLACK SKY 2026 - PARA REVISION` | 11 piezas + `LEEME.txt` |
+
+Las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/scripts/`) con el último estado conocido. Una pieza
+que cambia de estado **se mueve** de una carpeta a la otra y se sobrescribe con la versión vigente; no se borra.
+Detalle en pipeline §4.8. Las expansiones con IA quedan en `ai-generations/2026-11-05_sky-black-expand/`.
 
 Los scripts (`patches.cjs`, `parts.cjs`, `grado.cjs` y los de render/animación) tienen rutas
 fijas del scratchpad de la sesión original. **Adaptarlas** a la ubicación nueva antes de

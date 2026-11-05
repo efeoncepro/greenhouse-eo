@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda: velo del logo, regla de la flecha, alianzas, banderas, temporada de las fotos, entrega al día y canvas versión 40)
+> **Ultima actualizacion:** 2026-11-05 por Claude (rondas 5 a 7: gradiente de Daniela, degradado inferior negro, revisión en Frame.io, fotos de Talara y Piura, stories ampliadas con IA, carpetas aprobado/para revisión y canvas versión 51)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
 > [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
@@ -118,7 +118,9 @@ sin incluir los scripts de trabajo, y después se comparó cada archivo con el o
 de SKY quedó intacto.** OneDrive sube la carpeta a la nube después de la copia; hasta que termine, los demás no la ven completa.
 
 Las cifras de la tabla son las de esa primera copia. En la cuarta ronda la carpeta se puso al día con las piezas
-corregidas (ver [Cuarta ronda](#cuarta-ronda-legibilidad-flecha-alianzas-y-entrega)).
+corregidas (ver [Cuarta ronda](#cuarta-ronda-legibilidad-flecha-alianzas-y-entrega)), y otra vez en la séptima, cuando
+además nacieron las carpetas de rutas foco aprobadas y en revisión (ver
+[Quinta a séptima ronda](#quinta-a-séptima-ronda-gradiente-de-daniela-frameio-y-carpetas-de-estado)).
 
 > Detalle técnico: [manual, paso 10](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#10-entregar-en-onedrive)
 
@@ -202,8 +204,9 @@ propias de los mensajes internacionales y sus traducciones. Partes y tiempos en 
 
 El operador revisa dejando **comentarios anclados a cada pieza**; las respuestas y correcciones quedan en el mismo
 hilo. El canvas es privado del operador: para que otra persona (por ejemplo Daniela) lo vea y comente, se comparte
-desde «Compartir». Al cierre de la segunda ronda estaba en la versión 28; con la cuarta ronda (2026-11-05) va en la
-versión 40.
+desde «Compartir». Al cierre de la segunda ronda estaba en la versión 28; con la cuarta ronda (2026-11-05), en la
+versión 40; con la quinta, en la 44; con la sexta, en la 47, y con la séptima va en la **versión 51** (vigente). Sigue
+con las mismas 10 páginas.
 
 > Detalle técnico: [manual, páginas del canvas](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#qué-significan-las-páginas-del-canvas)
 
@@ -230,7 +233,9 @@ versión 40.
 Quedan por confirmar: si Brasil «Voe para Peru» va como pieza de alianza o como KV; la propuesta «Vuela por Perú» sin
 fotos; la base de Chile «Encuentra destinos» (su nota hablaba del clúster internacional de Perú); las frases y
 traducciones del story en video y del HPH; la ubicación de la foto de las rutas foco, y la tapa vertical en español.
-De la cuarta ronda queda uno más: si quiere la regla de la flecha también en los popups de los KV del kit. La lista
+De la cuarta ronda queda uno más: si quiere la regla de la flecha también en los popups de los KV del kit. De la
+séptima, siguen sin visto bueno Ayacucho, Chiclayo y la story de Pucallpa, y queda a criterio de SKY la sugerencia de
+Daniela de centrar y subir el logo. La lista
 completa, con lo que hay hoy en cada caso, está en el
 [catálogo](./catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
 
@@ -242,7 +247,7 @@ Lo que cambió el 2026-11-05 (canvas en la versión 40):
 
 | Tema | Qué se hace ahora |
 |---|---|
-| **Logo legible sobre la foto** | El degradado plano (20 % que bajaba a 0) se cambió por un velo diagonal que nace en la esquina del logo y se apaga antes del lado derecho, sin bordes. Su intensidad se calcula para cada foto y cada formato según la luz que hay detrás del logo, entre 16 % y 50 %. Sombras redondas, halos y cielos inventados siguen rechazados: se ven como una mancha |
+| **Logo legible sobre la foto** | (Reemplazado en la [quinta ronda](#quinta-a-séptima-ronda-gradiente-de-daniela-frameio-y-carpetas-de-estado) por el gradiente de Daniela.) El degradado plano (20 % que bajaba a 0) se cambió por un velo diagonal que nace en la esquina del logo y se apaga antes del lado derecho, sin bordes. Su intensidad se calcula para cada foto y cada formato según la luz que hay detrás del logo, entre 16 % y 50 %. Sombras redondas, halos y cielos inventados siguen rechazados: se ven como una mancha |
 | **Regla de la flecha** | Con destinos cortos, la flecha de precio y el badge se acercan hasta 40 px del bloque del destino (lo más ancho entre antetítulo, nombre y píldora). Nunca se alejan. Vale en KV, popup, story y GIF de las variantes y en los popups de los KV del kit; falta que Daniela confirme estos últimos |
 | **Chile Travel** | Pegado a la esquina superior derecha, alineado con los bordes, en todas sus aplicaciones: KV, popup, story, GIF y story en video de Brasil «Voe a Santiago» |
 | **Stories con PromPerú** | PromPerú centrado entre la franja de precio y el pie. La marca de agua, pegada arriba a la izquierda, y la ubicación, pegada arriba a la derecha, a la misma altura. La marca de agua va arriba a la izquierda en todos los formatos |
@@ -255,6 +260,32 @@ Las próximas rondas se trabajan en una sesión aparte, derivada de esta.
 
 > Detalle técnico: [catálogo de formatos, banderas y alianzas](./catalogo-formatos-sky.md#banderas-y-alianzas) ·
 > [manual, foto aprobada de cada destino](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7e-bis-poner-la-foto-aprobada-de-cada-destino)
+
+## Quinta a séptima ronda: gradiente de Daniela, Frame.io y carpetas de estado
+
+Las tres rondas son del 2026-11-05 y tocan sobre todo las **rutas foco de Perú**. Los pedidos llegaron por Teams y por
+la revisión que Daniela armó en **Frame.io**, con un estado («aprobado» o «ajuste solicitado») y un comentario por
+pieza. El canvas pasó por las versiones 44, 47 y 51.
+
+| Tema | Qué cambió y por qué |
+|---|---|
+| **Gradiente detrás del logo** | Se usa el gradiente que Daniela dejó en el kit (negro, 69 % que baja a 0), en lugar del velo diagonal de la cuarta ronda. Estirado a todo el alto, como en su maqueta, oscurecía caras y monumentos, así que la misma forma se corta poco después del logo: termina entre el 42 % y el 50 % del alto, según el formato. La intensidad ya no se calcula por foto |
+| **Degradado inferior negro** | Detrás del pie y del legal, las piezas con foto de destino llevan un degradado negro (antes era marrón); los KV del kit siguen con el marrón. Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y «Vuela por el Perú» |
+| **Revisión en Frame.io** | Frame no tiene herramienta conectada ni deja responder desde aquí. La revisión se lee abriendo el enlace sin login en el navegador integrado, o desde los avisos que Frame manda por correo. Lo que Daniela aprueba o deja en revisión ordena la entrega (ver abajo) |
+| **Fotos de Talara y Piura** | La foto de cada ruta sale **sólo** de su carpeta «FOTOS PARA PROMPERU». En la quinta ronda Talara tomó una ballena de otro banco de PromPerú porque su carpeta estaba vacía, y Daniela la rechazó: ese banco ya no se usa. Ahora Talara lleva «Playa Las Pocitas» y Piura una foto nueva, «Playa Vichayito». **El nombre del archivo dice la ubicación** y manda sobre el CSV. Daniela movió fotos entre carpetas sin aviso, por eso antes de cada ronda se revisan las carpetas |
+| **Encuadres** | En Iquitos y Chiclayo la foto sube para que el atractivo no quede bajo el precio; Ayacucho se reencuadró para sacar a las personas (sin IA); Trujillo ganó cielo en el popup; el popup de Cusco tiene un degradado inferior más alto para que «Vuela a» se lea, y el crédito de PromPerú de la story subió de tamaño |
+| **Stories ampliadas con IA** | Cuando la story pedía más cielo arriba y la foto horizontal no tenía margen, se amplió con IA sólo la franja que usa la story: Piura, Arequipa, Juliaca, Pucallpa y Tarapoto (esta última hacia arriba y abajo, para que el castillo quede entero). Julio aprobó gastar hasta USD 1; se gastaron cerca de USD 0,19 entre la sexta y la séptima ronda. La parte original de la foto quedó intacta y la unión no se nota |
+| **Story en video con foto del destino** | La intro y el brandlift usan la foto del destino, ya no a la mujer del kit |
+| **Logo** | Daniela sugirió, sin pedirlo, centrar y subir el logo: queda a criterio de SKY |
+
+**Carpetas de estado.** Tras la segunda revisión en Frame se armaron dos carpetas nuevas junto a «BLACK SKY 2026», con
+su misma estructura: «BLACK SKY 2026 - APROBADO» (19 piezas) y «BLACK SKY 2026 - PARA REVISION» (11 piezas y un
+`LEEME.txt` con el cambio de cada una). Sólo cubren las rutas foco, que es lo único revisado en Frame. Cuando una pieza
+cambia de estado se **mueve** de una carpeta a la otra; no se borra. Siguen sin visto bueno Ayacucho, Chiclayo y la
+story de Pucallpa. «BLACK SKY 2026» y «ENTREGABLES BLACK» también quedaron al día.
+
+> Detalle técnico: [scripts del despliegue BLACK, §4.6 a §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
+> [manual, revisión en Frame.io y carpetas de estado](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7h-leer-la-revisión-de-frameio-y-repartir-aprobado-y-revisión)
 
 ## Reglas que se cumplen siempre
 

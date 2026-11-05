@@ -1,9 +1,9 @@
 # Catálogo de formatos SKY — Qué pieza es cada una, su tamaño y cómo se nombra
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-11-05 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda completa: velo del logo, regla de la flecha y su alcance, alianzas en todas las piezas, banderas, temporada de las fotos, entrega y canvas versión 40)
+> **Ultima actualizacion:** 2026-11-05 por Claude (rondas 5 a 7: gradiente de Daniela, degradado inferior negro, fotos de Talara y Piura, carpetas «BLACK SKY 2026 - APROBADO» y «BLACK SKY 2026 - PARA REVISION» y canvas versión 51)
 > **Documentacion tecnica:** [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [Canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
@@ -190,6 +190,10 @@ Las 13 rutas: Arequipa, Cajamarca, Chiclayo, Cusco, Iquitos, Jauja, Juliaca, Piu
 y Tumbes. Pucallpa venía repetida en la lista y se hizo una sola vez.
 
 Por ruta hay KV (en `KV ESTATICOS`), popup y story (en `RUTAS FOCO PERU`, 26 archivos).
+
+Desde la tercera ronda son 15 rutas (se sumaron Ayacucho y Talara), cada una con la foto y la ubicación de su destino
+en lugar del marcador: ver [Rutas foco con la foto de cada destino](#rutas-foco-con-la-foto-de-cada-destino). Su
+estado de revisión está en las [carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión).
 
 ### Plantillas CyberSky (en el canvas)
 
@@ -428,21 +432,44 @@ Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/
 
 Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la foto aprobada de su destino y el
 legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
-Los créditos van en pequeño, en horizontal y sin sombra, en la esquina superior izquierda. Para que el
-logo se lea, la foto va completa con un velo diagonal suave que nace en la esquina del logo y se apaga antes del lado
-derecho, sin bordes, para no tapar nada de la foto. Reemplazó al degradado plano de antes (20 % que bajaba a 0). Su
-intensidad se calcula para cada foto y cada formato según la luz que hay detrás del logo, entre 16 % y 50 %: poca si
-el fondo ya es oscuro y más cuando el cielo es claro. Las sombras redondas, los halos y los cielos inventados siguen
-rechazados, porque se ven como una mancha. En la story, la marca de agua va pegada arriba a la izquierda y la
+Los créditos van en pequeño, en horizontal y sin sombra, en la esquina superior izquierda (en la story, a un tamaño
+algo mayor desde la sexta ronda). Para que el logo se lea, desde la quinta ronda la foto lleva el **gradiente de
+Daniela**: negro, de 69 % arriba a 0, cortado poco después del logo (entre el 42 % y el 50 % del alto según el
+formato) para no oscurecer caras ni monumentos. Reemplazó al velo diagonal de la cuarta ronda. Detrás del pie y del
+legal, el degradado inferior es **negro** en las piezas con foto de destino (los KV del kit siguen con el marrón).
+Las sombras redondas, los halos y los cielos inventados siguen rechazados, porque se ven como una mancha. En la story, la marca de agua va pegada arriba a la izquierda y la
 ubicación, pegada arriba a la derecha, a la misma altura; el logo de PromPerú va centrado entre la franja de precio y
-el pie. La story de Tacna se volvió a encuadrar para que la flecha no tape a la persona. Chiclayo y Talara todavía no
-tienen foto aprobada. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá
+el pie. La story de Tacna se volvió a encuadrar para que la flecha no tape a la persona. La foto de cada ruta sale sólo de
+su carpeta «FOTOS PARA PROMPERU» y **el nombre del archivo es la ubicación**, que manda sobre el CSV: Talara lleva
+«Playa Las Pocitas, Piura» y Piura «Playa Vichayito, Piura». Algunas stories (Piura, Arequipa, Juliaca, Pucallpa,
+Talara y Tarapoto) usan la foto ampliada con IA hacia arriba para ganar cielo detrás del logo. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá
 a Lima» (Argentina) llevan una foto de cada ciudad. La de Santiago es de verano, porque la pieza es para Argentina y
 allí noviembre es primavera-verano: una pareja en el Parque Bicentenario, con la Costanera de fondo. La regla es
 elegir fotos de la temporada del mercado al que va la pieza.
 
 > Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
-> [scripts, §4.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+> [scripts, §4.4 a §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+
+### Carpetas de estado: aprobado y para revisión
+
+Después de la revisión de Daniela en Frame.io se crearon dos carpetas hermanas de «BLACK SKY 2026», en
+`SKY Campañas/2026/10_Noviembre/`:
+
+| Carpeta | Qué trae (tras la séptima ronda) |
+|---|---|
+| **«BLACK SKY 2026 - APROBADO»** | 19 piezas con visto bueno de Daniela |
+| **«BLACK SKY 2026 - PARA REVISION»** | 11 piezas ajustadas o sin visto bueno, más un `LEEME.txt` con el cambio de cada una: Talara y Piura (popup y story), Ayacucho y Chiclayo (popup y story), el popup de Cusco y las stories de Tarapoto y Pucallpa |
+
+- **Estructura:** la misma de «BLACK SKY 2026», hoy sólo con rutas foco, que es lo único que se revisó en Frame:
+  `HM PE/RUTAS FOCO/<CIUDAD>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png`, con el código de aeropuerto de la ciudad
+  (por ejemplo, `HM PE/RUTAS FOCO/PIURA/BS_STORY_PIU.png`).
+- **Versión:** cada carpeta tiene la versión vigente de la pieza, con el gradiente nuevo, aunque la aprobación se haya
+  dado sobre una versión anterior.
+- **Cambio de estado:** una pieza que pasa de revisión a aprobada (o al revés) se **mueve** de una carpeta a la otra.
+  Nada se borra.
+
+> Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
+> [scripts, §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 
 ## El canvas de Claude Design
 
@@ -450,8 +477,9 @@ El canvas «SKY CyberSky Perú — Adaptaciones» es la mesa de revisión: ahí 
 Es un artifact **privado** del operador (<https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee>); se comparte desde
 «Compartir» y quien lo recibe puede comentar. No es la producción final: lo que se entrega se renderiza aparte.
 
-La tabla muestra las 10 páginas al cierre de la segunda ronda (versión 28). La cuarta ronda se trabajó en el mismo
-canvas, que el 2026-11-05 va en la versión 40.
+La tabla muestra las 10 páginas al cierre de la segunda ronda (versión 28). Las rondas siguientes se trabajaron en el
+mismo canvas y con las mismas páginas: versión 40 en la cuarta, 44 en la quinta, 47 en la sexta y **51 en la séptima**,
+la vigente al 2026-11-05.
 
 | # | Página | Qué hay |
 |---|---|---|
@@ -473,12 +501,16 @@ algunas piezas aparecen rayadas, es que todavía no cargaron; no es un error.
 
 ## Qué queda por confirmar con Daniela
 
-Nuevos (2026-11-05): fotos de Chiclayo y Talara; en Pucallpa y Trujillo la ubicación del CSV no coincide con
+Nuevos (2026-11-05): la foto de Chiclayo (la de Talara se resolvió en la séptima ronda); en Pucallpa y Trujillo la ubicación del CSV no coincide con
 la foto entregada; si el origen de las rutas es Lima («DESDE LIMA» se dedujo del legal); y si «Encuentra
 destinos» de Chile debe hacerse con el clúster internacional de Perú, como dice la confirmación de Adri.
 
 De la cuarta ronda: si Daniela quiere la regla de la flecha (flecha y badge a 40 px del destino) también en los popups
 de los KV del kit. Las próximas rondas se trabajan en una sesión aparte, derivada de esta.
+
+De la séptima ronda: siguen sin visto bueno Ayacucho, Chiclayo y la story de Pucallpa (ver
+[carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión)), y la sugerencia de Daniela de centrar y subir el
+logo queda a criterio de SKY.
 
 | Tema | Qué hay hoy | Qué falta |
 |---|---|---|
@@ -487,7 +519,7 @@ de los KV del kit. Las próximas rondas se trabajan en una sesión aparte, deriv
 | Chile «Encuentra destinos» | Hecho desde el clúster internacional de Chile | Su nota decía «cluster inter de Perú»: confirmar la base |
 | Frases del story en video | Nacional desde la referencia; internacional y traducciones propias | Aprobar frases y traducciones |
 | Textos del HPH | Flecha y botón traducidos por Efeonce | Aprobar traducciones |
-| Rutas foco Perú | `[Ubicación de la foto]` como marcador | Ubicación real de cada foto |
+| Rutas foco Perú | Ubicación del CSV, o la del nombre de la foto cuando no coinciden (Talara, Piura) | Visto bueno de Ayacucho, Chiclayo y la story de Pucallpa |
 | Tapa vertical en español | Recortada de la horizontal | Tapa vertical oficial |
 | Precios y descuentos | Marcadores `000.000` y `00%` | La grilla de precios |
 
