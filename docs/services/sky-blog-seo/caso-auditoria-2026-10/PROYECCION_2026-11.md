@@ -96,7 +96,7 @@ Es coincidencia en el mes, no atribución, y es un piso: no cubre cambio de disp
 - La historia de `www` se exportó el 05-11: GSC conserva desde el 24-06-2025, y enero–mayo de 2025 ya se perdió.
 - Con datos reales, el valor previo extrapolado da unos US$ 43.000–61.000 al mes. El informe mantiene
   US$ 28.000–45.000, la cifra enviada el 23-10, así que el repago de antes está, si algo, subestimado.
-- Los CPC comprados (US$ 1,53, 29 tareas DataForSEO) se están guardando en la base con el writer canónico (`valor/scripts/06-persist-cpc.ts`, autorizado por Julio el 05-11; corre contra el proxy local).
+- Los CPC comprados (US$ 1,53, 29 tareas DataForSEO) quedaron guardados el 05-11 con el writer canónico (`valor/scripts/06-persist-cpc.ts`, autorizado por Julio): 19.239 filas `keyword_overview` en `greenhouse_growth.seo_keyword_market_data`, 4.987 con CPC, verificadas por lectura en la base.
 
 ## Lectura interna (no va a SKY)
 

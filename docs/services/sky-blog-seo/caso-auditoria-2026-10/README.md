@@ -36,7 +36,7 @@ de la empresa Sky Airlines (`30825221458`).
 | Lote inicial: 15 nuevos + 25 optimizaciones | [LOTE_INICIAL_PARA_APROBACION.md](LOTE_INICIAL_PARA_APROBACION.md) | Propuesta para aprobar con Natalia; reemplaza a `PERU_TITULOS_PARA_APROBACION.md` |
 | Insumos del kickoff 02-11 (estado al 31-10, expectativa a corregir, decisiones) | [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md) | Para la sesión que arma el deck |
 | Deck del kickoff (34 láminas + 4 de anexo) | Artifact privado https://claude.ai/artifact/JQ3k1siSTNxgUiqu1NsaHE · fuente `ai-generations/2026-10-31_kickoff-seo-sky/canvas/project/` · PDF en `…/deck/out/` | Armado el 01-11; PDF en generación. Detalle en [insumos §7](KICKOFF_2026-11-02_INSUMOS.md#7-deck-y-equipo-confirmados-el-01-11) |
-| Proyección a 24 meses y aporte a la venta (pedido del kickoff 02-11) | [PROYECCION_2026-11.md](PROYECCION_2026-11.md) · correo [03-proyeccion-y-conversion.md](correos/03-proyeccion-y-conversion.md) · PDF y planilla en OneDrive › Proyección 2026-11 | Preparado el 05-11; sin enviar |
+| Proyección a 24 meses y aporte a la venta (pedido del kickoff 02-11) | [PROYECCION_2026-11.md](PROYECCION_2026-11.md) · correo [03-proyeccion-y-conversion.md](correos/03-proyeccion-y-conversion.md) · PDF y planilla en OneDrive › Workspace › Clientes › Sky Airlines › Proyección Blog 2026-11 | Preparado el 05-11; sin enviar |
 | Página ejecutiva (borrador previo) | Artifact privado «Auditoría Blog SKY» | Superada por el PDF |
 
 ## Decisiones tomadas en el caso

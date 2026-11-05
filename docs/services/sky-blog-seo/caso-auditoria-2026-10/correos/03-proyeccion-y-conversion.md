@@ -10,7 +10,7 @@ recordó en Teams el 05-11 («por fa tu ayuda con lo pendiente de la reu del lun
 - el PDF «Efeonce - Proyección Blog SKY (05-11-2026).pdf»;
 - la planilla del desglose de búsquedas valorizadas.
 
-Ambos quedan en OneDrive › Alineación › 1. Clientes (Interno) › Sky - SEO-AEO › Proyección 2026-11.
+Ambos quedan en OneDrive › Workspace › Clientes › Sky Airlines › Proyección Blog 2026-11 (copia interna en Alineación › 1. Clientes (Interno) › Sky - SEO-AEO › Proyección 2026-11).
 
 - **Para:** Pilar Romero <pilar.romero@skyairline.com>
 - **CC:** Natalia Ortiz <natalia.ortiz@skyairline.com>; Valentina Hoyos <valentina.hoyos@efeonce.org>;
