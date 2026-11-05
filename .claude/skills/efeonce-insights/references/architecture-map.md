@@ -62,6 +62,19 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 - `src/lib/copy/insights.ts` — `GH_INSIGHTS.contentScope`, `readerLimits.outsideContentScope`, `metrics['site_total.*']`.
 - Pruebas: `content-scope/contracts.test.ts`, `content-scope.live.test.ts`, `scoped-readers.live.test.ts`, `editorial/content-scope-plan.test.ts`, casos nuevos en `adapters/adapters.test.ts`.
 
+## Control de Search Console, valor estimado y redes (2026-11-04; `develop` local, sin push ni release)
+
+- `src/lib/growth/seo/search-control/read-search-control.ts` — `readSeoSearchControlForWindow` (owner reader, SEO domain): Search Console en vivo SIN la dimensión consulta (`[]`, `['date']`, `['page']`; `byPage`, `final`, `web`), totales + serie diaria + páginas; falla si vuelve una página fuera del alcance. `rankSearchControlPageMovers` y `SEO_SEARCH_CONTROL_METHOD` (`gsc_search_control_v1`). ISSUE-191.
+- `src/lib/growth/seo/search-control/page-expression.ts` — `searchConsolePageExpression` (alcance → regex `includingRegex` con el veredicto de `isPathInContentScope`) y `searchConsoleHostOf`. Prueba de paridad en `__tests__/page-expression.test.ts`.
+- `src/lib/growth/seo/organic-traffic-value/read-for-window.ts` — `readOrganicTrafficValueForWindow` (owner reader): clics del control y detalle página/consulta/país sobre el alcance × CPC YA capturados del mercado del target (`readKeywordMarketData`); nunca compra; `cpcAsOf`, `gscCountryOfMarket`, `brandPatternOfDomain`.
+- `src/lib/growth/seo/organic-traffic-value/collect.ts` + `scripts/seo/organic-traffic-value.ts` — collector del método (acepta `sc-domain:` y alcance de contenido) y CLI del operador (`--markets`, `--brand`, `--content-scope`); no es ruta del adapter.
+- `adapters/seo-adapter.ts` — `seo_report_adapter_v2`: `gscFacts` (control), `moverFacts` (paso `hidden` de la cascada, páginas del control), `organicValueFacts` (`organic_value_usd`, `organic_value.valued_clicks`).
+- `adapters/ga4-site-facts.ts` — `site.social_sessions`, `social_source.*`, `socialSourceOf` (fuente GA4 → red/isotipo), máximo 3 partes.
+- `editorial/deterministic-planner.ts` — `socialSourceFinding`; las filas `social_source.*` van a la tabla GA4, no como afirmaciones. `editorial/{criterion-figures,figure-selection}.ts`, `presentation/{content-contract,metric-glyphs}.ts`, `render/figure-slots.ts` — registro de los hechos nuevos.
+- `src/lib/copy/insights.ts` — `GH_INSIGHTS.seoControl`, `organicValue`, `figures.driversHiddenLabel`, `metrics['organic_value*' | 'site.social_sessions']`, nota de la tarjeta del valor, `ga4.socialChannelName`/`otherNetworks`.
+- `scripts/insights/preview-edition.ts` — `--modules=<subconjunto>` y `--title="…"` (sólo el PDF local).
+- Pendiente fuera de Insights: tablero SEO y demás readers de `seo_gsc_daily` siguen sumando el subconjunto (ISSUE-191 abierto).
+
 ## TASK-1846 — durable rendering (2026-09-16)
 
 | Piece | Where | Responsibility |

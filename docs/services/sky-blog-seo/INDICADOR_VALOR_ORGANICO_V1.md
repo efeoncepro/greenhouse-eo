@@ -70,6 +70,19 @@ promediar las dos valoraciones. Las series del valor nativo respetan la versión
 - Fórmulas y totales del Excel contrastados con el cálculo canónico y fuentes guardadas.
 - Aprobación de interpretación por SKY antes de usarlo como indicador contractual o claim de rentabilidad.
 
+## Uso fuera de SKY (2026-11-04, code complete local)
+
+El método no cambia de versión al salir del piloto. Desde el 2026-11-04 lo usan, sin release todavía:
+
+- la CLI para otras organizaciones, con `--markets`, `--brand`, `--content-scope` y propiedades `sc-domain:`
+  ([manual](../../manual-de-uso/growth/valorar-trafico-organico.md)); primer caso: blog de Berel, octubre 2026,
+  mercado México;
+- el capítulo de búsqueda de Efeonce Insights (`organic_value_usd`), con el mercado único del target SEO, el alcance
+  de contenido y sólo CPC ya capturados ([funcional](../../documentation/growth/valor-publicitario-organico.md)).
+
+Las reglas de esta página siguen valiendo igual. La regla de marca de SKY no se reutiliza: cada consumer declara la
+suya (en Insights, la etiqueta del dominio raíz).
+
 Fuentes verificadas el 15-10-2026:
 [Google Search Analytics](https://developers.google.com/webmaster-tools/v1/searchanalytics/query),
 [límites y extracción](https://developers.google.com/webmaster-tools/v1/how-tos/all-your-data),

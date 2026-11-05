@@ -49,6 +49,19 @@ alcance por expresión de página) y el adapter SEO (`seo_report_adapter_v2`) to
 posición, bloques semanales, referencia del sitio y páginas. Las consultas siguen del detalle y la cascada agrega el
 paso «Consultas que Google no muestra». Si el control falla, límite; nunca la tabla. Ediciones selladas no cambian.
 
+**Valor orgánico (code complete local, 2026-11-05, sin release):** el método `gsc_clicks_country_cpc_v1` ya medía con el
+control sin consulta; su collector acepta ahora propiedades `sc-domain:` y el alcance de contenido (misma expresión de
+página que el reader del control). El reader `readOrganicTrafficValueForWindow` lo lleva al capítulo SEO de Insights
+(`organic_value_usd`, con clics valorados sobre el total del control), sólo con CPC ya capturados y sin comprar. Ver el
+delta del [ADR](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md) y la
+[arquitectura de Insights §5.2](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
+
+**Rollout de lo anterior:** pendiente. Commits locales `a01a043dc`, `4c2de9aca` y `b583cd93f` en `develop`, sin push
+ni release: nada corre en Vercel ni en el `ops-worker`. El runtime que genere la edición necesita
+`GROWTH_SEARCH_CONSOLE_ENABLED=true`, `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` y
+`GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF`. El informe de octubre de Berel se armó con la vista previa
+local, no con una edición de producción.
+
 **Tablero SEO y demás readers de `seo_gsc_daily`:** pendiente. Dirección propuesta: materializar además una serie diaria por página SIN consulta (control)
 — o por propiedad — y que los totales de clics/impresiones/CTR salgan de esa serie, dejando `query × page` como detalle
 con cobertura declarada (clics con consulta visible / total). Cambia las cifras históricas impresas: requiere versión
@@ -64,9 +77,14 @@ cobertura de consultas.
 
 open
 
+Delta 2026-11-05: Insights code complete local (rollout pendiente); el tablero SEO y los demás readers de
+`seo_gsc_daily` siguen sin corregir. Se cierra cuando todo total presentado salga del control y la corrección esté
+desplegada.
+
 ## Relacionado
 
 - `src/lib/growth/seo/gsc-daily-materializer.ts`, `src/lib/growth/seo/overview/read-overview-kpis.ts`
 - `src/lib/efeonce-insights/adapters/seo-adapter.ts`
+- `src/lib/growth/seo/search-control/read-search-control.ts`, `src/lib/growth/seo/organic-traffic-value/read-for-window.ts`
 - Método de valor orgánico: `docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md`
 - Evidencia local: `.captures/berel-organic-value-2026-10/inputs-2026-09.json`, `inputs-2026-10.json`

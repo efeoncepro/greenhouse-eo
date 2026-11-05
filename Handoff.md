@@ -2,6 +2,27 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-05 — Insights Berel octubre «sólo blog»: clics completos (ISSUE-191), valor estimado y redes
+
+**Código (develop, sin push ni release):** `f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`. El capítulo SEO de
+Insights toma totales, serie, contexto del sitio y movimientos de páginas del control de Search Console sin la
+dimensión consulta (`readSeoSearchControlForWindow`, adapter `seo_report_adapter_v2`); la cascada suma «Consultas que
+Google no muestra»; si el control falla, límite, nunca la tabla. Nuevo `organic_value_usd` (`readOrganicTrafficValueForWindow`,
+sólo CPC capturados, sin CPC = límite) y `site.social_sessions`/`social_source.*` de GA4. CLI de valor orgánico con
+`--markets --brand --content-scope` y `sc-domain:`. Vista previa con `--modules` y `--title`; fix de etiquetas gemelas.
+Necesita `GROWTH_SEARCH_CONSOLE_ENABLED` + OAuth de Search Console en el runtime que genera la edición.
+**Berel:** blog octubre 4.094 clics (antes se habrían impreso 1.065); el informe de septiembre entregado el 2026-10-12
+imprimió 799 de 3.540. Compra CPC MX única autorizada (508 consultas, task DataForSEO
+`11041847-1987-0607-0000-0e19efc03a45`, USD 0,04836). PDF A4 (18 págs.) y deck (14) desde la **vista previa local**, no
+por el flujo de producción, en OneDrive `Alineación/1. Clientes (Interno)/Berel/Informes/`.
+**Correo a Berel: redactado, NO enviado** (Para María Fernanda Vega, Anel Garza y Marcela Espinoza; CC Valentina Hoyos y
+Daniela Ferreira; CCO HubSpot; debía salir el lunes 2026-11-02, pide disculpas y explica visitas desde redes y la
+medición completa de clics). **Los PDF muestran el valor publicitario de ~US$ 85 (A4 págs. 6 y 14, y el deck) que el
+correo omite por decisión del operador:** confirmar con él antes de adjuntar.
+**Pendiente:** push + release; tablero SEO y demás readers de `seo_gsc_daily` siguen sumando el subconjunto
+(ISSUE-191 open); corrección de URLs migradas en movimientos (hoy regla manual); captura de CPC de consultas nuevas por
+mes es manual. Docs: funcional Insights 1.26, valor orgánico 1.1 (funcional y manual), manual Insights 1.23.
+
 ## 2026-11-05 — GPT Image 2.6 (Sunburst/Flare) en la CLI, junto a 2.5
 
 **Código (develop, sin push):** `src/lib/ai/openai-image.ts` (modelos 2.6 + `gpt-image-2-2026-04-21`; tabla de capacidades
@@ -261,13 +282,3 @@ compilada `inicio` (12 widgets, nav/footer canónicos, agenda con CTA `site-nav-
 (`_gh_home_orbita_seo_before_20261029_092107`); videos diferidos (0 MB al cargar). A papelera con 301 a `/`: /home-2-2/,
 /home-2/, /home/, /home-prueba/ y cinco demos Ohio. QA vivo 1440/1280/390. Pendiente: editor Elementor, PSI/CWV (cuota),
 push de develop y runtime `af1a785`. Commits locales `5532e6371`…`f86460ec5`.
-
-## 2026-10-28 — MG Indusol: correo enviado y cierre documental
-
-[Expediente Mayra / MG Indusol](docs/commercial/prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md):
-correo único autorizado enviado a las 19:37:35 Chile, brochure 360° completo, firma gráfica y CCO;
-Enviados y EMAIL 119882403672 SENT comprobados por separado. Contact 258762787214 nació por
-Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia del aviso, piso de
-50 personas, presupuesto y proceso comprador sin confirmar; tres adyacentes investigados sin acercamientos.
-[Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
-estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.

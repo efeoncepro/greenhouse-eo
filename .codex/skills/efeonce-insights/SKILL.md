@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when an organization's report must measure only the content Efeonce works on (content scope, TASK-2033: path rules in the SEO domain, sealed in the edition; live for Berel in staging and the ops-worker since 2026-10-12, Production pending release), when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975 and channel isotypes TASK-1990/1996, in production since release `36a73e7b7e19` on 2026-10-03), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when an organization's report must measure only the content Efeonce works on (content scope, TASK-2033: path rules in the SEO domain, sealed in the edition; live for Berel in staging and the ops-worker since 2026-10-12, Production pending release), when the SEO chapter's totals, its estimated advertising value or the social visits are involved (ISSUE-191 Search Console control, `organic_value_usd`, `site.social_sessions`; local `develop` 2026-11-04, unreleased), when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when choosing or changing a report figure (selection criterion, stat card, waterfall/waffle/donut/stacked pages — TASK-1974/1975 and channel isotypes TASK-1990/1996, in production since release `36a73e7b7e19` on 2026-10-03), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -43,7 +43,8 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **Idempotency is `(organization_id, idempotency_key)` + `request_hash`**: same key + same request ⇒
   same edition (`200`, `idempotent: true`); different request ⇒ `409 idempotency_conflict`. NEVER
   create a second edition "to retry"; failed editions are recovered from their phase.
-- **Adapters consume only the owner readers** (`readSeoOverviewKpisForWindow`, the AEO run whose
+- **Adapters consume only the owner readers** (`readSeoOverviewKpisForWindow`, `readSeoSearchControlForWindow`,
+  `readOrganicTrafficValueForWindow`, the AEO run whose
   `asOfDate` falls in the window, the ICO materializers). NEVER import `@/lib/client-portal/*` from
   the domain (it is a leaf of the DAG; lint enforces it) and NEVER read producer tables directly.
 - **Sealed snapshot and frozen plan are immutable** (no-update/no-delete triggers, hashes). A
@@ -130,6 +131,28 @@ it without repeating what already cost a day*. It grows with every task: see the
   printed only on the WHITE A4 cover: the navy cover and the deck cover have no «Qué mide este informe» zone, and an
   organization with an `on_dark` logo gets navy from the `auto` rule — set its cover to `light` if the scope must show
   on the cover (Berel is `light`). See `contracts.md` § Alcance de contenido and `operations.md` § Alcance de contenido.
+- **SEO chapter totals come from the Search Console control, never from `seo_gsc_daily` (ISSUE-191, 2026-11-04;
+  code complete in local `develop`, not released).** That table stores `query × page` and Google drops anonymized
+  queries there, so any total read from it is a subset (Berel blog, October 2026: 1,065 of 4,094 clicks). Clicks,
+  impressions, CTR, position, weekly blocks, the `site_total.*` reference and page movers come from
+  `readSeoSearchControlForWindow` (live, no `query` dimension, `byPage`, `final`, content scope as a page expression);
+  query movers stay on the detail and the waterfall adds the measured step «Consultas que Google no muestra» so it adds
+  up to the chapter total. If the control fails, the chapter declares the limit — NEVER fall back to the table. Adapter
+  `seo_report_adapter_v2`; sealed editions are untouched. The SEO dashboard and other `seo_gsc_daily` readers still sum
+  the subset (ISSUE-191 open for them). Needs `GROWTH_SEARCH_CONSOLE_ENABLED` + the Search Console OAuth client in the
+  runtime that generates the edition.
+- **Estimated advertising value is an estimate over captured prices, never a purchase, never US$ 0 (2026-11-04,
+  local).** `organic_value_usd` (`gsc_clicks_country_cpc_v1`, the SKY pilot method; reader
+  `readOrganicTrafficValueForWindow`) uses only CPC already captured for the SEO target's single market, over the
+  content scope; the reader NEVER buys. It travels with `numerator`/`denominator` = valued clicks / control total and is
+  never extrapolated; without any CPC it is a rejection (`no_data`), never zero. Its `freshness.asOf` is the CPC capture
+  date (today's prices on a past month, not historical CPC). It is not revenue, savings nor ROI. Raising coverage for a
+  new month is a manual, operator-authorized purchase with a ceiling (`references/operations.md`). Whether the client
+  email mentions it is an operator decision per delivery (for Berel October 2026 it does not; the PDFs do).
+- **Social visits are never SEO (2026-11-04, local).** `site.social_sessions` (GA4 Organic Social + Organic Video over
+  the same population as the organic visits) and `social_source.*` by network are said as a finding and kept in the GA4
+  table. NEVER present them as «social search» (GA4 cannot tell a search inside a network from a feed view) and never
+  attribute them to SEO work.
 - **The weekly clicks line draws only complete weeks (2026-10-12, every organization).** The month's last block has
   2–3 days; drawn beside full weeks it read as a drop under a headline that said clicks rose. The short block is not
   drawn nor tabulated; the reading names it («Fuera de la figura: 29–30 sept, que no completa una semana.») and its

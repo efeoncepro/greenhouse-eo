@@ -9,6 +9,8 @@ Para valorar clics orgánicos observados con CPC por país, usar la foundation l
 `src/lib/growth/seo/organic-traffic-value/` y el [manual del indicador](../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
 Reutiliza los snapshots Labs y su writer; cobertura y fechas son parte del resultado. El valor nativo con
 ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo`.
+Efeonce Insights consume el indicador (`readOrganicTrafficValueForWindow`, 2026-11-04) leyendo sólo CPC ya
+capturados: nunca compra; subir cobertura es una compra manual con techo (`.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md`).
 
 Skill de dos capas, inseparables:
 

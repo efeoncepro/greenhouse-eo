@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-10-23 por Claude (1.8: §8.ad y fila de §10 con el catálogo A4 premium para informes no-Insights —hallazgos, escenarios, `productLabel`, tendencia anotada, guarda del pie y `pnpm report:compose`—, commit `001683d83` en `develop` local. 1.7: §8.ac y fila de §10 con TASK-1974 + TASK-1975, code complete y rollout pendiente. 1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
+> **Ultima actualizacion:** 2026-11-05 por Claude (1.9: §12.2 y fila de §10 con el capítulo SEO desde el control de Search Console —ISSUE-191—, el valor publicitario estimado y las visitas desde redes, commits `a01a043dc`, `4c2de9aca`, `b583cd93f` y `f45230b2e` en `develop` local, code complete y rollout pendiente. 1.8: §8.ad y fila de §10 con el catálogo A4 premium para informes no-Insights —hallazgos, escenarios, `productLabel`, tendencia anotada, guarda del pie y `pnpm report:compose`—, commit `001683d83` en `develop` local. 1.7: §8.ac y fila de §10 con TASK-1974 + TASK-1975, code complete y rollout pendiente. 1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -860,6 +860,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Think (`efeonce-think` `main`) + Vercel Production (TASK-1875, 2026-09-28) | informe live `/insights/r/<token>`, muestra `/insights/muestra`, lockup y OG de Insights; `INSIGHTS_SHARING_ENABLED=true` en Production (redeploy `greenhouse-cssemzyzb`); WAF con la excepción `x-efeonce-think-key` | **En producción** (`544ecd4`); canary sobre `EO-INS-000014` verde (crear, leer, descargar, revocar ⇒ 410); producción sirve el modelo 1.0, el 1.1 en staging | §8.ab; arquitectura §14.10 |
 | `develop` local de greenhouse-eo + `main` local de Think y AXIS (TASK-1974 + TASK-1975, 2026-10-03) | criterio de selección, tarjeta de cifra, páginas PDF/deck de cascada, waffle, dona y apiladas, modelo web 1.4, tokens y contrato AXIS 0.3.42 | **Code complete, rollout pendiente**: nada empujado; orden AXIS (push + tag) → Think (push) → Greenhouse (develop → staging → release); dona y apiladas sin verificar con GA4 real | §8.ac; arquitectura §14.12 |
 | `develop` local de greenhouse-eo (2026-10-23) | catálogo A4 premium para informes no-Insights: `report-findings`, `report-scenarios`, `productLabel`, tendencia anotada, guarda del pie, `pnpm report:compose` | **Code complete, sin push**; sin flag (cambio de render). El mapper de Insights ya declara `productLabel`, así que el render de producción no cambia de aspecto al promoverse | §8.ad; arquitectura §6.2.1 |
+| `develop` local de greenhouse-eo (2026-11-04/05) | capítulo SEO con totales del control de Search Console (`seo_report_adapter_v2`, ISSUE-191), valor publicitario estimado (`organic_value_usd`) y visitas desde redes (`site.social_sessions`); etiquetas de página gemelas; `preview-edition.ts --modules --title` | **Code complete local, rollout pendiente**: sin push ni release; nada corre en Vercel ni en el `ops-worker`. Sin flag nuevo; el runtime que genere la edición necesita las variables de Search Console | §12.2; arquitectura §5.2 y §14.13 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---
@@ -981,6 +982,34 @@ Este registro cubre la fundación. El alcance de contenido se construyó despué
 | CLI | `scripts/seo/set-content-scope.ts` | `pnpm seo:content-scope` |
 
 Desplegado en Vercel staging y en el `ops-worker` el 2026-10-12 (`d9a1c6a2d`). Vercel Production, sin release.
+
+
+## 12.2 Delta 2026-11-05 — capítulo SEO desde el control de Search Console, valor estimado y visitas desde redes
+
+Contrato en la [arquitectura §5.2](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) y estado en su §14.13. Causa:
+[ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md) (sigue abierto). Lo que agrega
+o cambia en el inventario, archivo por archivo:
+
+| Archivo | Commit | Qué hace |
+| --- | --- | --- |
+| `src/lib/growth/seo/search-control/read-search-control.ts` (nuevo) | `4c2de9aca` | Reader dueño `readSeoSearchControlForWindow` (método `gsc_search_control_v1`): Search Console en vivo sin la dimensión consulta —total, serie diaria y páginas—, `type=web`, `dataState=final`, `byPage`; falla con `page_outside_content_scope` si vuelve una página fuera del alcance. `rankSearchControlPageMovers` ordena las páginas que más movieron los clics |
+| `src/lib/growth/seo/search-control/page-expression.ts` (nuevo) | `4c2de9aca` | `searchConsolePageExpression` (expresión RE2 con el veredicto de `isPathInContentScope`) y `searchConsoleHostOf` (`sc-domain:` mide el dominio y sus subdominios) |
+| `src/lib/growth/seo/search-control/__tests__/read-search-control.test.ts` (nuevo) | `4c2de9aca` | Pruebas del reader |
+| `src/lib/growth/seo/organic-traffic-value/collect.ts` | `a01a043dc`, `4c2de9aca` | Acepta propiedades `sc-domain:` y reglas del alcance; falla si vuelve una página fuera del alcance. La expresión de página pasó a `search-control/page-expression.ts` |
+| `src/lib/growth/seo/organic-traffic-value/__tests__/collect.test.ts`, `__tests__/page-expression.test.ts` | `a01a043dc` | Propiedad de dominio, alcance y paridad de la expresión con el matcher sobre las mismas URLs |
+| `src/lib/growth/seo/organic-traffic-value/read-for-window.ts` (nuevo) | `b583cd93f` | `readOrganicTrafficValueForWindow`: método `gsc_clicks_country_cpc_v1` sobre el mercado del target y el alcance, sólo con CPC ya capturados (`readKeywordMarketData`); nunca compra; `cpcAsOf` = captura del precio más reciente usado |
+| `scripts/seo/organic-traffic-value.ts` | `a01a043dc` | CLI con `--markets`, `--brand` y `--content-scope` (antes constantes de SKY) |
+| `src/lib/efeonce-insights/adapters/seo-adapter.ts` | `4c2de9aca`, `b583cd93f`, `f45230b2e` | `seo_report_adapter_v2`: totales, serie semanal, `site_total.*` y páginas desde el control; consultas desde el detalle; paso «Consultas que Google no muestra» en la cascada; sin caída a la tabla; hechos `organic_value_usd` y `organic_value.valued_clicks`; `uniquePageLabels` deja lugar al sufijo « ·2» |
+| `src/lib/efeonce-insights/adapters/ga4-site-facts.ts` | `b583cd93f` | `site.social_sessions` (Organic Social + Organic Video) y `social_source.*` por red (`socialSourceOf`) |
+| `src/lib/efeonce-insights/adapters/adapters.test.ts`, `ga4-site-facts.test.ts` | `4c2de9aca`, `b583cd93f`, `f45230b2e` | Pruebas del adapter v2, del valor, de redes y de las etiquetas gemelas |
+| `src/lib/efeonce-insights/editorial/deterministic-planner.ts`, `criterion-figures.ts`, `figure-selection.ts` | `4c2de9aca`, `b583cd93f` | Plan del capítulo con el paso de consultas ocultas, el valor estimado y las visitas desde redes |
+| `src/lib/efeonce-insights/presentation/content-contract.ts`, `metric-glyphs.ts`; `render/figure-slots.ts` | `b583cd93f` | Las métricas nuevas en el contrato de presentación; notas de cifra que citan su métrica y se pintan sólo en su página |
+| `src/lib/copy/insights.ts` | `4c2de9aca`, `b583cd93f` | Población del control, etiqueta del paso oculto, métricas nuevas y etiquetas de fuente más cortas |
+| `scripts/insights/preview-edition.ts` | `f45230b2e` | `--modules=seo` (subconjunto del encargo, nunca agrega) y `--title="…"` (sólo el PDF local) |
+
+Verificación local: vista previa de Berel, octubre de 2026, alcance blog, A4 de 18 páginas y deck de 14 láminas con 0
+violaciones. No hay migración, flag nuevo ni cambio de `seo_gsc_daily`. **Code complete local, rollout pendiente**:
+sin push, sin release; nada de esto corre en Vercel ni en el `ops-worker`.
 
 ## 13. Referencias
 

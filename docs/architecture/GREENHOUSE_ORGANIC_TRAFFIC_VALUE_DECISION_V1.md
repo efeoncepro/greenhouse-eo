@@ -60,3 +60,34 @@ formal de trabajo, ownership API/MCP y pruebas de autorización; este ADR no dec
 Pruebas requeridas: país correcto, CPC cero/ausente, duplicados, reconciliación, marca/sin marca,
 propiedad equivocada, paginación y compatibilidad del request previo. El piloto real y sus límites se
 registran en la auditoría de entrega de SKY; no sustituir esa lectura por pruebas unitarias.
+
+## Delta 2026-11-05 — propiedades de dominio, alcance de contenido y consumer de lectura en Insights
+
+Estado: **code complete local, rollout pendiente** (commits `a01a043dc` y `b583cd93f` en `develop`, sin push ni
+release). El método `gsc_clicks_country_cpc_v1` no cambia: mismas fórmulas, controles y reglas de `null`.
+
+- **Propiedades `sc-domain:`.** El collector acepta propiedades de dominio: el host pedido debe ser el dominio o un
+  subdominio suyo, y pedido por el dominio raíz mide todos sus hosts (`x.com`, `www.x.com`). Una propiedad por prefijo
+  de URL sigue exigiendo el host exacto.
+- **Alcance de contenido (TASK-2033).** Con reglas, Google recibe una expresión de página con el mismo veredicto que
+  `isPathInContentScope` (`src/lib/growth/seo/search-control/page-expression.ts`; prueba de paridad sobre las mismas
+  URLs, no sobre el texto de la expresión). Controles y detalle miden sólo ese contenido, y el collector falla si vuelve
+  una página fuera del alcance.
+- **CLI.** `scripts/seo/organic-traffic-value.ts` acepta `--markets=<paísISO3>:<location_code>,…`, `--brand=<regex>` y
+  `--content-scope`; sin flags conserva los valores del piloto SKY.
+- **Consumer de lectura para Insights.** `readOrganicTrafficValueForWindow`
+  (`src/lib/growth/seo/organic-traffic-value/read-for-window.ts`) valora un solo mercado, el del target SEO, sobre el
+  alcance, sólo con CPC ya capturados (`readKeywordMarketData`). **Nunca compra.** Devuelve `cpcAsOf`, la fecha de
+  captura del precio más reciente usado: es valoración con precios a esa fecha, no CPC histórico del mes. Sin ningún CPC
+  con clics el resultado es un límite, nunca US$ 0. El adapter SEO de Insights emite `organic_value_usd` (estimado, USD,
+  numerador/denominador = clics valorados / total del control) y `organic_value.valued_clicks`
+  ([arquitectura de Insights §5.2](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md)). Esto amplía el alcance de entrega original,
+  que dejaba fuera la publicación en Insights; API/MCP propios, UI, jobs y persistencia del derivado siguen fuera.
+- **Captura de CPC de consultas nuevas.** Sigue siendo manual: CLI + compra por `pnpm dataforseo` con organización,
+  `--consumer seo`, preview y techo, persistida con `parseKeywordOverviewItem` + `persistKeywordMarketData` (filas NULL
+  para lo que el proveedor no tiene). El scheduler `ops-seo-keyword-market-data` sólo cubre keywords seguidas, así que
+  un mes nuevo sin captura deja consultas sin valorar. Primer caso fuera de SKY: Berel, mercado MX, compra única
+  autorizada por el operador (508 consultas, 230 con CPC, USD 0,04836 contra un techo de USD 0,50).
+- **Relación con ISSUE-191.** La medición del blog de Berel con este método destapó
+  [ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md): el control sin consulta que
+  este método ya usaba no cuadraba con la tabla `seo_gsc_daily`.

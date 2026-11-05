@@ -15,6 +15,23 @@ Método y piloto de SKY:
 [`INDICADOR_VALOR_ORGANICO_V1.md`](../../../../docs/services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md),
 [`valorar-trafico-organico.md`](../../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
 
+### Delta 2026-11-04 — Consumer Efeonce Insights del valor orgánico (`develop` local, sin release)
+
+El capítulo SEO de Insights es el primer consumer productivo del indicador: el reader
+`readOrganicTrafficValueForWindow` (`src/lib/growth/seo/organic-traffic-value/read-for-window.ts`) valoriza los clics
+del control de Search Console sobre el alcance de contenido con los CPC **ya capturados** en
+`seo_keyword_market_data` (`readKeywordMarketData`) del único mercado del target SEO. **Nunca compra**: un render o un
+schedule de Insights no genera gasto DataForSEO. Sin ningún CPC el hecho `organic_value_usd` es un límite, no US$ 0;
+`cpcAsOf` es la fecha de captura del precio. El collector y la CLI aceptan ahora propiedades `sc-domain:`,
+`--markets`, `--brand` y `--content-scope` (antes constantes SKY): el método no es exclusivo de SKY.
+
+**Subir cobertura es una compra manual, autorizada y con techo.** El scheduler mensual `ops-seo-keyword-market-data`
+sólo cubre keywords seguidas, no las consultas nuevas del mes. Flujo: la CLI lista las consultas sin CPC → compra
+única `pnpm dataforseo -- run …keyword_overview/live` con organización, `--consumer seo`, estimado y techo → persistir
+con `parseKeywordOverviewItem` + `persistKeywordMarketData`, con filas NULL para lo que el proveedor no tiene. Caso
+fuente Berel MX (2026-11-04): 508 consultas, USD 0,04836 real con techo USD 0,50, 230 con CPC; cobertura parcial y
+CPC de pintura bajos ⇒ valor del blog de octubre ≈ US$ 85.
+
 ## §1 Cliente canónico (API + firmas)
 
 Vive en `src/lib/ai/dataforseo.ts` (364 líneas, `import 'server-only'`). Base URL fija `https://api.dataforseo.com` (`src/lib/ai/dataforseo.ts:13`). Exports:

@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.22
+> **Version:** 1.23
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-13 por Claude (1.22: estado de despliegue del alcance, portada blanca, `--cover` en la vista previa y cómo leer un pico. Historia: 1.21: fijar el alcance de contenido de una organización. 1.20 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-11-05 por Claude (1.23: vista previa con `--modules` y `--title`; el capítulo de búsqueda toma sus totales del control de Search Console (ISSUE-191), suma valor publicitario estimado y visitas desde redes; revisar movimientos por URLs migradas antes de entregar; code complete local, rollout pendiente. 1.22: estado de despliegue del alcance, portada blanca, `--cover` en la vista previa y cómo leer un pico. Historia: 1.21: fijar el alcance de contenido de una organización. 1.20 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 > **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
@@ -798,6 +798,9 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | Output falla de nuevo tras `retry` con `render_error` | Causa de contenido (p. ej. validación de slots) que reintentar no arregla; `attempts` sube hasta 3 y termina en `dead_letter` | Corregir la edición (`revise`) y pedir el render de la nueva versión |
 | `422 render_rejected` al pedir el render | Output no renderizable en ese ambiente (`web` siempre), o el plan excede un presupuesto del catálogo | Pedir sólo lo renderizable; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
 | El output queda `failed` con `render_error` y un detalle que empieza con `report-bar-geometry`/`insights-bar-geometry` | La etiqueta de una barra no representa su valor (más allá del redondeo impreso) | Es un bug de datos o de formato, no de layout: reproducirlo con la vista previa local (abajo) y corregir en el plan o el mapper |
+| Los clics del capítulo de búsqueda no cuadran con Search Console (son bastante menores) | Edición generada con código anterior a ISSUE-191, que sumaba sólo consultas visibles | Generar la edición con el adapter `seo_report_adapter_v2` tras el release; una edición sellada no cambia |
+| No aparece el valor publicitario estimado | Sin CPC capturados del mercado, target sin mercado, Search Console sin responder o contrato v1 | Ver el límite en el plan; capturar CPC con el manual de valor orgánico |
+| El deck falla cerrado por una etiqueta de página de más de 40 caracteres | Dos URLs que se abrevian igual y el sufijo « ·2» | Corregido el 2026-11-04 (`uniquePageLabels` acorta la base); si reaparece, es regresión |
 | En un informe falta una métrica que el módulo debería traer | El adapter no la encontró en su fuente | Desde 2026-09-22 la falta aparece como límite («Entregas a tiempo: sin datos»); si no aparece ni como cifra ni como límite, es un bug del adapter (así se descubrió que OTD nunca llegaba) |
 | Run en `partial_failed` | Un output salió y otro falló | Leer cada output; `retry` re-encola sólo los fallidos |
 | Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
@@ -831,11 +834,34 @@ GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POS
   --edition=insed-... --org=org-... --output=both
 ```
 
-Opciones útiles: `--editorial-v2` (el contrato vigente), `--plan-only` (imprime el plan sin componer) y
-`--cover=light|dark`, que muestra la otra portada sin tocar la preferencia de la organización. Para que la vista
+Opciones útiles: `--editorial-v2` (el contrato vigente), `--plan-only` (imprime el plan sin componer),
+`--cover=light|dark`, que muestra la otra portada sin tocar la preferencia de la organización,
+`--modules=seo` (un subconjunto de los módulos del encargo, por ejemplo sólo el blog; nunca agrega un módulo que la
+edición no pidió: si lo intentas, el script falla) y `--title="…"` (título del PDF local cuando el subconjunto cambia lo
+que cubre el informe; el reporte guardado no cambia). Ejemplo del informe del blog de Berel de octubre:
+
+```bash
+pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+  --edition=insed-... --org=org-... --output=both --editorial-v2 \
+  --start=2026-10-01 --end-exclusive=2026-11-01 --modules=seo --title="Informe del blog, octubre 2026"
+``` Para que la vista
 previa lea la cola de oportunidades y Analytics hacen falta `GROWTH_SEO_WORK_QUEUE_ENABLED=true` y, para Analytics,
 `GROWTH_GA4_ENABLED=true` con la configuración OAuth del entorno de staging; sin ella el informe sale con el límite
 «Google Analytics 4: sin datos suficientes».
+
+**Capítulo de búsqueda desde el 2026-11-04 (local, sin release; ISSUE-191).** Los totales, la línea semanal, el
+contexto del sitio y las páginas que más cambiaron salen del control de Search Console pedido en vivo sin la dimensión
+consulta (`readSeoSearchControlForWindow`), no de `seo_gsc_daily`. Para eso el entorno que corre la vista previa (o el
+runtime que genera la edición) necesita `GROWTH_SEARCH_CONSOLE_ENABLED=true`, `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` y
+`GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF`. Sin ellos el capítulo declara el límite y no cae a la tabla.
+El «Valor publicitario estimado» sale sólo con contrato v2, un target SEO con mercado y CPC ya capturados de ese
+mercado; si no hay ninguno, aparece como límite. Para cubrir un mes nuevo, capturar antes los CPC
+([manual](../growth/valorar-trafico-organico.md#cubrir-los-cpc-de-un-mes-nuevo-para-insights)).
+
+**Antes de entregar, mira la página de movimientos.** Una URL que migró se lee como «la página que más cambió»: la
+nueva sube desde casi cero y la vieja cae a cero. En Berel, octubre de 2026, la guía de pintura para madera pasó de 25
+a 310 clics en la URL nueva y de 229 a 0 en la vieja: combinadas, de 254 a 310 (+22 %). El informe no lo corrige
+todavía; si ocurre, explícalo al entregar o retira esa página del relato.
 
 Si el validador encuentra una cifra sin respaldo, el script lo informa y no compone, igual que producción. Todos los
 defectos del canary del 2026-09-22 aparecieron así, con datos reales; la edición de demostración, sin datos, no mostró

@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.25
+> **Version:** 1.26
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-23 por Claude (1.25: el diseño del informe A4 también sirve para auditorías y otros informes de Efeonce que no son de Insights: hallazgos con severidad, escenarios, tendencia con etapas y la regla de que el pie nunca se cubre. 1.24: el alcance está desplegado en staging y en el proceso de ediciones programadas; portada blanca para leerlo, línea semanal con semanas completas y tres nombres de Analytics. Historia: 1.23: alcance de contenido por organización, el informe mide sólo lo que trabajamos. 1.22: fuentes citadas con logo en las tablas del PDF y el deck, y las tres redes nuevas. Historia: 1.21 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-11-05 por Claude (1.26: el capítulo de búsqueda cuenta todos los clics de Google, también los de consultas que Google no detalla; nuevo «valor publicitario estimado» y «visitas desde redes»; code complete local, rollout pendiente. 1.25: el diseño del informe A4 también sirve para auditorías y otros informes de Efeonce que no son de Insights: hallazgos con severidad, escenarios, tendencia con etapas y la regla de que el pie nunca se cubre. 1.24: el alcance está desplegado en staging y en el proceso de ediciones programadas; portada blanca para leerlo, línea semanal con semanas completas y tres nombres de Analytics. Historia: 1.23: alcance de contenido por organización, el informe mide sólo lo que trabajamos. 1.22: fuentes citadas con logo en las tablas del PDF y el deck, y las tres redes nuevas. Historia: 1.21 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.20: el criterio de selección, la tarjeta de cifra (también con el isotipo del canal) y las cinco figuras nuevas están en producción desde el 2026-10-03; una parte muy chica de una dona se lee «<1 %». 1.19: el criterio de selección de gráficos quedó implementado en local por TASK-1974 y TASK-1975 —code complete, rollout pendiente—: qué figura recibe cada dato, la página de cifras, las cinco figuras nuevas del PDF y el deck, el tono de la variación (verde mejor, rojo peor, gris neutro), el waffle por unidad y la animación del informe Live; se corrigen las frases que decían que el PDF sólo dibuja cuatro formas y que la variación no dice si un cambio es bueno o malo. 1.18: nueva sección «Cómo elige el informe sus gráficos» con el criterio de selección de gráficos aprobado por el operador el 2026-10-03 —principio, tres reglas, tabla pregunta → figura y tarjeta de cifra—; implementación en curso en una task de EPIC-045; se corrige la frase que decía que los informes sólo traen las cuatro formas del PDF. 1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 > **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
@@ -76,6 +76,7 @@ Con un alcance declarado, el capítulo de búsqueda cambia así:
 | Keywords en primera página | Las que posicionan con una página del alcance |
 | Oportunidades recomendadas | Las que apuntan a una página del alcance |
 | Tráfico orgánico estimado | No aparece: sólo existe para el sitio completo, y el informe lo dice en sus límites |
+| Valor publicitario estimado (desde 2026-11-04, local) | Sólo los clics del alcance |
 | El sitio completo | Una frase de contexto al final del capítulo |
 
 «Qué mide este informe», en la portada, nombra el contenido medido. La frase de contexto compara las dos
@@ -84,13 +85,14 @@ sitio, -13,6 %.»
 
 Qué conviene saber:
 
-- **Las cifras se ven más chicas.** 799 clics al mes en vez de 14.156. Es lo normal en contenido informativo, y la
-  portada dice qué se está midiendo.
+- **Las cifras se ven más chicas.** Es lo normal en contenido informativo, y la portada dice qué se está midiendo.
+  (Hasta el 2026-11-04 el ejemplo de Berel decía 799 clics en septiembre: esa cifra dejaba fuera las consultas que
+  Google no detalla. El total completo del mismo contenido fue 3.540; ver la sección siguiente.)
 - **Una edición ya creada no cambia.** El alcance rige para las ediciones nuevas; corregir una anterior es crear una
   versión nueva de ese informe.
 - **El capítulo de motores de respuesta no se recorta.** La visibilidad en IA es de la marca, no de una página.
-- **Search Console y Analytics no cuentan lo mismo.** Search Console sólo guarda los clics de consultas con texto;
-  Analytics cuenta todas las visitas desde buscadores. Sobre el mismo contenido los números difieren y pueden moverse
+- **Search Console y Analytics no cuentan lo mismo.** Search Console cuenta clics desde la búsqueda de Google;
+  Analytics cuenta visitas desde todos los buscadores. Sobre el mismo contenido los números difieren y pueden moverse
   distinto.
 - **Una página nueva fuera de las secciones declaradas no entra sola.** En Berel, una guía publicada en la raíz del
   sitio hay que agregarla al alcance.
@@ -120,6 +122,76 @@ cierto. El cambio aplica a todas las organizaciones.
 
 > Detalle técnico: [arquitectura §5.1](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) ·
 > `src/lib/growth/seo/content-scope/` · `src/lib/efeonce-insights/adapters/seo-adapter.ts`
+
+## El capítulo de búsqueda cuenta todos los clics, y suma dos cifras nuevas
+
+> Construido el 2026-11-04 en local (ISSUE-191). **Code complete local, rollout pendiente:** no está en staging ni en
+> producción, ni en el proceso de ediciones programadas. Las ediciones que se generen allí siguen con la cuenta anterior
+> hasta el release.
+
+### Todos los clics de Google, también los que Google no detalla
+
+Google no informa el texto de una parte de las búsquedas (las que considera privadas o demasiado raras). Hasta ahora
+el capítulo sumaba sólo las búsquedas con texto, así que **sus totales eran una parte del total**. En el blog de Berel,
+octubre de 2026: el informe habría dicho 1.065 clics cuando Google registró 4.094; septiembre, 799 frente a 3.540. La
+variación también cambia: +33,3 % con la cuenta parcial, +15,6 % con la completa. El informe de septiembre que ya se
+entregó usó la cuenta parcial.
+
+Desde este cambio:
+
+| Qué | De dónde sale |
+| --- | --- |
+| Clics, impresiones, CTR, posición, línea semanal, contexto del sitio completo y páginas que más cambiaron | El total de Google, que incluye todas las búsquedas |
+| Consultas que más cambiaron | Las búsquedas que Google muestra (las demás no tienen texto que mostrar) |
+| Cascada de lo que explica el cambio | Las consultas visibles, más un paso nuevo, «Consultas que Google no muestra», para que cuadre con el total |
+
+La fuente del total se cita como «Search Console (total)» y la del detalle por consulta como «Search Console (consultas
+visibles)». Si Google no responde, el capítulo lo dice en sus límites; **nunca vuelve a la cuenta parcial**. Una edición
+ya sellada no cambia: corregir una anterior es crear una versión nueva.
+
+### Valor publicitario estimado
+
+Lo que costaría comprar en Google Ads los clics del contenido medido: cada clic de una consulta visible se multiplica
+por el costo por clic de esa consulta en el país del informe. Es el mismo método del piloto del Blog SKY
+([qué es y cómo se lee](../growth/valor-publicitario-organico.md)).
+
+- **Es un estimado, no un ingreso ni un ahorro.** La tarjeta lleva la marca «estimado» y la nota lo dice.
+- **Es parcial y lo declara.** Junto al valor van los clics valorados sobre el total del contenido. Lo que no tiene
+  precio queda sin valorar; no se extrapola al resto.
+- **Usa sólo precios ya capturados**, del mercado declarado en el SEO de la organización. El informe nunca compra
+  precios. La fecha que acompaña al valor es la del precio, no un costo histórico del mes; el mes anterior se compara
+  con esos mismos precios.
+- **Sin ningún precio no hay valor**, ni US$ 0: el informe lo deja en sus límites. Tampoco aparece si la organización no
+  declara mercado o no tiene Search Console conectado.
+- Un valor bajo puede deberse a precios bajos del rubro o a pocos precios capturados. En el blog de Berel de octubre fue
+  de cerca de US$ 85: costos por clic bajos en pintura en México y precios para una parte de las consultas.
+- Para cubrir un mes nuevo hay que capturar antes los precios de las consultas nuevas; hoy es un paso manual del equipo
+  ([manual](../../manual-de-uso/growth/valorar-trafico-organico.md)).
+
+No confundir con el **tráfico orgánico estimado** (de DataForSEO): es otra estimación, con otra base, y con alcance de
+contenido no aparece.
+
+### Visitas desde redes
+
+Google Analytics 4 suma las visitas que llegan desde redes sociales sin pago (canales Organic Social y Organic Video),
+contadas sobre el mismo contenido que las visitas orgánicas, y cuántas trae cada red. El informe lo dice como un
+hallazgo y lo deja en la tabla de Analytics, que pasa a llamarse «Visitas desde buscadores y redes». En Berel, octubre:
+915 visitas frente a 823 en septiembre (+11,2 %), 755 de ellas desde Facebook.
+
+**No es búsqueda.** No se presenta como «búsqueda social» ni se atribuye al trabajo de SEO.
+
+### Qué revisar antes de entregar
+
+- **Una URL que cambió de dirección se lee como la página que más cambió.** Si un artículo se mudó (por ejemplo, de la
+  raíz del sitio a `/articulos/`), la URL nueva aparece subiendo y la vieja cayendo a cero, aunque la página en sí haya
+  crecido mucho menos. En Berel, octubre: la guía de pintura para madera pasó de 25 a 310 clics en la URL nueva y de 229
+  a 0 en la vieja; juntas, de 254 a 310 (+22 %). El informe todavía no lo corrige: hay que mirar la página de
+  movimientos y explicarlo al entregar.
+- **Las notas de una cifra** citan la métrica de la que hablan y aparecen sólo en la página que tiene esa cifra.
+
+> Detalle técnico: [ISSUE-191](../../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md) ·
+> `src/lib/growth/seo/search-control/` · `src/lib/growth/seo/organic-traffic-value/read-for-window.ts` ·
+> `src/lib/efeonce-insights/adapters/seo-adapter.ts` · `src/lib/efeonce-insights/adapters/ga4-site-facts.ts`
 
 ## Qué ve cada persona
 

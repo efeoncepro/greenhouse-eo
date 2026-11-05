@@ -1,5 +1,10 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-11-05 · Las cifras de la guía que cambió de URL, con la base del control.** La lección del 2026-11-04 sobre
+  la migración de URL midió con la tabla (5 → 138, 82 → 0, combinada 87 → 138). Con el control de Search Console
+  (ISSUE-191) la URL nueva pasa de 25 a 310, la vieja de 229 a 0 y la guía combinada de 254 a 310 (+22 %). La regla no
+  cambia: mirar la página de movimientos antes de entregar; un par «sube desde casi 0 / cae a 0» con el mismo slug es
+  una migración. Al citar una cifra de una lección anterior a ISSUE-191, verificar con qué base se midió.
 - **2026-11-04 · ISSUE-191 · El capítulo SEO imprimía un subconjunto de los clics.** Síntoma: al valorizar el blog de
   Berel, el control de Search Console sin la dimensión consulta daba 4.094 clics en octubre y el informe 1.065 (sitio:
   32.790 vs 14.899). `seo_gsc_daily` guarda `query × page` y Google omite ahí las consultas anonimizadas. Corregido en

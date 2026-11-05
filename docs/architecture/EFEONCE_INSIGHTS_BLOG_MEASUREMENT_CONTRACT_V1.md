@@ -115,6 +115,16 @@ La policy de producción deberá definir suficiencia por métrica/uso. La misma 
 describir un total controlado y no bastar para un ranking de consultas o valoración CPC.
 [Limitaciones GSC](https://support.google.com/webmasters/answer/17011259?hl=en).
 
+> **Delta 2026-11-05 — el control sin query ya lo implementa Insights; el tablero SEO no.**
+> [ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md) confirmó con datos reales lo
+> que este apartado exigía: `seo_gsc_daily` guarda `query × page` y su suma es un subconjunto (blog de Berel, octubre
+> de 2026: 1.065 de 4.094 clics). El capítulo SEO de Insights toma ahora clics, impresiones, CTR, posición, serie y
+> páginas del reader dueño `readSeoSearchControlForWindow` (sin dimensión consulta, `byPage`, `final`, alcance como
+> expresión de página) y deja `query × page` como detalle; si el control falla declara el límite y no cae a la tabla
+> ([arquitectura §5.2](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md)). Estado: **code complete local, rollout pendiente**. El
+> tablero SEO y los demás readers de `seo_gsc_daily` siguen sumando el subconjunto. Esto no adopta el resto de este
+> contrato candidato (receipts, `dataAvailability`, policy de suficiencia), que sigue Proposed.
+
 ### AEO nativo
 
 Receipt exige perfil/método, run ID, corrida terminada, panel fingerprint, observaciones planificadas, exitosas

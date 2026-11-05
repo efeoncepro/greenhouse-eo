@@ -3,6 +3,7 @@
 > Status: **En ejecución, actualizado 2026-10-04.** Foundation/render/catálogos/editorial v2/shared web y criterio de figuras publicados; modelo web vigente **1.4** (release `36a73e7b7e19`). Generación, render, IA, editorial v2, sharing, emisión, correo y recurrencias ON en Vercel Production (readback 04/10). TASK-1957/1962 desplegadas, cierre pendiente; TASK-1975 espera revisión y promoción de fixes posteriores. Portal (TASK-1849), jerarquía cliente (TASK-1958), canales y expansión de evidencia siguen abiertos.
 > [Auditoría de cierre](../audits/insights/2026-10-04-epic-045-closure-review.md). Los deltas fechados de §14 conservan historia; no sustituyen este estado vigente.
 > Delta 2026-10-23 (§6.2.1): el catálogo A4 `insights-report` suma hallazgos, escenarios, `productLabel`, tendencia anotada, guarda del pie y `pnpm report:compose` para informes no-Insights (auditorías); en `develop` local.
+> Delta 2026-11-05 (§5.2, §14.13): el capítulo SEO toma sus totales del control de Search Console sin la dimensión consulta (ISSUE-191, adapter `seo_report_adapter_v2`), suma el valor publicitario estimado (`gsc_clicks_country_cpc_v1`, nunca compra CPC) y las visitas desde redes de GA4. **Code complete local, rollout pendiente** (sin push ni release).
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/in-progress/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
@@ -183,6 +184,60 @@ el informe deja de hablar del trabajo. El alcance de contenido resuelve eso sin 
 
 Contrato completo en la skill `efeonce-insights` (`references/contracts.md` § Alcance de contenido); estado y
 evidencia en su `program-ledger.md` § TASK-2033.
+
+### 5.2 Capítulo SEO: control de Search Console, valor estimado y visitas desde redes (Delta 2026-11-05 — code complete local, rollout pendiente)
+
+Este delta corrige de qué reader salen los totales del capítulo SEO. No cambia §5.1 salvo en un punto: el total de
+Search Console ya no lo recorta `readSeoOverviewKpisForWindow`, sino el control descrito abajo. Commits locales en
+`develop` `a01a043dc`, `4c2de9aca`, `b583cd93f` y `f45230b2e`; sin push ni release. Estado y pendientes en §14.13.
+
+**Por qué ([ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md)).**
+`seo_gsc_daily` guarda sólo filas `query × page`. Cuando se pide la dimensión consulta, Google omite las consultas
+anonimizadas y aplica límites de filas, así que todo total sumado desde esa tabla es un subconjunto. En el blog de
+Berel, octubre de 2026, la tabla suma 1.065 clics y Search Console reporta 4.094; la variación impresa era +33,3 % y la
+real es +15,6 %.
+
+**Totales: el control.** El reader dueño `readSeoSearchControlForWindow`
+(`src/lib/growth/seo/search-control/read-search-control.ts`, método `gsc_search_control_v1`) consulta Search Console
+en vivo con el reader autorizado de la organización y SIN la dimensión consulta: dimensiones `[]` (total), `['date']`
+(serie) y `['page']` (páginas, paginado), con `type=web`, `dataState=final` y `aggregationType=byPage`.
+- El alcance de contenido viaja como expresión de página de la API (`search-control/page-expression.ts`), con el mismo
+  veredicto que `isPathInContentScope`. El recorte lo hace Google; si vuelve una página fuera del alcance, el reader
+  falla con `page_outside_content_scope`.
+- Una propiedad de dominio (`sc-domain:x.com`) mide el dominio y sus subdominios; una de prefijo de URL, su host exacto.
+- CTR del período = clics / impresiones (nunca el promedio de CTR diarios).
+
+**Qué toma el adapter (`seo_report_adapter_v2`).** Del control: clics, impresiones, CTR, posición, bloques semanales,
+referencia del sitio completo (`site_total.*`, también del control sin recorte) y movimientos de páginas
+(`rankSearchControlPageMovers`). Del detalle `seo_gsc_daily` (`readSeoWindowMovers`): sólo los movimientos de
+consultas, con su cobertura declarada. La cascada de movimientos agrega el paso medido «Consultas que Google no
+muestra» para cuadrar con el total del capítulo. Los hechos llevan `source=gsc:<propiedad>` y
+`evidenceRef=gsc_control:<org>:<ventana>[:scope_vN]`.
+- **Fallo cerrado:** si el control falla, el capítulo declara el límite (`not_connected`, `module_disabled` o
+  `insufficient_data`) y NUNCA cae a la tabla materializada.
+- **Ediciones selladas no cambian:** el snapshot conserva el adapter y el método con que se selló.
+
+**Valor publicitario estimado.** El reader dueño `readOrganicTrafficValueForWindow`
+(`src/lib/growth/seo/organic-traffic-value/read-for-window.ts`) aplica el método `gsc_clicks_country_cpc_v1`
+([ADR](GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md)) sobre el mercado único del target SEO y el alcance de contenido,
+con CPC YA capturados (`readKeywordMarketData`). NUNCA compra. Hechos (sólo contrato editorial v2, con target y con el
+control respondiendo):
+- `organic_value_usd`: unidad `usd`, `observation=estimated`, numerador/denominador = clics valorados / total del control.
+- `organic_value.valued_clicks`: los clics valorados.
+- `freshness.asOf = cpcAsOf`: la fecha de captura del precio más reciente usado. Es valoración con precios a esa fecha,
+  no CPC histórico del mes.
+- Sin mercado en el target, sin conexión o sin ningún CPC con clics: límite, nunca US$ 0. No se extrapola a lo que no
+  tiene CPC. No se suma ni reemplaza al ETV del dominio, que conserva su método.
+
+**Visitas desde redes (GA4).** `src/lib/efeonce-insights/adapters/ga4-site-facts.ts` emite `site.social_sessions`
+(canales Organic Social + Organic Video sobre la misma población que las sesiones orgánicas; Paid Social fuera) y
+`social_source.<red>` (hasta tres partes; con más, las dos mayores y el resto sumado). Se dice como hallazgo y queda en
+la tabla GA4. NUNCA se presenta como «búsqueda social» ni se atribuye al SEO: GA4 no distingue búsqueda dentro de la red
+de visita desde el feed.
+
+**Runtime.** El control y el valor leen Search Console en vivo: el runtime que genera la edición necesita
+`GROWTH_SEARCH_CONSOLE_ENABLED=true`, `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` y
+`GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF`.
 
 ## 6. Plan editorial, gráficos y salidas
 
@@ -1613,6 +1668,45 @@ Ningún flag nuevo: el render ya estaba encendido. Las ediciones internas de Ber
 el coral queda sólo para una oportunidad declarada (`figure-donut.ts`, `figure-waffle.ts`). Glifos Trazo e isotipos en
 cifras, filas, leyendas y aperturas, tableros por motor y por asistente: criterio §11 y §15 «Isotipo de canal en la
 tarjeta» (TASK-1990/TASK-1996).
+
+### 14.13 Estado — capítulo SEO con el control de Search Console, valor estimado y visitas desde redes (Delta 2026-11-05: code complete local, rollout pendiente)
+
+Contrato en §5.2. Origen: el informe de Berel de octubre de 2026 (alcance «blog») y
+[ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md), que sigue abierto.
+
+**Qué existe (commits locales en `develop`, sin push).**
+
+| Commit | Qué agrega |
+| --- | --- |
+| `a01a043dc` | Collector del valor orgánico con propiedades `sc-domain:` y alcance de contenido; CLI `scripts/seo/organic-traffic-value.ts` con `--markets`, `--brand` y `--content-scope`; ISSUE-191 abierto |
+| `4c2de9aca` | Reader `readSeoSearchControlForWindow` + `page-expression.ts`; adapter `seo_report_adapter_v2` con totales, serie, referencia y páginas del control; paso «Consultas que Google no muestra» en la cascada |
+| `b583cd93f` | Reader `readOrganicTrafficValueForWindow`; hechos `organic_value_usd` y `organic_value.valued_clicks`; `site.social_sessions` y `social_source.*` en GA4; notas de cifra que citan su métrica y se pintan sólo en la página que la tiene; etiquetas de fuente más cortas |
+| `f45230b2e` | `uniquePageLabels` acorta la base de una etiqueta de página gemela para que el sufijo « ·2» quepa en el slot de 40 caracteres del deck (antes llegaba a 43 y el deck fallaba cerrado); `scripts/insights/preview-edition.ts` acepta `--modules=seo` (subconjunto del encargo, nunca agrega módulos) y `--title="…"` (sólo el PDF local) |
+
+**Verificado.** Vista previa local de Berel, octubre de 2026, sólo blog: A4 de 18 páginas y deck de 14 láminas con 0
+violaciones; clics del blog 3.540 → 4.094 (+15,6 %) contra 799 → 1.065 que habría impreso la tabla; visitas desde redes
+915 contra 823 (+11,2 %). Valor estimado del blog en octubre: cerca de US$ 85, bajo porque los CPC de pintura en México
+son bajos y la cobertura de CPC es parcial (230 de 508 consultas con CPC, tras una compra única autorizada por el
+operador). El entregable se generó con la vista previa local, no por el flujo de producción (crear → render en
+`artifact-worker` → emitir → compartir o enviar).
+
+**Pendiente.**
+- Push, staging y release; ninguna de estas piezas corre en Vercel ni en el `ops-worker`. El runtime que genere la
+  edición debe tener las tres variables de Search Console de §5.2.
+- El tablero SEO y los demás readers de `seo_gsc_daily` siguen sumando el subconjunto (ISSUE-191).
+- Capturar CPC de las consultas nuevas de cada mes es manual: la CLI del valor orgánico más una compra
+  `pnpm dataforseo -- run …keyword_overview/live` con organización, `--consumer seo` y techo, persistida con
+  `parseKeywordOverviewItem` + `persistKeywordMarketData` (filas NULL para lo que el proveedor no tiene). El scheduler
+  mensual `ops-seo-keyword-market-data` sólo cubre keywords seguidas.
+- Una URL que migró aparece como «la página que más cambió» (la URL nueva sube y la vieja cae a cero). No hay
+  corrección en código: antes de entregar, revisar la página de movimientos y leer las dos URL juntas.
+
+**Invariantes para agentes.**
+- **NUNCA** presentar en un informe un total de clics, impresiones, CTR o posición leído de `seo_gsc_daily`: es
+  detalle `query × page`. El total es el control sin la dimensión consulta; si el control falla, límite, nunca la tabla.
+- **NUNCA** comprar CPC desde Insights: el reader del valor sólo usa precios ya capturados. Sin CPC no hay valor
+  (límite), jamás US$ 0, y `cpcAsOf` no se presenta como CPC histórico del mes.
+- **NUNCA** presentar `site.social_sessions` como búsqueda social ni atribuirlo al SEO.
 
 
 ## 15. Contrato de contenido del informe (TASK-1962)
