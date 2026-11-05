@@ -19,6 +19,8 @@ story. Entregables locales en `ai-generations/`, sin publicar; datos y derechos 
 [manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) y [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
 Segunda ronda: logo BLACK con la fecha nueva en todas las piezas, grilla por mercado (12 mensajes con popup, GIF y
 story en video), 13 rutas foco de Perú, formatos Chile «KV listo» y HPH por mercado con sus banderas.
+El 2026-11-05 los 321 entregables se entregaron en OneDrive, en la carpeta nueva «ENTREGABLES BLACK (Efeonce
+2026-11-05)» junto al kit, verificados contra el original; el kit no se modificó.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

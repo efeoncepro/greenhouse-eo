@@ -21,7 +21,10 @@ genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos (con la lista de
 resplandor) y todo rehecho desde `src2/`; 12 mensajes de la grilla por mercado con KV, popup, GIF y story video (12 MP4
 de 15,7 s); 13 rutas foco de Perú con popup y story; Chile «KV listo» (TikTok 3, DAT 2, PMAX 4) desde los editables. Entregables locales no versionados en
 `ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; sus
-scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. OneDrive no se modificó.
+scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. El kit en OneDrive no se
+modificó; el 2026-11-05 la entrega (sin `scripts/`) se copió a la carpeta nueva
+`Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/`: 321 archivos (626 MB) verificados
+byte a byte. Mapeo en [sky-design-canvas.md](sky-design-canvas.md#entregables-y-scripts-locales).
 
 Pendientes sin confirmar por el operador:
 
@@ -29,6 +32,8 @@ Pendientes sin confirmar por el operador:
   fotos (propuesta), «Encuentra destinos» de Chile hecho con el clúster internacional (el pedido decía «clúster inter
   de Perú»), frases INTER del brandlift y sus traducciones AR/PT/EN, ubicación de la foto en las rutas (placeholder),
   tapa vertical en español (recortada de la horizontal).
+- Entrega en OneDrive: confirmar que la sincronización terminó (la copia local no prueba que ya
+  esté en la nube).
 
 - CyberSky: «S/» (el KV dice «$/»), separador de miles con coma (1,043), origen Lima y la
   contradicción del legal (tramo Lima–X vs X–Lima); elementos sólo del KV de Cusco omitidos en

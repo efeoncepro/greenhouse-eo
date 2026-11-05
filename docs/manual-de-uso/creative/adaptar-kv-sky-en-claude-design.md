@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-04 por Claude (segunda ronda de Daniela: logo, grilla por mercado, rutas, Chile KV listo y story video)
+> **Ultima actualizacion:** 2026-11-05 por Claude (entrega de los entregables BLACK en una carpeta nueva de OneDrive)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -40,7 +40,8 @@ PNG) se renderizan en local con las mismas plantillas.
    en el DS no aparece solo en el canvas.
 3. **El kit del cliente** está en OneDrive, en la carpeta compartida «Sky - Efeonce - General», bajo
    «SKY Campañas/2026/10_Noviembre/Despliegue Base». Ahí están el archivo de Illustrator del KV, los SVG por mercado,
-   banderas, logos, badges, las referencias de animación y el audio. **Esa carpeta se lee; nunca se modifica.**
+   banderas, logos, badges, las referencias de animación y el audio. **Esa carpeta se lee; nunca se modifica.** La
+   entrega final va en una carpeta nueva junto al kit (paso 10).
 4. **La fuente Metric Medium no está en el Design System**, pero las piezas la usan. Para los renders locales se toma
    de OneDrive, en «SKY Campañas/00_Assets/00_Brand-Assets/2. Tipografias/Metric_family/». Los SVG del kit no traen
    fuente de respaldo: sin Metric instalada, el render sale con otra letra.
@@ -168,6 +169,71 @@ resplandor), se corrige **una vez en las fuentes** y se rehace todo desde ahí:
 Los entregables quedan en `ai-generations/` (por ejemplo, `ai-generations/2026-11-04_sky-black-gif/`) y no se
 versionan en el repo.
 
+### 10. Entregar en OneDrive
+
+Cuando el operador lo pide, los entregables locales se copian al kit compartido en una **carpeta nueva**, sin tocar
+nada de lo que ya existe:
+
+1. **Crea una carpeta nueva con fecha y autoría** dentro de `Despliegue Base`. En el caso fuente (2026-11-05):
+   `ENTREGABLES BLACK (Efeonce 2026-11-05)/`.
+2. **Comprueba que no exista** antes de copiar. Si ya existe, detente y pregunta: nunca escribas sobre una entrega
+   anterior.
+3. **Copia sin `--delete`** y nunca sobre las carpetas del kit (`FORMATO GIF`, `KV X HM`, `FORMATO HPH`, etc.).
+   Excluye `scripts/` y `.DS_Store`.
+4. **Verifica byte a byte**: `diff -rq` por carpeta y `cmp` por archivo. Todo debe dar idéntico.
+5. **Espera la sincronización.** La copia queda en disco al instante, pero OneDrive la sube a la nube después; avisa al
+   operador cuando termine de subir.
+
+Mapeo usado en BLACK (321 archivos, 626 MB):
+
+| Carpeta local | Carpeta en OneDrive | Archivos |
+|---|---|---|
+| raíz (archivos sueltos) | `GIF Y VIDEO KV` | 72 (GIF, MP4 y MP4 con audio de los 24 KV) |
+| `kv/` | `KV ESTATICOS` | 37 |
+| `estaticos/` | `POPUP Y STORY` | 48 |
+| `rutas-peru/` | `RUTAS FOCO PERU` | 26 (13 rutas con popup y story) |
+| `chile-kv-listo/` | `CHILE KV LISTO` | 18 (TikTok ×3, DAT ×2, PMAX ×4, en 1x y 2x) |
+| `story-video/` | `STORY VIDEO 5 SLIDES` | 12 videos de 15,7 s |
+| `pmax/` | `PMAX` | 60 |
+| `hph/` | `HPH` | 48 |
+
+```bash
+SRC="ai-generations/2026-11-04_sky-black-gif"
+BASE="$HOME/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2026/10_Noviembre/Despliegue Base"
+DEST="$BASE/ENTREGABLES BLACK (Efeonce 2026-11-05)"
+
+# 1. La carpeta no debe existir
+[ -e "$DEST" ] && { echo "ABORT: $DEST ya existe"; exit 1; }
+mkdir "$DEST"
+
+# 2. Archivos sueltos de la raíz (sin subcarpetas)
+mkdir "$DEST/GIF Y VIDEO KV"
+rsync -a --exclude='*/' --exclude='.DS_Store' "$SRC/" "$DEST/GIF Y VIDEO KV/"
+
+# 3. Subcarpetas: local -> OneDrive (sin --delete, sin scripts/)
+while IFS='|' read -r local remote; do
+  rsync -a --exclude='.DS_Store' "$SRC/$local/" "$DEST/$remote/"
+  diff -rq -x '.DS_Store' "$SRC/$local" "$DEST/$remote" && echo "OK $remote"
+done <<'EOF'
+kv|KV ESTATICOS
+estaticos|POPUP Y STORY
+rutas-peru|RUTAS FOCO PERU
+chile-kv-listo|CHILE KV LISTO
+story-video|STORY VIDEO 5 SLIDES
+pmax|PMAX
+hph|HPH
+EOF
+
+# 4. Raíz: cmp archivo por archivo
+for f in "$SRC"/*; do
+  [ -f "$f" ] && [ "$(basename "$f")" != ".DS_Store" ] || continue
+  cmp -s "$f" "$DEST/GIF Y VIDEO KV/$(basename "$f")" || echo "DIFIERE: $f"
+done
+```
+
+`diff -rq` sin salida y ningún «DIFIERE» significan que la entrega es idéntica a lo local. En BLACK todo dio idéntico
+y el kit original no se tocó.
+
 ## Qué significan las páginas del canvas
 
 | Página | Qué contiene |
@@ -185,7 +251,9 @@ versionan en el repo.
 
 ## Qué no hacer
 
-- **No modificar el kit en OneDrive.** Se lee; los arreglos van en el render o se reportan para la fuente.
+- **No modificar el kit en OneDrive.** Se lee; los arreglos van en el render o se reportan para la fuente. Esto no
+  impide entregar: la entrega va en una **carpeta nueva** dentro de `Despliegue Base` (paso 10), nunca dentro de una
+  carpeta del kit, sin `--delete` y sin reemplazar archivos existentes.
 - **No gastar en IA sin autorización** explícita del operador, ni con una clave distinta de la que él indique.
 - **No pautar con datos sin confirmar.** Moneda, separadores, origen, tramo del legal y derechos de fotos y medallas
   los confirma el operador o el cliente.
@@ -222,3 +290,5 @@ versionan en el repo.
 - [Adaptaciones SKY en Claude Design (funcional)](../../documentation/creative/adaptaciones-sky-en-claude-design.md).
 - Taller local del caso fuente: `ai-generations/2026-11-04_sky-black-gif/` (GIF, MP4, estáticos y scripts) y
   `ai-generations/2026-11-04_sky-cybersky-peru/` (fotos, grado de color y scripts).
+- Entrega del caso fuente en OneDrive: «Sky - Efeonce - General/SKY Campañas/2026/10_Noviembre/Despliegue
+  Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/» (321 archivos, 626 MB, verificada byte a byte el 2026-11-05).

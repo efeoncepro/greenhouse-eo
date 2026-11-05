@@ -73,6 +73,7 @@ nunca en el archivo del cliente.
 | Un render en paralelo falla o mezcla cuadros | Los dos procesos escribían el mismo HTML temporal | Un temporal por archivo; ante la duda, rehacer todo en secuencia |
 | Las imágenes del chat de Teams no se pueden leer | La API de Teams entrega el texto pero no las imágenes alojadas (403 también con token de az) | Abrir Teams web en el navegador integrado (sesión del operador) y leerlas en el visor |
 | Falta la tapa de cierre vertical en español | El kit sólo trae la horizontal en ES (PT y EN sí traen vertical) | Recortar el centro de la horizontal sobre blanco y avisar para pedir la vertical a la fuente |
+| «No modificar el kit en OneDrive» se lee como no escribir en OneDrive | La regla protege las carpetas del kit (`FORMATO GIF`, `KV X HM`, etc.), no prohíbe entregar ahí (caso 2026-11-05: 321 archivos) | Entregar en una carpeta nueva, fechada y con autoría dentro de `Despliegue Base`; verificar antes que no exista, copiar sin `--delete` y comparar byte a byte. Sin scripts de trabajo. La copia local no prueba que OneDrive ya subió |
 
 ## Propuestas rechazadas o retiradas
 

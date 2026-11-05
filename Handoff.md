@@ -24,6 +24,10 @@ y todo rehecho en cascada (KV, partes, popup/story, GIF, PMAX, HPH). Nuevas pág
 editables). HPH por mercado con la lista de banderas del mercado. **Por confirmar:** BR «Voe para Peru» (alianza o KV),
 «Vuela por Perú» sin fotos, «Encuentra destinos» CL hecho con el clúster internacional, frases INTER del brandlift y
 traducciones, tapa vertical ES recortada de la horizontal (falta en el kit).
+**Entrega en OneDrive (2026-11-05):** los 321 entregables (sin `scripts/`) quedaron en una carpeta nueva,
+`Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/` (GIF Y VIDEO KV, KV ESTATICOS, POPUP Y STORY, RUTAS FOCO
+PERU, CHILE KV LISTO, STORY VIDEO 5 SLIDES, PMAX, HPH; 626 MB), verificados byte a byte con `diff -rq`/`cmp`. El kit
+no se tocó; la subida a la nube depende de la sincronización de OneDrive.
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-04 por Claude (segunda ronda de Daniela)
+> **Ultima actualizacion:** 2026-11-05 por Claude (entrega de las piezas BLACK en una carpeta nueva junto al kit)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
 > **Manual de uso:** [Adaptar un KV de SKY en Claude Design](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md)
 > **Documentacion relacionada:** [Creative Workbench — Design System Lab](./creative-workbench-lab.md)
@@ -34,6 +34,8 @@ posteriores.
   MP4, PNG) se renderizan en local con las mismas plantillas.
 - **No publica nada.** Los dos artifacts son privados del operador; pautar o publicar es una decisión aparte.
 - **No reemplaza el kit del cliente.** Los archivos de SKY en OneDrive son la fuente; se leen y nunca se modifican.
+  Las piezas terminadas se entregan aparte, en una carpeta nueva junto al kit (ver
+  [Entrega en OneDrive](#entrega-en-onedrive)).
 
 ## Adaptación por destino
 
@@ -80,6 +82,29 @@ editar, logos de alianza y URL ausentes, y archivos con marcas de imagen generad
 antes de pautar.
 
 > Detalle técnico: [manual, paso 3](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#3-leer-un-kit-despliegue-base)
+
+### Entrega en OneDrive
+
+Las piezas finales de BLACK se entregaron el 2026-11-05, a pedido del operador, en una **carpeta nueva** dentro de
+«Despliegue Base», al lado del kit: «ENTREGABLES BLACK (Efeonce 2026-11-05)». El nombre lleva la fecha y quién
+entrega, para no confundirla con los archivos de SKY.
+
+| Carpeta | Qué trae | Archivos |
+|---|---|---|
+| GIF Y VIDEO KV | GIF, MP4 y MP4 con audio de los 24 KV | 72 |
+| KV ESTATICOS | Los KV como imagen fija | 37 |
+| POPUP Y STORY | Popup y story estáticos | 48 |
+| RUTAS FOCO PERU | 13 rutas con popup y story | 26 |
+| CHILE KV LISTO | TikTok (3), DAT (2) y PMAX (4), en tamaño normal y doble | 18 |
+| STORY VIDEO 5 SLIDES | Videos de story de 15,7 s | 12 |
+| PMAX | Paquete PMAX | 60 |
+| HPH | Paquete HPH | 48 |
+
+En total son 321 archivos (626 MB). Antes de copiar se comprobó que la carpeta no existía; se copió sin borrar nada y
+sin incluir los scripts de trabajo, y después se comparó cada archivo con el original: todo quedó idéntico. **El kit
+de SKY quedó intacto.** OneDrive sube la carpeta a la nube después de la copia; hasta que termine, los demás no la ven completa.
+
+> Detalle técnico: [manual, paso 10](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#10-entregar-en-onedrive)
 
 ## Descomposición de un KV
 
@@ -165,7 +190,8 @@ hilo.
 
 ## Reglas que se cumplen siempre
 
-- El kit del cliente en OneDrive se lee y no se modifica.
+- El kit del cliente en OneDrive se lee y no se modifica. Las entregas van en una carpeta nueva junto al kit, con
+  fecha y autoría, sin borrar ni reemplazar nada de lo que ya existe.
 - La IA sólo se usa con autorización explícita del operador y con la clave que él indique.
 - Nada se publica fuera de los artifacts privados del operador.
 - Los datos dudosos (moneda, separador de miles, origen, sentido del tramo, derechos de imagen) los confirma el

@@ -15,7 +15,9 @@ sigue en Creative Workbench ([SKILL.md](../SKILL.md), invariantes; [sky-producti
 
 - Un artboard aprobado en el canvas no es una corrida de Workbench ni hereda sus sellos.
 - No modificar las fuentes del cliente: el kit en OneDrive se lee y todos los parches se aplican
-  en memoria o en archivos locales de la sesión (ver «Correcciones sobre el render»).
+  en memoria o en archivos locales de la sesión (ver «Correcciones sobre el render»). Las entregas
+  van a una carpeta nueva, fechada y con autoría, dentro de `Despliegue Base`; nunca sobre las
+  carpetas del kit (ver «Entregables y scripts locales»).
 - No publicar fuera de los artifacts privados del operador. Gasto de IA sólo con autorización
   explícita y con la clave indicada por el operador.
 
@@ -371,6 +373,25 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 | --- | --- |
 | `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; `scripts/` (incluye `logofix`, `banderas`, `variantes`, `rutas`, `chile-refs`, `story-video`, `render-gif.sh`) |
 | `ai-generations/2026-11-04_sky-cybersky-peru/` | Selfies generadas, grado de color y scripts |
+
+**Entrega en OneDrive (2026-11-05, a pedido del operador).** Los entregables de
+`2026-11-04_sky-black-gif/`, sin `scripts/` ni `.DS_Store`, se copiaron a una carpeta nueva:
+`Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/` (misma ruta base que el kit).
+
+| Local | OneDrive | Archivos |
+| --- | --- | --- |
+| Raíz (GIF, MP4, `*_audio.mp4`) | `GIF Y VIDEO KV` | 72 |
+| `kv/` | `KV ESTATICOS` | 37 |
+| `estaticos/` | `POPUP Y STORY` | 48 |
+| `rutas-peru/` | `RUTAS FOCO PERU` | 26 |
+| `chile-kv-listo/` | `CHILE KV LISTO` | 18 |
+| `story-video/` | `STORY VIDEO 5 SLIDES` | 12 |
+| `pmax/` | `PMAX` | 60 |
+| `hph/` | `HPH` | 48 |
+
+Total 321 archivos, 626 MB. Antes de copiar se comprobó que la carpeta no existía; verificación
+con `diff -rq` por carpeta y `cmp` por archivo de la raíz: todo idéntico. El kit no se modificó.
+La copia local no prueba que OneDrive ya la haya subido a la nube.
 
 Los scripts (`patches.cjs`, `parts.cjs`, `grado.cjs` y los de render/animación) tienen rutas
 fijas del scratchpad de la sesión original. **Adaptarlas** a la ubicación nueva antes de
