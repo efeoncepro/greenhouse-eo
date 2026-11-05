@@ -2,7 +2,8 @@
 name: sky-blog-seo
 description: >-
   Operar el servicio SEO del Blog SKY: recuperación tras la migración, análisis GA4/GSC,
-  prioridades editoriales y valor publicitario estimado por consulta y país. Usar para
+  prioridades editoriales, lotes editoriales (research SEO/AEO, redacción en Notion, ficha SEO,
+  callouts, specs y handoff) y valor publicitario estimado por consulta y país. Usar para
   trabajo de esta cuenta; artículos e imágenes conservan su playbook vivo de Notion.
 ---
 
@@ -43,6 +44,11 @@ Al 01-11: SKY restauró los nueve artículos de Perú y entregó
 administrador de WordPress; deck del kickoff del 02-11 armado. Deck, equipo, sistema visual y las siete decisiones
 pedidas: [insumos del kickoff §7](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/KICKOFF_2026-11-02_INSUMOS.md).
 
+Al 05-11: los 54 artículos activos del Content Hub tienen research SEO/AEO y una versión redactada en POV
+«El Viajero» al final de su página de Notion, con ficha SEO, callouts de imagen y banner, y specs para
+producción. Nada se publicó ni está aprobado por SKY. Estado, bloqueos y decisiones pendientes:
+[lote de noviembre](../../../docs/services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md).
+
 ## Elegir el trabajo
 
 **Auditoría/recovery.** Cargar `seo-aeo` y sus módulos técnicos/de migraciones pertinentes. Reconstruir
@@ -75,6 +81,12 @@ quedó reordenado el 23-10 (ver su Delta): primero palancas de todo el sitio y c
 del 15-11; la URL larga de cambio de vuelo va con 301 a `/cambiar-vuelo-sky/`; Trujillo, Destinos de verano
 y SKY Plus bajan como recuperación. Backlog de 30 piezas: `outputs/sky-blog-seo-audit-2026-10-23/SKY-backlog-editorial-nov-ene.csv`.
 No declarar equivalencia por slug parecido o HTTP 200; revisar intención, vigencia y destino del CTA antes de proponer 301.
+
+**Lote editorial (research → redacción → specs → handoff).** Cargar
+[`references/lote-editorial.md`](references/lote-editorial.md) antes de investigar o redactar más de un
+artículo: inventario, research con DataForSEO (no Semrush a ese volumen), pauta + piloto, redacción por lotes
+con ficha SEO y callouts, rutas sólo de «Precios y Rutas SKY» 🟢 del mercado del lector, specs literales y
+paquete de handoff. Fija el orden y las trampas; la voz sigue siendo del Playbook.
 
 **Producción.** Cargar el [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e)
 y sólo sus normas enlazadas que hagan falta. No copiar voz, formatos visuales ni catálogo de rutas a esta skill.
@@ -127,6 +139,20 @@ y `pnpm report:compose <plan.json> --out <dir> --asset org-logo:sky=ai-generatio
   `ai-generations/2026-09-23_cmp003-sky-hangar/refs/sky-official.svg`. No usar el de la organización.
 - El canal OneDrive «Sky - Efeonce - General» está compartido con SKY: no dejar borradores ahí. Lo interno va
   a «1. Clientes (Interno) › Sky - SEO-AEO»; al canal compartido sólo después del envío.
+
+## Lecciones del lote editorial (05-11-2026)
+
+- Research de lote con DataForSEO: Semrush agotaría la cuota (Julio). `serp-compare` admite 20 queries por
+  panel y `research` 20 seeds por corrida; costo del lote de 54, USD 1,61.
+- El SERP orgánico de DataForSEO llega en parte envuelto (`google.com/goto`): `serp-compare` puede dar a SKY
+  por ausente. Recalcular la posición desde `breadcrumb`/`website_name`.
+- Ocho fichas «Nuevo» ya tenían URL publicada. Se decidió caso a caso (reescribir sobre la URL, 301 propuesto
+  o URL por decidir) y la propiedad `Trabajo SEO` no se cambió sin aprobación de Julio. Buscar la URL
+  existente del tema antes de proponer un slug nuevo.
+- Lotes en paralelo sobrescribieron el generador común de specs: un generador por lote y validación de todas
+  las specs contra los borradores al cierre.
+- Pilotear un artículo y ajustar la pauta antes de repartir; el piloto (Zorritos) fijó el formato de ficha,
+  JSON-LD y callouts que replicaron los nueve lotes.
 
 ## Cierre de cada encargo
 

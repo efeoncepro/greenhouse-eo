@@ -235,6 +235,7 @@ La diferencia con otras capas de documentacion:
 
 ### Growth
 
+- [Correr un lote editorial del Blog SKY](growth/correr-lote-editorial-blog-sky.md) — de la investigación al paquete de producción: inventario del Content Hub, research SEO/AEO con DataForSEO (no Semrush a ese volumen), piloto, redacción por lotes en POV «El Viajero» con ficha SEO y metadatos, callouts de imagen y banner con rutas sólo de «Precios y Rutas SKY», specs literales y handoff. No publica. Caso fuente: 54 artículos, 2026-11-05.
 - [Preparar medición LinkedIn Ads](growth/preparar-medicion-linkedin.md) — inventario de cuenta/Partner ID, reglas/campañas, consentimiento, rutas web/servidor y validación previa; sin instalación.
 - [Normalizar origen/canales de adquisición](hubspot/normalizar-origen-canales-adquisicion.md) — inventario, consumidores, campos candidatos y preservación histórica antes de writes.
 - [Activar/verificar conversiones Google Ads](growth/activar-conversiones-google-ads.md) — políticas comerciales, consentimiento, recibos, Web/Server y evidencia de recepción/atribución.

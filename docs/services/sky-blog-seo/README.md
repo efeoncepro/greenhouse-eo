@@ -9,6 +9,12 @@ entregó administrador de WordPress; deck del kickoff armado (ver el [caso](caso
 El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
 y sus cifras salen sólo de [HECHOS.md](caso-auditoria-2026-10/HECHOS.md).
 
+Estado al 05-11-2026: los 54 artículos activos del Content Hub tienen research SEO/AEO y una versión redactada
+en POV «El Viajero» al final de su página de Notion, con ficha SEO y metadatos, callouts de imagen y de banner de
+ruta, y specs para producción (44 banners listos, 10 bloqueados por ruta no catalogada o por política de la nota).
+Está pendiente de revisión de Valentina y de aprobación de SKY; **nada se publicó**. Flujo, bloqueos y decisiones:
+[lote editorial de noviembre](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md).
+
 ## Resultado y alcance
 
 La [matriz de cobertura y pendientes](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md) distingue el
@@ -40,7 +46,7 @@ un plazo ni una cifra de recuperación. Noviembre–enero es una ventana de trab
 | Auditoría inicial | Inventario, evidencia de la migración, problemas comprobados, hipótesis por validar y backlog priorizado con responsables/dependencias. |
 | Recuperación técnica | Recomendaciones y validación de redirecciones, indexabilidad, canonicals, robots, sitemaps, enlaces y páginas perdidas. Cada cambio necesita owner técnico y comprobación posterior. |
 | Planeación editorial | Propuesta de títulos, intención, breve sinopsis, ruta/mercado y acción nueva/refresh/consolidación. SKY aprueba antes de producir. |
-| Contenido | Brief y optimización de artículos aprobados, conforme al playbook editorial vivo. Publicación progresiva y comprobación de URL final. |
+| Contenido | Brief y optimización de artículos aprobados, conforme al playbook editorial vivo. Publicación progresiva y comprobación de URL final. Un lote sigue el [flujo editorial](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md): research → redacción → ficha SEO → callouts → specs → handoff. |
 | Medición | GA4 y GSC por blog, país y página; consultas de marca/sin marca; prioridades y evolución mensual. Valor publicitario estimado con cobertura explícita. |
 | Continuidad | Registro de decisiones, seguimiento de acciones y reporte que conecte problemas, ejecución y resultados observados. |
 
@@ -77,6 +83,7 @@ El informe A4 (23 páginas) se regenera con `pnpm exec tsx scripts/seo/sky-blog-
 | [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e) | Producción de artículos y handoff; enlaza las normas de voz, imagen y rutas vigentes. |
 | «SKY Blog · Sistema visual de imágenes» (Daniela Ferreira, 18 láminas, enviado el 30-10 por Teams) | Criterio fotográfico del blog. SharePoint Sky-Efeonce: `Documentos compartidos/General/SKY Blog SEO/01 Onboarding/SKY_Blog_Sistema_Visual.pdf` (sincronizado en OneDrive «Sky - Efeonce - General/SKY Blog SEO/01 Onboarding/»). Dirección por validar con el equipo; su aprobación se pidió a Marca SKY en el kickoff. |
 | Notion del cliente / Content Hub | Inventario editorial, responsables, aprobaciones, calendario y estado operativo. |
+| [Precios y Rutas SKY](https://app.notion.com/p/c6bcd3d717794691b706befbc25c4b74) | Única fuente de rutas enlazables y de banners: sólo filas 🟢 Activas del mercado del lector, con URL limpia. Sin fila, el banner queda bloqueado y se escala a Paid / Ad Ops. |
 | WordPress | Contenido y configuración efectiva; publicar se confirma abriendo la URL final. |
 | GA4 / GSC conectados a SKY | Desempeño propio. Cada fuente conserva su métrica y calendario. |
 | DataForSEO | CPC y visibilidad estimados, con mercado, fecha y metodología. |
@@ -210,7 +217,10 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 - [Discovery de medición del blog, 27-10](../../audits/insights/2026-10-27-sky-blog-discovery/README.md): host URL,
   GA4/GSC, histórico y proyección de citas AEO; las visitas IA en GA4 no sustituyen corridas del motor. BQ vacío
   para SKY en el rango consultado y PG sólo 11–25 de octubre al corte. Los dos dossiers conservan el diagnóstico inicial.
-- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude.
+- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude; método de lote en
+  [`references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md).
+- [Lote editorial de noviembre 2026](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md) y su
+  [manual paso a paso](../../manual-de-uso/growth/correr-lote-editorial-blog-sky.md).
 - [Manual del indicador](../../manual-de-uso/growth/valorar-trafico-organico.md).
 - [Funcionamiento del indicador](../../documentation/growth/valor-publicitario-organico.md).
 - [Decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md).
