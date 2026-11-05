@@ -28,14 +28,22 @@ Guardar evidencia y un estado independiente por canal para poder continuar sin r
    obtener la confirmación específica de créditos si la exige y no volver a pedir una ya otorgada para
    el mismo lote/operación. No inferir email, usar buzón genérico como individual ni tratar un correo
    personal como corporativo. Sin evidencia suficiente, continuar LinkedIn y dejar el alta/email pendientes.
+   Si una licitación privada pide las bases a un buzón general oficial, verificado en el sitio de la empresa,
+   ese buzón es el canal del proceso: reutilizar su Contact y no crear el del autor sin correo individual
+   verificado. Caso KSB Chile, 05/11/2026 (Deal 67622242568, EMAIL 120622408328).
 4. **Registrar en HubSpot.** Aplicar [handoff CRM](crm-and-commercial-handoff.md) y diccionario vigente.
    Verificar portal/identidad; deduplicar por email y entidad; reutilizar o crear Company con país e
    industria, y completar campos conocidos pertinentes. Leer de vuelta Contact, Company y Primary tras
    automatizaciones. Alta de contacto no crea Lead, Deal, suscripción ni secuencia por defecto.
+   Si la Company existente es la matriz global de otro país, crear la filial local con país e industria y
+   asociarla como hija («Parent Company») sin tocar la matriz. KSB Chile 60766270868 → 53965760378, 05/11/2026.
 5. **Elegir material.** Usar la landing específica de la necesidad, contrastada en vivo, y el brochure
    original aprobado correspondiente. Buscar el documento existente en HubSpot; generar enlace para
    esta persona cuando corresponda. No reutilizar tracking ajeno, URL de administración ni PDF derivado.
    No reabrir aprobación del brochure. La landing explica la oferta; el brochure permite evaluarla.
+   Enlace por persona: Documents → original → «Crear enlace» → su correo, con «Se requiere una dirección de
+   correo» y «Permitir descarga» activas → hubs.ly; comprobar que redirige a hubspotdocuments.com (200) y
+   cerrar la pestaña. Buscarlo antes de detenerse: Julio lo reclamó en el caso KSB, 05/11/2026.
    Si el formulario nativo exige email y sólo LinkedIn está autorizado, pedir allí el correo laboral y
    reservar el enlace; nunca introducir un correo ficticio o personal descartado para desbloquearlo.
 6. **Redactar por canal.** Cargar [conversaciones útiles](conversation-quality-and-review.md) y
@@ -44,6 +52,8 @@ Guardar evidencia y un estado independiente por canal para poder continuar sin r
    Mostrar comprensión de lo que pide, sin elogios vacíos ni un catálogo genérico. Adaptar el InMail
    al espacio del canal; el email desarrolla el argumento. Cada uno debe entenderse por sí solo.
    No inventar casos, certificaciones, rangos de inversión, SLAs, disponibilidad ni anunciantes listos.
+   Mostrar en el chat el texto completo de cada correo o InMail, listo para copiar, además de guardarlo en el
+   expediente; nunca sólo la ruta o un resumen. Julio, 05/11/2026: «¿Pero dónde está el correo?».
 7. **Ejecutar el mandato.** «Investiga, crea los contactos y contáctalos por LinkedIn y mail» autoriza
    esas acciones para los objetivos indicados; no pedir otra aprobación genérica al cambiar de fase.
    Verificar historial, saldo/costo InMail y destinatario antes de enviar. Si hay conversación directa
@@ -55,6 +65,7 @@ Guardar evidencia y un estado independiente por canal para poder continuar sin r
 8. **Verificar y entregar.** Leer el mensaje en la conversación de LinkedIn, la copia de Enviados y la
    actividad EMAIL CRM por separado. Un clic en Enviar no prueba entrega ni lectura. Registrar texto,
    destinatario, enlaces, fecha/zona, IDs, evidencia, incertidumbres y siguiente paso en expediente privado.
+   Si Julio envía por su cuenta, confirmarlo leyendo la actividad EMAIL SENT en HubSpot (KSB, 05/11/2026).
    Si un canal falla, no detener los otros autorizados ni declarar completado el pendiente. Antes de
    reintentar una acción incierta, buscar su resultado para evitar duplicados. Si la composición comenzó
    en un buzón compartido, comprobar también sus Enviados: la ubicación de la copia no acredita el remitente.

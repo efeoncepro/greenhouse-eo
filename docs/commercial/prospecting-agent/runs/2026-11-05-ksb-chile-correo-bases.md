@@ -1,6 +1,10 @@
-# KSB Chile — correo de solicitud de bases (borrador, 05/11/2026)
+# KSB Chile — correo de solicitud de bases (enviado, 05/11/2026)
 
-Estado: **borrador, sin enviar**. Enlace nativo HubSpot creado el 05/11/2026 desde Chrome para `cl.ksb@ksb.com` sobre el documento 357361299 (Agencia de Marketing 360° completo, 84 láminas), con email requerido y descarga: https://hubs.ly/Q04DvcpK0 (resuelve a hubspotdocuments.com, HTTP 200). Envío por Outlook con firma gráfica y CCO HubSpot, sólo con OK de Julio.
+Estado: **enviado**. Julio lo envió desde su Outlook el 05/11/2026 a las 17:23 America/Santiago (20:23:31Z) a `cl.ksb@ksb.com`. HubSpot lo registró como actividad EMAIL 120622408328, estado `SENT`, asociada al Contact 215349028236 y al Deal 67622242568. El próximo paso del Deal quedó en esperar las bases y decidir GO/NO-GO por admisibilidad.
+
+Enlace nativo HubSpot creado el 05/11/2026 desde Chrome para `cl.ksb@ksb.com` sobre el documento 357361299 (Agencia de Marketing 360° completo, 84 láminas), con email requerido y descarga: https://hubs.ly/Q04DvcpK0 (resuelve a hubspotdocuments.com, HTTP 200).
+
+El texto que sigue es el borrador preparado para el envío; se conserva sin cambios en este expediente.
 
 Landings comprobadas en vivo el 05/11/2026 (HTTP 200): inicio, performance marketing, marketing de
 contenidos, redes sociales, inbound marketing y agenda.

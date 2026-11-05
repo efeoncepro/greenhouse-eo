@@ -28,15 +28,30 @@
 | Deal `KSB \| CL \| Agencia de marketing digital 2027 \| 2026-11` | 67622242568 | Creado; Cita programada (entrada administrativa), Licitación, Prospección directa, Efeonce Digital, Strategic Bets, CLP; sin monto ni cierre. |
 | Contact `cl.ksb@ksb.com` | 215349028236 | Reutilizado (buzón general preexistente); asociado a la Company nueva y al Deal. Primary sin cambio. |
 | Contact Nelson Urbano Meza | — | No creado: falta un correo corporativo individual verificado. |
+| Email «Licitación Agencia de Marketing Digital 2027 — solicitud de bases» | 120622408328 | Registrado como actividad EMAIL, estado `SENT`, asociada al Contact 215349028236 y al Deal. |
+| Deal: próximo paso (`hs_next_step`) | 67622242568 | Actualizado: esperar las bases; GO/NO-GO por admisibilidad. |
 
 ## Buying group (Apollo, sin enriquecer)
 
 Gerente de Agua, Industria y Energía; Director/Gerente División Minería; Zone Manager. Gerente general
 histórico Hans Baumann (ksb.com; vigencia sin verificar). Ninguno registrado.
 
+## Correo de solicitud de bases — enviado (05/11/2026)
+
+| Canal | Estado | Detalle |
+| --- | --- | --- |
+| Outlook (cuenta de Julio) | Enviado | 05/11/2026 17:23 America/Santiago (20:23:31Z), a `cl.ksb@ksb.com`. Lo envió Julio. |
+| HubSpot | Registrado | EMAIL 120622408328, estado `SENT`, asociado al Contact 215349028236 y al Deal 67622242568. |
+| Brochure | Enlazado | Agencia de Marketing 360° completo (documento 357361299, 84 láminas), enlace nativo https://hubs.ly/Q04DvcpK0 creado para `cl.ksb@ksb.com` desde Chrome. |
+| Landings | Enlazadas | Performance marketing, marketing de contenidos, redes sociales, inbound marketing y agenda. |
+
+Texto y verificación de enlaces: [expediente del correo](2026-11-05-ksb-chile-correo-bases.md). Workspace de la
+licitación: [`tenders/ksb-chile-agencia-marketing-digital-2027`](../../tenders/ksb-chile-agencia-marketing-digital-2027/README.md).
+
 ## Pendientes
 
-1. Autorizar el envío del correo pidiendo las bases a `cl.ksb@ksb.com` (Outlook, firma gráfica, CCO HubSpot).
+1. ~~Autorizar el envío del correo pidiendo las bases a `cl.ksb@ksb.com` (Outlook, firma gráfica, CCO HubSpot).~~
+   **Cerrado el 05/11/2026:** Julio envió el correo a las 17:23 (EMAIL 120622408328, `SENT`).
 2. Opcional: match en Apollo de Nelson (1 crédito si lo encuentra).
 3. Con las bases: GO/NO-GO por admisibilidad (Google Partners, Meta Business Partner, equipo 7+, ROI, referencias).
 4. Agregar esta entrada a `REGISTRO.md` cuando no tenga cambios ajenos sin commitear.

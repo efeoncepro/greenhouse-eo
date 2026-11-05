@@ -39,6 +39,8 @@ El carril de HubSpot (CLI, MCP o in-app) lo decide el [manual de carriles](../..
 junto con la skill de HubSpot; lee el objeto antes de proponer el cambio y reléelo después de escribir.
 Borrador y envío por Outlook siguen la [política vigente](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Un borrador creado no es un envío.
+Si el navegador integrado muestra vencida la sesión de HubSpot, reintentar en Claude in Chrome (el Chrome real
+de Julio) antes de declarar bloqueo; nunca ingresar credenciales. KSB, 05/11/2026: el enlace del brochure salió así.
 
 ## Radar personal
 

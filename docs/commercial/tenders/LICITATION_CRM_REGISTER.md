@@ -1,5 +1,21 @@
 # Registro operativo CRM de licitaciones
 
+## KSB Chile — Agencia de Marketing Digital 2027 — licitación privada — solicitud de bases enviada 05/11/2026
+
+Estado: `Screening`. Señal en LinkedIn (Nelson Urbano Meza, KSB Chile S.A.), publicada el 05/11/2026; presentación
+16/11/2026 sin hora ni zona; presupuesto base 720 UF/año; vigencia 12 meses + 2 prórrogas.
+
+- **Negocio** [67622242568](https://app.hubspot.com/contacts/48713323/record/0-3/67622242568): **KSB ∣ CL ∣ Agencia de marketing digital 2027 ∣ 2026-11**.
+  - Cita programada como entrada administrativa, Licitación, Prospección directa, Efeonce Digital, Strategic Bets, CLP.
+  - Sin monto ni cierre. Próximo paso: esperar bases; GO/NO-GO por admisibilidad.
+- **Empresa nueva** KSB Chile S.A., 60766270868, hija de KSB 53965760378 (Alemania). Una automatización puso su ciclo de vida en «Oportunidad».
+- **Contacto** buzón `cl.ksb@ksb.com`, 215349028236, reutilizado. Nelson sin Contact (sin correo individual verificado; 0 créditos Apollo).
+- **Correo de solicitud de bases:** enviado por Julio desde Outlook el 05/11/2026 17:23 (20:23:31Z); EMAIL 120622408328 `SENT`, asociado al contacto y al negocio. Brochure Agencia de Marketing 360° por enlace nativo https://hubs.ly/Q04DvcpK0.
+- **Brechas:** Google Partners y Meta Business Partner no verificados; equipo 7+, ROI y referencias industriales sin verificar; ≈ 60 UF/mes, bajo para el equipo exigido.
+- **No se hizo:** lectura de bases, GO, oferta ni consultas formales.
+
+[Expediente y pendientes](ksb-chile-agencia-marketing-digital-2027/README.md).
+
 ## Fiordo Austral — CRM — Wherex 428823 — alta y negocio compartido verificados 05/11/2026
 
 Alta autorizada por Julio, con HubSpot como solución elegida.
