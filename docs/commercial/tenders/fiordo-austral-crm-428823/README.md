@@ -81,6 +81,42 @@ Después de crear el registro, la tarjeta mostraba:
 
 Por API, el pipeline, la etapa, el cierre y el owner del negocio local siguieron sin cambios. No hay prueba de participación del cliente (POI), comisión ni conversación con el comprador.
 
+## Propuesta: preparación en Markdown para /design (05/11/2026)
+
+Se investigó en paralelo con cinco subagentes. Los resultados son internos y están en `research/`:
+- comprador y negocio;
+- encaje funcional;
+- matriz de ciberseguridad;
+- método, equipo y precio;
+- brief visual.
+
+**Decisión de edición: Sales Hub Enterprise.** Professional no cumple los requisitos obligatorios de la §4 de las bases ni los funcionales c y g:
+- API de auditoría;
+- sandbox;
+- conjuntos de permisos;
+- objetos personalizados;
+- aprobaciones nativas;
+- backup diario programado.
+
+| Archivo | Para quién | Estado |
+| --- | --- | --- |
+| [PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md](PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md) | Master de la oferta técnica en 19 bloques, con notas de diseño ▸ que se separan antes de entregar | Borrador; no está aprobado |
+| [ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md](ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md) | Comprador. Matriz con las columnas que exigen las bases | Borrador |
+| [oferta-economica.md](oferta-economica.md) | Cuadro económico preliminar | **Requiere aprobación de Julio** |
+| [research/brief-visual-design.md](research/brief-visual-design.md) | Interno. Dirección para /design | Listo para la etapa de diseño |
+
+**Precio preliminar, año 1:**
+- **Licencias:** USD 18.000 en Sales Hub Enterprise (10 asientos de lista), pagados directo a HubSpot. El onboarding de HubSpot es USD 0 si se confirma el waiver de partner.
+- **Servicios Efeonce:** USD 47.900 + IVA (piso USD 39.150).
+- **No se usó el cotizador V3:** su catálogo no tiene una oferta de implementación CRM, así que el cálculo se hizo sobre costos objetivo, sin nómina.
+
+**Lo que no se ha hecho:**
+- cotización emitida;
+- GO;
+- consultas en Wherex;
+- diseño;
+- envío.
+
 ## Pendientes
 
 1. Confirmar en la ficha de Wherex las fechas de cierre y de preguntas, la URL de la ficha y si se cobra comisión.
