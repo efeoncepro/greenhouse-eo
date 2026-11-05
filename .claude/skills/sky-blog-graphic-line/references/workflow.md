@@ -41,7 +41,7 @@ gtimeout 900 pnpm -s ai:image --openai-key personal \
 ```
 
 - Con REF-01 real: `--image "$D/refs/ref-01.jpg"` (modo edición). Para un lugar identificable el motor preferido es
-  Nano Banana Pro (`docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`).
+  el mismo `gpt-image-2.5-sunburst` en modo edición. Nano Banana Pro está excluido (Julio, 2026-11-05).
 - `--openai-key personal` sólo para generación creativa operada por agente mientras quede crédito
   (`docs/manual-de-uso/ai-tooling/alternar-clave-openai.md`); nunca como default.
 - Una intención por corrida: si sale mal, leer por qué, corregir el prompt y recién ahí volver a pagar. Nada de

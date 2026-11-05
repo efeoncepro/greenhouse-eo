@@ -2,6 +2,32 @@
 
 Formato: qué pasó → regla → dónde quedó codificada → estado (Codificada + prueba / Codificada / Documental).
 
+## 2026-11-05 · Ruta primero, titular sin repetir el H1, avión que se lea como avión
+
+**Qué pasó.** Julio revisó el banner del kickoff: «el avión no es un avión, son 2 palitos» (un trazo de líneas a
+`rotate(8)` fijo, con la línea punteada pasando por debajo) y «la etiqueta debería ir antes del título del artículo,
+porque el título ya lo tendrá el mismo artículo, y el nombre de la ruta debería destacar más». El primer reemplazo,
+el ícono «Avión despegando» del pack, se veía chico y de perfil: «hazlo más avión moderno como el de SKY».
+
+**Regla.** Orden de lectura logo → **ruta «Origen → Destino» (Metric Black, arriba)** → titular secundario (Metric
+Bold, `purple/100`, máximo 6 palabras, nunca el H1 ni el meta title) → CTA. Sin etiqueta inferior. Si la ciudad no
+cabe, el destino baja a la segunda línea; nunca se achica la letra. Avión: jet moderno visto desde arriba, relleno,
+en `t = 0,42` del arco, girado por la tangente, con hueco en la línea punteada. Aprobado por Julio el 2026-11-05.
+
+**Dónde.** `contracts/sky-blog-recipes.json → ruta.jerarquia, ruta.plane, ruta.copy, layouts.*.routeName`,
+`compose/route-banner.mjs → routeName, routeGeometry, planeIcon`, `blog/assets/plane-topview.svg`;
+`test/route-banner.test.mjs`. **Codificada + prueba.**
+
+## 2026-11-05 · Nano Banana Pro queda fuera del blog
+
+**Qué pasó.** Julio: «Nano banana pro no lo uses, no tiene buena calidad».
+
+**Regla.** Todas las fotos con `gpt-image-2.5-sunburst` (max, 3840×2160). Con REF-01 real, el mismo motor en modo
+edición (`--image`); las correcciones dirigidas, también. Probar otro motor exige medir contra 2.5 y autorización.
+
+**Dónde.** `contracts/sky-blog-photography.json → engines.authorized / engines.excluded`; `test/engines.test.mjs`.
+**Codificada + prueba.**
+
 ## 2026-11-02 · HERO SPACE sin margen superior corta la cabeza en escritorio
 
 **Qué pasó.** Primera portada generada con el sistema (Cusco, San Blas, registro E, `gpt-image-2.5-sunburst` max

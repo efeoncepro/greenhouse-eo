@@ -77,7 +77,7 @@ Fuera del Workbench:
    para obtener una variante ni se genera directo a 1408×768.
 7. **El banner de ruta no lleva precios, moneda, «Oferta», «Imperdible», «Está bueno SKY» ni
    comparaciones**, y sólo existe con la ruta verificada (`verificadaEl` + `fuente`). El CTA y la
-   etiqueta los escribe el compositor.
+   la ruta («Origen → Destino») los escribe el compositor; la ruta va arriba y manda, el titular (máx. 6 palabras) no repite el H1.
 8. **Metric sin fallback; logo oficial intacto.** Un logo SKY por pieza.
 9. **Medir no aprueba.** `qa.approval` queda `pending-human-and-pixel-review`; ejecución, criterio de
    marca, aprobación y entrega son estados separados.
@@ -91,7 +91,7 @@ Fuera del Workbench:
 2. Decidir el primer plano (elemento o razón) y, si es E, quién fotografía y hacia dónde mira el compañero.
 3. `prompt-plate.mjs` → prompt BASE + NEGATIVE (con `--portada` para IMG 1).
 4. Generar el maestro en Greenhouse con un motor autorizado (`gpt-image-2.5-sunburst` sin REF;
-   Nano Banana Pro con REF de lugar). Una intención por corrida, sin reintentos pagados a ciegas.
+   el mismo motor en modo edición con la REF-01 real; Nano Banana Pro excluido por Julio el 2026-11-05). Una intención por corrida, sin reintentos pagados a ciegas.
 5. Mirar el maestro al 100 %. Si es portada: `medir-portada.mjs --sujeto … --vista …`.
 6. `exportar.mjs` (con `--portada` para og y cuadrado).
 7. QA ([qa-review.md](references/qa-review.md)) → Frame.io → estado en Notion → WordPress.

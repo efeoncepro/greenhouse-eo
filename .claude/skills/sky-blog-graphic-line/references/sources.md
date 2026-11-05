@@ -29,7 +29,7 @@ Andrés (newsletter), Melkin (producción de piezas).
 | Infografías | «Fuera por ahora» vs formato antes/después en la wiki | Fuera; el formato antes/después es de Berel (ver §3) |
 | Vista aérea / avión | Propuesta los admite; Spec los prohíbe | Prohibidos (dron y avión/cabina/uniforme SKY) |
 | Nomenclatura | `N1_B01_Portada`, `N1_IMG-1`, `N6_B02_V2`, nombres descriptivos | ID de tarea `N[art]_IMG-[n]` / `N[art]_BAN-[n]`; archivo = nombre de la spec en kebab-case (`exportar.mjs --nombre`) |
-| Motores | «Definir modelos» (pendiente) vs fichas que ya fijan Nano Banana Pro / ChatGPT Images 2.5 | Ambos autorizados como hipótesis de arranque; nombre verificable en el log |
+| Motores | «Definir modelos» (pendiente) vs fichas que ya fijan Nano Banana Pro / ChatGPT Images 2.5 | Solo `gpt-image-2.5-sunburst` (con REF-01 en modo edición); Nano Banana Pro excluido por Julio el 2026-11-05 por calidad |
 | Banner de ruta | Medidas sólo en una ficha y el kickoff | Contrato: 1408×400 y 1080×1080, WebP < 150 KB |
 | Estados | Cinco vocabularios; fichas «Aprobado» con cuerpo «Bloqueado» | Estado de ficha ≠ tarea es un hallazgo (Playbook 14/10); no se aprueba encima |
 

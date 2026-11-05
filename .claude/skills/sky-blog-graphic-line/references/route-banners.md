@@ -11,8 +11,8 @@ máximo dos menciones de ruta por artículo. No cuenta dentro de las 3 editorial
 
 | Opción | Composición |
 |---|---|
-| **A · `ruta.color`** | Morado SKY con resplandor arriba a la derecha, logo, titular, ruta dibujada (arco punteado, puntos verdes, avión de línea, códigos IATA), etiqueta «Ruta {Origen} – {Destino}» (escritorio) y botón blanco «Ver vuelos a {ciudad} →» |
-| **B · `ruta.foto`** | Mitad color con logo, titular y botón; mitad foto de la serie del artículo (misma luz que la portada) con etiqueta IATA en chip blanco. **El titular nunca va sobre la foto** |
+| **A · `ruta.color`** | Morado SKY con resplandor arriba a la derecha, logo, **ruta «{Origen} → {Destino}» en Metric Black (primer elemento de lectura)**, titular secundario en Metric Bold `purple/100`, ruta dibujada (arco punteado con hueco bajo el avión, puntos verdes, jet visto desde arriba orientado por la tangente, códigos IATA) y botón blanco «Ver vuelos a {ciudad} →». Sin etiqueta inferior desde el 2026-11-05 |
+| **B · `ruta.foto`** | Mitad color con logo, ruta «{Origen} → {Destino}», titular secundario y botón; mitad foto de la serie del artículo (misma luz que la portada) con etiqueta IATA en chip blanco. **El titular nunca va sobre la foto** |
 
 Formatos: `ruta` 1408×400 y `ruta-movil` 1080×1080, WebP < 150 KB, con ALT.
 
@@ -63,8 +63,9 @@ Escribe `runs/<uuid>/{<slug>.webp, job.json, qa.json}`. `qa.json` registra copy 
 | Fondo | `purple/500` #78028a | — |
 | Resplandor | `purple/400` #9207a9 | El kickoff usó #9b1fae, que no existe en los tokens |
 | Puntos de ruta | `green/400` #26de00 | El logo del catálogo deck de Greenhouse usa #00e400: ¿cuál es el oficial? |
-| Etiqueta | `purple/100` #f1bafc | — |
-| Tipografía | Metric Black (titular), Bold (IATA, CTA), Semibold (etiqueta) | El kickoff mostró Assistant (tema del blog). Si Marca pide Assistant, se cambia en el contrato y el compositor |
+| Titular (segundo nivel) | `purple/100` #f1bafc | — |
+| Avión | `blog/assets/plane-topview.svg`: jet moderno visto desde arriba (alas en flecha, winglets, dos motores), relleno blanco | No es asset oficial del pack: validar con Marca SKY |
+| Tipografía | Metric Black (ruta), Bold (titular, IATA, CTA) | El kickoff mostró Assistant (tema del blog). Si Marca pide Assistant, se cambia en el contrato y el compositor |
 | Logo | `sky-logo-on-photo.svg` (blanco + verde), oficial | — |
 | Geometría | Kickoff escalado ×1,333 (escritorio) y ×2,571 (móvil); B móvil es nuevo (foto arriba 40 %) | Validación de Diseño |
 

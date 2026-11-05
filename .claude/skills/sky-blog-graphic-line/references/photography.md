@@ -112,8 +112,9 @@ node brands/sky-airline/blog/scripts/prompt-plate.mjs \
 | Caso | Motor |
 |---|---|
 | Escena nueva sin referencia | `gpt-image-2.5-sunburst` («ChatGPT Images 2.5») |
-| Lugar identificable con REF real | Nano Banana Pro |
-| Corregir una pieza ya generada | Nano Banana Pro (edición dirigida) |
+| Lugar identificable con REF real | `gpt-image-2.5-sunburst` en modo edición (`--image` REF-01) |
+| Corregir una pieza ya generada | `gpt-image-2.5-sunburst` en modo edición (edición dirigida) |
+| ~~Nano Banana Pro~~ | **Excluido** (Julio, 2026-11-05: «no tiene buena calidad»). Contrato: `engines.excluded` |
 | Variantes de recorte | Ninguno: se recorta el maestro |
 | Texto | Ninguno: el texto sólo existe en el banner de ruta, compuesto |
 
