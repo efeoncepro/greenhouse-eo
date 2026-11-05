@@ -41,7 +41,12 @@ negro 69 % → 0) en lugar del velo diagonal; a todo el alto tapaba caras (Julio
 logo (0,42 / 0,50 / 0,46 del alto), con comparación A/B enviada. Talara y Chiclayo con foto del banco PromPerú y
 ubicación del CSV; Iquitos, Talara y Chiclayo reencuadrados con `lift` (reflejo del agua abajo); stories en video
 de AR Lima, AR Santiago y «Vuela por el Perú» con la foto del destino en intro y brandlift. Canvas versión 44;
-«BLACK SKY 2026» (46 archivos) y entregables de OneDrive actualizados. Detalle en pipeline §4.6. Se regeneraron los GIF de AR Lima, AR
+«BLACK SKY 2026» (46 archivos) y entregables de OneDrive actualizados. Detalle en pipeline §4.6.
+Sexta ronda (2026-11-05, revisión de Daniela en Frame.io sobre las 30 piezas de rutas): Ayacucho sin personas
+(reencuadre), Trujillo popup con más cielo, crédito de la story a 18 px y stories de Piura, Arequipa, Juliaca y
+Pucallpa expandidas hacia arriba con GPT Image 2.6 Flare (fal sin saldo; ≈ USD 0,15, aprobado por Julio). Canvas
+versión 47; «BLACK SKY 2026» (30 archivos) y entregables actualizados. Frame no se puede responder desde aquí.
+Detalle en pipeline §4.7. Se regeneraron los GIF de AR Lima, AR
 Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con banderas, y la story en video de las nueve
 de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya compara por tamaño y fecha sin leer el
 destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin

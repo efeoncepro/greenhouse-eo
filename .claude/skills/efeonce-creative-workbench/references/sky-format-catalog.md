@@ -539,7 +539,7 @@ entrega de OneDrive y quedaron verificados con `cmp`. Ningún entregable es ante
 
 ### 6.3 Por confirmar con Daniela
 
-Quinta ronda (2026-11-05): Talara y Chiclayo con foto del banco PromPerú (confirmar Chiclayo, Daniela sólo comentó Talara); largo del gradiente bajo el logo (0,42/0,50/0,46) propuesto tras el rechazo del de alto completo, por confirmar; Tarapoto popup aprobado en Frame. Tercera ronda (2026-11-05): Pucallpa y Trujillo tienen una ubicación
+Sexta ronda (2026-11-05, Frame.io): aprobadas Cajamarca, Jauja y Tacna (popup y story), y los popups de Arequipa, Juliaca, Pucallpa, Tarapoto y Tumbes y la story de Trujillo; la story de Tarapoto dice «APROBADA» con estado «Ajuste solicitado» y la de Tumbes no tiene comentario: confirmar las dos. Aprobaciones sobre la versión de la cuarta ronda (antes del gradiente nuevo). Quinta ronda (2026-11-05): Talara y Chiclayo con foto del banco PromPerú (confirmar Chiclayo, Daniela sólo comentó Talara); largo del gradiente bajo el logo (0,42/0,50/0,46) propuesto tras el rechazo del de alto completo, por confirmar; Tarapoto popup aprobado en Frame. Tercera ronda (2026-11-05): Pucallpa y Trujillo tienen una ubicación
 en el CSV que no coincide con la foto entregada (CSV «Catarata Velo de la Novia» y «Chan Chan»; fotos «Plaza
 del Reloj Público» y «Balneario de Malabrigo»), se usó el CSV; el crédito de Trujillo viene del CSV; «DESDE
 LIMA» se dedujo del legal; CL «Encuentra destinos» sigue hecho con el clúster inter de Chile aunque el mensaje

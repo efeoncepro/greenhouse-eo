@@ -415,6 +415,43 @@ desde `notifications@frame.io`, porque no hay herramienta para leer ni responder
 - **Correr `rutas.cjs` solo después de `rehacer-destinos.sh` deja `src2/` sin fotos de destino** (reescribe los
   SVG de las rutas desde cero). Volver a correr `./rehacer-destinos.sh` completo.
 
+### 4.7 Sexta ronda (2026-11-05): revisión de Daniela en Frame.io
+
+Daniela armó en Frame.io la revisión de las 15 rutas foco (`https://f.io/VZlcCQta`, carpeta «RUTAS FOCO PROMPERU»,
+una carpeta por ruta con `BS_POPUP_` y `BS_STORY_`), con estado y un comentario por activo. Revisó las versiones de la
+cuarta ronda, subidas a las 17:14. **Cómo se leyó:** el enlace abre sin login en el navegador integrado. Las carpetas
+y los activos se abren con doble clic (no tienen enlace), y una URL `/view/<id>` cargada directamente no trae el
+panel de comentarios. Funcionó un script en la página que hace doble clic en cada tarjeta (`[aria-label="Seleccionar
+activo …"]` → su contenedor), espera `#1` en el texto y vuelve con `history.back()`. **Con el panel del navegador
+oculto, Frame deja de pintar** y el script ve 0 tarjetas. Los avisos por correo (`notifications@frame.io`, «N
+Notifications on 2 projects») traen todos los comentarios y cambios de estado, y sirven de respaldo.
+
+| Ruta | Popup | Story | Qué se hizo |
+| --- | --- | --- | --- |
+| Ayacucho | Tapar a las personas | Quitarlas | Reencuadre sin IA: personas fuera del cuadro (KV `t` 0,60, popup 0,556, story `z` 1,3 y `t` 0,66) |
+| Cajamarca, Jauja, Tacna | Aprobada | Aprobada | — |
+| Chiclayo, Talara | Foto equivocada | Ídem | Ya resuelto en la quinta ronda |
+| Cusco | Gradiente | Gradiente | Ya resuelto en la quinta ronda (fade de Daniela) |
+| Iquitos | Choza tapada | Ídem | Ya resuelto en la quinta ronda (`lift`) |
+| Juliaca | Aprobada | Más cielo con IA, arco menos apretado | Expansión hacia arriba |
+| Piura | Gradiente | Bajar palmeras · crédito PromPerú muy pequeño | Expansión hacia arriba; crédito de la story a 18 px (`credito(…, size)`) |
+| Pucallpa | Aprobada | Torre más chica, sin chocar con el logo | Expansión hacia arriba (recorte de 900 px) |
+| Arequipa | Aprobada | «BLACK SKY» en el cielo | Expansión hacia arriba (recorte de 900 px) |
+| Trujillo | Más cielo sobre el logo | Aprobada | Popup `t` 0,625 (la foto tenía 200 px de margen arriba) |
+| Tarapoto | Aprobada | Comentario «APROBADA», estado «Ajuste solicitado» | Sin cambio; confirmar con Daniela |
+| Tumbes | Aprobada | Sin comentario | Sin cambio |
+
+**Expansión de las stories (gasto aprobado por Julio, hasta USD 1; gastado ≈ USD 0,15).** Las dos cuentas de fal
+(`FAL_API_KEY`, `FAL_API_KEY_B`) estaban sin saldo («User is locked. Reason: Exhausted balance»), así que Flux Fill,
+el default de `pnpm ai:inpaint expand`, no corrió. Se usó `--adapter openai --model gpt-image-2.6-flare --quality
+medium` con `OPENAI_API_KEY_PROFILE=personal` (el CLI advierte que GPT Image no sirve para expandir). Con cielo
+limpio arriba funcionó: PASS, zona protegida idéntica bit a bit, sin costura visible al 100 %. Método: recortar de
+la foto horizontal la franja que usa la story (800 px de ancho, o 900 cuando hace falta más cielo), expandirla a 9:16
+(`--canvas 800x1422` o `900x1600 --anchor bottom --blend 100`) y usarla como fuente de la story
+(`f.story.src = <CIUDAD>_STORY.png`, `s` = `t` = 0,5). Corridas en
+`ai-generations/2026-11-05_sky-black-expand/`; fuentes en `fotos-destino/*_STORY.png`. El sujeto queda más abajo y
+algo más chico, y el logo cae sobre cielo.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

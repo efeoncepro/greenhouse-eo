@@ -93,6 +93,11 @@ Julio) y quedó acotado bajo el logo (`FADE_FIN` 0,42/0,50/0,46), con comparaci�
 reencuadrados con `lift`; stories en video de AR Lima, AR Santiago y «Vuela por el Perú» con el destino en intro y
 brandlift. `BLACK SKY 2026` (46 archivos) y ENTREGABLES actualizados. **Por confirmar:** largo del gradiente; foto de
 Chiclayo (Daniela sólo comentó Talara). Los comentarios de Frame.io no se pueden responder desde aquí.
+**Sexta ronda (2026-11-05, Frame.io `https://f.io/VZlcCQta`, canvas versión 47):** 30 comentarios de Daniela sobre las
+rutas (versión de la cuarta ronda). Aplicados: Ayacucho sin personas (reencuadre), Trujillo popup con más cielo, crédito de
+PromPerú a 18 px en la story, y stories de Piura, Arequipa, Juliaca y Pucallpa expandidas hacia arriba con GPT Image 2.6
+Flare (fal sin saldo en sus dos cuentas; ≈ USD 0,15, aprobado por Julio). `BLACK SKY 2026` (30 archivos) y ENTREGABLES al día.
+**Por confirmar:** story de Tarapoto («APROBADA» con estado de ajuste) y story de Tumbes (sin comentario).
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 
