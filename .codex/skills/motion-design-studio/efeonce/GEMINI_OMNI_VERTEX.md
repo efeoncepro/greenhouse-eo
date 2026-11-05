@@ -29,9 +29,11 @@
 >   (360p→1080p), 11.584 (720p→4K); tokens de entrada 0. Esto habilita el flujo **borrador a 360p/720p → upscale de
 >   la toma elegida**.
 > - **Multi-turno:** `store:true` + `previous_interaction_id`; el turno de seguimiento envuelve sus partes en
->   `{"type":"user_input","content":[...]}`. Interacciones guardadas o async se retienen hasta 7 días;
+>   `{"type":"user_input","content":[...]}`, salvo en `upscale`: el turno encadenado va **sin `input`**, porque la API rechaza
+>   texto en upscale (HTTP 400, verificado en vivo; el ejemplo oficial con «Upsample video.» está mal). Interacciones guardadas o async se retienen hasta 7 días;
 >   `store:false` es stateless (compatible con ZDR). En la CLI: `--previous <interaction-id>` para `edit` y
->   `upscale`. **Sin canary live todavía** (el único canary 1.2 es `text` 360p/3 s, completado el 2026-11-05).
+>   `upscale`. **Canaries live 2026-11-05:** `text` 360p/3 s y `upscale --previous` 360p→720p (8.688 tokens = estimación,
+>   0 de entrada y 0 de razonamiento; conserva el contenido y gana detalle). `edit --previous` sigue sin canary.
 > - **Precio:** USD 12 por 1M tokens de video de salida (1.1: USD 17,50), con las mismas tasas de tokens por segundo:
 >   ≈ USD 0,023/s a 360p, 0,07/s a 720p, 0,104/s a 1080p y 0,209/s a 4K. Un clip de 15 s a 720p ≈ USD 1,04. La tabla
 >   de precios Cloud no se pudo leer (página renderizada en JS); el USD 12 sale de la página de precios Developer API y
@@ -58,7 +60,7 @@
 > # Upscale de la toma elegida desde el archivo (720p → 4K)
 > pnpm ai:omni --task upscale --video gs://<bucket>/omni/out/toma.mp4 --source-resolution 720p \
 >   --resolution 4k --duration 10 --gcs-output gs://<bucket>/omni/up/ --max-usd 2 --yes --out toma-4k.mp4
-> # Upscale encadenado al turno anterior (sin --video; sin canary live)
+> # Upscale encadenado al turno anterior (sin --video ni --prompt; verificado en vivo 360p→720p)
 > pnpm ai:omni --task upscale --previous <interaction-id> --source-resolution 360p --resolution 1080p \
 >   --duration 15 --gcs-output gs://<bucket>/omni/up/ --max-usd 2 --yes
 > # Repetir con el contrato 1.1

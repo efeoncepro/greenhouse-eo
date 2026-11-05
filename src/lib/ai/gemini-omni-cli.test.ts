@@ -107,10 +107,11 @@ describe('Gemini Omni Cloud CLI contract', () => {
       resolution: '1080p'
     })
     expect(request.input).toEqual([{ type: 'video', uri: video.uri, mime_type: 'video/mp4' }])
+    expect(JSON.stringify(request)).not.toContain('"type":"text"')
   })
 
   it('rejects impossible upscales and upscale on 1.1', () => {
-    const base = { ...options('upscale'), videos: [video], duration: 10 }
+    const base = { ...options('upscale'), prompt: '', videos: [video], duration: 10 }
 
     expect(() => buildOmniRequest({ ...base, resolution: '4k', sourceResolution: '360p' })).toThrow('360p→4k')
     expect(() => buildOmniRequest({ ...base, resolution: '1080p' })).toThrow('--source-resolution')
@@ -132,7 +133,23 @@ describe('Gemini Omni Cloud CLI contract', () => {
 
     expect(request.previous_interaction_id).toBe('v1_abc123')
     expect(request.store).toBe(true)
-    expect(request.input).toEqual([{ type: 'user_input', content: [{ type: 'text', text: 'Upsample video.' }] }])
+    // Verified live 2026-11-05: a chained upscale is accepted only without input (text → HTTP 400).
+    expect('input' in request).toBe(false)
+
+    const chainedEdit = buildOmniRequest({ ...options('edit'), previousInteractionId: 'v1_abc123' })
+
+    expect(chainedEdit.input).toEqual([
+      { type: 'user_input', content: [{ type: 'text', text: 'A controlled camera move' }] }
+    ])
+    expect(() =>
+      buildOmniRequest({
+        ...options('upscale'),
+        videos: [video],
+        resolution: '720p',
+        sourceResolution: '360p',
+        duration: 3
+      })
+    ).toThrow('upscale no acepta texto')
     expect(() =>
       buildOmniRequest({ ...options('edit'), videos: [video], previousInteractionId: 'v1_abc123' })
     ).toThrow('turno anterior')

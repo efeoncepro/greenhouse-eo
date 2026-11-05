@@ -48,7 +48,7 @@ Si la respuesta declara un modelo fuera de Omni 1.1/1.2, la CLI **avisa y conser
 | `reference` | `reference_to_video` | prompt + imágenes y/o videos de referencia | 3–15 s | 3–10 s | [Referencias](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/generate-videos-from-references) |
 | `edit` | `edit` | prompt + un video (o `--previous`) + imágenes opcionales | = duración del fuente (≤ 15 s) | = fuente (≤ 10 s) | [Edición](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/edit-videos) |
 | `extend` | `extend` | prompt + un video + imágenes opcionales (sólo 1.2) | 3–10 s de extensión | 3–10 s | [Extensión](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/extend-videos) |
-| `upscale` | `upscale` | un video (o `--previous`) + `--source-resolution`; prompt opcional | = fuente (≤ 15 s) | no disponible | [Upscale](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/upscale-videos) |
+| `upscale` | `upscale` | un video (o `--previous`) + `--source-resolution`; **sin prompt** (Google responde 400 si llega texto) | = fuente (≤ 15 s) | no disponible | [Upscale](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/upscale-videos) |
 
 **Límites de entrada que valida la CLI:**
 
@@ -67,9 +67,9 @@ Omni 1.2 permite producir barato y pagar alta resolución sólo por la toma eleg
 2. Corregir con `edit` sobre el mismo clip, si hace falta.
 3. Reescalar la toma ganadora con `--task upscale`.
 
-`--previous <interaction-id>` continúa sobre el video del turno anterior en `edit` o `upscale`, sin volver a subir el video. La CLI envía `previous_interaction_id`, `store:true` y el contenido envuelto en `{"type":"user_input","content":[...]}`, como en el ejemplo oficial de upscale. Las interacciones almacenadas o asíncronas se retienen **hasta 7 días**; para upscale, el turno anterior debe ser el inmediatamente previo y haber generado un video 360p o 720p.
+`--previous <interaction-id>` continúa sobre el video del turno anterior en `edit` o `upscale`, sin volver a subir el video. La CLI envía `previous_interaction_id` y `store:true`. En `upscale` encadenado **no envía `input`**: el ejemplo oficial agrega un texto («Upsample video.») envuelto en `user_input`, pero la API lo rechaza con HTTP 400 («Text input is not supported for upscale task»), verificado en vivo el 2026-11-05. En `edit` encadenado envía el prompt envuelto en `{"type":"user_input","content":[...]}`. Las interacciones almacenadas o asíncronas se retienen **hasta 7 días**; para upscale, el turno anterior debe ser el inmediatamente previo y haber generado un video 360p o 720p.
 
-> **Sin canary propio:** el shape de `--previous` sale de la documentación Cloud (ejemplo de upscale). Hasta que una corrida real lo confirme, tratar `--previous` como contrato documentado, no verificado. Si falla, usar el video de GCS como `--video`.
+> **Verificado en vivo (2026-11-05):** `upscale --previous` 360p→720p sobre el canary `text`. **Sin canary todavía:** `edit --previous`, upscale por archivo (`--video`) ni las transiciones a 1080p y 4K. Si un turno encadenado falla, usa el video de GCS como `--video`.
 
 ## 4. Preflight GCP
 
@@ -163,9 +163,10 @@ El GCS privado es la autoridad de recuperación de salida para esta CLI. Definir
 ### 7.1 Estado de verificación de Omni 1.2 (2026-11-05)
 
 - **Verificado en vivo (sólo lectura):** `GET https://aiplatform.googleapis.com/v1beta1/publishers/google/models/gemini-omni-1.2-flash` respondió 200 con `launchStage: "GA"`; el mismo GET para `gemini-omni-1.1-flash-preview` también respondió 200.
-- **Verificado en local:** 17 pruebas del contrato (`src/lib/ai/gemini-omni-cli.test.ts`) y `--estimate` de la CLI para texto 15 s, upscale por archivo y por `--previous`, transición inválida y límites de frames/1.1.
+- **Verificado en local:** 17 pruebas del contrato (`src/lib/ai/gemini-omni-cli.test.ts`) y `--estimate` de la CLI para texto de 15 s, upscale por archivo y por `--previous`, transición inválida y límites de frames/1.1.
 - **Verificado en vivo (generación, 2026-11-05):** canary `text` de 1.2 con `pnpm ai:omni --task text --resolution 360p --aspect 16:9 --duration 3 --yes`. La interacción `ChAyMDUyOTYwMjdiNmM4YmU4EAgaAjJhKgRtYWlu` terminó `completed` y declaró `gemini-omni-1.2-flash`. El MP4 (1.318.461 bytes) quedó en `gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/omni-1-2-smoke-2026-11-05/449499589896650503.mp4` y se descargó con `--out`: H.264 640×360 a 24 fps, 3,029 s, con audio AAC estéreo de 48 kHz (ambiente suave, media −38,5 dB). Uso declarado: 41 tokens de entrada, **5.793 tokens de video** (= 1.931/s × 3, la tasa de 360p) y 557 de razonamiento. A USD 12/1M, el video cuesta ≈ USD 0,070, igual que la estimación de la CLI. El razonamiento se cobra aparte y la estimación no lo incluye. La imagen es coherente: una bolita de vidrio rueda sobre un escritorio de madera con luz de mañana, en una toma continua.
-- **Sin verificar en vivo:** las otras seis tareas de 1.2, en especial `upscale` y `--previous`; también 15 s, 9:16, los límites de referencias, la factura real y C2PA en bytes.
+- **Verificado en vivo (upscale encadenado, 2026-11-05):** `pnpm ai:omni --task upscale --previous <id del canary text> --source-resolution 360p --resolution 720p --duration 3 --yes`. El primer intento recibió HTTP 400 por el texto que pedía el ejemplo oficial; la CLI ya se corrigió para no enviar `input`. La interacción `ChAxNzExMTJhODMxMzFhNDA3EAgaAmViKgRtYWlu` terminó `completed`. El MP4 (2.070.844 bytes, `gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/omni-1-2-smoke-2026-11-05/9933598628033493008.mp4`) es H.264 **1280×720** a 24 fps, 3,029 s, y conserva el audio AAC estéreo. Uso: **8.688 tokens de video** (= 2.896/s × 3, la tasa 360p→720p), **0 de entrada y 0 de razonamiento**: ≈ USD 0,104, igual que la estimación. Comparado cuadro a cuadro con el borrador, conserva composición, movimiento y luz, y gana detalle en los bordes del vidrio y la veta de la madera.
+- **Sin verificar en vivo:** text, image, frames, reference, edit y extend en 1.2 (salvo el canary `text` 360p/3 s), `edit --previous`, upscale por archivo, 1080p/4K, 15 s, 9:16, los límites de referencias, la factura real y C2PA en bytes.
 
 ## 8. Evidencia histórica de Omni 1.1 (2026-09-24)
 
@@ -184,4 +185,4 @@ La inspección visual de un fotograma medio confirmó una esfera azul en el vide
 
 El primer intento de `edit`/`extend` con un `response_format` genérico recibió HTTP 400. Se corrigió el cuerpo por tarea y se repitió con éxito. El componente nominal de video de las seis corridas fue aproximadamente USD 0,608 antes de input/texto/impuestos; no es una lectura de factura.
 
-**Pendientes:** revisión temporal completa de fidelidad/continuidad y escucha de audio, inspección C2PA, factura real, lifecycle del bucket, canaries de 1.2 (incluidos upscale y turnos), 9:16 y límites de referencias. La generación técnica no aprueba un asset comercial ni activa Globe.
+**Pendientes:** revisión temporal completa de fidelidad/continuidad y escucha de audio, inspección C2PA, factura real, lifecycle del bucket, canaries de 1.2 (falta todo salvo text 360p y upscale encadenado 360p→720p), 9:16 y límites de referencias. La generación técnica no aprueba un asset comercial ni activa Globe.

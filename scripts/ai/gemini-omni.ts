@@ -65,7 +65,7 @@ Entradas: --image <gs://...|archivo> (repetible), --video <gs://...|archivo> (re
           --staging-uri gs://bucket/prefix/ obligatorio para archivos locales
 Duración: 1.2 → text/image/reference 3..15 · frames y extend 3..10 · edit = duración del fuente
           1.1 → 3..10 en todas las tareas
-Upscale:  sólo 1.2 · --task upscale --video clip.mp4 --source-resolution 360p|720p --resolution 720p|1080p|4k
+Upscale:  sólo 1.2, sin --prompt · --task upscale --video clip.mp4 --source-resolution 360p|720p --resolution 720p|1080p|4k
           (360p→720p|1080p, 720p→1080p|4k) · --duration = largo del fuente para estimar (por defecto 15)
 Turnos:   --previous <interaction-id> continúa sobre el clip del turno anterior (edit o upscale, sin --video)
 Opciones: --project, --prompt-file, --aspect 16:9|9:16, --resolution 360p|720p|1080p|4k,

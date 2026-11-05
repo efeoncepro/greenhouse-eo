@@ -161,6 +161,11 @@ export function validateOmniRequest(options: OmniRequestOptions): void {
   if (!OMNI_TASKS.includes(options.task)) throw new Error(`Elige --task ${OMNI_TASKS.join('|')}.`)
   if (!options.prompt.trim() && options.task !== 'upscale') throw new Error('Falta --prompt o --prompt-file.')
 
+  // Live 2026-11-05: Cloud answers HTTP 400 "Text input is not supported for upscale task".
+  if (options.prompt.trim() && options.task === 'upscale') {
+    throw new Error('upscale no acepta texto: quita --prompt (Google responde 400 si llega texto).')
+  }
+
   if (options.task === 'upscale' && !model.supportsUpscale) {
     throw new Error(`${model.label} no admite upscale; usa --model 1.2.`)
   }
@@ -238,7 +243,7 @@ export function buildOmniRequest(options: OmniRequestOptions) {
   const chained = options.previousInteractionId !== undefined
 
   const parts = [
-    ...(options.prompt.trim() || chained ? [{ type: 'text', text: options.prompt.trim() || 'Upsample video.' }] : []),
+    ...(options.prompt.trim() ? [{ type: 'text', text: options.prompt.trim() }] : []),
     ...options.images.map(image => ({ type: 'image', uri: image.uri, mime_type: image.mimeType })),
     ...options.videos.map(video => ({ type: 'video', uri: video.uri, mime_type: video.mimeType }))
   ]
@@ -258,9 +263,11 @@ export function buildOmniRequest(options: OmniRequestOptions) {
     model: model.id,
     background: true,
     store: true,
-    // A stateful follow-up wraps its parts in a user_input turn (Cloud upscale page example).
     ...(chained ? { previous_interaction_id: options.previousInteractionId } : {}),
-    input: chained ? [{ type: 'user_input', content: parts }] : parts,
+    // A chained upscale sends no input at all: the Cloud doc example adds a text part, but the API rejects
+    // text for upscale (verified live 2026-11-05). A chained edit wraps its parts in a user_input turn
+    // (documented shape, not yet live-tested).
+    ...(chained && parts.length === 0 ? {} : { input: chained ? [{ type: 'user_input', content: parts }] : parts }),
     response_format: [responseFormat],
     generation_config: { video_config: { task: TASK_NAMES[options.task] } }
   }

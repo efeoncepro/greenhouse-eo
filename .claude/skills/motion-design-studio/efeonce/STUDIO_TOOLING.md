@@ -74,8 +74,9 @@ no reenvíes a ciegas. Contrato, flags y recetas:
 escucha de audio, C2PA ni factura real. `edit` usa un MP4 fuente y puede llevar imágenes de referencia;
 `extend` usa un MP4 fuente. Ninguna corrida habilita Globe ni aprueba un entregable comercial.
 **1.2:** identidad GA confirmada en vivo en Model Garden el 2026-11-05 y canary `text` 360p/16:9/3 s completado ese mismo
-día: MP4 640×360 a 24 fps con audio, 5.793 tokens de video ≈ USD 0,070, igual a `--estimate`. Sin canary todavía: upscale,
-`--previous` ni las demás tareas. Contrato y fuentes: `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»).
+día: MP4 640×360 a 24 fps con audio, 5.793 tokens de video ≈ USD 0,070, igual a `--estimate`. También completado `upscale --previous`
+360p→720p (8.688 tokens = estimación; sin `input`: la API rechaza texto en upscale). Sin canary: `edit --previous`,
+upscale por archivo, 1080p/4K y las demás tareas. Contrato y fuentes: `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»).
 
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
