@@ -452,6 +452,30 @@ la foto horizontal la franja que usa la story (800 px de ancho, o 900 cuando hac
 `ai-generations/2026-11-05_sky-black-expand/`; fuentes en `fotos-destino/*_STORY.png`. El sujeto queda más abajo y
 algo más chico, y el logo cae sobre cielo.
 
+### 4.8 Séptima ronda (2026-11-05): segunda revisión en Frame y Teams
+
+Daniela subió a Frame la versión de la sexta ronda y aprobó casi todo: Arequipa, Iquitos, Jauja, Juliaca, Tacna,
+Trujillo y Tumbes completas, la story de Cusco y el popup de Tarapoto. Ajustes:
+
+- **Talara y Piura: foto y ubicación de su carpeta.** Daniela reordenó `FOTOS PARA PROMPERU`: en `(COSTA) TALARA` quedó
+  `Playa Las Pocitas, Piura.png` (la foto que usaba Piura; la ballena del banco «ya no la usan») y en `(COSTA) PIURA` una
+  nueva, `Playa Vichayito, Piura.png`. **El nombre del archivo es la ubicación** y manda sobre el CSV: `rutas.cjs` lee
+  `DEST[name].ubic` antes que la columna `Ubicacion`. Talara reutiliza la expansión story de Las Pocitas
+  (`TALARA_POCITAS_STORY.png`). Piura usa `s` = [0,35; 0,5] para que se vea la curva de la playa y no sólo mar.
+- **Tarapoto story** («no la escales tanto… que no se corte tanto la torre»): recorte de 1200 px expandido a 1200×2133
+  con `--anchor center` (cielo arriba, follaje abajo), ≈ USD 0,04. El castillo queda entero.
+- **Cusco popup** («el "Vuela a" se pierde»): piso propio `f.popup.piso = [430, 1080, 0,85]`; `compose.cjs` acepta
+  `f.popup.piso` y `f.story.piso` por pieza.
+- **Degradado inferior negro** (Teams: «el gradiente marrón de abajo lo dejaría en negro»): `piso(…, c)` recibe el color;
+  las piezas con foto de destino usan `#000` (popup, story y `lf-piso` del KV) y los KV del kit siguen con `#2a1608`.
+  Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y «Vuela por el Perú».
+- Daniela sugirió (sin pedirlo) centrar el logo y subirlo; queda a criterio de SKY.
+
+**Carpetas de estado** (`split.py`, tabla `E` con el último estado conocido): `10_Noviembre/BLACK SKY 2026 - APROBADO` y
+`BLACK SKY 2026 - PARA REVISION`, con la estructura de `BLACK SKY 2026`. Una pieza que cambia de estado **se mueve** entre
+las dos (no se borra) y se sobrescribe con la versión vigente. Ayacucho, Chiclayo y la story de Pucallpa no aparecen en la
+segunda revisión: siguen en revisión.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

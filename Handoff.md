@@ -98,6 +98,11 @@ rutas (versión de la cuarta ronda). Aplicados: Ayacucho sin personas (reencuadr
 PromPerú a 18 px en la story, y stories de Piura, Arequipa, Juliaca y Pucallpa expandidas hacia arriba con GPT Image 2.6
 Flare (fal sin saldo en sus dos cuentas; ≈ USD 0,15, aprobado por Julio). `BLACK SKY 2026` (30 archivos) y ENTREGABLES al día.
 **Por confirmar:** story de Tarapoto («APROBADA» con estado de ajuste) y story de Tumbes (sin comentario).
+**Séptima ronda (2026-11-05, segunda revisión en Frame y Teams, canvas versión 51):** Talara = Playa Las Pocitas y Piura =
+Playa Vichayito (foto y ubicación de su carpeta; `ubic` en `fotos-destino.json` manda sobre el CSV), story de Tarapoto
+expandida (≈ USD 0,04), piso más alto en el popup de Cusco y degradado inferior negro en las piezas con foto de destino (GIF
+y story video de AR Lima, AR Santiago y «Vuela por el Perú» rehechos). Carpetas `BLACK SKY 2026 - APROBADO` (19) y
+`- PARA REVISION` (11 + LEEME) en `10_Noviembre/`. **Pendiente:** visto bueno de Ayacucho, Chiclayo y story de Pucallpa.
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

@@ -55,6 +55,8 @@ Quinta ronda: detrás del logo va el gradiente que dejó Daniela, cortado bajo e
 Talara y Chiclayo ya tienen foto y ubicación, y la choza de Iquitos, la ballena de Talara y el muelle de Chiclayo quedan a la vista.
 Sexta ronda: los comentarios de Daniela en Frame.io sobre las rutas foco quedaron aplicados: Ayacucho sin personas, más
 cielo sobre el logo en Trujillo, Piura, Arequipa, Juliaca y Pucallpa, y el crédito de PromPerú más grande en la story.
+Séptima ronda: Daniela aprobó casi todas las rutas en su segunda revisión; Talara y Piura llevan la foto de su carpeta, la
+story de Tarapoto muestra el castillo entero y el degradado inferior pasó a negro. Lo aprobado y lo pendiente están en carpetas aparte.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 
