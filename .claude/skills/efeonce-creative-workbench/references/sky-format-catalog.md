@@ -176,7 +176,7 @@ medidos sobre los archivos entregados.
 | Tamaño | 1080×1080 PNG |
 | Origen en el kit | No hay plantilla de popup en el kit: se recompone desde las partes del KV y la foto fuente |
 | Elementos | Foto re-encuadrada al 80 % del KV (escala 1,45, cabeza en y≈260) · logo al 100 % arriba a la izquierda · destino, precio y badge al 88 % con el precio terminando en y=938 · pie en y≈972 · degradado inferior marrón `#2a1608` (0 → 0,78 entre y 800 y 1080) |
-| Reglas por tipo | Clúster DOM: lista reordenada en 3 columnas (Norte 6 · Sur 6 · Sur 3) al 90 %. Clúster INTER y Encuentra Chile: lista al 84 % con oscurecido izquierdo. KV con banderas o regiones: lista escalada para caber entre y 336 y 664. Alianza: escala 1, misma posición del KV |
+| Reglas por tipo | Clúster DOM: lista reordenada en 3 columnas (Norte 6 · Sur 6 · Sur 3) al 90 %. Clúster INTER y Encuentra Chile: lista al 84 % con oscurecido izquierdo. KV con banderas o regiones: lista escalada para caber entre y 336 y 664. Alianza: escala 1, misma posición del KV. Desde la cuarta ronda, flecha de precio y badge corridos a la izquierda hasta 40 px tras el bloque de destino cuando quedan más lejos (también en los KV del kit) y crédito en (40, 34) |
 | Variantes | 24 KV + 13 rutas |
 | Nombre | `<KV>__popup.png` |
 | Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/` |
@@ -190,7 +190,7 @@ medidos sobre los archivos entregados.
 | Tamaño | 1080×1920 PNG |
 | Origen en el kit | Sin plantilla estática en el kit; se recompone desde las partes |
 | Elementos | Foto al 113 % del KV (escala 2,04, cubre 1920 sin inventar cielo) · zonas seguras ~270 px arriba y abajo · logo al 130 % anclado en y=270 · lista, destino, precio, badge y pie +350 px (pie termina ~1655) · degradado inferior 0 → 0,82 entre y 1360 y 1660 |
-| Reglas por tipo | Clúster DOM: bloque y pie +80 px más (pie ~1735), lista al 115 % centrada entre logo y destino. Alianza: escala 1,1, borde derecho en x=1032, tope en y=500 (bajo el avión, que con el logo al 130 % llega a x≈925) |
+| Reglas por tipo | Clúster DOM: bloque y pie +80 px más (pie ~1735), lista al 115 % centrada entre logo y destino. Alianza: escala 1,1, borde derecho en x=1032, tope en y=500 (bajo el avión, que con el logo al 130 % llega a x≈925); sigue vigente para PromPerú «otros HM» (BR «Voe para Peru»). Desde la cuarta ronda: la alianza que en el KV toca la esquina superior derecha (Chile Travel) se ancla a (1080, 0) al 110 %; en las stories con PromPerú, PromPerú centrado en x=540 entre la franja de precio y el pie y la ubicación pegada arriba a la derecha (borde derecho 1040, superior 22); crédito en (40, 34) como en KV y popup; regla de la flecha a 40 px |
 | Variantes | 24 KV + 13 rutas |
 | Nombre | `<KV>__story.png` |
 | Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/` |
@@ -363,7 +363,8 @@ Detalle del flujo plantilla + datos en [sky-design-canvas.md](sky-design-canvas.
 
 | Propiedad | Valor |
 | --- | --- |
-| Diámetro | 67 px (radio 33,5) con borde blanco de 2 px |
+| Diámetro | 67 px (radio 33,5) con borde blanco de 2 px. Desde la cuarta ronda es un solo aro de 2 px (antes sumaba ~5 px con el aro propio del SVG): `banderas.cjs` quita ese aro y recorta la bandera a su círculo |
+| HPH por mercado | Bandera al 93 % de su caja con un aro del 3 % del diámetro (`hph/market.cjs`) |
 | Texto | Metric Medium 33, blanco `#fefefe`; segunda línea con interlínea 31,35 |
 | Posición en KV | Centro x=103, texto x=166,5, primera fila y=378; paso 98 px hasta 4 filas, 92 px con 5 |
 | Fila de Uruguay | 4 banderas de 52 px (radio 26), paso 66 px, desde x=92, a la altura de la píldora de origen oculta |
@@ -409,8 +410,10 @@ Cada SVG circular pesa ~1,78 MB porque embebe las 7 banderas raster y muestra un
 | Chile Travel (fuera de Chile) | `ALIANZAS/SERNATURE/CHILE TRAVEL (FUERA DE CHILE).svg` (146×171) | `HM_BR_KV_SANTIAGO`: alto 150 px, **pegado a la esquina superior derecha** (x = 1080 − ancho, y = 0; Daniela 2026-11-05); en la story, anclado a (1080, 0) al 110 % |
 | Chile es tuyo (sólo HM Chile) | `ALIANZAS/SERNATURE/CHILE ES TUYO (SOLO HM CHILE).svg` (145×171) | No se usó (ningún KV chileno lleva alianza) |
 
-Ubicación de la foto en rutas: `[Ubicación de la foto]`, Metric Bold 18, blanco con contorno suave, alineado
-a la derecha en x=1032, bajo PromPerú, con pin verde vectorial. Placeholder.
+Ubicación de la foto en rutas: Metric Bold 18, blanco con contorno suave, alineado a la derecha en x=1032, bajo
+PromPerú, con pin verde vectorial. Desde la tercera ronda el texto sale del CSV de Daniela; sólo Chiclayo y
+Talara siguen con `[Ubicación de la foto]`. En la story (desde la cuarta ronda) va pegada arriba a la derecha:
+borde derecho en x=1040, borde superior en y=22.
 
 ### 4.6 Gráficos, video y audio del kit
 
@@ -462,9 +465,11 @@ lista, otro) es **inferido**: la sesión sólo verificó que KV2 trae lista o ta
 | `HPH` | `hph/` | 6 juegos × 4 tamaños × 2 | 48 |
 | `LOGO BLACK` | `logo-black/` | Logo BLACK ES/PT/EN con la fecha nueva: PNG transparente 4000 y 2000 px + SVG corregido (2026-11-05) | 9 |
 
-Total 321 archivos, 626 MB; recontado el 2026-11-05 por carpeta. `scripts/` queda sólo en local.
+Total 321 archivos, 626 MB; recontado el 2026-11-05 por carpeta. `scripts/` queda sólo en local. Tras la cuarta
+ronda la carpeta se actualizó con `rsync -a` sin `--checksum` (comparar contenido descarga los archivos sólo en la
+nube y el proceso se colgaba) y quedó al día; los conteos de esta tabla son los del primer recuento.
 
-### 5.3 Canvas de Claude Design (versión 28, 10 páginas)
+### 5.3 Canvas de Claude Design (versión 28 con 10 páginas; versión 40 al cierre de la cuarta ronda)
 
 1 Internacionales · 2 Nacionales · 3 Plantillas (CyberSky) · 4 KV Black · HM · 5 KV Black · Animación GIF ·
 6 KV Black · Popup y Story · 7 KV Black · PMAX y HPH · KV Black · Grilla por mercado · KV Black · Rutas foco
@@ -474,7 +479,8 @@ por script). URL y lecciones de la plataforma: [sky-design-canvas.md](sky-design
 ### 5.4 «BLACK SKY 2026» (orden pedido por Daniela, 2026-11-05)
 
 Ruta: `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (estaba vacía). 155 archivos, copiados con
-`organizar.cjs` y verificados con `diff -rq`. Nomenclatura `BS_<MEDIDA o FORMATO>_<PIEZA>`: genéricos
+`organizar.cjs` y verificados con `diff -rq`. En la cuarta ronda se actualizaron 73 (el script compara por tamaño
+y fecha, sin leer el destino en OneDrive). Nomenclatura `BS_<MEDIDA o FORMATO>_<PIEZA>`: genéricos
 `INTER` / `DOM` / `DESTINOS`; destinos y rutas foco con IATA (SCL, LIM, AQP, AYP, CJA, CIX, CUZ, IQT, JAU,
 JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_INTER`).
 
@@ -497,7 +503,8 @@ vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima
 del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
 PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, desde la cuarta
 ronda, un velo diagonal adaptativo (pipeline §4.5); en la story, la ubicación va completa en la esquina superior
-derecha (margen 48) y PromPerú centrado (x=540) entre el precio y el pie. Regla de la flecha de precio: 40 px
+derecha (borde derecho en x=1040, borde superior en y=22) y PromPerú centrado (x=540) entre el precio y el pie.
+Tacna story reencuadrada (z 1,25, t [0,36; 0,5]) para que la flecha no tape a la persona. Regla de la flecha de precio: 40 px
 después del bloque del destino cuando el destino es corto, en KV, popup y story.
 Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
 en placeholder. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima

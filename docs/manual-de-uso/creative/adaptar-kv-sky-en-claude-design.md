@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda: velo del logo, regla de la flecha, alianzas y encuadres)
+> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda completa: ubicación de las alianzas en la story, alcance de la flecha, aro de 2 px, velo del logo en el QA, copia por tamaño y fecha)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -31,6 +31,10 @@ Cubre tres trabajos que se hicieron el 2026-11-04 y que sirven de caso fuente:
 Y la segunda ronda (2026-11-04/05, pedidos de Daniela por Teams): logo con fecha nueva en todo el despliegue, grilla
 de 12 mensajes por mercado, KV con banderas, rutas foco de Perú, Chile «KV listo» (TikTok, DAT, PMAX), PMAX y HPH por
 mercado y story en video de 5 slides.
+
+Y la cuarta ronda (2026-11-05, canvas en la versión 40): velo diagonal detrás del logo, regla de la flecha de
+precio, Chile Travel en la esquina y PromPerú centrado en las stories, aro de 2 px en las banderas, fotos de la
+temporada del mercado y entrega puesta al día. Las rondas siguientes se trabajan en una sesión derivada.
 
 Qué es cada formato, su tamaño, cuántos se hicieron, dónde quedaron y cómo se lee su nombre de archivo está en el
 **[Catálogo de formatos SKY](../../documentation/creative/catalogo-formatos-sky.md)**. Este manual explica cómo se
@@ -224,8 +228,11 @@ story en video:
    lista de regiones. «Encuentra destinos» de Chile sale del clúster internacional; el de Perú, del KV internacional
    con banderas.
 2. Logos de alianza: Chile Travel (`SERNATURE/CHILE TRAVEL (FUERA DE CHILE)`) en Brasil «Voe a Santiago» y PromPerú
-   «otros HM» en Brasil «Voe para Peru». Van arriba a la derecha en KV y popup; en la story, bajo el avión (a escala
-   1,1, sin montarse con él).
+   «otros HM» en Brasil «Voe para Peru». En KV y popup van arriba a la derecha. **Chile Travel** va pegado a la
+   esquina superior derecha, alineado con los bordes, en todas sus aplicaciones (KV, popup, story, GIF y story en
+   video). En las **stories de las rutas foco y de «Vuela por el Perú»**, PromPerú «solo HM Perú» va centrado entre la
+   franja de precio y el pie. PromPerú «otros HM» (Brasil «Voe para Peru») conserva su margen y en la story va al margen
+   derecho debajo del avión.
 3. Separa el KV en capas (`layers.cjs`; las listas nuevas usan la región `[40,320,720,890]` y la alianza
    `[740,0,1080,330]`) y arma popup y story (`compose.cjs`): en el popup la lista se ajusta entre el logo y el destino.
 4. Anima (paso 5) y arma el story en video (paso 7f).
@@ -239,7 +246,9 @@ en US); el logo de alianza correcto según el mercado; que el título no choque 
 ### 7d. KV con banderas por mercado
 
 1. Toma el KV del mercado y suma, bajo el logo, la lista de destinos con bandera, con el estilo del clúster
-   internacional de Chile: círculo de 67 px con borde blanco y el texto en Metric Medium 33 (`banderas.cjs`).
+   internacional de Chile: círculo de 67 px con aro blanco fino de 2 px, como el kit (la primera versión tenía unos
+   5 px), y el texto en Metric Medium 33 (`banderas.cjs`). El mismo aro va en PE «Encuentra destinos», en los popups,
+   stories, GIF y stories en video de estos KV y en el HPH por mercado.
 2. Las listas salen de las 5 referencias que mandó Daniela:
 
 | KV | Lista |
@@ -260,7 +269,8 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 
 1. Por cada ruta, parte de `HM_PE_KV_DOM-RUTA` y cambia el destino por la ciudad; el título se ajusta para no pasar de
    430 px de ancho (`rutas.cjs`).
-2. Pon el logo **PromPerú «solo HM Perú»** (PNG; no hay SVG) arriba a la derecha.
+2. Pon el logo **PromPerú «solo HM Perú»** (PNG; no hay SVG) arriba a la derecha en KV y popup. En la story va
+   centrado entre la franja de precio y el pie.
 3. Debajo, el texto de ubicación de la foto con el pin verde: `[Ubicación de la foto]` como marcador mientras no haya
    foto por destino.
 4. Entrega KV (`HM_PE_RUTA_<CIUDAD>.png`), popup y story. Las 13 rutas de BLACK: Arequipa, Cajamarca, Chiclayo, Cusco,
@@ -281,13 +291,16 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 
 Si el logo se pierde sobre la foto, ajusta el encuadre en `fotos-destino.json` (`f.<formato>.t`, o `src` para
 usar otra versión de la foto) y vuelve a correr `./rehacer-destinos.sh`. El único apoyo detrás del logo es el
-velo diagonal que calcula `destinos.cjs` según la luz de cada foto (nace arriba a la izquierda y se apaga antes del
-lado derecho). No pongas sombras radiales, halos ni cielos inventados: se ven como mancha. Si la flecha o el badge
-tapan a una persona, usa `z` y `t` del formato (como la story de Tacna). Elige fotos de la temporada del mercado:
-en noviembre, verano en Argentina y Chile.
+velo diagonal que calcula `destinos.cjs` según la luz de cada foto y cada formato (nace arriba a la izquierda, se
+apaga antes del lado derecho, no tiene bordes y va de 16 % a 50 %). Reemplazó al degradado plano de 20 % a 0. No
+pongas sombras radiales, halos ni cielos inventados: se ven como mancha. Si la flecha o el badge tapan a una persona,
+usa `z` y `t` del formato (como la story de Tacna). Elige fotos de la temporada del mercado: en noviembre es
+primavera-verano en Argentina (por eso «Volá a Santiago» lleva una foto de verano).
 
 La regla de la flecha la aplican `brecha.cjs` (KV) y `compose.cjs` (popup y story): si el destino es corto, la
-flecha y el badge se acercan hasta 40 px del bloque del destino. Después de cambiar un texto de destino, corre
+flecha y el badge se acercan hasta 40 px del bloque del destino, medido desde lo más ancho entre antetítulo, nombre
+y píldora. Nunca se alejan. Vale para KV, popup, story y GIF de las variantes y para los popups de los KV del kit
+(en estos últimos, falta que Daniela confirme). Después de cambiar un texto de destino, corre
 `./rehacer-destinos.sh` y `node compose.cjs` (sin nombres, para todas).
 
 Qué revisar: el sujeto queda a la derecha, sin tapar el logo ni el precio; el antetítulo, las fechas y
@@ -301,6 +314,10 @@ arriba a la izquierda; el legal dice «Final tramo <Ciudad>-Lima. Tasas incluida
 `node organizar.cjs <entregables locales> "<…>/10_Noviembre/BLACK SKY 2026"` copia sin borrar nada, con la
 estructura por mercado y formato y los nombres `BS_…`. Si falta una fuente o dos piezas quedarían con el
 mismo nombre, se detiene. Primero pruébalo en una carpeta local y compáralo con `diff -rq`.
+
+Para decidir qué copiar, `organizar.cjs` compara cada archivo por **tamaño y fecha**, sin abrirlo: leer archivos que
+OneDrive tiene sólo en la nube colgaba el proceso. En la cuarta ronda dejó «BLACK SKY 2026» con 155 archivos, y
+«ENTREGABLES BLACK» también quedó al día.
 
 ### 7f. Story en video (5 slides)
 
@@ -417,13 +434,14 @@ y el kit original no se tocó.
 
 ## Qué revisar por formato (QA visual)
 
-Antes de entregar, mira cada pieza al 100 % (no sólo la miniatura). Cinco controles valen para **todas**:
+Antes de entregar, mira cada pieza al 100 % (no sólo la miniatura). Seis controles valen para **todas**:
 
 | Control | Qué mirar |
 |---|---|
-| **Logo y fecha** | Logo BLACK con la fecha vigente en el idioma del mercado («DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT en Brasil, EN en EE. UU.), sin tocar el marco y sin resplandor borroso |
-| **Banderas** | Cada bandera corresponde al destino escrito a su lado; se mira la imagen, no el nombre del archivo |
-| **Alianzas** | El logo que toca: Chile Travel fuera de Chile, PromPerú «otros HM» fuera de Perú, PromPerú «solo HM Perú» en las rutas; arriba a la derecha y, en la story, sin montarse con el avión |
+| **Logo y fecha** | Logo BLACK con la fecha vigente en el idioma del mercado («DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT en Brasil, EN en EE. UU.), sin tocar el marco y sin resplandor borroso; legible sobre la foto gracias al velo diagonal, sin manchas ni halos |
+| **Banderas** | Cada bandera corresponde al destino escrito a su lado; se mira la imagen, no el nombre del archivo; aro blanco fino de 2 px |
+| **Alianzas** | El logo que toca: Chile Travel fuera de Chile, PromPerú «otros HM» fuera de Perú, PromPerú «solo HM Perú» en las rutas. En KV y popup, arriba a la derecha; Chile Travel pegado a la esquina en todas las piezas; en las stories de rutas y «Vuela por el Perú», PromPerú centrado entre la franja de precio y el pie; PromPerú «otros HM» en la story, al margen derecho bajo el avión |
+| **Flecha de precio** | Con destinos cortos, flecha y badge a 40 px del bloque del destino; nunca más lejos de donde los puso el kit |
 | **Precio placeholder** | `000.000`, `00%`, `USD 000`, `R$ 0.000` son marcadores: la pieza no se pauta hasta reemplazarlos con la grilla de precios |
 | **Textos del mercado** | Verbo, moneda, etiqueta de precio y badge literales del kit para ese mercado (VOLÁ sólo en AR/UY) |
 
@@ -505,7 +523,9 @@ Lo pendiente con Daniela, uno por uno, está en el
 | Un texto («Internacional») falta en popup, story o GIF | Era más ancho que su región y quedó en la foto. Amplía la región y rehaz las piezas; compara la foto separada contra la fuente |
 | La fecha del logo sale en portugués en un KV en español | El idioma se detectó en el SVG crudo (el contenido codificado tiene secuencias como «VOE»). Detéctalo sólo por el texto visible |
 | El HPH 728×90 por mercado fue rechazado | Se compuso desde las partes del KV. Rehazlo desde el SVG de referencia del kit |
-| El logo de alianza se monta con el avión en la story | Bájalo bajo el avión (escala 1,1, borde derecho 1032, tope y 500) |
+| El logo de alianza se monta con el avión en la story | Aplica la ubicación vigente desde la cuarta ronda: Chile Travel pegado a la esquina superior derecha; PromPerú «solo HM Perú» centrado entre la franja de precio y el pie; PromPerú «otros HM» al margen derecho, debajo del avión |
+| El logo BLACK no se lee sobre una foto clara | Ajusta el encuadre en `fotos-destino.json` y deja que `destinos.cjs` recalcule el velo diagonal (16 % a 50 %). No agregues sombras, halos ni cielo |
+| `organizar.cjs` se queda colgado al copiar a OneDrive | Estaba leyendo archivos que existen sólo en la nube. La versión actual compara por tamaño y fecha; usa esa |
 | La publicación del canvas falla con error 422 | Superaste 512 archivos en la versión. Quita con `null` lo que ya no se usa (en BLACK, las capas `anim/`) y publica por lotes |
 | Una ciudad aparece dos veces en las rutas | La lista venía repetida (Pucallpa). Hazla una sola vez y avísalo |
 | Falta la tapa de cierre vertical de un idioma | No viene en el kit (en BLACK, español). Recorta la horizontal sobre blanco y déjalo como pendiente |

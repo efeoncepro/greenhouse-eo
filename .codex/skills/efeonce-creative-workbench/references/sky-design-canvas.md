@@ -7,7 +7,10 @@ gobernada de Workbench ni registra aprobación del cliente. Continuidad y pendie
 [state-continuity.md](state-continuity.md), sección del corte 2026-11-04. La segunda ronda (2026-11-04/05)
 sumó la grilla por mercado, rutas de Perú, Chile «KV listo», HPH por mercado y story en video. Cada formato, su
 tamaño, su nombre y su mercado están en [sky-format-catalog.md](sky-format-catalog.md). Cada script y sus
-parámetros (GIF, MP4, story en video, logofix) están en [sky-black-pipeline.md](sky-black-pipeline.md).
+parámetros (GIF, MP4, story en video, logofix) están en [sky-black-pipeline.md](sky-black-pipeline.md). La tercera
+y la cuarta ronda (2026-11-05: fotos de destino, velo del logo, regla destino ↔ flecha, alianzas, marca de agua,
+aro de banderas) están en ese pipeline, §4.4 y §4.5; las rondas siguientes se llevan en la sesión derivada «SKY
+BLACK: siguientes rondas de ajustes del canvas».
 
 ## Frontera
 
@@ -29,7 +32,7 @@ sigue en Creative Workbench ([SKILL.md](../SKILL.md), invariantes; [sky-producti
 | Artifact | URL | Tipo | Estructura |
 | --- | --- | --- | --- |
 | Design System «SKY Airline — Performance» | https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Design System | `project/design-system.json` v3, `tokens.json` (forma de lista), `tokens.css`, `components/<Comp>/README.md` + `preview.html`, `bundle.js` mínimo; `index.d.ts` se sube como text/plain |
-| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre |
+| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; versión 40 al cierre de la cuarta ronda (2026-11-05) |
 
 **Design System.** Se construyó desde las 126 adaptaciones (37 composiciones) del pack SKY
 `0.1.0` de Workbench, consultadas con `pnpm marca:recetas sky` ([recipes.md](recipes.md)).
@@ -295,7 +298,8 @@ que OneDrive; el original no se toca) y **todos los scripts leen de `src2/`**:
 **2. KV con banderas por mercado** (`banderas.cjs`, referencias = 5 imágenes de Daniela): al KV del
 mercado se le suma bajo el logo la lista de destinos con bandera, con el estilo del clúster
 internacional de Chile (círculo 67 px con borde blanco 2 px, Metric Medium 33, interlínea 31,35,
-paso 92–98). Banderas circulares de `GRAFICOS/BANDERAS` renderizadas a PNG transparente:
+paso 92–98). En la cuarta ronda se corrigió el aro: sumaba ~5 px porque se apilaba el aro propio del SVG;
+ahora `banderas.cjs` lo quita, recorta la bandera a su círculo y dibuja un solo aro de 2 px (pipeline §4.1). Banderas circulares de `GRAFICOS/BANDERAS` renderizadas a PNG transparente:
 **«BANDERA CL (CIRCULO)_1.svg» es Argentina** y «BANDERA PUJ (CIRCULO)» es República Dominicana
 (no hay círculo de AR con ese nombre).
 
@@ -320,7 +324,12 @@ paso 92–98). Banderas circulares de `GRAFICOS/BANDERAS` renderizadas a PNG tra
 | US | Fly international | `HM_US_KV_BANDERAS` |
 
 El logo de alianza va arriba a la derecha en KV y popup (capa `alianza` [740,0,1080,330]); en la
-story, bajo el avión (con el logo al 130 % el avión llega a x≈925). En `parts.cjs`/`layers.cjs` las
+story, bajo el avión (con el logo al 130 % el avión llega a x≈925). Cuarta ronda (2026-11-05): Chile Travel va
+pegado a la esquina superior derecha (`x = 1080 − ancho`, `y = 0`) y en la story se ancla a (1080, 0) al 110 %;
+en las stories de las rutas y «Vuela por el Perú», PromPerú «solo HM Perú» va centrado en x=540 entre la franja de
+precio y el pie (PromPerú «otros HM» de BR «Voe para Peru» sigue bajo el avión), y la ubicación
+pegada arriba a la derecha (borde derecho 1040, superior 22). Con destinos cortos rige la regla destino ↔
+flecha: flecha y badge a 40 px del bloque de destino, nunca corridos a la derecha (pipeline §4.5). En `parts.cjs`/`layers.cjs` las
 listas nuevas usan la región `lista` [40,320,720,890]; en el popup se escalan para caber entre el
 logo (~322) y el destino (~684).
 
@@ -328,7 +337,9 @@ logo (~322) y el destino (~684).
 Chiclayo, Piura, Trujillo, Iquitos, Cajamarca, Arequipa, Tarapoto y Juliaca. Por ruta, KV desde
 `HM_PE_KV_DOM-RUTA` con el destino (ajustado a ≤ 430 px), logo **PromPerú «solo HM Perú»** (PNG,
 no hay SVG) arriba a la derecha y, debajo, el texto de ubicación de la foto con pin verde:
-`[Ubicación de la foto]` (placeholder; no tenemos fotos por destino). Entregables: popup y story.
+`[Ubicación de la foto]` (placeholder; no tenemos fotos por destino). Entregables: popup y story. Desde
+la tercera ronda son 15 rutas con foto aprobada y ubicación del CSV de Daniela (sin foto: Chiclayo y Talara);
+ver pipeline §4.4.
 
 **5. Chile «KV listo»** (BLACK SKY CL 26, lista de Notion): Banner TikTok 1920×1080 (precio,
 descuento, precio + descuento), DAT 1080×1080 (nacional e internacional) y PMAX precio+dcto en los
@@ -374,7 +385,7 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 
 | Ruta | Contenido |
 | --- | --- |
-| `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; `scripts/` (incluye `logofix`, `banderas`, `variantes`, `rutas`, `chile-refs`, `story-video`, `render-gif.sh`) |
+| `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; `scripts/` (copia vigente tras la cuarta ronda: incluye `logofix`, `banderas`, `variantes`, `rutas`, `destinos`, `brecha`, `rehacer-destinos.sh`, `organizar`, `chile-refs`, `story-video`, `render-gif.sh` y `vid-blobs.json` con los ids nuevos de video) |
 | `ai-generations/2026-11-04_sky-cybersky-peru/` | Selfies generadas, grado de color y scripts |
 
 **Entrega en OneDrive (2026-11-05, a pedido del operador).** Los entregables de
@@ -396,6 +407,13 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 Total 321 archivos, 626 MB. Antes de copiar se comprobó que la carpeta no existía; verificación
 con `diff -rq` por carpeta y `cmp` por archivo de la raíz: todo idéntico. El kit no se modificó.
 La copia local no prueba que OneDrive ya la haya subido a la nube.
+
+**Rondas posteriores (2026-11-05).** La carpeta de entrega se actualiza con `rsync -a` **sin `--checksum`**:
+comparar contenido lee el destino y un archivo de OneDrive que está sólo en la nube se descarga entero, así que
+el proceso se colgaba. Tras la cuarta ronda quedó al día. El orden pedido por Daniela vive aparte en
+`10_Noviembre/BLACK SKY 2026/`, armado con `organizar.cjs` (compara por tamaño y fecha, sin leer el destino):
+155 archivos, 73 actualizados en la cuarta ronda. Estructura y nomenclatura en
+[sky-format-catalog.md](sky-format-catalog.md) §5.4.
 
 Los scripts (`patches.cjs`, `parts.cjs`, `grado.cjs` y los de render/animación) tienen rutas
 fijas del scratchpad de la sesión original. **Adaptarlas** a la ubicación nueva antes de

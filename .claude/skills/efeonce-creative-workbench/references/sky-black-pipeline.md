@@ -61,7 +61,9 @@ OneDrive (kit, sólo lectura)
    │                            │
    │      banderas.cjs ─────────┤  + HM_*_KV_BANDERAS.svg
    │      variantes.cjs ────────┤  + SANTIAGO / LIMA / PERU / ENCUENTRA / DOM_REGIONES
-   │      rutas.cjs ────────────┘  + HM_PE_RUTA_<CIUDAD>.svg (13)
+   │      rutas.cjs ────────────┤  + HM_PE_RUTA_<CIUDAD>.svg (13; 15 desde la tercera ronda)
+   │      destinos.cjs ─────────┤  foto de destino, velo del logo, piso y crédito (§4.4–4.5)
+   │      brecha.cjs ───────────┘  regla destino ↔ flecha en variantes y rutas (§4.5)
    │                            │
    │      render.cjs (+patches) ─► png/<KV>.png                   KV fijo 1080×1350
    │      parts.cjs (+patches) ──► parts/<KV>__<capa>.png (+ bbox.json, ad hoc)
@@ -89,7 +91,9 @@ OneDrive (kit, sólo lectura)
 | 1 | `logofix.cjs` | `SRC` (KV, logos, HPH, PMAX, TikTok, DAT) | `src2/<misma ruta relativa>` | `node logofix.cjs [rutas relativas…]` (sin args: todo) |
 | 2 | `banderas.cjs` | `src2/KV X HM/HM_{AR,PE_INTER,BR,US,UY}_KV.svg`, `SRC/GRAFICOS/BANDERAS/` | `src2/KV X HM/HM_*_BANDERAS.svg`, `flags-circ/<k>.png` | `node banderas.cjs` |
 | 3 | `variantes.cjs` | `src2/KV X HM/` (incluye salidas de 2), `SRC/ALIANZAS/` | 7 SVG de variantes en `src2/KV X HM/` | `node variantes.cjs` |
-| 4 | `rutas.cjs` | `src2/KV X HM/HM_PE_KV_DOM-RUTA.svg`, PNG PromPerú | `src2/KV X HM/HM_PE_RUTA_*.svg` (13) | `node rutas.cjs` |
+| 4 | `rutas.cjs` | `src2/KV X HM/HM_PE_KV_DOM-RUTA.svg`, PNG PromPerú, `rutas-prompe.csv` | `src2/KV X HM/HM_PE_RUTA_*.svg` (15 desde la tercera ronda) | `node rutas.cjs` |
+| 4a | `destinos.cjs` | SVG de variantes y rutas, `fotos-destino.json`, `fotos-destino/` | los mismos SVG con foto, velo, piso y crédito | `node destinos.cjs` (o `./rehacer-destinos.sh`, §4.5) |
+| 4b | `brecha.cjs` | SVG de variantes y rutas | los mismos SVG con flecha y badge corridos y `data-capa` | `node brecha.cjs <archivos.svg…>` |
 | 5 | `render.cjs` | `src2/KV X HM/*.svg`, `patches.cjs` | `png/<KV>.png` | `node render.cjs [archivo.svg…]` |
 | 6 | `parts.cjs` | idem | `parts/<KV>__<capa>.png`, `parts/report.json` | `node parts.cjs [archivo.svg…]` |
 | 7 | `layers.cjs` | idem | `layers/<KV>__<capa>.png`, `layers/report.json` | `node layers.cjs [archivo.svg…]` |
@@ -108,7 +112,10 @@ OneDrive (kit, sólo lectura)
 El orden importa: `variantes` necesita `HM_PE_KV_INTER_BANDERAS.svg` (sale de `banderas`) y
 `HM_CL_KV_INTER_CLUSTER.svg` corregido (sale de `logofix`); `compose` y `story-video` necesitan `parts/`;
 `story-video` además necesita `formatos/<KV>__story.png`; `banners` y `hph/market` necesitan
-`parts/bbox.json`. Un cambio en la fuente se propaga **en cascada desde el paso 1**, nunca pieza por pieza.
+`parts/bbox.json`. Desde la cuarta ronda, después de `banderas` hay que correr `variantes`
+(`HM_PE_KV_ENCUENTRA` nace de `HM_PE_KV_INTER_BANDERAS`) y luego `hph/market` (usa `flags-circ/`); `brecha`
+va después de `destinos` y antes de `render`. Un cambio en la fuente se propaga **en cascada desde el paso 1**,
+nunca pieza por pieza.
 
 ## 2. Fuentes del kit que leen los scripts
 
@@ -205,8 +212,10 @@ Base = KV del mercado ya corregido. Primero renderiza las 7 banderas circulares 
 160×160 (`preserveAspectRatio="xMidYMid slice"`) en `flags-circ/<k>.png`; claves `AR` (archivo
 `BANDERA CL (CIRCULO)_1.svg`), `BR`, `CL`, `PE`, `US`, `UY`, `PUJ`.
 
-Bandera = círculo blanco de radio 33,5 + imagen inscrita 1,5 px adentro con `clip-path="circle(50%)"` +
-borde blanco de 2 px a radio 33. Lista bajo el logo, estilo del clúster internacional de Chile:
+Bandera (desde la cuarta ronda, §4.5): `banderas.cjs` quita el aro propio del SVG (`stroke="#fff"` → `none`),
+recorta la bandera a su círculo en `flags-circ/<k>.png` y dibuja **un solo aro blanco de 2 px** a r − 1. Antes
+era círculo blanco de radio 33,5 + imagen inscrita 1,5 px adentro con `clip-path="circle(50%)"` + borde de 2 px
+a radio 33, y con el aro del SVG sumaba ~5 px. Lista bajo el logo, estilo del clúster internacional de Chile:
 
 | Parámetro | Valor |
 | --- | --- |
@@ -230,14 +239,17 @@ nuevo; los demás se borran) y suma elementos en un `<g id="variante">`:
 | Variante | Base | Cambios de texto | Extra |
 | --- | --- | --- | --- |
 | `HM_AR_KV_SANTIAGO` / `_LIMA` | `HM_AR_KV` | VOLÁ → VOLÁ A; Internacional → Santiago / Lima | — |
-| `HM_BR_KV_SANTIAGO` | `HM_BR_KV` | Internacional → Santiago | Chile Travel, alto 150 |
+| `HM_BR_KV_SANTIAGO` | `HM_BR_KV` | Internacional → Santiago | Chile Travel, alto 150, pegado a la esquina (`x = 1080 − ancho`, `y = 0`; §4.5) |
 | `HM_BR_KV_PERU` | `HM_BR_KV` | VOE A → VOE PARA; Internacional → Peru | PromPerú «otros HM», alto 104 |
 | `HM_CL_KV_ENCUENTRA` | `HM_CL_KV_INTER_CLUSTER` | VUELA → ENCUENTRA; Internacional → Destinos | — |
 | `HM_PE_KV_ENCUENTRA` | `HM_PE_KV_INTER_BANDERAS` | VUELA A → ENCUENTRA; Calama → Destinos | — |
 | `HM_PE_KV_DOM_REGIONES` | `HM_PE_KV_DOM` | VUELA A → VUELA POR; Calama → Perú | 2 columnas de regiones |
 
-- **Alianza:** el SVG de la alianza se incrusta como `data:image/svg+xml;base64`, arriba a la derecha:
-  `x = 1080 − 48 − ancho`, `y = 52`, ancho proporcional al alto indicado.
+- **Alianza:** el SVG de la alianza se incrusta como `data:image/svg+xml;base64`, arriba a la derecha, con
+  ancho proporcional al alto indicado. PromPerú «otros HM» va con margen: `x = 1080 − 48 − ancho`, `y = 52`.
+  Chile Travel, desde la cuarta ronda, va pegado a la esquina: `x = 1080 − ancho`, `y = 0`.
+- **Regla de la flecha:** las variantes con destino corto (AR Lima y Santiago, BR Perú y Santiago) pasan
+  después por `brecha.cjs` (§4.5).
 - **Regiones de Perú:** NORTE (Tumbes, Piura, Chiclayo, Trujillo, Cajamarca, Tarapoto, Iquitos) y
   CENTRO Y SUR (Pucallpa, Jauja, Cusco, Arequipa, Juliaca, Tacna); columna `x = 84 + c × 236`,
   encabezado en `y = 372` (Metric Bold 22, `letter-spacing` 1) con regla verde `#26de00` de 2 px (82 px
@@ -292,7 +304,7 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   negra», Julio y Daniela), y luego el `drop` con cielo prolongado de la propia foto («se siente como una mancha»,
   cortaba la palmera de Piura). `cubrir` conserva la opción `drop`, pero no se usa en ninguna pieza.
 - **Story con PromPerú (rutas y «Vuela por el Perú»):** la ubicación es una capa aparte (`data-capa="ubicacion"`)
-  y va sola arriba a la derecha (desde §4.5: en la esquina, margen 48, al 110 %); PromPerú va entre la franja de
+  y va sola arriba a la derecha (desde §4.5: pegada a la esquina, borde derecho en x=1040 y borde superior en y=22, al 110 %); PromPerú va entre la franja de
   precio y el pie, al 120 % (desde §4.5: centrado en x=540), y el pie (puntualidad y legales) baja 115 px. En KV y popup siguen juntos arriba a la derecha.
 - **`compose.cjs`** usa `cubrir(n, W, H, 'popup'|'story')`, el velo del logo (§4.5),
   un piso más alto (popup desde 560, story 1000–1720) y el crédito.
@@ -313,9 +325,11 @@ publicar → copiar a `OUT` → `organizar.cjs`.
 
 ### 4.5 Cuarta ronda (2026-11-05): velo del logo, regla destino ↔ flecha, alianzas y encuadres
 
-Ocho comentarios de Daniela en el canvas. Todo se reconstruye con `./rehacer-destinos.sh`, que ahora corre
-`brecha.cjs` sobre variantes y rutas antes de `render`, y luego `node compose.cjs` sobre **todas** las piezas
-(la regla de la flecha cambia también los popups de los KV originales).
+Once comentarios en el canvas: ocho de Daniela y tres más (aro de las banderas, PromPerú centrado en Cajamarca, marca de agua y ubicación pegadas arriba). Todo se reconstruye con `./rehacer-destinos.sh`, que ahora corre
+`brecha.cjs` sobre variantes y rutas antes de `render` (la lista del script incluye también `HM_BR_KV_SANTIAGO`,
+`HM_BR_KV_PERU` y `HM_PE_KV_ENCUENTRA`, además de las rutas, `DOM_REGIONES` y AR Santiago y Lima), y luego
+`node compose.cjs` sobre **todas** las piezas (la regla de la flecha cambia también los popups de los KV
+originales). Canvas al cierre: versión 40.
 
 - **Velo del logo (`destinos.cjs` → `veloAlfa`, `veloSvg`, `velo`).** El degradado plano 20 % → 0 cruzaba todo el
   ancho, apagaba elementos de la foto a la derecha (faro de Lima) y no aseguraba el contraste con cielo claro
@@ -339,8 +353,8 @@ Ocho comentarios de Daniela en el canvas. Todo se reconstruye con `./rehacer-des
   `x = 1080 − ancho`, `y = 0` en el KV (alto 150). Popup lo hereda; en la story (`compose.cjs`) toda alianza que
   en el KV toque el borde superior derecho se ancla a (1080, 0) al 110 %. PromPerú «otros HM» sigue con margen.
 - **Story con PromPerú:** ubicación de la foto **completa en la esquina superior derecha, pegada arriba**
-  (borde derecho en x=1040, borde superior en y=22; antes y=228) y PromPerú **centrado en x=540** (antes centrado
-  bajo el precio), en todas las stories.
+  (borde derecho en x=1040, borde superior en y=22; antes y=228) y PromPerú **centrado en x=540**, entre la
+  franja de precio y el pie (antes centrado bajo el precio), en todas las stories con PromPerú.
 - **Marca de agua pegada arriba en todos los formatos:** en la story el crédito ya no baja a y=250; va en (40, 34)
   como en KV y popup, a la misma altura que la ubicación del lado derecho («los watermark siempre arriba pegado y
   la ubicación de al lado igual»).
@@ -351,13 +365,24 @@ Ocho comentarios de Daniela en el canvas. Todo se reconstruye con `./rehacer-des
   un aro de 3 % del diámetro (mín. 1 px). Después de `banderas.cjs` hay que correr `variantes.cjs`
   (`HM_PE_KV_ENCUENTRA` nace de `HM_PE_KV_INTER_BANDERAS`) y `hph/market.cjs`.
 - **AR «Volá a Santiago» en verano:** en Argentina es primavera-verano; la foto con nieve chocaba. Ahora
-  `santiago-1129335236` (pareja en el Parque Bicentenario con la Costanera): `original 3.png` para KV
-  (z 1,12, t [0,50; 0,41]) y popup (z 1,15, t [0,48; 0,40]) y la versión 1080×1920 para la story. El zoom sube
-  las caras sobre la flecha y el badge. La de nieve queda como `fotos-destino/AR_SANTIAGO_NIEVE.png`.
+  `santiago-1129335236` (pareja en el Parque Bicentenario con la Costanera): `original 3.png` (copia en
+  `fotos-destino/AR_SANTIAGO.png`) para KV (z 1,12, t [0,50; 0,41]) y popup (z 1,15, t [0,48; 0,40]) y la versión
+  1080×1920 (`fotos-destino/AR_SANTIAGO_V.jpg`) para la story. El zoom sube las caras sobre la flecha y el badge.
+  La de nieve queda como `fotos-destino/AR_SANTIAGO_NIEVE.png`.
 - **Tacna story:** la flecha tapaba a la persona; `f.story = { z: 1,25, t: [0,36; 0,5] }` la deja entera a la
   izquierda de la flecha.
 - Se regeneraron GIF de AR Lima, AR Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con
   banderas (AR, PE, BR, US, UY y PE «Encuentra»), y la story en video de las nueve que la tienen entre ellas.
+  Los ids nuevos de esos videos están en `vid-blobs.json` (copia en `OUT/scripts/`); las páginas del canvas se
+  regeneraron con ellos (§13.3).
+- **Entrega:** `organizar.cjs` (ya comparando por tamaño y fecha, §4.4) dejó «BLACK SKY 2026» con 155 archivos, 73
+  de ellos actualizados en esta ronda, y `ENTREGABLES BLACK (Efeonce 2026-11-05)/` se puso al día con
+  `rsync -a` **sin `--checksum`** (§14).
+- **Continuidad:** las rondas siguientes siguen en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del
+  canvas». La copia vigente de los scripts es `OUT/scripts/` (con rutas del scratchpad viejo que hay que adaptar,
+  §17).
+- **Pendiente:** confirmar con Daniela que la regla de la flecha también vale para los popups de los KV del kit
+  (§18).
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
@@ -445,7 +470,7 @@ Recompone desde `parts/` y la foto fuente (no estira el KV). Helpers:
 | --- | --- | --- |
 | Logo, alianza | 1 | `(0,0) → (0,0)` |
 | Destino | 0,88 | `(62, 1220) → (62, 938)` |
-| Precio y badge | 0,88 | `(1044, 1220) → (1044, 938)` |
+| Precio y badge | 0,88 | `(1044, 1220) → (1044, 938)`; desde la cuarta ronda, corridos a la izquierda hasta 40 px tras el bloque de destino si quedan más lejos (§4.5) |
 | Pie | 1 | `(0, 1240) → (0, 972)` |
 | Lista genérica (banderas/regiones) | `min(1, 328 / alto)` | centrada entre y 336 y 664 |
 | Lista clúster internacional | 0,84 | `(67, 366) → (67, 338)` |
@@ -461,7 +486,9 @@ vertical (Balmaceda, Puerto Natales, Punta Arenas, alineados con la primera fila
 | --- | --- |
 | Lista, precio, destino, badge, pie | escala 1, **+350 px** (`DB`) |
 | Logo | 1,3, esquina superior izquierda de su caja en `(x del KV, 270)` |
-| Alianza | 1,1, esquina superior **derecha** de su caja en `(1032, 500)`: bajo el avión |
+| Alianza | 1,1, esquina superior **derecha** de su caja en `(1032, 500)`: bajo el avión (vigente para PromPerú «otros HM» en BR «Voe para Peru»). Desde §4.5, la alianza que en el KV toca el borde superior derecho (Chile Travel) se ancla a `(1080, 0)` al 110 %; en las stories con PromPerú, PromPerú va centrado en x=540 entre la franja de precio y el pie y la ubicación pegada arriba a la derecha (borde derecho 1040, superior 22) |
+| Precio y badge | Corridos con `correStory` según la regla de la flecha (§4.5) |
+| Crédito (marca de agua) | `(40, 34)`, igual que en KV y popup (antes bajaba a y=250) |
 | Degradado | `piso(1360 → 1660, 0,82)` |
 | Clúster nacional | `DB = 430`; `piso(1440 → 1740, 0,82)`; lista 1,15 ancla `(84, 309)` centrada entre el fin del logo (`270 + alto × 1,3`) y el inicio del destino (`935 + 430`) |
 
@@ -657,6 +684,8 @@ de ancho), `hph/probe.cjs` (caja alfa de cada hoja → `probe.json`) y `hph/elli
    bandera 0,73 del paso, texto 0,36 del paso (Metric 500 `#fefefe`, interlínea 0,34), centrada si hay
    menos de 6 filas. En el 728×90 y en Uruguay, fila de banderas sin texto (diámetro = alto de la caja en
    el 728; si no, `min(alto/6 × 0,95, 70)`), separación 0,28 del diámetro. Banderas desde `flags-circ/`.
+   Desde la cuarta ronda cada bandera se dibuja al 93 % de su caja con un solo aro blanco del 3 % del
+   diámetro (mín. 1 px); correr `market.cjs` después de `banderas.cjs`, que regenera `flags-circ/` (§4.5).
 5. **BR y US:** logo `parts/<KV>__logo.png` escalado al ancho de la caja visible del logo genérico (con la
    caja del KV de `bbox.json`); puntualidad = recorte `[45, 1244, 330, 64]` de `parts/<KV>__pie.png`
    escalado por `alto visible / 58`, subido `3 × escala`.
@@ -676,7 +705,8 @@ descuentos siguen en placeholder (`000.000`, `00%`) hasta la grilla de precios. 
 
 ## 13. Publicación en el canvas de Claude Design
 
-Canvas: https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee (versión 28 al cierre; 10 páginas, 301 boards).
+Canvas «SKY CyberSky Perú — Adaptaciones»: https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee (versión 28 al
+cierre de la segunda ronda, con 10 páginas y 301 boards; versión 40 al cierre de la cuarta ronda, 2026-11-05).
 
 ### 13.1 Imágenes: `sync-canvas.cjs`
 
@@ -720,7 +750,9 @@ puede subir: el audio viaja como pista de un MP4.
    la pieza «GIF» se muestra como ese MP4 en bucle.
 3. Recién entonces correr `anim-page.cjs` y `new-pages.cjs`, que leen esos ids.
 
-Volver a subir un video genera **id nuevo**: actualizar `vid-blobs.json` y regenerar las páginas.
+Volver a subir un video genera **id nuevo**: actualizar `vid-blobs.json` y regenerar las páginas. Caso
+2026-11-05 (cuarta ronda): los GIF y stories en video regenerados (§4.5) tienen ids nuevos; la copia vigente
+de `vid-blobs.json` está en `OUT/scripts/`.
 
 ### 13.4 Publicar el proyecto
 
@@ -774,7 +806,10 @@ KV renombrados `__pmax-<fmt>.png` + `banners/*__pmax-1200x628{,_2x}.png`; `hph/`
 
 **OneDrive (2026-11-05):** copia a la carpeta nueva
 `Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/`, sin `scripts/` ni `.DS_Store`: 321 archivos,
-626 MB, verificados con `diff -rq` y `cmp`. Antes de entregar, `find OUT -type f ! -newermt '<fecha de la última
+626 MB, verificados con `diff -rq` y `cmp`. Las rondas siguientes la actualizan con `rsync -a` **sin
+`--checksum`** (comparar contenido lee el destino y un archivo sólo en la nube de OneDrive se descarga entero:
+el proceso se colgaba; [lessons.md](lessons.md)); tras la cuarta ronda quedó al día. «BLACK SKY 2026» sale de
+`organizar.cjs` (§4.4). Antes de entregar, `find OUT -type f ! -newermt '<fecha de la última
 corrección>'` debe salir vacío y cada PMAX 1080 debe dar `cmp` idéntico con su popup, KV o story.
 Mapeo de carpetas y reglas en
 [sky-design-canvas.md](sky-design-canvas.md), «Entregables y scripts locales».
@@ -810,7 +845,7 @@ Cada lote se revisa **mirando** una hoja de contacto, no sólo con métricas:
 | El divisor del pie queda en la base | Línea de ancho 0 | En `parts.cjs` basta ancho **o** alto > 0 |
 | `market.cjs` reporta logo 0 | Antialias del 2x deja la caja 1–2 px fuera | Holgura de ±3 px en `inside()` |
 | Banderas del 728×90 pegadas como cuadrados | El recorte del 1200 trae foto en las esquinas | Máscara circular `dest-in` |
-| Logo de alianza sobre el avión en la story | Con el logo al 130 % el avión llega a x≈925 | Alianza 1,1 con esquina superior derecha en `(1032, 500)` |
+| Logo de alianza sobre el avión en la story | Con el logo al 130 % el avión llega a x≈925 | Alianza 1,1 con esquina superior derecha en `(1032, 500)`; desde la cuarta ronda, Chile Travel se ancla a `(1080, 0)` y PromPerú va centrado entre precio y pie (§7, §4.5) |
 | Imágenes `file://` vacías en Playwright | `setContent` no carga recursos `file://` | Escribir HTML a disco y `goto` |
 | `x@2x.png` no carga en el artboard | El canvas no sirve nombres con «@» | Sufijo `_2x` |
 | `deploy 422: manifest exceeds 512 entries` | Versión con más de 512 archivos | Lotes y `null` en `files` (49 `anim/*`) |
@@ -827,7 +862,9 @@ El scratchpad de la sesión original es temporal. Antes de correr nada:
    `*-files.json` de las páginas, `vid-blobs.json` y `foto-fuente.png`. En `data/` están `bbox.json`
    (va a `parts/`), `anim-manifest.json` (va a `anim/manifest.json`), los dos archivos de hechos y los
    inventarios medidos del kit y de los entregables, con sus scripts `inv.sh`/`inv-kit.py`. Las fuentes
-   no se copian porque tienen licencia: reponerlas desde OneDrive.
+   no se copian porque tienen licencia: reponerlas desde OneDrive. Tras la cuarta ronda, esa copia es la
+   vigente (incluye `brecha.cjs`, `destinos.cjs`, `rehacer-destinos.sh`, `organizar.cjs` y el `vid-blobs.json`
+   con los ids nuevos); la sesión derivada «SKY BLACK: siguientes rondas de ajustes del canvas» parte de ella.
 2. **Reponer insumos** en el nuevo `K`: `Metric-*.otf` (desde OneDrive `Metric_family`),
    `hph/SourceSans3-Regular.otf`, `foto-fuente.png` (extraer el `<image>` embebido de un KV estándar),
    `P/ref/audio-gif.mp3` (copia del MP3 del kit) y un `P/` con el proyecto del canvas (bajarlo con
@@ -849,5 +886,6 @@ El scratchpad de la sesión original es temporal. Antes de correr nada:
 Frases INTER del brandlift y sus traducciones AR/PT/EN; traducciones de flecha y botón del HPH; BR «Voe
 para Peru» (alianza o KV); «Vuela por Perú» sin fotos; CL «Encuentra destinos» hecho desde el clúster
 internacional de Chile; texto de ubicación de la foto en las rutas; tapa vertical ES recortada; precios y
-descuentos en placeholder. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
+descuentos en placeholder; que la regla destino ↔ flecha (§4.5) también valga para los popups de los KV del
+kit. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
 [state-continuity.md](state-continuity.md).

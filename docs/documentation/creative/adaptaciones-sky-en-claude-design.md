@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (catálogo de formatos, story en video, fecha nueva del logo y pendientes con Daniela)
+> **Ultima actualizacion:** 2026-11-05 por Claude (cuarta ronda: velo del logo, regla de la flecha, alianzas, banderas, temporada de las fotos, entrega al día y canvas versión 40)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
 > [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
@@ -117,6 +117,9 @@ En total son 321 archivos (626 MB). Antes de copiar se comprobó que la carpeta 
 sin incluir los scripts de trabajo, y después se comparó cada archivo con el original: todo quedó idéntico. **El kit
 de SKY quedó intacto.** OneDrive sube la carpeta a la nube después de la copia; hasta que termine, los demás no la ven completa.
 
+Las cifras de la tabla son las de esa primera copia. En la cuarta ronda la carpeta se puso al día con las piezas
+corregidas (ver [Cuarta ronda](#cuarta-ronda-legibilidad-flecha-alianzas-y-entrega)).
+
 > Detalle técnico: [manual, paso 10](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#10-entregar-en-onedrive)
 
 ## Descomposición de un KV
@@ -199,7 +202,8 @@ propias de los mensajes internacionales y sus traducciones. Partes y tiempos en 
 
 El operador revisa dejando **comentarios anclados a cada pieza**; las respuestas y correcciones quedan en el mismo
 hilo. El canvas es privado del operador: para que otra persona (por ejemplo Daniela) lo vea y comente, se comparte
-desde «Compartir». Al cierre de la segunda ronda está en la versión 28.
+desde «Compartir». Al cierre de la segunda ronda estaba en la versión 28; con la cuarta ronda (2026-11-05) va en la
+versión 40.
 
 > Detalle técnico: [manual, páginas del canvas](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#qué-significan-las-páginas-del-canvas)
 
@@ -214,7 +218,7 @@ desde «Compartir». Al cierre de la segunda ronda está en la versión 28.
 - **La grilla define los mensajes.** Por mercado se producen los mensajes que pide la grilla («Vuela por Chile»,
   «Volá a Santiago», «Voe para Peru», etc.), cada uno con popup, GIF y story en video.
 - **Las alianzas tienen su logo por mercado:** Chile Travel fuera de Chile y PromPerú (versión «solo HM Perú» en Perú y
-  «otros HM» fuera de Perú).
+  «otros HM» fuera de Perú). Dónde va cada logo se ajustó en la [cuarta ronda](#cuarta-ronda-legibilidad-flecha-alianzas-y-entrega).
 - **Lo que no tenemos queda marcado.** La ubicación de la foto de las rutas foco va como placeholder; la lista de
   regiones de Perú es una propuesta sin fotos; las frases y traducciones propias quedan por confirmar.
 - **Chile tiene piezas «KV listo».** Cuando el kit trae el editable del formato (banner TikTok, DAT, PMAX), la pieza
@@ -226,10 +230,31 @@ desde «Compartir». Al cierre de la segunda ronda está en la versión 28.
 Quedan por confirmar: si Brasil «Voe para Peru» va como pieza de alianza o como KV; la propuesta «Vuela por Perú» sin
 fotos; la base de Chile «Encuentra destinos» (su nota hablaba del clúster internacional de Perú); las frases y
 traducciones del story en video y del HPH; la ubicación de la foto de las rutas foco, y la tapa vertical en español.
-La lista completa, con lo que hay hoy en cada caso, está en el
+De la cuarta ronda queda uno más: si quiere la regla de la flecha también en los popups de los KV del kit. La lista
+completa, con lo que hay hoy en cada caso, está en el
 [catálogo](./catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
 
 > Detalle técnico: [referencia de la skill, segunda ronda](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md#segunda-ronda-de-daniela-2026-11-04-chat-de-teams)
+
+## Cuarta ronda: legibilidad, flecha, alianzas y entrega
+
+Lo que cambió el 2026-11-05 (canvas en la versión 40):
+
+| Tema | Qué se hace ahora |
+|---|---|
+| **Logo legible sobre la foto** | El degradado plano (20 % que bajaba a 0) se cambió por un velo diagonal que nace en la esquina del logo y se apaga antes del lado derecho, sin bordes. Su intensidad se calcula para cada foto y cada formato según la luz que hay detrás del logo, entre 16 % y 50 %. Sombras redondas, halos y cielos inventados siguen rechazados: se ven como una mancha |
+| **Regla de la flecha** | Con destinos cortos, la flecha de precio y el badge se acercan hasta 40 px del bloque del destino (lo más ancho entre antetítulo, nombre y píldora). Nunca se alejan. Vale en KV, popup, story y GIF de las variantes y en los popups de los KV del kit; falta que Daniela confirme estos últimos |
+| **Chile Travel** | Pegado a la esquina superior derecha, alineado con los bordes, en todas sus aplicaciones: KV, popup, story, GIF y story en video de Brasil «Voe a Santiago» |
+| **Stories con PromPerú** | PromPerú centrado entre la franja de precio y el pie. La marca de agua, pegada arriba a la izquierda, y la ubicación, pegada arriba a la derecha, a la misma altura. La marca de agua va arriba a la izquierda en todos los formatos |
+| **Fotos de temporada** | Argentina «Volá a Santiago» lleva una foto de verano, porque allí noviembre es primavera-verano: una pareja en el Parque Bicentenario con la Costanera. Regla: elegir fotos de la temporada del mercado |
+| **Encuadres** | La story de Tacna se volvió a encuadrar para que la flecha no tape a la persona |
+| **Banderas** | Aro blanco fino de 2 px, como el kit (antes, unos 5 px), en los KV con banderas (AR, PE, BR, US y UY), PE «Encuentra destinos», sus popups, stories, GIF y stories en video, y el HPH por mercado |
+| **Entrega** | «BLACK SKY 2026» quedó actualizada (155 archivos) y «ENTREGABLES BLACK», al día. La copia a OneDrive compara cada archivo por tamaño y fecha, porque abrir archivos que están sólo en la nube dejaba el proceso colgado |
+
+Las próximas rondas se trabajan en una sesión aparte, derivada de esta.
+
+> Detalle técnico: [catálogo de formatos, banderas y alianzas](./catalogo-formatos-sky.md#banderas-y-alianzas) ·
+> [manual, foto aprobada de cada destino](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7e-bis-poner-la-foto-aprobada-de-cada-destino)
 
 ## Reglas que se cumplen siempre
 

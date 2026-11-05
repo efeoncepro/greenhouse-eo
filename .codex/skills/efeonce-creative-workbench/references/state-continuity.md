@@ -12,7 +12,7 @@ fotografía de evento en
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 28; diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 40 (cierre de la cuarta ronda, 2026-11-05); diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
@@ -35,15 +35,25 @@ Cuarta ronda (2026-11-05, 11 comentarios del canvas): velo diagonal adaptativo d
 regla destino ↔ flecha de precio a 40 px (`brecha.cjs` y `compose.cjs`, también en popups de los KV del kit), Chile
 Travel pegado a la esquina, AR Santiago en verano, story de Tacna reencuadrada, stories con PromPerú centrado y
 marca de agua y ubicación pegadas arriba, aro de banderas de 2 px (KV, GIF y HPH por mercado). Detalle en
-[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40.
-Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3.
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40. Se regeneraron los GIF de AR Lima, AR
+Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con banderas, y la story en video de las nueve
+de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya compara por tamaño y fecha sin leer el
+destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin
+`--checksum`.
+Continuidad: las rondas siguientes se llevan en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del
+canvas». La copia vigente de los scripts está en `ai-generations/2026-11-04_sky-black-gif/scripts/`, con rutas del
+scratchpad viejo que hay que adaptar ([sky-black-pipeline.md](sky-black-pipeline.md) §17).
+Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
+la regla de la flecha también vale para los popups de los KV del kit.
 
 Pendientes sin confirmar por el operador:
 
 - Segunda ronda BLACK: BR «Voe para Peru» (¿piezas de alianza PromPerú o KV?), «Vuela por Perú» con regiones sin
   fotos (propuesta), «Encuentra destinos» de Chile hecho con el clúster internacional (el pedido decía «clúster inter
-  de Perú»), frases INTER del brandlift y sus traducciones AR/PT/EN, ubicación de la foto en las rutas (placeholder),
-  tapa vertical en español (recortada de la horizontal).
+  de Perú»), frases INTER del brandlift y sus traducciones AR/PT/EN, ubicación de la foto en las rutas (desde la
+  tercera ronda sale del CSV; placeholder sólo en Chiclayo y Talara), tapa vertical en español (recortada de la
+  horizontal).
+- Cuarta ronda BLACK: regla de la flecha aplicada también a los popups de los KV del kit, por confirmar con Daniela.
 - Entrega en OneDrive: confirmar que la sincronización terminó (la copia local no prueba que ya
   esté en la nube).
 
