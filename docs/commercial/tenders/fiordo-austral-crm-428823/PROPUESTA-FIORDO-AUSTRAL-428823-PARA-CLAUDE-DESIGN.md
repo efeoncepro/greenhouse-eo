@@ -1,7 +1,10 @@
 # Propuesta Fiordo Austral — Implementación de plataforma CRM (Wherex 428823) — master para diseño
 
 > **Qué es este archivo:** el texto maestro de la oferta técnica, organizado por bloques y listo para diseñar en /design con el design system «La órbita» (línea `revenue-hubspot`). Cada bloque trae **contenido presentable** y, aparte, una **nota de diseño** (▸) que no va en la pieza.
-> **Estado:** borrador del 05/11/2026. **No está aprobado ni presentado.** El precio es preliminar y requiere la aprobación de Julio. Hay que volver a verificar el tier Gold y el waiver del onboarding de HubSpot antes de enviar.
+> **Estado:** borrador v2 del 05/11/2026. **No está aprobado ni presentado.**
+> - **Edición:** Sales Hub **Professional**. Julio eligió el escenario «Pro esbelto» y Enterprise queda como opción.
+> - **Licencias:** van separadas de la implementación, con los precios del portal: `pnpm --silent pricing:v3 hubspot estimate`.
+> - **Antes de enviar:** volver a verificar el tier Gold y el waiver del onboarding.
 > **Fuentes internas:** carpeta `research/` (comprador, encaje funcional, matriz de seguridad, método y precio, brief visual). El anexo para el comprador es `ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md`.
 > **Registro:** formal e institucional, de usted. Al cliente se le nombra como «Fiordo Austral».
 
@@ -14,7 +17,8 @@
 | **Requisito de las bases** | CRM para unos 10 usuarios. Incluye licencias, implementación, migración desde Excel, integraciones, capacitación, puesta en marcha, estabilización y soporte. Requerimientos funcionales a–g. Ciberseguridad con matriz de cumplimiento como condición de adjudicación y prueba técnica previa a producción. Outlook obligatorio; QAD, Teams y SharePoint deseables. Contrato de 12 meses renovable. Demo para los mejor evaluados. |
 | **Hecho investigado** | Negocio de subproductos del salmón (harina, aceite e hidrolizados), con 6 plantas y exportación: Asia 60 %, Europa 21 %, Norteamérica 11,5 % y Sudamérica 7,5 %. Ventas contra especificación por cliente (proteína y FFA) y certificados (MSC, ASC, Halal, Kosher, SMETA). Venta vía distribuidores y traders. Las capacidades HubSpot por edición vienen de knowledge.hubspot.com y legal.hubspot.com, consultados el 05/11/2026. |
 | **Supuesto propio** | Arquitectura de datos, cronograma de 16 semanas, equipo, horas, SLA de soporte de Efeonce y alcance de la fase opcional QAD. |
-| **Decisión pendiente** | Precio de lista y piso, moneda, waiver del onboarding de HubSpot, confirmación del tier Gold, personas del equipo, fechas y comisión en Wherex, sprocket 3D (no se usa hasta tener autorización) y licencias Microsoft que ya tenga el cliente. |
+| **Decisión tomada** | 05/11/2026: Sales Hub Professional, escenario «Pro esbelto», con licencias separadas de la implementación. Servicios por US$ 9.900 + IVA en el año 1. Enterprise va como opción. |
+| **Decisión pendiente** | Moneda de presentación, waiver del onboarding de HubSpot, US$ 100 frente a US$ 90 en Sales Pro, confirmación del tier Gold, personas del equipo, fechas y comisión en Wherex, sprocket 3D (no se usa hasta tener autorización) y licencias Microsoft que ya tenga el cliente. |
 
 ---
 
@@ -39,7 +43,7 @@ Puerto Montt
 
 De nuestra consideración:
 
-Efeonce Group presenta su propuesta para la implementación de la plataforma CRM de Fiordo Austral. Proponemos **HubSpot Sales Hub Enterprise**, implementado, integrado con Microsoft 365 y asegurado por Efeonce como Certified HubSpot Solutions Partner.
+Efeonce Group presenta su propuesta para la implementación de la plataforma CRM de Fiordo Austral. Proponemos **HubSpot Sales Hub Professional**, implementado, integrado con Microsoft 365 y asegurado por Efeonce como Certified HubSpot Solutions Partner. Ofrecemos además la opción de Sales Hub Enterprise.
 
 Hemos preparado esta propuesta a partir de lo que hace distinta la venta de Fiordo Austral. Su equipo vende contra especificaciones técnicas de cada cliente, en cuatro regiones del mundo, a través de visitas a planta, ferias, muestras y distribuidores. Y lo hace hoy desde planillas Excel. El CRM que proponemos convierte ese conocimiento en un sistema: cada cliente con sus requisitos de proteína y FFA, sus certificados y su historia; cada oportunidad con su etapa, su aprobación y su próximo paso, visible desde el escritorio y desde el teléfono.
 
@@ -93,30 +97,38 @@ Tres compromisos:
    - Entra ID con SSO y MFA resistente al phishing;
    - Acceso Condicional;
    - auditoría hacia Wazuh;
-   - ambientes separados;
-   - respaldo probado y restauración documentada.
+   - cambios controlados antes de producción;
+   - respaldo diario probado y restauración documentada.
 
 ▸ Diseño: layout `proposal-cinematic` `hero`. Frase protagonista; los tres compromisos como órbitas o lentes.
 
 ---
 
-## Bloque 5 — Por qué HubSpot Sales Hub Enterprise
+## Bloque 5 — Por qué HubSpot Sales Hub Professional
 
-Evaluamos las alternativas de referencia de las bases. Recomendamos **HubSpot Sales Hub Enterprise** porque combina una adopción alta en equipos comerciales con los controles que exige la sección 4 de las bases.
+Evaluamos las alternativas de referencia de las bases. Recomendamos **HubSpot Sales Hub Professional**: es la edición que un equipo comercial de 10 personas adopta y usa todos los días, a un costo de licencia proporcionado a su tamaño. Donde la sección 4 de las bases pide algo que la edición no trae de forma nativa, Efeonce lo implementa y lo demuestra en la prueba técnica previa a producción.
 
-| Lo que exige Fiordo Austral | Lo que aporta Sales Hub Enterprise |
+| Lo que exige Fiordo Austral | Cómo se resuelve con Sales Hub Professional |
 | --- | --- |
-| Especificaciones técnicas por cliente (% proteína, % FFA) | Objetos personalizados: un registro de «Especificación técnica» por cliente y producto, asociado a la empresa y a la oportunidad. |
-| Flujos de aprobación internos | Aprobaciones nativas en etapas del pipeline. |
-| Ambientes separados de desarrollo, pruebas y producción | Sandbox estándar para probar cambios antes de producción. |
-| Auditoría exportable hacia el SIEM | Registro de auditoría ampliado y API de auditoría de acciones de usuario. |
-| Mínimo privilegio y roles personalizados | Conjuntos de permisos, equipos y jerarquías, y permisos por campo para datos sensibles. |
-| Respaldo y recuperación | Respaldo automático diario y respaldos programados, restauración de cambios del CRM y papelera de 90 días. |
-| SSO con Entra ID y MFA | SSO SAML con Microsoft Entra ID, SSO obligatorio, aprovisionamiento SCIM y 2FA obligatorio para accesos sin SSO. |
+| SSO con Entra ID y MFA | SSO SAML con Microsoft Entra ID, SSO obligatorio para todos los usuarios, aprovisionamiento SCIM y 2FA obligatorio para accesos sin SSO. El MFA resistente al phishing y el Acceso Condicional se aplican en Entra ID. |
+| Especificaciones técnicas por cliente (% proteína, % FFA) | Propiedades de especificación en la empresa y en la oportunidad, con validaciones. La especificación de cada producto viaja en las líneas de la oportunidad. |
+| Flujos de aprobación internos | Flujos de trabajo que asignan la aprobación al responsable, bloquean el avance de etapa sin aprobación y registran quién aprobó y cuándo. |
+| Auditoría hacia el SIEM | Historial de inicios de sesión y de actividad de seguridad. El colector de Efeonce los envía a Wazuh junto con el historial de cambios de los registros. |
+| Mínimo privilegio | Permisos granulares por usuario y por equipo, sin cuentas compartidas. |
+| Respaldo y recuperación | Respaldo diario implementado por Efeonce hacia almacenamiento inmutable de Fiordo Austral, más la restauración de cambios del CRM y la papelera de 90 días. |
+| Cambios controlados | Cada cambio se documenta, se prueba con registros de prueba y se activa con lista de verificación. Las integraciones se validan en una cuenta de pruebas antes de conectarlas a producción. |
 
-**Sales Hub Professional** cubre la gestión comercial básica, pero no incluye objetos personalizados, aprobaciones nativas, sandbox, conjuntos de permisos ni la API de auditoría. Por eso no cumpliría requisitos obligatorios de las bases.
+**Opción Sales Hub Enterprise.** Si Fiordo Austral prefiere tener estos controles de forma nativa, Enterprise agrega:
+- registro de auditoría completo con su API;
+- sandbox estándar para separar ambientes;
+- conjuntos de permisos y permisos por campo;
+- objetos personalizados para la especificación técnica;
+- aprobaciones nativas de etapa;
+- respaldo diario programado.
 
-▸ Diseño: tabla convertida en «dos columnas de luz». Usar los íconos oficiales de producto de HubSpot sólo según las guías de partner. Sin comparativa gráfica contra otros fabricantes.
+El costo de esta opción figura en la oferta económica.
+
+▸ Diseño: la tabla se convierte en «dos columnas de luz». A la izquierda, lo que pide Fiordo Austral; a la derecha, cómo se resuelve. Las filas resueltas por Efeonce llevan una marca discreta de «implementado por Efeonce». La opción Enterprise va como nota lateral, no como columna. Usar los íconos oficiales de producto de HubSpot sólo según las guías de partner.
 
 ---
 
@@ -129,10 +141,11 @@ Evaluamos las alternativas de referencia de las bases. Recomendamos **HubSpot Sa
   - El estado (prospecto, activo, inactivo) se actualiza automáticamente según la fecha del último negocio ganado.
 - **Contactos:** rol en el cliente (compras, calidad, logística, gerencia) e idioma.
 - **Distribuidores y traders:** asociados a sus clientes finales con etiquetas de asociación. Así se ve quién compra a través de quién.
-- **Especificación técnica (objeto personalizado):**
-  - Producto, % proteína mínima, % FFA máxima, humedad, ceniza, otras especificaciones, certificación requerida (por ejemplo MSC, ASC, Halal o Kosher), vigencia y estado.
-  - Cada cliente puede tener varias especificaciones.
-  - Cada oportunidad hereda la que corresponde.
+- **Especificación técnica del cliente:**
+  - Propiedades en la empresa con su requisito habitual: producto, % proteína mínima, % FFA máxima, humedad, ceniza, otras especificaciones, certificación requerida (por ejemplo MSC, ASC, Halal o Kosher) y vigencia.
+  - Propiedades en cada oportunidad con la especificación pactada para ese negocio.
+  - Cuando un cliente compra varios productos con requisitos distintos, la especificación viaja en las líneas de producto de la oportunidad.
+  - El certificado de análisis queda adjunto al registro.
 - **Oportunidades:**
   - Producto o línea, toneladas, incoterm, puerto de destino, precio por tonelada, moneda, ventana de embarque y motivo de pérdida.
 - **Pipeline «Negocios de exportación»:**
@@ -143,7 +156,7 @@ Evaluamos las alternativas de referencia de las bases. Recomendamos **HubSpot Sa
 
 La arquitectura definitiva se valida con el equipo de Fiordo Austral en la fase de descubrimiento.
 
-▸ Diseño: **momento «Su ficha técnica»**. Captura real de un registro de Especificación técnica en el portal demo de Efeonce, con datos ficticios marcados como de ejemplo. Alrededor, diagrama de objetos con la Empresa al centro. No redibujar la interfaz de HubSpot: usar la captura real.
+▸ Diseño: **momento «Su ficha técnica»**. Captura real de la ficha de una empresa en el portal demo de Efeonce, con su bloque de especificación (proteína y FFA) y datos ficticios marcados como de ejemplo. Alrededor, diagrama de objetos con la Empresa al centro. No redibujar la interfaz de HubSpot: usar la captura real.
 
 ---
 
@@ -153,11 +166,11 @@ La arquitectura definitiva se valida con el equipo de Fiordo Austral en la fase 
 | --- | --- |
 | **a) Clientes y contactos** | Empresas y contactos con historial completo de correos, reuniones, llamadas y notas. Segmentación por país, región y mercado. Clasificación por tipo y estado. |
 | **b) Gestión comercial** | Pipeline visual con etapas de negociación, recordatorios y tareas automáticas. Registro de llamadas, reuniones, correos y visitas. |
-| **c) Especificaciones técnicas** | Objeto personalizado «Especificación técnica», con campos y validaciones propias. |
+| **c) Especificaciones técnicas** | Propiedades personalizadas de especificación en la empresa, en la oportunidad y en sus líneas de producto, con validaciones. |
 | **d) Gestión documental** | Contratos, especificaciones, certificados y correos adjuntos a empresas y oportunidades. Repositorio con versiones en SharePoint u OneDrive, vinculado al registro. |
 | **e) Reportes y gestión** | Dashboards de actividad por vendedor, clientes activos e inactivos, resultados por país, y oportunidades abiertas, ganadas y perdidas. Exportación a Excel. |
 | **f) Aplicación móvil** | App HubSpot para iOS y Android: registro de visitas, tareas y recordatorios, notificaciones y escáner de tarjetas de presentación para ferias. |
-| **g) Automatizaciones** | Alerta de cliente sin contacto en el plazo que se defina, recordatorios de reuniones y tareas, tareas posteriores a cada reunión, aprobaciones internas, correos de seguimiento, alertas de cierre próximo y dashboards automáticos. |
+| **g) Automatizaciones** | Alerta de cliente sin contacto en el plazo que se defina, recordatorios de reuniones y tareas, tareas posteriores a cada reunión, aprobaciones internas por flujo de trabajo, correos de seguimiento y secuencias, alertas de cierre próximo y dashboards automáticos. |
 
 ▸ Diseño: siete tarjetas (a–g) en un sistema de lentes o órbita, no una tabla plana. Para que la pieza se lea sin presentador, se puede incluir una tabla compacta.
 
@@ -211,10 +224,11 @@ La seguridad de la solución se construye en capas, con responsabilidades claras
   - Cifrado en tránsito con TLS 1.2 o superior y cifrado en reposo.
   - SOC 2 Type II, pruebas de penetración anuales independientes, bug bounty y gestión de incidentes.
 - **Efeonce** configura, integra y evidencia:
-  - SSO con Entra ID, roles con mínimo privilegio y conjuntos de permisos.
+  - SSO con Entra ID y permisos granulares por usuario y equipo, con mínimo privilegio.
   - Restricción de exportaciones.
   - Colector de auditoría hacia Wazuh.
-  - Respaldo programado hacia almacenamiento inmutable en el tenant de Fiordo Austral.
+  - Respaldo diario hacia almacenamiento inmutable en el tenant de Fiordo Austral.
+  - Control de cambios antes de producción.
   - Pruebas de restauración y soporte con respuesta a incidentes.
 - **Fiordo Austral** administra su tenant Microsoft: Entra ID, Acceso Condicional, MFA resistente al phishing, licencias y su SIEM Wazuh.
 
@@ -228,12 +242,21 @@ Usuario → Entra ID (MFA resistente al phishing y Acceso Condicional) → SSO S
   - tiempos de expiración cortos;
   - cierre remoto de sesiones;
   - detección de sesiones simultáneas en Wazuh.
-- **Integración con Wazuh.** No existe un conector nativo. Efeonce construye un colector sobre la API de auditoría de HubSpot, con decodificadores y reglas para Wazuh.
-- **Respaldo inmutable.** El respaldo diario de Enterprise se complementa con una exportación programada a almacenamiento inmutable bajo control de Fiordo Austral, con restauración de prueba trimestral.
+- **Integración con Wazuh.** No existe un conector nativo. Efeonce construye un colector:
+  - Lee las API de inicios de sesión y de actividad de seguridad de HubSpot.
+  - Agrega el historial de cambios de los registros.
+  - Los entrega a Wazuh con decodificadores y reglas propias.
+  - El detalle de acciones de usuario que Professional no expone por API se declara en la matriz. Enterprise lo trae completo.
+- **Respaldo inmutable.** Efeonce implementa una exportación diaria del CRM vía API hacia almacenamiento inmutable bajo control de Fiordo Austral. Se hace una restauración de prueba cada trimestre.
+- **Separación de ambientes.** Professional no incluye sandbox. Los cambios siguen un procedimiento controlado:
+  - documentación y aprobación;
+  - pruebas con registros de prueba;
+  - validación de integraciones en una cuenta de pruebas;
+  - activación con lista de verificación y reversa definida.
 
 Cada requisito de la sección 4 se responde en el **Anexo — Matriz de cumplimiento de ciberseguridad**, con estado, licencia, configuración, costo, plazo, limitaciones, responsable y evidencia.
 
-▸ Diseño: **momento «Cadena Zero Trust»**. La cadena de acceso como una trayectoria orbital con cinco nodos. Debajo, el resumen de la matriz con chips por estado, según el anexo del 05/11/2026: 74 requisitos, de los cuales 41 cumplen, 24 cumplen parcialmente, 7 requieren desarrollo y 2 no cumplen (RTO/RPO y ventanas de mantenimiento, que HubSpot no publica). Los 2 «no cumple» se presentan con su mitigación: pedir a HubSpot una declaración escrita. Las tres capas de responsabilidad como anillos concéntricos.
+▸ Diseño: **momento «Cadena Zero Trust»**. La cadena de acceso como una trayectoria orbital con cinco nodos. Debajo, el resumen de la matriz con chips por estado, según el anexo Pro del 05/11/2026: 74 requisitos, de los cuales 29 cumplen, 33 cumplen parcialmente, 10 requieren desarrollo de Efeonce y 2 no cumplen (RTO/RPO y ventanas de mantenimiento, que HubSpot no publica). Ninguno de los controles que las bases califican como incumplimiento crítico queda ausente. Los 2 «no cumple» se presentan con su mitigación: pedir a HubSpot una declaración escrita. Las tres capas de responsabilidad como anillos concéntricos.
 
 ---
 
@@ -245,7 +268,7 @@ Cada requisito de la sección 4 se responde en el **Anexo — Matriz de cumplimi
 | --- | --- | --- | --- |
 | **F0 Descubrimiento y diseño** | 1–2 | Entrevistas con Comercial, Adquisiciones, TI y Gerencia. Inventario de los Excel. Mapa del proceso comercial. Roles y permisos. Revisión del entorno Microsoft. | Documento de arquitectura, mapa de integraciones, plan de migración y plan de pruebas, firmados. |
 | **F1 Seguridad e identidad** | 2–4 | SSO con Entra ID, MFA y Acceso Condicional. Mínimo privilegio. Política de sesiones. Revisión de OAuth. Colector hacia Wazuh. Respaldo inmutable. Restricción de exportaciones. | Matriz de cumplimiento actualizada, evidencias de configuración, colector probado y restauración de prueba documentada. |
-| **F2 Configuración del CRM** | 3–6 | Objetos y propiedades, incluida la especificación técnica. Pipeline y aprobaciones. Repositorio documental. Automatizaciones. Dashboards. App móvil. | Portal configurado en sandbox, catálogo de automatizaciones y dashboards publicados. |
+| **F2 Configuración del CRM** | 3–6 | Propiedades, incluida la especificación técnica. Pipeline y aprobaciones. Repositorio documental. Automatizaciones. Dashboards. App móvil. | Portal configurado y probado con registros de prueba, catálogo de automatizaciones y dashboards publicados. |
 | **F3 Migración desde Excel** | 5–6 | Limpieza, deduplicación y normalización. Carga de prueba, validación con el negocio y carga final. | Informe de migración con registros de origen y destino, rechazos y muestra validada. |
 | **F4 Integraciones** | 6–8 | Outlook, calendario, contactos, Teams, SharePoint u OneDrive y Excel. Factibilidad de QAD. | Integraciones operativas e informe de factibilidad de QAD. |
 | **F5 Pruebas y prueba técnica de seguridad** | 9–10 | Pruebas funcionales por caso de uso. Prueba técnica previa a producción: SSO, MFA, Acceso Condicional, logs en Wazuh, roles, cifrado, respaldo con restauración y respuesta a incidentes. | Acta de aceptación funcional y acta de la prueba técnica de seguridad. |
@@ -253,7 +276,7 @@ Cada requisito de la sección 4 se responde en el **Anexo — Matriz de cumplimi
 | **F7 Estabilización** | 13–16 | Acompañamiento cercano, ajustes, adopción semanal y calidad de datos. | Informe de cierre de estabilización y backlog de mejoras priorizado. |
 | **Soporte y operación** | Meses 5 a 12 | Soporte con SLA, mantenimiento preventivo e indicadores mensuales. | Informe mensual y revisión trimestral. |
 
-**Ambientes.** Desarrollo y pruebas en el sandbox de HubSpot Enterprise; producción en el portal de Fiordo Austral. Ningún cambio llega a producción sin pasar por pruebas.
+**Ambientes.** Las integraciones se desarrollan y prueban en una cuenta de pruebas. La configuración se valida en el portal de Fiordo Austral con registros de prueba antes de abrirlo a los usuarios. Desde la puesta en marcha, ningún cambio llega a producción sin documentación, prueba y lista de verificación. Con la opción Enterprise se suma el sandbox estándar de HubSpot.
 
 ▸ Diseño: **momento «Cronograma»**. Trayectoria orbital con las 8 fases como hitos, y la prueba técnica de seguridad (F5) destacada como la puerta a producción. Ritmo `proposal-cinematic` `lines`.
 
@@ -266,7 +289,7 @@ Los datos de Fiordo Austral se migran sin perder historia y sin heredar duplicad
 1. Inventario de planillas y responsables.
 2. Limpieza, deduplicación y normalización de país, región y mercado.
 3. Mapeo a las propiedades del CRM.
-4. Carga de prueba en sandbox y validación con el equipo comercial.
+4. Carga de prueba de una muestra y validación con el equipo comercial.
 5. Carga final en producción.
 6. Informe con registros de origen y de destino, rechazos y duplicados resueltos.
 
@@ -347,20 +370,40 @@ La disponibilidad de la plataforma SaaS, su redundancia y su recuperación ante 
 
 ## Bloque 17 — Inversión (resumen)
 
+**A. Licencias HubSpot.** Contrato directo de Fiordo Austral con HubSpot; Efeonce gestiona la contratación.
+
 | Componente | Detalle | Valor |
 | --- | --- | --- |
-| Licencias HubSpot Sales Hub Enterprise | 10 asientos, contratación anual directa con HubSpot a precio de lista vigente | USD 1.500 mensuales (USD 18.000 anuales) |
-| Onboarding obligatorio de HubSpot | No aplica cuando la implementación la realiza un partner certificado | USD 0 *(sujeto a confirmación de HubSpot)* |
-| Implementación Efeonce | Fases F0 a F7: descubrimiento, seguridad, configuración, migración, integraciones, pruebas, puesta en marcha y estabilización | USD 33.800 + IVA *(preliminar)* |
-| Capacitación | Usuarios y administradores, material y grabaciones | USD 3.300 + IVA *(preliminar)* |
-| Soporte y operación | Meses 5 a 12, con el SLA del Bloque 14 | USD 1.350 + IVA mensuales × 8 = USD 10.800 + IVA *(preliminar)* |
-| **Total servicios Efeonce, año 1** | | **USD 47.900 + IVA** *(preliminar)* |
-| Opcional: integración con ERP QAD | Construcción después de la factibilidad (F4), según la versión y la API de QAD | Entre USD 4.700 y USD 9.500 + IVA, a cotizar |
-| Licencias Microsoft | Según las licencias que Fiordo Austral ya tenga (por ejemplo Entra ID P1/P2 o Defender for Cloud Apps para el control de sesión) | A confirmar |
+| Sales Hub Professional | 10 licencias, a US$ 100 por licencia al mes, precio de lista vigente | US$ 1.000 mensuales (US$ 12.000 anuales) |
+| Onboarding obligatorio de HubSpot | No aplica cuando la implementación la realiza un partner certificado | US$ 0 *(sujeto a confirmación de HubSpot)* |
+
+**B. Servicios Efeonce.** Todos los montos son más IVA.
+
+| Componente | Detalle | Valor |
+| --- | --- | --- |
+| Implementación | Fases F0 a F7: descubrimiento, seguridad e identidad, configuración, migración desde Excel, integraciones con Microsoft 365, pruebas y prueba técnica de seguridad, puesta en marcha y estabilización | US$ 6.900, pago único |
+| Capacitación | Usuarios y administradores, con material y grabaciones | US$ 1.000, pago único |
+| Soporte y operación | Meses 5 a 12, con el SLA del Bloque 14 | US$ 250 mensuales (US$ 2.000 por 8 meses) |
+| **Total servicios Efeonce, año 1** | | **US$ 9.900** |
+
+**Opciones** (no incluidas en el total):
+
+| Opción | Valor |
+| --- | --- |
+| Sales Hub Enterprise | Licencias de US$ 150 por licencia al mes: +US$ 500 mensuales (+US$ 6.000 anuales). Implementación y capacitación por US$ 11.900 y soporte por US$ 375 mensuales. |
+| Integración con ERP QAD | A cotizar después de la factibilidad en F4, según la versión y la API de QAD. |
+| Licencias Microsoft | Según las licencias que Fiordo Austral ya tenga, por ejemplo Entra ID P1/P2 o Defender for Cloud Apps para el control de sesión. A confirmar. |
 
 El detalle está en la oferta económica.
 
-▸ Nota interna: **NO PRESENTAR** sin aprobación de Julio sobre la lista, el piso (USD 39.150), la moneda, el recargo On-Demand y los meses de soporte. Confirmar con la PDM el waiver del onboarding y el precio de lista para este negocio. Se emite con la plantilla A4 de cotización.
+▸ Diseño: dos bloques separados y visibles, «Licencias HubSpot» y «Servicios Efeonce». Nunca un total que mezcle lo que factura HubSpot con lo que factura Efeonce.
+
+▸ Nota interna: **Pro esbelto aprobado por Julio el 05/11/2026.**
+- **Margen:** el de los servicios queda en ≈ 35 %, bajo el piso de 45 %. Julio eligió este escenario sabiendo ese margen, que estaba en la tabla comparativa que se le presentó.
+- **Antes de presentar:**
+  - confirmar con el especialista de HubSpot el waiver del onboarding y el precio de US$ 100 frente a US$ 90 con compromiso anual;
+  - volver a verificar el tier Gold;
+  - emitir con la plantilla A4 de cotización.
 
 ---
 

@@ -90,24 +90,25 @@ Se investigó en paralelo con cinco subagentes. Los resultados son internos y es
 - método, equipo y precio;
 - brief visual.
 
-**Decisión de edición: Sales Hub Enterprise.** Professional no cumple los requisitos obligatorios de la §4 de las bases ni los funcionales c y g:
-- API de auditoría;
-- sandbox;
-- conjuntos de permisos;
-- objetos personalizados;
-- aprobaciones nativas;
-- backup diario programado.
+**Decisión de edición (Julio, 05/11/2026): Sales Hub Professional, escenario «Pro esbelto».** Enterprise queda como opción.
+- La investigación recomendaba Enterprise por estas capacidades nativas: API de auditoría, sandbox, conjuntos de permisos, objetos personalizados, aprobaciones nativas y backup diario programado.
+- Julio priorizó precio competitivo para el mercado chileno.
+- Esos puntos se resuelven con controles de Efeonce y se declaran como «cumple parcialmente» o «requiere desarrollo» en el anexo.
+- Ninguno es una ausencia total de los controles críticos que las bases listan como causal de incumplimiento.
 
 | Archivo | Para quién | Estado |
 | --- | --- | --- |
 | [PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md](PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md) | Master de la oferta técnica en 19 bloques, con notas de diseño ▸ que se separan antes de entregar | Borrador; no está aprobado |
 | [ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md](ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md) | Comprador. Matriz con las columnas que exigen las bases | Borrador |
-| [oferta-economica.md](oferta-economica.md) | Cuadro económico preliminar v2: licencias separadas de la implementación, con precios del portal y alcance esbelto | **Requiere aprobación de Julio**; la edición está por decidir |
+| [oferta-economica.md](oferta-economica.md) | Cuadro económico v3, Pro esbelto: licencias separadas de la implementación, con precios del portal (pricebook de TASK-1405) | Escenario aprobado; falta la moneda y el waiver antes de emitir con la plantilla A4 |
 | [research/brief-visual-design.md](research/brief-visual-design.md) | Interno. Dirección para /design | Listo para la etapa de diseño |
 
-**Precio preliminar, año 1:**
-- **Licencias:** USD 18.000 en Sales Hub Enterprise (10 asientos de lista), pagados directo a HubSpot. El onboarding de HubSpot es USD 0 si se confirma el waiver de partner.
-- **Servicios Efeonce:** USD 47.900 + IVA (piso USD 39.150).
+**Precio, año 1 (Pro esbelto):**
+- **Licencias:** US$ 12.000 a HubSpot, por 10 licencias de Sales Hub Professional a US$ 100. El onboarding es US$ 0 si se confirma el waiver de partner.
+- **Servicios Efeonce:** US$ 9.900 + IVA: implementación US$ 6.900, capacitación US$ 1.000 y soporte US$ 250 × 8 meses.
+- **Opción Enterprise:** licencias US$ 18.000 y servicios US$ 11.900 + US$ 375 al mes.
+- **Fuera de mercado:** el cálculo v1 (US$ 47.900 en servicios) quedó descartado.
+- **Desactualizado:** `research/metodo-equipo-precio-INTERNO.md` conserva ese cálculo y la tabla de licencias antigua. La fuente vigente es `oferta-economica.md`.
 - **No se usó el cotizador V3:** su catálogo no tiene una oferta de implementación CRM, así que el cálculo se hizo sobre costos objetivo, sin nómina.
 
 **Lo que no se ha hecho:**
