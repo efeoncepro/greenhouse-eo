@@ -89,6 +89,7 @@ import {
   runPricingV3
 } from '../../src/lib/finance/pricing-v3/adapters/local-snapshot'
 
+import { HUBSPOT_PERMITTED, HUBSPOT_USAGE, runHubSpotCommand } from './pricing-v3-hubspot'
 import { createFileStorage, readArgumentFile, writeOutputFile } from './pricing-v3-storage-file'
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
@@ -118,12 +119,21 @@ const options = {
   option: { type: 'string', multiple: true },
   increment: { type: 'string', multiple: true },
   base: { type: 'string' },
+  // `hubspot list|estimate`: the HubSpot list price from the governed pricebook (TASK-1405).
+  hub: { type: 'string' },
+  tier: { type: 'string' },
+  seats: { type: 'string' },
+  months: { type: 'string' },
+  settlement: { type: 'string' },
+  'view-only': { type: 'string' },
+  contacts: { type: 'string' },
   current: { type: 'boolean' },
   'keep-blocked': { type: 'boolean' },
+  'waive-onboarding': { type: 'boolean' },
   help: { type: 'boolean' }
 } as const
 
-const SWITCHES = ['current', 'keep-blocked', 'help'] as const
+const SWITCHES = ['current', 'keep-blocked', 'waive-onboarding', 'help'] as const
 
 /** Flags that repeat. Both name an optional add-on of a quote document, so they share one list and one order. */
 const REPEATABLE = ['option', 'increment'] as const
@@ -361,6 +371,26 @@ const run = async () => {
     if (!Array.isArray(list) || list.length > 100) throw new PricingV3Error('INVALID_ARGUMENT', { option: 'impact' })
 
     return list
+  }
+
+  // `hubspot` reads the HubSpot pricebook only, never a source of the V3 catalog. Its usage stays out of the global
+  // help on purpose: that output is pinned by the CLI golden, so `hubspot` prints its own (`hubspot` alone or --help).
+  if (command === 'hubspot') {
+    if (values.help || !subcommand || !(subcommand in HUBSPOT_PERMITTED)) {
+      if (subcommand && !(subcommand in HUBSPOT_PERMITTED) && !values.help)
+        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'subcommand', allowed: Object.keys(HUBSPOT_PERMITTED) })
+      process.stdout.write(json({ tool: 'pricing-v3-local', binding: false, operations: { hubspot: HUBSPOT_USAGE } }))
+
+      return
+    }
+
+    permit(HUBSPOT_PERMITTED[subcommand as keyof typeof HUBSPOT_PERMITTED])
+    const { text, exitCode } = runHubSpotCommand(subcommand, values)
+
+    process.stdout.write(text)
+    process.exitCode = exitCode
+
+    return
   }
 
   if (values.help || !command || command === 'help') {

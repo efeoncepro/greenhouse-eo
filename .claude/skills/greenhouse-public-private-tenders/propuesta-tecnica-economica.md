@@ -177,6 +177,15 @@ ahí se justifica más el monto».
 
 ### Lo que no se inventa
 
+- **Licencias de software del vendor.** Van **separadas de la implementación**, con el precio del
+  pricebook y su fuente/as-of. Para HubSpot:
+  - Pricebook: `src/lib/growth/hubspot-pricing/`.
+  - CLI: `pnpm --silent pricing:v3 hubspot estimate`.
+  - Evidencia: `docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md`.
+
+  Normalmente las factura el vendor al cliente (`client_direct`), así que nunca entran al margen ni al
+  precio de los servicios de Efeonce. Caso fuente: Fiordo Austral, Wherex 428823, 05/11/2026. Julio pidió
+  separar licencias de implementación y tomar los precios del portal.
 - **Forma de pago.** Si el comprador dijo que las condiciones se revisan después, el documento no
   propone plazos. En el caso el agente escribió «30 días» y hubo que cambiarlo por «se acuerdan al
   formalizar el servicio». Vale lo mismo para cuotas e hitos: sólo si las bases los fijan.

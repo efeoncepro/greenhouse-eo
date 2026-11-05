@@ -79,14 +79,16 @@ presupuesto que él ya tenía comprometido, y lo rediriges a un trabajo que sí 
 
 ### 🎯 Dimensiona el waiver antes de cada propuesta — es tu descuento gratis
 
+Licencias con precio del portal del 05/11/2026; onboarding con as-of 2026-09-19.
+
 | Producto | Precio año 1 | Onboarding que borras | **Descuento efectivo** |
 |---|---|---|---|
-| **Marketing Hub Pro** | USD 9.600 (USD 800/mo) | **USD 3.000** | 🎯 **31% en el año 1** |
-| Marketing Hub Enterprise | USD 43.200 | **USD 7.000** | 16% |
-| Sales / Service Pro (10 seats) | USD 10.800 | USD 1.500 | 14% |
-| Sales / Service Enterprise (10 seats) | USD 18.000 | USD 3.500 | 19% |
+| **Marketing Hub Pro** | USD 10.680 (USD 890/mo × 12) | **USD 3.000** | 🎯 **28% en el año 1** (3.000 / 10.680) |
+| Marketing Hub Enterprise | USD 43.200 (USD 3.600 × 12) | **USD 7.000** | 16% (7.000 / 43.200) |
+| Sales / Service Pro (10 licencias) | USD 12.000 (USD 100 × 10 × 12) | USD 1.500 | 12,5% (1.500 / 12.000) |
+| Sales / Service Enterprise (10 licencias) | USD 18.000 (USD 150 × 10 × 12) | USD 3.500 | 19% (3.500 / 18.000) |
 
-> **En un Marketing Hub Pro le estás borrando casi un tercio del costo del primer año.**
+> **En un Marketing Hub Pro le estás borrando más de una cuarta parte del costo del primer año.**
 > Y es un descuento que **el HubSpot directo no puede igualar** — solo existe si el cliente pasa por un
 > partner certificado. **Es la ventaja estructural de tu canal. Ponla en la primera lámina, no en la letra chica.**
 

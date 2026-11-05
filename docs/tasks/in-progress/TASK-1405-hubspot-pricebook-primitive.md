@@ -4,9 +4,31 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-11-05 — Slice 1 entregado (catálogo + estimador + CLI)
+
+- **Pricebook:** `src/lib/growth/hubspot-pricing/` con `catalog.ts` 1.0.0 (`asOf` 2026-11-05), sembrado desde la lectura del portal Efeonce (`docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md`). Incluye 9 productos (Sales, Service, Smart CRM, Revenue, Marketing, Content, Data, Marketing+Content y Plataforma de Clientes) y 17 complementos.
+- **Evidencia:**
+  - `primary`: los precios leídos en el portal.
+  - `secondary`: los montos de onboarding, que vienen del catálogo legal con as-of 2026-09-19.
+  - `not_published`: el onboarding del bundle, Smart CRM Starter y las bandas de contactos.
+  - Las licencias adicionales «desde» se modelan como piso, nunca como precio exacto.
+- **Estimador puro:** `estimateHubSpotCost` y `freshness.ts`, con gate de 90 días. 15 tests de invariantes.
+- **CLI del cotizador:** `pnpm --silent pricing:v3 hubspot list|estimate` (`scripts/commercial/pricing-v3-hubspot.ts`). Entrega el fragmento `thirdPartyCosts[]` de un brief V3 (`category: licences`, `client_direct` por defecto o `reinvoiced`), validado contra `briefSchema`.
+  - Lo que no es exacto queda en `pending` y el comando sale con exit 2.
+  - Comprobado en un brief real (`managed-on-demand-third-party.demand.json`) con `compose quote --current`.
+  - No toca el catálogo V3, el engine ni el `tool_catalog`.
+  - El test está en `src/lib/finance/pricing-v3/__tests__/pricing-v3-hubspot-cli.test.ts`.
+- **Pendientes:**
+  - Slice 4 (reader expuesto por el endpoint `GET /api/public/growth/hubspot-pricing/catalog`, flag `HUBSPOT_PRICEBOOK_ENABLED` en el ledger, tool de Nexa y MCP).
+  - Reverificar el onboarding en `legal.hubspot.com`.
+  - Mostrar los datos `secondary` como rango.
+  - `pnpm test` y `pnpm build` del cierre.
+  - Docs funcional y manual.
+  - El precio anual frente al mensual (Sales Pro: el portal dice US$ 100; las fuentes secundarias, US$ 90 anual).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +41,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Slice 1 entregado 2026-11-05: catálogo + estimador puro + CLI pricing:v3 hubspot; pendientes endpoint público, Nexa, MCP, flag y reverificar onboarding en el catálogo legal`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -458,22 +480,22 @@ Luego 2 (estimador + invariantes) → 3 (gate de frescura) → 4 (contrato) → 
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/growth/hubspot-pricing/` con **catálogo versionado + `asOf` + marca de evidencia por dato**.
-- [ ] 🔴 **Cada precio tiene `sourceUrl` y evidencia** (`primary`/`secondary`/`not_published`). **Ninguno inventado.**
-- [ ] 🔴 **Los créditos se resuelven con `max(tier)`** — test: **4 Hubs Enterprise → 5.000, no 20.000**.
-- [ ] 🔴 **Un dato `not_published` devuelve `{ notPublished: true }`**, nunca un número.
-- [ ] 🔴 **Un dato `secondary` sale como rango**, nunca como precio exacto.
-- [ ] 🔴 **Los seats `view_only` no se cobran** (el estimador lo aplica solo).
-- [ ] 🔴 **El estimador es puro** (test: misma entrada → misma salida, sin I/O) **y corre igual en server y client**.
-- [ ] 🔴 **El output NO contiene margen, costo ni bill rate** (test — **la frontera con el cotizador es mecánica**).
+- [x] Existe `src/lib/growth/hubspot-pricing/` con **catálogo versionado + `asOf` + marca de evidencia por dato**.
+- [x] 🔴 **Cada precio tiene `sourceUrl` y evidencia** (`primary`/`secondary`/`not_published`). **Ninguno inventado.**
+- [x] 🔴 **Los créditos se resuelven con `max(tier)`** — test: **4 Hubs Enterprise → 5.000, no 20.000**.
+- [x] 🔴 **Un dato `not_published` devuelve `{ notPublished: true }`**, nunca un número.
+- [ ] 🔴 **Un dato `secondary` sale como rango**, nunca como precio exacto. *(Parcial 2026-11-05: nunca sale como exacto —va a `approximateUsd` y queda fuera de los totales—, pero como monto aproximado, no como rango.)*
+- [x] 🔴 **Los seats `view_only` no se cobran** (el estimador lo aplica solo).
+- [ ] 🔴 **El estimador es puro** (test: misma entrada → misma salida, sin I/O) **y corre igual en server y client**. *(Pureza fijada por test el 2026-11-05; la ejecución en client no está verificada: no hay consumer browser todavía.)*
+- [x] 🔴 **El output NO contiene margen, costo ni bill rate** (test — **la frontera con el cotizador es mecánica**).
 - [ ] 🎯 **El caso del waiver está fijado por test:** Marketing Pro → 12.600 sin partner → **9.600 con partner**
-      (onboarding = 0 = **31% del año 1**).
-- [ ] 🔴 **El gate de frescura rompe el build** si `asOf` > 90 días, con mensaje accionable.
+      (onboarding = 0 = **31% del año 1**). *(Pendiente 2026-11-05: el test fija el waiver con el precio vigente —Marketing Pro US$ 890 → 10.680 con partner—; sin partner el año 1 queda no exacto porque el onboarding es `secondary` hasta reverificarlo en el catálogo legal.)*
+- [x] 🔴 **El gate de frescura rompe el build** si `asOf` > 90 días, con mensaje accionable. *(Test en `src/lib/growth/hubspot-pricing/__tests__`, corre en `pnpm test`.)*
 - [ ] `GET /api/public/growth/hubspot-pricing/catalog` responde, **cacheable, sin auth, rate-limited**, detrás de
       `HUBSPOT_PRICEBOOK_ENABLED` (default OFF).
 - [ ] **Tool de Nexa + MCP** consumen **el mismo estimador**. **Cero lógica duplicada.**
 - [ ] 🔴 **El flag está en `FEATURE_FLAG_STATE_LEDGER.md`** con su runtime (**Vercel**).
-- [ ] 🔴 **Cero import del engine cost-plus.** El pricebook **no toca** `src/lib/finance/pricing/**`.
+- [x] 🔴 **Cero import del engine cost-plus.** El pricebook **no toca** `src/lib/finance/pricing/**`.
 - [ ] `pnpm test` (full) + `pnpm build` verdes en el último commit.
 - [ ] Docs: técnica + funcional + manual, proporcionales.
 

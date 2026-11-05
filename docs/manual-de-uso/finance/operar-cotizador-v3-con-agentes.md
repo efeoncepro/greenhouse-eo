@@ -2917,6 +2917,50 @@ No hay una comisión sobre lo que el cliente paga directo: si se pacta una, hoy 
 - No escribir el proveedor ni su monto en `label`: el `label` llega al cliente.
 - No nombrar el tipo de cambio de un costo en `fxRecordIds`.
 
+### Licencias HubSpot
+
+**Qué es.** La licencia de HubSpot que compra el cliente es software del vendor. Tiene precio de lista de HubSpot,
+no costo ni margen de Efeonce. En una oferta va **separada de la implementación**. El precio sale del pricebook de
+TASK-1405 (`src/lib/growth/hubspot-pricing/`), sembrado con la
+[lectura del portal Efeonce del 05/11/2026](../../services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md).
+No se usa el `tool` ETG-005 ni la policy de herramientas: esas cubren el HubSpot propio de Efeonce, otro objeto económico.
+
+**Consultar la lista vigente.**
+
+```bash
+pnpm --silent pricing:v3 hubspot list [--hub <id>] [--json]
+```
+
+**Estimar la licencia de un caso y obtener el fragmento para la demanda.**
+
+```bash
+pnpm --silent pricing:v3 hubspot estimate --hub <id> --tier <starter|pro|enterprise> --seats <n> \
+  [--months 12] [--settlement client_direct|reinvoiced] [--waive-onboarding] [--json]
+```
+
+Devuelve dos cosas:
+- **El estimado:** mensual, total del plazo y onboarding, cada dato con su marca de evidencia y su as-of.
+- **Un fragmento `thirdPartyCosts[]`** con `category: "licences"`, listo para pegar en el `brief`.
+
+**Liquidación.** El valor por defecto es `client_direct`: HubSpot le factura al cliente, así que la licencia queda
+como nota y no suma al total, al neto ni a la caja de Efeonce. Usar `reinvoiced` sólo cuando Efeonce revende la
+licencia. En ese caso entra a costo, con margen 0, según la política `third-party:licences`, y exige `evidence`.
+
+**Onboarding.** Es un costo único y va en el primer periodo. `--waive-onboarding` lo deja en cero cuando la
+implementación la hace Efeonce como partner certificado; se confirma por escrito con HubSpot antes de prometerlo.
+
+**Ejemplo.** Fiordo Austral, 10 licencias de Sales Hub:
+- **Pro:** US$ 1.000 al mes (US$ 100 por licencia).
+- **Enterprise:** US$ 1.500 al mes (US$ 150 por licencia).
+
+En los dos casos se presenta como bloque de licencias aparte de la implementación y la capacitación de Efeonce.
+
+**Qué no hacer.**
+- No meter la licencia dentro del precio de la implementación ni aplicarle margen.
+- No cotizar un precio que el pricebook marca como no publicado (por ejemplo, el onboarding del bundle Customer
+  Platform): se dice que HubSpot no lo publica.
+- No sumar créditos entre Hubs: manda el tier más alto.
+
 ## Reserva de contingencia
 
 **Qué es.** Un porcentaje sobre el costo del equipo que el cotizador agrega **como costo** a cada fila del equipo

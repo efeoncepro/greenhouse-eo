@@ -42,7 +42,7 @@ coordina agentes preconstruidos, custom y agentic workflows. AEO y Agent Hub no 
 
 | Producto | Qué hace | Por qué te importa comercialmente |
 |---|---|---|
-| **Smart CRM** | Sistema de registro base | Se vende standalone (USD 20/USD 50/USD 75 por seat) |
+| **Smart CRM** | Sistema de registro base | Se vende standalone: Pro USD 50 y Enterprise USD 75 por licencia (portal, 2026-11-05) |
 | **Marketing Hub** | Demand gen, automation, campañas, email, **AEO** | 🎯 **Tu punta de lanza B2B.** HubSpot es Leader del Gartner MQ de B2B Marketing Automation 2025 por 5.º año; no extrapolar a CRM Sales o multicanal B2C |
 | **Sales Hub** | Sales Workspace, pipeline, secuencias, forecasting y progresión inteligente de deals | Aterriza donde el job comercial lo exige; verificar betas por portal |
 | **Service Hub** | Help Desk, SLAs, KB, Customer Agent y Customer Success Workspace | Atención reactiva + adopción, salud, renovación y expansión |
@@ -70,16 +70,22 @@ HubSpot payments: **2,9% processing + 0,5% platform fee** (tarjeta). Stripe vía
 
 | Hub | Starter | Professional | Enterprise | 🔴 Onboarding **obligatorio** |
 |---|---|---|---|---|
-| **Marketing** | USD 20/seat (promo USD 7) · 1.000 contactos | **USD 800/mo** · 3 core seats · 2.000 contactos | **desde USD 3.600/mo** · 5 seats · 10.000 contactos | **USD 3.000 / USD 7.000** |
-| **Sales** | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** |
-| **Service** | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** |
-| **Content** | USD 20/seat | **USD 450/mo** | desde USD 1.500/mo | ❌ no declarado |
-| **Data** | USD 20/seat | **USD 720/mo** | desde USD 2.000/mo | ❌ no declarado |
-| **Revenue** | Free tier | desde USD 95/mo | desde USD 140/mo | ❌ no declarado |
-| **Customer Platform** | USD 20/seat | **USD 1.300/mo** | **desde USD 4.700/mo** | ❌ **NO PUBLICADO — PÍDELO** |
+| **Marketing** | USD 20/mo · 1.000 contactos | **USD 890/mo** · 3 licencias · 2.000 contactos | **USD 3.600/mo** · 5 licencias · 10.000 contactos | **USD 3.000 / USD 7.000** |
+| **Sales** | USD 20/mo | **USD 100/licencia/mo** | **USD 150/licencia/mo** | **USD 1.500 / USD 3.500** |
+| **Service** | USD 20/mo | **USD 100/licencia/mo** | **USD 150/licencia/mo** | **USD 1.500 / USD 3.500** |
+| **Content** | USD 20/mo | **USD 500/mo** · 3 licencias | USD 1.500/mo · 5 licencias | ❌ no declarado |
+| **Data** | USD 20/mo | **USD 800/mo** · 1 licencia | USD 2.000/mo · 1 licencia | ❌ no declarado |
+| **Revenue** | Free tier | USD 95/licencia/mo | USD 140/licencia/mo | ❌ no declarado |
+| **Smart CRM** | — | USD 50/licencia/mo | USD 75/licencia/mo | ❌ no declarado |
+| **HubSpot para marketers** (Marketing + Content) | — | **USD 1.000/mo** · 3 licencias | **USD 3.800/mo** · 5 licencias | ❌ no declarado |
+| **Customer Platform** | USD 20/mo | **USD 1.450/mo** · 6 licencias | **USD 4.700/mo** · 8 licencias | ❌ **NO PUBLICADO — PÍDELO** |
 | **HubSpot AEO** | — | **USD 50/mo standalone** — **incluido en Marketing Pro/Ent** ✅ | — | — |
 
-⚠️ El precio menor es **anual**; el mayor es **mes a mes**. Confírmalo en la cotización.
+✅ **Precios as-of 2026-11-05, portal Efeonce 48713323.** El onboarding conserva el as-of 2026-09-19.
+- Evidencia y complementos: [`SOURCES.md`](../SOURCES.md) y el snapshot `docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md`.
+- Para cotizar: `pnpm --silent pricing:v3 hubspot estimate`.
+
+⚠️ Sales y Service Pro aparecen en **USD 100** en el portal. La pública con compromiso anual se ha visto en USD 90 (secundaria). Confírmalo en la cotización.
 ❌ **La unidad de cobro de Revenue Hub** (USD 95/USD 140: ¿seat o cuenta?) no está clara. Existe un **Revenue Seat**
 formal ✅ — lo que sugiere que escala por seat. **Pregúntalo antes de cotizar.**
 

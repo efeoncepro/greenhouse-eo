@@ -306,6 +306,13 @@ salario, provisiones, tools/plataforma y margen. La puesta en marcha se costea p
 reclutamiento sólo si hay que contratar para ese cliente (`choices`), ambos estimados. HubSpot es contrato anual, pero
 su precio vigente espera evidencia y aún no declara plazo: `compose commitments` no avisa de ese compromiso. No exigir comprar HubSpot si el cliente dispone acceso válido:
 `clientProvidedTools` exige evidencia/ventana/líneas; acceso de partner o Solutions Partner no lo demuestra.
+**Licencias HubSpot que compra el cliente:**
+- Van **separadas** de la implementación y del fee de Efeonce.
+- Precio de lista vigente: pricebook `src/lib/growth/hubspot-pricing/` (TASK-1405).
+- CLI: `pnpm --silent pricing:v3 hubspot list|estimate`.
+- Evidencia: [snapshot del portal del 05/11/2026](../../../docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md).
+- Se declaran como `thirdPartyCosts` de categoría `licences`, con `settlement client_direct` cuando las factura HubSpot.
+- No usar el `tool` ETG-005: ese es el costo propio de Efeonce.
 Notion/M365 permanecen base del equipo y las IA se seleccionan por motivo. Preservar cliente-dirigido vs managed
 service; un fee con roles internos no crea nueva solución comercial ni garantía. Explain es interno, preview
 simulación redactada. La CLI V3 no crea leads/deals, modifica HubSpot, emite quotes, autoriza outreach o confirma

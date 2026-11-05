@@ -123,6 +123,7 @@ La operación directa del portal puede usar el [conector MCP o la HubSpot Agent 
 - Efeonce es responsable por método, diseño, change sets, ejecución aprobada, verificación, documentación y
   continuidad acordada.
 - La plataforma HubSpot conserva sus límites, licencias, créditos, disponibilidad y cambios de producto.
+- Las licencias HubSpot se ofertan separadas de la implementación, con precio del pricebook y fuente/as-of; las factura HubSpot al cliente.
 - Todo write productivo sigue `propose -> confirmación humana -> execute -> readback` y debe ser reversible o
   declarar explícitamente su recuperación.
 - Una configuración guardada no prueba funcionamiento. La aceptación exige evidencia runtime positiva y
@@ -132,6 +133,7 @@ La operación directa del portal puede usar el [conector MCP o la HubSpot Agent 
 ## Fuentes transversales
 
 - [Arquitectura de oferta V2](HUBSPOT_OFFER_ARCHITECTURE_V2.md)
+- [Precios de licencias HubSpot — lectura del portal Efeonce 2026-11-05](HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md) (pricebook TASK-1405 y `pnpm --silent pricing:v3 hubspot`)
 - [Lanzamientos Fall 2026 / UNBOUND 2026 — cierre revisado 2026-09-19](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
 - [Benchmark de mercado 2026-08-30](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 - [Canon técnico HubSpot as a Service](../../architecture/kortex/hubspot-as-a-service/README.md)

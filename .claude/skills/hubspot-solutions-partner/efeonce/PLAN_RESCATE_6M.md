@@ -12,7 +12,7 @@
 
 | # | Acción | Por qué ahora |
 |---|---|---|
-| 1 | ✅ **Partner Certification: LA TIENEN.** Poner el **waiver del onboarding** en la primera lámina de toda propuesta | En un Marketing Hub Pro le **borras USD 3.000 de un costo anual de USD 9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. Es el cierre de A1 y A2. **Hoy no está en el pitch** → `modules/11` § 2 |
+| 1 | ✅ **Partner Certification: LA TIENEN.** Poner el **waiver del onboarding** en la primera lámina de toda propuesta | En un Marketing Hub Pro le **borras USD 3.000 de un costo anual de USD 10.680 (USD 890 × 12, portal 2026-11-05) = 28% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. Es el cierre de A1 y A2. **Hoy no está en el pitch** → `modules/11` § 2 |
 | 2 | **Verificar si los USD 412 son netos post-discount** y si el trial que vence los infla | El waiver de la membership exige **>USD 400 neto**. Si cae, son **USD 4.800/año** |
 | 3 | 🥇 **Registrar a BeFUN como cliente gestionado** | Ya te compró Marketing Hub Pro. Ya tienes partner admin. **Estás regalando puntos managed.** Cuesta cero |
 | 4 | **Mail al PDM (Simón Suárez)** con las preguntas de `ESTADO_ACTUAL.md` § 9 | El proceso del *shared deal* y los managed points en cero **desbloquean todo lo demás** |

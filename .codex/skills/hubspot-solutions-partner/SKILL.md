@@ -133,7 +133,7 @@ Y Efeonce puede hacerlo **hoy**, con cuatro activos que ya tiene:
 
 | Activo | Qué le quita al comprador | Verificable |
 |---|---|---|
-| **El waiver del onboarding** — el cargo obligatorio **desaparece de su contrato** (USD 3.000 = **31% del año 1**) | Riesgo económico | ✅ **El HubSpot directo no puede igualarlo** |
+| **El waiver del onboarding** — el cargo obligatorio **desaparece de su contrato** (USD 3.000 = **28% del año 1** de Marketing Pro a USD 890/mo, portal 2026-11-05) | Riesgo económico | ✅ **El HubSpot directo no puede igualarlo** |
 | **Los dos graders** (AI Visibility · Portal Grader) | Riesgo de no saber | ✅ Ningún partner de la región tiene uno |
 | **La descalificación honesta** (los límites por escrito) | Riesgo de elegir mal | ✅ Documentados — **y nadie lo hace, porque asusta** |
 | **Kortex** (versionado, trazable, reversible) | Riesgo de quedar atrapado | ⚠️ **n=1 → describe el mecanismo, NUNCA implica escala** |
@@ -178,6 +178,13 @@ retainer de Managed CRM Ops.
    dan **5.000 créditos, no 20.000**. Y no hay rollover.
 5. **NUNCA** omitas el **onboarding fee obligatorio** (Marketing Ent = **USD 7.000**; Pro = USD 3.000; Sales/Service
    Ent = USD 3.500 / Pro = USD 1.500). El fee del bundle **Customer Platform no está publicado** — pídelo por escrito.
+   **Precio de lista vigente:**
+   - Pricebook `src/lib/growth/hubspot-pricing/` (TASK-1405).
+   - CLI `pnpm --silent pricing:v3 hubspot list|estimate`.
+   - Evidencia en `docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md`.
+
+   En una oferta, las licencias van **separadas de la implementación**: las factura HubSpot al cliente
+   (`settlement client_direct`), nunca dentro del margen de Efeonce.
 6. **NUNCA** cotices contactos de marketing adicionales de memoria: las fuentes públicas discrepan 10×.
 7. **NUNCA** prometas un roster fijo ni una "flota de agentes" por una lista de marketing. Agent Hub coordina
    agentes preconstruidos, custom y agentic workflows, y al corte 2026-08-30 permanece beta. Verifica por capacidad:
