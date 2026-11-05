@@ -37,17 +37,35 @@ Revisa cada pieza, en este orden:
 - [ ] **Muro del color declarado:** el muro se ve del color del marcador. Si la foto pasó por el
       corrector, revisa también su máscara (sin costuras, sol y sombra conservados, objetos de tono
       parecido intactos).
+- [ ] **Recoloreo a otro tono (franjas, variantes de color):** al 100 %, sin color viejo en las esquinas
+      superiores ni en los bordes del muro, y sin halo del color original alrededor de marcos, macetas o
+      muebles; los objetos de madera o barro conservan su color. Origen (2026-11-04, franjas N2 de Color a la
+      Mexicana): las muescas en la zona dejaron halos rosas. Receta en `color-pipeline.md` §6.
+- [ ] **Colores permitidos para el artículo:** ningún color con `2026:FRIDA KAHLO` en `sources` fuera de un
+      artículo de Frida, ni un color de cartilla de línea fuera de un artículo de esa línea
+      (`color-pipeline.md` §2). Un nombre de paleta distinto al del catálogo (Azul Campeón 432N) solo si está en
+      `berel-color-aliases.json` con su fuente (`color-pipeline.md` §5 bis).
 - [ ] **Remates terminados:** todo encuentro muro-plafón, viga, piso o vano con línea limpia y sombra
       de remate; nunca pintura terminando irregular contra concreto o piedra. Origen (2026-11-02,
       terraza): «Esto es un frizo mal terminado? si es así no se puede aprobar para Berel por el
       estrato».
 - [ ] **Estrato:** la escena se ve de estrato medio-alto a alto según su registro; nunca
       fraccionamiento genérico, aluminio blanco, laminado, plástico o desorden. Ver `photography.md`.
+      Si el comentario es «que se vea de mayor poder adquisitivo», la corrección es regenerar en registro
+      `alto` (`photography.md` §2), no cambiar muebles sobre el mismo plate (2026-11-04).
 - [ ] **Blog sin texto:** sin titular, píldora ni CTA en banners de blog.
 - [ ] **Nada de Efeonce** ni texto o logos generados dentro de la foto (el producto oficial en escena, con su etiqueta, sí;
       y la pieza mantiene su firma).
 - [ ] **Recortes verticales:** en post, story y Pinterest no entran elementos que el horizontal
       escondía (en la terraza, la viga entraba completa y la píldora caía encima).
+- [ ] **Piezas sociales con el título del artículo** (2026-11-05): post, story y reel llevan el mismo título del
+      artículo; la story funciona como story (profundidad, objeto focal, titular en muro calmo, aire abajo para
+      stickers), nunca una superficie plana llenando el cuadro (`photography.md` §6).
+- [ ] **Co-branding con un tercero (si lo hay):** escudo compuesto desde el SVG oficial y terminado por el modelo (no se ve
+      «puesto»); sin patrocinadores, marcador, gráficos de televisora ni firmas reales; nada histórico que la fuente no
+      respalde (`photography.md` §6 ter).
+- [ ] **Objeto agregado sobre un patrón:** el patrón (franjas, azulejo) sigue continuo detrás y alrededor del objeto;
+      la caja del objeto no corta su marco; 0 píxeles distintos fuera de objeto + sombra (`photography.md` §6 quater).
 
 Si un punto falla, no se «acepta con nota»: se corrige el plate, el foco (`photo.focal`), el titular
 o el color, y se vuelve a componer.
@@ -88,6 +106,17 @@ Avisos posibles en `warnings[]`:
 - «`«<nombre>» sin celda de primer nivel: <fallback>; revísalo o acorta el titular / cambia el foco`».
 - «`«<nombre>» sin marcador: <razón>`».
 - «`titular sobre fondo cargado (bordes X > 6): reserva el cuadrante superior izquierdo del plate o cambia el foco`».
+  Si persiste con todo foco razonable (fachada N1 de Color a la Mexicana, 2026-11-04: bordes 9–17 de 0.15 a 0.85),
+  la salida permitida es componer el post con otra escena del mismo artículo y declararlo en el handoff
+  (`photography.md` §6); no se acepta el aviso.
+
+Lecturas conocidas que **no** son error (2026-11-04):
+
+- En `blog.franjas`, un color de la ficha eliminado con la razón «el muro de ese color no aparece libre» cuando el
+  muro sí está: suele ser el nombre largo, cuya caja más su respiro no cabe en el muro libre de la franja (con una
+  puerta centrada quedan ≈ 270 px por franja de un tercio). Detalle y salidas en `marker-grid.md` §10.
+- En el corrector, `⚠ el muro detectado cubre menos del 5 %` al corregir una superficie chica (una puerta) es
+  esperado; se revisa la máscara igual.
 
 `qa.logoBed` (contraste del logo blanco contra el 1 % más claro de su caja y nitidez p99) aparece siempre como
 dato; solo avisa («logo sin lecho: …») si el job declara `photo.lecho` (opcional, apagado por defecto). Umbrales
@@ -123,6 +152,10 @@ Lo que no mide y se mira en la hoja y en el clip: muebles que entran semitranspa
 de pintura artificial, cámara que se mueve. En el reel armado revisa además que el marcador (2,5 s) y el titular
 (4,5 s) caigan sobre muro limpio, que la tapa entre limpia a los 8 s y que la música no tape los efectos de la tapa.
 Detalle en `video.md`.
+
+**Salto buscado (2026-11-05, reel de Rayados).** `fluidez` falló en el destello de la tele al encenderse: es el golpe
+pedido en el prompt, no un defecto. El color pasó (ΔE 2,2). Un `salto` que coincide con un efecto intencional se acepta
+solo después de mirar el clip y se declara en el handoff; el ΔE del muro nunca se relaja.
 
 ## 4. Hoja de contacto antes de subir
 
@@ -178,7 +211,8 @@ git diff --name-only   # todo cambio Berel dentro de brands/berel/** o projects/
 ```
 
 - 37 pruebas al 2026-11-02: 12 del compositor, 9 del builder de prompts, 5 del producto en escena, 3 del lecho,
-  6 del reel y 2 del corrector neutral.
+  6 del reel y 2 del corrector neutral. Al 2026-11-05, con la prueba de alias de paleta en `compose.test.mjs`
+  (`berel-color-aliases.json`): 37 PASS, 0 saltadas, con los recursos locales presentes.
   Las del compositor **se saltan** sin Gotham Rounded y el catálogo en
   `clients/berel/.resources-local/`: `skipped` no es verde. En una máquina sin recursos, di que no se
   verificaron.

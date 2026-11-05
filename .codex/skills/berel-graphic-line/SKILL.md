@@ -52,6 +52,7 @@ Workbench: repo privado `efeoncepro/creative-workbench`, checkout local
 | Recetas, formatos, grillas, componentes, `never` | `brands/berel/contracts/berel-recipes.json` |
 | Tokens (color, tipografía, logo, eslogan) | `brands/berel/contracts/berel-tokens.json` |
 | Evidencia de color (pares observados, error N41) | `brands/berel/contracts/berel-color-evidence.json` |
+| Alias oficiales de paleta (nombre de patrocinio o colección ↔ código del catálogo, con fuente) | `brands/berel/contracts/berel-color-aliases.json` |
 | Registros, tomas, banda del titular, lecho opcional, producto en escena (`productInScene`) y lecciones | `brands/berel/contracts/berel-photo-registers.json` |
 | Reel de transformación (formato, línea de tiempo, tapa, música, motores, QA) | `brands/berel/contracts/berel-video-reels.json` |
 | Compositor (`composeBerel`, `placeMarkers`, catálogo, QA) | `brands/berel/compose/render.mjs` |
@@ -78,6 +79,8 @@ sustituyen por otra fuente ni por valores aproximados.
 - **NUNCA** un nombre o código de color fuera del catálogo oficial: el par nombre+código debe
   coincidir exacto y falla cerrado (código inexistente, solo legacy 2025, o nombre que no
   corresponde al código). Caso real: «Cazuela de Barro 4-2103T» en N41; ese código es Comal.
+- **NUNCA** un color con `2026:FRIDA KAHLO` en `sources` fuera de un artículo de Frida Kahlo: es paleta
+  licenciada y la pieza llevaría el logo de la licencia (2026-11-04). `assertColor` no lo revisa.
 - **NUNCA** coordenadas en un job: `at`/`alt` fallan cerrado; la grilla del formato elige la celda.
   Tampoco tamaños, fuentes ni colores: la receta los define.
 - **SIEMPRE** Gotham Rounded (Light/Book/Medium/Bold), sin fallback. Arial Rounded, Poppins,
@@ -86,6 +89,9 @@ sustituyen por otra fuente ni por valores aproximados.
   modelo. El logo impreso en la etiqueta de un producto en escena no cuenta (decisión del operador
   2026-11-02): la pieza conserva su firma. `#EA0029` vive solo dentro del logo, nunca como acento de infografía.
 - **NUNCA** marca, firma ni elemento de Efeonce en una pieza Berel.
+- **NUNCA** un escudo o logo de un tercero generado por un modelo (co-branding, 2026-11-05): se compone desde el SVG
+  oficial del tercero (guardado en `.resources-local/logos/` con su `LEEME`) y el modelo solo lo termina en materia y luz;
+  sin patrocinadores ni firmas reales → [references/photography.md](references/photography.md) §6 ter.
 - **NUNCA** recursos licenciados (fuentes, catálogo, logos, fotos, renders, tapa, música) en Git.
 - **NUNCA** un envase generado por un modelo ni textos de etiqueta alterados: el producto sale del
   render oficial vigente y el modelo solo lo redibuja con la física de la escena.
@@ -102,7 +108,8 @@ sustituyen por otra fuente ni por valores aproximados.
    `berel-content-production`, módulos 05 y 11). Un banner sin ficha es un placeholder.
 2. **Recursos locales.** Comprueba `fonts/`, `logos/`, `catalog/berel-colors.json` y `photos/`. Si
    falta algo, detente.
-3. **Color.** Valida nombre+código contra el catálogo antes de cualquier generación →
+3. **Color.** Valida nombre+código contra el catálogo antes de cualquier generación y revisa su
+   `sources` (paleta licenciada, cartilla de línea) →
    [references/color-pipeline.md](references/color-pipeline.md).
 4. **Plate fotográfico** (si la foto es nueva): registro por estrato, toma, espacio y prompt con
    `prompt-plate.mjs`, banda del titular medida con `medir-plate.mjs`, generación y corrección del
@@ -137,6 +144,9 @@ sustituyen por otra fuente ni por valores aproximados.
 | El titular social no cabe o se lee mal | [marker-grid.md](references/marker-grid.md) |
 | Foto nueva: estrato, espacio, toma, prompt, remates, banda del titular | [photography.md](references/photography.md) |
 | Producto en escena: render, escala, presencia, recortes, dos logos, `verificar` | [photography.md](references/photography.md) §6 bis |
+| Co-branding con un tercero (club, licencia): escudo, pantalla con partido, camiseta | [photography.md](references/photography.md) §6 ter |
+| Editar una zona de un plate (pantalla, objeto) o poner un objeto sobre un muro con patrón | [workflow.md](references/workflow.md) §5 bis + [photography.md](references/photography.md) §6 quater |
+| Nombre de paleta distinto al del catálogo (Azul Campeón 432N) | [color-pipeline.md](references/color-pipeline.md) §5 bis |
 | El muro no es del color del catálogo · qué modelo · corrector · ΔE | [color-pipeline.md](references/color-pipeline.md) |
 | Revisar una pieza o un lote antes de subir · leer `qa.json` | [qa-review.md](references/qa-review.md) |
 | Rutas de corridas, canvas, Frame.io, nombres de archivo, handoff | [workflow.md](references/workflow.md) |
@@ -164,7 +174,7 @@ difiere un valor visual, manda el contrato del Workbench.
   de la adaptación social; el libro de marca y la receta `social.post` usan la escena de la portada o su versión
   «después», no la infografía. Hasta que se decida, sigue lo que diga la ficha del artículo y avisa del choque.
 - **Nombre de archivo.** El módulo 05 pide `.webp` en minúsculas y con guiones; la skill operativa del Workbench
-  nombra `N##_BN_<ROL>.webp` y `N##_SM_<POST|STORIE|PINTEREST>.png` (el corpus de reels usa `N##_SM_REEL.mp4`). Para la entrega manda la Spec de la wiki.
+  nombra `N##_BN_<ROL>.webp` y `N##_SM_<POST|STORIE|PINTEREST>.png` (el corpus de reels usa `N##_SM_REEL.mp4`). Para la entrega manda la Spec de la wiki. Aplicado el 2026-11-04: banners del blog con el nombre de la ficha y sociales `N##_SM_…` (o `<slug>_SM_…` sin número); ver [workflow.md](references/workflow.md) §13.
 
 ## 7. Mantenimiento (skill viva)
 

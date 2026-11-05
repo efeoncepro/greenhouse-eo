@@ -48,6 +48,11 @@ node $R armar --dir $O --clip $O/seedance-color.mp4 --out $O/reel-seedance.mp4 -
 node $R comparar --out $O/../comparar.mp4 --modelos "seedance omni" <dir> [<dir>…]
 ```
 
+> **`corregir` aún no está en todas las ramas (2026-11-04).** El subcomando existe solo en la rama sin mergear
+> `claude/berel-reel-forma` del Workbench (commit `159f03c`, PR #31). En otra rama `reel.mjs` responde
+> «uso: reel.mjs cuadros|capas|qa|armar|comparar». Mientras el PR #31 no se mergee, usa el rodeo de §5 bis sin cambiar
+> de rama.
+
 1. **Cuadros.** El reel parte del job de la **story** (hereda titular, marcador y focal). *Después* = recorte 9:16
    (864 × 1536) del plate ya corregido de color. *Antes* = edición de ese cuadro con GPT Image 2.5 Sunburst `xhigh`
    (clave personal; `cuadros` imprime el comando): misma cámara, muro sin color, sin lo que la escena va a ganar.
@@ -125,9 +130,65 @@ en `02_Recursos/11_Musica/Propuesta {n}_{MES}.mp3` (OCT, NOV, DIC), de 14,07 s: 
 `clients/berel/.resources-local/video/musica-<MES>.mp3`; la tapa en `video/tapa-cierre-9x16.mp4`. Mes nuevo = pista
 nueva en `music.tracks` del contrato.
 
+## 5 bis. Lecciones del 2026-11-04 (reels de los artículos Umbral Vivo y Color a la Mexicana)
+
+- **Reusar un clip aprobado si el cuadro después es idéntico.** El N1 del artículo Umbral Vivo es el plate del estudio
+  Ultravioleta con el muro lateral corregido a Conciencia 1-3301P, pero ese muro queda fuera del recorte 9:16 de la
+  story (foco 0,55, x 651). `cuadros` dio un `despues.png` con diferencia media 0,000 contra el del reel aprobado, así
+  que se reutilizó el clip Seedance aprobado (`seedance-forma-color.mp4`) con las capas nuevas del artículo y se ahorró
+  un clip de 96 créditos. Compara siempre los dos `despues.png` píxel a píxel antes de pagar otro clip.
+- **`qa` sin máscara útil → `--zona`.** Si la máscara del plate pertenece a otra corrección (aquí, el muro lateral) la
+  zona del muro queda vacía y `qa` se cae («la zona del muro quedó vacía»). Pasa `--zona x,y,w,h` en píxeles del cuadro
+  9:16 sobre el muro protagonista (Umbral: `120,120,620,480`, ΔE 0,4).
+- **El prompt del video se escribe como el aprobado, no con la cola de la plantilla.** `videoPrompt` del contrato
+  termina en «smooth continuous transformation», la frase que dio fundidos el 2026-11-02. Reemplaza la cola por la luz,
+  «consistent contact shadows, no camera movement, no people, no text», como en `approvedExample`, y quita los objetos
+  que no están en el recorte (en la fachada, la puerta).
+- **Fachada:** el cambio de antes es pintura y blanco, no muebles: muro de enlucido gris → color, marcos y cornisa del
+  mismo gris → blanco, y luego las macetas crecen en su lugar. El antes conserva rejas, ventanas, banqueta, calle y
+  ramas; Sunburst mantuvo cámara y encuadre a la primera.
+- **Música:** los dos reels de diciembre usan `musica-DIC.mp3`. Umbral Vivo sale en enero y aún no hay pista ENE:
+  cuando el squad la entregue, se vuelve a correr solo `armar`.
+- **`corregir` sin cambiar de rama (rodeo hasta que se mergee el PR #31).** El checkout estaba en
+  `claude/sky-blog-visual-system`, sin `corregir`. Se extrajeron los dos archivos del commit `159f03c` a temporales:
+  `git show 159f03c:brands/berel/compose/video.mjs > brands/berel/compose/_tmp-video-forma.mjs` y
+  `git show 159f03c:brands/berel/scripts/reel.mjs` pasado por `sed` para que importe ese temporal →
+  `brands/berel/scripts/_tmp-reel-forma.mjs`; se corrieron `corregir` y `qa` con él y se borraron los dos temporales.
+  Color a la Mexicana: ΔE 5,8 → 0,9 (ganancias 1,116 / 1,106 / 1,087, matiz 178). Cuando el PR #31 esté en `main`,
+  usa `reel.mjs corregir` directo y descarta este rodeo.
+- **El titular del reel se revisa sobre el recorte 9:16 del video, no sobre la story.** `capas` compone sobre el
+  `despues.png` de 864 × 1536, más angosto que la imagen de la story, y un titular que pasa en la story puede pisar un
+  objeto en el reel. «Un color vivo se ve mejor con blanco» se montó sobre la ventana superior; se cambió en la story y en
+  el reel por «Color vivo, marco blanco» (borde derecho del titular en 619 px contra el marco de la ventana en 655 px, a
+  1080 de ancho). Antes de `armar`, compara los límites de `capa-titulo.png` con los objetos del cuadro.
+- **Entregable medido:** 14 s, 1080 × 1920, H.264 + AAC, ≈ 4,5–4,8 MB. Dónde se deja y cómo se nombra:
+  [workflow.md](workflow.md) §13.
+
+## 5 ter. Lección del 2026-11-05 (reel de Rayados)
+
+- **Clip con golpe.** Seedance 2.0 con cuadro inicial y final. El prompt se escribió con acción: la tele se enciende con
+  un destello, el balón viene hacia la pantalla, la pintura azul brota desde detrás de la tele como una ola de estadio y
+  después crece la planta; se conservó el efecto Berel de objetos que se forman en su lugar (§1). La pantalla muestra
+  partido sin escudo, patrocinadores ni marcador ([photography.md](photography.md) §6 ter).
+- **`qa` y el destello:** `fluidez` falla justo en el encendido de la tele, que es el golpe buscado; el color pasó (ΔE
+  2,2). Se aceptó tras mirar el clip y se declara en el handoff ([qa-review.md](qa-review.md) §3 ter).
+
+- **Un clip aprobado no se regenera para que quepa un titular más largo.** El operador pidió el título del artículo en
+  todas las piezas («Colores de Rayados: la historia del azul y blanco», 3 líneas en 9:16) y la tercera línea pisaba la
+  tele. Regenerar el clip con un plate más alto dio otro movimiento (barrido de lado a lado) y el operador lo rechazó: «el
+  video anterior tenía más impacto visual». **Solución:** estirar solo la franja de muro liso sobre el objeto (0–475 px →
+  0–588 px a 1080×1920) y recortar lo mismo abajo, en el piso, con `ffmpeg split → crop/scale → vstack`; aplicar la misma
+  transformación al `despues.png` (864×1536: 0–380 → 0–470) en una carpeta nueva con el `reel.json`, y correr `capas` y
+  `armar` ahí. Solo sirve cuando la franja estirada es una superficie lisa (muro); nunca sobre muebles ni personas.
+- **Story y reel pueden salir de plates distintos de la misma escena:** la story usa el plate con el muro ampliado
+  (`rayados-n1-sala-tv-alta.png`, unión nivelada fila por fila en Lab) y el reel usa el clip original estirado.
+
 ## 6. Pendientes
 
 - Revisión de Berel (Daniela, Andrés o Melkin) de los reels piloto.
+- Revisión de Berel del reel de Rayados (N52), aprobado por el operador (Efeonce) el 2026-11-05.
+- Mergear el PR #31 del Workbench (`claude/berel-reel-forma`) para que `corregir` exista en todas las ramas y se
+  retire el rodeo de §5 bis.
 - El titular entra con fundido, no palabra a palabra como en el corpus.
 - La plantilla vigente está aprobada en una sola toma (estudio Ultravioleta, Seedance). Falta confirmarla en otros
   espacios (comedor, recámara, fachada, herrería) y probar FLUX 3 y Omni con ella.

@@ -43,6 +43,13 @@ meter el cuarto completo; `medio-alto` y `alto` usan 28 mm, más editorial y con
 (fachada de fraccionamiento, ventanas de aluminio blanco). El operador la rechazó y el registro se
 recalibró a medio-alto accesible. Ver [lessons.md](lessons.md).
 
+**Subir de registro, no parchar muebles (2026-11-04).** Sobre la N4 de Umbral Vivo (sala-comedor, `medio-alto`) el
+operador comentó: «Necesitamos que esta foto sea distinta, que se vea de mayor poder adquisitivo». La salida fue
+regenerar con `prompt-plate.mjs --registro alto`: residencia, plafón generoso, ventanal de piso a techo, piso de piedra,
+parota o tzalam, sillas de lino y herrajes discretos de bronce oscuro, sin oro ni candiles (el «lujo silencioso» del
+registro alto). Se conservaron composición y colores y cada color se volvió a corregir. Regla: si el cliente dice que una
+escena «se ve de menor poder adquisitivo», se regenera en `alto`; no se cambian muebles sueltos sobre el mismo plate.
+
 ## 3. El bloque común, regla por regla
 
 El bloque `common` del contrato entra en **todo** prompt. Cada regla existe por una razón de
@@ -186,6 +193,29 @@ nunca es una coordenada del marcador.
   (sillón derecho y cantera). Cita del operador: «lo que se ve en estos formatos más verticales es como mal encuadrado».
 - Si la grilla avisa «sin celda de primer nivel», mover `focal` es una de las tres salidas (las otras:
   acortar el titular o aceptar el aviso tras mirar la pieza). Ver [marker-grid.md](marker-grid.md).
+- **Fachada en recorte vertical (2026-11-04, Color a la Mexicana N1, Sueño Mexicano 3-2005D).** En una fachada ancha
+  de dos pisos el post 4:5 dejó el titular sobre cielo, ramas y ventanas con **todo** foco de 0.15 a 0.85, aun con
+  titulares más cortos (aviso «titular sobre fondo cargado», bordes 9–17 > 6). La story 9:16 pasó con foco 0.3 y
+  Pinterest (sin titular) con 0.5. El prompt de fachada había pisado la reserva del espacio del titular.
+  - **En el plate:** si una fachada va a alimentar piezas sociales, pide en `--extra` que el cuadrante superior
+    izquierdo quede como muro o cielo calmo, sin ramas, y mídelo con `medir-plate.mjs --focal post=…` antes de corregir
+    color.
+  - **Salida permitida en la pieza:** la receta `social.post` admite «la escena de portada o su versión después»; si
+    ningún foco da banda limpia, el post puede salir de **otra escena del mismo artículo** con muro alto limpio (aquí,
+    la sala N4 en Cempasúchil 2-1305D). Es una desviación consciente: se **declara en el handoff**, con el aviso que la
+    motivó.
+- **La story tiene que funcionar como story (2026-11-05, Rayados).** Una puerta lisa que llena el cuadro se rechazó:
+  «no funciona como story». La story pide una escena con profundidad y un objeto focal claro, el titular sobre muro
+  calmo y aire abajo para los stickers de la agencia. Si el recorte 9:16 del plate no lo da, se elige otra escena del
+  artículo o se amplía el muro (siguiente punto); nunca un acercamiento a una superficie plana.
+- **Título del artículo en todas las piezas sociales (2026-11-05).** Cita: «En el título debería ir en todas el título
+  del artículo». En 9:16 el título de Rayados ocupó 3 líneas y la tercera pisaba la tele. Salida aplicada en la story
+  fija: **ampliar el muro hacia arriba**, no acortar el título: se recortó la franja del plafón, se armó un lienzo más
+  alto con el borde superior reflejado como relleno, se pintó la banda nueva con GPT Image 2.5 Flare y máscara, se
+  reparó la banda de la unión y se igualó el muro sobre la unión **fila por fila en Lab** (media de cada fila contra la
+  del muro original, dentro de la máscara del corrector). Una ganancia solo de luminancia subió la saturación y se
+  descartó. Fal.ai Flux Fill no estaba disponible (saldo agotado). En el reel se resolvió distinto: [video.md](video.md)
+  §5 ter.
 
 ## 6 bis. Producto en escena (método guiado, 2026-11-02, candidato)
 
@@ -279,12 +309,56 @@ renders son frontales).
 Trampa de implementación (corregida): en sharp, dos `extractChannel` en el mismo pipeline no se encadenan; el último
 reemplaza al primero. El alfa del render se materializa antes de extenderlo, o la «máscara» es el canal rojo.
 
+## 6 ter. Co-branding con una marca de terceros (2026-11-05, Rayados)
+
+Caso fuente: artículo N52 «Colores de Rayados: la historia del azul y blanco» (patrocinio Berel × Club de Futbol
+Monterrey). El operador pidió que la escena dijera «Rayados» sin inventar marcas. Lección fechada:
+[lessons.md](lessons.md) (entrada 2026-11-05, co-branding).
+
+| Elemento | Permitido | Cómo se produce |
+|---|---|---|
+| Partido en la tele | Sí: balón hacia la pantalla, jugador de espaldas con camiseta a rayas, tribuna | Se edita **solo la pantalla** con `pnpm ai:inpaint image` (GPT Image 2.5 Sunburst); la zona protegida queda idéntica bit a bit. **Sin** escudo, patrocinadores, marcador ni gráficos de la televisora; ningún jugador reconocible |
+| Escudo del club | Sí, solo el oficial | SVG descargado del sitio del club (`storage.rayados.com/games_teams/11_rayados-cuadrado.svg`), guardado en `clients/berel/.resources-local/logos/rayados-escudo-oficial.svg` con su `LEEME` (fuente y fecha). **Nunca se genera** ni lo redibuja el modelo desde cero |
+| Camiseta enmarcada (vitrina) | Sí, sin Puma ni patrocinadores | Escudo en el pecho izquierdo de quien la viste (Puma iría en el derecho y no va). Autógrafo **genérico e ilegible**, nunca la firma de un jugador real |
+| Escudos en piezas históricas | No, si la fuente no lo respalda | Ver [lessons.md](lessons.md) (infografía reemplazada) |
+
+**Componer y después terminar.** Cita: «si lo pones después debes pedirle al modelo que le dé el acabado porque si no se
+ve "puesto"». Receta usada con el escudo sobre la camiseta:
+
+1. Componer el SVG oficial a escala en el pecho de la camiseta (la vitrina va centrada sobre la cama).
+2. Recortar la zona (512 px) y ampliarla a 1024; editarla con `gpt-image-2.5-sunburst` calidad `high` pidiendo solo
+   materia y luz (tela, relieve, brillo del vidrio).
+3. Devolver al plate **solo la silueta del escudo**, con un ajuste de color medio medido en un anillo alrededor para que
+   empate con la tela; verificar **0 píxeles distintos fuera de la silueta**.
+
+**Pendiente:** derechos de uso del escudo en el blog, a confirmar con Berel. Hasta entonces la pieza es candidata.
+
+## 6 quater. Objeto sobre un muro con patrón (franjas, azulejo, papel tapiz)
+
+Cuando el modelo agrega un objeto dentro de una máscara, también repinta el fondo de la máscara: en Rayados la franja
+vertical del muro perdió continuidad detrás de la vitrina (lo vio el operador). Regla:
+
+1. **Medir la caja del objeto** en la edición con perfiles de píxeles oscuros por columna y por fila, nunca con una sola
+   línea de barrido: la esquina iluminada por la ventana engañó la primera medición y cortó el marco izquierdo.
+2. **Conservar de la edición solo esa caja**, devolver el muro original alrededor y agregar una sombra de contacto
+   sintética y suave.
+3. **Verificar 0 píxeles distintos** fuera de objeto + sombra.
+
+Modelos en ese caso: el marco vacío salió con GPT Image 2.6 Flare con máscara (el operador sugirió 2.6 con boceto o
+marcado); la camiseta, con GPT Image 2.5 Flare con máscara, porque Sunburst sin máscara reencuadró la escena 63 px.
+Detalle y cita: [lessons.md](lessons.md) (entrada 2026-11-05, «Una edición por zona repinta el fondo»).
+
 ## 7. Rechazos que no se repiten
 
 | Fecha | Rechazo | Razón | Qué cambió |
 |---|---|---|---|
 | 2026-11-01/02 | Registro `medio` de la ronda 2 (se regeneraron fachada, infantil, baño y comedor) | Se veía de estrato bajo: fachada de fraccionamiento, aluminio blanco | `medio` recalibrado a medio-alto accesible; «nunca fraccionamiento» en el bloque común; plates regenerados (`ronda-2/v2/`) |
 | 2026-11-02 | Terraza `alto` con viga de concreto aparente | «Esto es un frizo mal terminado? si es así no se puede aprobar para Berel por el estrato»: la viga terminaba irregular contra el muro pintado y en los recortes verticales la píldora caía encima | Regla de remates en el bloque común; «concreto aparente solo como elemento terminado» en `alto`; plate regenerado con plafón liso y sombra de remate (`ronda-2/v3/`); caso en `lessons` del contrato |
+| 2026-11-04 | Sala-comedor N4 de Umbral Vivo en `medio-alto` | «Necesitamos que esta foto sea distinta, que se vea de mayor poder adquisitivo» | Regenerada con `--registro alto`, misma composición y colores, cada color corregido de nuevo (§2); caso en `lessons` del contrato |
+| 2026-11-04 | Post 4:5 de la fachada N1 de Color a la Mexicana | Titular sobre cielo, ramas y ventanas en todo foco 0.15–0.85 (bordes 9–17) | Post desde otra escena del artículo (N4), declarado en el handoff; reserva del cuadrante superior izquierdo en fachadas que irán a social (§6) |
+| 2026-11-05 | Vitrina agregada sobre el muro a franjas de Rayados | La franja perdió continuidad dentro de la máscara | Solo la caja medida del objeto + muro original + sombra sintética (§6 quater) |
+| 2026-11-05 | Story de Rayados con una puerta lisa llenando el cuadro | «no funciona como story» | Escena con profundidad y objeto focal; muro ampliado hacia arriba para el título de 3 líneas (§6) |
+| 2026-11-05 | Unión del muro ampliado igualada con ganancia de luminancia | Subió la saturación del muro | Igualado fila por fila en Lab con la máscara del corrector (§6) |
 | 2026-11-01/02 (antes de la grilla) | Marcadores sobre la lámpara (estudio) y sobre objetos | «Necesitamos reglas para que esto no se ponga sobre objetos así porque pierde limpieza y no se lee bien el texto» | Lo resuelve la grilla, pero empieza en el plate: tercio superior del muro libre y objetos a la derecha. Ver [marker-grid.md](marker-grid.md) |
 
 Detalle fechado de cada caso, con su cita completa: [lessons.md](lessons.md).
@@ -292,5 +366,6 @@ Detalle fechado de cada caso, con su cita completa: [lessons.md](lessons.md).
 ## 8. Pendiente (no verificado con Berel)
 
 - Registro fotográfico definitivo: hora dorada actual vs. luz de día del lenguaje histórico (libro §9.2).
+- Derechos de uso del escudo de Rayados en el blog de Berel (§6 ter), sin confirmar al 2026-11-05.
 - Los registros son **candidatos**: los aprueban Daniela, Andrés o Melkin, y luego Berel. Berel sigue `gated`
   en `clients/brands.json` (TASK-1945); ningún plate sale al cliente sin esa revisión.

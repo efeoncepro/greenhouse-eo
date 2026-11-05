@@ -237,6 +237,71 @@ exposición admite, qué función cumple y qué preparación exige**. Una resina
 la aplicación declarada. Si la clasificación inicial del brief contradice las fichas, corregir el
 brief y explicar el cambio en el toggle de evidencia correspondiente.
 
+### Artículo conectado a una promoción comercial (2026-11-04)
+
+*Caso «Color a la Mexicana»:* la promoción navideña de Berel regala un galón de blanco con la compra de una
+cubeta. El blog no se vuelve comercial por eso:
+
+1. **Ángulo evergreen que enseñe lo que la promoción habilita.** Si regala blanco, el artículo enseña a usar el
+   blanco («colores mexicanos con blanco»); no es una nota de la promoción ni persigue keywords estacionales que
+   los datos no respaldan (módulo 14).
+2. **Un solo párrafo removible** al final de la sección más relacionada, con enlace a `/promocion/...`. Las líneas
+   de producto participantes se nombran una vez.
+3. **Sin fechas, sin celebridades ni talento.** *Caso:* las condiciones decían vigencia del 29 de octubre al 20 de
+   diciembre de 2026 y el encabezado de la página de la promoción decía 29 de diciembre. Dos fechas que se
+   contradicen nunca entran al cuerpo; la discrepancia se registra en evidencia y se reporta.
+4. **Notas internas de producción:** el párrafo se retira del sitio cuando termina la promoción y el artículo
+   funciona sin él. Dejarlo escrito para quien mantenga la página.
+5. **El copy social no repite la promoción** (módulo 06).
+
+### Selección de colores para un artículo (2026-11-04)
+
+- **Paleta Frida Kahlo, sólo en artículos de Frida.** Excluir de cualquier otro artículo los colores del catálogo
+  cuyas fuentes incluyan la paleta licenciada: *Arte Talavera 428N*, *Pitaya 2-3605D* y *Maíz 2-1403T* (casos del
+  2026-11-04). Su uso arrastra la obligación de licencia del módulo 09.
+- **Preferir códigos de la paleta Multitono** sobre colores de una sola línea de cartilla: *Rosa Mexicano 269C*
+  existe sólo en Berelex Semimate, así que el lector no lo encuentra en otras líneas.
+- **Estado de las páginas de familia al 2026-11-04:** `/colores/rojos`, `/naranjas`, `/cafes` y `/pasteles` tienen
+  contenido; `/amarillos`, `/azules` y `/verdes` responden sin título (`/morados` no se volvió a medir ese día; la
+  regla general de familias rotas sigue vigente). `/blancos` no es una de las nueve familias del catálogo: la URL
+  responde soft-404 y no se enlaza nunca; los blancos viven en `/colores/pasteles`. Mientras las familias rotas sigan
+  así, sus colores enlazan a `/colores`. Releer en vivo antes de reutilizar este estado (§ Formato del enlace).
+- **Paleta de patrocinio con nombres propios (2026-11-05).** Cuando Berel entrega una paleta oficial con nombres
+  propios, el texto público usa **esos nombres**, aunque el catálogo nombre distinto el mismo código: la fuente del
+  cliente manda. *Caso Rayados (N52):* la cartilla «Colores Confiables» (módulo 09) define «Inspiración Albiazul» =
+  *Azul Campeón 432N* + *Blanco Unión 1-3901P*; en el catálogo esos códigos se llaman *Azul Templado* y *Tundra
+  Ártica*. La discrepancia se documenta en el toggle de evidencia y la confirmación del nombre que verá el cliente en
+  tienda queda pendiente con Berel (en `🗒️ Notas internas de producción`). La advertencia propia de la cartilla
+  («los colores son aproximados…») entra como **una frase llana** sobre el color impreso o en pantalla, nunca como
+  disclaimer de la operación. Enlaces: *Azul Campeón* → `/colores` (la familia `/azules` seguía sin título) y
+  *Blanco Unión* → `/colores/pasteles`.
+
+### De pieza temporal a evergreen (2026-11-05)
+
+*Caso N52 «79 años de Rayados»:* artículo del aniversario de 2024 en
+`/articulos/celebrando-79-anos-de-rayados-un-legado-de-color-y-pasion`. En la reunión mensual del 29 de octubre de 2026
+se decidió reescribirlo hacia la **historia general del club y su paleta oficial, sin temporalidad anual**, y
+mantenerlo en diciembre (módulo 09). Berel es patrocinador oficial del Club de Futbol Monterrey.
+
+1. **El ángulo sale de las consultas que la URL ya gana.** La página aparecía en posición 6–7 para «colores de
+   rayados» con cero clics porque su title hablaba de 79 años: la reescritura responde esas consultas (datos en el
+   módulo 14). No se inventa una intención nueva.
+2. **Sin edades ni conteos de aniversario en el cuerpo evergreen** («79 años», «este año», «cumple»). Las fechas
+   históricas sí entran cuando son hechos verificados en la fuente oficial del club (fundación, debut, rayas,
+   cambio de tono), nunca como cuenta desde hoy.
+3. **Hechos solo desde las páginas oficiales del club** (historia y «Nuestras Rayas» en rayados.com), enlazadas
+   como fuente externa. Si el club desmiente una versión popular —las rayas «desde 1961-62»—, la versión popular no
+   entra.
+4. **Metadatos de la V2:** title «Colores de Rayados: historia del azul y blanco | Berel» (54), H1 «Colores de
+   Rayados: la historia del azul y blanco» (49), meta de 149. **Slug propuesto** `/articulos/colores-de-rayados`
+   con 301 desde el anterior: requiere aprobación de Berel y Dev. Si se conserva el slug viejo, «79 años» seguirá
+   visible en la URL; se registra en notas internas, no se oculta.
+5. **Longitud:** ~1.700 palabras, bajo el piso contractual de 3.000; pendiente de la respuesta de Berel, igual que
+   N62/N63 (§ Estándares on-page). No se rellena.
+6. **Historia de la página:** la V1 queda como `🗄️ Histórico` y la V2 nace debajo. Toggles de la página: `🧭 Plan
+   editorial y SEO · V2 evergreen` · `📈 Research · 5 nov` · `✍️ Versión vigente V2` · `📣 Derivados sociales ·
+   propuesta V1` · `🗒️ Notas internas de producción`.
+
 ## Estándares on-page que la pieza debe cumplir
 
 Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md) §6):
@@ -252,6 +317,9 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
   No rellenar ni inventar datos para llegar al número. Si un tutorial/template o brief exige otra
   longitud, documentar y obtener excepción explícita; no presumir cumplimiento ni reescribir
   piezas previas fuera del alcance autorizado. La auditoría de longitud del lote sigue separada.
+  *Caso 2026-11-04 (Umbral Vivo, Color a la Mexicana):* versiones de ~1.200–1.500 palabras aceptadas como V1,
+  con la diferencia frente al piso contractual de 3.000 registrada en `🗒️ Notas internas de producción` como
+  «pendiente de la respuesta de Berel». No se rellena para cerrar la brecha ni se presume la excepción.
 - **AEO:** definiciones canónicas "X es Y" en la primera frase de cada sección · FAQ con respuesta
   directa en la primera línea · tablas comparativas y listas reales (los LLM las extraen con
   facilidad) · datos verificables y citables.

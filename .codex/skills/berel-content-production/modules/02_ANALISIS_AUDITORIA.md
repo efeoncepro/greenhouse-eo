@@ -86,6 +86,12 @@ En un segundo toggle hermano, agregar `🧩 Análisis de contenido`, con el mism
 de competencia **sin herramienta de datos van marcados como estimación**. No conviertas una
 impresión en un número.
 
+Con herramienta, cada cifra lleva la etiqueta de su fuente (receta de 2026-11-04, caso Umbral Vivo, en el
+[módulo 14](14_PLANEACION_TEMATICA_Y_COBERTURA.md#-research-con-tres-fuentes-antes-del-plan-editorial-2026-11-04)):
+Search Console de berel.com es **MEDIDO** y manda; Semrush base `mx` es **ESTIMADO**; una captura DataForSEO de la
+SERP y del AI Overview es **OBSERVADO** en su fecha. Vale igual para el `🔎 Análisis SEO/AEO` de una reescritura y
+para el `📈 Research` de un artículo nuevo: ninguno se escribe reciclando research de otra pieza.
+
 Estos toggles son visibles para Berel y por eso deben ser legibles, sustentados y profesionales: pueden
 documentar fuentes, método, discrepancias, limitaciones y decisiones, pero nunca prompts, credenciales,
 chain-of-thought, conversación entre agentes ni secretos operativos. Su contenido no se copia dentro del

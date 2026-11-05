@@ -53,6 +53,36 @@
 	- Recordatorio: el CMS antepone la marca al title; hay que invertirlo a `NoTitle | Pinturas Berel`
 ```
 
+## Toggle hermano — Research
+
+Va junto al plan, en la misma página, y se escribe **antes** del plan: el plan no recicla research de otra pieza
+(módulo 14, § Research con tres fuentes; caso Umbral Vivo, 2026-11-04). Orden aceptado de la página:
+`🧭 Plan editorial y SEO` · `📈 Research` · `✍️ Versión vigente para revisión V1` · `📣 Derivados sociales`
+(si hay propuesta) · `🗒️ Notas internas de producción` (módulo 01).
+
+```markdown
+# 📈 Research {toggle="true"}
+
+	## Fuentes
+	- Search Console berel.com (MEDIDO): ventana <fechas>, serie desde 2026-07-31
+	- Semrush base mx (ESTIMADO): <fecha de consulta>
+	- DataForSEO SERP Google MX móvil, profundidad 20, con AI Overview (OBSERVADO): <fecha>, <N> consultas
+	## Demanda medida
+	- Consultas e impresiones de GSC que el artículo puede responder, y si hoy alguna página las atiende
+	## Demanda estimada
+	- Volumen, KD e intención por keyword candidata
+	## Competencia observada
+	- Quién ocupa la SERP (Berel, Comex, Sherwin-Williams, plataformas) y a quién cita el AI Overview
+	## Artículos vecinos
+	- Piezas publicadas leídas en vivo desde sitemap-articulos.xml y riesgo de canibalización
+	## Arquitectura de palabras clave
+	- Principal y secundarias, con la fuente de cada cifra
+	## Implicaciones
+	- Qué decide el research sobre el ángulo, y qué descarta (por ejemplo, una keyword estacional sin demanda)
+	## Límites
+	- Lo que no se midió, cifras estimadas, fecha de caducidad de la captura
+```
+
 ## Distribución social antes de producir derivados
 
 Incorporar [matriz de distribución social](matriz-distribucion-social.md) dentro del plan.
@@ -64,6 +94,8 @@ CTA, señal y gates. No crear tareas por defecto ni cambiar formatos/cuotas/fór
 - [ ] Número reservado en el bloque mensual completo e identidad del artículo comprobada (módulo 16)
 
 - [ ] Brief buscado en Teams y material en SharePoint **antes** de proponer nada
+- [ ] Research nuevo con las tres fuentes (GSC MEDIDO · Semrush mx ESTIMADO · DataForSEO OBSERVADO) y artículos vecinos leídos en vivo, documentado en `📈 Research`
+- [ ] Si el artículo conecta con una promoción: ángulo evergreen, un párrafo removible sin fechas ni talento, y nota de retiro en Notas internas (módulo 03)
 - [ ] Justificado por escrito por qué es artículo y no ficha
 - [ ] Slug verificado contra lo ya publicado
 - [ ] Tabla de datos cerrada, con discrepancias anotadas y reportadas

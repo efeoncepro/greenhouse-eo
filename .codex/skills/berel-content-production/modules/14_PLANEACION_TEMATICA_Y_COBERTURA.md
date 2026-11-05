@@ -56,5 +56,61 @@ proponer sólo lo pertinente. Volumen/CPC/competencia son estimaciones Ads; `tot
 cantidad de keywords exclusivas de Berel ni demanda propia. Mantener cobertura parcial explícita y presupuesto
 acotado; no ampliar páginas automáticamente por un total grande ni mover slots, CMS o publicación durante research.
 
+## 🔴 Research con tres fuentes antes del plan editorial (2026-11-04)
+
+El `🧭 Plan editorial y SEO` de un artículo nuevo se escribe **después** del research, nunca reciclando el de
+otra pieza o de otro mes. *Caso Umbral Vivo (2026-11-04):* el plan se había redactado sobre research viejo y el
+operador lo detectó con una pregunta: «¿no hiciste research con Semrush, DataForSEO y Search Console?». El plan
+se rehízo con las tres fuentes. Receta que funcionó, con la etiqueta de cada dato:
+
+| Fuente | Cómo se leyó | Etiqueta | Peso |
+|---|---|---|---|
+| Search Console de berel.com | `greenhouse_growth.seo_gsc_daily` filtrado por la organización del `seo_targets` `seot-berel-fase0` (serie propia desde 2026-07-31; para 16 meses, el reader `readSearchConsoleAnalytics`) | **MEDIDO** | Manda sobre cualquier estimación |
+| Semrush base `mx` | `phrase_these` con volumen + KD + intención para la lista de candidatas | **ESTIMADO** | Dimensiona demanda y dificultad |
+| DataForSEO | `pnpm dataforseo -- serp-compare --panel panel.json`: primero `--dry-run`, después `--max-usd <tope> --yes`. Google México, móvil, profundidad 20, con AI Overview; Berel frente a Comex y Sherwin-Williams. Seis consultas costaron ~USD 0,05 | **OBSERVADO** | Muestra quién ocupa la SERP y a quién cita el AI Overview en la fecha de la captura |
+
+Además, antes de fijar el ángulo:
+
+- leer en vivo los artículos vecinos desde `sitemap-articulos.xml` para descartar canibalización (el inventario
+  de Notion no agota el sitio);
+- documentar el research en un toggle hermano `📈 Research` con estas secciones: **fuentes · demanda medida ·
+  demanda estimada · competencia observada · artículos vecinos · arquitectura de palabras clave ·
+  implicaciones · límites**. Plantilla: [`../templates/plan-editorial-y-seo.md`](../templates/plan-editorial-y-seo.md#toggle-hermano--research).
+
+Una cifra de una fuente nunca se presenta con la etiqueta de otra: un volumen Semrush no es demanda medida y una
+captura de SERP no es un ranking estable.
+
+### Elegir el ángulo con datos — caso «Color a la Mexicana» (2026-11-04)
+
+El artículo debía conectar con la promoción navideña de Berel. Los datos decidieron el ángulo, no la efeméride:
+
+- **GSC (MEDIDO):** «pintura blanca berel» sumaba ~12.453 impresiones en tres meses en berel.com y ningún
+  artículo respondía esa demanda.
+- **Semrush mx (ESTIMADO):** «colores mexicanos» 2.400; «colores que combinan con blanco» 720 con KD 15.
+- **SERP (OBSERVADO):** dominada por Pinterest y TikTok, sin ninguna marca de pintura; el AI Overview de
+  «colores mexicanos para pintar casa» ya citaba berel.com.
+- **Navidad:** 5 impresiones en GSC. Con ese dato no se persigue la keyword estacional; la promoción se conecta
+  desde un ángulo evergreen (módulo 03, § Artículo conectado a una promoción).
+
+Resultado: «colores mexicanos con blanco», que responde la demanda de blanco medida y la del cluster estimado.
+
+### Reescritura evergreen: leer lo que la URL ya gana — caso Rayados N52 (2026-11-05)
+
+Para reescribir una pieza temporal, el research empieza por las consultas que su URL **ya** recibe:
+
+- **GSC (MEDIDO):** la URL del aniversario aparecía en posición 6–7 para «colores de rayados» y «cuáles son los
+  colores del club de fútbol monterrey», con cero clics: el title hablaba de 79 años y no de colores. El ángulo
+  evergreen salió de ahí.
+- **Semrush mx (ESTIMADO):** las consultas de historia del club tienen volumen mínimo. «escudo de rayados» (2.900)
+  no se persiguió por derechos de uso del escudo.
+- **SERP DataForSEO (OBSERVADO):** el AI Overview cita rayados.com y ninguna marca de pintura ocupa la SERP.
+
+Las fechas del cuerpo se verificaron en las páginas oficiales del club (historia y «Nuestras Rayas») el 2026-11-05:
+fundación el 28 de junio de 1945 (acta); debut el 19 de agosto de 1945 en el Parque Cuauhtémoc, 1-0 frente a San
+Sebastián de León; el equipo desaparece en 1946 y renace en 1952; las rayas se aprueban el 10 de junio de 1952
+(jersey de rayas verticales azul y blanco, short azul) y el apodo nace ese año; azul rey desde 1952 y azul marino
+desde 1983. El club califica de incorrecta la versión de las rayas «desde 1961-62». Releer la fuente antes de
+reutilizar. Reglas de la reescritura: módulo 03, § De pieza temporal a evergreen.
+
 El baseline fechado y las 49 asignaciones están en
 [la auditoría](../../../../docs/audits/seo/BEREL_EDITORIAL_COVERAGE_2026-09-02.md); refrescar antes de producir.
