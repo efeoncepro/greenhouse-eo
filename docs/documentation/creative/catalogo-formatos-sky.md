@@ -1,9 +1,9 @@
 # Catálogo de formatos SKY — Qué pieza es cada una, su tamaño y cómo se nombra
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-11-05 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude
+> **Ultima actualizacion:** 2026-11-05 por Claude (fotos de destino en las rutas, orden de carpetas «BLACK SKY 2026»)
 > **Documentacion tecnica:** [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [Canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
@@ -391,6 +391,31 @@ CyberSky Perú se entregó aparte, como un PDF de 66 páginas (22 destinos × po
 
 > Detalle técnico: [manual, entregar en OneDrive](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#10-entregar-en-onedrive)
 
+### Carpeta ordenada para el equipo: «BLACK SKY 2026»
+
+Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`. Ahí quedaron 177 archivos:
+
+- **Una carpeta por mercado:** `HM CL`, `HM PE`, `HM AR`, `HM UY`, `HM BR` y `HM USA`.
+- **Dentro, una carpeta por formato:** `HPH`, `PMAX` y `GIF + POPUP`. Chile suma `BANNER TIKTOK` y `DAT`, y
+  Perú suma `RUTAS FOCO`.
+- **En `GIF + POPUP`, una carpeta por pieza confirmada**, por ejemplo «VUELA POR CHILE». Cada una trae el
+  popup, la story, el GIF (en GIF y en MP4, con y sin audio) y la story en video.
+- **PMAX:** si un mercado tiene más de una agrupación, cada una va en su carpeta («PMAX DOM», «PMAX INTER»…)
+  con sus 4 tamaños.
+- **Nombres:** `BS_` + formato o medida + pieza. Por ejemplo `BS_POPUP_DOM`, `BS_GIF_INTER`,
+  `BS_1200X628_INTER` o `BS_POPUP_PIU`: los destinos y las rutas foco llevan su código de aeropuerto.
+
+### Rutas foco con la foto de cada destino
+
+Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la foto aprobada de su destino y el
+legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
+Los créditos van en pequeño, en vertical sobre el borde derecho. Chiclayo y Talara todavía no tienen foto
+aprobada. «Vuela por el Perú» lleva la foto de Cajamarca y el logo de PromPerú. «Volá a Santiago» y «Volá a
+Lima» (Argentina) llevan una foto de cada ciudad.
+
+> Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
+> [scripts, §4.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+
 ## El canvas de Claude Design
 
 El canvas «SKY CyberSky Perú — Adaptaciones» es la mesa de revisión: ahí se ven todas las piezas juntas y se comentan.
@@ -418,6 +443,10 @@ algunas piezas aparecen rayadas, es que todavía no cargaron; no es un error.
 > Detalle técnico: [canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
 
 ## Qué queda por confirmar con Daniela
+
+Nuevos (2026-11-05): fotos de Chiclayo y Talara; en Pucallpa y Trujillo la ubicación del CSV no coincide con
+la foto entregada; si el origen de las rutas es Lima («DESDE LIMA» se dedujo del legal); y si «Encuentra
+destinos» de Chile debe hacerse con el clúster internacional de Perú, como dice la confirmación de Adri.
 
 | Tema | Qué hay hoy | Qué falta |
 |---|---|---|

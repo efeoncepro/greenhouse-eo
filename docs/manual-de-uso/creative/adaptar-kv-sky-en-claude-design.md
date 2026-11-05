@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (paso a paso por tipo de pieza de la segunda ronda, «qué revisar» por formato, señales y problemas nuevos)
+> **Ultima actualizacion:** 2026-11-05 por Claude (fotos de destino, CSV de rutas y orden «BLACK SKY 2026»)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -269,6 +269,25 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 
 **Qué revisar:** que la ciudad quepa sin chocar con la flecha; que el logo sea la versión «solo HM Perú» (no la de
 «otros HM»); que el marcador de ubicación se reemplace antes de pautar.
+
+### 7e-bis. Poner la foto aprobada de cada destino
+
+1. Copia el CSV del lote de rutas a `rutas-prompe.csv` y cada foto aprobada a `fotos-destino/`. Anótala en
+   `fotos-destino.json`, con el punto del sujeto y el crédito si el CSV lo pide.
+2. Corre `variantes.cjs` → `rutas.cjs` → `destinos.cjs` → `render.cjs` → `parts.cjs` → `compose.cjs`. Las
+   piezas que tienen GIF siguen con `layers` → `recrop` → `anim-css-gen` → `render-gif.sh` → `story-video`.
+3. Revisa una hoja de contacto con KV, popup y story **de cada pieza**. El popup y la story no usan la foto
+   del SVG: que se vean bien no prueba que el KV también esté bien.
+
+Qué revisar: el sujeto queda a la derecha, sin tapar el logo ni el precio; el antetítulo, las fechas y
+«Vuela a…» se leen sobre la foto; PromPerú, el pin y la ubicación van juntos; el crédito se ve pequeño en el
+borde derecho; el legal dice «Final tramo <Ciudad>-Lima. Tasas incluidas».
+
+### 7g. Ordenar la entrega en «BLACK SKY 2026»
+
+`node organizar.cjs <entregables locales> "<…>/10_Noviembre/BLACK SKY 2026"` copia sin borrar nada, con la
+estructura por mercado y formato y los nombres `BS_…`. Si falta una fuente o dos piezas quedarían con el
+mismo nombre, se detiene. Primero pruébalo en una carpeta local y compáralo con `diff -rq`.
 
 ### 7f. Story en video (5 slides)
 

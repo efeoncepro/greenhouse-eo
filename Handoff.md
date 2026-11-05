@@ -74,6 +74,10 @@ script por script (`sky-black-pipeline.md`), catálogo funcional (`docs/document
 y manual v1.4. Se encontraron 6 PMAX 1080 de DOM-RUTA/INTER-RUTA con la fecha vieja del logo: se recopiaron desde su
 popup, KV y story en local y en OneDrive (`cmp` idéntico). Scripts, `bbox.json`, manifiesto e inventarios quedaron
 persistidos en `ai-generations/2026-11-04_sky-black-gif/scripts/` (el scratchpad es temporal).
+**Tercera ronda (2026-11-05, Teams):** las 15 rutas foco del CSV de Daniela llevan su foto aprobada, legal, ubicación
+y crédito; «Vuela por el Perú» y AR Santiago/Lima llevan foto del destino (`destinos.cjs`, `fotos-destino.json`). Todo
+quedó ordenado en `10_Noviembre/BLACK SKY 2026/` (177 archivos, `organizar.cjs`); canvas en versión 34. **Pendiente:**
+fotos de Chiclayo y Talara; ubicación del CSV ≠ foto en Pucallpa y Trujillo; «DESDE LIMA» deducido; CL «Encuentra destinos».
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

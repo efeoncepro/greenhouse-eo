@@ -47,6 +47,8 @@ El 2026-11-05 los 321 entregables se entregaron en OneDrive, en la carpeta nueva
 2026-11-05)» junto al kit, verificados contra el original; el kit no se modificó.
 Quedaron documentados cada formato SKY (tamaños, nombres, mercados, GIF y story en video) y el pipeline de producción
 ([catálogo](docs/documentation/creative/catalogo-formatos-sky.md)). 6 PMAX de rutas Perú con la fecha vieja se corrigieron.
+Tercera ronda: rutas foco con la foto aprobada de cada destino (15, desde el CSV de Daniela), fotos de destino en
+«Vuela por el Perú» y Argentina, y entrega ordenada por mercado y formato en «BLACK SKY 2026».
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

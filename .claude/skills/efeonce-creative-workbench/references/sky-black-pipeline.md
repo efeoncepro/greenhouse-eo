@@ -259,6 +259,47 @@ nuevo; los demás se borran) y suma elementos en un `<g id="variante">`:
 
 Las rutas sólo producen KV, popup y story (no tienen animación ni story en video).
 
+### 4.4 Tercera ronda (2026-11-05): fotos de destino, CSV de rutas y orden en «BLACK SKY 2026»
+
+Pedido de Daniela por Teams: fotos aprobadas por ruta, legal, ubicación y crédito desde el CSV
+`BANCO DE IMAGENES/DESTINOS/02_PERU/FOTOS PARA PROMPERU/RUTAS FOTO PROMPE INFO/Lote Plantilla Rutas
+Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;LEGAL PRECIO;Ubicacion;Credito`).
+
+- **`rutas.cjs`** ahora lee el CSV: 15 rutas (se sumaron Ayacucho y Talara; la fila «Vuela por el Perú» va
+  a `HM_PE_KV_DOM_REGIONES`). Por ruta: oculta el legal del kit (está trazado) dentro de la caja
+  `[530,1122,965,1198]` y escribe el del CSV en Metric Regular 26 (dos líneas si supera 405 px), cambia
+  «DESDE [ORIGEN]» por «DESDE LIMA» recentrado y escribe la ubicación del CSV bajo PromPerú. Sin foto
+  aprobada (Chiclayo y Talara al 2026-11-05) la ubicación queda en `[Ubicación de la foto]`. El grupo
+  `<g id="ruta" data-capa="alianza">` fuerza esa capa en `parts`/`layers` (ver abajo). Exporta `PAGE`
+  (`legal`, `origen`, `alianza`) para reusarlo.
+- **`fotos-destino.json`** asigna foto por pieza: `src` (copia en `K/fotos-destino/`), `s` = punto del sujeto
+  (0-1), `cred` (crédito), `promperu` y `sombra`. Cubre las 13 rutas con foto, «Vuela por el Perú» (foto de
+  Cajamarca) y AR «Volá a Santiago» (`01_CHILE/SCL/santiago-679695892-original 1.png`) y «Volá a Lima»
+  (`02_PERU/LIM/Imagen de Codex 30 sept 2026, 11_48_10 a.m..png`).
+- **`destinos.cjs`** (correr después de `variantes` y `rutas`): en el SVG de `src2/` reemplaza la foto del kit
+  por `<image id="lf-foto-destino">` 1080×1350 (recorte que deja el sujeto en x≈0,62, y≈0,45), agrega
+  `lf-cielo` (velo superior #0b1a2e 0,38), `lf-piso` (degradado inferior #2a1608 0,8 desde y=760) y, si
+  corresponde, `lf-sombra` lateral y el crédito vertical en el borde derecho (Metric 13, blanco al 80 %,
+  centrado en y=560). **La foto del kit es un `<use href="#image">` y en las variantes aparece varias veces
+  en grupos recortados**: se reemplaza la copia cuyo recorte cubre más lienzo y se ocultan las demás que lo
+  tocan. Reemplazar «la primera» dejó el KV en blanco en AR y «Vuela por el Perú». Para «Vuela por el
+  Perú» también aplica legal, origen, PromPerú y ubicación con `PAGE`. Exporta `cubrir()` y `credito()`.
+- **`compose.cjs`** usa `cubrir(n, W, H, t)` en vez de `foto-fuente.png` para esas piezas (popup t=[0,62;0,40],
+  story t=[0,60;0,42]) y agrega velo superior, un piso más alto (popup desde 560, story 1000–1720), el
+  crédito (popup y=430, story y=900) y un halo radial oscuro detrás de PromPerú y la ubicación (nubes).
+- **`parts.cjs` / `layers.cjs`**: lista de rutas desde el CSV; región `ALIANZA_UBIC = [560,0,1080,330]` y capa
+  forzada por `data-capa` (la ubicación larga y su pin caían en la caja del logo y en la story quedaban
+  separados del texto).
+- **`organizar.cjs <OUT> <BLACK SKY 2026>`**: copia (sin borrar) a
+  `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` con la estructura y la nomenclatura de Daniela
+  (detalle en [sky-format-catalog.md](sky-format-catalog.md) §5.4). Falla si falta una fuente o si dos
+  destinos coinciden; deja `organizar-plan.json` con las 177 rutas.
+
+Orden de esta ronda: `variantes` → `rutas` → `destinos` → `render` → `parts` → `compose` → (`layers` →
+`recrop` → `anim-css-gen` → `render-gif.sh` → `story-video` para las que tienen GIF) → `sync-canvas` →
+`new-pages` (rutas desde el CSV) → subir los videos nuevos como asset y actualizar `vid-blobs.json` →
+publicar → copiar a `OUT` → `organizar.cjs`.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

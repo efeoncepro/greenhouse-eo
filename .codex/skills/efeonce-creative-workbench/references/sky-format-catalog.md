@@ -471,6 +471,34 @@ Total 321 archivos, 626 MB; recontado el 2026-11-05 por carpeta. `scripts/` qued
 Perú · KV Black · Chile KV listo. El orden de las tres últimas es **inferido** (se agregaron en ese orden
 por script). URL y lecciones de la plataforma: [sky-design-canvas.md](sky-design-canvas.md).
 
+### 5.4 «BLACK SKY 2026» (orden pedido por Daniela, 2026-11-05)
+
+Ruta: `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (estaba vacía). 177 archivos, 380 MB, copiados con
+`organizar.cjs` y verificados con `diff -rq`. Nomenclatura `BS_<MEDIDA o FORMATO>_<PIEZA>`: genéricos
+`INTER` / `DOM` / `DESTINOS`; destinos y rutas foco con IATA (SCL, LIM, AQP, AYP, CJA, CIX, CUZ, IQT, JAU,
+JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_INTER`).
+
+| Mercado | HPH | PMAX | GIF + POPUP (una carpeta por pieza) | Otros |
+| --- | --- | --- | --- | --- |
+| `HM CL` | genérico Chile inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM CLUSTER`, `PMAX INTER CLUSTER`, `PMAX PRECIO DCTO` (KV listo) | `VUELA POR CHILE` (DOM_CLUSTER), `VUELA INTER` (INTER_CLUSTER), `ENCUENTRA DESTINOS` | `BANNER TIKTOK` (3), `DAT` (2) |
+| `HM PE` | PE inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM RUTA`, `PMAX INTER RUTA` | `VUELA POR PERU` (DOM_REGIONES), `VUELA INTER` (INTER_BANDERAS), `ENCUENTRA DESTINOS` | `RUTAS FOCO/<CIUDAD>/` (15 × popup + story) |
+| `HM AR` | AR | 4 sueltas | `VOLA A SANTIAGO` (SCL), `VOLA A LIMA` (LIM) | |
+| `HM UY` | UY | 4 sueltas | `VOLA INTERNACIONAL` (UY_BANDERAS) | |
+| `HM BR` | BR | 4 sueltas | `VOE A SANTIAGO` (SCL, con Chile Travel) | |
+| `HM USA` | US | 4 sueltas | `FLY INTERNATIONAL` (US_BANDERAS) | |
+
+Cada carpeta de pieza trae `BS_POPUP_`, `BS_STORY_`, `BS_GIF_` (.gif y .mp4), `BS_GIF_…_AUDIO.mp4` y
+`BS_STORYVIDEO_` (.mp4). Con una sola agrupación de PMAX, las 4 imágenes van sueltas en `PMAX/`. Sólo 1x.
+Fuera de la carpeta por no estar en la lista confirmada por Adri: BR «Voe para Peru», los KV con banderas de
+AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GIF.
+
+**Rutas foco (tercera ronda):** 15 rutas del CSV con la foto aprobada de `FOTOS PARA PROMPERU/` (versión
+vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima. Tasas incluidas», ubicación
+del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
+PROMPERÚ). Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
+en placeholder. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
+y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» y «Volá a Lima» llevan foto del destino.
+
 ## 6. Inconsistencias y pendientes
 
 ### 6.1 Del kit (reportar; no corregir en OneDrive)
@@ -499,6 +527,12 @@ story; los otros 10 KV eran idénticos byte a byte. Ese mismo día se reemplazar
 entrega de OneDrive y quedaron verificados con `cmp`. Ningún entregable es anterior al logofix (`find ! -newermt`).
 
 ### 6.3 Por confirmar con Daniela
+
+Tercera ronda (2026-11-05): Chiclayo y Talara sin foto aprobada; Pucallpa y Trujillo tienen una ubicación
+en el CSV que no coincide con la foto entregada (CSV «Catarata Velo de la Novia» y «Chan Chan»; fotos «Plaza
+del Reloj Público» y «Balneario de Malabrigo»), se usó el CSV; el crédito de Trujillo viene del CSV; «DESDE
+LIMA» se dedujo del legal; CL «Encuentra destinos» sigue hecho con el clúster inter de Chile aunque el mensaje
+de Adri dice «cluster inter de Perú»; AR mantiene «DESDE [ORIGEN]».
 
 | Tema | Estado |
 | --- | --- |

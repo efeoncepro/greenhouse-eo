@@ -27,6 +27,9 @@ scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. El kit en
 modificó; el 2026-11-05 la entrega (sin `scripts/`) se copió a la carpeta nueva
 `Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/`: 321 archivos (626 MB) verificados
 byte a byte. Mapeo en [sky-design-canvas.md](sky-design-canvas.md#entregables-y-scripts-locales).
+Tercera ronda (2026-11-05): fotos aprobadas en las 15 rutas foco (CSV de Daniela), «Vuela por el Perú» y AR
+Santiago/Lima; orden y nomenclatura en `10_Noviembre/BLACK SKY 2026/` (177 archivos); canvas versión 34.
+Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3.
 
 Pendientes sin confirmar por el operador:
 
