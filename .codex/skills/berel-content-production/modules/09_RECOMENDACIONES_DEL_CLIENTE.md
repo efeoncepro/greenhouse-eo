@@ -265,6 +265,20 @@ Aplica a N29, no a todo tutorial de la marca. Revisar observaciones posteriores 
 El cambio exige revisar dependencias (módulo 13), no un reemplazo global de nombres ni reescribir
 los textos no afectados. La preferencia de producto no valida prestaciones ni otros soportes.
 
+### Rayados N52 — reunión del 29 de octubre y paleta del 5 de noviembre de 2026
+
+- **Reunión mensual del 2026-10-29:** el artículo de Rayados «se reescribe hacia historia general del club y paleta
+  oficial, sin temporalidad anual; se mantiene en diciembre». El resumen de la reunión transcribió «Abrel»: es un
+  error de transcripción y significa Berel. Berel es patrocinador oficial del Club de Futbol Monterrey. Aplicación:
+  módulo 03, § De pieza temporal a evergreen.
+- **Recurso del cliente del 2026-11-05:** María Fernanda Vega compartió en el chat de Teams «Berel - Efeonce |
+  Shared» la cartilla «Colores Confiables» (`02_Recursos/CARTILLA FUTBOL_CAMBIO SEPT 25.pdf`) y un PDF de espacios
+  aplicados con la paleta de cada equipo, también en `02_Recursos`. Paleta de Rayados, «Inspiración Albiazul»: *Azul
+  Campeón 432N* + *Blanco Unión 1-3901P*. Sus nombres mandan sobre los del catálogo (*Azul Templado*, *Tundra
+  Ártica*); confirmar con Berel el nombre en tienda (módulo 03, § Selección de colores).
+- **Pendientes hacia Berel:** derechos de uso del escudo, hashtag oficial de patrocinio, aprobación del slug nuevo
+  con 301 y la respuesta sobre la longitud contractual. Se reportan; no se resuelven por cuenta propia.
+
 ### Otras solicitudes del canal
 
 - **CTA del blog en piezas sociales:** referir al blog en su totalidad como **Inspiración**, usando

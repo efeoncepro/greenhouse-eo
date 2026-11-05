@@ -211,13 +211,54 @@ el callout de **la tarea y el subítem**, y prevalece sobre el CTA normal del ca
 
 | Caso                                        | Tratamiento obligatorio                                                                                                                                    |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Aniversario, cifra o edición pasada         | Declarar `Archivo YYYY`; no presentar como actualidad; validar fecha y derechos de escudos, fotografías, uniformes o assets de terceros antes de producir  |
+| Aniversario, cifra o edición pasada         | Declarar `Archivo YYYY`; no presentar como actualidad; validar fecha y derechos de escudos, fotografías, uniformes o assets de terceros antes de producir. Una reescritura evergreen que retira el aniversario reabre la evaluación de canales (N52, 2026-11-05; módulo 15) |
 | Conmemoración institucional o tema sensible | Revisión humana del equipo responsable; CTA informativo; sin venta, producto, consignas inventadas, apropiación ni imágenes de personas sin consentimiento |
 | Reescritura destinada a consolidarse        | Enlazar solo a la canónica propuesta si ya existe; no programar hasta que Editorial confirme consolidación, redirección y URL final                        |
 | URL planificada o soft-404                  | Puede figurar como destino previsto en el brief, pero no se activa ni se programa hasta superar QA live                                                    |
 
 El gate no se "resuelve" suavizando el copy: se conserva visible hasta que el dueño indicado lo
 retire con evidencia.
+
+## Propuesta social cuando Berel usa sus artes oficiales (2026-11-04)
+
+*Caso Umbral Vivo:* en la reunión con el cliente del 29 de octubre de 2026 se decidió que lo social de esa pieza
+usa las **artes oficiales de Berel**. Si aun así se pide una propuesta de Efeonce, se entrega como **alternativa**,
+no como paquete de producción:
+
+- **Dónde:** un toggle `📣 Derivados sociales · propuesta V1` en la página del artículo, hermano de la versión
+  vigente. Contiene el caption de Facebook, la tabla de 4 stories de Instagram (Story · Visual · Texto en pantalla ·
+  Interacción) y el Pin de Pinterest (título de hasta 100 caracteres y descripción de 100 a 200), con las reglas de
+  la matriz por canal.
+- **Reel (desde 2026-11-04):** el toggle suma una sección `Reel · 9:16, 14 s` con el archivo de video, qué pasa en
+  pantalla, el caption con el gancho en el primer segundo, el CTA «comenta» + link en bio y 3 hashtags con `#Berel`
+  primero. 🔴 Los hashtags de campaña (`#ColorAlaMexicana`, `#UmbralVivo`) se validan con Berel antes de publicar.
+  El formato es el de 14 s de § Producción del reel.
+- **Sin tareas ni subítems** hasta que Berel confirme que usará la propuesta. Confirmada, se aplica la Fase 4 y la
+  matriz del módulo 15.
+- **Producción:** la Story 1 se produce como imagen; las Stories 2–4 se describen (fuente visual, texto en pantalla
+  e interacción nativa) para que la agencia que publica las arme.
+- **Gate de URL:** ninguna pieza se programa hasta que la canónica planificada pase QA live (tabla de gates de
+  arriba).
+- **Promoción:** si el artículo lleva un párrafo de promoción removible, el copy social no la repite (módulo 03,
+  § Artículo conectado a una promoción comercial).
+
+### Reglas de la propuesta social de Rayados N52 (operador, 2026-11-05)
+
+Tras la reescritura evergreen (módulo 03), N52 recibió una propuesta V1 en el toggle `📣 Derivados sociales ·
+propuesta V1`: post de Facebook, secuencia de 4 stories de Instagram, Pin de Pinterest y reel de 14 s. Reglas que
+dejó el operador:
+
+- **El título del artículo va como titular en todas las piezas sociales** («En el título debería ir en todas el
+  título del artículo»). En el Pin, que no lleva overlay según su receta, el **título de Pinterest** es el título del
+  artículo.
+- **Una story tiene que funcionar como story.** Se rechazó una puerta plana que llenaba el cuadro: en 9:16 debe
+  haber escena, jerarquía y espacio para el texto y la interacción; no un recorte vertical del banner.
+- **Colores con nombre + código** en el copy social, igual que en el artículo (*Azul Campeón 432N*).
+- **Hashtags:** `#Berel #Rayados`, más `#AzulCampeón` en el reel; 🔴 pendientes del hashtag oficial de patrocinio
+  que defina Berel.
+- **Archivos:** `N52_SM_POST.png`, `N52_SM_STORIE.png`, `N52_SM_PINTEREST.png`, `N52_SM_REEL.mp4` (módulo 16).
+- La pieza deja de ser `Archivo YYYY` (tabla de gates): la reescritura retiró el aniversario, pero los derechos del
+  escudo siguen pendientes (módulo 05) y nada se programa sin la revisión de Berel.
 
 ## Arte entregado que no usa la base vigente: tarea v2
 
@@ -259,6 +300,10 @@ aparecer, preguntar a quien diseña. Un contador de «5 Items» con 4 assets vis
 - [ ] Piezas históricas, sensibles, consolidadas o con soft-404 conservan su gate visible
 - [ ] Si el arte entregado no parte de la base 🔁 vigente: tarea v2 nueva, original conservada con callout
 - [ ] Ningún derivado se declaró faltante sin abrir la subcarpeta «Social Media» de Frame.io
+- [ ] Si lo social usa artes oficiales de Berel: la propuesta de Efeonce vive en el toggle `📣 Derivados sociales · propuesta V1`, sin tareas ni subítems hasta la confirmación
+- [ ] El copy social no repite una promoción comercial del artículo
+- [ ] La propuesta V1 incluye la sección `Reel · 9:16, 14 s`; los hashtags de campaña quedan marcados para validar con Berel
+- [ ] El título del artículo va como titular en todas las piezas (en el Pin, como título de Pinterest); cada story funciona como story
 - [ ] Gancho en la primera línea / primer segundo
 - [ ] Emojis, hashtags y longitud según las reglas del canal
 - [ ] Sin superlativos vacíos, urgencia, competencia ni clichés de mexicanidad

@@ -19,6 +19,76 @@
 
 ---
 
+## 2026-11-04 · Recolorear a otro tono: matiz estrecho, no muescas en la zona
+
+- **Qué pasó:** en las franjas N2 de Color a la Mexicana, un plate con el muro en Rosa Capote 2-3110D se recoloreó a
+  Alebrije 3-3005D y a Milpa 3-1005D (ΔE origen→destino ≈ 80 de rosa a azul). Con el matiz por defecto de
+  `ajustar-muro.mjs`, la maceta de terracota, la puerta y la banca de madera también se teñían. Recortarlas con muescas
+  en `--zona` fue peor: el difuminado del borde (σ ≈ 0,02 × ancho, sangra ≈ 80 px) dejó halos rosas alrededor del marco
+  de la puerta, la maceta y la banca. Funcionó una zona rectangular de todo el muro + `--matiz 12` + semillas extra en
+  las esquinas superiores en sombra (si no, quedaban rosas), en dos pasadas: ΔE 0,07–0,3, objetos intactos, sin halos.
+  Paradisíaco 3-2002P (muro claro) siguió con `--matiz 45`; una puerta (superficie chica) pidió segunda pasada y avisó
+  cobertura < 5 %, como se espera.
+- **Regla:** en un cambio de tono grande los objetos se excluyen por tolerancia de matiz, nunca con muescas en la zona;
+  esquinas y bordes del muro se revisan al 100 %.
+- **Dónde quedó:** `color-pipeline.md` §6 y §7, `qa-review.md` §2, `workflow.md` §5. Sin cambio en el motor neutral ni
+  en el adaptador (son argumentos). **Documental**.
+
+## 2026-11-04 · «Que se vea de mayor poder adquisitivo»: subir a registro alto
+
+- **Cita:** «Necesitamos que esta foto sea distinta, que se vea de mayor poder adquisitivo» (N4 de Umbral Vivo,
+  sala-comedor en `medio-alto`).
+- **Qué pasó:** se regeneró con `prompt-plate.mjs --registro alto` (residencia, plafón generoso, ventanal de piso a
+  techo, piso de piedra, parota o tzalam, sillas de lino, herrajes discretos de bronce oscuro; sin oro ni candiles,
+  como pide el lujo silencioso del registro), con la misma composición y colores, y cada color se volvió a corregir.
+- **Regla:** si el cliente dice que una escena se ve de menor poder adquisitivo, se regenera en `alto`; no se parchan
+  muebles sobre el mismo plate.
+- **Dónde quedó:** `lessons` de `contracts/berel-photo-registers.json`, `photography.md` §2 y §7, `qa-review.md` §2.
+  **Codificada** (como lección del contrato; el builder no cambió).
+
+## 2026-11-04 · Fachada en recorte vertical: el post sale de otra escena
+
+- **Qué pasó:** el post 4:5 de la fachada N1 de Color a la Mexicana (Sueño Mexicano 3-2005D, dos pisos, ancha) dejó el
+  titular sobre cielo, ramas y ventanas con todo foco de 0.15 a 0.85, aun con titulares más cortos (bordes 9–17 > 6).
+  La story 9:16 pasó con foco 0.3 y Pinterest (sin titular) con 0.5. El prompt de la fachada había pisado la reserva del
+  espacio del titular. El post se compuso desde la sala N4 del mismo artículo (Cempasúchil 2-1305D, muro alto limpio):
+  la receta dice «escena de portada o su versión después», y esta desviación se declaró en el handoff.
+- **Regla:** una fachada que alimentará piezas sociales reserva el cuadrante superior izquierdo como muro o cielo calmo,
+  sin ramas, y se mide con `medir-plate.mjs` antes de corregir color. Si ningún foco da banda limpia, el post puede usar
+  otra escena del mismo artículo, declarada en el handoff; el aviso no se acepta.
+- **Dónde quedó:** `lessons` del contrato de fotografía, `photography.md` §6 y §7, `qa-review.md` §3, `workflow.md` §6.
+  **Codificada** (lección del contrato).
+
+## 2026-11-04 · Franjas: nombres largos junto a una puerta centrada
+
+- **Qué pasó:** con una puerta al centro, el muro libre útil de cada franja de un tercio era ≈ 270 px; «Brillo de Jade»
+  y «Cempasúchil» no cupieron (el motor reportó «el muro de ese color no aparece libre», pero era la caja más el respiro
+  sobre el marco de la puerta). Rosa Capote cupo justo (fracción de muro 0,86 contra 0,85), Alebrije y Milpa sin
+  problema. `sample` no ayudó.
+- **Regla:** mover `photo.focal` hacia el muro libre, el mismo en todas las franjas (se usó 0.77), o elegir un color de
+  nombre más corto. El cambio de motor del mismo día (dos anclas por franja) está en `marker-grid.md` §10.
+- **Dónde quedó:** `marker-grid.md` §10, `qa-review.md` §3. **Documental** (el límite lo impone el motor).
+
+## 2026-11-04 · Colores con licencia y colores de cartilla
+
+- **Qué pasó:** para Color a la Mexicana se excluyeron a propósito los colores cuyo `sources` incluye
+  `2026:FRIDA KAHLO` (Arte Talavera 428N, Pitaya 2-3605D, Maíz 2-1403T): son de la paleta licenciada y una pieza que la
+  muestra lleva el logo de la licencia. «Rosa Mexicano 269C» existe solo como color de la cartilla Berelex Semimate
+  (`2026:CARTILLA`), no en la paleta Multitono.
+- **Regla:** revisar `sources` (y `line`) en `catalog/berel-colors.json` antes de elegir un color; la paleta Frida solo en
+  artículos de Frida, y un color de cartilla solo si el artículo es de esa línea. `assertColor` no lo revisa.
+- **Dónde quedó:** `lessons` del contrato de fotografía, `color-pipeline.md` §2, `qa-review.md` §2. **Codificada**
+  (lección del contrato; sin guarda en código).
+
+## 2026-11-04 · Adaptaciones sociales de dos artículos (evidencia)
+
+- **Qué pasó:** post, story y Pinterest compuestos con `social.post|story|pinterest` desde el plate N1 de cada artículo:
+  Umbral Vivo (estudio Ultravioleta 3-3703T) y Color a la Mexicana (fachada Sueño Mexicano 3-2005D, con el post desde la
+  sala N4 en Cempasúchil 2-1305D). Todas con QA sin avisos.
+- **Dónde quedó:** jobs en `projects/berel/umbral-vivo/jobs/umbral_SM_*.json` y
+  `projects/berel/color-a-la-mexicana/jobs/mexicana_SM_*.json`; resumen en `docs/operations/HARNESS_STATUS.md`
+  (sección Berel) y `workflow.md` §6. Sin aprobación de diseño ni de Berel.
+
 ## 2026-11-02 · Reel: el color del muro se mide y el motor se elige por toma
 
 - **Cita:** «el efecto de los elementos lo resuelve mejor flux 3, es más fluido».
@@ -292,6 +362,54 @@
 - **Dónde quedó:** `brands/berel/compose/type.mjs`; `brands/berel/AGENTS.md`. **Codificada** (falla cerrado al cargar; las
   pruebas del compositor la ejercitan cuando hay recursos locales).
 
+## 2026-11-05 · Rayados: paleta con nombres propios, co-branding y bordes de una edición
+
+- **Nombres de paleta ≠ nombres de catálogo.** La cartilla «Colores Confiables» (paleta oficial de Rayados que confirmó Berel)
+  llama *Azul Campeón 432N* y *Blanco Unión 1-3901P* a códigos que el catálogo nombra *Azul Templado* y *Tundra Ártica*. El
+  compositor fallaba cerrado. **Regla:** el código manda; un nombre distinto sólo pasa si está en
+  `brands/berel/contracts/berel-color-aliases.json` con su fuente oficial (nunca un alias inventado). **Codificada**
+  (`assertColor` + prueba en `compose.test.mjs`).
+- **Las franjas angostas pierden el marcador.** Con rayas de ~220 px en el recorte 1408, el marcador (~250 px con aire) no cabe y
+  el compositor lo descarta con aviso. Se aceptó N4 sin marcador (el color va marcado en N1 y N3) antes que estrechar el patrón.
+- **Co-branding sin inventar marcas** (pedido del operador). Partido en la tele: sí, sin escudo, patrocinadores, marcador ni
+  jugadores reconocibles. Escudo del club: el SVG oficial de su sitio, guardado en `.resources-local/logos/` con su LEEME;
+  **se compone**, nunca se genera, y luego el modelo lo **termina** sólo en materia y luz, devuelto únicamente sobre su silueta
+  (0 píxeles cambiados fuera). Cita: «si lo pones después debes pedirle al modelo que le dé el acabado porque si no se ve
+  "puesto"». Autógrafo: genérico e ilegible, nunca la firma de un jugador real. Sin Puma ni patrocinadores.
+- **Una edición por zona repinta el fondo de la zona.** Al poner la vitrina, el modelo regeneró el muro dentro de la máscara y la
+  franja azul perdió continuidad (lo vio el operador). Sunburst sin máscara además reencuadró 63 px. **Regla:** con un objeto
+  sobre un patrón (franjas, azulejo, papel tapiz), conservar de la edición sólo el objeto (su caja medida) y devolver el muro
+  original alrededor, con la sombra de contacto sintética; verificar 0 píxeles distintos fuera de objeto + sombra.
+- **Dónde quedó:** [photography.md](photography.md) §6 ter (co-branding) y §6 quater (objeto sobre patrón),
+  [color-pipeline.md](color-pipeline.md) §5 bis (alias), [marker-grid.md](marker-grid.md) §7 (superficies angostas) y
+  `lessons` de `berel-photo-registers.json`.
+
+## 2026-11-05 · Rayados: una infografía histórica que no se puede respaldar se reemplaza
+
+- **Cita:** «reemplaza esa infografía por otra imagen que no sea infografía porque la van a objetar».
+- **Qué pasó:** la línea de tiempo 1945 · 1952 · 1983 mostraba playeras sin escudo; poner el escudo actual en playeras de esas
+  épocas presentaba como histórico un dato sin fuente (no está documentado qué escudo usó el club en cada época).
+- **Regla:** en una pieza con «Fuente: historia oficial», nada visual que la fuente no respalde. Si la marca del tercero no
+  puede ir con verdad, la pieza cambia de formato (aquí, foto de aplicación de un espacio nuevo: la puerta azul del recibidor)
+  y las posiciones N1–N4 se reordenan siguiendo el texto, sin dejar una posición vacía.
+- **Marcador sobre puertas:** una puerta con tablero de molduras deja una superficie lisa angosta y el marcador se cae; con
+  una puerta pivotante lisa de ~40 % del ancho entra a la primera.
+
+## 2026-11-05 · Rayados: piezas sociales con el título del artículo y una story que funcione como story
+
+- **Citas:** «En el título debería ir en todas el título del artículo»; sobre una story con una puerta lisa llenando el
+  cuadro: «no funciona como story».
+- **Qué pasó:** el título completo ocupó 3 líneas en 9:16 y pisaba la tele; el marcador del post cayó en la franja de la
+  píldora, sobre el título (el operador observó que restaba jerarquía visual); y la primera medición de la caja de la
+  vitrina, con una sola línea de barrido, cortó el marco izquierdo (la esquina iluminada por la ventana la engañó).
+- **Regla:** el titular social es el título del artículo en todas las piezas; si no cabe, se amplía el muro (story: muro
+  hacia arriba con unión igualada fila por fila en Lab; reel: franja de muro estirada), no se acorta el título. La story
+  necesita profundidad, objeto focal, muro calmo para el titular y aire abajo para stickers. Con «sin celda de primer
+  nivel», primero otro plate o foco (aquí, plate alto y foco 0.5). La caja de un objeto se mide con perfiles de píxeles
+  oscuros por columna y fila.
+- **Dónde quedó:** [photography.md](photography.md) §6 y §6 quater, [marker-grid.md](marker-grid.md) §9,
+  [qa-review.md](qa-review.md) §2, [video.md](video.md) §5 ter. **Documental.**
+
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.
@@ -300,3 +418,5 @@
 - Producto sin probar: abierto o en uso, en mano, familia de tamaños, toma cenital (`productInScene.notTested`).
 - Reel: titular palabra a palabra como el corpus (hoy entra con fundido); revisión de los reels piloto por Berel.
 - Empaque real de las Manchas (sus renders de 1 L son maquetas).
+- Rayados (N52): derechos de uso del escudo en el blog; confirmar que Azul Campeón y Blanco Unión se piden con ese nombre
+  en tienda; revisión de Berel del set aprobado por el operador el 2026-11-05.

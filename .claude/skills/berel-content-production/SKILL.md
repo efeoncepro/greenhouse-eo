@@ -308,6 +308,10 @@ Plantillas ......................................................... templates/
     imagen muestre la acción rotulada y que título, subtítulo, contenido y cierre cumplan una misma función.
     Anotar un riesgo como hipótesis de Efeonce, nunca como comentario ya hecho por Berel; en Frame.io
     comentar la versión exacta y verificar el envío. Módulo 20.
+71. 🔴 **Pieza temporal reescrita como evergreen = ángulo desde lo que la URL ya gana, sin edades ni aniversarios.**
+    La paleta oficial del cliente nombra los colores aunque el catálogo use otro nombre; las fichas se reespecifican
+    contra lo que la fuente sostiene (nada de escudo actual en uniformes históricos) y la matriz social se reevalúa.
+    Caso Rayados N52 (2026-11-05): módulos 03, 05, 06, 09 y 15.
 
 ## Lo que no se toca
 

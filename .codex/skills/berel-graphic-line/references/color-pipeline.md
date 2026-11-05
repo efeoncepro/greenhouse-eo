@@ -44,6 +44,19 @@ La pieza `N41_BN_INFOGRAFIA_1 (1)` rotuló **«Cazuela de Barro 4-2103T»**, per
 correcto es **Cazuela de Barro 1-3005D**. Quedó como regresión en `brands/berel/test/compose.test.mjs` y en
 `knownErrors` de `berel-color-evidence.json`. Si ves ese par en una ficha, corrígelo antes de seguir.
 
+### Antes de elegir: revisa `sources` (2026-11-04)
+
+Que un par exista y sea vigente no basta para usarlo en cualquier artículo. Mira su campo `sources` (y `line`) en
+`berel-colors.json` antes de elegirlo:
+
+- **`2026:FRIDA KAHLO`** (p. ej. Arte Talavera 428N, Pitaya 2-3605D, Maíz 2-1403T, que también traen
+  `2026:COLORES BEREL`): es la paleta licenciada. Una pieza que la muestra lleva el logo de la licencia, así que
+  **solo** se usa en artículos de Frida Kahlo. En Color a la Mexicana (2026-11-04) se excluyeron a propósito.
+- **`2026:CARTILLA` con `line`** (p. ej. Rosa Mexicano 269C, `line: BERELEX SEMIMATE`, sin `palette`): es un color de
+  la cartilla de una línea, no de la paleta Multitono. Evítalo salvo que el artículo sea de esa línea.
+
+`assertColor` no hace esta revisión: valida el par, no el uso. La decisión queda anotada en el handoff.
+
 ### Evidencia observada ≠ catálogo
 
 `berel-color-evidence.json` guarda **56 pares** leídos en piezas entregadas jun–nov 2026. Sirve para saber qué
@@ -92,6 +105,23 @@ Lectura:
 3. **Corrector**: `ajustar-muro.mjs` lleva la mediana del muro al HEX oficial (§6).
 4. **Validar** máscara y ΔE (§7). Solo entonces el plate entra a `clients/berel/.resources-local/photos/`.
 
+## 5 bis. Alias oficiales de paleta (2026-11-05)
+
+Algunas paletas de Berel (patrocinios, colecciones) publican un código del catálogo con otro nombre. El par nombre+código sigue
+fallando cerrado, salvo que el alias esté en `brands/berel/contracts/berel-color-aliases.json` con su fuente. Primer caso: la
+paleta oficial de Rayados (cartilla «Colores Confiables», 02_Recursos) — *Azul Campeón* = 432N (catálogo: Azul Templado) y
+*Blanco Unión* = 1-3901P (catálogo: Tundra Ártica). El HEX sale del catálogo por el código; el marcador y el prompt usan el nombre
+de la paleta. Confirmar con Berel que en tienda se piden con ese nombre (estado `pending-store-name-confirmation`).
+
+- **Fuente:** `02_Recursos/CARTILLA FUTBOL_CAMBIO SEPT 25.pdf` (cartilla «Colores Confiables · Pasión que inspira»), paleta
+  «Inspiración Albiazul», confirmada por María Fernanda Vega (Berel) el 2026-11-05. Contrato `berel.color-aliases.v1`:
+  cada alias declara `code`, `name`, `catalogName`, `palette`, `source` y `status`; `assertColor` (en `compose/render.mjs`)
+  lo acepta solo si está listado, con prueba en `compose.test.mjs`.
+- **Otros clubes de la cartilla** (Tigres, Santos, Pumas, Atlas, León, Pachuca) no se usaron y no tienen alias registrados
+  (Blanco Unión ya figura también para Santos y Pachuca). Antes de usar uno, agrégalo al contrato con su página de la
+  cartilla; nunca un alias de memoria.
+- Detalle del caso: [lessons.md](lessons.md) (entrada 2026-11-05).
+
 ## 6. El corrector a fondo
 
 Dos capas, a propósito:
@@ -138,6 +168,22 @@ sacar del polígono una **maceta de terracota** y **cojines** del mismo tono. Re
 alrededor de ellos (como la zona de la terraza de arriba, que deja fuera el mobiliario bajo). Lo que el corrector
 no puede separar por tono, lo separas tú con la zona.
 
+**Excepción: cambio de tono grande (2026-11-04).** Lo anterior vale cuando el color destino queda cerca del
+original. Cuando la misma escena se recolorea a un tono **muy distinto** (franjas N2 de Color a la Mexicana: un plate
+con el muro en Rosa Capote 2-3110D llevado a Alebrije 3-3005D y a Milpa 3-1005D, ΔE origen→destino ≈ 80 de rosa a
+azul), las muescas en la zona empeoran el resultado: el difuminado del borde (gaussiano, σ ≈ 0,02 × ancho, sangra
+≈ 80 px) dejó **halos rosas** alrededor del marco de la puerta, la maceta y la banca. Con el matiz por defecto, además,
+los objetos cálidos de tono cercano al muro (maceta de terracota, puerta y banca de madera) también se teñían.
+
+| Caso | Qué funciona |
+|---|---|
+| Cambio de tono grande (rosa → azul o verde) | **Zona rectangular simple** sobre todo el muro + **`--matiz 12`** + semillas extra en las esquinas superiores en sombra (sin ellas quedaban rosas), en **dos pasadas** (la segunda sobre la salida de la primera). Resultado: ΔE 0,07–0,3, objetos intactos, sin halos |
+| Muro claro destino (Paradisíaco 3-2002P) | `--matiz 45`, como antes |
+| Superficie chica (una puerta) | Segunda pasada; avisa cobertura < 5 %, y ahí ese aviso es esperado |
+
+Regla: en un cambio de tono grande, los objetos se excluyen **por tolerancia de matiz, nunca con muescas en la zona**.
+Y se revisan esquinas y bordes del muro al 100 % (§7), que es donde queda el color viejo.
+
 ## 7. Cómo validar
 
 1. **ΔE mediana después ≤ 3.** Resultados reales al 2026-11-02 (`clients/berel/.resources-local/photos/espacios/*.qa.json`):
@@ -146,6 +192,8 @@ no puede separar por tono, lo separas tú con la zona.
 2. **Mira la máscara** (`.mascara.png`) junto al plate: el muro entero, sin agujeros raros; los objetos fuera; sin
    costura en el borde de la zona.
 3. **Mira el plate al 100 %**: el sol y la sombra siguen ahí, la textura no se rayó, nada fuera del muro cambió.
+   Recorre las **esquinas y los bordes** del muro (en especial las esquinas superiores en sombra) y el contorno de
+   cada objeto: ahí aparecen el color viejo sin corregir y los halos del difuminado (2026-11-04, §6).
 4. Si algo falla, **ajusta la zona o las semillas y vuelve a correr** (es local y gratis). Nunca rotules un color
    que el muro no tiene.
 
@@ -171,3 +219,4 @@ el muro no coincide con el HEX y hay que declarar `sample: [u, v]` en el job, un
 
 - Script canónico para el chip `chip-<código>.png`.
 - Leyenda «Imagen ilustrativa. Los tonos pueden variar…»: ¿obligatoria? (libro §9.3, confirmar con Berel).
+- Confirmar con Berel que Azul Campeón y Blanco Unión se piden con ese nombre en tienda (§5 bis, `pending-store-name-confirmation`).

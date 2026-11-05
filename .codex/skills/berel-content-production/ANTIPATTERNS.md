@@ -93,6 +93,9 @@
 - Cancelar una tarea y asumir que dejó de sumar sin revisar etiquetas; retirar etiquetas de
   una entrega real para cuadrar el cupo; alterar fórmulas o dividir tareas sin permiso. (→ 15)
 - Presentar reservas etiquetadas como imágenes/videos entregados, o inventar el cupo mensual. (→ 15)
+- **Crear tareas o subítems de una propuesta social que el cliente no ha confirmado.** Si Berel decidió usar
+  sus artes oficiales, la propuesta de Efeonce vive en el toggle `📣 Derivados sociales · propuesta V1` hasta su
+  confirmación; y nada se programa antes del QA live de la URL. *Caso Umbral Vivo, 2026-11-04.* (→ 06, 15)
 
 ## Orden de producción
 
@@ -134,6 +137,13 @@
 - **Enlazar URLs del backend o del CMS.** Nunca salen al público. (→ `03`)
 
 ## Voz y contenido
+
+- 🔴 **Convertir el artículo en nota de la promoción, o meter sus fechas o su talento en el cuerpo.** La
+  promoción va en un párrafo removible al final de la sección más relacionada, sin fechas ni celebridades, y se
+  retira al terminar; dos fechas contradictorias de la propia promoción nunca entran. *Caso «Color a la Mexicana»,
+  2026-11-04.* (→ `03`)
+- **Usar colores de la Paleta Frida Kahlo en un artículo que no es de Frida** (Arte Talavera 428N, Pitaya 2-3605D,
+  Maíz 2-1403T), o un color de una sola línea de cartilla cuando hay uno Multitono equivalente. (→ `03`, `09`)
 
 - 🔴 **Escribir con el default es-CL del repositorio.** Berel es **español de México** y el
   "nosotros" es del cliente, no de Efeonce. (→ `04`)
@@ -203,6 +213,10 @@
 - **Poner `loading="lazy"` en el hero.** Es el LCP. (→ `05`)
 - **Marcar dos piezas con 🔁.** Una sola por artículo. (→ `05`)
 - **Párrafos dentro de la imagen.** Solo título y etiquetas. (→ `05`)
+- **Escribir «Sin texto» en la ficha de N1 o N4.** Llevan el marcador de color (nombre + código) y el logo de
+  Berel; corrección del operador del 2026-11-04. (→ `05`)
+- **Regenerar o cambiar el color de una imagen y dejar la ficha o el artículo como estaban.** Ficha, ALT y texto
+  del artículo se actualizan en la misma pasada (N4 y N2 del 2026-11-04). (→ `05`)
 - **Publicar un gráfico de la Paleta Frida Kahlo sin el logo de la licencia oficial.** Es obligación
   de licencia. (→ `09`)
 - 🔴 **Pedir una infografía sin nombrar formato ni variante.** Diseño tiene cinco formatos resueltos;
@@ -302,6 +316,11 @@
   pendiente CMS, autorización, publicación y lectura de la URL viva. (→ `08`)
 - 🔴 **Copiar las credenciales del CMS fuera de Notion** — a este repo, a un log, a un commit o a un
   prompt. **Nunca.** (→ `08`)
+- 🔴 **Exportar con un N## inventado** para que la entrega «se vea completa». Sin número asignado, la carpeta es
+  `Artículo (sin número) - <Título>` y los sociales van por slug; al asignarse el N## se renombran carpeta, archivos y
+  referencias. *Caso Color a la Mexicana y Umbral Vivo, 2026-11-04.* (→ `16`, `05`, `08`)
+- **Reportar como aprobado o listo para publicar lo que solo se entregó en OneDrive.** La carpeta de `04_Entregables`
+  es el handoff: faltan la revisión de diseño, la decisión de distribución de Berel y el QA live de la URL. (→ `01`, `08`)
 
 ## Ciclos anuales de Colores de Temporada — 2026-09-16
 
@@ -358,6 +377,21 @@
 - 🔴 **Pedir la firma de una persona o usar `Person` en el schema.** Berel publica como organización: `author` y
   `publisher` = `Organization` «Pinturas Berel». También se corrige el `Person` «Equipo Editorial Berel». (→ `03`, `09`)
 
+## Reescritura evergreen de Rayados N52 — 2026-11-05
+
+- 🔴 **Poner el escudo actual en uniformes históricos.** Una infografía de los jerseys de 1945, 1952 y 1983 con el
+  escudo de hoy afirma algo que la fuente no respalda («la van a objetar», operador). Se cambia la pieza; el escudo
+  solo entra desde el archivo oficial del club, con derechos registrados en notas internas. (→ `05`)
+- **Dejar números de aniversario en un cuerpo evergreen.** «79 años», «este año» o «cumple» caducan la pieza; las
+  fechas históricas verificadas sí entran como hechos, no como cuenta desde hoy. (→ `03`, `18`)
+- **Usar el nombre de catálogo cuando la paleta oficial del cliente usa otro.** La cartilla «Colores Confiables»
+  llama *Azul Campeón 432N* a lo que el catálogo llama *Azul Templado*: manda la fuente del cliente y la discrepancia
+  va al toggle de evidencia. (→ `03`, `09`)
+- **Entregar una story que no funciona como story.** Una puerta plana que llena el cuadro 9:16 es un recorte, no una
+  story: el operador la rechazó. (→ `06`)
+- **Mantener el `No aplica` de distribución después de reescribir la pieza.** Una decisión tomada para el archivo
+  de aniversario no rige la versión evergreen: la matriz se evalúa de nuevo. (→ `15`)
+
 ## Adaptación a México — campaña 2027 (2026-09-19)
 
 Berel dijo que la redacción «no suena natural» y «no está adaptada a México». Casos reales corregidos con la lente
@@ -397,6 +431,11 @@ línea, nunca para la formulación. Una lente propone; la decisión del cliente 
   posterior se hace **contra esa línea base** —las impresiones que la página tenía antes, cero si no
   existía—. Comparar el resultado con el volumen estimado fabrica un fracaso donde puede haber un
   éxito. (→ `02`)
+- 🔴 **Escribir el plan editorial sobre research reciclado.** El plan de un artículo nuevo se escribe después de
+  leer GSC (MEDIDO), Semrush mx (ESTIMADO) y la SERP de DataForSEO (OBSERVADO), y los artículos vecinos en vivo.
+  *Caso Umbral Vivo, 2026-11-04:* el operador lo detectó y el plan se rehízo. (→ `14`, `02`)
+- **Perseguir la keyword estacional porque hay una promoción.** Navidad tenía 5 impresiones; la demanda medida
+  estaba en el blanco. El ángulo lo deciden los datos. *Caso «Color a la Mexicana», 2026-11-04.* (→ `14`)
 
 ## Reporte
 

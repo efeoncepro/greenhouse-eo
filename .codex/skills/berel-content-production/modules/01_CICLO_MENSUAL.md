@@ -47,6 +47,18 @@ del agente. Prompts, secretos, credenciales y operación sensible sí permanecen
 2. `✍️ Versión vigente para revisión`.
 3. Si `Formato = Tutorial`, el híbrido se convierte en la única zona editorial activa; el plan permanece.
 
+**Estructura aceptada para un artículo nuevo (2026-11-04, Umbral Vivo y Color a la Mexicana).** Desplegando el
+punto 1, la página quedó con estos toggles hermanos, en este orden:
+
+1. `🧭 Plan editorial y SEO`.
+2. `📈 Research` — fuentes, demanda medida, demanda estimada, competencia observada, artículos vecinos,
+   arquitectura de palabras clave, implicaciones y límites (módulo 14).
+3. `✍️ Versión vigente para revisión V1` — metadatos en viñetas, artículo completo y callouts contextuales N1–N4
+   junto a su sección (módulos 03 y 05).
+4. `📣 Derivados sociales · propuesta V1`, sólo si hay propuesta social (módulo 06).
+5. `🗒️ Notas internas de producción` — gates de publicación, retiro de párrafos de promoción, longitud frente al
+   piso contractual y pendientes con Berel.
+
 Si el plan ya existe aguas arriba, sintetizarlo en el toggle de evidencia del artículo con enlaces a las
 fuentes, sin duplicar contenido sensible. El toggle demuestra qué se evaluó y decidió; no reproduce prompts,
 chain-of-thought, credenciales ni conversación entre agentes.
@@ -258,6 +270,24 @@ Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de ban
 🔴 Hacer **segunda lectura fresca** tras automatizaciones de Notion: fechas, estados, relaciones,
 responsables, `Formato` y contenido guardado.
 
+### Entrega de archivos en OneDrive (2026-11-04)
+
+Los archivos producidos se entregan en `Berel - Efeonce - Squad Berel › Workspace Oficial › 04_Entregables ›
+<NN>. Articulos <Mes>/Artículo N## - <Título>/`: banners del blog en la raíz y la subcarpeta `Social media` con los
+PNG de post, story y pinterest y el MP4 del reel. Es la misma carpeta de la que el CMS toma las imágenes. Estructura,
+nombres y el caso `Artículo (sin número)` → [`08`](08_PUBLICACION_CMS_DRUPAL.md), § La carpeta de entrega en OneDrive.
+
+🔴 **Entrega ≠ aprobación ≠ publicación.** Dejar los archivos en OneDrive no cambia el estado del Content Hub: faltan
+la revisión de diseño (Daniela, Andrés o Melkin) y la decisión de distribución de Berel, y nada se programa antes del QA
+live de la URL. Registrar la ruta de entrega en las notas internas del artículo.
+
+**Tras la aprobación del operador (2026-11-05, caso N52).** Cuando el operador aprueba los archivos («aprobados
+todos»): verificar byte a byte que lo que está en OneDrive es lo aprobado (p. ej. `07. Articulos Diciembre › Artículo
+N52 - Colores de Rayados la historia del azul y blanco`); registrar en las notas internas «Aprobados por Efeonce el
+5 de noviembre de 2026… Pendiente: revisión de Berel»; y abrir la revisión de diseño con una tarea `Listo para
+revisión` por cada banner y cada adaptación social, asignada a quien revisa (Daniela en N52, N62 y N63). La aprobación
+de Efeonce no es la de Berel ni cambia el estado del Content Hub.
+
 ### Barrido preventivo del mes
 
 Antes de cerrar un mes, revisar **todas** las filas editoriales del ciclo, aunque no tengan comentarios. Para
@@ -301,4 +331,5 @@ Siempre tres grupos:
 - [ ] Barrido preventivo completado sobre todas las páginas del mes, incluidas las que no tienen comentarios
 - [ ] Cada zona vigente pasó gate + lectura humana o quedó bloqueada con motivo; páginas sanas no se reescribieron
 - [ ] Conteo `P + B + T + S` conciliado; históricos separados y cupos/archivos/entregas diferenciados
+- [ ] Archivos entregados en `04_Entregables` con la ruta anotada en las notas internas; ninguno reportado como aprobado ni publicado por estar entregado
 - [ ] Reporte final separa listos · bloqueados · fuera de alcance

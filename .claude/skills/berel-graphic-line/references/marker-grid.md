@@ -149,6 +149,13 @@ un color que el muro no muestra.
 | el muro de ese color no aparece libre en el cuadro | El muro no es de ese color (foto sin corregir, color equivocado o recorte) |
 | no queda celda libre de título, logo o zonas seguras | Todo el muro libre está tomado por zonas que no se tocan |
 
+**Superficies más angostas que el marcador (2026-11-05, Rayados).** El marcador con su aire mide ≈ 250 px en el recorte
+1408 del blog. Rayas de ≈ 220 px y el tablero liso de una puerta con molduras (≈ 268 px) no dejan celda: el marcador se
+elimina, y es correcto. Se acepta la pieza sin marcador si el color va marcado en otra posición del artículo (N4 salió
+sin marcador; el color quedó en N1 y N3); no se estrecha el patrón para que quepa. Una puerta pivotante lisa de ≈ 40 %
+del ancho sí entra a la primera. Al planear el plate, el color que se quiere rotular necesita un paño liso más ancho que
+el marcador. Ver [lessons.md](lessons.md) (entradas 2026-11-05).
+
 ## 8. `sample` y por qué `at`/`alt` fallan cerrado
 
 - **`at`/`alt`** (coordenadas del sistema anterior) lanzan error: «el marcador ya no lleva
@@ -176,13 +183,34 @@ un color que el muro no muestra.
 - Por eso el plate reserva el **cuadrante superior izquierdo** como muro liso (sin ventana, lámpara ni
   espejo): ver `photography.md`.
 - El marcador va **bajo** el titular (objetivo 0,42 en post, 0,40 en story), nunca apilado con él.
+- **El titular es el título del artículo, en todas las piezas sociales** (operador, 2026-11-05: «En el título debería ir
+  en todas el título del artículo»). Si en 9:16 ocupa 3 líneas y pisa un objeto, no se acorta: se amplía el muro hacia
+  arriba en el plate ([photography.md](photography.md) §6) o, en el reel, se estira la franja de muro liso
+  ([video.md](video.md) §5 ter).
+- **Marcador en la franja de la píldora (2026-11-05, post de Rayados).** El aviso «sin celda de primer nivel» dejó el
+  chip sobre el título; el operador observó que eso restaba jerarquía visual. Se resolvió con el plate más alto (el del
+  muro ampliado) y `photo.focal` 0.5, con lo que el marcador cayó sobre el muro libre junto a la tele. Ante ese aviso,
+  primero busca muro libre con otro plate o foco; aceptar el segundo nivel es la última salida.
 
 ## 10. Franjas: cada columna es su propia grilla
 
-En `blog.franjas` cada columna busca su muro solo dentro de su franja: una columna, las filas de la
-grilla del blog, margen 24 px, objetivo [0,5 · 0,30], lado del texto a la derecha. No se tocan la
-banda de etiquetas (hasta 44 + 60 px desde arriba) ni la caja del logo. Un marcador por columna como
-máximo, sobre el color de esa columna.
+En `blog.franjas` cada columna busca su muro solo dentro de su franja: dos columnas de anclas dentro
+de la franja, las filas de la grilla del blog, margen 24 px, objetivo [0,5 · 0,30], lado del texto a la
+derecha (o a la izquierda si no cabe). No se tocan la banda de etiquetas (hasta 44 + 60 px desde
+arriba) ni la caja del logo. Un marcador por columna como máximo, sobre el color de esa columna.
+
+Cambio del 2026-11-04 (artículo Color a la Mexicana, N2): con una sola ancla centrada, en franjas de un
+tercio del ancho los nombres de más de ocho letras no cabían desde el centro y se eliminaban. Con dos
+anclas por franja el marcador se coloca junto al borde del muro libre. Límite que queda: el muro libre de
+la franja debe medir más que la caja del marcador más su respiro; si el nombre es largo («Brillo de
+Jade», «Cempasúchil» junto a una puerta), mueve `photo.focal` hacia el muro libre o elige otra escena. El
+foco de las franjas se mantiene igual en las tres columnas: es la misma escena y solo cambia el color.
+
+Medidas de ese caso, para calibrar: con la puerta centrada quedaban ≈ 270 px de muro libre útil por franja;
+Rosa Capote cupo justo (fracción de muro 0,86 contra el mínimo 0,85), Alebrije y Milpa sin problema. La razón que
+reporta el motor, «el muro de ese color no aparece libre», en realidad es la caja más el respiro montada sobre el marco
+de la puerta. Salidas en orden: el mismo `photo.focal` en todas las franjas, corrido hacia el muro libre (se usó 0.77),
+o un color de nombre más corto. `sample` no ayudó: el muro sí coincide con el HEX, lo que falta es ancho.
 
 ## 11. Errores corregidos en el camino
 

@@ -112,6 +112,18 @@ node brands/berel/scripts/ajustar-muro.mjs "$D/terraza.png" \
 - Guarda semillas y zona en un `zonas.tsv` junto a los prompts (como `ronda-2/zonas.tsv`) para poder repetir.
 - Valida: `deltaEAfter` ≤ 3, máscara limpia, sol y sombra conservados ([color-pipeline.md](color-pipeline.md) §7).
   Si no, ajusta zona o semillas y vuelve a correr (local, gratis).
+- **Misma escena en varios colores muy distintos** (franjas): zona rectangular de todo el muro, `--matiz 12`, semillas
+  también en las esquinas superiores en sombra y dos pasadas; nunca muescas en la zona ([color-pipeline.md](color-pipeline.md)
+  §6, caso 2026-11-04).
+
+## 5 bis. Editar una zona de un plate ya aprobado
+
+Para cambiar una sola zona (la pantalla de una tele, un objeto nuevo en el muro) sin regenerar la escena se usa
+`pnpm ai:inpaint image` desde Greenhouse; la zona protegida debe quedar idéntica bit a bit. Si el objeto va sobre un
+patrón (franjas, azulejo), la edición repinta el fondo de la máscara: conserva solo la caja medida del objeto y devuelve
+el muro original ([photography.md](photography.md) §6 quater). Logos o escudos de terceros se componen desde su SVG
+oficial y el modelo solo los termina ([photography.md](photography.md) §6 ter). Después de editar, vuelve a medir el
+color del muro y la banda del titular.
 
 ## 6. Jobs por formato (sin coordenadas)
 
@@ -146,6 +158,10 @@ Un job por formato en `projects/berel/<pieza>/jobs/<espacio>-<formato>.json`. Ej
   `focal`. `qa.logoBed` (contraste y nitidez bajo el logo) va siempre en el qa; solo avisa con `lecho`.
 - `sample: [u, v]` solo si la foto **no** está corregida al color.
 - No pases tamaños, posiciones, fuentes ni colores: los define la receta.
+- **Adaptaciones sociales de un artículo** (evidencia 2026-11-04, Umbral Vivo y Color a la Mexicana): los jobs viven en
+  `projects/berel/<proyecto>/jobs/<prefijo>_SM_<POST|STORIE|PINTEREST>.json`, junto a los `articulo-n#.json`, y parten
+  del plate N1 del artículo con las recetas `social.post|story|pinterest`. Si el post no encuentra banda limpia en el N1
+  con ningún foco, sale de otra escena del mismo artículo y se declara en el handoff ([photography.md](photography.md) §6).
 
 ## 7. Componer
 
@@ -211,12 +227,14 @@ Parte del job de la story ya revisada; todo vive en `projects/berel/<pieza>/sali
   en el `.dc.html` cada `/_blob/<id>` por la `url` que devuelve la subida, y publica con `root`.
 - Los comentarios del operador llegan como hilos del artifact: **responde en el hilo** (`ArtifactComments`), no en
   el chat.
+- Un tablero por artículo y familia en el canvas «Berel — Banners»: por ejemplo `Rayados-Articulo` (N1–N4) y
+  `Rayados-Social` (post, story, Pinterest, reel), 2026-11-05.
 
 ## 11. Pruebas y gates (Workbench)
 
 ```bash
 cd /Users/jreye/Documents/creative-workbench
-node --test brands/berel/test/*.test.mjs test/surface-color.test.mjs   # 37 PASS al 2026-11-02 (35 Berel + 2 motor)
+node --test brands/berel/test/*.test.mjs test/surface-color.test.mjs   # 37 PASS al 2026-11-02 y al 2026-11-05 (35 Berel + 2 motor)
 npm run gates                                                           # managed-drift, hygiene, piezas, native-policy
 ```
 
@@ -239,9 +257,39 @@ Sin los recursos locales, las pruebas que los necesitan se saltan: un «verde» 
 - Nombres: `N##_BN_<ROL>.webp` para blog, `N##_SM_<POST|STORIE|PINTEREST>.png` para social y
   `N##_SM_REEL.mp4` para el reel (convención del corpus), con el número de artículo correcto (ya hubo cruces
   N30→N38 y N50→N53).
-- Reel: MP4 H.264 + AAC, 1080×1920, 14 s, con la música del mes ya mezclada.
+- Reel: MP4 H.264 + AAC, 1080×1920, 14 s, con la música del mes ya mezclada (≈ 4,5–4,8 MB en los reels del
+  2026-11-04; las piezas de diciembre usan `musica-DIC.mp3`).
 - Blog 1408×768 webp < 200 KB; og:image 1200×630 derivado de la portada.
 - Sube a Frame.io debajo de la versión anterior.
+- **Carpeta de entrega en OneDrive** (verificada el 2026-11-04; en el Mac del operador se sincroniza en
+  `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/`): `Berel - Efeonce - Squad Berel › Workspace Oficial ›
+  04_Entregables › <NN>. Articulos <Mes>/Artículo N## - <Título>/`. Meses existentes: `01. Articulos Junio` …
+  `06. Articulos Noviembre`; el 2026-11-04 se creó `07. Articulos Diciembre`. Dentro de cada artículo, los banners del
+  blog van en la raíz y lo social en la subcarpeta `Social media` (en algunos meses escrita `Social Media`):
+  `N##_SM_POST.png`, `N##_SM_STORIE.png`, `N##_SM_PINTEREST.png`, `N##_SM_REEL.mp4` (algunos meses `N##_SM_REEL_2.mp4`).
+  Los banners de meses anteriores se llamaban `N##_BN_PORTADA.webp`, `N##_BN_CIERRE.webp`, `N##_BN_<TEMA>.webp`.
+- **Artículo sin número editorial todavía** (caso 2026-11-04, Color a la Mexicana y Umbral Vivo): la carpeta se llama
+  `Artículo (sin número) - <Título>/`; los banners del blog llevan el nombre exacto que declara la ficha del artículo
+  (manda la Spec de la wiki: minúsculas y guiones, p. ej. `colores-mexicanos-con-blanco-hero.webp`, `-comparativa`,
+  `-patio`, `-cierre`; `umbral-vivo-2027-hero.webp`, `umbral-vivo-2027-cierre.webp`) y lo social sale como
+  `<slug>_SM_POST.png | _SM_STORIE.png | _SM_PINTEREST.png | _SM_REEL.mp4` (slugs `colores-mexicanos-con-blanco`,
+  `umbral-vivo-2027`). Cuando se asigne el N##, renombra la carpeta a `Artículo N## - …` y los sociales a `N##_SM_…`.
+  Números asignados el 2026-11-05: **N62** Umbral Vivo y **N63** Color a la Mexicana (si la carpeta sigue «sin número»,
+  aplica el renombre).
+- **Caso con número (2026-11-05, N52 Rayados, reescritura evergreen; conserva su número):** `07. Articulos Diciembre ›
+  Artículo N52 - Colores de Rayados la historia del azul y blanco/` con 4 banners con el nombre de la ficha
+  (`colores-de-rayados-hero.webp`, `paleta-oficial-rayados-berel.webp`, `colores-de-rayados-puerta-azul.webp`,
+  `colores-de-rayados-recamara-rayas.webp`) y `Social media/N52_SM_POST.png`, `N52_SM_STORIE.png`,
+  `N52_SM_PINTEREST.png`, `N52_SM_REEL.mp4`. Aprobado por el operador (Efeonce) el 2026-11-05; revisión de Berel pendiente.
+- **Copia a OneDrive que se corta** («Operation timed out» sobre un archivo que se está sincronizando): borra el destino,
+  vuelve a copiar y verifica con `cmp origen destino` (sin salida = idéntico). Nunca des por entregado un archivo sin
+  ese `cmp`.
+- **Qué se exporta:** la corrida más reciente de cada slug (`ls -t projects/berel/<pieza>/runs/*/<archivo> | head -1`)
+  y el reel desde `projects/berel/<pieza>/salidas/video/<toma>/reel-*.mp4`. Las infografías N2/N3 de Umbral Vivo son
+  material de marca de Berel: no se exportan.
+- **Revisión ≠ entrega ≠ aprobación.** El canvas «Berel — Banners» (§10) es la superficie de revisión; OneDrive es la
+  superficie de entrega. Exportar a OneDrive no es aprobar: la revisión de diseño (Daniela, Andrés o Melkin) sigue
+  pendiente aunque los archivos ya estén en la carpeta.
 - **Efeonce no publica para Berel**: el social es insumo para la agencia que opera sus redes. La aprobación es de
   diseño (Daniela, Andrés o Melkin) y luego de Berel.
 
@@ -259,3 +307,4 @@ Sin los recursos locales, las pruebas que los necesitan se saltan: un «verde» 
 | Corridas compuestas | Workbench `projects/berel/<pieza>/runs/<uuid>/` | **Nunca** (ignorado) |
 | Contratos, scripts, compositor, pruebas, libro de marca | Workbench `brands/berel/**` | Sí |
 | Hoja de contacto | Scratchpad de la sesión | Nunca |
+| Entregables exportados (banners, sociales, reel) | OneDrive `Workspace Oficial › 04_Entregables › <NN>. Articulos <Mes>/` (§13) | Nunca |
