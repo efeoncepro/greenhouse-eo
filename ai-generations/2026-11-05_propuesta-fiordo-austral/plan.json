@@ -79,6 +79,10 @@
       "purpose": "18 · costo total"
     },
     {
+      "recipeId": "content-pricing-live",
+      "purpose": "19 · inversión"
+    },
+    {
       "recipeId": "decision-next-steps",
       "purpose": "20 · próximos pasos"
     },

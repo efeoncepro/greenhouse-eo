@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "layout": "live",
+  "voice": {
+    "eyebrow": "Inversión",
+    "question": "¿Cuánto invertimos?",
+    "answer": [
+      "US$ 9.900"
+    ]
+  },
+  "body": "Servicios Efeonce, más IVA. Las licencias van **aparte**: las factura HubSpot directo a Fiordo Austral.",
+  "quote": {
+    "kicker": "Oferta · Wherex 428823",
+    "title": "Para Fiordo Austral",
+    "lines": [
+      {
+        "name": "Implementación",
+        "desc": "Fases F0 a F7, en 16 semanas",
+        "period": "· pago único"
+      },
+      {
+        "name": "Capacitación",
+        "desc": "Usuarios y administradores",
+        "period": "· pago único"
+      },
+      {
+        "name": "Soporte y operación",
+        "desc": "SLA S1–S4, meses 5 a 12",
+        "period": "× 8 meses"
+      },
+      {
+        "name": "Onboarding HubSpot",
+        "desc": "No aplica con partner certificado",
+        "period": "· incluido"
+      }
+    ],
+    "totalLabel": "Servicios, año 1",
+    "tax": "neto + IVA",
+    "cta": "Ver la oferta económica"
+  },
+  "chips": [
+    {
+      "kicker": "Licencias HubSpot",
+      "text": "US$ 12.000 al año,\nfacturadas por HubSpot"
+    },
+    {
+      "kicker": "Opción Enterprise",
+      "text": "+US$ 6.000 al año\nen licencias"
+    }
+  ],
+  "selection": {
+    "target": "cta"
+  }
+}

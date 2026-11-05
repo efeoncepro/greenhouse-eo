@@ -281,6 +281,28 @@ d['selected'] = 3
 d['selection'] = {'target': 'object', **SEL}
 add('F18-costo', 'content-bullets', d, '18 · costo total')
 
+# 19 · Inversión (content-pricing live; montos reales con render-pricing-real.ts, como Assetplan)
+d = base(AP, 'A078-inversion-cotizacion.json')
+d['voice'] = {'eyebrow': 'Inversión', 'question': '¿Cuánto invertimos?', 'answer': ['US$ 9.900']}
+d['body'] = 'Servicios Efeonce, más IVA. Las licencias van **aparte**: las factura HubSpot directo a Fiordo Austral.'
+q = d['quote']
+q['kicker'] = 'Oferta · Wherex 428823'
+q['title'] = 'Para Fiordo Austral'
+q['lines'] = [
+    {'name': 'Implementación', 'desc': 'Fases F0 a F7, en 16 semanas', 'period': '· pago único'},
+    {'name': 'Capacitación', 'desc': 'Usuarios y administradores', 'period': '· pago único'},
+    {'name': 'Soporte y operación', 'desc': 'SLA S1–S4, meses 5 a 12', 'period': '× 8 meses'},
+    {'name': 'Onboarding HubSpot', 'desc': 'No aplica con partner certificado', 'period': '· incluido'},
+]
+q['totalLabel'] = 'Servicios, año 1'
+q['tax'] = 'neto + IVA'
+q['cta'] = 'Ver la oferta económica'
+d['chips'] = [
+    {'kicker': 'Licencias HubSpot', 'text': 'US$ 12.000 al año,\nfacturadas por HubSpot'},
+    {'kicker': 'Opción Enterprise', 'text': '+US$ 6.000 al año\nen licencias'},
+]
+add('F19-inversion', 'content-pricing-live', d, '19 · inversión')
+
 # 20 · Próximos pasos
 d = base(AP, 'A08-pasos.json')
 d['voice'] = {'eyebrow': 'Próximos pasos', 'question': '¿Qué sigue?', 'answer': ['La demo']}
