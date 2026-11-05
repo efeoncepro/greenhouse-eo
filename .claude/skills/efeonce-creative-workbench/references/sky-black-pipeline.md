@@ -299,7 +299,8 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
 - **`parts.cjs` / `layers.cjs`**: lista de rutas desde el CSV; región `ALIANZA_UBIC = [560,0,1080,330]` y capa
   forzada por `data-capa` (la ubicación larga y su pin caían en la caja del logo y en la story quedaban
   separados del texto).
-- **`organizar.cjs <OUT> <BLACK SKY 2026>`**: copia (sin borrar) a
+- **`organizar.cjs <OUT> <BLACK SKY 2026>`** (desde 2026-11-05 compara por tamaño y fecha, sin leer el destino:
+  leer un archivo sólo en la nube de OneDrive fuerza su descarga y el script se colgaba): copia (sin borrar) a
   `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` con la estructura y la nomenclatura de Daniela
   (detalle en [sky-format-catalog.md](sky-format-catalog.md) §5.4). Falla si falta una fuente o si dos
   destinos coinciden; deja `organizar-plan.json`. En `GIF + POPUP` va sólo el `.gif` (el MP4 con el mismo nombre
