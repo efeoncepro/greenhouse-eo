@@ -184,7 +184,7 @@ fondo claro.
 - Objeto de lámina con transparencia → `pnpm ai:image --model gpt-image-2.5-flare --background transparent`
   (transparencia plena en 2.5; en GPT Image 2 es preview). Valida el alfa decodificando bytes.
 - Retoque preciso con máscara → `--model gpt-image-2.5-sunburst`. Explorar en `low`/`medium`; `xhigh`/`max` sólo
-  para el asset final (2.5 `max` ≈ lo mismo que el default del CLI `gpt-image-2 · high`).
+  para el asset final (2.5 `max` ≈ lo mismo que `gpt-image-2 · high`).
 - El CLI imprime `$ costo estimado` antes de pedir (fórmula oficial de tokens; sólo informa, no confirma) y avisa
   que `--count N` son N pedidos pagados: léelo antes de dejarlo correr.
 - Capas editables de una ilustración aprobada → `pnpm ai:fal --capability seedream5-pro-layerize`, sin regenerar.

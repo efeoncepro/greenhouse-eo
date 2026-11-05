@@ -21,7 +21,8 @@ import {
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
   runOpenAIImageTool,
-  type OpenAIImageModel
+  type OpenAIImageModel,
+  type OpenAIImageSize
 } from '@/lib/ai/openai-image'
 
 vi.mock('server-only', () => ({}))
@@ -508,7 +509,7 @@ describe('GPT Image 2.6 family contract (Sunburst/Flare, 2026-11-04)', () => {
 
     vi.stubGlobal('fetch', fetchMock)
 
-    await generateOpenAIImage({ prompt: 'Loop.', model: 'gpt-image-2.6-flare', size: '640x640', quality: 'low', format: 'gif', gif: { frameCount: 9, frameDurationMs: 120 } })
+    await generateOpenAIImage({ prompt: 'Loop.', model: 'gpt-image-2.6-flare', size: '640x640' as OpenAIImageSize, quality: 'low', format: 'gif', gif: { frameCount: 9, frameDurationMs: 120 } })
 
     const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
 

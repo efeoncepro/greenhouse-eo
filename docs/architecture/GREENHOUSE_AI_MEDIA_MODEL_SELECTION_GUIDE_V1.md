@@ -415,7 +415,7 @@ Cada ficha: qué es · cuándo SÍ · cuándo NO · capacidades y límites · co
 |---|---|
 | `gpt-image-2.5-sunburst` / `gpt-image-2.5-sunburst-2026-09-08` | Pieza final con edición precisa, inpainting con máscara, multi-turno |
 | `gpt-image-2.5-flare` / `gpt-image-2.5-flare-2026-09-08` | Generación cotidiana, iteración rápida, transparente |
-| `gpt-image-2` / `gpt-image-2-2026-04-21` | Default del CLI y del runtime; único con Batch API (🔴 contradicción a revalidar: la doc del 2026-11-05 incluiría a 2.5, ver «Precio»); evitar como elección nueva salvo Batch |
+| `gpt-image-2` / `gpt-image-2-2026-04-21` | Default del runtime (`OPENAI_IMAGE_MODEL`); en el CLI se pide con `--model` (el default del CLI es `gpt-image-2.5-flare` desde 2026-11-05); único con Batch API (🔴 contradicción a revalidar: la doc del 2026-11-05 incluiría a 2.5, ver «Precio»); evitar como elección nueva salvo Batch |
 | `gpt-image-2.6-sunburst` (sin snapshot fechado) | Ejecutable por `pnpm ai:image` desde el 2026-11-05 [contrato]. Pieza final en `high`/`xhigh`/`max` a la par de 2.5 Sunburst (mismo costo; comparar en la toma); edición guiada por `markup` o por rayado; editar **sin** máscara (con la máscara del pipeline: panel negro, 1 de 1) [verificado 2026-11-05] |
 | `gpt-image-2.6-flare` (sin snapshot fechado) | Ejecutable por `pnpm ai:image` desde el 2026-11-05 [contrato]. SVG (`--format svg`) y GIF animado corto (`--format gif`); edición con máscara por `ai:inpaint` (PASS, 1 de 1); mismos tokens que Sunburst 2.6 pero menor latencia medida (`medium` 8,7 s vs 24,4 s) [verificado 2026-11-05, una corrida c/u] |
 

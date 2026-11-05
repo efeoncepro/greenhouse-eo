@@ -2,7 +2,7 @@
 
 `pnpm ai:nano` opera `gemini-nano-banana-2.1` por Google Cloud/Vertex `global` con las credenciales
 del resolver canónico del repo. Es tooling local; no configura el producto ni promueve rutas de Globe.
-`pnpm ai:image` sigue usando OpenAI con default `gpt-image-2`; Sunburst y Flare 2.5 se eligen explícitamente.
+`pnpm ai:image` sigue usando OpenAI; su default es `gpt-image-2.5-flare` desde el 2026-11-05 (Sunburst, 2.6 y `gpt-image-2` se eligen con `--model`).
 Implementación: `scripts/ai/nano-banana.ts`; contrato: `src/lib/ai/nano-banana-cli.ts`.
 
 ## Uso

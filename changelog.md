@@ -20,7 +20,8 @@ edición guiada por marcas (`--markup`) y por rayado sobre la foto, `--compressi
 apagado. Canarios reales (~USD 1): 2.6 cobra 4,2× en `low` y 3,3× en `medium` que 2.5 a la misma tarifa, igual en
 `high`/`xhigh`/`max`; Sunburst 2.6 con máscara también da panel negro, así que `ai:inpaint` lo edita sin máscara.
 Cuándo usar cada uno: [manual](docs/manual-de-uso/ai-tooling/generar-y-editar-imagenes-con-gpt-image.md) y guía de
-modelos §5.1. Default del CLI y del runtime sin cambio (`gpt-image-2`).
+modelos §5.1. Default de `pnpm ai:image`: `gpt-image-2.5-flare` (decisión del operador; `gpt-image-2` con `--model`);
+el del runtime sigue `gpt-image-2`.
 
 ## 2026-11-04 — SKY: adaptaciones en Claude Design (CyberSky Perú y kit BLACK)
 

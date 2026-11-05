@@ -56,7 +56,7 @@ falsamente la existencia de `input_fidelity`.
 - **Desde el 2026-11-05 (tarde) Greenhouse transporta 2.6** [contrato]: `gpt-image-2.6-sunburst` y
   `gpt-image-2.6-flare` están en `OpenAIImageModel` y en `OPENAI_IMAGE_MODEL_CAPABILITIES`; `pnpm ai:image` acepta
   `--model gpt-image-2.6-*` con `--complexity`, `--format svg|gif`, `--markup` y `--estimate`, y `pnpm ai:inpaint`
-  acepta 2.6. **El default del CLI y del runtime sigue siendo `gpt-image-2`.** Globe sigue sin ruta de 2.6. Ver
+  acepta 2.6. **El default del CLI es `gpt-image-2.5-flare` desde el 2026-11-05 (`gpt-image-2` sigue con `--model`); el del runtime sigue siendo `gpt-image-2`.** Globe sigue sin ruta de 2.6. Ver
   §Mapeo contra Greenhouse y Globe.
 - **Endpoints de 2.6:** sólo `v1/images/generations` y `v1/images/edits` según la ficha, que marca Batch,
   Responses y Chat Completions como "not supported" [oficial]. 🔴 Contradicción medida: el tool `image_generation`

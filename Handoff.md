@@ -9,7 +9,8 @@ con `complexity`/`svgOutput`/`gifOutput`/`markup`/`tokenFamily`/`shutdownDate`; 
 estimación 2.6 = tokens 2.5 × factor medido; `svgUsage`; `imageModel` en el tool de Responses), `scripts/ai/generate-image.ts`
 (flags `--complexity --format gif|svg --svg-model --svg-effort --frames --frame-ms --markup --compression --moderation
 --estimate`; ayuda con la tabla «¿2.5 o 2.6?»), adaptador de `ai:inpaint` (acepta 2.6, Sunburst 2.5 y 2.6 sin máscara,
-`complexity: low`). Tests focales 200/200, typecheck y lint limpios.
+`complexity: low`). Default de `ai:image` → `gpt-image-2.5-flare` (operador, 2026-11-05; `gpt-image-2` con `--model`);
+el runtime sigue `gpt-image-2`. Tests focales 200/200, typecheck y lint limpios.
 **Evidencia:** `ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json`, `cli/`, `cli/rayado/`), clave personal,
 ~USD 1 en total. Medido: tokens 2.6 a 1024² low 824 · medium 1.449 · high 1.758 · xhigh 3.122 · max 7.024; SVG exige
 `svg.model`; GIF también en edits, hoja ≤ 3840 y 8,3 MP (9×640² sí, 9×1024² no); markup en 2.5 y 2.6 sin tokens de

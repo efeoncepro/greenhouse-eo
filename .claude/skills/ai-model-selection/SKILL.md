@@ -151,11 +151,13 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
   (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
   (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
-- 🔴 **El default de `pnpm ai:image` es `gpt-image-2`, dos generaciones atrás** (2026-10-19, anuncio Efeonce | Google:
-  la primera ronda salió con ese modelo y el operador esperaba 2.5). Nombra siempre el modelo con `--model`; la guía
-  recomienda 2.5 Flare para generar y 2.5 Sunburst para editar o terminar. **GPT Image 2.6 (2026-11-04) corre en
+- 🔴 **El default de `pnpm ai:image` es `gpt-image-2.5-flare` desde el 2026-11-05** (decisión del operador). Antes era
+  `gpt-image-2` y eso costó una ronda (2026-10-19, anuncio Efeonce | Google: el operador esperaba 2.5); `gpt-image-2`
+  sigue disponible con `--model`. El default del **runtime** (`OPENAI_IMAGE_MODEL`) no cambió: sigue `gpt-image-2`.
+  Nombra igual el modelo con `--model` cuando importe; la guía recomienda 2.5 Flare para generar y 2.5 Sunburst para
+  editar o terminar. **GPT Image 2.6 (2026-11-04) corre en
   `pnpm ai:image` desde 2026-11-05** [contrato]: `--model gpt-image-2.6-flare|sunburst`, más `--complexity`,
-  `--format svg|gif` y `--markup`; el default sigue siendo `gpt-image-2`, así que 2.6 también se pide explícito.
+  `--format svg|gif` y `--markup`; 2.6 se pide explícito.
   Ruteo «¿2.5 o 2.6?» y comandos verificados en `greenhouse-ai-image-generator` §GPT Image 2.6 (y en
   `pnpm ai:image --help`).
 - 🔴 **GPT Image 2.6 es más caro que 2.5 sólo en `low`/`medium`; en `high`/`xhigh`/`max` cuesta igual**, a la misma

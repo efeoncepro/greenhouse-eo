@@ -27,6 +27,8 @@ Si no pasas `--model`, el comando usa `gpt-image-2` (no cambió). Para trabajo n
 
 ## Antes de empezar
 
+- **Sin `--model`, el comando usa `gpt-image-2.5-flare`** (default desde el 2026-11-05). Para la generación anterior pide
+  `--model gpt-image-2`; para Sunburst o la 2.6, nómbralos igual.
 - **Elige el modelo con la tabla de abajo.** El detalle, las cifras y los precios están en la
   [guía de selección de modelos, §5.1](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
 - **Decide quién paga.** Si eres un agente o un operador haciendo una pieza, una prueba o una iteración, agrega

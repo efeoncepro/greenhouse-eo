@@ -90,8 +90,8 @@ determinística se ve plana, el acabado lo da una pasada generativa **sobre la e
 generación desde cero. Decisión del operador: «tienes que pedir el acabado a Sunburst porque no se ve bien así
 determinístico».
 
-1. **Fondo** limpio con `pnpm ai:image --model gpt-image-2.5-flare` (el default del CLI es `gpt-image-2`: pedir el
-   modelo siempre). Si el título va sobre luz, pedir la luz como horizonte bajo y el centro oscuro.
+1. **Fondo** limpio con `pnpm ai:image --model gpt-image-2.5-flare` (es el default del CLI desde el 2026-11-05; nombrarlo
+   igual). Si el título va sobre luz, pedir la luz como horizonte bajo y el centro oscuro.
 2. **Componer** los elementos exactos en capas de profundidad (en el caso fuente: cerca con blur 24 px, medio nítido,
    lejos teñido a navy).
 3. **Acabado** con `--model gpt-image-2.5-sunburst` y la escena como referencia: sólo luz y lente (rim light,

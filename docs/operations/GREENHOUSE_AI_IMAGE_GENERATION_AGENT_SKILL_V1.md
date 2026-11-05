@@ -91,7 +91,7 @@ Facts operativos vigentes al 2026-06-01:
     2026-10-23); 1.5 y 1-mini se cortarán desde el 2026-12-01 (`assertOpenAIImageModelAvailable`). La estimación
     2.6 = tokens de 2.5 × factor medido; GIF sin estimación; SVG estima el raster y avisa que el modelo autor se
     cobra aparte. `runOpenAIImageTool` acepta `imageModel` (tool.model de Responses) — con 2.6, no garantizado.
-    Default del CLI y del runtime: sigue `gpt-image-2`.
+    Default del CLI: `gpt-image-2.5-flare` desde el 2026-11-05 (decisión del operador; `gpt-image-2` con `--model`). Default del runtime: sigue `gpt-image-2`.
     - **`pnpm ai:image`:** `--model gpt-image-2.6-flare|gpt-image-2.6-sunburst` · `--complexity low|medium|high`
       (sólo 2.6) · `--format png|jpeg|webp|gif|svg` (o la extensión `.gif`/`.svg` de `--out`) · `--svg-model <id>`
       (default `gpt-5.5`) · `--svg-effort none|minimal|low|medium|high|xhigh|max` (default `low`) · `--frames N`
@@ -701,7 +701,7 @@ Reglas operativas:
 - **Nano Banana Pro:** nunca por fal (decisión del operador 2026-09-16). En Google, `gemini-3-pro-image` está
   disponible en Vertex pero ninguna superficie lo usa; el provider `google-gemini-image` corre Nano Banana 2
   (`gemini-3.1-flash-image`). **`pnpm ai:nano` usa Nano Banana 2.1** con contrato local separado;
-  `pnpm ai:image` conserva OpenAI y default `gpt-image-2`. Ver [manual Nano](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
+  `pnpm ai:image` conserva OpenAI (default `gpt-image-2.5-flare` desde 2026-11-05). Ver [manual Nano](../manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
   y [prueba Nexa cine 4K/high](../audits/ai-tooling/2026-10-06-nexa-cine-nano-banana-2-1-vs-sunburst.md).
   La prueba visual no constituye ranking general ni cambia defaults. No cambiar
   `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: cambia todo el carril. Ver arquitectura del generador §Carril Google.

@@ -52,7 +52,7 @@ import { resolveOutputDir } from './resolve-output-dir'
 loadEnv({ path: join(process.cwd(), '.env.local') })
 
 /**
- * Greenhouse AI image CLI — generate images with OpenAI gpt-image-2 (default).
+ * Greenhouse AI image CLI — generate images with OpenAI GPT Image (default gpt-image-2.5-flare since 2026-11-05).
  *
  * Canonical entry point: src/lib/ai/openai-image.ts (`generateOpenAIImage`). This CLI is
  * the operational wrapper around it (flexible out path + timeout + batch). For repo-bound
@@ -103,8 +103,8 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *   --background <b>        auto | opaque | transparent (default opaque; GPT Image 2 transparency is preview;
  *                           transparent exige png o webp)
  *   --model <m>             gpt-image-2.6-flare | gpt-image-2.6-sunburst
- *                           gpt-image-2.5-flare | gpt-image-2.5-sunburst (+ snapshots -2026-09-08)
- *                           gpt-image-2 (default) (+ -2026-04-21) | gpt-image-1.5 | gpt-image-1-mini (apagados 2026-12-01)
+ *                           gpt-image-2.5-flare (default) | gpt-image-2.5-sunburst (+ snapshots -2026-09-08)
+ *                           gpt-image-2 (+ -2026-04-21) | gpt-image-1.5 | gpt-image-1-mini (apagados 2026-12-01)
  *   --count <n>             Imágenes por prompt (default 1). OJO: son N pedidos separados y se pagan N veces
  *   --timeout <ms>          Per-image timeout (default 280000; gpt-image-2 high can exceed 125s)
  *   --open                  Open the result(s) in the default viewer (macOS `open`)
@@ -150,8 +150,8 @@ interface CliArgs {
 const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.6 + 2.5 families + gpt-image-2)
 
   pnpm ai:image --prompt "<text>" [--out <path>] [--size 1536x1024] [--quality high]
-                [--background auto|opaque|transparent] [--format png|jpeg|webp|gif|svg] [--model gpt-image-2] [--count 1]
-                # --model gpt-image-2.6-flare|gpt-image-2.6-sunburst|gpt-image-2.5-flare|gpt-image-2.5-sunburst
+                [--background auto|opaque|transparent] [--format png|jpeg|webp|gif|svg] [--model gpt-image-2.5-flare] [--count 1]
+                # --model gpt-image-2.5-sunburst|gpt-image-2.6-flare|gpt-image-2.6-sunburst|gpt-image-2 (generación anterior)
                 # --quality xhigh|max (2.5 y 2.6) · --complexity low|medium|high (sólo 2.6)
                 [--compression 0-100] [--moderation auto|low] [--estimate] [--timeout 280000] [--open]
   pnpm ai:image --model gpt-image-2.6-flare --format svg --prompt "<icono plano>" --out icono.svg
@@ -193,7 +193,7 @@ Concept mode:
   Identidad de personas      → 2.5 Sunburst (canon de fotografía de marca) hasta un canario de identidad en 2.6.
   --complexity low NO abarató (mismos tokens, medido); úsalo por calidad, no por precio.
 
-Defaults: model gpt-image-2 · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
+Defaults: model gpt-image-2.5-flare · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
 Clave OpenAI:
   --openai-key <perfil>  Paga con el secreto greenhouse-openai-api-key-<perfil> (p. ej. personal)
                          en vez de la canónica. También vale OPENAI_API_KEY_PROFILE=<perfil> en el
@@ -217,7 +217,9 @@ const parseArgs = (argv: string[]): CliArgs => {
     size: '1536x1024',
     quality: 'high',
     background: 'opaque',
-    model: 'gpt-image-2',
+    // Default del CLI desde el 2026-11-05 (decisión del operador): 2.5 Flare. gpt-image-2 sigue disponible con --model;
+    // el default del RUNTIME (`OPENAI_IMAGE_MODEL`, src/lib/ai/openai-image.ts) no cambia con esto.
+    model: 'gpt-image-2.5-flare',
     count: 1,
     timeoutMs: 280_000,
     open: false,

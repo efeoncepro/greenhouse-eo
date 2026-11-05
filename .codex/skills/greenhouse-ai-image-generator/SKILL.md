@@ -156,8 +156,8 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    más en `low` y ~3× en `medium` (cifras en la guía §5.1); explorar e iterar barato sigue en 2.5 Flare, y 2.6 entra
    por capacidad (SVG, GIF, `complexity`) o por comparación en la pieza final (§GPT Image 2.6).
 5. **¿Necesitas Batch API (mitad de precio) o el contrato fija `gpt-image-2`?** → `gpt-image-2` (único con Batch;
-   el CLI no usa Batch). Ojo: el default del CLI (`gpt-image-2 · high · 1536x1024` ≈ USD 0,165) cuesta lo mismo
-   que 2.5 en `max`.
+   el CLI no usa Batch). Ojo: `gpt-image-2 · high · 1536x1024` (≈ USD 0,165, el default del CLI hasta el 2026-11-05)
+   cuesta lo mismo que 2.5 en `max`; el default del CLI hoy es `gpt-image-2.5-flare`.
 6. **¿Abrir muchos territorios barato o una serie relacionada?** → `seedream5-lite` (USD 0,035/imagen;
    `max_images` 1–6 vía `--input`).
 7. **¿Materialidad, atmósfera, color, look development, fusión multirreferencia orientada a material, cambio
@@ -183,7 +183,7 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
     Foto Efeonce siempre por `design-studio`, ficha + `pnpm foto:prompt` y cine-reviewer; mismo
     canon con cualquier motor. Si las referencias exceden el inline de 20 MiB, preparar copias
     de transporte con procedencia y revisar detalle (Nexa: JPEG98 4:4:4 sin cambio geométrico).
-    El default de `pnpm ai:image` continúa `gpt-image-2`; no se promueve Nano al runtime/Globe.
+    El default de `pnpm ai:image` es `gpt-image-2.5-flare` (desde 2026-11-05); no se promueve Nano al runtime/Globe.
 
 **Rankings: preséntalos con fecha y fuente, sin elegir uno como verdad.** OpenArt Arena imagen (2026-09-16):
 Seedream 5 Pro #1, GPT Image 2 #2, Nano Banana Pro #3. Arena y Artificial Analysis (2026-09-07/16): Sunburst y
@@ -1111,7 +1111,7 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
   **Nano Banana 2** (`gemini-3.1-flash-image`, vía Vertex con `getGoogleGenAIClient`), sobreescribible con la env
   `GOOGLE_GEMINI_IMAGE_MODEL`; vive sólo en el generador del producto. **`pnpm ai:nano` usa Nano Banana 2.1**
   (`gemini-nano-banana-2.1`) con contrato local independiente; ver [manual](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
-  y decisión 12. `pnpm ai:image` conserva OpenAI y default `gpt-image-2`. **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
+  y decisión 12. `pnpm ai:image` conserva OpenAI (default `gpt-image-2.5-flare` desde 2026-11-05). **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
   en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por

@@ -131,8 +131,8 @@ Dentro de GPT Image hay una familia nueva, **GPT Image 2.5**, con dos variantes:
 - **Flare** — la rápida, pensada para el uso de todos los días.
 - **Sunburst** — pensada para edición de precisión, cuando hay que corregir o ajustar con detalle.
 
-También sigue disponible la versión anterior, **GPT Image 2**, que todavía es la que usa el comando si no se
-elige otra. OpenAI recomienda la 2.5 para trabajos nuevos; la 2 sigue vigente y es la única que permite pedidos en
+También sigue disponible la versión anterior, **GPT Image 2**, que se pide nombrándola (`--model gpt-image-2`): desde el
+2026-11-05 el comando usa **2.5 Flare** si no se elige otra. OpenAI recomienda la 2.5 para trabajos nuevos; la 2 sigue vigente y es la única que permite pedidos en
 lote a mitad de precio.
 
 Dos novedades de la familia 2.5 que se notan en el resultado:
@@ -174,7 +174,8 @@ conveniente con la 2.5. La 2.6 tampoco admite pedidos en lote a mitad de precio.
   SVG, GIF animados, edición con marcas y el control de complejidad. Antes de gastar, `--estimate` muestra el costo
   sin llamar a OpenAI y avisa cuando la 2.6 sale más cara que la 2.5. `pnpm ai:inpaint` (editar una zona dejando el
   resto idéntico) también acepta la 2.6.
-- Si no se elige modelo, el comando sigue usando GPT Image 2.
+- Si no se elige modelo, el comando usa **GPT Image 2.5 Flare** (desde el 2026-11-05). GPT Image 2 se puede seguir
+  pidiendo con `--model gpt-image-2`. El motor del portal (runtime) no cambió.
 
 **Cuándo usar cada una, en simple**
 
