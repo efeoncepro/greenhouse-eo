@@ -51,6 +51,8 @@ Tercera ronda: rutas foco con la foto aprobada de cada destino (15, desde el CSV
 «Vuela por el Perú» y Argentina, y entrega ordenada por mercado y formato en «BLACK SKY 2026».
 Cuarta ronda: el logo se lee en todas las fotos sin apagarlas, la flecha de precio queda cerca de destinos cortos,
 Chile Travel va pegado a la esquina, Santiago para Argentina es de verano y las banderas tienen un borde fino.
+Quinta ronda: detrás del logo va el gradiente que dejó Daniela, cortado bajo el logo para no oscurecer caras ni monumentos;
+Talara y Chiclayo ya tienen foto y ubicación, y la choza de Iquitos, la ballena de Talara y el muelle de Chiclayo quedan a la vista.
 
 ## 2026-11-04 — efeoncepro.com: BreadcrumbList válido en la portada
 

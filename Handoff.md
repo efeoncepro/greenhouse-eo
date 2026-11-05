@@ -86,6 +86,13 @@ foto (reemplaza al degradado plano 20 %), regla destino ↔ flecha de precio a 4
 Santiago con foto de verano, story de Tacna reencuadrada, stories con PromPerú centrado y marca de agua y ubicación
 pegadas arriba, aro de banderas de 2 px (KV, GIF, story en video y HPH por mercado). Actualizado en canvas,
 `BLACK SKY 2026` y ENTREGABLES. **Por confirmar:** que la regla de la flecha valga también para los popups del kit.
+**Quinta ronda (2026-11-05, Teams y Frame.io, canvas versión 44):** gradiente de referencia de Daniela
+(`GRAFICOS/Gradiente para imagenes`, negro 69 % → 0) en lugar del velo diagonal. A todo el alto tapaba caras (rechazado por
+Julio) y quedó acotado bajo el logo (`FADE_FIN` 0,42/0,50/0,46), con comparación A/B enviada. Talara (ballena) y Chiclayo
+(Muelle de Pimentel) con foto de `BANCO DE VIDEOS/02_PERU/PROMPERU/` y ubicación del CSV; Iquitos, Talara y Chiclayo
+reencuadrados con `lift`; stories en video de AR Lima, AR Santiago y «Vuela por el Perú» con el destino en intro y
+brandlift. `BLACK SKY 2026` (46 archivos) y ENTREGABLES actualizados. **Por confirmar:** largo del gradiente; foto de
+Chiclayo (Daniela sólo comentó Talara). Los comentarios de Frame.io no se pueden responder desde aquí.
 
 ## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 

@@ -501,13 +501,13 @@ AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GI
 **Rutas foco (tercera ronda):** 15 rutas del CSV con la foto aprobada de `FOTOS PARA PROMPERU/` (versión
 vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima. Tasas incluidas», ubicación
 del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
-PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, desde la cuarta
-ronda, un velo diagonal adaptativo (pipeline §4.5); en la story, la ubicación va completa en la esquina superior
+PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, desde la quinta
+ronda, el gradiente de referencia de Daniela (negro 69 % → 0) acotado bajo el logo (pipeline §4.6); en la story, la ubicación va completa en la esquina superior
 derecha (borde derecho en x=1040, borde superior en y=22) y PromPerú centrado (x=540) entre el precio y el pie.
 Tacna story reencuadrada (z 1,25, t [0,36; 0,5]) para que la flecha no tape a la persona. Regla de la flecha de precio: 40 px
 después del bloque del destino cuando el destino es corto, en KV, popup y story.
-Chiclayo y Talara no tienen foto aprobada (carpetas vacías) y siguen con la del KV y la ubicación
-en placeholder. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
+Chiclayo y Talara: desde la quinta ronda llevan la foto aprobada de `BANCO DE VIDEOS/02_PERU/PROMPERU/` (Muelle de
+Pimentel y ballena jorobada) y la ubicación del CSV; sus carpetas en `FOTOS PARA PROMPERU` siguen vacías. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
 y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» (de verano desde la cuarta ronda: `santiago-1129335236`) y «Volá a Lima» llevan foto del destino.
 
 ## 6. Inconsistencias y pendientes
@@ -539,7 +539,7 @@ entrega de OneDrive y quedaron verificados con `cmp`. Ningún entregable es ante
 
 ### 6.3 Por confirmar con Daniela
 
-Tercera ronda (2026-11-05): Chiclayo y Talara sin foto aprobada; Pucallpa y Trujillo tienen una ubicación
+Quinta ronda (2026-11-05): Talara y Chiclayo con foto del banco PromPerú (confirmar Chiclayo, Daniela sólo comentó Talara); largo del gradiente bajo el logo (0,42/0,50/0,46) propuesto tras el rechazo del de alto completo, por confirmar; Tarapoto popup aprobado en Frame. Tercera ronda (2026-11-05): Pucallpa y Trujillo tienen una ubicación
 en el CSV que no coincide con la foto entregada (CSV «Catarata Velo de la Novia» y «Chan Chan»; fotos «Plaza
 del Reloj Público» y «Balneario de Malabrigo»), se usó el CSV; el crédito de Trujillo viene del CSV; «DESDE
 LIMA» se dedujo del legal; CL «Encuentra destinos» sigue hecho con el clúster inter de Chile aunque el mensaje
@@ -552,7 +552,7 @@ de Adri dice «cluster inter de Perú»; AR mantiene «DESDE [ORIGEN]».
 | CL «Encuentra destinos» | Se hizo desde el clúster internacional de Chile; su nota decía «cluster inter de Perú» |
 | Frases del brandlift INTER y traducciones (AR, PT, EN) | Propuestas propias |
 | Traducciones de flecha y botón HPH (PT, EN) | Propuestas propias |
-| Ubicación de la foto en rutas | Del CSV; Chiclayo y Talara siguen con `[Ubicación de la foto]` (sin foto aprobada) |
+| Ubicación de la foto en rutas | Del CSV en las 15 rutas (Chiclayo y Talara desde la quinta ronda) |
 | Regla de la flecha en popups de KV originales | Se aplicó a todos los popups (p. ej. «Internacional» se corre 41 px, «Calama» ~108); confirmar que la regla también vale para las piezas del kit |
 | Tapa vertical en español | Recortada de la horizontal |
 | Precios, descuentos, orígenes y fechas de vuelo | Placeholder en todas las piezas |

@@ -384,6 +384,37 @@ originales). Canvas al cierre: versión 40.
 - **Pendiente:** confirmar con Daniela que la regla de la flecha también vale para los popups de los KV del kit
   (§18).
 
+### 4.6 Quinta ronda (2026-11-05): gradiente de Daniela, Talara, Chiclayo e Iquitos
+
+Pedidos de Daniela (Teams) y de Frame.io (proyecto «SKY Airline Q2 2026»; los avisos llegan al correo de Julio
+desde `notifications@frame.io`, porque no hay herramienta para leer ni responder Frame directamente).
+
+- **Gradiente del logo (`destinos.cjs` → `FADE`, `FADE_FIN`, `veloSvg`).** Daniela dejó la referencia en
+  `Despliegue Base/GRAFICOS/Gradiente para imagenes/` (copia en `scripts/gradiente-daniela/`). Son tres SVG,
+  todos negro puro con dos paradas: 69 % de opacidad en un borde y 0 en el opuesto. Los nombres engañan:
+  `Fade_img_horizontal` es oscuro **arriba**, `Fade_img_abajo` es oscuro abajo y `Fade_img` es oscuro a la izquierda.
+  Reemplaza al velo diagonal adaptativo de §4.5 (Daniela: «el gradiente no lo veo igual»). Estirado a todo el
+  alto, como en su maqueta, **oscurecía caras y monumentos** (rechazado por Julio): a media altura sigue en 35 %.
+  Vigente: la misma forma, pero termina en `FADE_FIN` = 0,42 del alto en KV, 0,50 en popup y 0,46 en story, poco
+  después del logo, que llega a y≈0,24 / 0,30 / 0,31. La intensidad ya no se mide por foto (`veloAlfa` queda
+  sólo como registro).
+- **`lift` en `cubrir` (destinos.cjs).** Deja subir la foto hasta esa fracción del alto más allá de su borde
+  inferior y completa abajo con el reflejo vertical de sus últimas filas. Sirve cuando el atractivo está al pie
+  de una foto horizontal y quedaría bajo la franja de precio. La franja reflejada cae bajo el piso, el precio y
+  el pie, y en agua no se nota. Usado en Iquitos (choza tapada en popup y story, comentario de Frame), Talara
+  (ballena) y Chiclayo (muelle), con `t` hacia el centro (x≈0,55) para no chocar con el badge.
+- **Talara y Chiclayo ya tienen foto.** Las carpetas de `FOTOS PARA PROMPERU` siguen vacías, pero las fotos
+  aprobadas de las demás rutas son byte a byte las de `BANCO DE VIDEOS/02_PERU/PROMPERU/<CIUDAD> (REGIÓN).png`.
+  Talara = `TALARA (COSTA).png` (ballena jorobada, coincide con el CSV «Avistamiento de Ballena Jorobada»);
+  Chiclayo = `CHICLAYO (COSTA)02.png` (= `Pimentel.png`, coincide con «Muelle de Pimentel»; la versión con cielo
+  azul está en `NO USAR/`). Con la foto en `fotos-destino.json`, `rutas.cjs` escribe la ubicación del CSV.
+- **Story en video con foto de destino (`story-video.cjs`).** La intro y el brandlift usaban siempre a la
+  mujer del kit (`bg.png`, `bg2.png`), también en AR Lima, AR Santiago y «Vuela por el Perú». Ahora, si la pieza
+  está en `fotos-destino.json`, usan `cubrir(n, 1080, 1920, 'story')` con el gradiente; el brandlift va 10 % más
+  cerrado.
+- **Correr `rutas.cjs` solo después de `rehacer-destinos.sh` deja `src2/` sin fotos de destino** (reescribe los
+  SVG de las rutas desde cero). Volver a correr `./rehacer-destinos.sh` completo.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

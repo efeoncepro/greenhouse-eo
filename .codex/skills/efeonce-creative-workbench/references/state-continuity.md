@@ -35,7 +35,13 @@ Cuarta ronda (2026-11-05, 11 comentarios del canvas): velo diagonal adaptativo d
 regla destino ↔ flecha de precio a 40 px (`brecha.cjs` y `compose.cjs`, también en popups de los KV del kit), Chile
 Travel pegado a la esquina, AR Santiago en verano, story de Tacna reencuadrada, stories con PromPerú centrado y
 marca de agua y ubicación pegadas arriba, aro de banderas de 2 px (KV, GIF y HPH por mercado). Detalle en
-[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40. Se regeneraron los GIF de AR Lima, AR
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40.
+Quinta ronda (2026-11-05, Teams y Frame.io): gradiente de referencia de Daniela (`GRAFICOS/Gradiente para imagenes`,
+negro 69 % → 0) en lugar del velo diagonal; a todo el alto tapaba caras (Julio lo rechazó) y quedó acotado bajo el
+logo (0,42 / 0,50 / 0,46 del alto), con comparación A/B enviada. Talara y Chiclayo con foto del banco PromPerú y
+ubicación del CSV; Iquitos, Talara y Chiclayo reencuadrados con `lift` (reflejo del agua abajo); stories en video
+de AR Lima, AR Santiago y «Vuela por el Perú» con la foto del destino en intro y brandlift. Canvas versión 44;
+«BLACK SKY 2026» (46 archivos) y entregables de OneDrive actualizados. Detalle en pipeline §4.6. Se regeneraron los GIF de AR Lima, AR
 Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con banderas, y la story en video de las nueve
 de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya compara por tamaño y fecha sin leer el
 destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin
