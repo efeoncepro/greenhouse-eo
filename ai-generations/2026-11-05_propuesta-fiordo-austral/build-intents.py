@@ -11,6 +11,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(ROOT, '..', '..'))
 HS = os.path.join(REPO, 'ai-generations/2026-10-06_deck-hubspot/intents')
 AP = os.path.join(REPO, 'ai-generations/2026-10-20_propuesta-assetplan/intents')
+EX = os.path.join(REPO, 'src/lib/brand-surfaces/examples')
 OUT = os.path.join(ROOT, 'intents')
 os.makedirs(OUT, exist_ok=True)
 
@@ -81,6 +82,21 @@ d['verdicts'] = [
 ]
 d['selectedVerdict'] = 1
 add('F04-por-que-hubspot', 'decision-provider-fit', d, '04 · por qué HubSpot')
+
+# 04b · Partners (marcas oficiales de HubSpot y Microsoft)
+d = base(EX, 'deck-content-partners-intent.json')
+d.pop('progress', None)
+d['voice'] = {'eyebrow': 'Partners', 'question': '¿Con quién lo construyen?', 'answer': ['Con HubSpot']}
+d['body'] = 'Certified HubSpot Solutions Partner: licencias y soporte por canales oficiales.'
+d['seal'] = 'Partner oficial de'
+# La receta pide los nueve partners del muro aprobado. HubSpot va en la segunda fila y seleccionado: en la primera,
+# la etiqueta de la selección cae sobre los logos de abajo.
+_p = {x['alt']: x for x in d['partners']}
+d['partners'] = [_p[k] for k in ['Microsoft', 'Salesforce', 'Adobe', 'Amazon Web Services', 'Google Cloud', 'HubSpot', 'Claude', 'OpenAI', 'BytePlus']]
+d['progress'] = {'sections': 4, 'current': 1}
+d['selected'] = 6
+d['selection'] = {'target': 'object', 'label': 'Fiordo Austral', 'participantKind': 'department'}
+add('F04b-partners', 'content-partners', d, '05 · partners')
 
 # 05 · Su ficha técnica (cine, HS2d)
 d = base(AP, 'A035-crm-completo.json')
@@ -163,10 +179,68 @@ d['ownTeam'] = {'kicker': '¿Y nuestro equipo de TI?', 'title': 'Decide con noso
 ]}
 add('F09-seguridad', 'decision-difference', d, '09 · seguridad')
 
+# 09b · Zero Trust con Entra ID
+d = base(AP, 'A051-tiempos.json')
+d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': '¿Cómo se entra al CRM?', 'answer': ['Verificado']}
+d['progress'] = {'sections': 4, 'current': 2}
+d['items'] = [
+    {'title': 'Identidad', 'desc': 'SSO SAML con Microsoft Entra ID, obligatorio para todos, y altas y bajas por SCIM.'},
+    {'title': 'Acceso', 'desc': 'MFA resistente al phishing, Acceso Condicional y control de sesión desde Entra ID.'},
+    {'title': 'Permisos', 'desc': 'Mínimo privilegio por usuario y equipo, sin cuentas compartidas ni exportación libre.'},
+    {'title': 'Registro', 'desc': 'Inicios de sesión, seguridad y cambios enviados a Wazuh por un colector de Efeonce.'},
+]
+d['selected'] = 3
+d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
+add('F09b-zero-trust', 'content-bullets', d, '11 · zero trust')
+
+# 09c · Matriz de cumplimiento (resumen)
+d = base(AP, 'A051-tiempos.json')
+d['voice'] = {'eyebrow': 'Matriz de cumplimiento', 'question': '¿Cumple lo obligatorio?', 'answer': ['Uno a uno']}
+d['progress'] = {'sections': 4, 'current': 2}
+d['items'] = [
+    {'title': '29 · Cumple', 'desc': 'Requisitos cubiertos por Sales Hub Professional con su configuración.'},
+    {'title': '33 · Parcialmente', 'desc': 'Cubiertos con controles compensatorios de Efeonce, con su limitación declarada.'},
+    {'title': '10 · Desarrollo', 'desc': 'Colector Wazuh, respaldo inmutable, sesión única y recuperación, en la fase 1.'},
+    {'title': '2 · No cumple', 'desc': 'RTO/RPO y ventanas de mantenimiento: HubSpot no los publica; pedimos su declaración.'},
+]
+d['selected'] = 3
+d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
+add('F09c-matriz', 'content-bullets', d, '12 · matriz de cumplimiento')
+
+# 09d · Disponibilidad (dato de las bases con fuente)
+d = base(EX, 'deck-content-measure-intent.json')
+d['version'] = '0.1.2'
+d['voice'] = {'eyebrow': 'Disponibilidad', 'question': '¿Cuánto debe estar arriba?', 'answer': ['99,9 %']}
+d['body'] = 'mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 %.'
+d['measure'] = {'value': 0.999, 'source': 'Bases Wherex 428823, sección 4'}
+d['figures'] = [
+    {'value': '99,95 %', 'label': 'meta mensual de HubSpot', 'source': 'Términos de servicio de HubSpot'},
+    {'value': '≤ 1 h', 'label': 'respuesta Efeonce en S1', 'source': 'SLA de esta propuesta'},
+]
+d['photo'] = {'subject': 'person', 'plateRef': 'ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png', 'alt': 'Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul'}
+add('F09d-disponibilidad', 'content-measure', d, '13 · disponibilidad')
+
+# 09e · Continuidad e incidentes
+d = base(EX, 'deck-decision-risk-intent.json')
+d['theme'] = 'light'
+d['line'] = 'growth'  # receta sólo clara: como decision-case en el deck HubSpot, va como lámina de Efeonce en growth
+d['progress'] = {'sections': 4, 'current': 2}
+d['voice'] = {'eyebrow': 'Continuidad e incidentes', 'question': '¿Y si algo falla?', 'answer': ['Se', 'recupera']}
+d['body'] = 'Cada riesgo tiene su respuesta escrita y probada antes de pasar a producción.'
+d['risks'] = [
+    {'risk': 'Caída del servicio', 'name': 'Continuidad HubSpot', 'how': 'Réplica en tres centros de datos; Efeonce escala y reporta cada 2 h.'},
+    {'risk': 'Pérdida de datos', 'name': 'Respaldo inmutable', 'how': 'Copia diaria en el tenant de Fiordo Austral y restauración de prueba trimestral.'},
+    {'risk': 'Incidente de seguridad', 'name': 'Respuesta en 1 h', 'how': 'Guardia permanente, contención en 4 h, evidencia preservada e informe de causa raíz.'},
+    {'risk': 'Acceso indebido', 'name': 'Alertas en Wazuh', 'how': 'Inicios anómalos y sesiones simultáneas detectados, con cierre remoto.'},
+]
+d['selected'] = 1  # en las filas 2 a 4 la etiqueta de la selección cae sobre la respuesta o el cuerpo
+d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
+add('F09e-continuidad', 'decision-risk', d, '14 · continuidad e incidentes')
+
 # 10 · Residencia
 d = base(HS, 'B25-residencia.json')
 d['voice'] = {'eyebrow': 'Residencia de datos', 'question': '¿Dónde están los datos?', 'answer': ['En Estados', 'Unidos']}
-d['body'] = 'HubSpot los guarda en **cinco** regiones: EE. UU. Este y Oeste, Canadá, Fráncfort y Australia, con las garantías de su DPA.'
+d['body'] = 'Proponemos la región de **EE. UU.**; HubSpot también ofrece Canadá, Fráncfort y Australia, con las garantías de su DPA.'
 for m in d['markets']:
     if m['country'] == 'Chile':
         m['city'] = 'Fiordo Austral'
@@ -202,7 +276,7 @@ d['release']['videoCaption'] = 'Qué cambia para ventas, en 3 minutos'
 d['release']['approveCta'] = 'Aprobar cambio'
 d['tools'] = [
     {'tool': 'teams', 'kicker': 'Microsoft Teams', 'label': 'Nos hablamos'},
-    {'tool': 'notion', 'kicker': 'Notion', 'label': 'Backlog y documentos'},
+    {'tool': 'microsoft-365', 'kicker': 'SharePoint', 'label': 'Documentos del proyecto'},
     {'tool': 'loom', 'kicker': 'Loom', 'label': 'Se lo mostramos'},
     {'tool': 'hs-icon:sales', 'kicker': 'HubSpot', 'label': 'Pruebas controladas'},
 ]

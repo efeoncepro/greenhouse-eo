@@ -35,9 +35,9 @@
       "label": "Nos hablamos"
     },
     {
-      "tool": "notion",
-      "kicker": "Notion",
-      "label": "Backlog y documentos"
+      "tool": "microsoft-365",
+      "kicker": "SharePoint",
+      "label": "Documentos del proyecto"
     },
     {
       "tool": "loom",

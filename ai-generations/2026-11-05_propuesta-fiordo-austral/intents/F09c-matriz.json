@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Matriz de cumplimiento",
+    "question": "¿Cumple lo obligatorio?",
+    "answer": [
+      "Uno a uno"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "29 · Cumple",
+      "desc": "Requisitos cubiertos por Sales Hub Professional con su configuración."
+    },
+    {
+      "title": "33 · Parcialmente",
+      "desc": "Cubiertos con controles compensatorios de Efeonce, con su limitación declarada."
+    },
+    {
+      "title": "10 · Desarrollo",
+      "desc": "Colector Wazuh, respaldo inmutable, sesión única y recuperación, en la fase 1."
+    },
+    {
+      "title": "2 · No cumple",
+      "desc": "RTO/RPO y ventanas de mantenimiento: HubSpot no los publica; pedimos su declaración."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "TI",
+    "participantKind": "department"
+  }
+}

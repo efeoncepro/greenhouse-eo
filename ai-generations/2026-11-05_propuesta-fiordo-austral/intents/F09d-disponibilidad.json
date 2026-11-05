@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "recipe": "content-measure",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Disponibilidad",
+    "question": "¿Cuánto debe estar arriba?",
+    "answer": [
+      "99,9 %"
+    ]
+  },
+  "body": "mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 %.",
+  "measure": {
+    "value": 0.999,
+    "source": "Bases Wherex 428823, sección 4"
+  },
+  "photo": {
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
+    "alt": "Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul"
+  },
+  "figures": [
+    {
+      "value": "99,95 %",
+      "label": "meta mensual de HubSpot",
+      "source": "Términos de servicio de HubSpot"
+    },
+    {
+      "value": "≤ 1 h",
+      "label": "respuesta Efeonce en S1",
+      "source": "SLA de esta propuesta"
+    }
+  ],
+  "use": "proposal"
+}

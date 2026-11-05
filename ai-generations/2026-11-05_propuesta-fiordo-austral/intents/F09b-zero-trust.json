@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Zero Trust con Entra ID",
+    "question": "¿Cómo se entra al CRM?",
+    "answer": [
+      "Verificado"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 2
+  },
+  "items": [
+    {
+      "title": "Identidad",
+      "desc": "SSO SAML con Microsoft Entra ID, obligatorio para todos, y altas y bajas por SCIM."
+    },
+    {
+      "title": "Acceso",
+      "desc": "MFA resistente al phishing, Acceso Condicional y control de sesión desde Entra ID."
+    },
+    {
+      "title": "Permisos",
+      "desc": "Mínimo privilegio por usuario y equipo, sin cuentas compartidas ni exportación libre."
+    },
+    {
+      "title": "Registro",
+      "desc": "Inicios de sesión, seguridad y cambios enviados a Wazuh por un colector de Efeonce."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "TI",
+    "participantKind": "department"
+  }
+}
