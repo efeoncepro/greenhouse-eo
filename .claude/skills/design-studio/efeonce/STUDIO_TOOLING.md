@@ -26,9 +26,13 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Nano Banana 2.1 por `pnpm ai:nano` (Google Cloud/Vertex global, operador local); acabado premium → Gemini 3 Pro Image (sin CLI propia); texto conceptual → Ideogram;
-  vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa,
-  máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
-  (los tres con `pnpm ai:image --model`);
+  vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa
+  o pieza final → GPT Image 2.5 Sunburst (una zona con máscara → `pnpm ai:inpaint`, Flare); generación cotidiana →
+  GPT Image 2.5 Flare; Batch → GPT Image 2 (los tres con `pnpm ai:image --model`); SVG nativo o GIF animado →
+  **GPT Image 2.6 Flare** (2026-11-04) con `pnpm ai:image --format svg|gif` (desde 2026-11-05); corrección dibujada →
+  `pnpm ai:image --markup` o trazos rojos sobre la foto (2.5 o 2.6); la identidad de personas sigue en 2.5 Sunburst
+  hasta un canario, y para una pieza de producción raster se comparan 2.5 y 2.6 Sunburst en la toma real (2.6 cuesta
+  más sólo en `low`/`medium`, ~4×/~3×; igual en `high`+; cifras en la guía §5.1);
   divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
   (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta; **Pro no es 4K
   en fal**: resolución nativa > 2K → Lite o GPT Image).
@@ -100,7 +104,7 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
   y guía de selección §10.1. El default del provider de producto `google-gemini-image` sigue siendo Nano Banana 2
   (`gemini-3.1-flash-image`), sin migración de runtime. Nano Banana Pro (`gemini-3-pro-image`) figuraba disponible en
   Vertex en la revisión 2026-09-16, sin superficie ni CLI propia; no se refrescó aquí. OpenAI sigue directo y
-  `pnpm ai:image` conserva `gpt-image-2` por defecto. Para cine, ficha y `foto:prompt` primero y gates después con
+  `pnpm ai:image` conserva `gpt-image-2` por defecto (2.6 corre desde 2026-11-05, pero se pide explícito con `--model`). Para cine, ficha y `foto:prompt` primero y gates después con
   cualquier motor; la prueba Nexa 2.1 quedó APROBABLE, no es un alta en el banco aprobado ([casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable)).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
 - **OpenAI → directo.** La producción creativa que corres con `pnpm ai:image` lleva `--openai-key personal`

@@ -47,7 +47,9 @@ Proveedor:
   --model <id>               Default del adaptador (openai: gpt-image-2.5-flare, el verificado con máscara).
                              ★ gpt-image-2.5-sunburst es el MÁS POTENTE (las piezas de mayor impacto): úsalo para la
                              pieza final. Con máscara devuelve un panel negro, así que el comando lo hace editar sin
-                             máscara, le manda la zona marcada como guía y recompone; revisa el aviso de reencuadre
+                             máscara, le manda la zona marcada como guía y recompone; revisa el aviso de reencuadre.
+                             gpt-image-2.6-flare (con máscara) | gpt-image-2.6-sunburst (sin máscara: también dio panel
+                             negro): aceptados con complexity low; cuestan 3–4× más en low/medium que 2.5
   --quality <q>              openai: low | medium (default) | high | xhigh | max
   --seed <n>                 Sólo adaptadores que la acepten
   --provider-mask auto|on|off  Si la máscara viaja al proveedor (openai). auto: Sunburst edita sin máscara —con

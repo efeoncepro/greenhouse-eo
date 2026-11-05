@@ -2,6 +2,25 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-05 — GPT Image 2.6 (Sunburst/Flare) en la CLI, junto a 2.5
+
+**Código (develop, sin push):** `src/lib/ai/openai-image.ts` (modelos 2.6 + `gpt-image-2-2026-04-21`; tabla de capacidades
+con `complexity`/`svgOutput`/`gifOutput`/`markup`/`tokenFamily`/`shutdownDate`; `assertOpenAIImageOptionsSupported`;
+estimación 2.6 = tokens 2.5 × factor medido; `svgUsage`; `imageModel` en el tool de Responses), `scripts/ai/generate-image.ts`
+(flags `--complexity --format gif|svg --svg-model --svg-effort --frames --frame-ms --markup --compression --moderation
+--estimate`; ayuda con la tabla «¿2.5 o 2.6?»), adaptador de `ai:inpaint` (acepta 2.6, Sunburst 2.5 y 2.6 sin máscara,
+`complexity: low`). Tests focales 200/200, typecheck y lint limpios.
+**Evidencia:** `ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json`, `cli/`, `cli/rayado/`), clave personal,
+~USD 1 en total. Medido: tokens 2.6 a 1024² low 824 · medium 1.449 · high 1.758 · xhigh 3.122 · max 7.024; SVG exige
+`svg.model`; GIF también en edits, hoja ≤ 3840 y 8,3 MP (9×640² sí, 9×1024² no); markup en 2.5 y 2.6 sin tokens de
+entrada extra; rayado sobre la foto funciona; Sunburst 2.6 + máscara del pipeline = panel negro; Flare 2.6 PASS; el tool
+de Responses aceptó `tool.model` 2.6 aunque la ficha oficial dice que no.
+**Docs:** guía de modelos §2/§4/§5.1/§7/§8/§9/§12, matriz del proveedor OpenAI, arquitectura del generador, skills de
+imagen/diseño/ads/social, manual nuevo `generar-y-editar-imagenes-con-gpt-image.md`, funcional y manual de inpaint.
+**Pendiente:** canario de identidad de personas con 2.6 antes de usarlo en fotografía de marca; comparar 2.5 vs 2.6 en
+una pieza final real; Batch de 2.5 sin confirmar; `models:inventory`/`freshness` no cuentan los ids de OpenAI; el commit
+`48f6dd6de` y este trabajo siguen sin push.
+
 ## 2026-11-04 — SKY en Claude Design: CyberSky Perú y kit BLACK
 
 **Artifacts privados:** DS [«SKY Airline — Performance»](https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei) (desde las
@@ -251,22 +270,3 @@ Documents/PRESENTATIONS; su SQL automático no acredita calificación. Vigencia 
 50 personas, presupuesto y proceso comprador sin confirmar; tres adyacentes investigados sin acercamientos.
 [Cierre docs/skills](docs/audits/commercial/2026-10-28-mg-indusol-docs-skills.md): canon y espejos pertinentes,
 estado privado conciliado; sin secuencia, nuevo envío ni normalización CRM autorizados. Próximo: esperar respuesta.
-
-## 2026-10-27 — ARMOR / Indecaucho: caso v1 validado y revisión cerrada
-
-[Expediente](docs/commercial/accounts/indecaucho-armor/README.md): discovery realizada con Vanessa;
-HubSpot MEETING119610757452 READY/104intervenciones y transcripción Notion contrastadas en la revisión
-programada de las16h (misma grabación). Caso v1 ya preparado, conservado sin reescritura.
-[Validación y precisiones](docs/commercial/accounts/indecaucho-armor/POSTREUNION.md#validación-programada-del-2710--1600-chile):
-piloto90días LinkedIn/Google, Compras/SSO, canal distribuidor; EC/CO y visibilidad PE2027. Presupuesto y
-forecast del caso son escenarios internos, no acuerdo comprador; Kommo aclarado previamente por Julio.
-TASK119625704196 COMPLETED por lectura/análisis, body/estado y owner/fecha/asociaciones releídos;
-NOTE119606905700 intacta. Automatización focal eliminada al cumplir su única revisión, global sin cambios.
-Por pedido posterior de Julio, [propuesta90días](docs/commercial/accounts/indecaucho-armor/PROPUESTA-90-DIAS-BORRADOR.md)
-actualizada: [V3 calculóUSD22.450](docs/commercial/accounts/indecaucho-armor/COSTEO-V3-2026-10-27.md),
-primer período11.350 y siguientes5.550 × 2; medios separados hasta18.000. Por mandato de Julio, catálogo localv14
-incorpora Performance/Ecuador con reglas estimadas, mediante preview/apply/puntero; policyv12/créditosv1 intactos.
-Margen modelado59,28%, sin líneas bajo piso;1.860testsPASS/3skip. Sustituye21.000 provisionales/bloqueo anterior.
-Próximo: Julio/Operations revisar valor/alcance/capacidad, accesos y Finance entidad/tributos/cobro;
-propuesta29–30/10, terna4/11 sin selección acreditada. Datos de Kommo, documentación técnica y regla de canal
-pendientes. Sin aprobación, envío, nuevo cambio CRM, commit o deploy.

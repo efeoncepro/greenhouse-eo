@@ -57,14 +57,23 @@ presencia de un conector no garantiza una capacidad. Confirmar schema, sesión e
 | Falta duración o secuencia | montaje; generación sólo si falta una acción/toma | narrativa completa, continuidad y cierre |
 | Falta formato | recomposición del layout por destino | jerarquía y lectura preservadas; no mero recorte |
 
-### Motor de IA: cómo elegir (as-of 2026-09-16)
+### Motor de IA: cómo elegir (as-of 2026-09-16; delta GPT Image 2.6 2026-11-05)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Imagen → `greenhouse-ai-image-generator` §Elegir modelo; video →
 `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 
-1. **Escena o plate de imagen:** generación cotidiana → GPT Image 2.5 Flare; edición precisa, máscara o pieza final →
-   2.5 Sunburst (`pnpm ai:image --model …`); abrir territorios barato → Seedream 5 Lite; material, luz y atmósfera →
-   Seedream 5 Pro (`pnpm ai:fal`). Seedream 5 Pro en fal **no es 4K** (máx. 2048²).
+1. **Escena o plate de imagen:** generación cotidiana → GPT Image 2.5 Flare; edición precisa o pieza final →
+   2.5 Sunburst (`pnpm ai:image --model …`; una zona con máscara va por `pnpm ai:inpaint`, Flare); abrir territorios
+   barato → Seedream 5 Lite; material, luz y atmósfera → Seedream 5 Pro (`pnpm ai:fal`). Seedream 5 Pro en fal **no
+   es 4K** (máx. 2048²).
+   **Loop corto (sticker, micro-loop de pocos cuadros):** **GPT Image 2.6 Flare con `pnpm ai:image --format gif`**
+   (desde 2026-11-05; loop infinito verificado). La hoja de cuadros tiene presupuesto de píxeles: 640² admite hasta 9
+   cuadros y a 1024² no cabe una hoja de 2 o más (a más cuadros, cuadro más chico). El GIF no tiene estimación de
+   costo en la CLI. Movimiento de cámara, duración o audio → toma de video (punto 2).
+   **GPT Image 2.6 en lo demás:** vector → `--format svg`; corrección dibujada → `--markup` o trazos rojos sobre la
+   foto (2.5 o 2.6). Explorar barato sigue en 2.5 Flare (2.6 cuesta más en `low`/`medium`; guía §5.1). Para una pieza
+   de producción, compara 2.5 y 2.6 Sunburst en la toma real; la identidad de personas sigue en 2.5 Sunburst hasta
+   un canario. Detalle: `greenhouse-ai-image-generator` §GPT Image 2.6.
 2. **Toma de video:** explorar en el escalón barato (H3 Max Turbo 480P, Flux 3 draft o Seedance 2.0 mini 480p) y
    generar el final sólo de la toma aprobada; hero → Seedance 2.5, también con personas o marcas (hubo rechazos
    puntuales **cobrados** tras encolar, con condiciones sin medir: prueba primero corto y a baja resolución y ten

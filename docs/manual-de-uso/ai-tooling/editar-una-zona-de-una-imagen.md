@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.2
+> **Version:** 2.4
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-11-01 por Claude — (2.2) en «Preparacion», cargar el gasto de los adaptadores OpenAI al credito personal con `OPENAI_API_KEY_PROFILE=personal`. Antes (2.1, TASK-1965 + TASK-1973) nueva seccion «Para agentes»: arbol de decision por intencion con los ganadores medidos, lineas de comando, codigos de salida y que hacer con cada uno, regla del tope de costo y checklist de revision al 100 %; codigo 1 y tope de costo en la tabla de senales; tabla de tecnicas hermanas (borrar, expandir, mover, incorporar, fondo, detalle). Antes (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
+> **Ultima actualizacion:** 2026-11-05 (tarde) por Claude — (2.4) corrige el aviso de la 2.3: `ai:inpaint` **acepta** GPT Image 2.6; Flare 2.6 viaja con mascara (PASS medido), Sunburst 2.6 edita sin mascara como 2.5 (panel negro medido con mascara), a los 2.6 se les manda `complexity: low` y la edicion con marcas (`--markup`) vive en `pnpm ai:image`. Antes (2.3) aviso GPT Image 2.6 cuando el comando todavia no aceptaba sus ids. Antes (2.2) en «Preparacion», cargar el gasto de los adaptadores OpenAI al credito personal con `OPENAI_API_KEY_PROFILE=personal`. Antes (2.1, TASK-1965 + TASK-1973) nueva seccion «Para agentes»: arbol de decision por intencion con los ganadores medidos, lineas de comando, codigos de salida y que hacer con cada uno, regla del tope de costo y checklist de revision al 100 %; codigo 1 y tope de costo en la tabla de senales; tabla de tecnicas hermanas (borrar, expandir, mover, incorporar, fondo, detalle). Antes (2.0, TASK-1965) el flujo pasa a dos comandos: `pnpm ai:mask` arma y valida la mascara y `pnpm ai:inpaint image` recorta, genera, **recompone y verifica solo**: la zona protegida queda en delta maximo 0 o el comando sale con codigo 2. Los snippets de `node -e` y el codigo de recomposicion a mano quedan retirados. Nuevo: Sunburst con mascara devuelve un panel negro plano (3 de 3 pasadas medidas); el default es Flare y Sunburst edita sin mascara (`--provider-mask auto`). Antes (1.8) la mascara no sirve para mover material que ya esta en la foto; (1.7) GPT Image 2.5 regenera la imagen entera aunque reciba la mascara; (1.6) el halo para integrar un objeto real es la excepcion, no el default; (1.2) validacion de `--size`/`--background` y costo estimado antes de pedir.
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:mask`, `pnpm ai:inpaint image` (tecnicas hermanas: `pnpm ai:inpaint erase|expand|move|place|background`, `pnpm ai:layers`) (antes: `pnpm ai:image --image ... --mask ...`, que sigue funcionando pero no recompone), `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** [editar una zona de un video](editar-una-zona-de-un-video.md), [expandir, separar en capas, borrar, mover, incorporar y cambiar fondo](expandir-y-separar-en-capas.md), `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-10-02_task-1965-canary/`, `ai-generations/2026-10-03_task-1973-canary/`
@@ -23,14 +23,24 @@ ni un byte.
 ### Elige el adaptador y el modelo
 
 La guia canonica es [GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
-Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`):
+Lo medido en el canario del 2026-10-02 (`ai-generations/2026-10-02_task-1965-canary/`) y, para la 2.6, en el del
+2026-11-05 (`ai-generations/2026-11-05_gpt-image-2-6-canary/`):
 
 | `--adapter` / `--model` | Cuando | Que tener en cuenta |
 |---|---|---|
 | `openai` · `gpt-image-2.5-flare` (**default**, `medium`) | Edicion con mascara de uso diario | Puso el objeto con luz y sombra correctas; ≈ USD 0,01 a 1536×1024 `medium` |
 | `openai` · `gpt-image-2.5-sunburst` ★ | **El mas potente**: la pieza final de mayor impacto | **Con mascara devuelve la zona como un panel negro plano** (3 de 3 pasadas). Con `--provider-mask auto` (default) edita **sin mascara**, recibe la zona marcada en magenta como guia (imagen 2) y el comando recompone y corrige el color. Verificado 2026-10-02: planta dentro de la zona, sin rastro del magenta. Sin la guia puso la planta fuera de la zona |
+| `openai` · `gpt-image-2.6-flare` | Opcional, con mascara, cuando la pieza ya va a la 2.6 | Medido 2026-11-05 por el pipeline: **PASS, sin panel negro**. En `low` y `medium` cuesta 4,2× y 3,3× lo de 2.5 Flare; en `high` o mas, lo mismo |
+| `openai` · `gpt-image-2.6-sunburst` | Pieza final, a comparar con 2.5 Sunburst | **Con la mascara del pipeline tambien devolvio un panel negro** (1 de 1, el comando lo marco REVISAR). Igual que 2.5: con `--provider-mask auto` edita **sin mascara**, con guia de zona, y el comando recompone |
 | `fal:flux-pro-fill` | Rellenar una zona con algo nuevo; buena alternativa a OpenAI | Mascara blanca = editable; USD 0,05 por megapixel (redondeado arriba). Puso el objeto limpio en el canario |
 | `fal:seedream5-pro-edit` / `fal:seedream5-lite-edit` | Edicion por instruccion de Seedream | No usan mascara: la mascara solo recompone. Canario Lite 2026-10-02: objeto dentro de la zona, pero **costura visible en superficies lisas** (cambia el tono local) e ignora `image_size`. No es la primera opcion para pieza final |
+
+> **GPT Image 2.6 (desde 2026-11-05 en este comando).** Regla de mascara: **Sunburst 2.5 y 2.6 editan sin mascara;
+> Flare 2.5 y 2.6, con mascara** (`--provider-mask auto` lo hace solo). A los modelos 2.6 el comando les manda
+> `complexity: low` (lo que OpenAI recomienda para ediciones acotadas; no cambia el costo) y estima con el factor 2.6
+> medido. Los dos 2.6 redibujan la imagen entera (deriva media 12–17/255 fuera de la zona): la recomposicion sigue
+> haciendo falta. Costo y cifras en la [guia canonica, §5.1](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md);
+> eleccion entre 2.5 y 2.6 en [generar y editar imagenes con GPT Image](generar-y-editar-imagenes-con-gpt-image.md).
 
 Esta tabla vale para **agregar o cambiar** algo en una zona. Para **borrar** y para **expandir** los ganadores son
 otros (canario del 2026-10-03): borrar → clean plate si hay capas, si no Sunburst; expandir → Flux Fill, nunca GPT
@@ -255,6 +265,14 @@ Compara el resultado con la base **midiendo por zona**, no en promedio global:
 
 - **No uses Sunburst con mascara** (`--provider-mask on`): devolvio la zona como un panel negro plano en 3 de 3
   pasadas. Deja `--provider-mask auto` o usa Flare.
+- **No fuerces la mascara con Sunburst 2.6 tampoco.** Con la mascara del pipeline, `gpt-image-2.6-sunburst` repitio
+  el panel negro de la 2.5 (1 de 1, medido 2026-11-05): no uses `--provider-mask on` con el. Flare 2.6 si va con mascara.
+- **No explores con la 2.6 en `low` o `medium`**: cuesta 4,2× y 3,3× lo de la 2.5 por la misma prueba. Para iterar,
+  2.5 Flare; la 2.6 vale la pena en `high` o mas (mismo costo) o cuando la pieza ya va con ella.
+- **No busques `--markup` aqui.** La edicion guiada por anotaciones (un PNG transparente con marcas encima de la
+  imagen) vive en `pnpm ai:image --image base.png --markup marcas.png`, con 2.5 y 2.6, pero ese comando no recompone.
+  Aqui el equivalente es `--sketch`. No pases las anotaciones como `--mask`: son cosas distintas y la API no deja
+  combinarlas. Ver [generar y editar imagenes con GPT Image](generar-y-editar-imagenes-con-gpt-image.md).
 - **No uses la mascara para mover material que ya esta en la foto** (subir un lecho, correr un objeto). Medido el
   2026-09-23 con GPT Image 2.5 Sunburst sobre la franja de primer plano oscuro y desenfocado de una story: los dos
   candidatos llenaron **toda** la zona transparente con un panel plano de borde superior recto, justo en el limite de
@@ -327,6 +345,8 @@ Ganadores medidos en los canarios del 2026-10-02 y 2026-10-03 (`ai-generations/2
 │   ├─ uso diario, con mascara ........... default: --adapter openai (gpt-image-2.5-flare, quality medium)
 │   ├─ pieza final de mayor impacto ...... --model gpt-image-2.5-sunburst (el mas potente; edita SIN mascara y
 │   │                                      recibe la zona marcada como guia: lo hace --provider-mask auto, default)
+│   ├─ la pieza ya va en GPT Image 2.6 ... --model gpt-image-2.6-flare (con mascara, PASS 2026-11-05) o
+│   │                                      gpt-image-2.6-sunburst (sin mascara, igual que 2.5); low/medium cuestan 3–4×
 │   ├─ relleno puro, alternativa ......... --adapter fal:flux-pro-fill
 │   └─ "dibujo donde va" / objeto dado ... --sketch boceto.png [--reference objeto.png] --model gpt-image-2.5-sunburst
 ├─ Rehacer un detalle a mas resolucion ............................ image --zone-resolution 2048 (REINTERPRETA, no escala)
@@ -407,6 +427,8 @@ Si un punto falla, el resultado no se entrega aunque el codigo sea 0.
 ## Referencias tecnicas
 
 - Guía canónica de selección de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
+- Generar, SVG, GIF y edicion con marcas (`pnpm ai:image`): [generar y editar imagenes con GPT Image](generar-y-editar-imagenes-con-gpt-image.md)
+- Canario GPT Image 2.6 (mascara, Flare/Sunburst 2.6): `ai-generations/2026-11-05_gpt-image-2-6-canary/`
 - Contrato del proveedor: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
 - Cliente canonico: `src/lib/ai/openai-image.ts` (`editOpenAIImage`)
 - Pipeline: `scripts/ai/inpaint/` (`mask.ts`, `recompose.ts`, `crop.ts`, `sketch.ts`, `pipeline-image.ts`, `adapters/`); CLI `scripts/ai/inpaint/cli.ts` y `mask-cli.ts` (su `--help` es el contrato)

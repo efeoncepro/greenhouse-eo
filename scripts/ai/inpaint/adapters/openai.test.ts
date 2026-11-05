@@ -67,6 +67,53 @@ describe('adaptador OpenAI', () => {
     expect(output.meta.providerMask).toBe(false)
   })
 
+  it('GPT Image 2.6: Sunburst también edita SIN máscara (panel negro medido con la máscara del pipeline); Flare 2.6 con máscara y complexity low', async () => {
+    expect(resolveOpenAIProviderMask('gpt-image-2.6-sunburst', 'auto')).toBe(false)
+    expect(resolveOpenAIProviderMask('gpt-image-2.6-flare', 'auto')).toBe(true)
+    expect(openAIInpaintAdapter.advisories?.({ model: 'gpt-image-2.6-sunburst' })?.[0]).toMatch(/sin máscara/)
+
+    editOpenAIImage.mockResolvedValue({
+      imageBytesBase64: (await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#808080' } }).png().toBuffer()).toString('base64'),
+      model: 'gpt-image-2.6-flare',
+      size: '1024x1024',
+      quality: 'low',
+      usage: { output_tokens: 824 },
+      modelFallbackReason: null
+    })
+
+    const image = await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#000000' } }).png().toBuffer()
+
+    await openAIInpaintAdapter.run({ prompt: 'x', image, mask: maskFromRect(1024, 1024, { x0: 0, y0: 0, x1: 0.5, y1: 0.5 }), size: { width: 1024, height: 1024 }, model: 'gpt-image-2.6-flare', quality: 'low' })
+
+    const call = editOpenAIImage.mock.calls[0][0]
+
+    expect(call.mask).toBeDefined()
+    expect(call.complexity).toBe('low')
+  })
+
+  it('2.5 no recibe complexity (no lo acepta)', async () => {
+    editOpenAIImage.mockResolvedValue({
+      imageBytesBase64: (await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#808080' } }).png().toBuffer()).toString('base64'),
+      model: 'gpt-image-2.5-flare',
+      size: '1024x1024',
+      quality: 'low',
+      usage: null,
+      modelFallbackReason: null
+    })
+
+    const image = await sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#000000' } }).png().toBuffer()
+
+    await openAIInpaintAdapter.run({ prompt: 'x', image, mask: maskFromRect(1024, 1024, { x0: 0, y0: 0, x1: 0.5, y1: 0.5 }), size: { width: 1024, height: 1024 }, model: 'gpt-image-2.5-flare', quality: 'low' })
+
+    expect(editOpenAIImage.mock.calls[0][0].complexity).toBeUndefined()
+  })
+
+  it('estima 2.6 con el factor medido (low 1024² = 824 tokens), no con la grilla de 2.5', async () => {
+    const estimate = await openAIInpaintAdapter.estimate({ model: 'gpt-image-2.6-flare', quality: 'low', size: { width: 1024, height: 1024 }, count: 1 })
+
+    expect(estimate.usd).toBeCloseTo(824 * 30e-6, 4)
+  })
+
   it('estima con la fórmula oficial de tokens', async () => {
     const estimate = await openAIInpaintAdapter.estimate({ model: 'gpt-image-2.5-sunburst', quality: 'low', size: { width: 1024, height: 1024 }, count: 2 })
 

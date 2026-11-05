@@ -44,6 +44,10 @@ se editan después sobre la grabación, no se le piden al modelo. El oficio es d
 copiado acá se desincroniza en silencio y produce lo peor: dos fuentes que se contradicen y ninguna que
 avise. Acá vive el **método**; allá, el **dato**. Si necesitas el número, ábrelo.
 
+**Contrato de proveedor OpenAI GPT Image** (modelos, parámetros, ciclo de vida y contradicciones documentales de la
+familia; al 2026-11-05 todavía no recoge 2.6, cuyo dato vive en la guía §5.1): [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](../../../docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+Léelo antes de afirmar qué acepta un modelo OpenAI; el oficio de imagen vive en `greenhouse-ai-image-generator`.
+
 **Contratos de código (lo que cada CLI puede ejecutar de verdad):**
 `src/lib/ai/fal-capabilities.ts` · `src/lib/ai/higgsfield-capabilities.ts` · `src/lib/ai/openai-image.ts` ·
 `src/lib/ai/gemini-omni-cli.ts` (Google Cloud directo, tooling local). Para Omni 1.1, el manual
@@ -104,7 +108,9 @@ contradicción por accidente y pagando de más: la mitad barata era una prueba d
 4. **Ficha** (§5): lee «cuándo NO», las trampas y los filtros de contenido.
 5. **Estima antes de gastar.** `--estimate` en `pnpm ai:fal` valida e imprime el costo **sin encolar**.
    `--list`, `--balance` y `--status` son gratis. En `pnpm ai:omni`, `--estimate` tampoco envía, pero
-   estima sólo el video output nominal: input, texto y redondeo se suman. Cada POST exige `--yes`.
+   estima sólo el video output nominal: input, texto y redondeo se suman. Cada POST exige `--yes`. En
+   `pnpm ai:image`, `--estimate` imprime el costo y sale sin llamar a la API (2.6 incluido, con su factor medido;
+   el GIF no tiene estimación y en SVG sólo se estima el raster de referencia).
    El gasto OpenAI de generación creativa operada por un agente (`ai:image`, `ai:inpaint`) puede cargarse al
    perfil personal (`--openai-key personal` u `OPENAI_API_KEY_PROFILE=personal`, desde 2026-11-01); producto y
    runtime pagan con la clave de la empresa. **Quién paga no cambia la elección de modelo ni su precio.** Regla en
@@ -131,7 +137,8 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
   su 1080p ser reescalado o no estar probado. La ficha lo dice; el titular no.
 - 🔴 **El mejor modelo para generar puede ser el peor para editar con máscara.** GPT Image 2.5 Sunburst
   —el de las piezas más impactantes— devuelve la zona enmascarada como **panel negro plano** (3 de 3
-  pasadas, 2026-09-23 y 2026-10-02); Flare y Flux Pro Fill sí la editan. Para editar una zona usa
+  pasadas, 2026-09-23 y 2026-10-02), y Sunburst 2.6 también (1 de 1, 2026-11-05); Flare (2.5 y 2.6) y Flux Pro
+  Fill sí la editan. Para editar una zona usa
   `pnpm ai:inpaint image` (TASK-1965): **Flare con máscara es su default**, y si eliges Sunburst lo hace editar sin
   máscara con guía de zona y recompone con verificación.
 - 🔴 **Layerize cobra por capa y el número lo decide el modelo** (USD 0,034–0,0675 por capa). `pnpm ai:layers`
@@ -144,9 +151,19 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 - 🔴 **Para expandir, Flux Fill, no GPT Image** (canario 2026-10-03, misma foto y prompt): Flare achicó la escena
   (escala 0,88–0,90), Sunburst copió el relleno en espejo como contenido; `fal:flux-pro-fill` continuó sin costura
   (1,91:1 ≈ USD 0,10 · 9:16 ≈ 0,15). Es el default de `pnpm ai:inpaint expand`. Puede inventar elementos en el área nueva.
-- 🔴 **El default de `pnpm ai:image` es `gpt-image-2`, la generación anterior** (2026-10-19, anuncio Efeonce | Google:
-  la primera ronda salió con ese modelo y el operador esperaba 2.5). Nombra siempre el modelo con `--model`; la guía ya
-  recomienda Flare para generar y Sunburst para editar o terminar.
+- 🔴 **El default de `pnpm ai:image` es `gpt-image-2`, dos generaciones atrás** (2026-10-19, anuncio Efeonce | Google:
+  la primera ronda salió con ese modelo y el operador esperaba 2.5). Nombra siempre el modelo con `--model`; la guía
+  recomienda 2.5 Flare para generar y 2.5 Sunburst para editar o terminar. **GPT Image 2.6 (2026-11-04) corre en
+  `pnpm ai:image` desde 2026-11-05** [contrato]: `--model gpt-image-2.6-flare|sunburst`, más `--complexity`,
+  `--format svg|gif` y `--markup`; el default sigue siendo `gpt-image-2`, así que 2.6 también se pide explícito.
+  Ruteo «¿2.5 o 2.6?» y comandos verificados en `greenhouse-ai-image-generator` §GPT Image 2.6 (y en
+  `pnpm ai:image --help`).
+- 🔴 **GPT Image 2.6 es más caro que 2.5 sólo en `low`/`medium`; en `high`/`xhigh`/`max` cuesta igual**, a la misma
+  tarifa por token [medido 2026-11-05; ~4× en `low` y ~3× en `medium`, cifras en la guía §5.1]. «Nueva versión» no es
+  «mismo precio»: explorar e iterar barato sigue siendo 2.5 Flare, y la fórmula de grilla de 2.5 por sí sola subestima
+  2.6 (`ai:image --estimate` ya aplica el factor). Lo que justifica 2.6 es capacidad (SVG nativo, GIF animado,
+  `complexity`) o una comparación contra 2.5 Sunburst en la pieza final, donde cuestan lo mismo; no calidad medida por
+  nosotros. La identidad de personas sigue en 2.5 Sunburst hasta un canario.
 - 🔴 **Un carril depende del saldo de su proveedor, no sólo del modelo** (2026-10-19): `pnpm ai:inpaint expand` corre
   Flux Fill por fal y no salió con `FAL_API_KEY_B` en «User is locked. Exhausted balance». Antes de planear una ruta
   por fal, `pnpm ai:fal --balance`; ten una alternativa (allí, extensión determinística del fondo vacío).

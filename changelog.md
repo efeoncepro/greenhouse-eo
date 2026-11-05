@@ -11,6 +11,17 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-05 — GPT Image 2.6 en `pnpm ai:image` y `ai:inpaint`, junto a 2.5
+
+OpenAI lanzó GPT Image 2.6 (Sunburst y Flare) el 2026-11-04. La CLI ya lo opera de punta a punta junto a 2.5:
+`--complexity`, SVG nativo (`--format svg`, con `--svg-model`), GIF animado (`--format gif`, `--frames`, `--frame-ms`),
+edición guiada por marcas (`--markup`) y por rayado sobre la foto, `--compression`, `--moderation` y `--estimate`
+(costo sin llamar a la API). Validación única antes de gastar en el cliente canónico; `gpt-image-1` se corta por
+apagado. Canarios reales (~USD 1): 2.6 cobra 4,2× en `low` y 3,3× en `medium` que 2.5 a la misma tarifa, igual en
+`high`/`xhigh`/`max`; Sunburst 2.6 con máscara también da panel negro, así que `ai:inpaint` lo edita sin máscara.
+Cuándo usar cada uno: [manual](docs/manual-de-uso/ai-tooling/generar-y-editar-imagenes-con-gpt-image.md) y guía de
+modelos §5.1. Default del CLI y del runtime sin cambio (`gpt-image-2`).
+
 ## 2026-11-04 — SKY: adaptaciones en Claude Design (CyberSky Perú y kit BLACK)
 
 Nuevo Design System «SKY Airline — Performance» y canvas de adaptaciones en Claude Design (artifacts privados): 66 piezas
@@ -521,12 +532,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Arquitectura/ADRs, runtime/tracking y manuales reflejan Web6/Server10, EC ON, OAuth Efeonce/CLI de gestión y tracing HubSpot/Meta; evidencias comerciales pendientes.
 - Cuatro pares Codex/Claude sincronizados; distingue fuentes Performance/Discovery de tipos de campaña y configuración de recepción/atribución.
 - [Cobertura sólo comercial](docs/audits/growth/2026-10-18-commercial-forms-measurement-coverage.md):12 propuestas DRY_RUN sin aplicar; Lead Gen Web pendiente de clasificación y revisión de intención en Grader/Contacto. Sin mutaciones runtime.
-
-## 2026-10-18 — Ads activado y trazabilidad preparada para ocurrencias reales
-
-[Historial interno](docs/changelog/internal/README.md).
-
-- Ads686: EC ON, GTMWeb6/Server10 y políticas Performance/Discovery rev2 publicados; bridge compatible en WordPress/Think.
-- Tracing HubSpot y captura Meta configurados; flag true y companion ER5 del mainEC READY. Health200, watchdog6/6 y canarios PASS.
-- Snapshots GTM sin drift y plan offline actualizado. Primera ocurrencia/recibo/atribución pendientes; cero negocio ficticio o replay.
-- [Auditoría, evidencia y rollback](docs/audits/growth/2026-10-18-google-ads-activation.md). Cambios ajenos preservados.

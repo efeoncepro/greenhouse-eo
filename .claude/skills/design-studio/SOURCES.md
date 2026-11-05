@@ -61,6 +61,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
 | GPT Image 2 / 2.5 (Sunburst, Flare) | OpenAI directo (`pnpm ai:image`) | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. 2.5 sin Batch; costo estimable por fórmula oficial y rate limits publicados (iguales a GPT Image 2). |
+| GPT Image 2.6 (Sunburst, Flare, 2026-11-04) | OpenAI directo (`pnpm ai:image`, desde 2026-11-05) | Ruta canónica: `--model gpt-image-2.6-*` con `--complexity`, `--format svg\|gif`, `--markup` y `--estimate` [contrato 2026-11-05]. Sin Batch; misma tarifa por token que 2.5, más tokens sólo en `low`/`medium` (~4×/~3×) e igual en `high`/`xhigh`/`max` (cifras en la guía §5.1). Azure/Foundry sin 2.6; fal, OpenRouter (sin SVG/GIF/markup) e Higgsfield lo listan [tercero]. |
 | Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado CLI 2026-10-06: **Nano Banana 2.1** (`gemini-nano-banana-2.1`) se opera con `pnpm ai:nano`, Google Cloud/Vertex `global`; [manual](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md). **Nano Banana 2** (`gemini-3.1-flash-image`) conserva el default del provider `google-gemini-image` del producto; la nueva CLI no lo migra. **Nano Banana Pro** (`gemini-3-pro-image`) figuraba disponible en Vertex en la revisión 2026-09-16, sin superficie ni CLI propia; no se refrescó en esta prueba. Gemini Omni **1.1 video** se opera con `pnpm ai:omni` directo a Cloud (2026-09-24). |
 | Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v); USD/s por resolución base 0,05 · 0,10 · **0,20 a 1080p (default)**, Prime 0,068 · 0,14 · 0,28; 30 fps. Los 6 verificados en real 2026-09-16. Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
 | Kling 3 · Grok Imagine | Fal (evaluado, **no conectado**) | Revisión de catálogo/OpenAPI 2026-09-16, sin corridas: Kling O3 0,14 USD/s (4k 0,42/s; multi-shot, elements con voz, motion-control, 4K); Grok Imagine video v1.5 0,01/s (#10 OpenArt), imagen v2.0 (#4 OpenArt). Conectarlos es decisión del operador. |
@@ -78,7 +79,7 @@ disponibilidad.
 
 | Estado | Imagen | Video |
 |---|---|---|
-| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:nano`: Nano Banana 2.1 directo global, 4K/high con ocho refs verificado en Nexa cine; default OpenAI intacto. `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
+| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` en 2.5 y 2.6), GPT Image 2.6 Sunburst y Flare (desde 2026-11-05: SVG nativo, GIF animado, `markup`, `complexity`). `pnpm ai:nano`: Nano Banana 2.1 directo global, 4K/high con ocho refs verificado en Nexa cine; default OpenAI intacto. `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
 | **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (con sesión desde 2026-09-24; SVG real **sin corrida**; estado en `higgsfield-provider`) | Veo 3.1 (Vertex) |
 | **Evaluado, no conectado** | Grok Imagine imagen v2.0, Qwen Image 3, Flux.2 Pro, Kling imagen O3, Recraft por fal (23 endpoints) | Kling 3 (O3/V3), Grok Imagine video, Wan 2.7 (edición), HappyHorse 1.1, PixVerse V6 |
 | **Workbench watch** | Midjourney, Ideogram, Adobe Firefly, Magnific (upscale) | Higgsfield (Seedance 2.5 `omni_reference`, Kling, Soul ID), Runway |
@@ -92,6 +93,8 @@ disponibilidad.
 | Artificial Analysis texto a imagen / edición (leído 2026-09-16) | #15 / #9 | #2 y #1 / #1 y #2 | #3 / #5 | — |
 
 Los rankings **se contradicen**: el #1 de Seedream en OpenArt no se replica en Arena ni AA, y 2.5 tiene pocos votos.
+GPT Image 2.6 (preliminar, 2026-11-04/05): en Arena no supera a 2.5 Sunburst, en Design Arena sale primero y
+Artificial Analysis aún no lo lista [tercero].
 Video: OpenArt pone Seedance 2.5 #1 y H3 última de las conectadas; Artificial Analysis pone Wan 3.0 #1 en texto a
 video con audio y H3 Max (post-entrenado por fal) #1 en imagen a video con audio. Manda la prueba contra el brief.
 
@@ -117,6 +120,10 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 - OpenAI — Introducing ChatGPT Images 2.5 — https://openai.com/index/introducing-chatgpt-images-2-5/
 - OpenAI — ChatGPT Images 2.5 System Card — https://deploymentsafety.openai.com/chatgpt-images-2-5
 - OpenAI — GPT Image prompting guide (2026-04-21, escrita para `gpt-image-2`; NO hay guía de 2.5) — https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide
+- OpenAI — API changelog (2026-11-04: "Released GPT-Image-2.6 Sunburst and GPT-Image-2.6 Flare") — https://developers.openai.com/api/docs/changelog
+- OpenAI — ChatGPT Images 2.6 System Card — https://deploymentsafety.openai.com/chatgpt-images-2-6
+- OpenAI — Image prompting guide (cubre 2.6: Sunburst/Flare, texto, personaje, edición, fallas) — https://developers.openai.com/api/docs/guides/image-prompting
+- OpenAI — fichas de modelo `gpt-image-2.6-sunburst` y `gpt-image-2.6-flare` (developers.openai.com, árbol de modelos; sin snapshot fechado)
 - OpenAI — Image generation/editing guide — https://developers.openai.com/api/docs/guides/image-generation
 - OpenAI — API pricing — https://openai.com/api/pricing/
 - fal.ai — Seedream 5 Lite text-to-image API — https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image/api
@@ -172,6 +179,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 | **Gemini 3.1 Flash Lite Image** (Vertex) | escala y baja latencia | lifecycle corto | scale directo GCP + refresh gate |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, publishing diario | estilo cinematográfico < MJ | default del CLI; único con Batch; el repo ya lo usa (personaje Nexa) |
 | **GPT Image 2.5 Sunburst / Flare** (OpenAI, 2026-09-08) | Sunburst: edición precisa y pieza final (`xhigh`/`max`); Flare: generación cotidiana, ~1,5–1,75× más rápido, mismo costo | texto en imagen, consistencia de personaje y layout fijo siguen declarados como limitación | #1/#2 en Arena y AA (2026-09-07/16); recomendado por OpenAI para integraciones nuevas; `pnpm ai:image --model` |
+| **GPT Image 2.6 Sunburst / Flare** (OpenAI, 2026-11-04) | SVG nativo, GIF animado, `markup` en edits (también 2.5) y `complexity` | más caro que 2.5 sólo en `low`/`medium`; Sunburst 2.6 con máscara = panel negro; identidad y calidad sin medir por nosotros | `pnpm ai:image --model gpt-image-2.6-*` (desde 2026-11-05): vector, micro-loop y edición con marcas; explorar barato sigue en 2.5; identidad de personas en 2.5 Sunburst hasta un canario; pieza de producción: comparar 2.5 vs 2.6 Sunburst en la toma real |
 | **Seedream 5 Lite** (ByteDance/fal.ai) | divergencia de medios/materiales a USD 0,035 por output publicado | continuidad/anatomía antes del anchor | abrir territorios en paralelo y curar antes de Pro |
 | **Seedream 5 Pro** (ByteDance/fal.ai) | material/color/atmósfera, multirreferencia, edición regional semántica | **no es 4K en fal** (máx. 2048²); Edit devuelve raster plano sin máscara (las capas separables salen del endpoint aparte `pro/layerize`, vía `pnpm ai:fal`); layout extremo puede requerir otra pasada | desarrollar el mundo visual; relevar a GPT para system extension cuando aplique |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept art | texto en imagen, control preciso | mood boards, editorial, hero de alto concepto |
@@ -205,7 +213,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
   (grano, xerox, analógico) · layering/mixed-media · color audaz + surrealismo · texturas táctiles.
 - Selección de modelo por tarea: **texto en imagen → Nano Banana Pro / Ideogram** (ambos sin superficie operativa hoy: Nano Banana Pro sin CLI, Ideogram watch; texto final siempre determinístico); **estética/concepto
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
-  GPT Image 2.5 Flare; edición precisa/pieza final → 2.5 Sunburst; Batch → GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
+  GPT Image 2.5 Flare; edición precisa/pieza final → 2.5 Sunburst; Batch → GPT Image 2; SVG o GIF desde un prompt → GPT Image 2.6 Flare por `pnpm ai:image --format svg|gif`; pieza final → comparar 2.5 vs 2.6 Sunburst en la toma**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
   **broadcast/cine → Veo**; **económico simple → Kling**; **edición de un MP4 con instrucción → Gemini Omni 1.1 CLI** (cadena conversacional stateful sin probar);
   **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;

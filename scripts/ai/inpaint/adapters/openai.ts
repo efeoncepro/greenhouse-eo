@@ -65,9 +65,22 @@ export const openAIPickSize = (model: string): PickTargetSize => {
 
 const sizeString = (size: TargetSize) => `${size.width}x${size.height}` as OpenAIImageSize
 
-const isSunburst = (model: string) => model.startsWith('gpt-image-2.5-sunburst')
+/**
+ * Sunburst 2.5 Y 2.6. En 2.5 el panel negro con máscara está medido 3 de 3. En 2.6 (2026-11-05): con la máscara de
+ * este pipeline (RGB negro bajo el alfa) volvió a dar panel negro (1 de 1, `low`, detectado por `suspectFlatPanel`);
+ * con el RGB de la foto bajo el alfa no lo dio (1 de 1, llamada directa). Hasta medir más, Sunburst edita sin máscara.
+ * Flare 2.6 con la máscara del pipeline: PASS sin panel (1 de 1).
+ */
+const isSunburst = (model: string) => /^gpt-image-2\.(5|6)-sunburst/.test(model)
 
-/** `auto`: Sunburst sin máscara (su edición con máscara devuelve un panel negro); el resto, con máscara. */
+/**
+ * `complexity` de 2.6 en edición acotada: OpenAI recomienda valores bajos para ediciones enfocadas y advierte que los
+ * altos pueden «introduce unwanted changes» [oficial]. El pipeline edita una zona, así que pide `low`; no cambia el
+ * costo (medido 2026-11-05). Calidad dentro de la zona con `low` vs `high`: [sin dato].
+ */
+const INPAINT_COMPLEXITY = 'low' as const
+
+/** `auto`: Sunburst 2.5 sin máscara (su edición con máscara devuelve un panel negro); el resto, con máscara. */
 export const resolveOpenAIProviderMask = (model: string, mode: ImageAdapterParams['providerMask']): boolean =>
   mode === 'on' ? true : mode === 'off' ? false : !isSunburst(model)
 
@@ -110,7 +123,7 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
 
     return {
       usd: Math.round(perImage * count * 10_000) / 10_000,
-      basis: `${count} × salida ${sizeString(size)} ${quality ?? DEFAULT_QUALITY} (fórmula oficial de tokens × USD ${OPENAI_IMAGE_OUTPUT_USD_PER_MILLION}/1M; la entrada suma aparte)`
+      basis: `${count} × salida ${sizeString(size)} ${quality ?? DEFAULT_QUALITY} (${model.startsWith('gpt-image-2.6') ? 'factor 2.6 medido sobre 2.5' : 'fórmula oficial de tokens'} × USD ${OPENAI_IMAGE_OUTPUT_USD_PER_MILLION}/1M; la entrada suma aparte)`
     }
   },
   async run({ prompt, image, extraImages = [], mask, size, model, quality, providerMask }) {
@@ -120,6 +133,7 @@ export const openAIInpaintAdapter: InpaintImageAdapter = {
     assertOpenAIImageSizeSupported({ model: resolved, size: sizeString(size) })
 
     const result = await editOpenAIImage({
+      ...(getOpenAIImageModelCapabilities(resolved).complexity ? { complexity: INPAINT_COMPLEXITY } : {}),
       prompt,
       // Varias imágenes: la máscara se aplica a la primera (guía de OpenAI); el resto son boceto y referencias.
       image: [image, ...extraImages].map((bytes, index) => ({ bytes, filename: index === 0 ? 'base.png' : `ref-${index}.png`, mimeType: 'image/png' })),

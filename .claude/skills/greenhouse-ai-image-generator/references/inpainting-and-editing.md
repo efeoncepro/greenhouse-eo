@@ -1,7 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
 > **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
-> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`). Esto es el playbook operativo: intención → comando → modelo → flags →
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`); delta 2026-11-05 (§2, GPT Image 2.6 y `markup`; tarde: `--markup` y rayado verificados en `pnpm ai:image`, Sunburst 2.6 con máscara = panel negro, Flare 2.6 por el pipeline PASS). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -59,8 +59,10 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 
 | Intención | Comando | Modelo por defecto | Flags que importan |
 |---|---|---|---|
-| Editar o agregar algo **en una zona** | `ai:inpaint image --image --mask --prompt` | `openai` · **Flare** `medium` con máscara | `--adapter fal:flux-pro-fill` (alternativa con máscara) · `--model gpt-image-2.5-sunburst` para la pieza final |
+| Editar o agregar algo **en una zona** | `ai:inpaint image --image --mask --prompt` | `openai` · **Flare** `medium` con máscara | `--adapter fal:flux-pro-fill` (alternativa con máscara) · `--model gpt-image-2.5-sunburst` para la pieza final · `--model gpt-image-2.6-flare` opcional (PASS por el pipeline 2026-11-05) |
 | Guiar con un dibujo, como el Markup de ChatGPT | `image --sketch` (+ `--reference` para el objeto) | el de `image` | sin `--mask`, la máscara sale del trazo (`--sketch-margin`, 40) y **crece hasta el objeto** (`--grow-mask auto`); una `--mask` explícita nunca crece |
+| Guiar con anotaciones **nativas** de OpenAI (`markup`) | `pnpm ai:image --image base.png --markup marcas.png --prompt …` (no es `ai:inpaint`) | GPT Image 2.5 Flare, 2.6 Flare o 2.6 Sunburst [verificado 2026-11-05] | PNG **transparente del mismo tamaño que la base** con trazos rojos (óvalo + nota o boceto a mano alzada); la CLI valida alfa y tamaño; **no combina con `--mask`**. Prompt: *"Follow the red annotations: … Do not render the annotations. Keep everything else identical."* La capa no suma costo de entrada. 🔴 `ai:image` **no recompone ni verifica delta 0**: si el resto debe quedar idéntico, recompón o usa `--sketch` |
+| **Rayar** la foto (trazos rojos aplanados sobre la imagen) | `pnpm ai:image --image base-rayada.png --prompt …` (sin `--markup`) | GPT Image 2.5 o 2.6 [verificado 1 de 1 por caso, `low`] | Borrar: *"Remove the objects scribbled over in red … and the red scribbles. Keep everything else identical."* (Flare 2.6 y 2.5 borraron una libreta). Agregar: un boceto rojo de lámpara se volvió lámpara real (Sunburst 2.6). Mismo límite: sin recomposición ni verificación |
 | Rehacer un detalle (manos, textura) | `image --zone-resolution <px>` (512–4096) | el de `image` | **reinterpreta, no escala**: Flare redibujó la taza y le quitó el pie |
 | **Borrar** un objeto | `ai:inpaint erase` | con `--layers`: **clean plate** (USD 0) · con `--mask`: **Sunburst por instrucción** | `--layer` (repetible), `--grow` (16), `--shadow auto` (default con capas: suma la sombra proyectada), `--fill plate\|model` |
 | **Mover** o escalar un elemento | `ai:inpaint move --layers --layer --dx --dy [--scale]` | sin IA salvo el halo | `--scale` 0,2–3 · `--harmonize auto\|off` (sólo sombra de contacto y reflejo) · `--shadow off` |
@@ -75,7 +77,15 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 - 🔴 **Sunburst NUNCA con máscara:** devuelve la zona como **panel negro plano** (3 de 3). El pipeline lo hace editar sin
   máscara (`--provider-mask auto`), le manda la zona en magenta como imagen 2 (`--guide auto`), corrige el color en un
   anillo de 14 px (`--color-match auto`) y recompone. Revisa el aviso de reencuadre.
-- **Flare es el default con máscara** para editar una zona; Sunburst es el más potente para la pieza final.
+  🔴 **Vale para Sunburst 2.5 Y 2.6** (delta 2026-11-05): Sunburst 2.6 con la máscara del pipeline (RGB negro bajo el
+  alfa) también devolvió **panel negro** (1 de 1, el pipeline lo detectó y salió `3` REVISAR). `ai:inpaint` ya acepta
+  2.6 [contrato 2026-11-05]: manda **Sunburst 2.6 sin máscara (como 2.5)** y **Flare 2.6 con máscara**, y a los modelos
+  con `complexity` les envía `complexity: low` (recomendación oficial para ediciones acotadas; no cambia el costo); la
+  estimación aplica el factor 2.6. Ambos 2.6 redibujan la imagen entera (deriva media fuera de la zona 12–17/255):
+  la recomposición sobre la original sigue siendo obligatoria, y la hace el pipeline.
+- **Flare es el default con máscara** para editar una zona (2.5 por defecto; **Flare 2.6 por el pipeline: PASS, sin
+  panel** [verificado 2026-11-05], opcional); Sunburst es el más potente para la pieza final. Rostros e identidad de
+  personas siguen en 2.5 Sunburst: 2.6 no tiene canario de identidad.
 - **Borrar = editor por instrucción, no relleno con máscara:** Flare con máscara dejó media taza; Flux Fill dibujó
   **otra** taza dos veces; Seedream 5 Pro Edit dejó un fantasma del asa que el detector **no** ve. Con capas, el clean
   plate es gratis y limpio.
