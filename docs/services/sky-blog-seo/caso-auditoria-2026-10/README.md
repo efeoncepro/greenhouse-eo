@@ -4,7 +4,8 @@ Expediente del encargo de Julio del 23-10-2026: auditar el Blog SKY a partir de 
 lo que se había avanzado el 15-10, armar el informe de entrega con el renderer A4 premium y preparar los correos.
 Estado al 01-11-2026: **informe enviado el 23-10 a Pilar y Natalia; SKY entregó administrador de WordPress y
 restauró los 9 artículos de Perú; el Search Console de Efeonce es sólo la propiedad del blog; deck del kickoff
-armado para el 02-11.** Insumos, deck, equipo y sistema visual: [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md).
+armado para el 02-11.** Delta 05-11: el token de Search Console también lee `www` y su historia del blog quedó
+exportada; proyección y conversión en [PROYECCION_2026-11.md](PROYECCION_2026-11.md). Insumos, deck, equipo y sistema visual: [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md).
 
 ## Qué pidió SKY (reuniones)
 

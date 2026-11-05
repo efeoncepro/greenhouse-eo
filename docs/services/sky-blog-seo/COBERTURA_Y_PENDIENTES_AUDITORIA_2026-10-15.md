@@ -1,5 +1,24 @@
 # SKY · Cobertura y pendientes de la auditoría orgánica
 
+## Delta 2026-11-05
+
+Trabajo de la [proyección a 24 meses](caso-auditoria-2026-10/PROYECCION_2026-11.md); cifras en
+[HECHOS.md](caso-auditoria-2026-10/HECHOS.md#hechos-del-05-11-2026-proyección-a-24-meses). Avanzan SKY-AUD-01 y
+SKY-AUD-07. **Ningún check de cierre se marca.**
+
+| Frente | Investigación | Preparación | Aplicación | Resultados |
+| --- | --- | --- | --- | --- |
+| SKY-AUD-01 | El token de la conexión lee la propiedad `www` (`siteFullUser`). Historia de `/blog/` exportada el 05-11 desde el 24-06-2025; ene–may 2025 ya perdido. Serie GSC mensual blog + `www` y valor pre/post migración con datos reales. | CSV diario, por página y por consulta × país en `outputs/sky-blog-proyeccion-2026-11/valor/`. | Ninguna. | No aplica. |
+| SKY-AUD-07 | Conversión GA4 con `purchase` (no `vpv_bv`): ≈1.000 personas/mes leen el blog y compran ese mes (≈2.350 antes de migrar); 0,25 % de compra en la sesión de entrada. `purchase` sin monto: no hay ingresos por blog. Sin corte de sesión al pasar a skyairline.com. | Informe y correo con el pedido a Digital SKY (monto en `purchase`) y a Pilar (Lector GA4 para la cuenta de servicio). | Ninguna. | No aplica. |
+
+- La decisión «Historia de Search Console» del kickoff queda resuelta por Efeonce: no hacía falta un acceso nuevo.
+  Lo que sigue abierto en SKY-AUD-01 es la cronología de TI, backups, reglas de redirección y el último reporte
+  del proveedor.
+- SKY-AUD-07 sigue abierto: es coincidencia en el mes, no atribución; no cubre cambio de dispositivo ni cookies
+  rechazadas, y no hay monto de compra ni acceso al motor de reservas. Consentimiento y destinos del CTA sin probar.
+- Ningún cambio se aplicó al CMS, redirecciones, Azure, GTM ni conexiones; la propiedad conectada de la
+  organización sigue siendo la del blog.
+
 ## Delta 2026-10-23
 
 - La [auditoría consolidada del 23-10](../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md)
@@ -96,7 +115,8 @@ WordPress autenticado, owner Azure/CDN, versiones GTM y ciertos informes GSC req
 No confundir permiso de lectura de rendimiento con capacidad de modificar el sitio ni usar credenciales
 del WordPress institucional de Efeonce para SKY.
 
-**El GSC anterior no está disponible, según Julio.** Se conserva como límite histórico, no como
+**El GSC anterior no está disponible, según Julio.** (Superado el 05-11-2026: la propiedad `www` es legible y su
+historia de `/blog/` quedó exportada; ver Delta 2026-11-05.) Se conserva como límite histórico, no como
 solicitud abierta obligatoria ni impedimento general: continuar con GA4, GSC actual, archivo, cohortes y
 registros recuperables. No reconstruir consultas/posiciones antiguas exactas a partir de estimaciones de
 mercado o del dominio completo.

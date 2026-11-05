@@ -17,8 +17,8 @@ Fecha: 05-11-2026. Estado: **informe (13 páginas), planilla y correo preparados
 
 | Pieza | Dónde |
 | --- | --- |
-| Informe A4 | `outputs/sky-blog-proyeccion-2026-11/informe/` (plan) y PDF compuesto con `pnpm report:compose`; copia en OneDrive › 1. Clientes (Interno) › Sky - SEO-AEO › Proyección 2026-11 |
-| Planilla de búsquedas valorizadas | Misma carpeta de OneDrive; generador `valor/scripts/10-planilla-keywords.ts` |
+| Informe A4 | `outputs/sky-blog-proyeccion-2026-11/informe/` (plan) y PDF compuesto con `pnpm report:compose`; para adjuntar en OneDrive › Workspace › Clientes › Sky Airlines › Proyección Blog 2026-11; copia interna en 1. Clientes (Interno) › Sky - SEO-AEO › Proyección 2026-11 |
+| Planilla de búsquedas valorizadas | Mismas carpetas de OneDrive; generador `valor/scripts/10-planilla-keywords.ts` |
 | Generador del informe | [`scripts/seo/sky-blog-projection-report.ts`](../../../../scripts/seo/sky-blog-projection-report.ts) |
 | Modelo de proyección | `outputs/sky-blog-proyeccion-2026-11/modelo/proyeccion.py`; salidas `proyeccion_mensual.csv` y `resumen_modelo.json` |
 | Series GA4 y conversión | `outputs/sky-blog-proyeccion-2026-11/ga4/`: orgánico por mes, país y canal; compra en la sesión, embudo lector → compra, navegación por referrer y clics a skyairline.com |

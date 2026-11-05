@@ -32,6 +32,24 @@ con `parseKeywordOverviewItem` + `persistKeywordMarketData`, con filas NULL para
 fuente Berel MX (2026-11-04): 508 consultas, USD 0,04836 real con techo USD 0,50, 230 con CPC; cobertura parcial y
 CPC de pintura bajos ⇒ valor del blog de octubre ≈ US$ 85.
 
+### Delta 2026-11-05 — Persistir una compra grande de CPC (caso SKY, 19.239 keywords)
+
+Compra para la proyección del Blog SKY: 29 tareas `keyword_overview/live`, 19.239 keywords, USD 1,525 real
+(estimado 2,66, techo 3, preview antes de cada POST pagado). Persistida con el writer canónico
+(`parseKeywordOverviewItem` + `persistKeywordMarketData`, `sourceEndpoint: 'keyword_overview'`) desde
+`outputs/sky-blog-proyeccion-2026-11/valor/scripts/06-persist-cpc.ts`: 19.239 filas, 4.987 con CPC, verificadas
+por lectura en la base. Lecciones:
+
+- **La escritura a la base compartida necesita autorización explícita del operador.** El clasificador de permisos
+  bloqueó al subagente hasta que Julio la autorizó; comprar no autoriza persistir. Pedirla al principio del encargo.
+- **Forzar el proxy local para corridas largas.** La primera corrida quedó ~10 min sin salida porque
+  `loadGreenhouseToolEnv` conectaba por el Cloud SQL Connector. Con el proxy ya levantado por `pnpm pg:connect`,
+  sobrescribir en el proceso: `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME= GREENHOUSE_POSTGRES_HOST=127.0.0.1
+  GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false`. El Connector gana si su variable tiene valor.
+- **Duración:** ~700 filas por lote, ~50 min para 19 mil filas. Correr en segundo plano con log y no reintentar a
+  ciegas: el writer es idempotente (`ON CONFLICT DO NOTHING`), pero hay que leer el conteo antes de relanzar.
+- **Los recibos no se versionan.** `dataforseo/` pesaba ~300 MB; se quedan como evidencia local ignorada.
+
 ## §1 Cliente canónico (API + firmas)
 
 Vive en `src/lib/ai/dataforseo.ts` (364 líneas, `import 'server-only'`). Base URL fija `https://api.dataforseo.com` (`src/lib/ai/dataforseo.ts:13`). Exports:

@@ -20,6 +20,9 @@ equipo, accesos y sistema visual mientras se armaba el deck (§7) y corrigió el
   `www.skyairline.com` (corregido por Julio el 01-11). El de Valentina falló; Julio respondió que con `mkt@` basta.
   La historia previa a la migración (cuando el blog vivía en `skyairline.com/blog`) está en la propiedad `www`, que
   Efeonce todavía no tiene. Ver §4, punto 7.
+  **Delta 05-11-2026:** el token de Search Console de SKY que usa Efeonce también lee la propiedad `www`
+  (`siteFullUser`). La historia de `/blog/` se exportó ese día, desde el 24-06-2025 (lo anterior ya venció). Detalle
+  en [PROYECCION_2026-11.md](PROYECCION_2026-11.md).
 - **Contactos de TI** para la copia en Azure y para evaluar `skyairline.com/blog`: Giovanna Rojas y Luis Muñoz. Pilar
   pidió estar en copia junto con Natalia.
 - 🔴 **Las contraseñas viajaron en texto plano por correo.** Recomendar cambiarlas tras el primer ingreso. Nunca van
@@ -88,7 +91,8 @@ mes del año anterior y por qué enero de 2025 no es comparable.
 6. **Regla de despublicación:** nada se retira sin redirección. Preguntar quién retiró los 9 artículos.
 7. **Historia de Search Console:** SKY da acceso a la propiedad `www.skyairline.com` y Efeonce exporta la historia
    antes de que venza: GSC conserva 16 meses, así que jul–sep 2025 se pierde entre noviembre de 2026 y enero de 2027.
-   Efeonce hoy sólo tiene la propiedad del blog.
+   Efeonce hoy sólo tiene la propiedad del blog. **Cerrado el 05-11-2026:** el token también lee `www` y la
+   historia de `/blog/` quedó exportada.
 
 Pedidos a Marca SKY: aprobar el estilo fotográfico (§7), manual de marca para banners, rutas activas y criterio sobre
 imágenes con IA.

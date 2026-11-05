@@ -83,6 +83,29 @@ El método no cambia de versión al salir del piloto. Desde el 2026-11-04 lo usa
 Las reglas de esta página siguen valiendo igual. La regla de marca de SKY no se reutiliza: cada consumer declara la
 suya (en Insights, la etiqueta del dominio raíz).
 
+## Delta 2026-11-05 — antes y después de la migración, con la propiedad `www`
+
+Para la [proyección a 24 meses](caso-auditoria-2026-10/PROYECCION_2026-11.md) el método se corrió sin cambios en los
+dos lados de la migración. Cifras completas en [HECHOS.md](caso-auditoria-2026-10/HECHOS.md#hechos-del-05-11-2026-proyección-a-24-meses).
+
+- **Antes de migrar:** propiedad `https://www.skyairline.com/` filtrada a `/blog/`, jul–sep 2025. El collector canónico
+  sólo lee la propiedad conectada (el blog), así que `www` se extrajo con un espejo de sus entradas
+  (`outputs/sky-blog-proyeccion-2026-11/valor/scripts/03-www-collect.ts`); el cálculo es `calculateOrganicTrafficValue`
+  sin cambios.
+- **Resultado medido (CL + PE):** US$ 2.107/mes en ago–oct 2026 contra US$ 7.406/mes en jul–sep 2025 (−72 %); sin marca
+  −81 %. Cobertura de valoración 12–15 % en ambos lados: es un piso.
+- **Reconciliación con el 23-10:** el extrapolado (no canónico, sólo para reconciliar) da ≈US$ 15.600/mes hoy y
+  ≈US$ 52.400/mes antes (rango real ≈43–61 mil). El 28–45 mil enviado el 23-10 se estimó sin `www` y quedaba corto; el
+  informe de la proyección lo mantiene por consistencia, así que su repago es conservador.
+- **Revaloración:** los dos lados usan CPC capturados en oct–nov 2026. El valor de 2025 es a precios de hoy, no el precio
+  de esa época.
+- **Marca:** el peso subió de 49–52 % antes de migrar a 66–70 % hoy, porque el valor sin marca cayó más.
+- **CPC persistidos para reutilizar:** la compra del 05-11 (29 tareas `keyword_overview`, US$ 1,525) quedó en
+  `greenhouse_growth.seo_keyword_market_data` con `parseKeywordOverviewItem` + `persistKeywordMarketData`: 19.239 filas,
+  4.987 con CPC, verificadas por lectura. La CLI e Insights las leen sin volver a comprar.
+- **Base del país:** con filtro de página, GSC sólo da país para los clics con consulta visible. El valor no cambia
+  (siempre es por fila con consulta), pero un reparto por país de los clics totales debe declarar su base.
+
 Fuentes verificadas el 15-10-2026:
 [Google Search Analytics](https://developers.google.com/webmaster-tools/v1/searchanalytics/query),
 [límites y extracción](https://developers.google.com/webmaster-tools/v1/how-tos/all-your-data),

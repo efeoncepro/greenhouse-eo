@@ -1,9 +1,9 @@
 # Calcular el valor publicitario estimado del tráfico orgánico
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-15 (piloto Blog SKY)
-> **Ultima actualizacion:** 2026-11-05 por Claude (1.1: flags `--markets`, `--brand` y `--content-scope`; propiedades `sc-domain:`; cómo cubrir los CPC de un mes nuevo para Insights; code complete local, rollout pendiente)
+> **Ultima actualizacion:** 2026-11-05 por Claude (1.2: comparar antes y después de una migración; persistir compras grandes. 1.1: flags `--markets`, `--brand` y `--content-scope`; propiedades `sc-domain:`; cómo cubrir los CPC de un mes nuevo para Insights; code complete local, rollout pendiente)
 > **Documentacion tecnica:** [decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md) · [funcional](../../documentation/growth/valor-publicitario-organico.md)
 
 Usar con el [método versionado](../../services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md).
@@ -89,6 +89,29 @@ Proyectar los items con `parseKeywordOverviewItem` y persistir con `persistKeywo
 calcular y registrar el recibo. La escritura de gasto la hace el transporte; no insertar otro ledger.
 Las consultas que el proveedor no tiene se persisten igual, como filas con CPC `NULL`: quedan «sin valorar» y la
 compra queda registrada.
+
+Una compra grande tarda: persistir 19 mil filas llevó ~50 min (~700 por lote). Si el entorno conecta por el Cloud SQL
+Connector y la corrida queda sin salida, forzar el proxy local de `pnpm pg:connect` en el proceso
+(`GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=` vacío, `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `PORT=15432`, `SSL=false`).
+Escribir en la base compartida necesita autorización explícita del operador, aparte de la de comprar.
+
+## Comparar antes y después de una migración
+
+Si el contenido cambió de URL (por ejemplo, de `www.ejemplo.com/blog/` a `blog.ejemplo.com`), el «antes» está en la
+propiedad anterior de Search Console:
+
+1. Confirmar con `sites.list` del token de la conexión que esa propiedad es visible. No asumir por lo que se dijo.
+2. Exportar cuanto antes: Search Console conserva 16 meses y lo que vence no se recupera.
+3. Filtrar la propiedad anterior a la carpeta migrada. El collector canónico sólo lee la propiedad conectada de la org:
+   para la anterior se usa un espejo de sus entradas, sin cambiar la conexión, y se calcula con
+   `calculateOrganicTrafficValue` sin cambios.
+4. Con filtro de página, la dimensión país sólo trae los clics con consulta visible. Un reparto por país de los clics
+   totales sale de la propiedad sin filtro; declarar la base.
+5. Comparar clics y valor, no posición media: las dos propiedades mezclan impresiones distintas.
+6. El valor del «antes» se calcula con CPC de hoy: es una revaloración a precios actuales, no el precio de esa época.
+
+Caso de referencia: Blog SKY, jul–sep 2025 contra ago–oct 2026
+([cifras](../../services/sky-blog-seo/caso-auditoria-2026-10/HECHOS.md#hechos-del-05-11-2026-proyección-a-24-meses)).
 
 ## Cubrir los CPC de un mes nuevo para Insights
 

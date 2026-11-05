@@ -230,9 +230,44 @@ dataset normal para pruebas ni guardar el código temporal en fuente/env/tag de 
 | Service account | `greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com` |
 | Clientes de código | `src/lib/growth/gtm/api-client.ts` (`GtmApiClient`) · `src/lib/growth/ga4/api-client.ts` |
 | Verificar en vivo | `scripts/ga4/realtime-events.ts 486264460` · `scripts/gtm/verify-connection.ts` |
+| Consultar GA4 (solo lectura, ad hoc) | `pnpm ga4:query` (`scripts/ga4/query.ts`) — ver sección siguiente |
 | Lecturas → portada `/blog/` | Las insignias «Más leído» / «Tendencia» del rail «Para leer con calma» (2026-10-24) **no tienen lector**: una lectura GA4 entra sólo por el filtro WordPress `eo_home_rail_signals` (id de entrada → `top` / `trend`); nunca se muestran sin su dato. Operación: skill `efeonce-public-site-wordpress` → `references/blog-home-operation.md` |
 
 > **⚠️ Verificar SIEMPRE el Measurement ID destino.** El sitio tiene DOS ids GA4-ish (`G-KYPPY57M14` en el GTM, `GT-KV5CNNKQ` de Site Kit). Antes de crear un GA4 Event tag, confirmar **qué measurement ID pertenece a la propiedad `486264460`** por la Admin API (`properties/486264460/dataStreams`) — si mandas al id equivocado, el evento no aparece en la propiedad que medimos. Ver `docs/reference/measurement-gtm-ga4/07-ga4-admin-api-ops.md`.
+
+## Consultas GA4 ad hoc de solo lectura — `pnpm ga4:query` (desde 2026-11-05)
+
+Camino **por defecto** para análisis puntuales e informes (reportes, embudos, eventos clave, metadatos) sobre
+cualquier propiedad GA4. Manual canónico: [consultar-ga4-por-cli.md](../../../docs/manual-de-uso/growth/consultar-ga4-por-cli.md).
+No usa el OAuth por organización de la app ni variables de Vercel; no lee `.env.local`, PostgreSQL ni Secret
+Manager. ADC local impersona `greenhouse-gtm-publisher@…` (override `GA4_QUERY_SERVICE_ACCOUNT`) con scope
+`analytics.readonly`, igual que `realtime-events.ts`.
+
+- **Prerrequisitos:** ADC vigente; rol **Service Account Token Creator** del usuario sobre la SA (lo otorga una
+  persona; un agente **NUNCA** se lo autoasigna); la SA agregada como **Lector** en cada propiedad (lo da el dueño de
+  la propiedad; nunca agregarla a la de un cliente sin su autorización).
+- **Subcomandos:** `doctor` · `report` (`--from --to --dims --metrics --filter campo=valor` repetible, AND/EXACT,
+  `--limit`, o `--body`/`--body-file`; paginación automática de 100k; `--out .csv|.json`; `--format json`) ·
+  `funnel` (v1alpha `runFunnelReport`, `--body-file`) · `admin <property|keyEvents|dataStreams|customDimensions|customMetrics>` ·
+  `metadata --grep` · `batch <specs.mjs|json> <outDir> [--force]` (un JSON por consulta con `capturedAt`; salta los existentes).
+- **Alias:** `efeoncepro`=486264460 · `efeonce-cl`=347852876 · `sky`=354430952.
+- **Estado 2026-11-05:** verificado en `efeoncepro.com`. **SKY da 403** (la SA aún no es Lector; pedido en curso);
+  hasta entonces SKY se lee por la conexión por organización (`src/lib/growth/analytics-ga4/`), que exige el OAuth
+  client de Vercel. Portal/dashboards/Insights siguen siempre por esa conexión, no por la CLI.
+
+**Gotchas de análisis GA4** (caso fuente: propiedad SKY, 2026-11-05):
+
+1. Un `runReport` multimes con dimensión de alta cardinalidad (`yearMonth × country`) puede volver con
+   `dataLossFromOtherRow=true` y **subcontar** (Chile ene-2025: 73.640 vs 90.274 consultando el mes solo). Partir a un
+   mes por request y revisar siempre ese flag y la fila `(other)`.
+2. Los eventos clave pueden incluir pseudo-pageviews (SKY: `vpv_bv`, 178,7 M de eventos) que inflan la tasa genérica
+   `keyEvents` (~41 %). Para conversión usar la métrica del evento: `keyEvents:purchase`.
+3. Un `purchase` sin valor deja `purchaseRevenue`/`totalRevenue`/`grossPurchaseRevenue`/`itemRevenue`/`eventValue`
+   en 0: el revenue **no es medible**. Comprobarlo antes de prometer atribución de ingresos.
+4. La Data API no entrega conversiones asistidas por página. Lo medible es co-ocurrencia (misma sesión, o embudo
+   cerrado por usuario con `runFunnelReport` «vio X y luego compró» dentro del mes): es un **piso** (cross-device,
+   consentimiento).
+5. Cross-domain: si `sessionSource` del sitio destino nunca es el host del blog, la navegación sigue en la misma sesión.
 
 ## Metodología — cómo decidir el camino (árbol de decisión)
 

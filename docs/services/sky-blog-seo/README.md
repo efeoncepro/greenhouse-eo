@@ -16,6 +16,8 @@ Está pendiente de revisión de Valentina y de aprobación de SKY; **nada se pub
 [lote editorial de noviembre](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md). Ese mismo día se produjeron las imágenes del
 lote (88 banners de ruta, 43 portadas nuevas y 93 escenas, todo pendiente de revisión de Diseño y Marca SKY y sin
 subir): [producción de imágenes de noviembre](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md).
+También el 05-11 quedó lista la proyección a 24 meses y el aporte del blog a la venta pedidos en el kickoff (informe,
+planilla de búsquedas valorizadas y correo, sin enviar): [proyección](caso-auditoria-2026-10/PROYECCION_2026-11.md).
 
 ## Resultado y alcance
 
@@ -235,6 +237,8 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
   corrige y amplía la anterior (§6).
 - [Caso de auditoría y entrega, octubre 2026](caso-auditoria-2026-10/README.md) y sus
   [hechos verificados](caso-auditoria-2026-10/HECHOS.md).
+- [Proyección a 24 meses y aporte a la venta, noviembre 2026](caso-auditoria-2026-10/PROYECCION_2026-11.md); generador
+  [`scripts/seo/sky-blog-projection-report.ts`](../../../scripts/seo/sky-blog-projection-report.ts).
 - Informe A4 y tablas de apoyo: `outputs/sky-blog-seo-audit-2026-10-23/`; generador del plan:
   [`scripts/seo/sky-blog-audit-report.ts`](../../../scripts/seo/sky-blog-audit-report.ts).
 - [Expediente comercial antecedente](../../commercial/tenders/sky-blog-2026/README.md).

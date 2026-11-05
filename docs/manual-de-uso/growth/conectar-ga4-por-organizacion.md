@@ -8,6 +8,12 @@
 > **Delta 2026-10-17:** Efeonce se conectó por primera vez (propiedad `486264460`, «efeoncepro.com»); Berel y Sky
 > siguen activas. Las tres respondieron a una lectura sin escritura. Ver
 > [Estado vigente y diagnóstico](#estado-vigente-y-diagnóstico-2026-10-17).
+>
+> **Delta 2026-11-05 — ¿conexión o CLI?** Esta conexión es la que usan el portal, los dashboards e Insights. Para
+> un análisis puntual o preparar un informe desde la terminal, usa `pnpm ga4:query`
+> ([Consultar GA4 por CLI](consultar-ga4-por-cli.md)): lee con la cuenta de servicio de Efeonce y no necesita el
+> OAuth ni las variables de Vercel. Requiere que esa cuenta sea Lector en la propiedad; Sky aún no la tiene, así
+> que por ahora Sky sólo se lee por esta conexión.
 
 
 1. Abre **Agencia → Cliente → Ciclo de vida** de la organización correcta. Para Berel, usa **Grupo Berel**.

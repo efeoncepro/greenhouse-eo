@@ -69,11 +69,13 @@ migración/medición histórica, indexación/seguridad, calidad editorial, compe
 experiencia móvil y contribución comercial. El censo público no acredita revisión editorial de los
 1.697 posts ni la auditoría técnica del motor de reservas.
 
-El GSC de Efeonce es sólo la propiedad del blog (subdominio), no `www.skyairline.com` (confirmado el 01-11).
-La historia previa a la migración, cuando el blog vivía en `skyairline.com/blog`, está en la propiedad `www`.
-No bloquea el diagnóstico, pero GSC conserva 16 meses: jul–sep 2025 vence entre noviembre de 2026 y enero de
-2027. Quedó como decisión pedida a SKY en el kickoff («Historia de Search Console»: SKY da acceso a `www`,
-Efeonce exporta). No simular consultas antiguas con el dominio padre.
+La conexión GSC de la organización es la propiedad del blog (subdominio). Desde el 05-11-2026 el mismo token
+de operador ve también `https://www.skyairline.com/` (`siteFullUser`, comprobado con `sites.list`; el 01-11 se
+creía que no). Ahí vive la historia previa a la migración, cuando el blog estaba en `skyairline.com/blog`:
+se exportó el 05-11 filtrada a `/blog/` (desde el 24-06-2025; ene–may 2025 ya no existe en GSC) en
+`outputs/sky-blog-proyeccion-2026-11/valor/historia-www-blog-*.csv`. Eso cierra la decisión «Historia de
+Search Console» del kickoff. Leer `www` no cambia la propiedad conectada de la org, y el collector canónico sólo
+lee la conectada. No simular consultas antiguas con el dominio padre.
 Comprobar acceso nominal a WordPress/GTM/infra del sitio correcto. La conexión analítica no acredita
 permisos CMS; las credenciales institucionales de Efeonce no habilitan SKY.
 
@@ -142,7 +144,8 @@ y `pnpm report:compose <plan.json> --out <dir> --asset org-logo:sky=ai-generatio
 - Medir la recuperación contra el mismo mes del año anterior, nunca contra septiembre: el blog es estacional.
 - La propiedad GSC antigua vence a los 16 meses; exportarla antes de que se pierda la historia previa.
 - Un acceso a Search Console nombra una propiedad: confirmar cuál (blog o `www`) antes de dar por resuelta la
-  historia. El 31-10 se registró por error acceso a `www`; era la del blog (corregido el 01-11).
+  historia. El 31-10 se registró por error acceso a `www`; era la del blog (corregido el 01-11). El 05-11,
+  `sites.list` mostró que el token sí ve `www`: comprobar con `sites.list`, no con lo que se dijo.
 - Terceros con acceso al WordPress despublican: comparar el inventario contra el corte anterior en cada
   pasada y alertar con la lista de URL.
 - El logo de la organización SKY en Greenhouse es una imagen generada por IA; el oficial es
@@ -163,6 +166,25 @@ y `pnpm report:compose <plan.json> --out <dir> --asset org-logo:sky=ai-generatio
   las specs contra los borradores al cierre.
 - Pilotear un artículo y ajustar la pauta antes de repartir; el piloto (Zorritos) fijó el formato de ficha,
   JSON-LD y callouts que replicaron los nueve lotes.
+
+## Lecciones de la proyección (05-11-2026)
+
+Detalle y cifras: [PROYECCION_2026-11](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/PROYECCION_2026-11.md).
+
+- La propiedad `www` se lee con el token de la conexión (`sites.list` primero) y se filtra a `/blog/`. GSC
+  conserva 16 meses: lo que no se exporta a tiempo se pierde (ene–may 2025 ya se perdió).
+- Con filtro de página, la dimensión país de GSC sólo devuelve clics con consulta visible (oct-26: 7.433 de
+  24.965). El reparto por país del blog sale de la propiedad sin filtro; declarar la base en cada fila.
+- La conversión GA4 es coincidencia en el mes, no atribución, y es un piso. Usar sólo `purchase`: `vpv_bv`
+  infla la tasa. El `purchase` de SKY no trae monto, así que no hay ingresos por blog.
+- Proyectar con R = visitas ÷ mismo mes de 2025 y «sin intervenir» con la caída interanual medida del último mes
+  cerrado, no con una constante.
+- CPC de hoy sobre meses de 2025 es revaloración a precios actuales. Con datos reales, el valor previo
+  extrapolado (US$ 43–61 k) supera el 28–45 k enviado el 23-10; se mantuvo el publicado por consistencia.
+- Mirar cada PNG después de recomponer el informe: un CSV regenerado renombró una columna y la página imprimió
+  `NaN`. `report-table` admite 4 columnas y 16 filas; los temas chicos van a «Otros».
+- Adjuntos para enviar: OneDrive › Workspace › Clientes › Sky Airlines › <carpeta del entregable>. Las carpetas
+  con nombre del cliente en la raíz son canales compartidos con SKY.
 
 ## Cierre de cada encargo
 
