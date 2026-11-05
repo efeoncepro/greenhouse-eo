@@ -357,6 +357,11 @@ renders en paralelo con el mismo temporal mezclaron cuadros y uno falló.
 | Comentarios | Llegan como hilos anclados a un artboard; responder en el mismo hilo |
 
 - Un archivo publicado con «@» en el nombre (`x@2x.png`) no carga en el artboard; usar `x_2x.png`.
+- Una versión del canvas admite **512 archivos como máximo** (`deploy 422: manifest exceeds 512 entries`).
+  Publicar por lotes (imágenes, luego artboards con `canvas.json`) y quitar con `null` en `files` lo que ya no se usa
+  (caso 2026-11-04: las 49 capas de `anim/`, porque las animaciones del canvas son videos).
+- Con muchos artboards el canvas muestra rayados los que aún no cargó a zoom bajo; no es un error: verificar en la vista
+  «play» del artboard.
 
 ## Entregables y scripts locales
 

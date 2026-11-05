@@ -10,7 +10,7 @@ revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cóm
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 28; diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
