@@ -1,5 +1,30 @@
 # Registro operativo CRM de licitaciones
 
+## Fiordo Austral — CRM — Wherex 428823 — alta y negocio compartido verificados 05/11/2026
+
+Alta autorizada por Julio, con HubSpot como solución elegida.
+
+- **Negocio** [67612649069](https://app.hubspot.com/contacts/48713323/record/0-3/67612649069): **Fiordo Austral ∣ CL ∣ Implementación HubSpot ∣ 428823**.
+  - Pipeline por defecto, etapa inicial administrativa, `newbusiness`, owner Julio 75788512.
+  - Modalidad Licitación y canal WherEX.
+  - Cierre comercial estimado 31/12/2026 (`2026-12-31T15:00:00Z`). Sin monto.
+- **Empresa nueva** Pesquera Fiordo Austral S.A., 60767512668, como Primary.
+- **Nota** 120606904959.
+- **Contactos:** 5, obtenidos de Apollo con 5 créditos y correo verificado: Adquisiciones, Comercial, TI, Finanzas y Gerencia General.
+- **Ciclo de vida:** HubSpot lo pasó solo a `opportunity`, sin calificación humana.
+- **Negocio compartido:** convertido desde Chrome a las 18:28.
+  - Liderazgo Partner.
+  - Sales Hub Enterprise y Professional.
+  - Cercanía: aún sin conversación.
+  - PDM: Maria del Mar Castro.
+  - Etapa en HubSpot: Discovery.
+  - Especialista en crecimiento: pendiente de asignación.
+  - Sin POI.
+- **Pendiente:** confirmar las fechas en Wherex.
+- **No se hizo:** oferta, consultas ni envíos.
+
+[Expediente, contactos y pendientes](fiordo-austral-crm-428823/README.md).
+
 ## Qualitor — Simoniz — SMZ-116 — alta verificada 29/10/2026
 
 **Revisión documental 30/10 — HOLD para ofertar:** [caso v2](simoniz-qualitor-temporada-viajes-smz-116/CASO-DE-NEGOCIO-QUALITOR-SMZ-116.md) y [contraste de respuesta/decisión](simoniz-qualitor-temporada-viajes-smz-116/REVISION-RESPUESTA-2026-10-30.md). Seis consultas contestadas: COP 70 millones integrales, operación incluida, materiales adaptados Simoniz, zonas de afluencia sin listado PDV; respuesta «COLOMBIA» bloquea asumir facturación Chile. Inicio declarado 25/11 vs ítem aún 01/12. Aviso fija 06/11 **14:00 Colombia / 16:00 Chile**, ficha sigue 18:00 sin zona; discrepancia pendiente, sin prórroga. Wherex Editando, 0 COP y sin archivos; sin adjudicación/contrato acreditados en fuentes revisadas. Ruta local a validar por Julio/Legal antes del 03/11 12:00 Colombia; gate interno bid/no-bid propuesto 05/11 12:00 Colombia. Sin cambios ni nuevo readback HubSpot, envío o presentación. Copia OneDrive conserva v1. Los datos CRM siguientes son históricos del 29/10.
