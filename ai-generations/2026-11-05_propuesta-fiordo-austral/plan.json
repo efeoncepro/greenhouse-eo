@@ -1,0 +1,91 @@
+{
+  "document": "proposal",
+  "line": "revenue-hubspot",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-orbit",
+      "purpose": "01 · portada"
+    },
+    {
+      "recipeId": "content-text",
+      "purpose": "02 · lo que entendimos"
+    },
+    {
+      "recipeId": "content-service-lanes",
+      "purpose": "03 · qué cubre el CRM"
+    },
+    {
+      "recipeId": "decision-provider-fit",
+      "purpose": "04 · por qué HubSpot"
+    },
+    {
+      "recipeId": "proposal-cinematic-revops",
+      "purpose": "05 · su ficha técnica",
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png"
+    },
+    {
+      "recipeId": "decision-platform-coexistence",
+      "purpose": "06 · integraciones"
+    },
+    {
+      "recipeId": "method-migration-reconcile",
+      "purpose": "07 · migración"
+    },
+    {
+      "recipeId": "method-staircase",
+      "purpose": "08 · automatizaciones"
+    },
+    {
+      "recipeId": "decision-difference",
+      "purpose": "09 · seguridad"
+    },
+    {
+      "recipeId": "content-markets",
+      "purpose": "10 · residencia de datos",
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png"
+    },
+    {
+      "recipeId": "section-cine-purpose",
+      "purpose": "11 · salida",
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png"
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "12 · cronograma"
+    },
+    {
+      "recipeId": "content-day-release-cycle",
+      "purpose": "13 · cambios controlados"
+    },
+    {
+      "recipeId": "content-day-live-library",
+      "purpose": "14 · capacitación"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "15 · soporte y SLA"
+    },
+    {
+      "recipeId": "content-day-live-console",
+      "purpose": "16 · operación"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "purpose": "17 · equipo",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "18 · costo total"
+    },
+    {
+      "recipeId": "decision-next-steps",
+      "purpose": "20 · próximos pasos"
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "purpose": "21 · contraportada",
+      "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png"
+    }
+  ]
+}

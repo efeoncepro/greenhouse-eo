@@ -1,0 +1,45 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-migration-reconcile",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Migración desde Excel",
+    "question": "¿Cómo sabemos que migró todo?",
+    "answer": [
+      "Porque",
+      "cuadra"
+    ]
+  },
+  "body": "Claves, duplicados, carga de prueba y **reconciliación** registro por registro, con vuelta atrás lista.",
+  "note": "Datos de muestra · las claves y reglas se definen con su equipo",
+  "stages": [
+    {
+      "label": "Origen",
+      "value": "3.420",
+      "description": "empresas y contactos en planillas"
+    },
+    {
+      "label": "Claves y duplicados",
+      "value": "286",
+      "description": "duplicados unificados"
+    },
+    {
+      "label": "Carga de prueba",
+      "value": "200",
+      "description": "registros · 0 errores"
+    },
+    {
+      "label": "Carga completa",
+      "value": "3.134",
+      "description": "con resultado por registro"
+    }
+  ],
+  "reconciliation": "3.134 = 3.134 · cuadra",
+  "rollbackBadge": "Rollback listo"
+}

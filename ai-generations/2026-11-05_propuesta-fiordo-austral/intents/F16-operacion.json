@@ -1,0 +1,70 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-day-live-console",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Soporte y operación",
+    "question": "¿Y después de la puesta en marcha?",
+    "answer": [
+      "Lo",
+      "operamos"
+    ]
+  },
+  "body": "Soporte, permisos, respaldo y registros de seguridad, con indicadores mensuales y una revisión **trimestral**.",
+  "console": {
+    "icon": "data",
+    "title": "Soporte y operación · este mes",
+    "subtitle": "Sales Hub Professional · 10 usuarios",
+    "sampleMark": "Datos de muestra",
+    "metrics": [
+      {
+        "value": "100 %",
+        "label": "Soporte en SLA",
+        "detail": "12 de 12 solicitudes"
+      },
+      {
+        "value": "2",
+        "label": "Cambios aprobados",
+        "detail": "probados y documentados"
+      },
+      {
+        "value": "0",
+        "label": "Alertas de seguridad",
+        "detail": "registros al día en Wazuh"
+      }
+    ],
+    "checks": [
+      {
+        "label": "Revisión de usuarios, roles y permisos",
+        "status": "Hecha",
+        "done": true
+      },
+      {
+        "label": "Envío de registros de HubSpot a Wazuh",
+        "status": "Al día",
+        "done": true
+      },
+      {
+        "label": "Restauración de prueba del respaldo",
+        "status": "Hecha",
+        "done": true
+      },
+      {
+        "label": "Nueva alerta de seguimiento comercial",
+        "status": "En pruebas",
+        "done": false
+      }
+    ],
+    "review": {
+      "kicker": "Próxima revisión trimestral",
+      "title": "Adopción, calidad de datos y prioridades",
+      "cta": "Ver agenda"
+    }
+  }
+}

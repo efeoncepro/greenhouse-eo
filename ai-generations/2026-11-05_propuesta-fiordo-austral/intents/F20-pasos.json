@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-next-steps",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "¿Qué sigue?",
+    "answer": [
+      "La demo"
+    ]
+  },
+  "body": "Una demostración del flujo completo de un cliente.",
+  "agenda": {
+    "kicker": "01 · Demostración · 60 min",
+    "title": "Su CRM, en vivo",
+    "descriptor": "Ficha técnica, oportunidad con aprobación, visita desde el móvil y reporte por país",
+    "days": [
+      {
+        "weekday": "Jue",
+        "day": "29"
+      },
+      {
+        "weekday": "Vie",
+        "day": "30"
+      },
+      {
+        "weekday": "Lun",
+        "day": "2"
+      },
+      {
+        "weekday": "Mar",
+        "day": "3"
+      },
+      {
+        "weekday": "Mié",
+        "day": "4"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 4,
+      "time": 2
+    },
+    "summary": "A coordinar por Wherex · hora de Chile",
+    "cta": "Agendar la demostración"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Seguridad",
+      "title": "Prueba técnica",
+      "desc": "Con el equipo de TI, antes de producción."
+    },
+    {
+      "number": "03",
+      "label": "Inicio",
+      "title": "Descubrimiento",
+      "desc": "Desde la firma del contrato."
+    }
+  ]
+}

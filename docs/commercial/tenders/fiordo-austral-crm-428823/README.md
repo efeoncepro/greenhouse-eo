@@ -129,3 +129,7 @@ Se investigó en paralelo con cinco subagentes. Los resultados son internos y es
    Falta confirmar con el especialista el waiver del onboarding y el mínimo de licencias.
 3. Verificar en la documentación vigente de HubSpot tres puntos: restricción a una sesión por usuario, exportación de auditoría hacia Wazuh y respaldo inmutable. Con eso se define la edición.
 4. Armar la matriz de cumplimiento de ciberseguridad y la oferta técnica y económica, con el bid/no-bid y el margen.
+
+## Diseño en /design (05/11/2026)
+
+Canvas privado: https://claude.ai/artifact/UFRkFSWCHXyPC1Cq57YQDr. Tiene 20 láminas compuestas con `pnpm brand:compose` desde recetas aprobadas, y el plan validado con `brand:deck-plan` sin avisos. Fuentes, intents y ajustes están en `ai-generations/2026-11-05_propuesta-fiordo-austral/LEEME.md`. Falta la lámina de inversión con montos.

@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Costo total",
+    "question": "¿Hay costos escondidos?",
+    "answer": [
+      "Ninguno"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 4
+  },
+  "items": [
+    {
+      "title": "Licencias HubSpot",
+      "desc": "10 licencias de Sales Hub Professional: US$ 12.000 al año, facturadas por HubSpot."
+    },
+    {
+      "title": "Onboarding de HubSpot",
+      "desc": "No aplica cuando implementa un partner certificado: US$ 0."
+    },
+    {
+      "title": "Servicios Efeonce",
+      "desc": "Implementación, capacitación y soporte: US$ 9.900 + IVA el primer año."
+    },
+    {
+      "title": "Licencias Microsoft",
+      "desc": "Las que falten, como Entra ID P1, declaradas antes de firmar."
+    }
+  ],
+  "selected": 3,
+  "selection": {
+    "target": "object",
+    "label": "Fiordo Austral",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

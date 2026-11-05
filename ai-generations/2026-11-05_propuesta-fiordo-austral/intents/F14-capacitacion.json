@@ -1,0 +1,67 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-day-live-library",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Capacitación y adopción",
+    "question": "¿Cómo aprende nuestro equipo?",
+    "answer": [
+      "A su",
+      "ritmo"
+    ]
+  },
+  "body": "Sesiones en vivo y tutoriales cortos grabados sobre **su** HubSpot, para usuarios y administradores.",
+  "library": {
+    "tool": "loom",
+    "kicker": "En Loom · sobre su portal",
+    "title": "Tutoriales de su equipo"
+  },
+  "dataOrigin": "illustrative",
+  "sampleMark": "Datos de muestra",
+  "videos": [
+    {
+      "icon": "sales",
+      "role": "Ventas",
+      "title": "Registrar una visita desde el teléfono",
+      "duration": "2:40"
+    },
+    {
+      "icon": "sales",
+      "role": "Ventas",
+      "title": "Crear un negocio de exportación",
+      "duration": "3:05"
+    },
+    {
+      "icon": "data",
+      "role": "Datos",
+      "title": "Adjuntar el certificado de análisis",
+      "duration": "2:15"
+    },
+    {
+      "icon": "data",
+      "role": "Administración",
+      "title": "Revisar permisos y respaldo",
+      "duration": "4:10"
+    }
+  ],
+  "stats": [
+    {
+      "value": "10",
+      "label": "usuarios capacitados"
+    },
+    {
+      "value": "2",
+      "label": "perfiles: usuarios y administradores"
+    },
+    {
+      "value": "En español",
+      "label": "sesiones y grabaciones"
+    }
+  ]
+}

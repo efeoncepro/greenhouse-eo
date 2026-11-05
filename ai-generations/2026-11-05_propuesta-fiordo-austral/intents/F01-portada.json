@@ -1,0 +1,32 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "layout": "orbit",
+  "voice": {
+    "eyebrow": "Propuesta técnica · Wherex N.º 428823",
+    "question": "¿Un CRM para todo el equipo?",
+    "answer": [
+      "Uno solo"
+    ]
+  },
+  "body": "Preparada para **Pesquera Fiordo Austral** · Noviembre 2026",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "column": {
+    "topPx": 220
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal",
+  "clientLogo": {
+    "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/assets/fiordo-austral-logo-web.png",
+    "alt": "Fiordo Austral"
+  }
+}

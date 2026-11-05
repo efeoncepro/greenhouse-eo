@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-difference",
+  "voice": {
+    "eyebrow": "Seguridad y accesos",
+    "question": "¿Quién ve nuestros datos?",
+    "answer": [
+      "Sólo quien",
+      "debe"
+    ]
+  },
+  "body": "HubSpot tiene SOC 2 Tipo II y SOC 3. Efeonce deja los controles **encendidos** y los prueba antes de producción.",
+  "alternative": {
+    "kicker": "HubSpot recién creado",
+    "title": "Controles por configurar"
+  },
+  "efeonce": {
+    "kicker": "HubSpot que entregamos",
+    "title": "Controles encendidos"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Usuarios creados a mano, uno por uno",
+      "efeonce": "SSO con Entra ID, MFA y altas por SCIM"
+    },
+    {
+      "alternative": "Todos ven todos los registros",
+      "efeonce": "Permisos por usuario y equipo"
+    },
+    {
+      "alternative": "Accesos sin registro en el SIEM",
+      "efeonce": "Accesos y cambios enviados a Wazuh"
+    },
+    {
+      "alternative": "Respaldo semanal y manual",
+      "efeonce": "Respaldo diario e inmutable en su tenant"
+    },
+    {
+      "alternative": "Cambios directo en producción",
+      "efeonce": "Cambios documentados, probados y aprobados"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y nuestro equipo de TI?",
+    "title": "Decide con nosotros",
+    "pillars": [
+      {
+        "title": "Identidad",
+        "description": "Entra ID y Acceso Condicional"
+      },
+      {
+        "title": "Monitoreo",
+        "description": "Wazuh con reglas propias"
+      },
+      {
+        "title": "Prueba",
+        "description": "Controles probados antes de producción"
+      }
+    ]
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-waves",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Implementación · 16 semanas",
+    "question": "¿Cuándo está listo?",
+    "answer": [
+      "Por",
+      "fases"
+    ]
+  },
+  "body": "Cada fase se **prueba** antes de la siguiente; la prueba técnica de seguridad es la puerta a producción.",
+  "steps": [
+    {
+      "kicker": "Semanas 1–4",
+      "name": "Diseño y seguridad",
+      "desc": "Arquitectura firmada, SSO con Entra ID, colector Wazuh y respaldo inmutable."
+    },
+    {
+      "kicker": "Semanas 3–8",
+      "name": "Configuración",
+      "desc": "Propiedades, pipeline, automatizaciones, migración desde Excel e integraciones."
+    },
+    {
+      "kicker": "Semanas 9–12",
+      "name": "Prueba y puesta",
+      "desc": "Aceptación funcional, prueba técnica de seguridad, capacitación y paso a producción."
+    },
+    {
+      "kicker": "Semanas 13–16",
+      "name": "Estabilización",
+      "desc": "Acompañamiento cercano, ajustes, adopción semanal y calidad de datos."
+    }
+  ],
+  "selectedStep": 3
+}

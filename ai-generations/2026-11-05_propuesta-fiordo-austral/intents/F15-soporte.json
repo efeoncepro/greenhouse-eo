@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-bullets",
+  "voice": {
+    "eyebrow": "Soporte y nivel de servicio",
+    "question": "¿Cuándo nos responden?",
+    "answer": [
+      "A tiempo"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 3
+  },
+  "items": [
+    {
+      "title": "S1 Crítico · ≤ 1 h",
+      "desc": "Caída o incidente de seguridad: guardia permanente, contención en 4 h e informe de causa raíz."
+    },
+    {
+      "title": "S2 Alto · ≤ 4 h",
+      "desc": "Función clave degradada, como Outlook o los registros a Wazuh: resolución en 2 días hábiles."
+    },
+    {
+      "title": "S3 Medio · ≤ 1 día",
+      "desc": "Error de un reporte o de un usuario: resolución en 5 días hábiles."
+    },
+    {
+      "title": "S4 Bajo · ≤ 2 días",
+      "desc": "Consultas y mejoras, planificadas en el backlog mensual con indicadores de servicio."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Fiordo Austral",
+    "participantKind": "department"
+  }
+}
