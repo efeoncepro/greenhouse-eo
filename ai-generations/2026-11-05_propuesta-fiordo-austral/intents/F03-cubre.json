@@ -8,9 +8,9 @@
   "recipe": "content-service-lanes",
   "voice": {
     "eyebrow": "Nuestra propuesta · Sales Hub Professional",
-    "question": "¿Qué cubre el CRM?",
+    "question": "Las seis necesidades de las bases,",
     "answer": [
-      "Todo el ciclo"
+      "cubiertas"
     ]
   },
   "lanes": [

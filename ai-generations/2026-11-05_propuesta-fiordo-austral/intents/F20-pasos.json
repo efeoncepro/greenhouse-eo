@@ -10,9 +10,9 @@
   "recipe": "decision-next-steps",
   "voice": {
     "eyebrow": "Próximos pasos",
-    "question": "¿Qué sigue?",
+    "question": "El siguiente paso es",
     "answer": [
-      "La demo"
+      "una demo"
     ]
   },
   "body": "Una demostración del flujo completo de un cliente.",

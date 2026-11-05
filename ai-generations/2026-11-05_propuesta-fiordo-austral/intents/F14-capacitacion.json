@@ -10,10 +10,10 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Capacitación y adopción",
-    "question": "¿Cómo aprende nuestro equipo?",
+    "question": "Cada rol aprende sobre",
     "answer": [
-      "A su",
-      "ritmo"
+      "su propio",
+      "portal"
     ]
   },
   "body": "Sesiones en vivo y tutoriales cortos grabados sobre **su** HubSpot, para usuarios y administradores.",

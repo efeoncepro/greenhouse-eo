@@ -11,9 +11,9 @@
   "layout": "team",
   "voice": {
     "eyebrow": "Quién lo implementa",
-    "question": "¿Quién implementa nuestro CRM?",
+    "question": "Implementa un equipo certificado en",
     "answer": [
-      "Expertos"
+      "HubSpot"
     ]
   },
   "body": "Un **equipo asignado**: consultor líder, implementador, especialistas en integraciones, seguridad y datos, y gestión de proyecto.",

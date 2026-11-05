@@ -1,6 +1,6 @@
 """Propuesta Fiordo Austral (Wherex 428823) — intents de las láminas, sobre los intents aprobados del deck HubSpot
 (2026-10-06) y de la propuesta Assetplan (2026-10-20). Copy desde PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md.
-Edición: Sales Hub Professional («Pro esbelto», Julio 05/11/2026). Registro formal: preguntas en voz del comprador.
+Edición: Sales Hub Professional («Pro esbelto», Julio 05/11/2026). Voz (05/11, Julio: «la dinámica de preguntas y respuestas se siente absurda y forzada»): par pregunta–respuesta sólo en 04, 14 y 23; el resto, anillo arriba y esfera abajo como frase en dos tiempos (delta 2026-10-25 de La órbita).
 Uso (desde la raíz del repo): python3 ai-generations/2026-11-05_propuesta-fiordo-austral/build-intents.py
 """
 import copy
@@ -36,7 +36,7 @@ def add(key, recipe_id, intent, purpose):
 
 # 01 · Portada
 d = base(HS, 'P01-portada.json')
-d['voice'] = {'eyebrow': 'Propuesta técnica · Wherex N.º 428823', 'question': '¿Un CRM para todo el equipo?', 'answer': ['Uno solo']}
+d['voice'] = {'eyebrow': 'Propuesta técnica · Wherex N.º 428823', 'question': '¿Un CRM para todo el equipo?', 'answer': ['Propuesta', 'CRM HubSpot']}
 d['body'] = 'Preparada para **Pesquera Fiordo Austral** · Noviembre 2026'
 d['selection'] = {'target': 'client-logo', 'label': 'Efeonce', 'participantKind': 'role'}
 d['clientLogo'] = {'path': 'ai-generations/2026-11-05_propuesta-fiordo-austral/assets/fiordo-austral-logo-web.png', 'alt': 'Fiordo Austral'}
@@ -44,7 +44,7 @@ add('F01-portada', 'cover-proposal-orbit', d, '01 · portada')
 
 # 02 · Lo que entendimos
 d = base(AP, 'A02-necesidad.json')
-d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': '¿Qué necesita nuestro equipo?', 'answer': ['Un lugar']}
+d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': 'Cuatro regiones, diez usuarios,', 'answer': ['un CRM']}
 d['progress'] = {'sections': 4, 'current': 1}
 d['body'] = 'Vender contra la especificación de cada cliente, en terreno y en cuatro regiones.'
 d['points'] = [
@@ -57,7 +57,7 @@ add('F02-entendimos', 'content-text', d, '02 · lo que entendimos')
 
 # 03 · Qué cubre el CRM
 d = base(HS, 'P05-servicios.json')
-d['voice'] = {'eyebrow': 'Nuestra propuesta · Sales Hub Professional', 'question': '¿Qué cubre el CRM?', 'answer': ['Todo el ciclo']}
+d['voice'] = {'eyebrow': 'Nuestra propuesta · Sales Hub Professional', 'question': 'Las seis necesidades de las bases,', 'answer': ['cubiertas']}
 d['lanes'] = [
     {'icon': 'sales', 'title': 'Clientes y contactos', 'products': 'Smart CRM', 'description': 'Historial completo, segmentado por país, región, mercado, tipo y estado.'},
     {'icon': 'sales', 'title': 'Pipeline de exportación', 'products': 'Sales Hub', 'description': 'Etapas de negociación, muestras, aprobación interna y seguimiento.'},
@@ -71,7 +71,7 @@ add('F03-cubre', 'content-service-lanes', d, '03 · qué cubre el CRM')
 
 # 04 · Por qué HubSpot
 d = base(HS, 'P04-encaje.json')
-d['voice'] = {'eyebrow': 'Edición recomendada', 'question': '¿Por qué HubSpot?', 'answer': ['Porque', 'encaja']}
+d['voice'] = {'eyebrow': 'Edición recomendada', 'question': '¿Pro o Enterprise?', 'answer': ['Pro', 'primero']}
 d['body'] = 'Para un equipo de diez personas recomendamos **Professional**: adopción rápida y licencia proporcionada.'
 d['note'] = 'Recomendación para 10 usuarios · Enterprise queda como opción'
 d['verdicts'] = [
@@ -83,24 +83,12 @@ d['verdicts'] = [
 d['selectedVerdict'] = 1
 add('F04-por-que-hubspot', 'decision-provider-fit', d, '04 · por qué HubSpot')
 
-# 04b · Partners (marcas oficiales de HubSpot y Microsoft)
-d = base(EX, 'deck-content-partners-intent.json')
-d.pop('progress', None)
-d['voice'] = {'eyebrow': 'Partners', 'question': '¿Con quién lo construyen?', 'answer': ['Con HubSpot']}
-d['body'] = 'Certified HubSpot Solutions Partner: licencias y soporte por canales oficiales.'
-d['seal'] = 'Partner oficial de'
-# La receta pide los nueve partners del muro aprobado. HubSpot va en la segunda fila y seleccionado: en la primera,
-# la etiqueta de la selección cae sobre los logos de abajo.
-_p = {x['alt']: x for x in d['partners']}
-d['partners'] = [_p[k] for k in ['Microsoft', 'Salesforce', 'Adobe', 'Amazon Web Services', 'Google Cloud', 'HubSpot', 'Claude', 'OpenAI', 'BytePlus']]
-d['progress'] = {'sections': 4, 'current': 1}
-d['selected'] = 6
-d['selection'] = {'target': 'object', 'label': 'Fiordo Austral', 'participantKind': 'department'}
-add('F04b-partners', 'content-partners', d, '05 · partners')
+# 04b · Partners: retirada el 05/11 (Julio: «no tiene sentido como está planteada»). La receta content-partners exige
+# el muro de nueve partners de Efeonce, que en una propuesta HubSpot distrae; la credencial va en la insignia Gold.
 
 # 05 · Su ficha técnica (cine, HS2d)
 d = base(AP, 'A035-crm-completo.json')
-d['voice'] = {'eyebrow': 'Especificaciones técnicas', 'question': '¿Y los requisitos técnicos?', 'answer': ['En el CRM']}
+d['voice'] = {'eyebrow': 'Especificaciones técnicas', 'question': 'Lo que exige cada cliente,', 'answer': ['en el CRM']}
 d['body'] = 'Proteína, FFA, humedad y certificaciones de cada cliente, en su registro y en cada oportunidad.'
 d['steps'] = [
     {'glyph': 'medicion', 'kicker': 'Especifica', 'name': 'Proteína y FFA'},
@@ -113,7 +101,7 @@ add('F05-ficha', 'proposal-cinematic-revops', d, '05 · su ficha técnica')
 
 # 06 · Integraciones
 d = base(HS, 'B21-integraciones.json')
-d['voice'] = {'eyebrow': 'Integrado a Microsoft 365', 'question': '¿Hay que reemplazar nuestros sistemas?', 'answer': ['No hace', 'falta']}
+d['voice'] = {'eyebrow': 'Integrado a Microsoft 365', 'question': 'Outlook, Teams y SharePoint', 'answer': ['se', 'conectan']}
 d['body'] = 'HubSpot se conecta con lo que Fiordo Austral ya usa, con **permisos mínimos** y registro de actividad.'
 d['note'] = 'QAD: factibilidad incluida; la construcción es una fase opcional'
 d['platforms'] = [
@@ -132,7 +120,7 @@ add('F06-integraciones', 'decision-platform-coexistence', d, '06 · integracione
 
 # 07 · Migración desde Excel
 d = base(HS, 'P09-migracion.json')
-d['voice'] = {'eyebrow': 'Migración desde Excel', 'question': '¿Cómo sabemos que migró todo?', 'answer': ['Porque', 'cuadra']}
+d['voice'] = {'eyebrow': 'Migración desde Excel', 'question': 'Cada registro de las planillas', 'answer': ['migra y', 'cuadra']}
 d['body'] = 'Claves, duplicados, carga de prueba y **reconciliación** registro por registro, con vuelta atrás lista.'
 d['note'] = 'Datos de muestra · las claves y reglas se definen con su equipo'
 d['stages'] = [
@@ -146,7 +134,7 @@ add('F07-migracion', 'method-migration-reconcile', d, '07 · migración')
 
 # 08 · Automatizaciones
 d = base(HS, 'B22-automatizacion.json')
-d['voice'] = {'eyebrow': 'Automatizaciones', 'question': '¿Qué se automatiza?', 'answer': ['Lo', 'rutinario']}
+d['voice'] = {'eyebrow': 'Automatizaciones', 'question': 'Las alertas y tareas llegan', 'answer': ['solas']}
 d['body'] = 'Reglas fijas y auditables para que ningún cliente se enfríe y ninguna oportunidad avance sin aprobación.'
 d['levels'] = [
     {'name': 'Alerta', 'descriptor': 'cliente que se enfría'},
@@ -161,7 +149,7 @@ add('F08-automatizaciones', 'method-staircase', d, '08 · automatizaciones')
 
 # 09 · Seguridad
 d = base(HS, 'B23-seguridad.json')
-d['voice'] = {'eyebrow': 'Seguridad y accesos', 'question': '¿Quién ve nuestros datos?', 'answer': ['Sólo quien', 'debe']}
+d['voice'] = {'eyebrow': 'Seguridad y accesos', 'question': 'El CRM se entrega con sus controles', 'answer': ['encendidos']}
 d['body'] = 'HubSpot tiene SOC 2 Tipo II y SOC 3. Efeonce deja los controles **encendidos** y los prueba antes de producción.'
 d['alternative'] = {'kicker': 'HubSpot recién creado', 'title': 'Controles por configurar'}
 d['efeonce'] = {'kicker': 'HubSpot que entregamos', 'title': 'Controles encendidos'}
@@ -181,7 +169,7 @@ add('F09-seguridad', 'decision-difference', d, '09 · seguridad')
 
 # 09b · Zero Trust con Entra ID
 d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': '¿Cómo se entra al CRM?', 'answer': ['Verificado']}
+d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': 'Cada acceso al CRM pasa por', 'answer': ['Entra ID']}
 d['progress'] = {'sections': 4, 'current': 2}
 d['items'] = [
     {'title': 'Identidad', 'desc': 'SSO SAML con Microsoft Entra ID, obligatorio para todos, y altas y bajas por SCIM.'},
@@ -195,7 +183,7 @@ add('F09b-zero-trust', 'content-bullets', d, '11 · zero trust')
 
 # 09c · Matriz de cumplimiento (resumen)
 d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Matriz de cumplimiento', 'question': '¿Cumple lo obligatorio?', 'answer': ['Uno a uno']}
+d['voice'] = {'eyebrow': 'Matriz de cumplimiento', 'question': 'Los 74 requisitos, respondidos', 'answer': ['uno a uno']}
 d['progress'] = {'sections': 4, 'current': 2}
 d['items'] = [
     {'title': '29 · Cumple', 'desc': 'Requisitos cubiertos por Sales Hub Professional con su configuración.'},
@@ -210,7 +198,7 @@ add('F09c-matriz', 'content-bullets', d, '12 · matriz de cumplimiento')
 # 09d · Disponibilidad (dato de las bases con fuente)
 d = base(EX, 'deck-content-measure-intent.json')
 d['version'] = '0.1.2'
-d['voice'] = {'eyebrow': 'Disponibilidad', 'question': '¿Cuánto debe estar arriba?', 'answer': ['99,9 %']}
+d['voice'] = {'eyebrow': 'Nivel de servicio', 'question': 'Disponibilidad mensual exigida:', 'answer': ['99,9 %']}
 d['body'] = 'mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 %.'
 d['measure'] = {'value': 0.999, 'source': 'Bases Wherex 428823, sección 4'}
 d['figures'] = [
@@ -225,7 +213,7 @@ d = base(EX, 'deck-decision-risk-intent.json')
 d['theme'] = 'light'
 d['line'] = 'growth'  # receta sólo clara: como decision-case en el deck HubSpot, va como lámina de Efeonce en growth
 d['progress'] = {'sections': 4, 'current': 2}
-d['voice'] = {'eyebrow': 'Continuidad e incidentes', 'question': '¿Y si algo falla?', 'answer': ['Se', 'recupera']}
+d['voice'] = {'eyebrow': 'Continuidad e incidentes', 'question': 'Cada riesgo, con su', 'answer': ['cobertura']}
 d['body'] = 'Cada riesgo tiene su respuesta escrita y probada antes de pasar a producción.'
 d['risks'] = [
     {'risk': 'Caída del servicio', 'name': 'Continuidad HubSpot', 'how': 'Réplica en tres centros de datos; Efeonce escala y reporta cada 2 h.'},
@@ -239,7 +227,7 @@ add('F09e-continuidad', 'decision-risk', d, '14 · continuidad e incidentes')
 
 # 10 · Residencia
 d = base(HS, 'B25-residencia.json')
-d['voice'] = {'eyebrow': 'Residencia de datos', 'question': '¿Dónde están los datos?', 'answer': ['En Estados', 'Unidos']}
+d['voice'] = {'eyebrow': 'Residencia de datos', 'question': '¿Dónde quedan los datos?', 'answer': ['En Estados', 'Unidos']}
 d['body'] = 'Proponemos la región de **EE. UU.**; HubSpot también ofrece Canadá, Fráncfort y Australia, con las garantías de su DPA.'
 for m in d['markets']:
     if m['country'] == 'Chile':
@@ -248,13 +236,13 @@ add('F10-residencia', 'content-markets', d, '10 · residencia de datos')
 
 # 11 · Salida
 d = base(HS, 'B26-salida.json')
-d['voice'] = {'eyebrow': 'Sin amarras', 'question': '¿Y si mañana nos vamos?', 'answer': ['Con todo']}
+d['voice'] = {'eyebrow': 'Sin amarras', 'question': 'Si se van, se llevan', 'answer': ['sus datos']}
 d['body'] = 'Sus datos son suyos: entran a HubSpot con **orden** y salen igual de completos.'
 add('F11-salida', 'section-cine-purpose', d, '11 · salida')
 
 # 12 · Cronograma
 d = base(HS, 'P11-olas.json')
-d['voice'] = {'eyebrow': 'Implementación · 16 semanas', 'question': '¿Cuándo está listo?', 'answer': ['Por', 'fases']}
+d['voice'] = {'eyebrow': 'Implementación · 16 semanas', 'question': 'De la firma a producción,', 'answer': ['16', 'semanas']}
 d['body'] = 'Cada fase se **prueba** antes de la siguiente; la prueba técnica de seguridad es la puerta a producción.'
 d['steps'] = [
     {'kicker': 'Semanas 1–4', 'name': 'Diseño y seguridad', 'desc': 'Arquitectura firmada, SSO con Entra ID, colector Wazuh y respaldo inmutable.'},
@@ -267,7 +255,7 @@ add('F12-cronograma', 'method-waves', d, '12 · cronograma')
 
 # 13 · Cambios controlados
 d = base(HS, 'P12-dia-a-dia.json')
-d['voice'] = {'eyebrow': 'Cambios controlados', 'question': '¿Qué llega a producción?', 'answer': ['Lo que', 'aprueben']}
+d['voice'] = {'eyebrow': 'Cambios controlados', 'question': 'A producción llega', 'answer': ['sólo lo', 'aprobado']}
 d['body'] = 'Nada llega a producción sin su **aprobación**: se prueba con registros de prueba y se explica en un video corto.'
 d['release']['kicker'] = 'Cambio 03 · Sales Hub'
 d['release']['title'] = 'Alerta de cliente sin contacto'
@@ -284,7 +272,7 @@ add('F13-cambios', 'content-day-release-cycle', d, '13 · cambios controlados')
 
 # 14 · Capacitación
 d = base(HS, 'P13-adopcion.json')
-d['voice'] = {'eyebrow': 'Capacitación y adopción', 'question': '¿Cómo aprende nuestro equipo?', 'answer': ['A su', 'ritmo']}
+d['voice'] = {'eyebrow': 'Capacitación y adopción', 'question': 'Cada rol aprende sobre', 'answer': ['su propio', 'portal']}
 d['body'] = 'Sesiones en vivo y tutoriales cortos grabados sobre **su** HubSpot, para usuarios y administradores.'
 d['library'] = {'tool': 'loom', 'kicker': 'En Loom · sobre su portal', 'title': 'Tutoriales de su equipo'}
 d['videos'] = [
@@ -302,7 +290,7 @@ add('F14-capacitacion', 'content-day-live-library', d, '14 · capacitación')
 
 # 15 · Soporte y SLA
 d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Soporte y nivel de servicio', 'question': '¿Cuándo nos responden?', 'answer': ['A tiempo']}
+d['voice'] = {'eyebrow': 'Soporte y nivel de servicio', 'question': 'Un incidente crítico se atiende en', 'answer': ['1 hora']}
 d['progress'] = {'sections': 4, 'current': 3}
 d['items'] = [
     {'title': 'S1 Crítico · ≤ 1 h', 'desc': 'Caída o incidente de seguridad: guardia permanente, contención en 4 h e informe de causa raíz.'},
@@ -316,7 +304,7 @@ add('F15-soporte', 'content-bullets', d, '15 · soporte y SLA')
 
 # 16 · Operación
 d = base(HS, 'P14-operacion.json')
-d['voice'] = {'eyebrow': 'Soporte y operación', 'question': '¿Y después de la puesta en marcha?', 'answer': ['Lo', 'operamos']}
+d['voice'] = {'eyebrow': 'Soporte y operación', 'question': 'Tras la puesta en marcha,', 'answer': ['lo', 'operamos']}
 d['body'] = 'Soporte, permisos, respaldo y registros de seguridad, con indicadores mensuales y una revisión **trimestral**.'
 c = d['console']
 c['title'] = 'Soporte y operación · este mes'
@@ -337,13 +325,13 @@ add('F16-operacion', 'content-day-live-console', d, '16 · operación')
 
 # 17 · Equipo
 d = base(AP, 'A07-por-que.json')
-d['voice'] = {'eyebrow': 'Quién lo implementa', 'question': '¿Quién implementa nuestro CRM?', 'answer': ['Expertos']}
+d['voice'] = {'eyebrow': 'Quién lo implementa', 'question': 'Implementa un equipo certificado en', 'answer': ['HubSpot']}
 d['body'] = 'Un **equipo asignado**: consultor líder, implementador, especialistas en integraciones, seguridad y datos, y gestión de proyecto.'
 add('F17-equipo', 'section-cine-team', d, '17 · equipo')
 
 # 18 · Costo total
 d = base(HS, 'P-costo.json')
-d['voice'] = {'eyebrow': 'Costo total', 'question': '¿Hay costos escondidos?', 'answer': ['Ninguno']}
+d['voice'] = {'eyebrow': 'Costo total', 'question': 'Licencias HubSpot y servicios Efeonce,', 'answer': ['por separado']}
 d['progress'] = {'sections': 4, 'current': 4}
 d['items'] = [
     {'title': 'Licencias HubSpot', 'desc': '10 licencias de Sales Hub Professional: US$ 12.000 al año, facturadas por HubSpot.'},
@@ -379,7 +367,7 @@ add('F19-inversion', 'content-pricing-live', d, '19 · inversión')
 
 # 20 · Próximos pasos
 d = base(AP, 'A08-pasos.json')
-d['voice'] = {'eyebrow': 'Próximos pasos', 'question': '¿Qué sigue?', 'answer': ['La demo']}
+d['voice'] = {'eyebrow': 'Próximos pasos', 'question': 'El siguiente paso es', 'answer': ['una demo']}
 d['body'] = 'Una demostración del flujo completo de un cliente.'
 a = d['agenda']
 a['kicker'] = '01 · Demostración · 60 min'

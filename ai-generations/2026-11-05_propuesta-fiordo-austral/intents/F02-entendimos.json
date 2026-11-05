@@ -10,9 +10,9 @@
   "recipe": "content-text",
   "voice": {
     "eyebrow": "Lo que entendimos",
-    "question": "¿Qué necesita nuestro equipo?",
+    "question": "Cuatro regiones, diez usuarios,",
     "answer": [
-      "Un lugar"
+      "un CRM"
     ]
   },
   "progress": {

@@ -10,10 +10,10 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Cambios controlados",
-    "question": "¿Qué llega a producción?",
+    "question": "A producción llega",
     "answer": [
-      "Lo que",
-      "aprueben"
+      "sólo lo",
+      "aprobado"
     ]
   },
   "body": "Nada llega a producción sin su **aprobación**: se prueba con registros de prueba y se explica en un video corto.",

@@ -10,9 +10,9 @@
   "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Soporte y nivel de servicio",
-    "question": "¿Cuándo nos responden?",
+    "question": "Un incidente crítico se atiende en",
     "answer": [
-      "A tiempo"
+      "1 hora"
     ]
   },
   "progress": {

@@ -10,9 +10,9 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Migración desde Excel",
-    "question": "¿Cómo sabemos que migró todo?",
+    "question": "Cada registro de las planillas",
     "answer": [
-      "Porque",
+      "migra y",
       "cuadra"
     ]
   },

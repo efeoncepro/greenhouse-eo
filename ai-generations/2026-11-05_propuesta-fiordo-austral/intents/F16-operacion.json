@@ -10,9 +10,9 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Soporte y operación",
-    "question": "¿Y después de la puesta en marcha?",
+    "question": "Tras la puesta en marcha,",
     "answer": [
-      "Lo",
+      "lo",
       "operamos"
     ]
   },

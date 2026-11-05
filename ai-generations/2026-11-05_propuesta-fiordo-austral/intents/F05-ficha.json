@@ -11,9 +11,9 @@
   "layout": "service",
   "voice": {
     "eyebrow": "Especificaciones técnicas",
-    "question": "¿Y los requisitos técnicos?",
+    "question": "Lo que exige cada cliente,",
     "answer": [
-      "En el CRM"
+      "en el CRM"
     ]
   },
   "body": "Proteína, FFA, humedad y certificaciones de cada cliente, en su registro y en cada oportunidad.",

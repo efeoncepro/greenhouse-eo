@@ -8,10 +8,10 @@
   "recipe": "decision-platform-coexistence",
   "voice": {
     "eyebrow": "Integrado a Microsoft 365",
-    "question": "¿Hay que reemplazar nuestros sistemas?",
+    "question": "Outlook, Teams y SharePoint",
     "answer": [
-      "No hace",
-      "falta"
+      "se",
+      "conectan"
     ]
   },
   "body": "HubSpot se conecta con lo que Fiordo Austral ya usa, con **permisos mínimos** y registro de actividad.",

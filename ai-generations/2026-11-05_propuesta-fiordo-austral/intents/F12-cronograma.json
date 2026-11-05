@@ -10,10 +10,10 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Implementación · 16 semanas",
-    "question": "¿Cuándo está listo?",
+    "question": "De la firma a producción,",
     "answer": [
-      "Por",
-      "fases"
+      "16",
+      "semanas"
     ]
   },
   "body": "Cada fase se **prueba** antes de la siguiente; la prueba técnica de seguridad es la puerta a producción.",

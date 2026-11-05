@@ -10,10 +10,10 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Edición recomendada",
-    "question": "¿Por qué HubSpot?",
+    "question": "¿Pro o Enterprise?",
     "answer": [
-      "Porque",
-      "encaja"
+      "Pro",
+      "primero"
     ]
   },
   "body": "Para un equipo de diez personas recomendamos **Professional**: adopción rápida y licencia proporcionada.",

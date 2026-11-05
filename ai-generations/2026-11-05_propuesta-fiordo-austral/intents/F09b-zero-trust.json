@@ -10,9 +10,9 @@
   "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Zero Trust con Entra ID",
-    "question": "¿Cómo se entra al CRM?",
+    "question": "Cada acceso al CRM pasa por",
     "answer": [
-      "Verificado"
+      "Entra ID"
     ]
   },
   "progress": {

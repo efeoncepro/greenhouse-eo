@@ -8,8 +8,8 @@
   "line": "revenue-hubspot",
   "theme": "dark",
   "voice": {
-    "eyebrow": "Disponibilidad",
-    "question": "¿Cuánto debe estar arriba?",
+    "eyebrow": "Nivel de servicio",
+    "question": "Disponibilidad mensual exigida:",
     "answer": [
       "99,9 %"
     ]

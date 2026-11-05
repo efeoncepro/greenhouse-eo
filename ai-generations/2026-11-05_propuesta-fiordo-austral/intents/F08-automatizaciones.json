@@ -8,10 +8,9 @@
   "recipe": "method-staircase",
   "voice": {
     "eyebrow": "Automatizaciones",
-    "question": "¿Qué se automatiza?",
+    "question": "Las alertas y tareas llegan",
     "answer": [
-      "Lo",
-      "rutinario"
+      "solas"
     ]
   },
   "body": "Reglas fijas y auditables para que ningún cliente se enfríe y ninguna oportunidad avance sin aprobación.",

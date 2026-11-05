@@ -8,9 +8,9 @@
   "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Costo total",
-    "question": "¿Hay costos escondidos?",
+    "question": "Licencias HubSpot y servicios Efeonce,",
     "answer": [
-      "Ninguno"
+      "por separado"
     ]
   },
   "progress": {

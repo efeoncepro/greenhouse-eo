@@ -8,7 +8,7 @@
   "recipe": "content-markets",
   "voice": {
     "eyebrow": "Residencia de datos",
-    "question": "¿Dónde están los datos?",
+    "question": "¿Dónde quedan los datos?",
     "answer": [
       "En Estados",
       "Unidos"

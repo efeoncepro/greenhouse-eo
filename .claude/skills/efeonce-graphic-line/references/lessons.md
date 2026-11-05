@@ -1011,3 +1011,11 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   - **Causa:** el canvas de Design le quita el `<style>` a los SVG subidos, y los colores de esa insignia están en clases de estilo.
   - **Regla:** la insignia, y cualquier SVG oficial que coloree con clases, se sube como PNG derivado del SVG con sharp, sin tocar el arte. El README de la insignia lo permite.
   - Sobre fondo oscuro se usa `badge-light-spp-hubspot` (placa crema).
+
+## 2026-11-05 · Propuesta Fiordo Austral: el par pregunta-respuesta en todas las láminas
+
+- **Síntoma:** Julio rechazó el deck completo: «la dinámica de preguntas y respuestas de todo el deck se siente muy absurda y forzada». Las 25 láminas llevaban un par y casi todas las respuestas eran comodines («Lo rutinario», «Se recupera», «A tiempo», «Expertos», «Ninguno»).
+  - **Causa:** todas las recetas del compositor exigen `voice.question`, y el agente leyó el campo obligatorio como una pregunta obligatoria. La regla ya estaba escrita (criteria §4, «Cuándo sí y cuándo no», y el delta 2026-10-25 de La órbita) y no se aplicó.
+  - **Regla:** el slot `question` también admite una línea que abre el tema sin ser pregunta: el tema, el contexto o un dato. El destacado la completa como una frase en dos tiempos («Cada acceso al CRM pasa por / **Entra ID**», «Si se van, se llevan / **sus datos**»). Así cumple la receta sin tocar código.
+  - Una propuesta deja entre dos y cuatro pares reales, en los momentos de decisión: la edición, los datos y el precio. La portada va sin voz (método `orbit-decision` a mano hasta TASK-2014).
+  - El destacado en minúscula continúa la frase; el límite de largo de cada slot lo da el compositor (`item_too_long`).

@@ -9,9 +9,9 @@
   "layout": "purpose",
   "voice": {
     "eyebrow": "Sin amarras",
-    "question": "¿Y si mañana nos vamos?",
+    "question": "Si se van, se llevan",
     "answer": [
-      "Con todo"
+      "sus datos"
     ]
   },
   "body": "Sus datos son suyos: entran a HubSpot con **orden** y salen igual de completos.",

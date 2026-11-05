@@ -10,9 +10,9 @@
   "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Matriz de cumplimiento",
-    "question": "¿Cumple lo obligatorio?",
+    "question": "Los 74 requisitos, respondidos",
     "answer": [
-      "Uno a uno"
+      "uno a uno"
     ]
   },
   "progress": {

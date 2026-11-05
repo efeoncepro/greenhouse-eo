@@ -10,10 +10,9 @@
   "theme": "light",
   "voice": {
     "eyebrow": "Continuidad e incidentes",
-    "question": "¿Y si algo falla?",
+    "question": "Cada riesgo, con su",
     "answer": [
-      "Se",
-      "recupera"
+      "cobertura"
     ]
   },
   "progress": {
