@@ -344,6 +344,7 @@ Mapeo usado en BLACK (321 archivos, 626 MB):
 | `story-video/` | `STORY VIDEO 5 SLIDES` | 12 videos de 15,7 s |
 | `pmax/` | `PMAX` | 60 |
 | `hph/` | `HPH` | 48 |
+| `logo-black/` | `LOGO BLACK` | 9 (logo ES/PT/EN en PNG 4000 y 2000 px y SVG; agregada el 2026-11-05) |
 
 ```bash
 SRC="ai-generations/2026-11-04_sky-black-gif"

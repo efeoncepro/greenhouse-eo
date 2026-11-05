@@ -644,6 +644,15 @@ la máscara de la foto `Raster 1` no cubre el borde inferior y deja una línea c
 porque la foto viene subida. `hph/generic.cjs`, `hph/market.cjs` y `chile-refs.cjs` la aplican al leer el SVG.
 Verificado con un diff por SVG (sólo cambian píxeles a ≤ 6 px del borde) y con un escaneo de bordes de toda la entrega.
 
+### Logo BLACK suelto en PNG grande (2026-11-05)
+
+`node logo-export.cjs <OUT>` toma los tres logos corregidos de `src2/KV X HM/LOGO BLACK/` (`SKY_LOGO_BLACK_ESP`,
+`SKY-13` = PT, `SKY_LOGO_BLACK_USA` = EN) y exporta `SKY_LOGO_BLACK_<ES|PT|EN>_<4000|2000>px.png` con fondo
+transparente. Amplía el viewBox un 15 % por lado para que el avión y el resplandor no se corten, renderiza 1,3 veces
+más grande, recorta a lo visible, deja un margen del 3 % y baja al ancho exacto con lanczos3. Junto a los PNG va el
+SVG corregido, con los textos vivos en Metric. La punta del ala del avión viene cortada en la imagen del kit (fila
+0 opaca en los tres idiomas): no es un defecto de la exportación.
+
 ## 14. Entrega
 
 **Local (`OUT`, no versionado):** raíz = `render-gif.sh`; `story-video/` = `story-video.cjs`. El resto se

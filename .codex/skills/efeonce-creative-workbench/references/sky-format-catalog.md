@@ -460,6 +460,7 @@ lista, otro) es **inferido**: la sesión sólo verificó que KV2 trae lista o ta
 | `STORY VIDEO 5 SLIDES` | `story-video/` | 12 story en video | 12 |
 | `PMAX` | `pmax/` | 12 KV × 5 | 60 |
 | `HPH` | `hph/` | 6 juegos × 4 tamaños × 2 | 48 |
+| `LOGO BLACK` | `logo-black/` | Logo BLACK ES/PT/EN con la fecha nueva: PNG transparente 4000 y 2000 px + SVG corregido (2026-11-05) | 9 |
 
 Total 321 archivos, 626 MB; recontado el 2026-11-05 por carpeta. `scripts/` queda sólo en local.
 

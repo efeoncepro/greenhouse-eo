@@ -391,6 +391,7 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 | `story-video/` | `STORY VIDEO 5 SLIDES` | 12 |
 | `pmax/` | `PMAX` | 60 |
 | `hph/` | `HPH` | 48 |
+| `logo-black/` | `LOGO BLACK` (2026-11-05) | 9 |
 
 Total 321 archivos, 626 MB. Antes de copiar se comprobó que la carpeta no existía; verificación
 con `diff -rq` por carpeta y `cmp` por archivo de la raíz: todo idéntico. El kit no se modificó.

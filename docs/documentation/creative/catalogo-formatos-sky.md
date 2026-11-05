@@ -385,6 +385,7 @@ dentro de «Despliegue Base». Son 321 archivos y 626 MB.
 | `STORY VIDEO 5 SLIDES` | 12 stories en video | 12 |
 | `PMAX` | 12 KV × 4 tamaños + el 1200×628 en 2x | 60 |
 | `HPH` | Genérico de Chile + 5 mercados, 4 tamaños, en 1x y 2x | 48 |
+| `LOGO BLACK` (agregada 2026-11-05) | Logo BLACK con la fecha nueva en español, portugués e inglés: PNG transparente de 4000 y 2000 px de ancho, más el SVG corregido | 9 |
 
 CyberSky Perú se entregó aparte, como un PDF de 66 páginas (22 destinos × popup, post y story).
 
