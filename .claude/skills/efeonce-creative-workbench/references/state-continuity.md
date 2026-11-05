@@ -46,7 +46,9 @@ Sexta ronda (2026-11-05, revisión de Daniela en Frame.io sobre las 30 piezas de
 (reencuadre), Trujillo popup con más cielo, crédito de la story a 18 px y stories de Piura, Arequipa, Juliaca y
 Pucallpa expandidas hacia arriba con GPT Image 2.6 Flare (fal sin saldo; ≈ USD 0,15, aprobado por Julio). Canvas
 versión 47; «BLACK SKY 2026» (30 archivos) y entregables actualizados. Frame no se puede responder desde aquí.
-Detalle en pipeline §4.7. Se regeneraron los GIF de AR Lima, AR
+Detalle en pipeline §4.7.
+Lo aprobado y lo ajustado quedaron separados en `10_Noviembre/BLACK SKY 2026 - APROBADO` (12) y
+`BLACK SKY 2026 - PARA REVISION` (18 + LEEME), con la estructura de Daniela (catálogo §5.4). Se regeneraron los GIF de AR Lima, AR
 Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con banderas, y la story en video de las nueve
 de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya compara por tamaño y fecha sin leer el
 destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin

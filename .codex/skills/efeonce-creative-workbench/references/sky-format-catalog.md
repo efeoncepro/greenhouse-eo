@@ -493,6 +493,13 @@ JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_
 | `HM BR` | BR | 4 sueltas | `VOE A SANTIAGO` (SCL, con Chile Travel) | |
 | `HM USA` | US | 4 sueltas | `FLY INTERNATIONAL` (US_BANDERAS) | |
 
+**Aprobado / para revisión (2026-11-05, pedido de Julio tras la revisión en Frame.io):** dos carpetas hermanas de
+`BLACK SKY 2026`, con su misma estructura (`HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`):
+`BLACK SKY 2026 - APROBADO` (12 piezas aprobadas en Frame) y `BLACK SKY 2026 - PARA REVISION` (16 ajustadas, más las
+stories de Tarapoto y Tumbes por confirmar, con un `LEEME.txt` del cambio en cada pieza). Se copian los archivos
+vigentes, con el gradiente nuevo, aunque la aprobación se dio sobre la versión de la cuarta ronda. Script:
+`split.py` (estado por pieza en la tabla `E`); sólo cubre las rutas foco, que son lo único revisado en Frame.
+
 Cada carpeta de pieza trae `BS_POPUP_`, `BS_STORY_`, `BS_GIF_` (sólo .gif: el MP4 con el mismo nombre se
 leía como duplicado) y `BS_STORYVIDEO_` (.mp4). El GIF en MP4, con y sin audio, sigue en la entrega anterior. Con una sola agrupación de PMAX, las 4 imágenes van sueltas en `PMAX/`. Sólo 1x.
 Fuera de la carpeta por no estar en la lista confirmada por Adri: BR «Voe para Peru», los KV con banderas de
