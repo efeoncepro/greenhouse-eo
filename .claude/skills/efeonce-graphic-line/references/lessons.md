@@ -1000,3 +1000,14 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   `matrix3d`), no como un rectángulo suelto.
 - **Plantas de venta dibujadas como cajas etiquetadas.** Síntoma: rechazo del operador. Regla: una planta se dibuja
   como plano arquitectónico: muros con grosor, puertas con giro, ventanas, mobiliario, cotas, escala y norte.
+
+## 2026-11-05 — Propuesta Fiordo Austral en /design: láminas a mano rechazadas e insignia negra
+
+- **Síntoma 1:** se dibujaron las láminas en el canvas de /design a mano, montando los componentes del design system (`Voice`, `Orbit`, `Icon`). Julio las rechazó: «las estás poniendo todas mal» y «así no hacemos las portadas».
+  - **Regla:** un deck de marca propia nunca se arma a mano en el canvas. Primero se elige del catálogo de recetas, después se valida el plan (`pnpm brand:deck-plan -- --plan`) y se compone cada lámina con `pnpm brand:compose`. Recién entonces los PNG compuestos van al canvas como imágenes a sangre.
+  - Precedentes que hay que replicar: `ai-generations/2026-10-20_propuesta-assetplan/` y `ai-generations/2026-10-06_deck-hubspot/`, con sus `build-intents.py` y `build-canvas.py`.
+  - Los componentes del design system son para piezas sueltas, no para láminas con receta.
+- **Síntoma 2:** la insignia HubSpot Solutions Partner salió negra en el canvas.
+  - **Causa:** el canvas de Design le quita el `<style>` a los SVG subidos, y los colores de esa insignia están en clases de estilo.
+  - **Regla:** la insignia, y cualquier SVG oficial que coloree con clases, se sube como PNG derivado del SVG con sharp, sin tocar el arte. El README de la insignia lo permite.
+  - Sobre fondo oscuro se usa `badge-light-spp-hubspot` (placa crema).
