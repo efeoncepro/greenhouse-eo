@@ -304,8 +304,8 @@ del deck Salesforce se reutilizan con datos e íconos oficiales de HubSpot (`hub
   el plate T3-mide del tríptico en vez de una foto del caso.
 - **Recetas sólo claras:** `decision-case` y `content-clients` se componen como láminas de Efeonce en la línea
   `growth` (el contrato `line-piece-keeps-efeonce-dark` no admite una pieza de línea clara).
-- **Insignia Gold = claim** con readback `hubspot-partner-readback-2026-10-06`; el sprocket 3D de HubSpot es de uso
-  interno (canvas, no PDF); sin mascotas de HubSpot.
+- **Insignia Gold = claim** con readback `hubspot-partner-readback-2026-10-06`; el sprocket 3D de HubSpot está
+  autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14; ratificado el 2026-11-05 en la propuesta Fiordo Austral); siempre desde el kit, sin modificar ni generar el logo; sin mascotas de HubSpot.
 - **Variante de la insignia por contraste con la superficie** (operador 2026-10-31): clara → placa `dark`, oscura →
   placa `light`, `orange` sólo como acento y nunca sobre naranja. La crema de AXIS
   (`hubspot-solutions-partner-gold-light`) no va sobre papel. Tabla en

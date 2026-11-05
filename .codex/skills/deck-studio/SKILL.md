@@ -224,7 +224,8 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   «Comparación de color», «Banco de fotos»). **PDF** (16:9): OneDrive
   `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`, armado con
   `node ai-generations/2026-10-06_deck-hubspot/exp/brochure-pdf.mjs <brochure-files.json> <salida.pdf>` desde las
-  láminas del canvas verificadas por sha256 (portada con la insignia Gold; **sin** el sprocket 3D, de uso interno).
+  láminas del canvas verificadas por sha256 (portada con la insignia Gold; se armó **sin** el sprocket 3D, que entonces era de uso interno). Desde el 2026-10-14
+  el sprocket está autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14; ratificado el 2026-11-05 en la propuesta Fiordo Austral); siempre desde el kit, sin modificar ni generar el logo.
   Pipeline: `ai-generations/2026-10-06_deck-hubspot/` (`build-intents.py`, `nuevas.py`, `ti.py`, `build-canvas.py`,
   `fotos/LEEME.md` con banco y descartes). Pendientes antes de usarlo con prospectos y el uso comercial: skill
   `hubspot-solutions-partner`. **Lecciones de oficio medidas en esta corrida:**

@@ -1123,3 +1123,19 @@ Publicado «Explora», cuatro columnas, newsletter/empleo separados, partners gr
 legales discretos y controles flotantes ocultos sólo al ver footer. 531px desktop, QA6casos y axe
 sin violaciones. [Recibo](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 La variante anterior se conserva como historial; no se cambia la firma de correo ni tiers.
+
+## 2026-11-05 — Sprocket 3D de HubSpot autorizado fuera de Efeonce (norma 1.36)
+
+- **Decisión del operador:** Julio pidió la propuesta de Fiordo Austral «muy HubSpot» con sus activos oficiales y luego
+  ordenó «Sí, actualízala» para la norma.
+  - El sprocket 3D de HubSpot queda **autorizado fuera de Efeonce**, con la aprobación escrita de HubSpot que el
+    operador declaró el 2026-10-14 (caso Assetplan). Se ratifica en esta fecha.
+  - Siempre se usa desde el kit (`ai-generations/2026-10-06_deck-hubspot/png/sprocket-3d-flotando-800.png`), sin
+    modificar ni generar el logo.
+- **Dónde va:** sobre la plataforma de `content-service-lanes`, a 380 px en x 1410 / y 470.
+- **Qué se actualizó:** la norma de superficie (§4.6, deck HubSpot), el README de recetas y las skills `deck-studio` y
+  `hubspot-solutions-partner`.
+  - Antes decían «uso interno»; el catálogo de recetas y el manual ya lo daban por autorizado.
+  - El PDF del brochure de octubre se armó sin el sprocket y queda así.
+- **Insignia Gold naranja:** sobre fondo oscuro se puede usar la variante naranja cuando la pieza pide el acento de
+  HubSpot. Se sube como PNG, porque el canvas de Design le quita el `<style>` al SVG.

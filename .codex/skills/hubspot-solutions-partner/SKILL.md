@@ -89,12 +89,13 @@ collateral vigente es el brochure aprobado el 2026-10-06 (§ «Collateral comerc
 - **Créditos:** se venden como **asesoría de cuántos necesita el cliente** («¿Cuántos créditos necesito? A medida.»),
   nunca como «no compres».
 - **Marca:** insignia Gold con readback `hubspot-partner-readback-2026-10-06` (portada del PDF). El sprocket 3D de
-  HubSpot es **sólo de uso interno** hasta aprobación escrita de HubSpot: está en el canvas, fuera del PDF. Sin
+  HubSpot está autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14; ratificado el 2026-11-05 en la propuesta Fiordo Austral); siempre desde el kit, sin modificar ni generar el logo. Sin
   mascotas ni personajes de HubSpot.
 - **Pendientes (no resueltos; del operador):** (1) **autorización de ANAM** para −57 % de carga comercial y +32 % de
   ventas en 7 meses (y cómo termina la frase): sin ella el brochure **no se usa con prospectos**; 5 rutas hacia una
-  persona y 23 fuentes sí están en el caso publicado; (2) aprobación escrita del sprocket; (3) lámina de equipo
-  HubSpot (nombres, cargos, certificaciones, fotos); (4) plazo estándar de implementación.
+  persona y 23 fuentes sí están en el caso publicado; (2) lámina de equipo HubSpot (nombres, cargos,
+  certificaciones, fotos); (3) plazo estándar de implementación. La aprobación escrita del sprocket se declaró el
+  2026-10-14.
 - **Brochure oficial de la agencia** (aprobado 2026-10-16, «Agencia de Marketing 360°», skill `deck-studio`): su tramo
   Revenue cierra con el caso ANAM como prueba de implementación HubSpot (Customer Agent, rutas hacia una persona). Sus
   cifras de ANAM tienen el mismo pendiente de autorización antes de enviarlo afuera.
