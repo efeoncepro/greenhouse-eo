@@ -100,8 +100,8 @@ add('F04b-partners', 'content-partners', d, '05 · partners')
 
 # 05 · Su ficha técnica (cine, HS2d)
 d = base(AP, 'A035-crm-completo.json')
-d['voice'] = {'eyebrow': 'Su ficha técnica', 'question': '¿Dónde viven las especificaciones?', 'answer': ['En la ficha']}
-d['body'] = 'Proteína, FFA, humedad, certificaciones y documentos de cada cliente, en su registro y en cada oportunidad.'
+d['voice'] = {'eyebrow': 'Especificaciones técnicas', 'question': '¿Y los requisitos técnicos?', 'answer': ['En el CRM']}
+d['body'] = 'Proteína, FFA, humedad y certificaciones de cada cliente, en su registro y en cada oportunidad.'
 d['steps'] = [
     {'glyph': 'medicion', 'kicker': 'Especifica', 'name': 'Proteína y FFA'},
     {'glyph': 'contrato', 'kicker': 'Documenta', 'name': 'Certificados'},

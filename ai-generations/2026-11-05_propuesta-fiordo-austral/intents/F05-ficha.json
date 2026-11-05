@@ -10,13 +10,13 @@
   "recipe": "proposal-cinematic",
   "layout": "service",
   "voice": {
-    "eyebrow": "Su ficha técnica",
-    "question": "¿Dónde viven las especificaciones?",
+    "eyebrow": "Especificaciones técnicas",
+    "question": "¿Y los requisitos técnicos?",
     "answer": [
-      "En la ficha"
+      "En el CRM"
     ]
   },
-  "body": "Proteína, FFA, humedad, certificaciones y documentos de cada cliente, en su registro y en cada oportunidad.",
+  "body": "Proteína, FFA, humedad y certificaciones de cada cliente, en su registro y en cada oportunidad.",
   "steps": [
     {
       "glyph": "medicion",
