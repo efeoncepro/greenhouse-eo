@@ -2,6 +2,101 @@
 
 Formato: qué pasó → regla → dónde quedó codificada → estado (Codificada + prueba / Codificada / Documental).
 
+## 2026-11-05 · Alejar la cámara: usar el candidato crudo, no el recompuesto
+
+**Qué pasó.** En el lote de 54 artículos muchas portadas salieron con el sujeto bajo. Pedir la posición en el prompt
+(«COMPOSITION, MEASURED» con porcentajes del cuadro) no bastó: las v2 de equipaje, líquidos y noticias también
+necesitaron expansión. Se alejó la cámara expandiendo el maestro con `ai:inpaint` y Flare (Sunburst con máscara devuelve
+un panel negro; Flux Fill de fal no tenía saldo). El candidato recompuesto, con la zona protegida pegada bit a bit,
+dejaba uniones visibles; un pase de corrección de uniones con máscara en la junta no se adoptó. Se usó el candidato
+crudo (2560×1440, imagen completa rehecha) ampliado con lanczos a 3840×2160: quedaron 39 maestros ampliados. Costo: el
+crudo es otra imagen; en Punta Cana la viajera desapareció, y el log avisó reencuadres.
+
+**Regla.** Expansión con `zoomout.mjs` (lienzo + guía difuminada + máscara) → Flare high → `candidate-1-raw.png`
+ampliado → `medir-portada` con la caja nueva → comparar con el maestro anterior (sujeto presente, mismo lugar).
+Método pendiente de validación de Julio, igual que la ampliación 2560 → 3840.
+
+**Dónde.** [hero-and-export.md](hero-and-export.md) §7; scripts en `projects/sky/blog-lote-2026-11/tools/imagenes/`
+(`zoomout.mjs`, `runzoom2.sh`, commit del Workbench `e8b2098`). No está en el contrato ni en `prompt-plate`.
+**Documental.**
+
+## 2026-11-05 · Mitad inferior clara: el suelo de la expansión va en sombra profunda
+
+**Qué pasó.** En portadas con arena al sol, espuma o pisos brillantes, el gate de contraste fallaba: el H1 blanco no se
+leía en la mitad inferior aunque el sujeto estuviera arriba. Pedir el suelo «in soft open shade, calm and mid-toned» no
+siempre alcanzó.
+
+**Regla.** Repetir la expansión describiendo el suelo «in DEEP soft shade: matte, mid-dark and calm, never bright, with
+no sunlit sand, no bright reflections and no white foam in the lower half», con un elemento real del lugar muy
+desenfocado en el borde inferior. Nunca un velo ni un degradado propio encima.
+
+**Dónde.** [hero-and-export.md](hero-and-export.md) §7 paso 2. **Documental.**
+
+## 2026-11-05 · Retocar letras: máscara + Flare y un prompt que no nombre «logo»
+
+**Qué pasó.** Tres fotos traían letras: el arco de Catacaos (portada) con letras inventadas, la inscripción tallada del
+arco de Yanahuara y un letrero en la fachada de la escena 2 de la noticia de Talara. El retoque de Talara abortó
+porque el prompt decía «no logo»: la guarda de marca de `ai:inpaint` corta cualquier mención de logo, marca o brand,
+aunque sea en negativo. En Yanahuara la primera máscara cubrió media inscripción y quedó la otra mitad.
+
+**Regla.** `ai:mask` (`--rect` o `--polygon`) + `ai:inpaint image` con `gpt-image-2.5-flare` high y
+`OPENAI_API_KEY_PROFILE=personal`. El prompt describe la superficie limpia en positivo («…with nothing mounted on it»).
+Si queda texto, segundo paso sobre el resultado con una máscara que cubra toda la banda. Mirar al 100 % y guardar el
+`-antes.png`.
+
+**Dónde.** [qa-review.md](qa-review.md) §1 «Letras dentro de la foto»; invariante 11 de `SKILL.md`. **Documental.**
+
+## 2026-11-05 · Referencias reales: leer la descripción antes de licenciar
+
+**Qué pasó.** Julio habilitó Shutterstock para las REF-01 y, donde no había, eligió Wikimedia Commons. La búsqueda de
+Shutterstock devolvió para lugares de Perú fotos de otros países con nombres parecidos: «Oropesa landmarks, Spain» para
+Lamas, un pinar de Norfolk para Costa del Este, un mercado de Marrakech para el aguaje de Iquitos, manglares de
+Langkawi (Malasia) para Tumbes. Las búsquedas además agotaron el tope de 100 consultas por hora de la API.
+
+**Regla.** Elegir mirando hojas de contacto con candidatos etiquetados y leyendo la descripción; licenciar en lote
+después de elegir; sin REF del lugar real, la pieza queda bloqueada (portadas de Colán y Amigos, 6 escenas). Una REF
+aproximada se declara en el expediente. Procedencia en `refs-ledger/` sin URLs firmadas.
+
+**Dónde.** [sources.md](sources.md) §5; invariante 10 de `SKILL.md`; `projects/sky/blog-lote-2026-11/refs-ledger/`.
+**Documental.**
+
+## 2026-11-05 · Bajo 200 KB sin perder resolución: desenfoque leve del maestro
+
+**Qué pasó.** 11 escenas con follaje, manglar u oleaje no bajaban de 200 KB ni con calidad 60 y `exportar.mjs` falló
+en `toWebpUnder`. La regla prohíbe reducir resolución.
+
+**Regla.** Exportar desde una copia del maestro con desenfoque leve a 3840 px, subiendo σ por pasos (0,6 · 0,9 · 1,2 y
+luego 1,6 · 2,0 · 2,4) hasta que pase. En el lote bastó entre 0,6 y 2,0; a 1408 px no se ve, y se confirma mirando al
+100 % la de σ más alto. El maestro original no se toca.
+
+**Dónde.** [hero-and-export.md](hero-and-export.md) §5. Copias en `ai-generations/2026-11-05_sky-blog-lote/escenas/suave/`.
+**Documental.**
+
+## 2026-11-05 · `ai:inpaint` sin perfil paga la clave de empresa
+
+**Qué pasó.** Julio preguntó «tenemos dos API key, ¿cuál estás usando?». Las generaciones con `ai:image` decían «clave
+personal» en el log, pero `ai:inpaint` no acepta `--openai-key`: al quitar la flag rechazada, las expansiones y
+retoques de portada (≈ USD 3, suma de los manifiestos) corrieron con la clave de empresa. Julio: «no hay problema».
+
+**Regla.** Todo `ai:inpaint` de generación creativa se corre con `OPENAI_API_KEY_PROFILE=personal` delante; `ai:image`
+con `--openai-key personal`. Revisar la línea de clave del log antes de seguir una tanda.
+
+**Dónde.** Invariante 12 de `SKILL.md`; `runzoom2.sh` del lote ya lo antepone. Manual de la clave:
+`docs/manual-de-uso/ai-tooling/alternar-clave-openai.md`. **Documental.**
+
+## 2026-11-05 · El costo de un lote se suma una vez por log
+
+**Qué pasó.** Al cerrar portadas y banners se informó a Julio «cerca de USD 43 en generación (cifra estimada de los
+registros)». El comando sumó `batch*.log` y `../*/*.log` desde la carpeta `portadas/`: el segundo glob vuelve a incluir
+los mismos `batch*.log`, que quedaron contados dos veces (143 líneas). Sin duplicar, las 49 generaciones de portada (43 piezas más
+6 versiones v2) estiman ≈ USD 20,00 y las líneas de expansión y corrección de uniones, ≈ USD 3,03.
+
+**Regla.** Sumar las líneas `costo estimado ≈ USD` con una lista explícita de logs, sin solapar globs, y decir que es
+estimación (la entrada se cobra aparte). Separar generación, expansión y retoque.
+
+**Dónde.** [workflow.md](workflow.md) §9; cifras corregidas en el expediente
+`docs/services/sky-blog-seo/LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md`. **Documental.**
+
 ## 2026-11-05 · Lote de noviembre: la caja del sujeto empieza en la coronilla y el zoom deja margen arriba
 
 **Qué pasó.** En el lote de 54 artículos, muchas portadas generadas dejaban al sujeto bajo; se «alejó la cámara»
@@ -17,8 +112,10 @@ sube la escena, el sujeto queda desde ≥ 18 % del alto. Toda letra legible dent
 antes de exportar (herrería, carteles, toldos). Si la ruta no cabe en la receta B de escritorio, ese formato pasa a
 receta A; nunca se achica la letra (se probó y se revirtió por la regla aprobada del 2026-11-05).
 
-**Dónde.** Documental; el zoom del lote vive en el scratchpad de la sesión (`zoomout.mjs`, `ZOOM_TOP`), no en el
-contrato. Pendiente: llevar el margen a `HERO SPACE` / `medir-portada` como advertencia cuando la caja toca el borde
+**Dónde.** [hero-and-export.md](hero-and-export.md) §3 y §7; [route-banners.md](route-banners.md) §3. El zoom del lote
+quedó copiado en `projects/sky/blog-lote-2026-11/tools/imagenes/zoomout.mjs` (Workbench `e8b2098`; se corrió con
+`ZOOM_TOP=0.18`, el default del script es 0,13) y no en el contrato. El retoque de letras: lección «Retocar letras» de
+arriba. Pendiente: llevar el margen a `HERO SPACE` / `medir-portada` como advertencia cuando la caja toca el borde
 superior de la ventana. **Documental.**
 
 ## 2026-11-05 · Ruta primero, titular sin repetir el H1, avión que se lea como avión
@@ -115,7 +212,8 @@ registra. Recomendación aceptada por el operador el 2026-11-02 («Sí, construy
 verificadas el día que se publica», pero nada lo hacía cumplir.
 
 **Regla.** El compositor escribe CTA y etiqueta desde el contrato, rechaza el copy prohibido y exige `verificadaEl` +
-`fuente`; el titular no se achica para caber.
+`fuente`; el titular no se achica para caber. (Desde el 2026-11-05 la etiqueta inferior se retiró: la ruta va arriba;
+ver la lección «Ruta primero».)
 
 **Dónde.** `contracts/sky-blog-recipes.json → ruta.copy`, `compose/route-banner.mjs → validateRouteJob`;
 `test/route-banner.test.mjs`. **Codificada + prueba.**

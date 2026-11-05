@@ -40,8 +40,11 @@ Opción B agrega `"photo": { "file": "../salidas/<foto-aprobada>.webp", "focal":
 - IATA que no sean 3 letras mayúsculas; origen = destino.
 - Sin `ruta.verificadaEl` (AAAA-MM-DD) y `ruta.fuente`; fecha futura. Más de 7 días desde la verificación = aviso:
   verificar de nuevo el día que se publica.
-- Titular sobre el presupuesto (8 palabras en A, 9 en B) o que no cabe en sus líneas (A escritorio 2, B 3, móvil 3).
+- Titular de más de 6 palabras (A y B, desde el 2026-11-05) o que no cabe en sus 2 líneas (todos los formatos).
   **No se achica la letra: se acorta el titular.**
+- Ruta «Origen → Destino» que no cabe en 2 líneas o en el ancho del formato: el compositor pide usar la receta A o el
+  formato móvil. Caso: «Santiago → Río de Janeiro» (Paraty) no cabe en B escritorio; ese formato pasó a A y el móvil
+  conserva la foto. Se probó achicar la letra y se revirtió (regla aprobada por Julio el 2026-11-05).
 - Titular que choca con la ruta dibujada (móvil A) o con el CTA (B); CTA que no cabe en la mitad de color (B escritorio,
   ciudad muy larga).
 - Falta de Metric local: no hay fuente de reemplazo.
@@ -69,7 +72,23 @@ Escribe `runs/<uuid>/{<slug>.webp, job.json, qa.json}`. `qa.json` registra copy 
 | Logo | `sky-logo-on-photo.svg` (blanco + verde), oficial | — |
 | Geometría | Kickoff escalado ×1,333 (escritorio) y ×2,571 (móvil); B móvil es nuevo (foto arriba 40 %) | Validación de Diseño |
 
-## 6. Ejemplos de calibración
+## 6. Lote de noviembre 2026
+
+44 artículos × 2 formatos = 88 banners (`projects/sky/blog-lote-2026-11/jobs/<id>-ruta.json` y `<id>-ruta-movil.json`),
+todos bajo 150 KB, compuestos en `runs/banners/<uuid>/`. Cinco artículos van con foto (receta B): cena chilena, retablo,
+Sauce y Yanahuara en los dos formatos, y Paraty sólo en móvil; el resto en receta A. La foto de B sale de la serie
+aprobada del artículo (`photo.file` relativo al job y siempre dentro de `projects/sky/`).
+
+- **Fuente de la ruta en el lote:** el catálogo de Notion «Precios y Rutas SKY», sólo filas 🟢 Activa para el mercado del
+  lector, consultado el 2026-11-05. `ruta.fuente` lo dice y pide volver a verificar en skyairline.com el día de
+  publicación (el compositor avisa a los 7 días).
+- **Bloqueados (10):** 8 por ruta no 🟢 Activa para su mercado (Cajamarca, Carnaval de Cajamarca, Chiclayo, Cumbemayo,
+  Talara y la noticia de Talara en Perú; Lima en 3 días en Chile; Cancún, con SCL → CUN 🔴 Archivada) y 2 notas de
+  puntualidad sin dato por ruta que sostenga una venta. El motivo queda en `specs/MANIFEST.json`; no se compone ni se
+  enlaza hasta que Paid / Ad Ops catalogue la ruta.
+- **Titular:** lo trae la spec (`banner_titular` del MANIFEST), no el H1.
+
+## 7. Ejemplos de calibración
 
 `projects/sky/blog-linea-grafica/jobs/` (rutas **no verificadas**: son los ejemplos del kickoff). A Lima–Tumbes y B
 Santiago–Lima con la portada de Lima; 20–148 KB.

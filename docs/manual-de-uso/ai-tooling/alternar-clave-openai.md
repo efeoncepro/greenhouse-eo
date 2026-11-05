@@ -1,9 +1,10 @@
 # Alternar la clave de OpenAI en las CLIs de imagen
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-11-01 por Claude (sesión con Julio Reyes)
-> **Ultima actualizacion:** 2026-11-01 por Claude
+> **Ultima actualizacion:** 2026-11-05 por Claude — (1.2) `pnpm ai:inpaint` no acepta `--openai-key`: el perfil va con
+>   `OPENAI_API_KEY_PROFILE=personal` antepuesto; sin la variable paga la clave de empresa (caso del lote Blog SKY).
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) · código `src/lib/ai/openai-api-key.ts`
 
 ## Para qué sirve
@@ -21,8 +22,15 @@ Cada clave alterna es un **perfil**: el perfil `personal` vive en el secreto
 | Trabajo | Clave |
 |---|---|
 | Producto y runtime: Vercel, workers, `pnpm dev`, flujos canónicos del portal | **Empresa** (`greenhouse-openai-api-key`), siempre |
-| Generación creativa operada por un agente u operador con `pnpm ai:image` o `pnpm ai:inpaint` (piezas, conceptos, pruebas, iteraciones) | **Personal** (`--openai-key personal`), mientras quede crédito |
+| Generación creativa operada por un agente u operador con `pnpm ai:image` o `pnpm ai:inpaint` (piezas, conceptos, pruebas, iteraciones) | **Personal**, mientras quede crédito: `--openai-key personal` en `ai:image`; `OPENAI_API_KEY_PROFILE=personal` antepuesto en `ai:inpaint` |
 
+- 🔴 **`pnpm ai:inpaint` no tiene `--openai-key`.** Si se lo pasas, falla con «Flag desconocida» y es fácil quitarlo y
+  seguir: sin `OPENAI_API_KEY_PROFILE=personal` delante, la corrida paga con la clave de empresa y no avisa, porque
+  `ai:inpaint` no imprime qué clave pagó ni la guarda en su `manifest.json`. Caso 2026-11-05 (lote del Blog SKY): las
+  portadas salieron con la personal, pero unas 58 expansiones y retoques con `ai:inpaint` (≈ USD 3) se pagaron con la de
+  empresa hasta que Julio preguntó cuál se estaba usando. La forma correcta es
+  `OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint image …`, en cada comando y en cada script que lo llame. `pnpm ai:mask`
+  no llama a OpenAI y no necesita la variable.
 - El perfil personal se pasa **explícito en cada comando**. **NUNCA** se deja como default en
   `.env.local`: ese archivo lo leen todos los procesos locales, incluido `pnpm dev`, y el flujo canónico
   terminaría pagado por la cuenta personal.
@@ -66,13 +74,17 @@ Cada clave alterna es un **perfil**: el perfil `personal` vive en el secreto
    OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint image ...
    ```
 
-4. **Dejarla por defecto en tu máquina** agregando `OPENAI_API_KEY_PROFILE=personal` a `.env.local`.
-   Para volver a la canónica, borrar la línea o usar `--openai-key default`.
+4. **No dejarla por defecto en `.env.local`.** Ese archivo lo leen todos los procesos locales, incluido
+   `pnpm dev`, y el producto terminaría pagado con la cuenta personal (regla de arriba y de `CLAUDE.md`).
+   Para scripts que llaman varias veces a la CLI, anteponer la variable dentro del propio script, en cada
+   llamada. Para volver a la canónica en una corrida de `ai:image`, usar `--openai-key default`.
 
 ## Qué significan las señales
 
 - Cada imagen generada por `ai:image` termina en `· clave personal` o `· clave default`: es la clave
   que pagó esa llamada.
+- `ai:inpaint` no imprime la clave. Lo único que asegura la personal es que el comando lleve
+  `OPENAI_API_KEY_PROFILE=personal`; revisa el comando o el script, no la salida.
 - Los resultados del cliente canónico traen `keyProfile` junto a `secretSource`.
 
 ## Qué no hacer
@@ -94,4 +106,6 @@ Cada clave alterna es un **perfil**: el perfil `personal` vive en el secreto
 
 - Resolver: `src/lib/ai/openai-api-key.ts` (`resolveOpenAIApiKey`, `OPENAI_API_KEY_PROFILE`).
 - Consumidores: `src/lib/ai/openai.ts` (texto) y `src/lib/ai/openai-image.ts` (imagen).
-- CLI: `scripts/ai/generate-image.ts` (`--openai-key`).
+- CLI: `scripts/ai/generate-image.ts` (`--openai-key`, que asigna `OPENAI_API_KEY_PROFILE` antes de resolver). `ai:inpaint`
+  (`scripts/ai/inpaint/cli.ts`) no tiene el flag: su adaptador `openai` usa `editOpenAIImage`, que resuelve con
+  `resolveOpenAIApiKey()` y lee solo la variable de entorno.

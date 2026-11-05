@@ -13,7 +13,9 @@ Estado al 05-11-2026: los 54 artículos activos del Content Hub tienen research 
 en POV «El Viajero» al final de su página de Notion, con ficha SEO y metadatos, callouts de imagen y de banner de
 ruta, y specs para producción (44 banners listos, 10 bloqueados por ruta no catalogada o por política de la nota).
 Está pendiente de revisión de Valentina y de aprobación de SKY; **nada se publicó**. Flujo, bloqueos y decisiones:
-[lote editorial de noviembre](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md).
+[lote editorial de noviembre](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md). Ese mismo día se produjeron las imágenes del
+lote (88 banners de ruta, 43 portadas nuevas y 93 escenas, todo pendiente de revisión de Diseño y Marca SKY y sin
+subir): [producción de imágenes de noviembre](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md).
 
 ## Resultado y alcance
 
@@ -221,6 +223,8 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
   [`references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md).
 - [Lote editorial de noviembre 2026](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md) y su
   [manual paso a paso](../../manual-de-uso/growth/correr-lote-editorial-blog-sky.md).
+- [Producción de imágenes del lote de noviembre 2026](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md) y su
+  [manual paso a paso](../../manual-de-uso/growth/producir-imagenes-lote-blog-sky.md).
 - [Manual del indicador](../../manual-de-uso/growth/valorar-trafico-organico.md).
 - [Funcionamiento del indicador](../../documentation/growth/valor-publicitario-organico.md).
 - [Decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md).

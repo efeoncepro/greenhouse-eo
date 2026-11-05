@@ -114,14 +114,39 @@ node brands/sky-airline/blog/scripts/prompt-plate.mjs \
 | Escena nueva sin referencia | `gpt-image-2.5-sunburst` («ChatGPT Images 2.5») |
 | Lugar identificable con REF real | `gpt-image-2.5-sunburst` en modo edición (`--image` REF-01) |
 | Corregir una pieza ya generada | `gpt-image-2.5-sunburst` en modo edición (edición dirigida) |
+| Cambiar sólo una zona (alejar la cámara, borrar letras) | `gpt-image-2.5-flare` con máscara vía `pnpm ai:inpaint image`. Sunburst con máscara devuelve un panel negro |
 | ~~Nano Banana Pro~~ | **Excluido** (Julio, 2026-11-05: «no tiene buena calidad»). Contrato: `engines.excluded` |
 | Variantes de recorte | Ninguno: se recorta el maestro |
 | Texto | Ninguno: el texto sólo existe en el banner de ruta, compuesto |
 
 Hipótesis de arranque de Notion; se corrige con fecha cuando una pieza real lo demuestre. El motor y su versión se
-registran desde el log del CLI; sin evidencia, no se atribuye.
+registran desde el log del CLI; sin evidencia, no se atribuye. `pnpm ai:image` usa Flare por default desde el
+2026-11-05: pasar siempre `--model gpt-image-2.5-sunburst` para una foto del blog.
 
-## 8. Ensayo del 2026-10-08 (registro E)
+**Colorimetría Brandlift.** Julio pidió el 2026-11-05 «recuerda la colorimetría de SKY, bokeh y demás». En el lote se
+sumó al prompt (campo `extra` de `prompt-plate`) el bloque de la hoja 15 de Daniela Ferreira: POV del viajero a la
+altura de los ojos, luz natural luminosa con sombras abiertas y blancos con detalle, color natural con ocres, azules y
+piel fieles, contraste moderado, sin filtro, sin naranja-turquesa ni HDR, profundidad óptica real (lo cercano muy fuera
+de foco con bokeh suave, el sujeto nítido) y momento espontáneo; más el lente por tipo (A, B, C y D 28–35 mm; E y G 50 mm;
+F 35–50 mm). Vive en `projects/sky/blog-lote-2026-11/plates/brandlift.json`; todavía no está en el contrato.
+
+## 8. Escenas IMG 2–3 desde las specs (lote)
+
+En un lote, cada escena se convierte en una entrada de `prompt-plate` leída de su spec (`plates/escenas-img23.json`,
+99 entradas el 2026-11-05):
+
+- **Tipo** = la letra con que empieza el tipo de la spec (A–H). **Registro** D o E, de la spec.
+- **E exige `fotografo` y `mirada`**: la frase de la spec «fotografía X, mirando Y» se separa en los dos campos.
+- **Primer plano y borde** salen del texto de la spec (las 99 entradas del lote llevaron uno; si no es plausible, el
+  builder acepta `sinPrimerPlano` con la razón).
+- **`refLugar`** sale del texto de fidelidad de la spec («REF-01 de … en la tarea»). Si la escena exige REF y no hay
+  una válida, queda bloqueada: el 2026-11-05 fueron 6 de 67 (amigos 2 y 3, asado alemán en cena chilena 2, picante a la
+  tacneña en Tacna 3, cerámica Wayku en Lamas 3, poza de Baños del Inca en Cajamarca 3).
+- Una escena puede reusar como REF la de la portada del mismo artículo cuando muestra el mismo lugar.
+- Las escenas no pasan `medir-portada`: se muestran completas en el cuerpo. Sí pasan QA al píxel, retoque de letras y
+  `exportar.mjs` sin `--portada`.
+
+## 9. Ensayo del 2026-10-08 (registro E)
 
 `gpt-image-2.5-sunburst`, calidad max, maestros 3840×2160, previews 1408×768 WebP < 200 KB
 (`ai-generations/2026-10-08_sky-registro-e-prueba/`). Hallazgos que siguen vigentes:

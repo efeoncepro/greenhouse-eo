@@ -1,7 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
 > **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
-> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`); delta 2026-11-05 (§2, GPT Image 2.6 y `markup`; tarde: `--markup` y rayado verificados en `pnpm ai:image`, Sunburst 2.6 con máscara = panel negro, Flare 2.6 por el pipeline PASS). Esto es el playbook operativo: intención → comando → modelo → flags →
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`); delta 2026-11-05 (§2, GPT Image 2.6 y `markup`; tarde: `--markup` y rayado verificados en `pnpm ai:image`, Sunburst 2.6 con máscara = panel negro, Flare 2.6 por el pipeline PASS; noche: lote Blog SKY, guarda de marca con «logos» en negativo y alejar la cámara con el crudo de Flare). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -105,7 +105,9 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
   describir la identidad y pasarla por `--reference`. `--allow-brand` es para ediciones de contexto, no para esto.
 - **La guarda también aborta si el prompt dice «logos» en negativo** («sin logos», «no logos»; caso anuncio
   Efeonce | Google, 2026-10-19): lee la palabra, no la intención. Si la edición toca el contexto y hay que nombrar
-  marcas, `--allow-brand`.
+  marcas, `--allow-brand`. Se repitió el 2026-11-05 (lote Blog SKY): «no lettering, no logos» frenó 11 expansiones
+  y un retoque de letrero, sin cobro. Para borrar letras falsas o un letrero, describir la superficie limpia en
+  positivo («plain smooth stone… completely blank stone surface») en vez de nombrar lo que no debe aparecer.
 - **Piel craquelada / «papel arrugado»** en una foto IA es artefacto de upscaler; se corrige con la misma ruta. Si la
   persona además no es la canónica, cambiar la cara por las anclas resuelve las dos cosas en una pasada.
 
@@ -118,6 +120,17 @@ Unificarlos es decisión de TASK-1925; no cambies uno por otro en una serie ya a
 Exhausted balance», el comando no corre (`pnpm ai:fal --balance` antes de planearlo). Con un fondo vacío, sin objetos
 que continuar, el formato se extendió de forma determinística (color por columna + grano), fuera de este pipeline y
 sin su verificación: caso del 9:16 del anuncio Efeonce | Google.
+
+**Alejar la cámara sin Flux Fill: el crudo de Flare, no el recompuesto (2026-11-05, lote Blog SKY).** Con fal sin
+saldo, para subir al sujeto de 11 portadas se armó el lienzo a mano (escena reducida y subida sobre 3840×2160 con una
+guía difuminada de la misma foto) y una máscara que protegía al sujeto, con `ai:inpaint image` + `gpt-image-2.5-flare`
+`high`. El recompuesto `candidate-1.png` dejó uniones en 7 de 11 (Flare reencuadra, lo mismo que midió el canario de
+`expand`) y una pasada de fundido las empeoró. El crudo `candidate-1-raw.png` (2560×1440) salió coherente y se amplió
+con lanczos a 3840×2160 [verificado a ojo, 11 de 11 sin uniones]. Costo: el crudo es la imagen entera redibujada, así
+que **no** tiene la garantía de delta 0 (en una portada desapareció la persona): revisar lugar, personas y detalle al
+100 % y dejarlo declarado como pendiente de validación humana. Es un rodeo; con saldo, `expand` con Flux Fill. Scripts:
+`creative-workbench/projects/sky/blog-lote-2026-11/tools/imagenes/zoomout.mjs` y `runzoom2.sh` (rutas del scratchpad
+de la sesión: ajustarlas antes de reusar).
 
 ## 3. Máscaras — `pnpm ai:mask`
 

@@ -139,6 +139,9 @@ redactados, pero no generan tareas de diseño ni se producen hasta que SKY aprue
 El detalle por lote (imágenes ya producidas que no se regeneran, adjuntos cruzados, correcciones a textos
 publicados, 301 propuestos) está en `NOTAS_LOTES.md`.
 
+La producción de imágenes que siguió a este handoff (banners, portadas y escenas, con sus bloqueos, costos y
+pendientes) está en [LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md).
+
 ## Restricciones que se respetaron
 
 - No se cambiaron propiedades del Content Hub ni se crearon tareas o páginas.

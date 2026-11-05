@@ -20,10 +20,35 @@
 Un artefacto en el punto focal **se regenera, no se retoca**. Después de una edición generativa, repetir anatomía,
 mirada y geografía. Tres intentos fallidos = estado `Bloqueado`, anotar qué falla y escalar.
 
+**Letras dentro de la foto.** Toda letra legible, falsa o real, se borra antes de exportar: la foto editorial no
+lleva texto. Casos del 2026-11-05: el arco de entrada de Catacaos con letras inventadas («ETTCGOUNTE»), la inscripción
+tallada del arco de Yanahuara (escena 2) y un letrero en una fachada de la escena 2 de la noticia de Talara. Se retoca
+con máscara y Flare:
+
+```bash
+cd /Users/jreye/Documents/greenhouse-eo
+pnpm -s ai:mask --base <maestro>.png --rect u0,v0,u1,v1 --feather 8 --out <retoque>/<id>-mask.png
+# o --polygon "u,v;u,v;…" --dilate 10 --feather 12 para una forma curva (arco)
+OPENAI_API_KEY_PROFILE=personal gtimeout 900 pnpm -s ai:inpaint image --image <maestro>.png --mask <retoque>/<id>-mask.png \
+  --adapter openai --model gpt-image-2.5-flare --quality high --run <retoque>/<id> --max-usd 1 --yes \
+  --prompt "the same carved white sillar stone arch, its face plain and smooth with only natural stone texture and joints, absolutely no carved inscription, no letters and no words; same sunlight and shadows"
+```
+
+- El prompt describe en positivo la superficie limpia y **nunca nombra «logo», «marca» ni «brand»**, ni siquiera en
+  negativo: la guarda de marca de `ai:inpaint` aborta con FATAL. En Talara, «with no sign, no logo, no letters» falló y
+  pasó «the same plain white building facade above the windows, with nothing mounted on it; same light».
+- Si la máscara no cubre toda la banda de texto, queda un resto: segundo paso con una máscara nueva sobre el resultado
+  del primero (Yanahuara necesitó dos).
+- `ai:inpaint` no acepta `--openai-key`; sin `OPENAI_API_KEY_PROFILE=personal` paga la clave de empresa.
+- Guardar el `-antes.png` y mirar el resultado al 100 %: herrería, piedra y luz deben seguir siendo las del lugar.
+  Costo de referencia: USD 0,04–0,06 estimado por paso (los tres retoques de escenas sumaron ≈ USD 0,15).
+
 ## 2. Portada
 
 Además del píxel: `medir-portada.mjs` en verde **y** mirar las vistas `-hero-desktop` y `-hero-mobile` (¿se lee el H1?
-¿el sujeto queda entero arriba?). Revisar og y cuadrado por separado.
+¿el sujeto queda entero arriba?). Revisar og y cuadrado por separado. La caja del sujeto se declara desde la coronilla:
+un gate verde con la caja desde los hombros deja pasar cabezas cortadas. Si la portada viene de una expansión,
+comparar con el maestro anterior: el modelo puede reencuadrar o borrar al sujeto.
 
 ## 3. Secuencia del artículo
 
@@ -32,8 +57,10 @@ encuadre. Si la tanda pierde variedad, se escala a Editorial; no se cambia la es
 
 ## 4. Banner de ruta
 
-Ruta verificada el día de publicación; copy sin precios ni ofertas; titular sin viudas y dentro de sus líneas; CTA y
-etiqueta correctos; en B, titular fuera de la foto; peso < 150 KB; ALT presente. Ver `qa.json`.
+Ruta primero y destacada; ruta verificada el día de publicación; copy sin precios ni ofertas; titular de máximo 6
+palabras, sin viudas, dentro de sus líneas y distinto del H1; CTA correcto; sin etiqueta inferior (retirada el
+2026-11-05); avión legible como jet sobre el arco; en B, titular fuera de la foto; peso < 150 KB; ALT presente. Ver
+`qa.json`.
 
 ## 5. Qué se registra en la ficha (Notion)
 
@@ -52,7 +79,19 @@ REF usadas (REF-ESTILO-D separada de REF-01 reales) · caja del sujeto y foco de
   (sólo la última versión aprobada), luego WordPress.
 - Estado de la ficha y estado de la tarea que no coinciden son un hallazgo (Playbook, 2026-10-14): no se aprueba encima.
 
-## 7. Llevarlo a un canvas de Claude Design (`/design`)
+## 7. Revisar un lote
+
+- Mirar las piezas en **hojas de contacto** (miniaturas etiquetadas con el id) antes del gate y después de exportar, y
+  abrir al 100 % las dudosas. En portadas, la hoja usa la vista `-hero-desktop` de cada una.
+- Separar lo que es error del flujo (se corrige antes de entregar) de lo que es **observación para revisión humana**
+  (se anota en el expediente del lote y no se «arregla» por cuenta propia). Ejemplos del 2026-11-05: portada de Punta
+  Cana sin la viajera tras la expansión; cenas navideñas con la persona cortada a la altura del pecho porque el foco son
+  las manos y la comida; ícono del avión en el celular de la portada de check-in; escenas con bikini de espaldas
+  (Tarapoto 2, playas de Buenos Aires 3); referencias aproximadas (Catacaos 2 con un taller de paja toquilla de Ecuador,
+  Titicaca 3 con Taquile para Amantaní, lodge de selva 2 y 3 con vegetación amazónica genérica).
+- Un lote no se aprueba en bloque: cada pieza sigue su estado en Notion y su versión en Frame.io.
+
+## 8. Llevarlo a un canvas de Claude Design (`/design`)
 
 Canvas vigente (privado): «Blog SKY — Línea gráfica», https://claude.ai/artifact/XSXa4MRuNjnyaKmhdLTvUD (8 láminas,
 2026-11-02, sin sistema de diseño: ninguno de la cuenta es de SKY; texto en Assistant, la fuente del tema, porque Metric

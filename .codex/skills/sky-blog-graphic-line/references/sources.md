@@ -44,3 +44,33 @@ pendiente de decisión del operador: moverlas al teamspace de Berel.
 - «Kickoff — Sección de estilo fotográfico» (Daniela): Sin empezar, fecha 28/10 vencida; el kickoff fue el 02/11.
 - «Producción de banners de artículos del Content Hub» (Daniela, 43 artículos en Idea): Bloqueada por la redacción
   (Valentina).
+
+## 5. Referencias fotográficas reales (REF-01)
+
+Un lugar identificable sólo se genera con una foto real del lugar cargada como `--image` (invariante 10). En el lote del
+2026-11-05 las REF salieron de dos fuentes, por decisión de Julio: Shutterstock primero («también tienes Shutterstock …
+con el cual puedes pedir imágenes reales de referencia») y, donde no había, Wikimedia Commons (opción «Usar Wikimedia
+Commons» elegida por Julio). Resultado: 33 portadas y 61 escenas generadas con REF; 20 licencias Shutterstock
+(7 portadas + 13 escenas) de las 100 descargas de la suscripción.
+
+| Fuente | Cómo se usó | Límites medidos el 2026-11-05 |
+|---|---|---|
+| Shutterstock API | Token en Secret Manager `greenhouse-shutterstock-oauth-token` (proyecto `efeonce-group`); búsqueda `GET /v2/images/search`; licencia en lote `POST /v2/images/licenses?subscription_id=…&size=huge` (suscripción Standard Image License, listada por `GET /v2/user/subscriptions`) y descarga desde la URL que devuelve cada licencia | 100 consultas por hora (`RateLimit-Limit: 100`; `RateLimit-Reset` dice cuándo vuelve). Las búsquedas agotaron el tope y la licencia esperó el reinicio |
+| Wikimedia Commons | `Special:FilePath/<archivo>?width=2000` para portadas; miniaturas `…/1920px-…` para escenas; reducción a 2400 px con sharp | Pausas entre descargas y User-Agent identificado; con 429 o descargas inválidas, reintentar más despacio; un ancho de miniatura no estándar puede responder 400 y entonces se baja el original |
+
+Reglas:
+
+- **Leer la descripción y mirar la miniatura antes de licenciar.** La relevancia del buscador es pobre para lugares de
+  Perú: entre los candidatos aparecieron un pinar de Norfolk (Inglaterra) para Costa del Este, un puesto de fruta de
+  Marrakech para el aguaje de Iquitos, «Oropesa landmarks, Spain» para Lamas y manglares de Langkawi (Malasia) para
+  Tumbes. Todos se reemplazaron por fotos de Wikimedia del lugar real.
+- **Elegir mirando:** hojas de contacto con hasta 8 candidatos por imagen, etiquetados `S0…` (Shutterstock) y `W0…`
+  (Wikimedia; `X0…` en la segunda pasada), con la imagen y la búsqueda como rótulo (`tools/imagenes/csheet3.mjs`, `csheet4.mjs`).
+- **Una REF aproximada se declara**, no se esconde: Catacaos 2 usa un taller de paja toquilla de Ecuador, Titicaca 3
+  usa Taquile para Amantaní y lodge de selva 2 y 3 usan vegetación amazónica genérica. Quedan como observación para
+  revisión humana.
+- **Sin REF válida, la pieza no se genera:** portadas de Colán y Amigos y 6 escenas quedaron bloqueadas el 2026-11-05.
+- **Procedencia en `refs-ledger/` de la pieza**, sin URLs firmadas: Shutterstock con `image_id` y `license_id`;
+  Wikimedia con título, página, licencia y autor; cada escena con su fuente y el uso «REF-01 solo como evidencia
+  geográfica para generar; no se publica». Las fotos descargadas viven fuera de Git
+  (`ai-generations/<fecha>_sky-blog-lote/{portadas,escenas}/refs/`).
