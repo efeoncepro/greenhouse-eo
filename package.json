@@ -181,6 +181,7 @@
     "meta": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/meta/cli.ts",
     "google-ads": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/google-ads/cli.ts",
     "gtm:snapshot": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/gtm/snapshot.ts",
+    "ga4:query": "tsx scripts/ga4/query.ts",
     "measurement:smoke": "node scripts/gtm/measurement-smoke.mjs",
     "growth:forms-tracking-audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/forms-tracking-audit.ts",
     "growth:forms:embed-key": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/mint-surface-embed-key.ts",

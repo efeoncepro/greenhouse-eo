@@ -104,6 +104,11 @@ actividad por página: no equivale a entradas ni suma sesiones únicas. Para adq
 con landing en el alcance. GA4 y GSC conservan sus calendarios; clics no equivalen a sesiones. No emitir una
 edición nueva de Insights o alterar snapshots históricos sólo para preparar un análisis.
 
+Consultas puntuales a GA4 para informes: `pnpm ga4:query` ([manual](../../../docs/manual-de-uso/growth/consultar-ga4-por-cli.md)).
+Usa la cuenta de servicio de Efeonce por impersonación, sin el OAuth de la app ni Vercel. Al 05-11-2026 no tiene
+acceso a la propiedad de SKY (403): falta que SKY la agregue como Lector. Mientras tanto, la vía es la conexión
+GA4 por organización.
+
 Reconciliar cada cruce GSC contra su control: página y país independientes no acreditan cobertura de
 página × país ni de consulta × página × país. Paginar o quitar query no recupera necesariamente el total;
 mantener faltantes y cobertura explícitos. Fecha CMS actual puede ser republicación, no creación.
