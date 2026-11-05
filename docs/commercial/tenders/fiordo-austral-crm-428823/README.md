@@ -102,7 +102,7 @@ Se investigó en paralelo con cinco subagentes. Los resultados son internos y es
 | --- | --- | --- |
 | [PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md](PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md) | Master de la oferta técnica en 19 bloques, con notas de diseño ▸ que se separan antes de entregar | Borrador; no está aprobado |
 | [ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md](ANEXO-MATRIZ-CIBERSEGURIDAD-428823.md) | Comprador. Matriz con las columnas que exigen las bases | Borrador |
-| [oferta-economica.md](oferta-economica.md) | Cuadro económico preliminar | **Requiere aprobación de Julio** |
+| [oferta-economica.md](oferta-economica.md) | Cuadro económico preliminar v2: licencias separadas de la implementación, con precios del portal y alcance esbelto | **Requiere aprobación de Julio**; la edición está por decidir |
 | [research/brief-visual-design.md](research/brief-visual-design.md) | Interno. Dirección para /design | Listo para la etapa de diseño |
 
 **Precio preliminar, año 1:**
@@ -120,6 +120,11 @@ Se investigó en paralelo con cinco subagentes. Los resultados son internos y es
 ## Pendientes
 
 1. Confirmar en la ficha de Wherex las fechas de cierre y de preguntas, la URL de la ficha y si se cobra comisión.
-2. Volver a mirar la tarjeta compartida para confirmar qué especialista en crecimiento se asignó y qué fecha de cierre muestra HubSpot.
+2. ~~Ver la tarjeta compartida~~. Lo que muestra el 05/11/2026 tras la asignación:
+   - especialista en crecimiento: nserrano@hubspot.com;
+   - fecha de cierre de HubSpot: 31/12/2026;
+   - etapa: Discovery.
+
+   Falta confirmar con el especialista el waiver del onboarding y el mínimo de licencias.
 3. Verificar en la documentación vigente de HubSpot tres puntos: restricción a una sesión por usuario, exportación de auditoría hacia Wazuh y respaldo inmutable. Con eso se define la edición.
 4. Armar la matriz de cumplimiento de ciberseguridad y la oferta técnica y económica, con el bid/no-bid y el margen.
