@@ -10,7 +10,7 @@
     "eyebrow": "Seguridad y accesos",
     "question": "El CRM se entrega con sus controles",
     "answer": [
-      "encendidos"
+      "Encendidos"
     ]
   },
   "body": "HubSpot tiene SOC 2 Tipo II y SOC 3. Efeonce deja los controles **encendidos** y los prueba antes de producción.",

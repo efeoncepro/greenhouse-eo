@@ -456,6 +456,15 @@ add('F21-contraportada', 'close-proposal-horizon', d, '21 · contraportada')
 # del plan técnico: va con la oferta económica y en la presentación de adjudicación.
 ECONOMICA = {'F19-inversion'}
 plan = {'document': 'proposal', 'line': 'revenue-hubspot', 'slides': []}
+# 06/11, comentario de Julio en el canvas: «cuando esto comienza en minúscula no se ve bien». El destacado (la esfera)
+# arranca siempre con mayúscula, aunque continúe la frase del anillo.
+CAPITALIZADAS = []
+for key, recipe_id, intent, purpose in slides:
+    ans = (intent.get('voice') or {}).get('answer')
+    if ans and ans[0][:1].islower():
+        ans[0] = ans[0][:1].upper() + ans[0][1:]
+        CAPITALIZADAS.append(key)
+print('mayúscula inicial en', len(CAPITALIZADAS), ':', ' '.join(CAPITALIZADAS))
 for key, recipe_id, intent, purpose in slides:
     with open(os.path.join(OUT, key + '.json'), 'w', encoding='utf-8') as fh:
         json.dump(intent, fh, ensure_ascii=False, indent=2)
