@@ -125,6 +125,20 @@ el muro original ([photography.md](photography.md) §6 quater). Logos o escudos 
 oficial y el modelo solo los termina ([photography.md](photography.md) §6 ter). Después de editar, vuelve a medir el
 color del muro y la banda del titular.
 
+Lo que el PASS del comando **no** cubre: solo prueba que fuera de la máscara no cambió nada; lo que el modelo hizo
+**dentro** de la máscara hay que revisarlo a mano (caso N4 Rayados, [lessons.md](lessons.md) 2026-11-05/06):
+
+1. **Antes**, mide los bordes del fondo que la máscara cubre (dónde termina cada franja, el zócalo, la arista de un
+   mueble) y escríbelos en el prompt como regla: «el muro detrás no cambia; la franja termina en el mismo borde vertical
+   que arriba».
+2. Si rehaces un mueble, describe su construcción física: cuántas patas, de dónde salen los postes y qué pieza nunca
+   cruza por delante.
+3. Pide 2–3 candidatos (`--count`), arma un **antes y después lado a lado** de la zona y míralo al 100 %. Elige el
+   candidato cuyo borde de fondo coincide con el medido. Un umbral de color no reemplaza la mirada: el azul en sombra no
+   cruza `b − r > 40`.
+4. Recompone desde una rama del Workbench que tenga los jobs (`main` o una rama Berel, nunca la de SKY) y sin `|| true`:
+   confirma por la hora o el id que la corrida es nueva antes de copiarla a `salidas/`, OneDrive o el canvas.
+
 ## 6. Jobs por formato (sin coordenadas)
 
 Un job por formato en `projects/berel/<pieza>/jobs/<espacio>-<formato>.json`. Ejemplo real
