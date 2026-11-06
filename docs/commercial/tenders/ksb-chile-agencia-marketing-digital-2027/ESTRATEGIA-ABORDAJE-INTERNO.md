@@ -148,6 +148,34 @@ fee/medios, así que pedir más honorarios penaliza. Las certificaciones puntúa
 (el eje HubSpot pierde peso). Lectura: **NO-GO económico**, salvo que Julio decida entrar como apuesta estratégica
 con alcance mínimo y costo asumido. Se adelanta la decisión del martes 10/11.
 
+## 7c. ¿Puede KSB Chile pagar más que 720 UF? (06/11, decisión de Julio: ir con presupuesto propio)
+
+- **Tamaño.** No hay balance público (S.A. cerrada, RUT 96.691.060-7). Los directorios con datos del SII la ponen en
+  **tramo 12 o 13** (600 mil a más de 1 millón de UF al año); RedConecta dice más de 1,7 millones de UF. 300–360
+  personas, 7 sucursales y planta propia. Estimación **[I]**: ventas de **USD 45–100 M al año** (UF ≈ USD 44).
+- **Gasto de marketing de referencia.** Benchmarks de manufactura: 5–9,5 % de ventas (Gartner citado por terceros,
+  Trivera), y menos en empresas grandes y en filiales que reciben marca, sitio y automatización de la casa matriz
+  (aquí: CoreMedia, Marketo, agencia SNK). Aun con un 0,5–1 % local **[I]**, serían USD 225 mil–1 M al año.
+- **Las 720 UF** (≈ USD 32 mil al año) son ≈ **0,03–0,07 % de sus ventas**. Una propuesta de 2.000–3.000 UF al año
+  sería ≈ 0,1–0,3 %. **Capacidad de pago hay de sobra; lo que limita es la partida aprobada.** El tope parece un
+  monto asignado o un umbral de aprobación local **[I]**; superarlo puede requerir aprobación de la gerencia general
+  o de la casa matriz.
+- **Señales de gasto real:** pauta activa en Google, Meta y LinkedIn (29 anuncios) con agencia incumbente, ferias
+  (Expocorma 2026; Expomin 2027 probable) y equipo de marketing propio.
+- **Riesgo:** la económica pesa 25 % y mide fee/medios; si puntúan contra el precio más bajo, una oferta sobre el tope
+  pierde buena parte de ese 25 %. Hay que ganarlo en el 75 % técnico y darles un camino para aprobar.
+- **Forma recomendada:** dos niveles en la misma propuesta. **Base** dentro de las 720 UF con alcance honesto
+  (lo que de verdad cabe) y **Recomendada** con el sistema completo, justificada contra los KPIs que exigen
+  (ROI 200 %, ROAS 3,0) y en UF por mes, desglosada honorarios/medios. Montos con el Cotizador V3.
+
+Fuentes: [chilerutempresa](https://chilerutempresa.cl/empresa/96691060-7/ksb-chile-s-a),
+[chilepymes](https://chilepymes.com/info/ksb-chile-s-a-E6E965138B564E56),
+[RedConecta](https://red-conecta.com/empresa/19177/ksb-chile-sa),
+[RocketReach](https://rocketreach.co/ksb-chile-sa-profile_b47e3237fc52f4ad),
+[KSB 2025](https://www.ksb.com/en-global/media/press-releases/uebersicht/2025-figures-ksb-outperforms-previous-year-2388764),
+[Trivera](https://www.trivera.com/blog/building-an-informed-marketing-budget-part-1-benchmarks/),
+[Webtonic](https://www.webtonic.io/blog/manufacturing-digital-marketing-statistics).
+
 ## 8. Escenarios de precio (a validar con el Cotizador V3)
 
 - **A — Alcance completo sobre el presupuesto base.** Los cuatro canales, contenido y redes al precio que da el
