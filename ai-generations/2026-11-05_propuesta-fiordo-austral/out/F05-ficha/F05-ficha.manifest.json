@@ -31,8 +31,8 @@
             "notePx": "--gl-pc-note-px=16px"
           },
           "photo": {
-            "src": "asset-ref:plate:HS2d-datos-en-orden",
-            "alt": "Antonio, con la chaqueta de Efeonce, ordena con la mano partículas de datos en una red de capas de luz azul"
+            "src": "asset-ref:plate:FA06-ficha-del-cliente",
+            "alt": "Julio, de Efeonce, sostiene un registro de vidrio en el que cuatro formas de luz, los requisitos de un cliente, encajan solas en sus casilleros"
           },
           "voice": {
             "question": "Lo que exige cada cliente,",
@@ -106,8 +106,8 @@
           "notePx": "--gl-pc-note-px=16px"
         },
         "photo": {
-          "src": "asset-ref:plate:HS2d-datos-en-orden",
-          "alt": "Antonio, con la chaqueta de Efeonce, ordena con la mano partículas de datos en una red de capas de luz azul"
+          "src": "asset-ref:plate:FA06-ficha-del-cliente",
+          "alt": "Julio, de Efeonce, sostiene un registro de vidrio en el que cuatro formas de luz, los requisitos de un cliente, encajan solas en sus casilleros"
         },
         "voice": {
           "question": "Lo que exige cada cliente,",

@@ -41,8 +41,8 @@
             "pillarTextPx": "--gl-sc-pillar-text-px=20px"
           },
           "photo": {
-            "src": "asset-ref:plate:HS4-te-llevas-todo",
-            "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara"
+            "src": "asset-ref:plate:FA23-sus-datos",
+            "alt": "Nexa entrega un estuche de vidrio con el archivo completo, mientras detrás queda abierto y vacío el cajón de donde salió"
           },
           "voice": {
             "question": "Si se van, se llevan",
@@ -112,8 +112,8 @@
           "pillarTextPx": "--gl-sc-pillar-text-px=20px"
         },
         "photo": {
-          "src": "asset-ref:plate:HS4-te-llevas-todo",
-          "alt": "Un líder de RevOps de Efeonce extiende la mano con un cubo de luz azul que contiene una base de datos completa, como si la entregara"
+          "src": "asset-ref:plate:FA23-sus-datos",
+          "alt": "Nexa entrega un estuche de vidrio con el archivo completo, mientras detrás queda abierto y vacío el cajón de donde salió"
         },
         "voice": {
           "question": "Si se van, se llevan",

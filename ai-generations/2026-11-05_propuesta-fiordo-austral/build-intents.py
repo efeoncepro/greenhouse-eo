@@ -119,6 +119,8 @@ d['steps'] = [
     {'glyph': 'informe', 'kicker': 'Reporta', 'name': 'Por país y vendedor'},
 ]
 d['selection'] = {'target': 'answer', **SEL}
+# 06/11, Julio: «sí, hazlas»: foto propia FA06 en vez de HS2d del deck HubSpot (ficha revisada por cine-reviewer).
+d['photo'] = {**d.get('photo', {}), 'register': 'cine', 'subject': 'person', 'plateRef': 'ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA06-ficha-del-cliente.png', 'alt': 'Julio, de Efeonce, sostiene un registro de vidrio en el que cuatro formas de luz, los requisitos de un cliente, encajan solas en sus casilleros'}
 add('F05-ficha', 'proposal-cinematic-revops', d, '05 · su ficha técnica')
 
 # 06 · Integraciones
@@ -350,6 +352,8 @@ d = base(HS, 'B26-salida.json')
 d['voice'] = {'eyebrow': 'Sin amarras', 'question': 'Si se van, se llevan', 'answer': ['sus datos']}
 d['body'] = 'Sus datos son suyos: entran a HubSpot con **orden** y salen igual de completos.'
 d['pillars'][0]['text'] = 'registros y propiedades cuando lo necesiten.'  # 06/11: la base venía en tuteo
+# 06/11, Julio: «sí, hazlas»: foto propia FA23 en vez de HS4 del deck HubSpot (ficha revisada por cine-reviewer).
+d['photo'] = {**d.get('photo', {}), 'register': 'cine', 'subject': 'nexa', 'plateRef': 'ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA23-sus-datos.png', 'alt': 'Nexa entrega un estuche de vidrio con el archivo completo, mientras detrás queda abierto y vacío el cajón de donde salió'}
 add('F11-salida', 'section-cine-purpose', d, '11 · salida')
 
 # 12 · Cronograma

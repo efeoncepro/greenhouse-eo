@@ -1,0 +1,45 @@
+{
+  "id": "FA06-ficha-del-cliente",
+  "formato": "16:9",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "CMP-crm-B",
+  "alcance": "proposal-cinematic",
+  "linea": "revenue-hubspot",
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "identidad": [
+    {
+      "persona": "julio"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce",
+      "persona": "julio"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 74 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE BOMBER JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. He holds ONE slim upright pane of clear glass, about the size of a tablet, edge-lit in azure blue (#0375DB), the blue carrier of the frame, like a single client record, with ONE hand only, his right hand (camera-left), by its lower edge, out to the side of his body at chest height, elbow bent close to his side; the whole pane sits outside the silhouette of his torso, never in front of his chest, so the mark on the camera-right side of his chest stays fully visible; his left arm hangs relaxed at his side, out of the action. His right elbow is at about 62 % of the frame width and the pane's far edge never passes a hand-span beyond it; between the left edge of the frame and the pane there is a wide band of empty darkness covering more than half of the frame. Exactly FOUR shapes of light in the whole frame and only ONE of them outside the glass: the sphere, the drop and the hexagon already rest inside their sockets, with no copy, twin, echo or trail of them anywhere outside the pane. The ring arrives from the dark depth BEHIND the pane, travelling toward the lens, seen almost head-on, a hand-span from the bottom socket; its short soft streak points back into the depth behind his right shoulder. Nothing of light — no shape, no streak, no glow — exists to the left of the pane's left edge: that edge is the left limit of every light in the frame. The four shapes are small solid volumes of cool light, each about the size of a walnut, with depth and soft falloff like glowing glass beads: never flat outlines, never neon signs, never pictograms or app icons. The glass carries NO interface: no avatar circle, no bars, no buttons, no lines of placeholder text, no frame; its only marks are four faint empty sockets of light stacked one above the other. Top socket: the sphere, settled. Second: the drop, settled. Third: the hexagon, settled. Bottom socket: still empty, waiting for the ring. No characters, no numbers, nothing legible. ONE single tiny point glows magenta-pink (#E86BD0) on the leading edge of the arriving ring, the only accent in the frame; it lights nothing around it. He does not touch the shapes: the record fills itself. His head stays almost frontal and he looks calmly into the lens, both eyes open with the full round iris visible, a calm, assured closed-mouth half-smile. The light of the record reaches his face from below and from camera-left: his camera-left cheek is lit, the camera-right half of his face falls into deeper shadow with the nose shadow legible on it; the mark on the camera-right side of his chest stays out of that light. Thin haze catches the trails. The LEFT 55 % of the frame is calm, deep dark studio space with only faint haze: no trails, no shapes, no objects. Rich contrast, no text, no letters, no numbers, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a matte ash-black presentation table close to the lens, outside every light, reflecting nothing",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "llave": {
+    "fuente": "the edge-lit glass record he holds out with one hand",
+    "lado": "to his right side (camera-left), beside his body at chest height, below and to the side of his face",
+    "tamano": "about 25 by 18 cm",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "far behind him, between his camera-left shoulder and the right edge of the frame, a few large cold blue practical lights at shoulder height or lower, melted into round bokeh, where the four shapes come from; nothing in the left 55 % of the frame and nothing in the top third above his camera-left shoulder",
+  "fenomeno": {
+    "que": "four distinct shapes of light, each one a requirement of the client, travel from the dark and click into their own rows on a single glass record",
+    "esServicio": "la ficha técnica de cada cliente (proteína, FFA, humedad y certificados) vive en su registro del CRM"
+  },
+  "nota": "Lámina 06 «Lo que exige cada cliente, / En el CRM.» de la propuesta Fiordo Austral (06/11/2026). Reemplaza HS2d del deck HubSpot (Antonio, red de datos genérica). Las cuatro formas son abstractas: no se ancla en la categoría del cliente. Julio, director de Efeonce."
+}
