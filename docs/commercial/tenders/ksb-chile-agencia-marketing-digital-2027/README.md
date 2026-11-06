@@ -17,7 +17,7 @@ Ojeda (`Pamela.Ojeda@ksb.com`), con `Base_Licitacion_MKT_Digital_v2.pdf`:
 - Cierre del 16/11 a las **16:30**.
 
 **Estrategia de abordaje (INTERNO, 06/11):** [ESTRATEGIA-ABORDAJE-INTERNO.md](ESTRATEGIA-ABORDAJE-INTERNO.md):
-GO condicionado a certificaciones y precio; decisión el martes 10/11; incumbente probable United Visions.
+GO condicionado a precio (certificaciones declaradas por Julio, evidencia por archivar); decisión el martes 10/11; incumbente probable United Visions.
 
 **PDF original:** OneDrive `Alineación/4. Comercial/Licitaciones/KSB Chile/01. Bases y anexos originales/Base_Licitacion_MKT_Digital_v2.pdf`
 (413.267 bytes, 4 páginas). **Texto:** [bases-LIC-MKT-2026-001-texto.md](bases/bases-LIC-MKT-2026-001-texto.md).
@@ -45,13 +45,14 @@ GO condicionado a certificaciones y precio; decisión el martes 10/11; incumbent
 
 | Requisito | Estado | Lectura |
 | --- | --- | --- |
-| Google Partners (Ads) | Bienvenida 2024; badge actual no verificado. Partner de Google Cloud ≠ Google Partners | Verificar en el portal |
-| Meta Business Partner | No iniciado | No se obtiene antes del 16/11 |
+| Google Partners (Ads) | **Declarado por Julio el 06/11** | Archivar badge/pantallazo con ID para adjuntar |
+| Meta Business Partner | **Declarado por Julio el 06/11** | Archivar ficha/badge para adjuntar |
 | «HubSpot Premium» | Gold Solutions Partner (readback 06/10) | Nivel inexistente; consultado |
 | Equipo 7, medios > 50 UF/mes, referencias, viabilidad financiera | Sin verificar | — |
 | Presupuesto | ≈ 60 UF/mes si es sólo tarifa | Bajo para 7 roles; revisar contra piso de margen |
 
-Si las certificaciones son eliminatorias, Efeonce queda fuera por Meta. El sitio corporativo usa **Marketo**
+Con las tres certificaciones declaradas por Julio (06/11), la compuerta que queda es el precio; falta archivar la
+evidencia de Google y Meta. El sitio corporativo usa **Marketo**
 (script visto el 06/11); KSB Chile podría usar HubSpot localmente.
 
 ## Consultas enviadas (06/11/2026 10:12 Santiago)

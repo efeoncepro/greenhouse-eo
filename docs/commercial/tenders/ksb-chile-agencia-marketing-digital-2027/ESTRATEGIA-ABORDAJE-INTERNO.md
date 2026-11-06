@@ -9,17 +9,21 @@
 
 **GO condicionado, con dos compuertas antes de invertir en la oferta completa:**
 
-1. **Certificaciones.** Si KSB responde que Google Partners y Meta Business Partner son excluyentes, es **NO-GO**:
-   Meta Business Partner no está iniciado y el badge de Google Partners no está verificado (registro de partnerships,
-   líneas 42–43; carpeta `Certificaciones/Partners/` vacía). Si puntúan, seguimos.
+1. **Certificaciones — cubierta por declaración de Julio (06/11).** Efeonce es Google Partner, Meta Business
+   Partner y HubSpot Solutions Partner (Gold). Queda pendiente **archivar la evidencia** que se adjuntará en 8.6:
+   badge o pantallazo del portal de Google Partners con el ID de empresa, ficha de Meta Business Partner y la carta de
+   HubSpot (ya existe). La carpeta `Certificaciones/Partners/` está vacía. Confirmar que lo de Google es **Google Ads
+   / Google Partners**, no Google Cloud, que es otro programa. Si la evidencia no se puede producir antes del 13/11,
+   no se declara.
 2. **Precio.** 720 UF/12 meses ≈ 60 UF/mes ≈ CLP 2,48 M ≈ USD 2.700 (UF 41.263,57 al 03/11). El pack de Performance
    pone el piso multicanal (nivel 2, 3–4 canales) en **USD 5.890/mes** con margen 45 %, sin contenidos ni redes
    (`docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md`, estado
    `hypothesis_only`). Si las 720 UF son sólo tarifa y son tope, no se llega al piso sin recortar alcance. Si KSB
    acepta ofertas sobre el presupuesto base (la económica pesa sólo 15 %), seguimos.
 
-**Fecha límite para decidir:** martes 10/11. Si KSB no responde antes, decidir con el supuesto más conservador
-(certificaciones excluyentes = NO-GO). Mientras tanto se avanza sólo en lo reutilizable (diagnóstico y estrategia),
+**Fecha límite para decidir:** martes 10/11. Con las certificaciones cubiertas, la compuerta que queda es el precio:
+si KSB no responde antes, decidir con el supuesto conservador (720 UF = tope de tarifa) y elegir entre los
+escenarios del §8. Mientras tanto se avanza sólo en lo reutilizable (diagnóstico y estrategia),
 no en la económica.
 
 ## 2. Qué aprendimos del cliente
@@ -124,9 +128,9 @@ Formato: resumen 2 págs, estrategia 10, equipo 3, económica, referencias, cert
 
 | Brecha | Estado | Acción antes del 16/11 |
 | --- | --- | --- |
-| Meta Business Partner | No iniciado | Depende de la consulta 1. No declararlo. Si puntúa, explicar la ruta (verificación del negocio en Business Manager) |
-| Google Partners (Ads) | Bienvenida 2024; badge no verificado | Revisar el portal de Partners hoy. **No repetir el claim del deck de Gana sin evidencia** |
-| HubSpot «Premium» | Gold, carta de HubSpot del 06/01/2026 y readback 06/10 | Adjuntar la carta; releer el perfil antes de enviar |
+| Meta Business Partner | Declarado por Julio el 06/11 | Archivar la ficha o badge en `Certificaciones/Partners/` y adjuntarla |
+| Google Partners (Ads) | Declarado por Julio el 06/11 | Archivar badge o pantallazo del portal con ID; confirmar que es Google Ads, no Cloud |
+| HubSpot «Premium» | Solutions Partner Gold, carta de HubSpot del 06/01/2026 y readback 06/10 | Adjuntar la carta; releer el perfil antes de enviar |
 | 5 años | Inicio de actividades SII 01/05/2021 (verificado en el PDF) | Cumple (5 años y 6 meses). **No usar «fundación 2018»** |
 | Referencias con montos comparables (3) | SKY (creativo y SEO), Berel (SEO/AEO), Motogas (redes). Ninguna de paid/lead gen B2B | Elegir 3 con autorización del cliente; reforzar con un caso de medios verificable (Eusari no se publica) |
 | Medios > 50 UF/mes comprobable | Sin evidencia documental | Buscar una cuenta gestionada con gasto comprobable; si no existe, es una brecha declarada |
@@ -161,4 +165,5 @@ Formato: resumen 2 págs, estrategia 10, equipo 3, económica, referencias, cert
 - Muchas agencias postulando (KSB lo dice) y evaluación técnica en sólo 10 días.
 - KPIs agresivos con base orgánica mínima y ciclo de venta largo.
 - Gobernanza global: marca, sitio y Marketo los controla Alemania; la agencia local opera dentro de ese marco.
-- Riesgo propio: declarar certificaciones o experiencia sin evidencia. Todo claim de la oferta debe tener respaldo.
+- Riesgo propio: declarar certificaciones o experiencia sin evidencia. Las tres certificaciones están declaradas
+  por Julio; antes de enviar, cada una debe tener su documento archivado y adjunto.
