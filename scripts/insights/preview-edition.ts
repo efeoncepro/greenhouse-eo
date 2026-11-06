@@ -55,6 +55,7 @@ import { getInsightEditionById } from '@/lib/efeonce-insights/stores/edition-sto
 import { getInsightReportById } from '@/lib/efeonce-insights/stores/report-store'
 import { readOrganizationLogoForRender } from '@/lib/storage/greenhouse-assets'
 import { resolveInsightWindows } from '@/lib/efeonce-insights/window'
+import { missingCompanionModules } from '@/lib/efeonce-insights/contracts/request'
 
 const arg = (name: string): string | undefined => {
   const hit = process.argv.find(a => a.startsWith(`--${name}=`))
@@ -109,13 +110,21 @@ const main = async () => {
   const start = arg('start')
   const endExclusive = arg('end-exclusive')
   const windowed = start && endExclusive ? { ...edition.request, period: { ...edition.request.period, start, endExclusive } } : edition.request
-  // `--modules=seo[,aeo,ico]`: un subconjunto de los módulos del encargo (p. ej. sólo el blog: `seo` con el alcance de
-  // contenido). Nunca agrega un módulo que la edición no pidió.
+  // `--modules=seo,aeo[,ico]`: un subconjunto de los módulos del encargo. Nunca agrega un módulo que la edición no pidió
+  // ni deja `seo` sin `aeo` (estándar del informe, 2026-11-06).
   const modulesArg = arg('modules')
   const modules = modulesArg ? modulesArg.split(',').map(m => m.trim()).filter(Boolean) : null
 
   if (modules && modules.some(m => !windowed.modules.includes(m as (typeof windowed.modules)[number]))) {
     throw new Error(`--modules=${modulesArg} debe ser un subconjunto de [${windowed.modules.join(', ')}]`)
+  }
+
+  // Estándar del informe: con `seo` siempre va `aeo` (mismo contrato que la creación y las recurrencias). Octubre 2026
+  // de Berel salió sin AEO justamente por un `--modules=seo` en esta vista previa.
+  const missingModules = missingCompanionModules((modules ?? windowed.modules) as typeof windowed.modules)
+
+  if (missingModules.length > 0) {
+    throw new Error(`--modules=${modulesArg ?? windowed.modules.join(',')} debe incluir ${missingModules.join(', ')}: la visibilidad orgánica siempre va con la de motores de respuesta`)
   }
 
   const request = modules ? { ...windowed, modules: modules as typeof windowed.modules } : windowed

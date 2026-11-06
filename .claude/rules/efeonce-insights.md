@@ -13,6 +13,9 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
 §10 gates, §14 estado) + `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`. El dominio vive en `src/lib/efeonce-insights/**`
 (el path lleva marca: `insights` a secas colisiona con Nexa Insights) sobre el schema `greenhouse_insights`.
 
+- **Estándar del informe (2026-11-06): `seo` siempre con `aeo`, lo más completo posible.** `missingCompanionModules`
+  (`contracts/request.ts`) lo impone en el validador del encargo y en la vista previa. El alcance de contenido recorta
+  el capítulo SEO, nunca quita el AEO. **NUNCA** entregar un informe sólo de búsqueda.
 - **Ventanas `[start, end)` en zona IANA**, resueltas en `window.ts` (DST en dos pasadas, «mes anterior» ≠ 30 días,
   29-feb → 28-feb, máximo de días, nunca futuro). **NUNCA** recalcular una ventana inline en un adapter o lane.
 - **Idempotencia por `(organization_id, idempotency_key)` + `request_hash`**: misma key y mismo payload ⇒ la misma

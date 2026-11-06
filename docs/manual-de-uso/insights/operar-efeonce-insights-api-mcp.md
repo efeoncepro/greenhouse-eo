@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.23
+> **Version:** 1.24
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-11-05 por Claude (1.23: vista previa con `--modules` y `--title`; el capítulo de búsqueda toma sus totales del control de Search Console (ISSUE-191), suma valor publicitario estimado y visitas desde redes; revisar movimientos por URLs migradas antes de entregar; code complete local, rollout pendiente. 1.22: estado de despliegue del alcance, portada blanca, `--cover` en la vista previa y cómo leer un pico. Historia: 1.21: fijar el alcance de contenido de una organización. 1.20 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-11-06 por Claude (1.24: `seo` siempre con `aeo`, credenciales de la vista previa y rechazos impresos; 1.23: vista previa con `--modules` y `--title`; el capítulo de búsqueda toma sus totales del control de Search Console (ISSUE-191), suma valor publicitario estimado y visitas desde redes; revisar movimientos por URLs migradas antes de entregar; code complete local, rollout pendiente. 1.22: estado de despliegue del alcance, portada blanca, `--cover` en la vista previa y cómo leer un pico. Historia: 1.21: fijar el alcance de contenido de una organización. 1.20 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 > **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
@@ -836,15 +836,29 @@ GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POS
 
 Opciones útiles: `--editorial-v2` (el contrato vigente), `--plan-only` (imprime el plan sin componer),
 `--cover=light|dark`, que muestra la otra portada sin tocar la preferencia de la organización,
-`--modules=seo` (un subconjunto de los módulos del encargo, por ejemplo sólo el blog; nunca agrega un módulo que la
-edición no pidió: si lo intentas, el script falla) y `--title="…"` (título del PDF local cuando el subconjunto cambia lo
-que cubre el informe; el reporte guardado no cambia). Ejemplo del informe del blog de Berel de octubre:
+`--modules=seo,aeo` (un subconjunto de los módulos del encargo; nunca agrega un módulo que la edición no pidió ni
+deja `seo` sin `aeo`: si lo intentas, el script falla) y `--title="…"` (título del PDF local; el reporte guardado no
+cambia). Ejemplo del informe de Berel de octubre (blog en el capítulo de búsqueda, motores de respuesta completos):
 
 ```bash
 pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
   --edition=insed-... --org=org-... --output=both --editorial-v2 \
-  --start=2026-10-01 --end-exclusive=2026-11-01 --modules=seo --title="Informe del blog, octubre 2026"
-``` Para que la vista
+  --start=2026-10-01 --end-exclusive=2026-11-01 --modules=seo,aeo
+```
+
+**Estándar del informe (2026-11-06): con búsqueda siempre van los motores de respuesta.** Un encargo con `seo` y sin
+`aeo` se rechaza («modules debe incluir aeo»), en la creación, en las recurrencias y en la vista previa. El alcance de
+contenido recorta el capítulo de búsqueda; el capítulo AEO sale completo (puntaje, mención por motor, Share of Model,
+Share of Voice, citas, sitios citados, tipo de fuente, sentimiento y visitas desde asistentes de IA). Si la
+organización no tiene análisis AEO en la ventana, deja `aeo` y usa `policy.allowPartial` para que el límite se vea.
+
+**Credenciales para la vista previa.** Search Console y GA4 se leen con la configuración OAuth de staging: corre
+`vercel env pull <scratchpad>/staging.env --environment=staging --yes`, filtra con `grep -E` las variables
+`GROWTH_SEARCH_CONSOLE_ENABLED`, `GROWTH_GA4_ENABLED`, `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID`,
+`GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECRET_REF`, `GOOGLE_GA4_OAUTH_CLIENT_ID`,
+`GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` y `GROWTH_SEO_WORK_QUEUE_ENABLED` a un archivo y cárgalo con
+`set -a; . <archivo>; set +a`. En bash 3.2, `. <(grep …)` no carga nada. La vista previa imprime cada rechazo con su
+motivo: un `seo/gsc: module_disabled` significa que faltan esas variables, no que Google no tenga datos. Para que la vista
 previa lea la cola de oportunidades y Analytics hacen falta `GROWTH_SEO_WORK_QUEUE_ENABLED=true` y, para Analytics,
 `GROWTH_GA4_ENABLED=true` con la configuración OAuth del entorno de staging; sin ella el informe sale con el límite
 «Google Analytics 4: sin datos suficientes».

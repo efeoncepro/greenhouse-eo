@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { EvidenceFactV1, EvidenceSnapshotContentV1 } from '../contracts/evidence'
 import { authorPlanWithBoundedAi, INSIGHTS_AUTHORING_PROMPT_VERSION_V2 } from './ai-authoring'
 import { buildDeterministicPlan } from './deterministic-planner'
-import { assertChartsAllowed } from './editorial-v2'
+import { assertChartsAllowed, contextOfFacts, humanFactSentence } from './editorial-v2'
 import { FAMILY_EVIDENCE_MATRIX, FAMILY_EVIDENCE_MATRIX_VERSION, canProduceFamily } from './family-evidence-matrix'
 import { validateEditorialPlan } from './plan-validation'
 
@@ -687,6 +687,16 @@ describe('TASK-1962 — GA4 en el Search Visibility 360', () => {
     expect(byAssistant.dimensionChannelIds).toEqual(['chatgpt', 'gemini', null])
     expect(byAssistant.series).toHaveLength(1)
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+  })
+
+  it('una parte de un total que cambia se dice sin el total («de 1.648 a 1.082», no «a 1.082 de 1.121»)', () => {
+    // Lo esencial de Berel, octubre 2026: el total del período anterior era otro, así que «de 1.648 a 1.082 de 1.121» se
+    // leía como un rango. La parte se imprime sola; el total queda en el hallazgo de la figura.
+    const current = { ...assistant('chatgpt', 'ChatGPT', 1082, 'chatgpt'), denominator: 1121, comparisonFactId: 'aeo.ai_source.chatgpt.prev' }
+    const previous = { ...assistant('chatgpt', 'ChatGPT', 1648, 'chatgpt'), factId: 'aeo.ai_source.chatgpt.prev', denominator: 1686 }
+    const byId = new Map([current, previous].map(fact => [fact.factId, fact]))
+
+    expect(humanFactSentence(current, byId, 'es-CL', contextOfFacts([current, previous]))).toBe('ChatGPT: de 1.648 a 1.082 (-34,3 %).')
   })
 
   it('si las partes no suman el total (snapshot anterior al adapter v2) no hay dona: barras ordenadas completas, nunca una figura parcial', () => {

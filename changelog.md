@@ -29,6 +29,13 @@ separó en V1 (la original) y V2 (la vigente).
 El taller dejó la carpeta temporal y vive en `ai-generations/2026-11-04_sky-black-gif/taller/`, con un chequeo de
 arranque (`doctor.sh`). Una sesión nueva, sin contexto, reconstruyó las piezas byte a byte siguiendo sólo la skill.
 
+## 2026-11-06 — Insights: la búsqueda siempre va con los motores de respuesta
+
+Estándar del operador: un encargo con `seo` sin `aeo` se rechaza (`missingCompanionModules`, en el validador del encargo
+y en la vista previa); el alcance de contenido recorta sólo el capítulo de búsqueda. La vista previa imprime cada
+rechazo con su motivo y lo esencial ya no imprime una parte con un total ajeno. Berel octubre rehecho con AEO completo
+(A4 32 págs., deck 25). Local, sin release.
+
 ## 2026-11-05 — Insights: el capítulo de búsqueda cuenta todos los clics de Google, valor estimado y visitas desde redes
 
 Code complete local, rollout pendiente (sin push ni release). El capítulo SEO toma sus totales del control de Search
@@ -532,17 +539,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Nexsys: formulario corregido y once respaldos enviados; readback Outlook/adjuntos y HubSpot SENT confirmado.
 - [Manual](docs/manual-de-uso/comercial/operar-partnerships-y-distribuidores.md), política Outlook y cuatro skills en Codex/Claude incorporan revisión integral, separación de notas internas, autoridad de firma y control de adjuntos.
 - [Directorio](docs/operations/EFEONCE_PARTNER_CONTACT_DIRECTORY_V1.md): 27 personas, 8 buzones, fuentes y rebotes; cuatro skills Codex/Claude enlazadas. Microsoft verificado y Geraldine informada. Sin nuevos envíos al consolidar contactos.
-
-## 2026-10-19 — Customer Agent Voice: caso ANAM y guía operativa
-
-- Documentada la activación de Emma en el 600, llamada real y correo enviado con firma gráfica/CCO.
-- Manual y skills espejo separan número/canal/deployment/IVR, horario humano, créditos de voz y resolución de texto.
-- Transferencia humana y buzón pendientes de prueba; sin nuevo cambio de portal ni reactivación Kortex.
-- [Evidencia](docs/audits/ANAM_CUSTOMER_AGENT_VOICE_SETUP_2026-10-19.md) · [procedimiento](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).
-
-## 2026-10-18 — Indecaucho: outreach gráfico y seguimiento nativo
-
-- Katia/Company/Primary/segmento180 y primer correo Outlook con firma/CCO/EMAIL SENT verificados.
-- Un seguimiento HubSpot programado22Oct09:30Quito, salida por respuesta/reunión; deck360 original íntegro.
-- Skills espejo incorporan recuperación de publicaciones, calidad Apollo y readback de firma/envío/calendario.
-- [Evidencia y límites](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md); sin push ni nuevos permisos.

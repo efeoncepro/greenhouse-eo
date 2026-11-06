@@ -474,4 +474,4 @@ se saltan en silencio.
   `11041847-1987-0607-0000-0e19efc03a45`, USD 0,04836 real, 230 con CPC.
 - **Visitas desde redes** (`site.social_sessions` + `social_source.*`): GA4 Organic Social + Organic Video sobre la misma
   población que las orgánicas. Nunca se presentan como búsqueda social ni como efecto del SEO.
-- **Vista previa «sólo blog»:** `preview-edition.ts --modules=seo --title="…"`.
+- **Vista previa del blog:** `preview-edition.ts --modules=seo,aeo` (desde 2026-11-06 `--modules=seo` sin `aeo` falla: estándar del informe). Credenciales: `vercel env pull` de staging a un archivo y `set -a; . archivo` (ver manual).

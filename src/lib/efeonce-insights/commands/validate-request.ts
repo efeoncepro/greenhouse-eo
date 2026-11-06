@@ -13,6 +13,7 @@ import {
   INSIGHT_MODULES,
   INSIGHT_OUTPUTS,
   INSIGHT_REQUEST_VERSION,
+  missingCompanionModules,
   type InsightAudience,
   type InsightComparisonV1,
   type InsightDepth,
@@ -75,6 +76,12 @@ export const validateInsightRequest = (
   }
 
   const modules = assertEnumArray<InsightModule>(raw.modules, 'modules', INSIGHT_MODULES)
+  const missingModules = missingCompanionModules(modules)
+
+  if (missingModules.length > 0) {
+    throw new InsightsInputError(`modules debe incluir ${missingModules.join(', ')}: la visibilidad orgánica siempre va con la de motores de respuesta`, { field: 'modules', missing: missingModules })
+  }
+
   const outputs = assertEnumArray<InsightOutput>(raw.outputs, 'outputs', INSIGHT_OUTPUTS)
   const audience = assertEnum<InsightAudience>(raw.audience ?? 'client', 'audience', INSIGHT_AUDIENCES)
 

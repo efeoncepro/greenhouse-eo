@@ -1,5 +1,22 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-11-06 · Estándar · Un informe «sólo blog» salió sin AEO y el operador lo rechazó.** Síntoma: la vista previa
+  de Berel octubre se corrió con `--modules=seo` (sólo el blog); el PDF no tenía capítulo de motores de respuesta
+  aunque el Grader tenía un análisis del 3 de octubre con 5 motores, competidores, citas y sentimiento. Regla: `seo`
+  siempre lleva `aeo`, lo más completo posible; el alcance de contenido recorta el capítulo SEO, nunca quita el AEO.
+  Ahora lo impone `missingCompanionModules` en el validador del encargo y en la vista previa. Rehecho: A4 32 págs.,
+  deck 25 láminas, 158 hechos.
+- **2026-11-06 · Vista previa local: `vercel env pull` + archivo, no `. <(…)`.** Las credenciales de Search Console y
+  GA4 se sacan de staging con `vercel env pull <scratchpad>/staging.env --environment=staging` y se cargan con
+  `set -a; . <archivo filtrado>`. En bash 3.2 `. <(grep …)` no carga nada y el capítulo SEO sale con
+  `module_disabled` (sólo keywords). La vista previa ahora imprime cada rechazo con su motivo: mirarlos antes de
+  componer.
+- **2026-11-06 · Lo esencial decía «ChatGPT: de 1.648 a 1.082 de 1.121».** Una parte de un total en una frase «de X a
+  Y» se leía como rango porque el total anterior era otro. `arrivalText` imprime la parte sola en esas frases.
+- **2026-11-06 · Pendiente: un motor sin período anterior queda fuera de la figura de mención por motor.** Claude
+  (33,3 %) entró al panel en octubre y `chartFor` sólo dibuja los motores comparables; sale en la afirmación y en la
+  tabla de respaldo. Dibujarlo exige que la serie admita un período anterior ausente (contrato `chart_spec_v1`).
+
 - **2026-11-05 · Las cifras de la guía que cambió de URL, con la base del control.** La lección del 2026-11-04 sobre
   la migración de URL midió con la tabla (5 → 138, 82 → 0, combinada 87 → 138). Con el control de Search Console
   (ISSUE-191) la URL nueva pasa de 25 a 310, la vieja de 229 a 0 y la guía combinada de 254 a 310 (+22 %). La regla no

@@ -56,6 +56,19 @@ byte-idénticos (42 reescritos). `png/` varía unos píxeles en las piezas con f
 Skill `efeonce-creative-workbench` (`sky-black-pipeline.md` §0, §4.5, §17 y §17.1; `state-continuity`;
 `sky-design-canvas`; espejo `.codex`) y manual SKY 1.9. `OUT/scripts/` quedó superada. Sin push.
 
+## 2026-11-06 — Insights: búsqueda siempre con motores de respuesta (estándar) y Berel octubre rehecho
+
+**Decisión del operador:** todo informe con `seo` lleva `aeo`, lo más completo posible. `missingCompanionModules`
+(`contracts/request.ts`) lo impone en `validate-request.ts` (creación, revisión, recurrencias) y en
+`preview-edition.ts`; el alcance de contenido recorta sólo el capítulo SEO. Además: la vista previa imprime cada rechazo
+con su motivo, y lo esencial ya no dice «de 1.648 a 1.082 de 1.121» (`arrivalText`). Código local, sin push ni release.
+**Berel octubre rehecho con AEO** (análisis del 3-oct: 5 motores, Share of Model 41,7 %, Share of Voice 44,6 % frente a
+Comex/Sherwin-Williams/Behr, citas 26,8 %, sentimiento, visitas desde IA 1.121): A4 32 págs. y deck 25, reemplazados en
+OneDrive `Berel/Informes/` y en `~/Desktop/Berel - Informe octubre 2026/`. **El borrador de correo quedó desactualizado:**
+no menciona AEO; hay que sumarle los hallazgos de motores de respuesta antes de enviar (sigue sin enviarse).
+**Pendiente:** Claude (33,3 %) no entra a la figura de mención por motor porque no tiene período anterior; sale en
+texto y tabla (requiere cambiar `chart_spec_v1`).
+
 ## 2026-11-05 — Insights Berel octubre «sólo blog»: clics completos (ISSUE-191), valor estimado y redes
 
 **Código (develop, sin push ni release):** `f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`. El capítulo SEO de
@@ -327,23 +340,3 @@ Próximo: U01 contexto por Space en ruta/reader real local; después bindings/pr
 concurrencia, historia integral y distribución pendientes. Contrato GA4/GSC/AEO candidato; TASK-2033/1960
 conservan scope/reporting. Sin src/producción/provisioning/envíos ni historia real de Diseño modificados.
 Typecheck focal sin diagnósticos, ESLint focal y task lint PASS; recibo conserva hashes de los componentes ejercitados.
-
-## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
-
-[Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por
-Julio (OK explícito), COP 120.000.000 netos de IVA; excepción de margen ≈ 17 % decidida por Julio, bajo el piso de 45 %.
-Pendientes: certificado de residencia fiscal SII (retención máx. 10 %, convenio Chile–Colombia art. 12), declaración de
-conflicto de intereses adjuntada en el reenvío de las 17:38 (sin comisión Wherex), claims SSilva/Berel/«+85» y permiso de logos (TASK-1937). Lecciones en skills
-espejo: Wherex (`wherex-radar-chrome-playwright.md`) y «La órbita» (`lessons.md`). HubSpot: deal 66672959873 en
-«Presentación de soluciones», COP 120.000.000, nota 120053981805. Sin push.
-
-## 2026-10-30 — Qualitor SMZ-116: respuesta leída, HOLD contractual
-
-[Expediente](docs/commercial/tenders/simoniz-qualitor-temporada-viajes-smz-116/README.md) y
-[contraste primario](docs/commercial/tenders/simoniz-qualitor-temporada-viajes-smz-116/REVISION-RESPUESTA-2026-10-30.md):
-Caso v2 local. COP 70 millones integrales, operación incluida, materiales adaptados Simoniz y zonas sin lista de PDV.
-«COLOMBIA» no habilita facturación Chile: HOLD; sin ruta local aceptada, recomendar NO-BID modalidad chilena.
-Inicio del foro 25/11 frente a ítem 01/12; cierre del aviso 06/11 14:00 Colombia = 16:00 Chile frente a UI 18:00 sin zona, pendiente conciliar.
-Wherex Editando / 0 COP / sin archivos; adjudicación, firma y OC no acreditadas en cobertura revisada.
-Gates internos propuestos: Julio/Legal 03/11 y bid/no-bid 05/11, 12:00 Colombia. Sin envío, oferta ni cambio HubSpot.
-OneDrive conserva v1; no se sobrescribió. No hay recordatorio ni comunicación futura programada.

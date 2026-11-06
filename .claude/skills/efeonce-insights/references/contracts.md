@@ -17,6 +17,9 @@
 | `idempotencyKey` | optional, 8–200 chars |
 | `title`, `purpose` | optional 3–200 / 3–500; name the report on first creation, ignored on revise |
 
+**Module standard (2026-11-06):** a request with `seo` must include `aeo`; `validate-request.ts` throws
+`InsightsInputError` on `modules` with `missing: ['aeo']`. Applies to manual creation, revise and schedule templates.
+
 ## Responses
 
 - Create: `202` new edition `{report, edition, idempotent:false, generation:{outcome, failedPhase, failureCode}}`;

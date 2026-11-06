@@ -42,7 +42,7 @@ vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: infra.publish }
 const ENV_ON = { INSIGHTS_SCHEDULES_ENABLED: 'true', INSIGHTS_RENDER_ENABLED: 'true', INSIGHTS_GENERATION_ENABLED: 'true' }
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
 
-const template = { modules: ['seo'], comparison: { kind: 'previous_period' }, audience: 'client', locale: 'es-CL', depth: 'standard', outputs: ['deck_pdf'], policy: { allowPartial: true } }
+const template = { modules: ['seo', 'aeo'], comparison: { kind: 'previous_period' }, audience: 'client', locale: 'es-CL', depth: 'standard', outputs: ['deck_pdf'], policy: { allowPartial: true } }
 
 const schedule = (overrides: Record<string, unknown> = {}) => ({
   scheduleId: 'isch-1', organizationId: 'org-a', scheduleVersion: 1, state: 'active', label: 'Mensual SEO', cadence: 'monthly', timeZone: 'America/Santiago',

@@ -156,6 +156,16 @@ compatible explícita, nunca usar el dato actual como histórico. Datos incomple
 bloquean la emisión por defecto. Una política explícita `allow_partial` puede emitir omisiones visibles,
 pero nunca salta los gates de seguridad, validez del instrumento o auditoría técnica.
 
+### 5.0 Estándar de módulos (Delta 2026-11-06 — code complete local, rollout pendiente)
+
+Un encargo con `seo` siempre incluye `aeo` (`INSIGHT_REQUIRED_COMPANION_MODULES` + `missingCompanionModules` en
+`contracts/request.ts`). Lo exige `validate-request.ts`, así que cubre creación manual, revisión y la plantilla de las
+recurrencias, y lo repite `scripts/insights/preview-edition.ts`; el error es `InsightsInputError` en `modules` con
+`missing`. El alcance de contenido (§5.1) recorta sólo el capítulo SEO; el AEO publica todo lo que el Grader midió en
+la ventana. Sin análisis AEO en la ventana, el encargo conserva `aeo` y usa `policy.allowPartial` para que el límite
+quede impreso. Decisión del operador tras el informe de Berel de octubre 2026, que salió sin AEO desde una vista
+previa con `--modules=seo`.
+
 ### 5.1 Alcance de contenido por organización (TASK-2033 — en staging y `ops-worker` desde 2026-10-12; Production sin release)
 
 Un informe mide lo que Efeonce trabaja, no todo lo que la fuente trae. Search Console entrega la propiedad completa

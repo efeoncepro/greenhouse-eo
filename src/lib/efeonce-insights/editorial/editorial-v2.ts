@@ -46,6 +46,13 @@ const valueText = (fact: EvidenceFactV1, locale: string): string => {
   return fmt(fact, locale)
 }
 
+/**
+ * Valor de llegada en una frase «de X a Y»: una parte de un total («1.082 de 1.121») se imprime sola, porque el total
+ * del período anterior es otro y «de 1.648 a 1.082 de 1.121» se lee como un rango (lo esencial de Berel, 2026-11-06).
+ */
+const arrivalText = (fact: EvidenceFactV1, locale: string): string =>
+  fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null ? fmt(fact, locale) : valueText(fact, locale)
+
 // ─── Familias nuevas ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -264,7 +271,7 @@ export const humanFactSentence = (fact: EvidenceFactV1, byId: Map<string, Eviden
   if (!agreed) return `${subject}: ${fromTo(fact, change, locale)}.`
 
   const before = fmt(change.previous, locale)
-  const after = valueText(fact, locale)
+  const after = arrivalText(fact, locale)
   const many = agreed.plural
 
   if (before === fmt(fact, locale)) return `${agreed.subject} ${many ? R.heldMany : R.held} ${R.heldAt} ${after}.`
@@ -305,7 +312,7 @@ const listOf = (names: string[]): string => (names.length <= 1 ? names.join('') 
 // Con las dos cifras IMPRESAS iguales, «de 31 a 31 (0,0 %)» no dice nada: «se mantuvo en 31».
 const fromTo = (fact: EvidenceFactV1, change: NonNullable<ReturnType<typeof changeOf>>, locale: string): string => {
   const before = fmt(change.previous, locale)
-  const after = valueText(fact, locale)
+  const after = arrivalText(fact, locale)
 
   return before === after ? `${R.held} ${R.heldAt} ${after}` : `${R.from} ${before} ${R.lineTo} ${after} (${change.text})`
 }

@@ -178,6 +178,10 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
 
 - `modules`: subset of the catalog modules whose `available` is `true`. A module marked
   `module_not_assigned` or `no_active_spaces` will not produce evidence; do not include it.
+  **Standard: `seo` always goes with `aeo`.** Search visibility is reported in Google and in answer engines
+  together, with every AEO measure available for the window. A request with `seo` and without `aeo` is rejected
+  (`modules debe incluir aeo`). If the organization has no AEO analysis in the window, keep `aeo` and use
+  `policy.allowPartial` so the chapter states the limit; never drop it.
 - `period`: `{ start, endExclusive, timeZone }` with civil dates `YYYY-MM-DD` and an IANA zone.
   The window is `[start, endExclusive)`: August 2026 is `2026-08-01` to `2026-09-01`. Whole calendar
   months unlock monthly sources (ETV, ICO); arbitrary ranges only serve daily sources (Search Console).
@@ -352,12 +356,12 @@ does not change: plans are immutable. Describe it as it is.
 
 ## Recipes
 
-Monthly SEO + ICO edition for a client, previous month comparison:
+Monthly SEO + AEO + ICO edition for a client, previous month comparison:
 
-1. `get_insights_catalog { organizationId }` → confirm `seo` and `ico` available.
-2. Propose to the human: modules `["seo","ico"]`, period `2026-08-01`→`2026-09-01`
+1. `get_insights_catalog { organizationId }` → confirm `seo`, `aeo` and `ico` available.
+2. Propose to the human: modules `["seo","aeo","ico"]`, period `2026-08-01`→`2026-09-01`
    `America/Santiago`, comparison `previous_period`, audience `client`, outputs `["report_pdf"]`,
-   idempotencyKey `insights-<org>-2026-08-seo-ico`.
+   idempotencyKey `insights-<org>-2026-08-seo-aeo-ico`.
 3. `create_insight_edition { organizationId, request }` → read `generation.outcome`.
 4. `get_insight_edition { editionId, includeEvidence: true }` → summarize facts with units and as-of,
    list rejections as limits, and state that issuing is pending human review.

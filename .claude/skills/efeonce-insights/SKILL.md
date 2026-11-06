@@ -37,6 +37,13 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 ## Hard rules (verbatim in `.claude/rules/efeonce-insights.md`, auto-loaded by path)
 
+- **Report standard (operator, 2026-11-06): `seo` always goes with `aeo`, as complete as possible.** Search
+  visibility is reported in Google AND in answer engines: score, mention rate per engine, Share of Model, Share of
+  Voice vs competitors, citation share, cited sites, source types, sentiment and visits from AI assistants (GA4).
+  `missingCompanionModules` (`contracts/request.ts`) enforces it in `validate-request.ts` (manual creation,
+  schedules) and in `preview-edition.ts`. NEVER deliver a blog-only/SEO-only report: a content scope trims the SEO
+  chapter, never the AEO chapter. Without an AEO run in the window, keep `aeo` with `allowPartial` so the limit shows.
+  Source case: Berel October 2026 went out of a `--modules=seo` preview without AEO and had to be redone.
 - **Windows are `[start, endExclusive)` civil dates in an IANA zone**, resolved only by `window.ts`
   (DST two-pass, "previous month" is not 30 days, Feb 29 → Feb 28, max 400 days, never starts in the
   future). NEVER recompute a window inline in an adapter, lane or renderer.

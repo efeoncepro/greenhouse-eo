@@ -72,7 +72,8 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 - `adapters/ga4-site-facts.ts` — `site.social_sessions`, `social_source.*`, `socialSourceOf` (fuente GA4 → red/isotipo), máximo 3 partes.
 - `editorial/deterministic-planner.ts` — `socialSourceFinding`; las filas `social_source.*` van a la tabla GA4, no como afirmaciones. `editorial/{criterion-figures,figure-selection}.ts`, `presentation/{content-contract,metric-glyphs}.ts`, `render/figure-slots.ts` — registro de los hechos nuevos.
 - `src/lib/copy/insights.ts` — `GH_INSIGHTS.seoControl`, `organicValue`, `figures.driversHiddenLabel`, `metrics['organic_value*' | 'site.social_sessions']`, nota de la tarjeta del valor, `ga4.socialChannelName`/`otherNetworks`.
-- `scripts/insights/preview-edition.ts` — `--modules=<subconjunto>` y `--title="…"` (sólo el PDF local).
+- `scripts/insights/preview-edition.ts` — `--modules=<subconjunto>` (nunca `seo` sin `aeo`), `--title="…"` (sólo el PDF local) e impresión de cada rechazo con su motivo.
+- `contracts/request.ts` — `INSIGHT_REQUIRED_COMPANION_MODULES` / `missingCompanionModules`: `seo` exige `aeo` (2026-11-06).
 - Pendiente fuera de Insights: tablero SEO y demás readers de `seo_gsc_daily` siguen sumando el subconjunto (ISSUE-191 abierto).
 
 ## TASK-1846 — durable rendering (2026-09-16)
