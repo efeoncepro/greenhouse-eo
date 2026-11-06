@@ -1,9 +1,10 @@
 // Neón v3: letras nítidas, el marco como tubo encendido, penumbra detrás y opacidad de la capa de luz.
 const sharp = require('/Users/jreye/Documents/greenhouse-eo/node_modules/sharp');
 const { mascaraKV, K } = require('./neon2.cjs');
-const OUTD = __dirname + '/out3'; require('fs').mkdirSync(OUTD, { recursive: true });
+const OUTD = __dirname + '/out4'; require('fs').mkdirSync(OUTD, { recursive: true });
 const OPAC = { sutil: 0.45, medio: 0.72, fuerte: 1.0 };
-const G = [80, 255, 40], CORE = [240, 255, 232];
+const LETRA = [38, 222, 0];
+const G = [60, 245, 25], CORE = [150, 255, 120]; // plano: sin núcleo blanco
 const raw1 = (b, w, h) => sharp(b, { raw: { width: w, height: h, channels: 1 } });
 function box(src, W, H, r) {
   const t = new Float32Array(src.length), o = new Float32Array(src.length), d = 2 * r + 1;
@@ -44,25 +45,29 @@ async function neon(src, mk, fmt, mb) {
   const m = await mascaraFmt(mk, fmt, W, H);
   const t6 = gauss(m, W, H, 6 * sc, false);
   const frame = Buffer.alloc(W * H), letra = Buffer.alloc(W * H);
-  for (let j = 0; j < W * H; j++) { const mm = m[j] / 255, th = Math.max(0, Math.min(1, (t6[j] - 0.3) / 0.25)); letra[j] = Math.round(mm * th * 255); frame[j] = Math.round(mm * (1 - th) * 255); }
+  const nucleo = Buffer.alloc(W * H);
+  for (let j = 0; j < W * H; j++) nucleo[j] = t6[j] > 0.38 ? 255 : 0;
+  const exp = gauss(nucleo, W, H, 7 * sc, false);                    // crece ~10 px: cubre bordes y trazos de la A
+  const zona = new Uint8Array(W * H);
+  for (let j = 0; j < W * H; j++) { const mm = m[j] / 255, th = exp[j] > 0.04 ? 1 : 0; zona[j] = th; letra[j] = Math.round(mm * th * 255); frame[j] = Math.round(mm * (1 - th) * 255); }
   const f2 = gauss(frame, W, H, 1.6 * sc, true), f6 = gauss(frame, W, H, 6 * sc, true), f22 = gauss(frame, W, H, 22 * sc, true), f60 = gauss(frame, W, H, 60 * sc, true), f140 = gauss(frame, W, H, 140 * sc, true);
-  const l5 = gauss(letra, W, H, 5 * sc, true), l20 = gauss(letra, W, H, 20 * sc, true);
+  const l5 = gauss(letra, W, H, 5 * sc, true), l20 = gauss(letra, W, H, 20 * sc, true), l50 = gauss(letra, W, H, 50 * sc, true);
   const st = gauss(m, W, H, 90 * sc, true);
   const wb = await mascaraFmt({ ...mb, lb: mk.lb }, fmt, W, H);
   const full = new Float32Array(W * H * 3);
   for (let j = 0; j < W * H; j++) {
     const Lf = 1 - Math.exp(-(1.5 * f6[j] + 0.85 * f22[j] + 0.38 * f60[j] + 0.16 * f140[j]));
-    const Ll = 1 - Math.exp(-(0.5 * l5[j] + 0.22 * l20[j]));
+    const Ll = 1 - Math.exp(-(1.1 * l5[j] + 0.6 * l20[j] + 0.25 * l50[j]));
     const L = 1 - (1 - Lf) * (1 - Ll);
     const stage = 1 - 0.5 * Math.min(1, st[j] * 1.4);               // penumbra tras el letrero
-    const core = Math.min(1, f2[j] * 1.25);                         // tubo blanco del marco
-    const lm = letra[j] / 255;
+    const core = Math.min(1, f2[j] * 1.25) * 0.55;                  // trazo del marco más claro, plano
+    const lm = Math.min(1, (letra[j] / 255) * 1.0);
     for (let c = 0; c < 3; c++) {
       const o = px[j * 3 + c] / 255;
       let v = o * stage;
       v = v + (G[c] / 255) * L * (1 - v * 0.3);
       v = v + (CORE[c] / 255 - v) * core;
-      v = v * (1 - lm) + o * lm;                                    // letras intactas y nítidas
+      if (zona[j]) { const cov = Math.min(1, lm * 1.2); v = v * (1 - cov) + (LETRA[c] / 255) * cov; } // letra = verde plano #26de00 sobre el halo
       const wm = (wb[j] / 255) * 0.8; v = v * (1 - wm) + o * wm;    // avión y textos blancos limpios
       full[j * 3 + c] = Math.max(0, Math.min(1, v));
     }

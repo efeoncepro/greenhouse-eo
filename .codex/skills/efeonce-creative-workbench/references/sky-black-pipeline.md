@@ -514,27 +514,33 @@ encima de los PNG del taller.
 - **Código:** `$T/exploraciones/neon-logo/`. Vigente: `neon3.cjs` (receta, KV/popup/story) y `extra3.cjs` (logo solo
   sobre negro, logo sobre la foto sola `parts/<KV>__base` + logo, y encendido animado); `page2.cjs` arma la página del
   canvas desde `blobs.json` (ids de assets). `neon2.cjs`, `sindiseno.cjs` y `encendido.cjs` son la ronda 1 (rechazada) y
-  `neon3` reusa de `neon2` solo `mascaraKV`. Salidas en `out3/` y `fr3-*/` (fuera de git).
+  `neon3` reusa de `neon2` solo `mascaraKV`. Salidas en `out4/` y `fr4-*/` (fuera de git).
 - **Ronda 1 (canvas v54), rechazada por el operador por falta de impacto:** halo aditivo del mismo verde sobre letras y
   marco. A tamaño de story no se leía como neón: ablandaba los bordes de «BLACK» (se veía desenfocado), no había
   penumbra y el halo quedaba corto. No repetirla.
-- **Receta vigente (ronda 2, canvas v55):** máscara = píxeles verdes de `parts/<KV>__logo.png` (`G − max(R,B)`) bajo
-  y=134 del KV; se separa en **letras** (centro grueso: desenfoque σ6 > 0,3) y **marco** (trazo fino). Las **letras se
-  restauran intactas** encima (nítidas, verde de marca) y solo llevan un brillo exterior leve (σ 5/20). El **marco es el
-  tubo**: núcleo casi blanco `(240,255,232)` y halo verde `(80,255,40)` en σ 6/22/60/140 (pesos 1,5/0,85/0,38/0,16,
-  `1 − e^(−Σ)`). **Penumbra** detrás del letrero: la foto baja hasta 50 % bajo un desenfoque σ90 de la máscara, para
-  que se lea también sobre cielo claro. El avión y los textos blancos se re-mezclan al 80 % para que no se tiñan. En story
-  todo escala ×1,3 con la geometría de `compose.cjs` (`(lb.x, lb.y) → (lb.x, 270)`). Los desenfoques son en **coma
-  flotante** (tres cajas): con buffers de 8 bits, los σ grandes sobre un trazo de 2 px dejaban bandas de posterización.
+- **Ronda 2 (canvas v55), rechazada: salía biselada.** Letras nítidas, marco como tubo de núcleo blanco y penumbra,
+  pero las letras se separaban del marco por grosor (σ6 > 0,3) y su **borde** caía en «trazo fino»: recibía el núcleo
+  blanco (filo claro) y, por dentro, el borde suavizado del original mezclado con la penumbra (línea oscura). SKY no
+  quiere volumen: **plano**, con el efecto neón.
+- **Receta vigente (ronda 3, canvas v56, plana):** máscara = píxeles verdes de `parts/<KV>__logo.png`
+  (`G − max(R,B)`) bajo y=134 del KV. **Letras** = núcleo grueso (σ6 > 0,38) **crecido ~10 px** (σ7 > 0,04), para
+  que cubra bordes y trazos de la A; **marco** = el resto. Las letras se **componen como verde plano `#26de00`** encima
+  del halo, con la máscara como cobertura (sin filos, sin sombras, sin restaurar el borde original). Halo exterior de
+  las letras σ 5/20/50 (pesos 1,1/0,6/0,25). El **marco** lleva halo verde `(60,245,25)` en σ 6/22/60/140 (pesos
+  1,5/0,85/0,38/0,16, `1 − e^(−Σ)`) y su trazo solo se aclara a `(150,255,120)` al 55 %: **sin núcleo blanco**.
+  **Penumbra** detrás del letrero: la foto baja hasta 50 % bajo un desenfoque σ90 de la máscara. Avión y textos blancos se
+  re-mezclan al 80 % para que no se tiñan. En story todo escala ×1,3 con la geometría de `compose.cjs`
+  (`(lb.x, lb.y) → (lb.x, 270)`). Desenfoques en **coma flotante** (tres cajas): en 8 bits los σ grandes sobre un
+  trazo de 2 px posterizan.
 - **Las tres opciones = opacidad de esa capa de luz** sobre la pieza actual, como pidió Adriana: 1 · sutil 45 %,
-  2 · medio 72 %, 3 · fuerte 100 %. Encendido animado: 78 cuadros a 25 fps (0,5 s apagado, parpadeo de tubo, queda en
+  2 · medio 72 %, 3 · fuerte 100 % (iguales en la ronda 3). Encendido animado: 78 cuadros a 25 fps (0,5 s apagado, parpadeo de tubo, queda en
   100 %), MP4 de Tacna KV e Iquitos story.
 - **Canvas:** página «KV Black · Neón del logo (exploración)» (`kv-black-neon`), 9 tableros de fila
   (`neon-<formato>-<ciudad>.dc.html`): logo solo sobre negro, logo sobre la foto sola (Tacna clara, Iquitos oscura) y KV,
   popup y story de ambas; columnas actual · 1 · 2 · 3 · encendido. **La versión ya tenía 495 archivos** (límite 511):
   las imágenes y videos van como **assets** (`/_blob/…`, no cuentan) y cada fila es un solo tablero. `launch` no se
-  tocó. La copia local `$P/canvas.json` quedó sincronizada con la v55: un script de página que publique desde `$P` la
-  conserva. Los assets de la ronda 1 siguen en el store sin uso (no se borraron).
+  tocó. La copia local `$P/canvas.json` quedó sincronizada con la v56: un script de página que publique desde `$P` la
+  conserva. Los assets de las rondas 1 y 2 siguen en el store sin uso (no se borraron); la ronda 3 reusa los de «actual».
 - **Errores de sharp que costaron una vuelta:** `blur` sobre un buffer de 1 canal devuelve 3 (rayas horizontales):
   `extractChannel(0)`; `extract` corre antes que `composite` en la misma cadena; `create` no admite 1 canal.
 - **Pendiente:** que Dianesty (SKY) elija la opción. Aplicarla a las ~150 piezas es otra fase y solo a pedido; la receta
