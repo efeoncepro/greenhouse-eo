@@ -67,7 +67,7 @@ El alta comercial existente crea contexto financiero y rechaza otro cliente; el 
 
 ### Depends on
 
-- [TASK-2096](TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
+- [TASK-2096](../in-progress/TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
 - [TASK-2097](TASK-2097-operational-space-service-source-routing.md) — contrato local requerido; no exige rollout.
 - [TASK-2098](TASK-2098-operational-accounts-finance-owner-attribution.md) — contrato local requerido; no exige rollout.
 - [Evidencia local](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md); 204 pruebas, no certificación productiva.

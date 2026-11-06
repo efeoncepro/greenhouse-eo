@@ -67,7 +67,7 @@ El sync resuelve el Space con `LIMIT 1` sin orden ni filtro `active` y el upsert
 
 ### Depends on
 
-- [TASK-2096](TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
+- [TASK-2096](../in-progress/TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
 - [Evidencia local](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md); 204 pruebas, no certificación productiva.
 
 ### Blocks / Impacts

@@ -2792,7 +2792,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 > Reserva 2026-11-06: TASK-2096–2102 para EPIC-057, cuentas operativas por Space; verificados libres en filas, notas de reserva y filesystem. Autorización: formalizar EPIC y dependencias, sin ejecución runtime. Siguiente ID libre TASK-2103.
 
-| `TASK-2096` | `to-do` | **Cuentas operativas: autoridad y contexto por Space.** EPIC-057; U01; backend-data/api; planificación sin implementación. | `docs/tasks/to-do/TASK-2096-operational-space-authority-and-request-context.md` |
+| `TASK-2096` | `in-progress` | **Cuentas operativas: autoridad y contexto por Space.** EPIC-057; U01; backend-data/api; tomada 2026-11-06. | `docs/tasks/in-progress/TASK-2096-operational-space-authority-and-request-context.md` |
 | `TASK-2097` | `to-do` | **Cuentas operativas: routing estable de servicios y fuentes.** EPIC-057; U02; backend-data/sync; planificación sin implementación. | `docs/tasks/to-do/TASK-2097-operational-space-service-source-routing.md` |
 | `TASK-2098` | `to-do` | **Cuentas operativas: owner financiero y atribución por servicio.** EPIC-057; U02F; backend-data/reader; planificación sin implementación. | `docs/tasks/to-do/TASK-2098-operational-accounts-finance-owner-attribution.md` |
 | `TASK-2099` | `to-do` | **Cuentas operativas: plan y command de alta hija idempotente.** EPIC-057; U03; backend-data/command; planificación sin implementación. | `docs/tasks/to-do/TASK-2099-operational-space-provisioning-plan-command.md` |

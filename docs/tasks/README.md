@@ -12,7 +12,7 @@
 
 - `TASK-2097` — [Cuentas operativas: routing estable de servicios y fuentes](to-do/TASK-2097-operational-space-service-source-routing.md), to-do; EPIC-057 / U02; sin implementación.
 
-- `TASK-2096` — [Cuentas operativas: autoridad y contexto por Space](to-do/TASK-2096-operational-space-authority-and-request-context.md), to-do; EPIC-057 / U01; sin implementación.
+- `TASK-2096` — [Cuentas operativas: autoridad y contexto por Space](in-progress/TASK-2096-operational-space-authority-and-request-context.md), in-progress; EPIC-057 / U01; discovery y plan 2026-11-06.
 
 - [EPIC-057: cuentas operativas por Space](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md): TASK-2096–2102 planificadas; TASK-2094 valida; Insights/portal conservan sus dueñas.
 

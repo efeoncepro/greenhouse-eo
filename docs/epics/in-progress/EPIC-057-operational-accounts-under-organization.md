@@ -49,7 +49,7 @@ La solución cruza dominios y reutiliza EPIC-045/046/022, sin trasladarles tarea
 | Unidad | Task única | Dueño | Dependencias de implementación local | Estado al formalizar |
 | --- | --- | --- | --- | --- |
 | U00/U08 | [TASK-2094](../../tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md) | QA/arquitectura transversal | Baseline ya ejecutado; certificación integral tras contratos/consumers indicados abajo | in-progress |
-| U01 | [TASK-2096](../../tasks/to-do/TASK-2096-operational-space-authority-and-request-context.md) | Identity / Spaces | Baseline 204 casos de TASK-2094 | to-do |
+| U01 | [TASK-2096](../../tasks/in-progress/TASK-2096-operational-space-authority-and-request-context.md) | Identity / Spaces | Baseline 204 casos de TASK-2094 | to-do |
 | U02 | [TASK-2097](../../tasks/to-do/TASK-2097-operational-space-service-source-routing.md) | Services / Source Sync | TASK-2096 | to-do |
 | U02F | [TASK-2098](../../tasks/to-do/TASK-2098-operational-accounts-finance-owner-attribution.md) | Finance / Service Attribution | TASK-2096, TASK-2097 | to-do |
 | U03 | [TASK-2099](../../tasks/to-do/TASK-2099-operational-space-provisioning-plan-command.md) | Core / Spaces | TASK-2096, TASK-2097, TASK-2098 | to-do |

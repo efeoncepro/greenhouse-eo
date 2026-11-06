@@ -67,7 +67,7 @@ Account360 agrega todos los Spaces de la Organization y su caché se indexa sól
 
 ### Depends on
 
-- [TASK-2096](TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
+- [TASK-2096](../in-progress/TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
 - [TASK-2097](TASK-2097-operational-space-service-source-routing.md) — contrato local requerido; no exige rollout.
 - [Evidencia local](../../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md); 204 pruebas, no certificación productiva.
 

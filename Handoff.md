@@ -408,4 +408,5 @@ inactivo conserva claims sin límite; un P&L cerrado se reescribe. Tasks 2096–
 corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin código ni producción. Disco local al 98%.
 ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service explícito). ADR, `DECISIONS_INDEX`,
 EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
-Próximo: TASK-2096 local.
+TASK-2096 tomada (in-progress, `develop`): [plan](docs/tasks/plans/TASK-2096-plan.md) con H2b nuevo (magic link sin
+chequeo de activo). Medido: 0 clientes con más de un Space activo. Espera checkpoint: migraciones sólo en PG efímero.

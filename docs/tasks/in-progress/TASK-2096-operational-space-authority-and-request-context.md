@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
+- Status real: `Tomada 2026-11-06; discovery y plan; sin código. Medido: 0 clientes con más de un Space activo (16 con uno), session_360 = 116 filas para 116 usuarios; H1 latente`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`

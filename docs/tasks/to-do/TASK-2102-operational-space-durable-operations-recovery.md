@@ -67,7 +67,7 @@ Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede re
 
 ### Depends on
 
-- [TASK-2096](TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
+- [TASK-2096](../in-progress/TASK-2096-operational-space-authority-and-request-context.md) — contrato local requerido; no exige rollout.
 - [TASK-2097](TASK-2097-operational-space-service-source-routing.md) — contrato local requerido; no exige rollout.
 - [TASK-2098](TASK-2098-operational-accounts-finance-owner-attribution.md) — contrato local requerido; no exige rollout.
 - [TASK-2100](TASK-2100-operational-space-readers-cache-isolation.md) — contrato local requerido; no exige rollout.
