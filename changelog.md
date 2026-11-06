@@ -11,6 +11,10 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-06 — SKY BLACK 2026: piezas aprobadas y story de Pucallpa corregida
+
+Daniela aprobó todas las rutas foco; la story de Pucallpa quedó corregida (torre más arriba) y espera su visto bueno.
+
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con precio
 
 El Workbench compone las 39 piezas BLACK (KV, popup y story) desde el diseño aprobado y les pone precio, descuento,

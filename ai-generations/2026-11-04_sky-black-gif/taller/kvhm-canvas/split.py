@@ -2,12 +2,11 @@ import os, shutil, sys
 O='/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-04_sky-black-gif/rutas-peru'
 N=os.path.expanduser('~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2026/10_Noviembre')
 IATA={'AREQUIPA':'AQP','AYACUCHO':'AYP','CAJAMARCA':'CJA','CHICLAYO':'CIX','CUSCO':'CUZ','IQUITOS':'IQT','JAUJA':'JAU','JULIACA':'JUL','PIURA':'PIU','PUCALLPA':'PCL','TACNA':'TCQ','TALARA':'TYL','TARAPOTO':'TPP','TRUJILLO':'TRU','TUMBES':'TBP'}
-# Estado en Frame.io (Daniela, 2026-11-05): A = aprobado; R = ajustado, va a revisión; C = por confirmar (sin cambios)
-# Estado vigente (Frame.io, Daniela, 2026-11-05: 1.ª revisión 17:14 y 2.ª revisión 16:49–17:00 hora de Frame).
-# A = aprobado; R = ajustado o con cambios pedidos, va a revisión.
-E={'AYACUCHO':('R','R'),'CAJAMARCA':('A','A'),'CHICLAYO':('R','R'),'CUSCO':('R','A'),'IQUITOS':('A','A'),'JAUJA':('A','A'),
-   'JULIACA':('A','A'),'PIURA':('R','R'),'PUCALLPA':('A','R'),'TACNA':('A','A'),'TALARA':('R','R'),'TARAPOTO':('A','R'),
-   'TRUJILLO':('A','A'),'TUMBES':('A','A'),'AREQUIPA':('A','A')}
+# Estado vigente (Daniela, Teams 2026-11-06 10:28 + Frame «V2»: «Marqué todo como aprobado. Sólo la story de Pucallpa
+# no me hizo la corrección que le dejé»). La corrección («subir un poco más la torre, sin que choque con el logo») se
+# aplicó el 2026-11-06 con lift 0.07 y queda en revisión hasta su visto bueno. A = aprobado; R = va a revisión.
+E={c:('A','A') for c in IATA}
+E['PUCALLPA']=('A','R')
 DST={'A':N+'/BLACK SKY 2026 - APROBADO','R':N+'/BLACK SKY 2026 - PARA REVISION'}
 apply='--apply' in sys.argv; cnt={'A':0,'R':0}; plan=[]
 for c,(p,s) in E.items():
@@ -19,6 +18,9 @@ print(cnt)
 if apply:
   for st,src,dst in plan:
     os.makedirs(os.path.dirname(dst),exist_ok=True)
+    # Una pieza que cambia de estado se MUEVE de una carpeta a la otra (nunca queda en las dos, nunca se borra).
+    other=dst.replace(DST[st],DST['R' if st=='A' else 'A'])
+    if os.path.exists(other): shutil.move(other,dst)
     shutil.copy2(src,dst)
   print('copiados',len(plan))
 for st,src,dst in plan: print(st, dst.split('10_Noviembre/')[1])

@@ -33,7 +33,7 @@ sigue en Creative Workbench ([SKILL.md](../SKILL.md), invariantes; [sky-producti
 | Artifact | URL | Tipo | Estructura |
 | --- | --- | --- | --- |
 | Design System «SKY Airline — Performance» | https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Design System | `project/design-system.json` v3, `tokens.json` (forma de lista), `tokens.css`, `components/<Comp>/README.md` + `preview.html`, `bundle.js` mínimo; `index.d.ts` se sube como text/plain |
-| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; 40 tras la cuarta ronda, 44 tras la quinta y 47 tras la sexta; **vigente: versión 51** (séptima ronda, 2026-11-05), con las mismas 10 páginas |
+| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; 40 tras la cuarta ronda, 44 tras la quinta y 47 tras la sexta; 51 tras la séptima; **vigente: versión 53** (octava ronda, 2026-11-06: todo aprobado salvo la story de Pucallpa, corregida), con las mismas 10 páginas |
 
 **Design System.** Se construyó desde las 126 adaptaciones (37 composiciones) del pack SKY
 `0.1.0` de Workbench, consultadas con `pnpm marca:recetas sky` ([recipes.md](recipes.md)).

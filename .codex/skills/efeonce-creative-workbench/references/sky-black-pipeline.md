@@ -483,6 +483,22 @@ Trujillo y Tumbes completas, la story de Cusco y el popup de Tarapoto. Ajustes:
 las dos (no se borra) y se sobrescribe con la versión vigente. Ayacucho, Chiclayo y la story de Pucallpa no aparecen en la
 segunda revisión: siguen en revisión.
 
+### 4.9 Octava ronda (2026-11-06): todo aprobado salvo la story de Pucallpa
+
+- Daniela (Teams 10:28 + Frame «V2», `https://f.io/gJMZ_dQl`): «Marqué todo como aprobado. Sólo la de Pucallpa el story
+  no me hizo la corrección que le dejé». La corrección estaba en el aviso de Frame del 2026-11-05 17:05: **«SUBIR UN
+  POCO MÁS LA TORRE, SIN QUE CHOQUE CON EL LOGO»**. (Con el panel del navegador oculto, Frame no pinta: se leyó del
+  correo `notifications@frame.io`.)
+- Arreglo: la foto de la story ya cubría justo el alto (900×1600 → 1080×1920), sin margen para moverla. Se usó `lift`
+  como en Iquitos: `fotos-destino.json → HM_PE_RUTA_PUCALLPA.f.story = { s [0.5,0.5], t [0.5,0.43], lift 0.07 }`. La
+  torre sube ~130 px, la punta queda ~30 px bajo la fecha del logo y el reflejo de abajo cae bajo el degradado del pie.
+- Estados: `split.py` ahora marca las 15 rutas como aprobadas salvo `PUCALLPA` story, y **mueve** la pieza de una
+  carpeta a la otra (antes sólo copiaba y una pieza podía quedar en las dos). «BLACK SKY 2026 - APROBADO» quedó con 29
+  piezas y «- PARA REVISION» sólo con `BS_STORY_PCL.png` + LEEME. Canvas versión 53 (sólo cambió esa imagen).
+- Workbench: contrato de fotos re-admitido en la rama `claude/sky-black-2026-pucallpa` (commit `074cdc6`, sin push); la
+  story que arma el Workbench coincide con la del taller (media 0,13/255). El admisor fallaba al re-admitir (archivos en
+  solo lectura); quedó idempotente.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

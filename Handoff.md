@@ -2,6 +2,15 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: Daniela aprobó todo salvo la story de Pucallpa (corregida, en revisión)
+
+Teams 10:28 + Frame «V2»: todo aprobado; la story de Pucallpa no tenía su corrección («subir un poco más la torre, sin
+que choque con el logo», aviso de Frame 2026-11-05 17:05). Corregida con `lift` 0.07 en `fotos-destino.json` (la torre
+sube ~130 px; queda ~30 px bajo el logo). `split.py` mueve piezas entre carpetas: «APROBADO» 29, «PARA REVISION» sólo
+`BS_STORY_PCL.png` + LEEME. «BLACK SKY 2026» (1 archivo) y «ENTREGABLES BLACK» al día; canvas versión 53. Workbench:
+rama `claude/sky-black-2026-pucallpa` commit `074cdc6` (contrato de fotos + admisor idempotente), **sin push ni PR**.
+Pendiente: visto bueno de Daniela a la story de Pucallpa; PR del Workbench con autorización.
+
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con sus cifras
 
 Pedido de Julio: las piezas aprobadas por Daniela sólo esperan precio; el Workbench tiene que poder construirlas.

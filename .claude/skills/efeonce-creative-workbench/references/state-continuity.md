@@ -64,6 +64,8 @@ en `ai-generations/2026-11-04_sky-black-gif/taller/`, sin rutas al scratchpad vi
 taller/kvhm-canvas/doctor.sh` ([sky-black-pipeline.md](sky-black-pipeline.md) §0 y §17). `scripts/` quedó superada. Desde el 2026-11-06 el Workbench también construye las 39 piezas con cifras
 (familia `brands/sky-airline/campaigns/black-2026/`, en `main` del Workbench por PR #35, squash `a47fea2`; jobs con
 `null` hasta que SKY dé precios y fechas; [sky-black-pipeline.md](sky-black-pipeline.md) §19).
+2026-11-06 (octava ronda): Daniela aprobó todo salvo la story de Pucallpa; corregida (torre más arriba, pipeline §4.9)
+y en revisión. Canvas versión 53.
 Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
 la regla de la flecha también vale para los popups de los KV del kit.
 
