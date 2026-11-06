@@ -654,6 +654,11 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   `anim-css-gen`/`render-gif` de las 10). Sin story video. Entrega con
   `ORGANIZAR_SOLO='GIF \+ POPUP/(?!VOE).*/BS_(POPUP|GIF)_' node organizar.cjs …`: popup, GIF y GIF con audio de las 10
   carpetas. Story y story video en OneDrive quedan los de la novena ronda, con el logo anterior: los exporta Daniela.
+- **Canvas (a pedido de Julio): versión 61.** 10 MP4 mudos de GIF subidos como assets (ids nuevos en `vid-blobs.json`) y
+  32 archivos publicados: KV y popup de las 10 piezas, 10 tableros `g-gif` y los 2 `anim` de clúster. Como en la
+  entrega, quedaron fuera las stories, BR y Chile nacional: `sync-canvas` los había reescrito y se devolvieron a lo
+  publicado. Antes de publicar se comprobó que los archivos a reemplazar seguían iguales a la versión 59, porque otra
+  sesión había publicado en el medio (cambió otros archivos y `canvas.json` seguía idéntico).
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
