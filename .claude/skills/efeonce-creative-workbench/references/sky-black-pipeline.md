@@ -654,6 +654,11 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   `anim-css-gen`/`render-gif` de las 10). Sin story video. Entrega con
   `ORGANIZAR_SOLO='GIF \+ POPUP/(?!VOE).*/BS_(POPUP|GIF)_' node organizar.cjs …`: popup, GIF y GIF con audio de las 10
   carpetas. Story y story video en OneDrive quedan los de la novena ronda, con el logo anterior: los exporta Daniela.
+- **Sin GIF desde esta ronda** (Daniela vía Julio, 2026-11-06: «no uses GIF, sólo deja en MP4, que es mejor formato»):
+  en las carpetas `GIF + POPUP` la pieza animada va sólo como `BS_GIF_<PIEZA>_AUDIO.mp4`. Los 10 `.gif` del lote se
+  movieron a la papelera de macOS (`~/.Trash/BLACK SKY 2026 - GIF retirados 2026-11-06/`, recuperables) y
+  `organizar.cjs` ya no los agrega. `render-gif.sh` sigue generando el `.gif` en `OUT`, pero no se entrega. Quedó un
+  `.gif` en BR «Voe a Santiago», que está fuera del lote.
 - **Canvas (a pedido de Julio): versión 61.** 10 MP4 mudos de GIF subidos como assets (ids nuevos en `vid-blobs.json`) y
   32 archivos publicados: KV y popup de las 10 piezas, 10 tableros `g-gif` y los 2 `anim` de clúster. Como en la
   entrega, quedaron fuera las stories, BR y Chile nacional: `sync-canvas` los había reescrito y se devolvieron a lo

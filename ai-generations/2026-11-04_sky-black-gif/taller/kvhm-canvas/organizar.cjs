@@ -20,7 +20,8 @@ const gif = (mk, kv, carpeta, suf) => {
   const d = `${mk}/GIF + POPUP/${carpeta}/`;
   add(`estaticos/${kv}__popup.png`, d + `BS_POPUP_${suf}.png`);
   add(`estaticos/${kv}__story.png`, d + `BS_STORY_${suf}.png`);
-  add(`${kv}.gif`, d + `BS_GIF_${suf}.gif`);
+  // Desde la décima ronda (2026-11-06, Daniela vía Julio: «no uses GIF, sólo deja en MP4, que es mejor formato») no se
+  // entrega el .gif: la pieza animada va sólo como MP4 con audio (BS_GIF_<PIEZA>_AUDIO.mp4, abajo).
   // Sólo el GIF: el MP4 con el mismo nombre se veía como «exportado dos veces» (Daniela, 2026-11-05).
   add(`story-video/${kv}__story-video.mp4`, d + `BS_STORYVIDEO_${suf}.mp4`);
   // Novena ronda (Daniela, Frame 2026-11-06: «el GIF no tiene audio»): un GIF no lleva sonido. Va el MP4 con el audio

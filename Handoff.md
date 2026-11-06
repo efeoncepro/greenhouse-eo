@@ -12,6 +12,8 @@
   Machu Picchu («Vuela por el Perú»). `destinos.cjs` reemplaza ahora la foto en los clústeres raster (`capa`).
 - Entregado en OneDrive `BLACK SKY 2026`: 30 archivos (POP-up, GIF y GIF_AUDIO de las 10 carpetas). Story y story video
   no se rehicieron (los exporta Daniela). Canvas actualizado (versión 61: 20 imágenes, 12 tableros, 10 videos). Detalle: skill §4.12.
+- Daniela: «no uses GIF, sólo MP4». Se retiraron los 10 `.gif` del lote (a la papelera, recuperables); queda el
+  `BS_GIF_*_AUDIO.mp4`. `organizar.cjs` ya no entrega `.gif`.
 
 ## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
 
