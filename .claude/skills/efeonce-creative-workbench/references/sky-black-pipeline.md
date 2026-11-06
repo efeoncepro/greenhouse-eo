@@ -95,19 +95,22 @@ OneDrive (kit, sólo lectura)
 | # | Paso | Lee | Escribe | Invocación |
 | --- | --- | --- | --- | --- |
 | 1 | `logofix.cjs` | `SRC` (KV, logos, HPH, PMAX, TikTok, DAT) | `src2/<misma ruta relativa>` | `node logofix.cjs [rutas relativas…]` (sin args: todo) |
-| 2 | `banderas.cjs` | `src2/KV X HM/HM_{AR,PE_INTER,BR,US,UY}_KV.svg`, `SRC/GRAFICOS/BANDERAS/` | `src2/KV X HM/HM_*_BANDERAS.svg`, `flags-circ/<k>.png` | `node banderas.cjs` |
+| 2 | `banderas.cjs` | `src2/KV X HM/HM_{AR,PE_INTER,BR,US,UY}_KV.svg`, `SRC/GRAFICOS/BANDERAS/` | `src2/KV X HM/HM_*_BANDERAS.svg`, `flags-circ/<k>.png` | `node banderas.cjs [HM_…_BANDERAS…]` (desde 2026-11-06 acepta piezas; sin args: todas) |
 | 3 | `variantes.cjs` | `src2/KV X HM/` (incluye salidas de 2), `SRC/ALIANZAS/` | 7 SVG de variantes en `src2/KV X HM/` | `node variantes.cjs` |
 | 4 | `rutas.cjs` | `src2/KV X HM/HM_PE_KV_DOM-RUTA.svg`, PNG PromPerú, `rutas-prompe.csv` | `src2/KV X HM/HM_PE_RUTA_*.svg` (15 desde la tercera ronda) | `node rutas.cjs` |
 | 4a | `destinos.cjs` | SVG de variantes y rutas, `fotos-destino.json`, `fotos-destino/` | los mismos SVG con foto, velo, piso y crédito | `node destinos.cjs` (o `./rehacer-destinos.sh`, §4.5) |
 | 4b | `brecha.cjs` | SVG de variantes y rutas | los mismos SVG con flecha y badge corridos y `data-capa` | `node brecha.cjs <archivos.svg…>` |
+| 4c | `pildora.cjs` | — (módulo) | — | No se corre solo: `variantes.cjs` y `rutas.cjs` lo usan con `await page.evaluate(PILDORA, { txt })`. Píldora rosada con avión fijo y 35 px tras la última letra (§4.14) |
+| 4d | `adaptar-foto.cjs` | `fotos-destino.json`, `fotos-destino/` | `fotos-destino/<foto>-adapt.png` | `node adaptar-foto.cjs <pieza> [umbral] [factor] [lista\|destino]` (usado: 105 y .35). Después, a mano en `fotos-destino.json`: `src` → `<foto>-adapt.png` y `srcOriginal` con la original (§4.14) |
 | 5 | `render.cjs` | `src2/KV X HM/*.svg`, `patches.cjs` | `png/<KV>.png` | `node render.cjs [archivo.svg…]` |
 | 6 | `parts.cjs` | idem | `parts/<KV>__<capa>.png`, `parts/report.json` | `node parts.cjs [archivo.svg…]` |
 | 7 | `layers.cjs` | idem | `layers/<KV>__<capa>.png`, `layers/report.json` | `node layers.cjs [archivo.svg…]` |
 | 8 | `recrop.cjs` | `layers/` | `anim/` + `anim/manifest.json` | `node recrop.cjs HM_AR_KV [HM_…]` (nombres, no rutas) |
 | 9 | `compose.cjs` | `parts/`, `foto-fuente.png` | `formatos/<KV>__popup.png`, `__story.png` | `node compose.cjs [HM_…]` (sin args: todos) |
 | 10 | `anim-css-gen.cjs` | `anim/manifest.json` | `anim-css-<KV>.html` | `node anim-css-gen.cjs HM_AR_KV [HM_…]` |
-| 11 | `render-gif.sh` | `anim-css-<KV>.html`, audio | `OUT/<KV>.mp4`, `_audio.mp4`, `.gif` | `./render-gif.sh [HM_…]` (sin args: todas) |
-| 12 | `story-video.cjs` | `parts/`, `formatos/`, `SRC/FORMATO STORY/`, `SRC/GRAFICOS/` | `OUT/story-video/` | `node story-video.cjs [HM_…]` |
+| 11 | `render-gif.sh` | `anim-css-<KV>.html`, audio | `OUT/<KV>.mp4`, `_audio.mp4` (BT.709 desde 2026-11-06), `.gif` (ya no se entrega) | `./render-gif.sh [HM_…]` (sin args: todas) |
+| 11a | `reencode-709.sh` | `fr-<kv>/` (cuadros ya capturados), audio | `OUT/<KV>.mp4`, `_audio.mp4` | `./reencode-709.sh HM_… [HM_…]`: re-codifica en BT.709 sin volver a renderizar (§4.13) |
+| 12 | `story-video.cjs` | `parts/`, `formatos/`, `SRC/FORMATO STORY/`, `SRC/GRAFICOS/` | `OUT/story-video/` | `node story-video.cjs [HM_…]` (sin producir desde la décima ronda: §9) |
 | 13 | `banners.cjs` | `parts/`, `parts/bbox.json`, `foto-fuente.png` | `banners/` | `node banners.cjs pmax-1200x628` (filtro por subcadena) |
 | 14 | `hph/generic.cjs` | `src2/FORMATO HPH/` | `hph/out/` | `node hph/generic.cjs` |
 | 15 | `hph/market.cjs` | `src2/FORMATO HPH/`, `parts/`, `parts/bbox.json`, `flags-circ/` | `hph/out-mercados/` | `node hph/market.cjs` |
@@ -122,6 +125,30 @@ El orden importa: `variantes` necesita `HM_PE_KV_INTER_BANDERAS.svg` (sale de `b
 (`HM_PE_KV_ENCUENTRA` nace de `HM_PE_KV_INTER_BANDERAS`) y luego `hph/market` (usa `flags-circ/`); `brecha`
 va después de `destinos` y antes de `render`. Un cambio en la fuente se propaga **en cascada desde el paso 1**,
 nunca pieza por pieza.
+
+**Variables de entorno (estado al 2026-11-06).** Sin ellas, la salida es la del default vigente:
+
+| Variable | Lee | Efecto |
+| --- | --- | --- |
+| `VELO_A` | `destinos.cjs` | Opacidad del difuminado superior arriba. Default `.45` (prueba B, §4.13; antes 0,69) |
+| `VELO_FORMA` | `destinos.cjs` | `suave` (default: paradas 1 · .62 · .24 · .06 · 0 en 0 · .3 · .6 · .85 · 1), `lineal` (dos paradas, el de la quinta ronda) o `logo` (elipse sólo detrás del logo, rechazada: «está mala») |
+| `VELO_FIN_K` | `destinos.cjs` | Multiplica `FADE_FIN` (kv .42 · popup .5 · story .46). Default `.85` |
+| `SOMBRA=1` | `destinos.cjs`, `compose.cjs` | Devuelve la sombra lateral de las piezas con lista (retirada en la onceava ronda) |
+| `VELO_LISTA=1` | `destinos.cjs`, `compose.cjs` | Devuelve el velo radial detrás de la lista de USA (retirado en la onceava ronda) |
+| `VELO_AUTO=1` | `compose.cjs`, `destinos.cjs` | Difuminado superior sólo si el fondo del logo es ruidoso: p80 de la luz > 185, desviación > 25 o borde medio > 1,5 (en el KV decide `lf-cielo`) |
+| `PISO_SUTIL=1` | `compose.cjs`, `destinos.cjs` | Sin el degradado marrón: piso negro al 15 % sólo si el p75 de la luz del pie supera 120 (en el KV decide `lf-piso`, desde y=1010) |
+| `STORY_VIDEO=1` | `new-pages.cjs` | Vuelve a armar los tableros `g-storyv-*` de la Grilla (apagados desde la versión 63 del canvas) |
+| `ORGANIZAR_SOLO=<regex>` | `organizar.cjs` | Copia sólo las rutas de destino que casan (§4.12) |
+
+`ronda12.sh` y `rutas-foco.sh` exportan `VELO_AUTO=1 PISO_SUTIL=1`: es el criterio vigente de Daniela («tres caminos»,
+§4.14). Sin esos dos flags, `compose.cjs` pone el piso negro al 62 % de las piezas con foto de destino.
+
+**Scripts de ronda y de prueba** (cada uno documenta su orden en la cabecera): `ronda9.sh` (§4.11), `ronda10.sh`
+(§4.12), `ronda11.sh` (= `ronda10.sh` + rutas de Perú, §4.13), `ronda12.sh` (banderas → variantes → rutas → destinos →
+brecha → render/parts/compose de 14 piezas + 15 rutas → layers/recrop/anim-css-gen/render-gif de 12, con
+`VELO_AUTO=1 PISO_SUTIL=1`, §4.14). `pruebas-velo.sh` corre 3 piezas × 4 variantes de difuminado a `OUT/pruebas-velo/`
+y al final vuelve a dejar el default; `pruebas-velo-canvas.cjs <root> <ids.json>` arma el canvas aparte de esas
+pruebas (https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC).
 
 ## 2. Fuentes del kit que leen los scripts
 
@@ -236,6 +263,9 @@ Listas exactas por KV: tabla de [sky-design-canvas.md](sky-design-canvas.md), «
 **Uruguay** (`fila`): se ocultan (`display="none"`) las hojas dentro de la caja del texto que contiene
 `ORIGEN` ampliada −90/−30/+40/+30 px (izquierda/arriba/derecha/abajo), y en su lugar va una fila de 4
 banderas (PUJ, CL, BR, US) de radio 26 en `cx = 92 + i × 66`, centrada en la altura de ese texto.
+**Superado el 2026-11-06 (§4.13):** Uruguay lleva lista con nombre bajo el logo (Punta Cana · Santiago y conexión con
+15 destinos · Salvador · Miami) y vuelve la píldora de origen, «DESDE MONTEVIDEO» (supuesto). Las listas no llevan
+sombra de texto (§4.14).
 
 ### 4.2 `variantes.cjs`: mensajes de la grilla por mercado
 
@@ -273,7 +303,8 @@ nuevo; los demás se borran) y suma elementos en un `<g id="variante">`:
 2. PromPerú «solo HM Perú» (PNG 1928×724) a alto 68 en `x = 1080 − 48 − ancho`, `y = 56`.
 3. Debajo, `[Ubicación de la foto]` (placeholder; no hay fotos por destino): Metric Bold 18, blanco,
    alineado a la derecha en `x = 1032`, `y = 158`, `letter-spacing .5`, trazo `rgba(0,0,0,.25)` de 3 px con
-   `paint-order:stroke`, y un pin vectorial verde a su izquierda (no emoji).
+   `paint-order:stroke`, y un pin vectorial verde a su izquierda (no emoji). Desde la doceava ronda (2026-11-06,
+   Dianesty: «le quitamos las sombras») la ubicación va **sin** contorno oscuro (§4.14).
 
 Las rutas sólo producen KV, popup y story (no tienen animación ni story en video).
 
@@ -297,7 +328,8 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
 - **`destinos.cjs`** (correr después de `variantes` y `rutas`; todo junto: `./rehacer-destinos.sh`): en el SVG
   de `src2/` reemplaza la foto del kit por `<image id="lf-foto-destino">` 1080×1350 con la foto completa, agrega
   `lf-cielo` (velo del logo; desde la cuarta ronda es diagonal y adaptativo, ver §4.5), `lf-piso`
-  (degradado inferior #2a1608 0,8 desde y=760), `lf-sombra` lateral si lleva lista y el crédito. **La foto del
+  (degradado inferior #2a1608 0,8 desde y=760; desde §4.14 con `PISO_SUTIL=1` es negro al 15 % desde y=1010 y sólo si
+  el pie es claro), `lf-sombra` lateral si lleva lista (desde §4.13 sólo con `SOMBRA=1`) y el crédito. **La foto del
   kit es un `<use href="#image">` y en las variantes aparece varias veces en grupos recortados**: se reemplaza la
   copia cuyo recorte cubre más lienzo y se ocultan las demás que lo tocan.
 - **Crédito (marca de agua):** horizontal, Metric 12, blanco al 75 %, **sin sombra**, esquina superior izquierda
@@ -322,7 +354,8 @@ Prompe(Hoja1) (2).csv` (copia en `K/rutas-prompe.csv`; columnas `DESTINO NOMBRE;
   `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` con la estructura y la nomenclatura de Daniela
   (detalle en [sky-format-catalog.md](sky-format-catalog.md) §5.4). Falla si falta una fuente o si dos
   destinos coinciden; deja `organizar-plan.json`. En `GIF + POPUP` va sólo el `.gif` (el MP4 con el mismo nombre
-  se veía «exportado dos veces»): 155 archivos.
+  se veía «exportado dos veces»): 155 archivos. **Invertido desde la décima ronda (2026-11-06, §4.12):** sin `.gif`;
+  la pieza animada va sólo como `BS_GIF_<PIEZA>_AUDIO.mp4`.
 
 Orden de esta ronda: `variantes` → `rutas` → `destinos` → `render` → `parts` → `compose` → (`layers` →
 `recrop` → `anim-css-gen` → `render-gif.sh` → `story-video` para las que tienen GIF) → `sync-canvas` →
@@ -404,7 +437,8 @@ desde `notifications@frame.io`, porque no hay herramienta para leer ni responder
   alto, como en su maqueta, **oscurecía caras y monumentos** (rechazado por Julio): a media altura sigue en 35 %.
   Vigente: la misma forma, pero termina en `FADE_FIN` = 0,42 del alto en KV, 0,50 en popup y 0,46 en story, poco
   después del logo, que llega a y≈0,24 / 0,30 / 0,31. La intensidad ya no se mide por foto (`veloAlfa` queda
-  sólo como registro).
+  sólo como registro). **Superado el 2026-11-06 (§4.13):** el default es la prueba B (45 % arriba, curva suave,
+  termina al 85 % de ese largo); el 69 % lineal queda como `VELO_A=.69 VELO_FORMA=lineal VELO_FIN_K=1` (§1).
 - **`lift` en `cubrir` (destinos.cjs).** Deja subir la foto hasta esa fracción del alto más allá de su borde
   inferior y completa abajo con el reflejo vertical de sus últimas filas. Sirve cuando el atractivo está al pie
   de una foto horizontal y quedaría bajo la franja de precio. La franja reflejada cae bajo el piso, el precio y
@@ -593,7 +627,7 @@ sin texto («left 2 comments»). Recetas de lectura:
 | Popup de PE internacional, «Encuentra destinos» PE y «Vuela por el Perú» | Logo al 86 % (76 % en «Vuela por el Perú») y 14 px más arriba; la lista gana el aire | `compose.cjs` → `LOGO_CHICO` |
 | Popup UY | «Internacional» al 98 % (antes 88 %) y banderas 14 px más arriba: el destino se arma por franjas del KV | `compose.cjs` |
 | AR «Volá a Santiago» | Origen provisorio «DESDE BUENOS AIRES» a cuerpo 25, con la píldora alargada lo que crece el texto (+59 px). Foto con cielo limpio arriba: banco «IA Marca/BUENOS AIRES MUJER.jpg» (es Santiago) | `variantes.cjs → origen`, `fotos-destino.json` |
-| Fotos nuevas | UY: Santiago (`IA Marca/SANTIAGO.jpg`). USA: Plaza de Armas de Santiago (`01_CHILE/SCL`, Codex 23 sept 05_52_07). PE internacional: Buenos Aires (`03_ARGENTINA/BUE`, ChatGPT 29 sept 16_43_50). PE «Encuentra destinos»: familia en Sacsayhuamán **generada** (abajo). Las piezas con lista sobre foto llevan `sombra` (ahora también en popup y story) | `fotos-destino.json`, `compose.cjs` |
+| Fotos nuevas | UY: Santiago (`IA Marca/SANTIAGO.jpg`). USA: Plaza de Armas de Santiago (`01_CHILE/SCL`, Codex 23 sept 05_52_07). PE internacional: Buenos Aires (`03_ARGENTINA/BUE`, ChatGPT 29 sept 16_43_50). PE «Encuentra destinos»: familia en Sacsayhuamán **generada** (abajo). Las piezas con lista sobre foto llevan `sombra` (ahora también en popup y story; retirada en §4.13, sólo con `SOMBRA=1`) | `fotos-destino.json`, `compose.cjs` |
 | «El GIF no tiene audio» (7 GIF) | Un GIF no lleva sonido. Junto al GIF va `BS_GIF_<PIEZA>_AUDIO.mp4` (el `_audio.mp4` de `render-gif.sh`) | `organizar.cjs` |
 
 - **Foto de la familia (Julio aprobó generarla):** el banco sólo tiene selfies cerradas y el badge tapaba la cara.
@@ -692,14 +726,16 @@ Comentarios leídos en Frame (V3, https://f.io/noHToa-i, 20 activos) y en el cha
   otro degradé en las letras, se nota mucho con las transiciones».
 - **Píldora lila** («centrar textos de caluga lila», USA): `variantes.cjs` ajusta la píldora para que ícono y texto
   tengan el mismo aire a cada lado (26,7 px, el que el kit deja a la izquierda); acepta un origen ya puesto. Aplicado a
-  USA, AR Lima, AR Santiago y Uruguay.
+  USA, AR Lima, AR Santiago y Uruguay. *(Superado en §4.14: la píldora ya no se centra; el avión queda fijo y la
+  píldora termina 35 px tras la última letra, `pildora.cjs`.)*
 - **USA**: sin velo tras la lista («los textos de santiago y lima tienen un difuminado negro»). Pendiente de Dianesty:
   si suma Buenos Aires.
 - **Uruguay** («sumar los nombres de los destinos»): la fila de banderas pasa a lista bajo el logo (`banderas.cjs`, que
   ahora acepta piezas como argumento): Punta Cana · Santiago y conexión con 15 destinos (texto de las demás piezas, pedido
   de Daniela) · Salvador · Miami (pendiente de confirmar). La píldora vuelve, con «DESDE MONTEVIDEO» (supuesto).
 - **Sombra de letra en las listas de banderas** (no un velo): `feDropShadow` dy 2, desvío 2,6, opacidad .8 en todas las
-  listas de `banderas.cjs`; sin ella «Buenos Aires» se perdía sobre el puente blanco del popup de Perú.
+  listas de `banderas.cjs`; sin ella «Buenos Aires» se perdía sobre el puente blanco del popup de Perú. *(Retirada en
+  §4.14; en Perú internacional y Uruguay la lista se apoya ahora en la foto adaptada con `adaptar-foto.cjs`.)*
 - Aplicado con `ronda11.sh` (lote + rutas foco de Perú) más Uruguay y las listas. Entregado en OneDrive: popups y
   `BS_GIF_*_AUDIO.mp4` de las 10 carpetas, y popup y story de las 15 rutas de Perú. Canvas principal versión 68 (otra
   sesión publicó la 66 y 67: se reemplazaron sólo imágenes y tableros `g-gif`, sin tocar `canvas.json`).
@@ -721,10 +757,12 @@ Comentarios leídos en Frame (V3, https://f.io/noHToa-i, 20 activos) y en el cha
 - **Adaptar la foto donde no alcanza** (tercer camino): `adaptar-foto.cjs <pieza> [umbral] [factor] [lista|destino]`
   comprime las luces en la zona de los textos, con borde difuso, y escribe `fotos-destino/<foto>-adapt.png`.
   `fotos-destino.json` guarda `srcOriginal`. No hay que filtrar por color: un corte para proteger la piel dejó manchas
-  posterizadas en el puente. Se usó con 105 y .35 en Perú internacional y Uruguay (lista), y en Tumbes, Trujillo, Tacna,
+  posterizadas en el puente. Se usó con 105 y .35 en Perú internacional y Uruguay (lista), en Chile internacional y Chile
+  «Encuentra destinos» (zona `lista-cluster`: la sombra lateral de los clústeres en `compose.cjs` también quedó bajo
+  `SOMBRA=1`), y en Tumbes, Trujillo, Tacna,
   Cusco, Chiclayo, PE Encuentra y Vuela por el Perú (destino). Criterio: p75 de la luz tras el destino > 160.
 - Entregado: lote (popup + MP4 con audio, BT.709) y rutas de Perú (popup + story) en OneDrive BLACK SKY 2026. Canvas
-  principal versión 72: sólo imágenes y tableros `g-gif`; `canvas.json` es de la sesión de rutas foco.
+  principal versión 74: sólo imágenes y tableros `g-gif`; `canvas.json` es de la sesión de rutas foco.
 
 ### 4.13 Rutas foco de Chile y Perú internacional (2026-11-06): sólo popup y story
 
@@ -868,8 +906,15 @@ Recompone desde `parts/` y la foto fuente (no estira el KV). Helpers:
 - `foto(s, X0, Y0, W, H)`: fuente espejada a escala `s`; `X0` es la posición del borde derecho espejado y
   `Y0` la de la fila 0.
 - `sombra(W, H)` (sólo clústeres: nombre con `CLUSTER` o `HM_CL_KV_ENCUENTRA`): degradado horizontal negro
-  0,42 → 0,2 al 45 % → 0 al 75 %.
-- `piso(W, H, y0, y1, a)`: degradado vertical `#2a1608` de 0 a `a` entre `y0` y `y1`.
+  0,42 → 0,2 al 45 % → 0 al 75 %. La sombra que pide `fotos-destino.json → sombra` (dentro de `fondos`, piezas con
+  foto de destino) sólo se aplica con `SOMBRA=1` desde la onceava ronda (§4.13); la de los clústeres, también sólo
+  con `SOMBRA=1` desde la doceava (§4.14): sus listas se sostienen con la foto adaptada (`adaptar-foto.cjs lista-cluster`).
+- `piso(W, H, y0, y1, a, c)`: degradado vertical de 0 a `a` entre `y0` y `y1`, `#2a1608` por defecto. Con
+  `PISO_SUTIL=1` (§4.14): en piezas con foto de destino el marrón queda en alfa 0; en las de la foto del kit pasa a
+  negro con alfa ≤ 0,15.
+- `fondos(n, bg, W, H, fmt)` (piezas de `fotos-destino.json`): difuminado superior (`velo`; con `VELO_AUTO=1` sólo si
+  la zona del logo es ruidosa) y piso negro (0,62: popup 560 → 1080, story 1000 → 1720; con `PISO_SUTIL=1`, negro al
+  15 % en los últimos 120 px de la zona del pie y sólo si su p75 de luz supera 120).
 
 **Popup 1080×1080:** `foto(1.45, 1782, −154 × 1.45)` (mujer al 80 % del KV, cabeza en y≈260);
 `piso(800 → 1080, 0,78)`.
@@ -903,6 +948,10 @@ vertical (Balmaceda, Puerto Natales, Punta Arenas, alineados con la primera fila
 Salida en `formatos/`: 74 PNG (37 × 2).
 
 ## 8. GIF y MP4: animación, captura y codificación
+
+🔴 **Desde el 2026-11-06 la pieza animada se entrega sólo como MP4 con audio** (`BS_GIF_<PIEZA>_AUDIO.mp4`; Daniela:
+«no uses GIF, sólo deja en MP4, que es mejor formato»), **codificado en BT.709 y etiquetado** (§8.4). `render-gif.sh`
+todavía genera el `.gif` en `OUT`, pero no se entrega ni se publica.
 
 ### 8.1 Movimiento medido en las referencias
 
@@ -957,12 +1006,15 @@ Para cada KV (`NAMES` = argumentos o todos los `anim-css-HM_*.html`), borra `fr-
 codifica tres archivos en `OUT`:
 
 ```bash
+# Color (2026-11-06): matriz BT.709 explícita + etiquetas. Sin esto ffmpeg pasa RGB→YUV con BT.601 sin etiquetar,
+# Frame, QuickTime y los navegadores lo leen como BT.709 y el verde del logo cae de 221 a 189.
+V709="-vf scale=out_color_matrix=bt709:out_range=tv:flags=lanczos+accurate_rnd+full_chroma_int,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv"
 # MP4 sin audio
-ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png \
-  -c:v libx264 -pix_fmt yuv420p -crf 18 -movflags +faststart $OUT/$N.mp4
+ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png $V709 \
+  -c:v libx264 -crf 18 -movflags +faststart $OUT/$N.mp4
 # MP4 con audio (AUD = P/ref/audio-gif.mp3, copia de AUDIO FINAL PARA LOS GIF.mp3)
-ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png -i $AUD \
-  -c:v libx264 -pix_fmt yuv420p -crf 18 -c:a aac -b:a 192k \
+ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png -i $AUD $V709 \
+  -c:v libx264 -crf 18 -c:a aac -b:a 192k \
   -af "volume=-3dB,alimiter=limit=0.79" -shortest -movflags +faststart $OUT/${N}_audio.mp4
 # GIF: paleta propia por archivo, 256 colores, dither sierra2_4a, bucle infinito
 ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png \
@@ -975,6 +1027,11 @@ ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png \
   AAC); pico medido −0,3 dBFS. El GIF no lleva sonido.
 - **Recorte por `-shortest`:** el `_audio.mp4` termina con el audio: **98 cuadros, 3,936 s**, contra 99
   cuadros y 3,96 s del MP4 mudo.
+- **Color BT.709 (2026-11-06, Dianesty: «en todos los gif cambia el color del logo»):** con `$V709` el verde del logo
+  vuelve a 217 ≈ KV (medido decodificando en BT.709). Para MP4 ya codificados sin la matriz, `./reencode-709.sh <KV…>`
+  re-codifica desde `fr-<kv>/` sin re-renderizar. Regla general: todo MP4 que ffmpeg arme desde PNG lleva la matriz
+  BT.709 explícita y las etiquetas; verificar con `ffprobe` que `color_space`, `color_primaries` y `color_transfer`
+  digan `bt709`.
 
 **Resultados medidos** (24 KV: 12 originales y 12 de la grilla y extras, todos 1080×1350, 25 fps):
 
@@ -986,9 +1043,14 @@ ffmpeg -y -loglevel error -framerate 25 -i fr-$n/f%04d.png \
 
 Los GIF con lista (clústeres, banderas, regiones, «Encuentra») pesan 5,5–7,7 MB; los estándar 3,8–4,1 MB.
 `render-all.sh` es la versión **obsoleta** que capturaba desde los artboards `anim-*.dc.html` del canvas:
-desde que esos artboards son `<video>` con `/_blob/`, da cuadros negros. No usarla.
+desde que esos artboards son `<video>` con `/_blob/`, da cuadros negros. No usarla (aunque también recibió `$V709`).
+Pesos medidos antes del cambio a BT.709; el `.gif` ya no se entrega.
 
 ## 9. Story en video: `story-video.cjs`
+
+**Sin producir desde la décima ronda (2026-11-06):** story y story en video los exporta Daniela; el lote es sólo
+popup y MP4. El canvas no muestra los tableros `g-storyv-*` salvo con `STORY_VIDEO=1` (versión 63; Julio: «luego
+iteraremos el video»). Los ids `__story-video` siguen en `vid-blobs.json`. Lo que sigue describe el script tal como quedó.
 
 12 MP4 1080×1920, 30 fps, **15,709 s (471 cuadros)**, H.264 + AAC 192 kb/s, 7,3–7,7 MB. Mensaje → idioma
 y tipo (`MSG`): CL y PE en `es`; AR (Santiago, Lima) y UY en `ar`; BR en `pt`; US en `en`. Tipo `dom` para
@@ -1114,7 +1176,10 @@ descuentos siguen en placeholder (`000.000`, `00%`) hasta la grilla de precios. 
 ## 13. Publicación en el canvas de Claude Design
 
 Canvas «SKY CyberSky Perú — Adaptaciones»: https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee (versión 28 al
-cierre de la segunda ronda, con 10 páginas y 301 boards; versión 40 al cierre de la cuarta ronda, 2026-11-05).
+cierre de la segunda ronda, con 10 páginas y 301 boards; versión 40 al cierre de la cuarta ronda, 2026-11-05;
+**versión 74 al cierre de la doceava ronda, 2026-11-06**). Las pruebas de difuminado viven en un canvas aparte:
+https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC (`pruebas-velo-canvas.cjs`). Cuando otra sesión publicó
+`canvas.json` en el medio, publicar sólo imágenes y tableros, sin tocar `canvas.json`.
 
 ### 13.1 Imágenes: `sync-canvas.cjs`
 
@@ -1144,7 +1209,7 @@ página** y los vuelve a crear (idempotente), separando columnas cada 1160 px:
 | `anim-page.cjs` | KV Black · Animación GIF (`kv-black-anim`) | 12 `<video>` (ids de `vid-blobs.json`), 6 referencias y la previa con audio; reescribe `anim-css-*.html` |
 | `formats-page.cjs` | KV Black · Popup y Story (`kv-black-formatos`) | 24 estáticos; escribe `formats-files.json` |
 | `pmax-hph-page.cjs` | KV Black · PMAX y HPH (`kv-black-pmax-hph`) | 48 PMAX + 24 HPH; escribe `pmax-hph-files.json` |
-| `new-pages.cjs` | Grilla por mercado, Rutas foco Perú, Chile KV listo | KV, popup, GIF, story y story video por mensaje; 26 rutas; 9 Chile; escribe `new-pages-files.json` |
+| `new-pages.cjs` | Grilla por mercado, Rutas foco Perú, Chile KV listo | KV, popup, GIF, story y story video por mensaje; 26 rutas; 9 Chile; escribe `new-pages-files.json`. Desde 2026-11-06 el tablero `g-gif-*` reproduce el MP4 **con audio** y controles («MP4 1080×1350 (con audio)», ids `<KV>__mp4`) y `g-storyv-*` sólo sale con `STORY_VIDEO=1` |
 
 ### 13.3 Videos como assets y `vid-blobs.json`
 
@@ -1155,7 +1220,8 @@ puede subir: el audio viaja como pista de un MP4.
    llamada; 36 videos = 2 llamadas o más).
 2. Copiar los ids que devuelve a `K/vid-blobs.json`: objeto plano `"<KV>__gif": "<id32hex>"` (24) y
    `"<KV>__story-video": "<id32hex>"` (12). Los `__gif` apuntan al **MP4 mudo** del KV: en el canvas
-   la pieza «GIF» se muestra como ese MP4 en bucle.
+   la pieza «GIF» se mostraba como ese MP4 en bucle. Desde la versión 62 (2026-11-06) los tableros de la Grilla usan
+   `"<KV>__mp4"`: el `<KV>_audio.mp4` que se entrega, con controles.
 3. Recién entonces correr `anim-page.cjs` y `new-pages.cjs`, que leen esos ids.
 
 Volver a subir un video genera **id nuevo**: actualizar `vid-blobs.json` y regenerar las páginas. Caso
@@ -1219,6 +1285,12 @@ KV renombrados `__pmax-<fmt>.png` + `banners/*__pmax-1200x628{,_2x}.png`; `hph/`
 el proceso se colgaba; [lessons.md](lessons.md)); tras la cuarta ronda quedó al día. «BLACK SKY 2026» sale de
 `organizar.cjs` (§4.4). Antes de entregar, `find OUT -type f ! -newermt '<fecha de la última
 corrección>'` debe salir vacío y cada PMAX 1080 debe dar `cmp` idéntico con su popup, KV o story.
+
+**Estado de la entrega al 2026-11-06 (doceava ronda):** en `10_Noviembre/BLACK SKY 2026/`,
+`<HM>/GIF + POPUP/<pieza>/` lleva el popup y `BS_GIF_<PIEZA>_AUDIO.mp4` (BT.709, sin `.gif`), y
+`HM PE/RUTAS FOCO/<DESTINO>/` lleva popup y story. Copia para revisión en `BLACK SKY 2026 - PARA REVISION/` con
+`LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`. Las rutas foco de Chile y Perú internacional siguen su propio
+flujo (§4.13 rutas foco, `rf-entregar.cjs`).
 Mapeo de carpetas y reglas en
 [sky-design-canvas.md](sky-design-canvas.md), «Entregables y scripts locales».
 
@@ -1260,6 +1332,9 @@ Cada lote se revisa **mirando** una hoja de contacto, no sólo con métricas:
 | Comando `node -e` con backticks rechazado | Bash 3.2 de macOS | Pasar el código a un archivo `.cjs` |
 | Entradas `KV` y `X` en `anim/manifest.json` | `recrop.cjs` recibió una ruta con espacios | Pasar sólo nombres `HM_…` |
 | Parche que deja de aplicar | El SVG cambió (p. ej. tras `logofix`) | `render`/`parts`/`layers` lanzan `sin <texto>`: actualizar `patches.cjs` |
+| El verde del logo cambia en los MP4 (221 → 189) (2026-11-06) | ffmpeg pasaba RGB → YUV con BT.601 sin etiquetar; Frame, QuickTime y navegadores leen BT.709 | `$V709` en `render-gif.sh` y `render-all.sh`; `reencode-709.sh` para lo ya capturado (§8.4) |
+| La píldora de origen se corre 8 px en cada pasada (2026-11-06) | Se escribía el trazado en coordenadas de pantalla y la píldora está dentro de un grupo trasladado | `pildora.cjs` escribe el trazado en coordenadas locales del grupo |
+| Manchas posterizadas al adaptar la foto (2026-11-06) | Un corte por color para proteger la piel en `adaptar-foto.cjs` | Comprimir sólo las luces por umbral de luminancia, con borde difuso; no filtrar por color |
 
 ## 17. Re-ejecutar en otra sesión
 
@@ -1281,7 +1356,7 @@ Rescate y prueba en frío del 2026-11-06. Una sesión nueva retoma así, sin ada
    `node_modules` de Greenhouse por ruta absoluta; no escribe en ninguno. Criterio de aprobado en §17.1.
    Recién entonces trabajar en `$K`.
 5. **Correr en el orden de §1** y mirar la hoja de contacto de cada lote (§15). Al cerrar, el flujo de
-   entrega de siempre: GIF → `sync-canvas` → `new-pages` → publicar → copiar a `OUT` → `organizar.cjs` →
+   entrega de siempre: MP4 con audio en BT.709 (`render-gif.sh`; no se entrega `.gif`) → `sync-canvas` → `new-pages` → publicar → copiar a `OUT` → `organizar.cjs` →
    `rsync -a` sin `--checksum` a «ENTREGABLES BLACK» (§13–§14). Nunca leer el destino en OneDrive.
 6. **Volver a listar el kit** (crece; Daniela mueve fotos entre carpetas sin avisar) y revisar que los textos
    que buscan `variantes`, `rutas`, `market.cjs` y `patches.cjs` sigan existiendo; los scripts avisan con `NO`.
@@ -1331,7 +1406,8 @@ Frases INTER del brandlift y sus traducciones AR/PT/EN; traducciones de flecha y
 para Peru» (alianza o KV); «Vuela por Perú» sin fotos; CL «Encuentra destinos» hecho desde el clúster
 internacional de Chile; texto de ubicación de la foto en las rutas; tapa vertical ES recortada; precios y
 descuentos en placeholder (ya se pueden llenar en el Workbench, §19); que la regla destino ↔ flecha (§4.5) también valga para los popups de los KV del
-kit. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
+kit. Desde la onceava ronda (2026-11-06), a Dianesty: ¿USA suma Buenos Aires? ¿Uruguay lleva Miami? El origen de
+Uruguay «DESDE MONTEVIDEO» es supuesto. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
 [state-continuity.md](state-continuity.md).
 
 ## 19. Construir con cifras en el Creative Workbench (2026-11-06)

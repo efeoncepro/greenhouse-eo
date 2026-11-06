@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.11
+> **Version:** 1.13
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-06 por Claude (las 30 rutas foco aprobadas; cifras en el Creative Workbench, paso 7i; taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
+> **Ultima actualizacion:** 2026-11-06 por Claude (rondas 11 y 12, paso 7j: sólo MP4 con audio en BT.709, difuminado B, tres caminos y adaptar la foto, sin sombras de texto, píldora de origen adaptable, copia para revisión y canvas versión 74; antes, rutas foco de Chile y Perú internacional: rehacer, revisar, entregar en revisión y republicar su página del canvas, paso 7e-quater; tope real de 511 archivos por versión; antes, las 30 rutas foco aprobadas; cifras en el Creative Workbench, paso 7i; taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -36,11 +36,20 @@ Y la cuarta ronda (2026-11-05, canvas en la versión 40): velo diagonal detrás 
 precio, Chile Travel en la esquina y PromPerú centrado en las stories, aro de 2 px en las banderas, fotos de la
 temporada del mercado y entrega puesta al día. Las rondas siguientes se trabajan en una sesión derivada.
 
-Y las rondas quinta a séptima (2026-11-05, canvas en la versión 51, vigente): gradiente de Daniela cortado bajo el
+Y las rondas quinta a séptima (2026-11-05, canvas en la versión 51): gradiente de Daniela cortado bajo el
 logo en lugar del velo diagonal, degradado inferior negro, fotos de ruta sólo desde su carpeta, stories ampliadas con
 IA, revisión de Daniela en Frame.io y reparto de las rutas foco en carpetas «APROBADO» y «PARA REVISION»
 (pasos [7e-bis](#7e-bis-poner-la-foto-aprobada-de-cada-destino), [7e-ter](#7e-ter-ampliar-con-ia-la-foto-de-una-story)
 y [7h](#7h-leer-la-revisión-de-frameio-y-repartir-aprobado-y-revisión)).
+
+Y las rutas foco de Chile y Perú internacional (2026-11-06): 16 rutas sólo en popup y story, con degradados sólo si
+hacen falta y la píldora de origen adaptable, entregadas en revisión y con su propia página en el canvas
+([paso 7e-quater](#7e-quater-rehacer-y-entregar-una-ruta-foco-de-chile-o-perú-internacional)).
+
+Y las rondas 11 y 12 (2026-11-06, canvas en la versión 74): la animación se entrega sólo como MP4 con audio y en
+BT.709, difuminado superior B, los tres caminos de Daniela (sin gradiente, gradiente sutil, adaptar la foto, foto
+nueva), sin sombras de texto, degradado inferior sólo donde hace falta, píldora de origen adaptable y copia para
+revisión ([paso 7j](#7j-rondas-11-y-12-sólo-mp4-difuminado-b-y-tres-caminos)).
 
 Qué es cada formato, su tamaño, cuántos se hicieron, dónde quedaron y cómo se lee su nombre de archivo está en el
 **[Catálogo de formatos SKY](../../documentation/creative/catalogo-formatos-sky.md)**. Este manual explica cómo se
@@ -142,9 +151,14 @@ nuevos de la segunda ronda (24 KV de mercado) y las 13 rutas de Perú, 37 PNG en
 Resultado en BLACK: por cada uno de los 24 KV de mercado, un GIF (1080×1350, 25 fps, 99 cuadros, 3,96 s, de 3,8 a
 7,7 MB), un MP4 sin audio y un MP4 con audio (`_audio`, 3,94 s). 72 archivos en total.
 
+**Desde el 2026-11-06 el GIF no se entrega:** la animación va sólo como MP4 con audio (`BS_GIF_<PIEZA>_AUDIO.mp4` en
+«BLACK SKY 2026»). `render-gif.sh` todavía genera el `.gif` en local, pero `organizar.cjs` ya no lo copia. Todo MP4
+sale en el estándar de color **BT.709** (ver [paso 7j](#7j-rondas-11-y-12-sólo-mp4-difuminado-b-y-tres-caminos)).
+
 **Qué revisar:** míralo en bucle varias vueltas. Que el movimiento termine antes de ~1,4 s y luego todo quede quieto;
 que el primer cuadro no salga en blanco ni negro; que ninguna parte (por ejemplo «Internacional») quede fija en la foto
-mientras su copia se mueve; que el MP4 con audio no sature y el golpe caiga cuando el precio se detiene.
+mientras su copia se mueve; que el MP4 con audio no sature y el golpe caiga cuando el precio se detiene; que el verde del logo en el MP4 sea el
+mismo del KV (si se ve más apagado, el video no salió en BT.709).
 
 ### 6. Llevar el KV a popup y story
 
@@ -225,7 +239,8 @@ la fecha no toque el marco.
 ### 7c. Grilla por mercado
 
 La grilla define **qué mensaje lleva cada mercado**. Son 12 mensajes y cada uno tiene KV, popup, GIF, story estática y
-story en video:
+story en video (desde el 2026-11-06 se entregan sólo popup y MP4 con audio; story y story en video los exporta
+Daniela):
 
 | Mercado | Mensajes | KV |
 |---|---|---|
@@ -269,7 +284,7 @@ en US); el logo de alianza correcto según el mercado; que el título no choque 
 | `HM_PE_KV_INTER_BANDERAS` | Punta Cana · Santiago y conexión con 15 destinos · Buenos Aires · Río de Janeiro y São Paulo · Miami |
 | `HM_BR_KV_BANDERAS` | Santiago e conexões para 15 destinos · Lima e conexões para 16 destinos · Argentina · Miami · Uruguai |
 | `HM_US_KV_BANDERAS` | Santiago and connect to 15 destinations · Lima and connect to 16 destinations |
-| `HM_UY_KV_BANDERAS` | Fila de 4 banderas (República Dominicana, Chile, Brasil, EE. UU.) en lugar de la píldora de origen |
+| `HM_UY_KV_BANDERAS` | Fila de 4 banderas (República Dominicana, Chile, Brasil, EE. UU.) en lugar de la píldora de origen. Desde la ronda 11, lista con nombre: Punta Cana · Santiago y conexión con 15 destinos · Salvador · Miami (por confirmar), y vuelve la píldora con «DESDE MONTEVIDEO» (supuesto) |
 
 3. Las banderas circulares se renderizan a PNG transparente desde `GRAFICOS/BANDERAS`.
 
@@ -310,9 +325,11 @@ corresponda al destino escrito a su lado y que el texto quepa sin cortarse.
 
 Si el logo se pierde sobre la foto, ajusta el encuadre en `fotos-destino.json` (`f.<formato>.t`, o `src` para
 usar otra versión de la foto) y vuelve a correr `./rehacer-destinos.sh` completo (correr `rutas.cjs` solo después
-deja las rutas sin foto). Desde la quinta ronda, el único apoyo detrás del logo es el **gradiente de Daniela** que
-aplica `destinos.cjs`: negro, de 69 % arriba a 0, cortado poco después del logo (42 % del alto en KV, 50 % en popup y
-46 % en story). Reemplazó al velo diagonal de la cuarta ronda; no lo estires a todo el alto, porque oscurece caras y
+deja las rutas sin foto). **Desde la ronda 11 rige el difuminado B y desde la 12, los tres caminos de Daniela
+([paso 7j](#7j-rondas-11-y-12-sólo-mp4-difuminado-b-y-tres-caminos)); lo que sigue en este párrafo sobre el
+gradiente es la regla anterior.** Desde la quinta ronda, el único apoyo detrás del logo era el **gradiente de
+Daniela** que aplicaba `destinos.cjs`: negro, de 69 % arriba a 0, cortado poco después del logo (42 % del alto en KV,
+50 % en popup y 46 % en story). Reemplazó al velo diagonal de la cuarta ronda; no lo estires a todo el alto, porque oscurece caras y
 monumentos. El degradado inferior, detrás del pie y del legal, es **negro** en las piezas con foto de destino y marrón
 en los KV del kit; si «Vuela a» se pierde abajo (popup de Cusco), sube ese degradado sólo en la pieza
 (`f.popup.piso` o `f.story.piso`). Si el atractivo queda al pie de una foto horizontal, bajo la franja de precio, sube
@@ -353,15 +370,117 @@ Antes, revisa si moviendo `t` alcanza: en el popup de Trujillo la foto tenía 20
    en `fotos-destino/<CIUDAD>_STORY.png` y úsala como fuente de la story en `fotos-destino.json` (`f.story.src`, con
    `s` y `t` en 0,5). Las corridas quedan en `ai-generations/<fecha>_sky-black-expand/`.
 
+### 7e-quater. Rehacer y entregar una ruta foco de Chile o Perú internacional
+
+Son las 16 rutas que van **sólo en popup y story** (qué rutas, de qué plantilla sale cada una y qué legal lleva cada
+tipo está en el [catálogo](../../documentation/creative/catalogo-formatos-sky.md#rutas-foco-de-chile-y-perú-internacional)).
+Tienen scripts propios en el taller, `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`: `rutas-foco.cjs`
+(tabla de rutas), `rutas-foco.sh` (corre todo el proceso), `rf-entregar.cjs` (entrega), `rf-page.cjs` (página del
+canvas) y `cielo.cjs` (cielo más azul). Usa este paso para ajustar una ruta (foto, encuadre, texto) o rehacerlas.
+
+1. **Confirma que ninguna otra sesión esté renderizando en el taller.** Las rutas comparten archivos temporales con el
+   resto del despliegue: si dos sesiones renderizan a la vez, las piezas se mezclan. Si hay otra corriendo, espera a
+   que termine.
+2. **Haz el cambio donde corresponde:**
+   - Destino, plantilla, legal u origen: en la tabla de `rutas-foco.cjs`. El destino va con su nombre completo y no
+     pasa de 400 px de ancho.
+   - Foto o encuadre: en la entrada de esa ruta en `fotos-destino.json` (por ejemplo, `z` del formato para reencuadrar:
+     el popup de Santiago de Perú usa 1,25). Toca **sólo** las entradas de las rutas foco; el resto del archivo lo usan
+     las demás rondas.
+   - Cielo blanco o muy claro detrás del logo: `node cielo.cjs <foto> <salida> 0.5` lo deja más azul y oscuro (así
+     quedó Buenos Aires).
+   - Elige fotos del banco del destino con la regla de Daniela: el logo nunca sobre cabezas, nada cortado de golpe y
+     espacio libre arriba. No generes fotos con IA.
+3. **Corre `./rutas-foco.sh`** con el nombre de las piezas que cambiaste (`HM_<CL|PE>_<DOM|INTER>_RUTA_<DESTINO>`),
+   o sin nombres para rehacer las 16. Encadena todo el proceso (ruta, destino, regla de la flecha, render, partes y
+   popup/story), borra antes las partes viejas de cada pieza y prende los degradados automáticos (`VELO_AUTO=1
+   PISO_SUTIL=1`): el difuminado de arriba aparece sólo si la zona del logo es ruidosa y el negro de abajo sólo si el
+   pie es claro. No los prendas ni los apagues a mano.
+4. **Revisa cada PNG al 100 %**, popup y story de cada ruta que tocaste (ver «Qué revisar» abajo). Si el logo o el
+   legal no se leen, no subas los degradados: adapta la foto (encuadre, otra foto, `cielo.cjs`).
+5. **Entrega en revisión.** Corre primero `node rf-entregar.cjs <OUT> "<…>/10_Noviembre/BLACK SKY 2026" --dry` para
+   ver qué copiaría, y después con `--revision`: copia a `BLACK SKY 2026/HM CL/RUTAS FOCO/<DESTINO>/` o
+   `HM PE/RUTAS FOCO/<DESTINO>/` (`BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png`) y una copia idéntica a
+   «BLACK SKY 2026 - PARA REVISION». Comprueba con `cmp` que las copias sean idénticas y que el `LEEME.txt` de
+   «PARA REVISION» liste las rutas y lo pendiente. Cuando Daniela apruebe una pieza, se mueve a
+   «BLACK SKY 2026 - APROBADO»; no se borra.
+6. **Pon al día Notion:** la subtarea de cada pieza entregada queda en «Listo para revisión», con su fecha de envío.
+7. **Republica la página del canvas** («KV Black · Rutas foco Chile y Perú inter»). El canvas está al tope de 511
+   archivos por versión, así que las imágenes van como assets:
+   1. Lee primero el artefacto publicado, para partir de lo que está arriba.
+   2. Sube los JPG nuevos como assets (cada subida da un id nuevo) y anota los ids en `rf-blobs.json`.
+   3. Corre `rf-page.cjs` para regenerar la página (argumentos en la skill, §4.13).
+   4. Publica sólo los tableros de las rutas, con `canvas.json` como ancla, idéntico al publicado. No subas las imágenes
+      como archivos del proyecto.
+
+**Qué revisar:** plantilla y legal del tipo correcto (DOM o INTER, y en Perú «Final ruta Lima-(destino)-Lima»); en
+Chile, sin PromPerú, sin dirección y sin marca de agua; el destino con su nombre completo y separado de la flecha; el
+logo sin cabezas debajo y nada cortado de golpe; la píldora de origen termina 35 px después de la última letra; el
+legal se lee (hoy está débil en el popup de Cusco y la story de Concepción); los precios siguen como marcador.
+
+> Detalle técnico: [scripts del despliegue BLACK, §4.13 «Rutas foco de Chile y Perú internacional»](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+
 ### 7g. Ordenar la entrega en «BLACK SKY 2026»
 
 `node organizar.cjs <entregables locales> "<…>/10_Noviembre/BLACK SKY 2026"` copia sin borrar nada, con la
-estructura por mercado y formato y los nombres `BS_…`. Si falta una fuente o dos piezas quedarían con el
+estructura por mercado y formato y los nombres `BS_…`. Desde el 2026-11-06 no copia los `.gif`: en `GIF + POPUP` va el
+MP4 con audio. Si falta una fuente o dos piezas quedarían con el
 mismo nombre, se detiene. Primero pruébalo en una carpeta local y compáralo con `diff -rq`.
 
 Para decidir qué copiar, `organizar.cjs` compara cada archivo por **tamaño y fecha**, sin abrirlo: leer archivos que
 OneDrive tiene sólo en la nube colgaba el proceso. En la cuarta ronda dejó «BLACK SKY 2026» con 155 archivos, y
 «ENTREGABLES BLACK» también quedó al día.
+
+### 7j. Rondas 11 y 12: sólo MP4, difuminado B y tres caminos
+
+Las dos rondas son del 2026-11-06 (Dianesty y Daniela, en la revisión «V3» de Frame.io y en Teams). Sus reglas valen
+para todo lo que se produzca desde ahora. Los motivos están en la [doc funcional](../../documentation/creative/adaptaciones-sky-en-claude-design.md#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos).
+Todos los comandos se corren en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`, después de
+`bash doctor.sh`.
+
+1. **Corre el lote con `./ronda12.sh`.** Prende `VELO_AUTO=1` (difuminado arriba sólo si el fondo del logo es ruidoso)
+   y `PISO_SUTIL=1` (piso negro al 15 % sólo si el pie es claro), para KV, popup y story.
+2. **Difuminado B.** Es el valor por defecto de `destinos.cjs`: negro al 45 % arriba, caída suave y fin al 85 % del
+   largo anterior. No pongas `SOMBRA=1` ni `VELO_LISTA=1`: devuelven la sombra lateral y el velo de lista, que
+   Dianesty pidió quitar.
+3. **Aplica los tres caminos de Daniela, en orden**, mirando cada pieza al 100 %:
+   1. Si se lee a la primera, sin gradiente.
+   2. Si no, el difuminado B (sutil).
+   3. Si no alcanza, no oscurezcas más: adapta la foto. Reencuadra con `fotos-destino.json`, o baja las luces en la
+      zona de los textos con `node adaptar-foto.cjs <pieza> [umbral] [factor] [lista|destino]` (se usó 105 y .35).
+      Escribe `fotos-destino/<foto>-adapt.png` y guarda la original en `srcOriginal`. Se adapta el destino cuando el
+      p75 de la luz detrás de él supera 160. Quitar elementos, oscurecer el cielo o quitar nubes también valen, sin
+      salir del brandlift.
+   4. Si aún no se lee, pide una foto nueva.
+
+   Para el legal de abajo, apóyate en el desenfoque del fondo (bokeh); el degradado inferior es negro al 10–15 % y sólo
+   donde el legal o el sello de puntualidad no se leen.
+4. **Sin sombras de texto.** Ni sombra en las letras ni degradé detrás de ellas: `banderas.cjs` ya no aplica sombra
+   (sólo la pone con `sombraTexto: true`) y la ubicación de las rutas de Perú ya no lleva contorno oscuro.
+5. **Píldora rosada de origen con avión** (regla para toda píldora con avión): la arma `pildora.cjs`, que usan
+   `variantes.cjs` y `rutas.cjs`. El avión no se mueve y la píldora termina 35 px después de la última letra. Para
+   cambiar un origen, edita el texto en `variantes.cjs` y vuelve a correr el lote; no muevas la píldora a mano.
+6. **MP4 en BT.709.** `render-gif.sh` y `render-all.sh` ya codifican así. Si un MP4 viejo tiene el verde del logo
+   apagado, recodifícalo sin volver a renderizar con `./reencode-709.sh <KV…>`. Cualquier MP4 que armes desde PNG
+   con ffmpeg debe salir en BT.709 y etiquetado.
+7. **Entrega.** En «BLACK SKY 2026», `<HM>/GIF + POPUP/<pieza>/` lleva popup y `BS_GIF_<PIEZA>_AUDIO.mp4` (sin GIF), y
+   `HM PE/RUTAS FOCO/<DESTINO>/` lleva popup y story. Para la revisión, copia lo mismo a «BLACK SKY 2026 - PARA
+   REVISION» con un LEEME que diga qué cambió (en esta ronda,
+   `LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`).
+8. **Canvas.** Publica en el principal sólo imágenes y tableros de animación (`g-gif`), que ahora reproducen el MP4
+   con audio y controles. Si otra sesión publicó `canvas.json` en el medio, no lo reemplaces. La Grilla ya no lleva
+   story en video; `STORY_VIDEO=1` lo vuelve a armar cuando se itere.
+9. **Pruebas visuales aparte.** Para comparar variantes (como las cuatro del difuminado), usa `pruebas-velo.sh` y
+   publica en un canvas de pruebas propio (`pruebas-velo-canvas.cjs`;
+   <https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC>), nunca en el principal. Deja también una copia en OneDrive
+   (en esta ronda, `10_Noviembre/BLACK SKY 2026 - DIFUMINADO (PRUEBAS 2026-11-06)/`).
+
+**Qué revisar:** que ninguna letra tenga sombra; que el gradiente aparezca sólo donde hace falta y sea sutil; que la
+píldora termine 35 px después del texto y el avión esté donde siempre; que el verde del logo del MP4 sea igual al del
+KV; que en `GIF + POPUP` no quede ningún `.gif`.
+
+**Pendiente con Dianesty:** si Estados Unidos suma Buenos Aires, si Miami va en Uruguay y el origen de Uruguay
+(«DESDE MONTEVIDEO» es un supuesto). No los des por confirmados.
 
 ### 7i. Poner las cifras y construir en el Creative Workbench
 
@@ -433,7 +552,7 @@ interfaz de Instagram (zonas de ~270 px arriba y abajo).
   propio de ella.
 - El canvas es **privado** del operador. Si alguien del equipo pregunta si es colaborativo (Daniela lo preguntó): se
   comparte desde «Compartir» y quien lo recibe puede verlo y comentar.
-- Publica por lotes: una versión admite como máximo 512 archivos. Primero las imágenes, luego los artboards; los
+- Publica por lotes: una versión admite como máximo 511 archivos. Primero las imágenes, luego los artboards; los
   videos van como assets.
 
 ### 9. Exportar
@@ -441,8 +560,8 @@ interfaz de Instagram (zonas de ~270 px arriba y abajo).
 | Entregable | Cómo se obtuvo en el caso fuente |
 |---|---|
 | **PDF** de adaptaciones | Render local con las mismas plantillas del canvas. CyberSky: 66 páginas, JPEG calidad 90, primero internacionales y luego nacionales, en orden popup → post → story |
-| **GIF** | Render local cuadro a cuadro, 25 fps, en bucle, con paleta por archivo |
-| **MP4** | Render local; una versión sin audio y otra con audio (`*_audio.mp4`) |
+| **GIF** | Render local cuadro a cuadro, 25 fps, en bucle, con paleta por archivo. No se entrega desde el 2026-11-06 |
+| **MP4** | Render local; una versión sin audio y otra con audio (`*_audio.mp4`), en BT.709. Desde el 2026-11-06 la animación se entrega sólo como MP4 con audio |
 | **PNG** | Los estáticos de popup y story, en `estaticos/`; KV en `kv/`; rutas en `rutas-peru/`; Chile en `chile-kv-listo/`; PMAX en `pmax/` y HPH en `hph/`, en 1x y `_2x` |
 | **Story video** | MP4 1080×1920 con audio, en `story-video/` |
 
@@ -521,7 +640,7 @@ Antes de entregar, mira cada pieza al 100 % (no sólo la miniatura). Seis contro
 
 | Control | Qué mirar |
 |---|---|
-| **Logo y fecha** | Logo BLACK con la fecha vigente en el idioma del mercado («DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT en Brasil, EN en EE. UU.), sin tocar el marco y sin resplandor borroso; legible sobre la foto gracias al gradiente de Daniela, que termina poco después del logo y no oscurece caras ni monumentos, sin manchas ni halos |
+| **Logo y fecha** | Logo BLACK con la fecha vigente en el idioma del mercado («DEL 25 DE NOVIEMBRE AL 2 DE DICIEMBRE», PT en Brasil, EN en EE. UU.), sin tocar el marco y sin resplandor borroso; legible sobre la foto con los tres caminos (sin gradiente si se lee; si no, el difuminado B; si no alcanza, la foto adaptada), sin oscurecer caras ni monumentos, sin manchas ni halos |
 | **Banderas** | Cada bandera corresponde al destino escrito a su lado; se mira la imagen, no el nombre del archivo; aro blanco fino de 2 px |
 | **Alianzas** | El logo que toca: Chile Travel fuera de Chile, PromPerú «otros HM» fuera de Perú, PromPerú «solo HM Perú» en las rutas. En KV y popup, arriba a la derecha; Chile Travel pegado a la esquina en todas las piezas; en las stories de rutas y «Vuela por el Perú», PromPerú centrado entre la franja de precio y el pie; PromPerú «otros HM» en la story, al margen derecho bajo el avión |
 | **Flecha de precio** | Con destinos cortos, flecha y badge a 40 px del bloque del destino; nunca más lejos de donde los puso el kit |
@@ -533,15 +652,16 @@ Y por formato:
 | Formato | Qué revisar además |
 |---|---|
 | KV 1080×1350 | Junta de la flecha morada cerrada; en el clúster internacional, precio alineado y sin franja clara arriba |
-| Popup 1080×1080 | Legal sobre el degradado, no sobre la ropa; lista de clúster entre logo y destino |
+| Popup 1080×1080 | Legal legible, no sobre la ropa (degradado negro al 10–15 % sólo si hace falta); lista de clúster entre logo y destino; ninguna letra con sombra |
 | Story 1080×1920 | Nada importante en los ~270 px de arriba y abajo |
-| GIF y MP4 | Movimiento hasta ~1,4 s y luego quieto; primer cuadro correcto; ninguna parte duplicada en la foto |
+| GIF y MP4 | Movimiento hasta ~1,4 s y luego quieto; primer cuadro correcto; ninguna parte duplicada en la foto; verde del logo igual al del KV (BT.709). Desde el 2026-11-06 sólo se entrega el MP4 con audio |
 | MP4 con audio | No satura; el golpe cae cuando el precio se detiene |
 | Story en video | Visto entero con sonido; música apagada antes de la tapa; tapa del idioma correcto |
 | PMAX 1200×628 | La cara de la persona libre (el badge no la tapa) |
 | HPH | El **728×90** igual a la referencia y legible; banderas del mercado, no las de Chile; URL del mercado |
 | TikTok y DAT de Chile | Idénticos a la referencia editable salvo el logo |
-| Rutas foco Perú | Ciudad dentro de 430 px; PromPerú «solo HM Perú»; foto tomada de la carpeta de su ruta y ubicación igual al nombre del archivo; degradado inferior negro; en stories ampliadas con IA, sin costura ni elementos inventados |
+| Rutas foco Perú | Ciudad dentro de 430 px; PromPerú «solo HM Perú»; foto tomada de la carpeta de su ruta y ubicación igual al nombre del archivo; degradado inferior negro, sutil (10–15 %) y sólo si hace falta; en stories ampliadas con IA, sin costura ni elementos inventados |
+| Rutas foco Chile y Perú inter | Sólo popup y story; legal de su tipo (DOM o INTER); en Chile, sin PromPerú, dirección ni marca de agua; destino con nombre completo, dentro de 400 px y separado de la flecha; logo sin cabezas debajo; píldora de origen 35 px después de la última letra; degradados sólo donde hacen falta ([paso 7e-quater](#7e-quater-rehacer-y-entregar-una-ruta-foco-de-chile-o-perú-internacional)) |
 
 ## Qué significan las señales
 
@@ -549,6 +669,7 @@ Y por formato:
 |---|---|
 | `000.000`, `00%`, `USD 000`, `R$ 0.000`, `US$000 o S/ 0,000` | Marcador de precio o descuento: falta la grilla de precios |
 | `[Ubicación de la foto]` con pin verde | Marcador: no hay foto ni ubicación por ruta todavía |
+| «DESDE SANTIAGO» en una ruta foco de Chile | Origen deducido: Daniela no lo indicó. Confirmarlo antes de pautar |
 | «(propuesta)» o «por confirmar» en el título del artboard | Decisión pendiente con Daniela (ver catálogo) |
 | Artboard rayado en el canvas a poca distancia | Carga perezosa: todavía no cargó, no es un error |
 
@@ -566,9 +687,10 @@ Lo pendiente con Daniela, uno por uno, está en el
 | **KV Black · Animación GIF** | Los 12 KV animados (video en bucle), las 6 referencias de animación del kit y una previa MP4 con audio |
 | **KV Black · Popup y Story** | 24 estáticos: 12 popup 1080×1080 y 12 story 1080×1920 |
 | **KV Black · PMAX y HPH** | El paquete PMAX de cada KV (4 formatos) y el HPH genérico de Chile más PE, AR, UY, BR y US con sus banderas (4 formatos) |
-| **KV Black · Grilla por mercado** | Los 12 mensajes de la grilla (CL, PE, AR, UY, BR, US) con KV, popup, GIF, story y story video; más los KV con banderas de AR y BR |
+| **KV Black · Grilla por mercado** | Los 12 mensajes de la grilla (CL, PE, AR, UY, BR, US) con KV, popup, animación y story; más los KV con banderas de AR y BR. Desde la versión 62 la animación es el MP4 con audio, con controles; desde la 63, sin story video |
 | **KV Black · Rutas foco Perú** | 13 rutas con popup y story, PromPerú y ubicación de la foto |
 | **KV Black · Chile KV listo** | Banner TikTok (3), DAT (2) y PMAX (4) desde las referencias editables |
+| **KV Black · Rutas foco Chile y Perú inter** | Las 16 rutas foco de Chile y Perú internacional, un tablero por ruta con popup y story lado a lado; imágenes como assets (ids en `rf-blobs.json`) |
 
 ## Qué no hacer
 
@@ -584,6 +706,17 @@ Lo pendiente con Daniela, uno por uno, está en el
 - **No publicar** nada fuera de los artifacts privados del operador.
 - **No buscar la foto de una ruta en otro banco** si su carpeta `FOTOS PARA PROMPERU/<ruta>` está vacía: pregunta antes.
 - **No borrar** una pieza al cambiar de estado entre «APROBADO» y «PARA REVISION»: se mueve.
+- **No entregar GIF.** Desde el 2026-11-06 la animación va sólo como MP4 con audio, en BT.709.
+- **No poner sombras de texto** ni degradé detrás de las letras, ni sombra lateral ni velo de lista.
+- **No oscurecer más una foto que no se lee** con el difuminado B: se adapta la foto o se pide una nueva.
+- **No publicar pruebas en el canvas principal:** van en un canvas de pruebas aparte.
+- **Nunca hacer `require('./compose.cjs')`** desde otro script: no tiene guarda y recompone todas las piezas del
+  despliegue, no sólo la tuya. Úsalo como comando o a través de `rutas-foco.sh`.
+- **No tocar entradas ajenas de `fotos-destino.json`.** El archivo lo comparten las rutas foco y las demás rondas: cambia
+  sólo las entradas de las piezas que estás rehaciendo.
+- **No renderizar mientras otra sesión renderiza** en el mismo taller: comparten temporales y las piezas se mezclan.
+- **No subir las imágenes de las rutas foco como archivos del canvas:** van como assets, porque el canvas está al tope
+  de 511 archivos por versión.
 
 ## Problemas comunes
 
@@ -597,7 +730,7 @@ Lo pendiente con Daniela, uno por uno, está en el
 | Línea fina en la flecha morada | La flecha está armada con 3 piezas y queda una junta de 1 px. En el render se ensanchó la pieza central; recomendación al cliente: unir las 3 formas |
 | Precio del clúster internacional más arriba que en los otros KV | El `$ 000.000` venía 18 px más arriba y la etiqueta 4 px; se alinearon a la base en el render |
 | Franja clara arriba en el clúster internacional | La capa oscura de la izquierda empezaba en y=6; se estiró hasta el borde. Recomendación: subirla a y=0 |
-| El legal queda sobre la ropa en popup o story | Se agrega un degradado oscuro inferior detrás del pie |
+| El legal queda sobre la ropa en popup o story | Apóyate en el desenfoque del fondo; si no basta, degradado negro al 10–15 % detrás del pie, sólo en esa pieza (`PISO_SUTIL=1` lo decide solo). Si tampoco alcanza, adapta la foto (paso 7j) |
 | La foto generada trae un aro negro en las esquinas | Es el lente ojo de pez del celular. Pide en el prompt «no circular frame, no black ring, no vignette» y revisa el encuadre |
 | Ojos saltones o pecas en todos | Pide tamaño de iris y párpados naturales, que la sorpresa se lea en cejas, boca y manos, y describe la piel de cada persona sin pecas salvo que se pidan |
 | Una imagen del artboard aparece rota | Si su nombre tiene «@» (`x@2x.png`) el canvas no la sirve. Renómbrala sin «@» (`x_2x.png`) |
@@ -609,13 +742,22 @@ Lo pendiente con Daniela, uno por uno, está en el
 | La fecha del logo sale en portugués en un KV en español | El idioma se detectó en el SVG crudo (el contenido codificado tiene secuencias como «VOE»). Detéctalo sólo por el texto visible |
 | El HPH 728×90 por mercado fue rechazado | Se compuso desde las partes del KV. Rehazlo desde el SVG de referencia del kit |
 | El logo de alianza se monta con el avión en la story | Aplica la ubicación vigente desde la cuarta ronda: Chile Travel pegado a la esquina superior derecha; PromPerú «solo HM Perú» centrado entre la franja de precio y el pie; PromPerú «otros HM» al margen derecho, debajo del avión |
-| El logo BLACK no se lee sobre una foto clara | Ajusta el encuadre en `fotos-destino.json` (el gradiente de Daniela ya va detrás del logo). Si la story necesita más cielo, amplíala con IA (paso 7e-ter). No agregues sombras, halos ni cielo inventado |
-| El gradiente del logo oscurece caras o monumentos | Está estirado a todo el alto. Debe terminar poco después del logo (42 % del alto en KV, 50 % en popup, 46 % en story) |
+| El logo BLACK no se lee sobre una foto clara | Sigue los tres caminos (paso 7j): difuminado B; si no alcanza, reencuadra en `fotos-destino.json` o adapta la foto con `adaptar-foto.cjs`; si la story necesita más cielo, amplíala con IA (paso 7e-ter). No oscurezcas más ni agregues sombras, halos ni cielo inventado |
+| El gradiente del logo oscurece caras o monumentos | Está estirado a todo el alto. Desde la ronda 11 rige el difuminado B (45 %, caída suave, fin al 85 % del largo anterior) y sólo donde hace falta (`VELO_AUTO=1`) |
+| El verde del logo se ve más apagado en el MP4 que en el KV | El video se codificó sin BT.709 (Frame, QuickTime y los navegadores leen BT.709). Recodifica con `./reencode-709.sh <KV…>`; `render-gif.sh` y `render-all.sh` ya lo hacen bien |
+| La píldora de origen se corre unos píxeles cada vez que corres el lote | Se escribió el trazado en coordenadas de pantalla dentro de un grupo trasladado (se corría 8 px por pasada). `pildora.cjs` lo escribe en coordenadas locales: usa ese |
+| Manchas posterizadas tras `adaptar-foto.cjs` | Se filtró por color (un corte para proteger la piel). No filtres por color: comprime sólo las luces, con borde difuso |
+| La pieza trae sombra en las letras o velo detrás de la lista | Se corrió con `SOMBRA=1`, `VELO_LISTA=1` o `sombraTexto: true`. Quítalos y vuelve a correr `./ronda12.sh` |
 | «No es la foto de esta ruta» | Se tomó de otro banco o Daniela movió las fotos entre carpetas. Usa sólo `FOTOS PARA PROMPERU/<ruta>`, compara tamaños antes de cada ronda y toma la ubicación del nombre del archivo |
 | La revisión de Frame.io muestra 0 piezas | El panel del navegador integrado está oculto y Frame no pinta. Muéstralo, o lee los avisos de `notifications@frame.io` en Outlook |
 | `pnpm ai:inpaint expand` falla con «User is locked. Reason: Exhausted balance» | Las cuentas de fal no tienen saldo. Pide al operador recargar o usar OpenAI con su clave (paso 7e-ter) |
 | `organizar.cjs` se queda colgado al copiar a OneDrive | Estaba leyendo archivos que existen sólo en la nube. La versión actual compara por tamaño y fecha; usa esa |
-| La publicación del canvas falla con error 422 | Superaste 512 archivos en la versión. Quita con `null` lo que ya no se usa (en BLACK, las capas `anim/`) y publica por lotes |
+| La publicación del canvas falla con error 422 | Superaste 511 archivos en la versión. Quita con `null` lo que ya no se usa (en BLACK, las capas `anim/`) y publica por lotes. Las imágenes nuevas súbelas como assets, como las de las rutas foco de Chile y Perú internacional |
+| Al rehacer una ruta foco cambiaron piezas de otras rondas | Algún script hizo `require('./compose.cjs')`, que recompone todo el despliegue. Llámalo como comando, revisa las piezas afectadas y vuelve a entregar sólo lo tuyo |
+| Piezas mezcladas o con partes de otra pieza | Dos sesiones renderizaron a la vez en el taller. Espera a que la otra termine y vuelve a correr `./rutas-foco.sh` con esas piezas |
+| «Río de Janeiro» o «Florianópolis» se meten en la muesca de la flecha | El destino pasó de 400 px. En las rutas foco de Chile y Perú internacional el tope es 400 px (no 430 como en las de Perú doméstico) |
+| Una ruta foco sale sin degradado arriba o abajo | Es lo esperado: los degradados van sólo si la foto los necesita. Si el logo o el legal no se leen, adapta la foto (encuadre, otra foto del banco o `cielo.cjs`) |
+| El canvas sigue mostrando la imagen vieja de una ruta | Falta el id nuevo del asset en `rf-blobs.json` o volver a correr `rf-page.cjs` antes de publicar los tableros |
 | Una ciudad aparece dos veces en las rutas | La lista venía repetida (Pucallpa). Hazla una sola vez y avísalo |
 | Falta la tapa de cierre vertical de un idioma | No viene en el kit (en BLACK, español). Recorta la horizontal sobre blanco y déjalo como pendiente |
 

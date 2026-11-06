@@ -12,6 +12,8 @@ const T = { kv: [0.74, 0.47], popup: [0.74, 0.44], story: [0.7, 0.5] }, SZ = { k
 // Cajas de la lista bajo el logo en cada formato (px del formato), con aire para que el borde difuso no se note.
 const ZONAS = {
   lista: { kv: [40, 320, 480, 820], popup: [30, 300, 460, 690], story: [40, 560, 520, 1080] },
+  // Lista de los clústeres de Chile (más alta y más larga: va del antetítulo hasta casi la flecha).
+  'lista-cluster': { kv: [30, 330, 600, 1100], popup: [20, 120, 540, 570], story: [20, 500, 640, 1300] },
   // Bloque del destino (antetítulo, nombre y píldora), donde el piso sutil ya no alcanza (Tumbes, Trujillo…).
   destino: { kv: [30, 900, 600, 1250], popup: [20, 690, 520, 900], story: [30, 1250, 640, 1530] }
 };

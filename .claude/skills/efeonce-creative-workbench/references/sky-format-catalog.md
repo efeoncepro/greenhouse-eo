@@ -134,7 +134,7 @@ Columnas de piezas: **B** = KV fijo + popup + story estática + GIF + MP4 + MP4 
 | `HM_AR_KV_LIMA` | Efeonce | VOLÁ A / Lima | IDA Y VUELTA DESDE | CON 00% OFF | — | ✓ | — | — | ✓ |
 | `HM_AR_KV_BANDERAS` | Efeonce (extra) | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | Perú y conexión con 16 destinos · Santiago y conexión con 15 destinos · Miami · Río de Janeiro, São Paulo y Florianópolis | ✓ | — | — | — |
 | `HM_UY_KV` | Kit | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | — | ✓ | ✓ | ✓ | — |
-| `HM_UY_KV_BANDERAS` | Efeonce | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | Fila de 4 banderas (DO, CL, BR, US) en lugar de la píldora de origen | ✓ | — | — | ✓ |
+| `HM_UY_KV_BANDERAS` | Efeonce | VOLÁ / Internacional | IDA Y VUELTA DESDE | CON 00% OFF | Fila de 4 banderas (DO, CL, BR, US) en lugar de la píldora de origen; desde 2026-11-06, lista con nombre (Punta Cana · Santiago y conexión con 15 destinos · Salvador · Miami) y píldora «DESDE MONTEVIDEO» (supuesto) | ✓ | — | — | ✓ |
 | `HM_BR_KV` | Kit | VOE A / Internacional | A PARTIR DE | COM ATÉ 00% OFF | — | ✓ | ✓ | ✓ | — |
 | `HM_BR_KV_SANTIAGO` | Efeonce | VOE A / Santiago | A PARTIR DE | COM ATÉ 00% OFF | Chile Travel pegado a la esquina superior derecha | ✓ | — | — | ✓ |
 | `HM_BR_KV_PERU` | Efeonce | VOE PARA / Peru | A PARTIR DE | COM ATÉ 00% OFF | PromPerú «otros HM» arriba a la derecha | ✓ | — | — | ✓ |
@@ -217,6 +217,7 @@ medidos sobre los archivos entregados.
 | Cantidad | 24 |
 | Peso | KV estándar 3,78–4,05 MB (14 archivos); con lista o banderas 4,07–7,69 MB (10). El más pesado es `HM_CL_KV_DOM_CLUSTER.gif` (7,69 MB, por las fotos circulares) |
 | Pendiente | No se verificó contra el límite de peso de cada plataforma de pauta |
+| Estado (2026-11-06) | **Retirado de la entrega** (Daniela: «no uses GIF, sólo deja en MP4, que es mejor formato»). `render-gif.sh` aún lo genera en local; la pieza «GIF» se entrega como MP4 con audio (3.5) |
 
 ### 3.5 MP4 en bucle, sin y con audio
 
@@ -227,9 +228,12 @@ medidos sobre los archivos entregados.
 | Cantidad | 24 | 24 |
 | Peso | 0,45–0,50 MB estándar; hasta 0,70 MB con lista | 0,55–0,60 MB estándar; hasta 0,80 MB con lista |
 | Carpeta | Raíz local → `GIF Y VIDEO KV/` | Idem |
+| Color (desde 2026-11-06) | BT.709, matriz explícita y etiquetado | Idem |
+| Entrega «BLACK SKY 2026» (desde 2026-11-06) | — | `GIF + POPUP/<pieza>/BS_GIF_<PIEZA>_AUDIO.mp4`: es **la** pieza animada |
 
-En el canvas, el «GIF» se muestra como `<video>` MP4 en bucle (autoplay, muted) porque el canvas congela la
-animación CSS.
+En el canvas, el «GIF» se mostraba como `<video>` MP4 en bucle (autoplay, muted) porque el canvas congela la
+animación CSS; desde la versión 62 los tableros de la Grilla muestran el MP4 con audio y controles. Pesos medidos
+antes del cambio a BT.709.
 
 ### 3.6 Story en video, 5 slides
 
@@ -239,6 +243,7 @@ animación CSS.
 | Estructura (Daniela) | Ver tabla de slides. Fundido de 0,3 s entre slides |
 | Audio | `SONIC BRAND-3-STORY_1.mp3` (15,272 s en el kit) a −3 dB bajo los slides 1–4, fundido entre 12,4 y 13,3 s; el audio propio de la tapa entra en 13,0 s. Medido: −12 LUFS, pico −0,5 dBFS |
 | Variantes | Los 12 mensajes de la grilla (no hay de los KV originales ni de las rutas) |
+| Estado (2026-11-06) | Sin producir desde la décima ronda: story y story en video los exporta Daniela. En el canvas, los tableros sólo salen con `STORY_VIDEO=1` (pipeline §9) |
 | Nombre | `<KV>__story-video.mp4` |
 | Local / OneDrive | `story-video/` → `STORY VIDEO 5 SLIDES/` |
 | Cantidad | 12 |
@@ -373,7 +378,7 @@ Detalle del flujo plantilla + datos en [sky-design-canvas.md](sky-design-canvas.
 | HPH por mercado | Bandera al 93 % de su caja con un aro del 3 % del diámetro (`hph/market.cjs`) |
 | Texto | Metric Medium 33, blanco `#fefefe`; segunda línea con interlínea 31,35 |
 | Posición en KV | Centro x=103, texto x=166,5, primera fila y=378; paso 98 px hasta 4 filas, 92 px con 5 |
-| Fila de Uruguay | 4 banderas de 52 px (radio 26), paso 66 px, desde x=92, a la altura de la píldora de origen oculta |
+| Fila de Uruguay | 4 banderas de 52 px (radio 26), paso 66 px, desde x=92, a la altura de la píldora de origen oculta. Superada el 2026-11-06: lista con nombre bajo el logo, como las demás (pipeline §4.13) |
 | Archivo de trabajo | PNG transparente 160 px en `kvhm-canvas/flags-circ/<clave>.png` |
 
 | Clave | Archivo del kit (`GRAFICOS/BANDERAS/`) |
@@ -512,6 +517,10 @@ vigentes, con el gradiente nuevo, aunque la aprobación se dio sobre la versión
 
 Cada carpeta de pieza trae `BS_POPUP_`, `BS_STORY_`, `BS_GIF_` (sólo .gif: el MP4 con el mismo nombre se
 leía como duplicado) y `BS_STORYVIDEO_` (.mp4). El GIF en MP4, con y sin audio, sigue en la entrega anterior. Con una sola agrupación de PMAX, las 4 imágenes van sueltas en `PMAX/`. Sólo 1x.
+**Desde el 2026-11-06 (décima ronda en adelante):** sin `.gif`; la pieza animada va sólo como
+`BS_GIF_<PIEZA>_AUDIO.mp4` (BT.709). El lote que Efeonce actualiza es popup + MP4 con audio; `BS_STORY_` y
+`BS_STORYVIDEO_` quedaron los de la novena ronda porque los exporta Daniela. Copia para revisión en
+`BLACK SKY 2026 - PARA REVISION/` con `LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`.
 Fuera de la carpeta por no estar en la lista confirmada por Adri: BR «Voe para Peru», los KV con banderas de
 AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GIF.
 
@@ -519,7 +528,8 @@ AR y BR (siguen como base de sus HPH) y los 12 KV originales como pieza popup/GI
 vertical cuando la hay: Tacna, Tumbes, Cusco), legal «Final tramo <Ciudad>-Lima. Tasas incluidas», ubicación
 del CSV, origen «DESDE LIMA» y crédito en Tumbes, Piura, Tacna (© PROMPERÚ) y Trujillo (© Carlos Pedroza -
 PROMPERÚ), en horizontal, pequeño y sin sombra en la esquina superior izquierda. Detrás del logo, desde la quinta
-ronda, el gradiente de referencia de Daniela (negro 69 % → 0) acotado bajo el logo (pipeline §4.6); en la story, la ubicación va completa en la esquina superior
+ronda, el gradiente de referencia de Daniela (negro 69 % → 0) acotado bajo el logo (pipeline §4.6; desde el
+2026-11-06, prueba B al 45 % y sólo si el fondo del logo lo pide, pipeline §4.13–§4.14); en la story, la ubicación va completa en la esquina superior
 derecha (borde derecho en x=1040, borde superior en y=22) y PromPerú centrado (x=540) entre el precio y el pie.
 Tacna story reencuadrada (z 1,25, t [0,36; 0,5]) para que la flecha no tape a la persona. Regla de la flecha de precio: 40 px
 después del bloque del destino cuando el destino es corto, en KV, popup y story.
@@ -585,6 +595,7 @@ de Adri dice «cluster inter de Perú»; AR mantiene «DESDE [ORIGEN]».
 | Tema | Estado |
 | --- | --- |
 | BR «Voe para Peru» | ¿Va con piezas de alianza (PromPerú) o como KV? |
+| USA y Uruguay (Dianesty, 2026-11-06) | ¿USA suma Buenos Aires? ¿Uruguay lleva Miami? El origen de Uruguay «DESDE MONTEVIDEO» es supuesto |
 | «Vuela por Perú» | Propuesta sin fotos (no hay fotos de Perú) |
 | CL «Encuentra destinos» | Se hizo desde el clúster internacional de Chile; su nota decía «cluster inter de Perú» |
 | Frases del brandlift INTER y traducciones (AR, PT, EN) | Propuestas propias |

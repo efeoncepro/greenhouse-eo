@@ -12,6 +12,8 @@ y la cuarta ronda (2026-11-05: fotos de destino, velo del logo, regla destino �
 aro de banderas) están en ese pipeline, §4.4 y §4.5; la quinta, la sexta y la séptima (gradiente de Daniela,
 revisión en Frame.io, degradado inferior negro y carpetas de estado), en §4.6 a §4.8 y en «Rondas quinta a séptima»
 más abajo. Las rondas siguientes se llevan en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del canvas».
+Las rutas foco de Chile y Perú internacional (2026-11-06) tienen su página propia: ver «Rutas foco de Chile y Perú
+internacional» más abajo y pipeline §4.13.
 
 ## Frontera
 
@@ -33,7 +35,7 @@ sigue en Creative Workbench ([SKILL.md](../SKILL.md), invariantes; [sky-producti
 | Artifact | URL | Tipo | Estructura |
 | --- | --- | --- | --- |
 | Design System «SKY Airline — Performance» | https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Design System | `project/design-system.json` v3, `tokens.json` (forma de lista), `tokens.css`, `components/<Comp>/README.md` + `preview.html`, `bundle.js` mínimo; `index.d.ts` se sube como text/plain |
-| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; 40 tras la cuarta ronda, 44 tras la quinta y 47 tras la sexta; 51 tras la séptima; **vigente: versión 53** (octava ronda, 2026-11-06: todo aprobado salvo la story de Pucallpa, corregida), con las mismas 10 páginas |
+| Canvas «SKY CyberSky Perú — Adaptaciones» | https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Design | `project/canvas.json` v3 + artboards `.dc.html`; el DS va instalado por copia en `project/ds/skyperformance/`. Versión 21 al cierre del 2026-11-04; 40 tras la cuarta ronda, 44 tras la quinta y 47 tras la sexta; 51 tras la séptima; 53 en la octava ronda (2026-11-06: todo aprobado salvo la story de Pucallpa, corregida); **vigente: versión 70** (2026-11-06), con la página `kv-black-rutas-foco` sumada a las anteriores |
 
 **Design System.** Se construyó desde las 126 adaptaciones (37 composiciones) del pack SKY
 `0.1.0` de Workbench, consultadas con `pnpm marca:recetas sky` ([recipes.md](recipes.md)).
@@ -54,6 +56,7 @@ en el DS** aunque las piezas la usan; en los renders locales se toma de OneDrive
 | 5 | KV Black · Animación GIF | 12 KV animados (`<video>` MP4 en bucle, autoplay muted, poster = KV fijo), las 6 referencias del kit como video y una previa MP4 con audio |
 | 6 | KV Black · Popup y Story | 24 estáticos: 12 popup 1080×1080 + 12 story 1080×1920 |
 | 7 | KV Black · PMAX y HPH | PMAX por KV (1080×1080, 1080×1350, 1080×1920 y 1200×628: 48 artboards) y HPH (genérico Chile + PE INTER, AR, UY, BR, US en 1200×1200, 300×600, 300×250 y 728×90: 24 artboards) |
+| — | KV Black · Rutas foco Chile y Perú inter (`kv-black-rutas-foco`, 2026-11-06) | 16 tableros, uno por ruta, con popup y story lado a lado; imágenes como assets (ver «Rutas foco de Chile y Perú internacional») |
 
 Los 12 KV BLACK: PE DOM, PE DOM-RUTA, PE INTER, PE INTER-RUTA, CL DOM, CL INTER, AR, UY, BR, US,
 CL DOM CLUSTER (regiones) y CL INTER CLUSTER (banderas). La previa con audio de la página 5 es
@@ -197,7 +200,7 @@ memoria (`patches.cjs`).
 | Logo | 100 %, arriba a la izquierda | 130 %, desde y=270 |
 | Bloque destino/precio/badge | 88 %; precio termina en y=938 (32 px sobre el pie) | +350 px respecto del KV |
 | Pie | y≈972 | +350 px; termina ~1655 |
-| Degradado inferior | Marrón `#2a1608`, 0 → 0,78 entre y 800 y 1080, para que el legal no quede sobre el pantalón | 0 → 0,82 entre y 1360 y 1660 |
+| Degradado inferior | Marrón `#2a1608`, 0 → 0,78 entre y 800 y 1080, para que el legal no quede sobre el pantalón. Desde 2026-11-06 con `PISO_SUTIL=1`: negro al 10–15 % y sólo donde el legal o el sello no se leen | 0 → 0,82 entre y 1360 y 1660 (misma regla desde 2026-11-06) |
 | Clúster internacional | Lista al 84 % | — |
 | Clúster nacional | Lista reordenada en 3 columnas (Norte 6 · Sur 6 · Sur 3) al 90 %, destino 88 %, logo 100 % | Bloque y pie +80 px más (pie ~1735, más cerca de la caja de respuesta de Instagram); lista al 115 % centrada entre logo y destino |
 
@@ -224,9 +227,12 @@ más abajo.
 2. Renderizar cuadro a cuadro con Playwright + Web Animations API a **25 fps, 99 cuadros**.
 3. **Descartar los 2 primeros cuadros capturados**: la captura llega con 2 cuadros de retraso.
 4. Exportar GIF (25 fps, bucle, paleta por archivo; quedaron de 3,7 a 7,6 MB), MP4 sin audio y
-   MP4 con audio (`*_audio.mp4`).
+   MP4 con audio (`*_audio.mp4`). **Desde el 2026-11-06 se entrega sólo el MP4 con audio** (`BS_GIF_<PIEZA>_AUDIO.mp4`;
+   Daniela: «no uses GIF, sólo deja en MP4, que es mejor formato») y los MP4 se codifican **en BT.709 etiquetado**:
+   sin eso el verde del logo cambiaba en Frame, QuickTime y los navegadores (pipeline §8.4).
 5. Publicar en el canvas como `<video>` (MP4 en bucle, autoplay muted, poster = KV fijo). El
-   canvas congela la animación CSS ([lessons.md](lessons.md)).
+   canvas congela la animación CSS ([lessons.md](lessons.md)). Desde la versión 62 los tableros de la Grilla
+   reproducen el MP4 con audio, con controles («MP4 1080×1350 (con audio)»).
 
 **Audio** (sólo MP4; el GIF no lleva sonido): `AUDIO FINAL PARA LOS GIF.mp3` dura 3,944 s y su
 golpe en 1,37 s coincide con el precio quedando fijo. Viene a −10,9 LUFS con true peak +0,6 dBFS;
@@ -369,6 +375,7 @@ Resumen para operar el canvas; el detalle técnico (parámetros, scripts y coman
 - **Gradiente del logo.** Reemplaza al velo diagonal de la cuarta ronda: es el SVG de referencia de Daniela (negro
   puro, 69 % → 0, dos paradas), acotado bajo el logo: termina en el 42 % del alto en KV, el 50 % en popup y el 46 %
   en story. Ojo con los nombres de los archivos de referencia: `Fade_img_horizontal` es oscuro arriba.
+  *(Superado el 2026-11-06 por la prueba B y el criterio «sólo si hace falta»: ver «Rondas novena a doceava».)*
 - **Degradado inferior negro** en las piezas con foto de destino (popup, story y KV de las rutas); los KV del kit
   siguen con el marrón `#2a1608`. Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y
   «Vuela por el Perú».
@@ -398,6 +405,51 @@ pipeline §4.7.
 | Centrar y subir el logo | Sugerencia de Daniela, no pedido: queda a criterio de SKY |
 | Ayacucho, Chiclayo y story de Pucallpa | Aprobadas el 2026-11-06 (octava ronda); la story de Pucallpa, tras subir la torre |
 
+## Rondas novena a doceava (2026-11-06: Frame «V2»/«V3» y Teams)
+
+Resumen para operar; el detalle técnico está en [sky-black-pipeline.md](sky-black-pipeline.md) §4.11 a §4.14 y las
+variables de entorno en su §1. El lote es **sólo POP-up y MP4** (Daniela exporta story y story en video). Canvas
+principal en la versión 74.
+
+- **Sin GIF.** La pieza animada va sólo como `BS_GIF_<PIEZA>_AUDIO.mp4` (Daniela: «no uses GIF, sólo deja en MP4, que
+  es mejor formato»), codificada en **BT.709 etiquetado** (Dianesty: «en todos los gif cambia el color del logo»).
+- **Degradados sólo donde hacen falta** (Daniela, Teams 18:03). Orden: (1) si la foto se lee a la primera, sin
+  gradiente; (2) si no, el difuminado sutil aprobado (prueba B: negro 45 % arriba, curva suave, termina al 85 % del
+  largo anterior); (3) si no alcanza, **no oscurecer más: adaptar la foto** (reencuadrar, quitar elementos, oscurecer
+  el cielo o quitar nubes sin salir del brandlift); (4) si aún no se ve bien, otra foto. Abajo, negro al 10–15 % sólo
+  donde el legal o el sello de puntualidad no se leen; los legales se apoyan en el bokeh. Se corre con
+  `VELO_AUTO=1 PISO_SUTIL=1` (`ronda12.sh`).
+- **Sin sombras de texto** ni degradé detrás de las letras (Dianesty: «se nota mucho sobre todo con las
+  transiciones»; «le quitamos las sombras»). Sin sombra lateral ni velo de lista.
+- **Píldora rosada de origen con avión, adaptativa** (regla transversal para todo «badge con avión»): el avión no se
+  mueve, la píldora crece a la derecha y termina 35 px después de la última letra (`pildora.cjs`).
+- **Uruguay** pasa a lista con nombre (Punta Cana · Santiago y conexión con 15 destinos · Salvador · Miami) con
+  «DESDE MONTEVIDEO» (supuesto). Pendiente con Dianesty: ¿Buenos Aires en USA? ¿Miami en Uruguay?
+- **Publicar en el canvas** sólo imágenes y tableros `g-gif` cuando otra sesión publicó `canvas.json` en el medio.
+
+| Tema | Decisión |
+| --- | --- |
+| Difuminado A, B y «sólo detrás del logo» (canvas aparte https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC) | Daniela: A y B se ven iguales; «la de sombra sólo detrás del logo está mala». Dianesty aprobó la B en todas |
+| Sombra de letra en las listas de banderas (onceava ronda) | Retirada en la doceava |
+| Píldora centrada (onceava ronda) | Reemplazada por la píldora adaptativa |
+
+## Rutas foco de Chile y Perú internacional (2026-11-06)
+
+16 rutas en popup y story (qué son, legales y nombres en [sky-format-catalog.md](sky-format-catalog.md) §5.4;
+scripts y umbrales en [sky-black-pipeline.md](sky-black-pipeline.md) §4.13, «Rutas foco de Chile y Perú
+internacional»). En el canvas viven en la página «KV Black · Rutas foco Chile y Perú inter»
+(`kv-black-rutas-foco`): un tablero por ruta con popup y story lado a lado.
+
+- **Imágenes como assets, no como archivos del proyecto.** El canvas estaba al tope de archivos por versión (493
+  de 511): los 64 archivos nuevos (tablero + JPG por formato) no cabían. Cada JPG se sube como asset (`/_blob/<id>`)
+  y los ids quedan en `rf-blobs.json`, del que `rf-page.cjs` arma la página.
+- **Republicar una pieza:** subir de nuevo su JPG como asset (id nuevo), actualizar `rf-blobs.json`, correr
+  `rf-page.cjs` y publicar **sólo los tableros**, con `canvas.json` como ancla idéntico al publicado. Antes, leer
+  el artefacto vivo: otra sesión publica en el mismo canvas.
+- **Versiones:** 66 (entrega inicial), 67 (difuminado B, 32 assets nuevos) y **70** (ajustes de Daniela, 32 assets
+  nuevos y sólo los 16 tableros). El re-render posterior a la doceava ronda salió idéntico píxel a píxel, así que la
+  versión 70 sigue vigente.
+
 ## Lecciones de la plataforma Claude Design
 
 | Comportamiento | Qué hacer |
@@ -415,6 +467,9 @@ pipeline §4.7.
 - Una versión del canvas admite **512 archivos como máximo** (`deploy 422: manifest exceeds 512 entries`).
   Publicar por lotes (imágenes, luego artboards con `canvas.json`) y quitar con `null` en `files` lo que ya no se usa
   (caso 2026-11-04: las 49 capas de `anim/`, porque las animaciones del canvas son videos).
+- Si el canvas ya está cerca del tope y hace falta una página nueva, publicar sus imágenes como **assets**
+  (`/_blob/<id>`), que no cuentan como archivos de la versión, y guardar los ids en un JSON local para regenerar la
+  página (caso 2026-11-06: `rf-blobs.json` de las rutas foco, ver la sección de arriba).
 - Con muchos artboards el canvas muestra rayados los que aún no cargó a zoom bajo; no es un error: verificar en la vista
   «play» del artboard.
 
@@ -460,10 +515,10 @@ estructura `HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`:
 
 | Carpeta | Contenido |
 | --- | --- |
-| `BLACK SKY 2026 - APROBADO` | Las 30 piezas de rutas foco (desde el 2026-11-06) |
-| `BLACK SKY 2026 - PARA REVISION` | Sólo `LEEME.txt`: no queda nada en revisión |
+| `BLACK SKY 2026 - APROBADO` | Las 30 piezas de rutas foco de Perú (desde el 2026-11-06) |
+| `BLACK SKY 2026 - PARA REVISION` | Desde el 2026-11-06, las 32 piezas de las rutas foco de Chile y Perú internacional (`HM CL/RUTAS FOCO/` y `HM PE/RUTAS FOCO/`) con su `LEEME.txt`, copiadas por `rf-entregar.cjs --revision` |
 
-Las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`) con el último estado conocido. Una pieza
+Las de Perú las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`) con el último estado conocido. Una pieza
 que cambia de estado **se mueve** de una carpeta a la otra y se sobrescribe con la versión vigente; no se borra.
 Detalle en pipeline §4.8. Las expansiones con IA quedan en `ai-generations/2026-11-05_sky-black-expand/`.
 

@@ -11,6 +11,15 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-06 — SKY BLACK 2026: la animación se entrega sólo en MP4 y los degradados van sólo donde hacen falta
+
+Rondas 11 y 12 del lote «GIF + POPUP» y de las rutas de Perú. Ya no se entrega GIF: la animación va como MP4 con audio,
+en BT.709, para que el verde del logo no cambie. Rigen el difuminado superior B, los tres caminos de Daniela (sin
+gradiente, gradiente sutil, adaptar la foto, foto nueva), las letras sin sombra y la píldora de origen que se ajusta al
+texto. Hay una copia para revisión en OneDrive y el canvas va en la versión 74; Dianesty debe confirmar los destinos de
+Estados Unidos y Uruguay. [Funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md) ·
+[manual, paso 7j](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md).
+
 ## 2026-11-06 — SKY BLACK 2026: rutas foco de Chile y Perú internacional en revisión
 
 Las 16 rutas foco nuevas (3 domésticas y 8 internacionales de Chile, 5 internacionales de Perú) tienen popup y story

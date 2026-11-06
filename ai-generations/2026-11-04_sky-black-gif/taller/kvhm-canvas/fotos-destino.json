@@ -407,22 +407,24 @@
     "srcOriginal": "PE_FAMILIA.png"
   },
   "HM_CL_KV_INTER_CLUSTER": {
-    "src": "CL_PUNTA_CANA.png",
+    "src": "CL_PUNTA_CANA-adapt.png",
     "s": [
       0.62,
       0.55
     ],
     "capa": "Raster_1_Imagen-2",
-    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): Punta Cana con espacio para textos y logo, según el brandlift. Banco 00_Banco Actualizado/PUJ «Imagen de ChatGPT 29 sept 2026, 08_34_37». En el POP-up Daniela escribió «Cusco… la misma que uses para GIF vuela inter HM Chile»: se usa la misma del GIF."
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): Punta Cana con espacio para textos y logo, según el brandlift. Banco 00_Banco Actualizado/PUJ «Imagen de ChatGPT 29 sept 2026, 08_34_37». En el POP-up Daniela escribió «Cusco… la misma que uses para GIF vuela inter HM Chile»: se usa la misma del GIF. Doceava ronda: sin la sombra lateral del clúster, foto adaptada en la zona de la lista (adaptar-foto.cjs lista-cluster).",
+    "srcOriginal": "CL_PUNTA_CANA.png"
   },
   "HM_CL_KV_ENCUENTRA": {
-    "src": "CL_FAMILIA_CALAMA.png",
+    "src": "CL_FAMILIA_CALAMA-adapt.png",
     "s": [
       0.74,
       0.62
     ],
     "capa": "Raster_1_Imagen-2",
-    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): familia en el interior de Chile (Calama), según el brandlift; la misma en GIF y POP-up. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio (la del banco, 16:9, dejaba la lista sobre la familia). Prompt en ai-generations/2026-11-04_sky-black-gif/foto-familia-calama/."
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): familia en el interior de Chile (Calama), según el brandlift; la misma en GIF y POP-up. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio (la del banco, 16:9, dejaba la lista sobre la familia). Prompt en ai-generations/2026-11-04_sky-black-gif/foto-familia-calama/. Doceava ronda: sin la sombra lateral del clúster, foto adaptada en la zona de la lista (adaptar-foto.cjs lista-cluster).",
+    "srcOriginal": "CL_FAMILIA_CALAMA.png"
   },
   "HM_PE_KV_DOM_REGIONES": {
     "src": "PE_MACHU_PICCHU-adapt.png",

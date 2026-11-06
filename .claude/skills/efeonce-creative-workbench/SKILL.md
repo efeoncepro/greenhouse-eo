@@ -39,6 +39,7 @@ No ejecutar un `creative:sync` total para restaurar comandos retirados.
 | Adaptar un KV SKY en el canvas de Claude Design: plantillas por destino, kit «Despliegue Base», popup/story, animación GIF/MP4 | [sky-design-canvas.md](references/sky-design-canvas.md) |
 | Saber qué formato SKY es cada pieza (KV HM, popup, post, story, GIF, story en video, PMAX, HPH, DAT, TikTok, rutas), su tamaño, nombre y mercado | [sky-format-catalog.md](references/sky-format-catalog.md) |
 | Reproducir o modificar la producción local BLACK: logofix, capas, GIF/MP4, story en video, HPH/PMAX, canvas y entrega | [sky-black-pipeline.md](references/sky-black-pipeline.md) |
+| Ajustar una ronda BLACK: degradados sólo donde hacen falta, adaptar la foto, píldora de origen, MP4 con audio en BT.709 (sin GIF) y flags `VELO_*`/`PISO_SUTIL`/`SOMBRA` | [sky-black-pipeline.md](references/sky-black-pipeline.md) §1 y §4.13–§4.14, [lessons.md](references/lessons.md) |
 | Poner precios, descuentos, origen y legal a las piezas BLACK aprobadas y construirlas en el Workbench | [sky-black-pipeline.md](references/sky-black-pipeline.md) §19 |
 | Usar, mantener o presentar el Lab premium Astro/TS/Tailwind, Efeonce + cliente | [lab.md](references/lab.md) |
 | Producir para Berel: banners, adaptaciones, plates, producto en escena, reels de transformación | Skill Greenhouse `berel-graphic-line` (oficio) + corte Berel en [state-continuity.md](references/state-continuity.md) |

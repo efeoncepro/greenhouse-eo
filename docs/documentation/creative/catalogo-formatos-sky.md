@@ -1,9 +1,9 @@
 # Catálogo de formatos SKY — Qué pieza es cada una, su tamaño y cómo se nombra
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.7
 > **Creado:** 2026-11-05 por Claude
-> **Ultima actualizacion:** 2026-11-06 por Claude (octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, fotos de Talara y Piura, carpetas «BLACK SKY 2026 - APROBADO» y «BLACK SKY 2026 - PARA REVISION» y canvas versión 51)
+> **Ultima actualizacion:** 2026-11-06 por Claude (rondas 11 y 12: animación sólo en MP4 con audio y en BT.709, difuminado B, sin sombras de texto, degradado inferior sólo donde hace falta, Uruguay con nombres, copia para revisión y canvas versión 74; antes, rutas foco de Chile y Perú internacional: 16 rutas en popup y story, en revisión, canvas versión 70; antes, octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, fotos de Talara y Piura, carpetas «BLACK SKY 2026 - APROBADO» y «BLACK SKY 2026 - PARA REVISION» y canvas versión 51)
 > **Documentacion tecnica:** [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [Canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
@@ -47,15 +47,15 @@ Si alguien necesita la definición de HPH, DAT o HM, hay que pedírsela a SKY o 
 | **Post** | 1080×1350 | El mismo tamaño del KV, armado desde plantilla | Feed de redes | CyberSky Perú |
 | **Popup** | 1080×1080 | Versión cuadrada del KV | Ventana emergente y formatos cuadrados | Ambas |
 | **Story** | 1080×1920 | Versión vertical completa, estática | Historias de Instagram y similares | Ambas |
-| **GIF** | 1080×1350 | El KV animado, en bucle y sin sonido | Donde el medio pide GIF | BLACK |
+| **GIF** | 1080×1350 | El KV animado, en bucle y sin sonido | Donde el medio pide GIF. **No se entrega desde el 2026-11-06** | BLACK |
 | **MP4** | 1080×1350 | La misma animación en video, sin sonido | Donde el medio prefiere video | BLACK |
-| **MP4 con audio** | 1080×1350 | La animación con la pista de audio del kit | Redes con sonido | BLACK |
+| **MP4 con audio** | 1080×1350 | La animación con la pista de audio del kit | Redes con sonido. Desde el 2026-11-06, la única animación que se entrega | BLACK |
 | **Story en video** | 1080×1920 | Video de 15,7 s en 5 partes, con música | Historias en video | BLACK |
 | **PMAX** | 1080×1080, 1080×1350, 1080×1920 y 1200×628 | 4 imágenes por KV | Google Performance Max | BLACK |
 | **HPH** | 1200×1200, 300×600, 300×250 y 728×90 | 4 banners con lista de destinos, sin precio | Banners de display | BLACK |
 | **Banner TikTok** | 1920×1080 | Banner horizontal en 3 variantes (precio, descuento, precio + descuento) | TikTok | BLACK (sólo Chile) |
 | **DAT** | 1080×1080 | Pieza cuadrada nacional e internacional | Ver la nota de siglas | BLACK (sólo Chile) |
-| **Ruta foco** | KV 1080×1350, popup y story | Una pieza por ciudad de Perú, con PromPerú | Promocionar rutas puntuales | BLACK (sólo Perú) |
+| **Ruta foco** | Perú doméstico: KV 1080×1350, popup y story · Chile y Perú internacional: sólo popup y story | Una pieza por ciudad; las domésticas de Perú llevan PromPerú | Promocionar rutas puntuales | BLACK (Perú y Chile) |
 
 Casi todos los PNG se entregan en **tamaño normal (1x)** y algunos también en **doble (2x)**, para pantallas de alta
 densidad. Los que tienen 2x son el HPH, el PMAX 1200×628 y todas las piezas de «Chile KV listo».
@@ -112,6 +112,8 @@ El KV animado. Ver [cómo es un GIF](#cómo-es-un-gif) más abajo.
 - **Cuántos:** 24, uno por KV de mercado.
 - **Peso:** entre 3,8 y 7,7 MB; los KV con lista (clúster, banderas, regiones) son los más pesados.
 - **Dónde:** `GIF Y VIDEO KV`.
+- **Desde el 2026-11-06 no se entrega:** Daniela pidió dejar la animación «sólo en MP4, que es mejor formato».
+  Ver [MP4 y MP4 con audio](#mp4-y-mp4-con-audio).
 
 ### MP4 y MP4 con audio
 
@@ -124,6 +126,12 @@ La misma animación del GIF, en video. Hay dos versiones por KV:
 
 Cuántos: 24 de cada uno, en `GIF Y VIDEO KV`. Esa carpeta tiene 72 archivos: 24 GIF + 24 MP4 + 24 MP4 con audio.
 
+**Desde el 2026-11-06** la animación se entrega sólo como **MP4 con audio**, sin GIF. En «BLACK SKY 2026» se llama
+`BS_GIF_<PIEZA>_AUDIO.mp4` (el nombre conserva «GIF»). Todo MP4 se codifica y se marca en el estándar de color
+**BT.709**, el que leen Frame, QuickTime y los navegadores: antes el verde del logo se veía más apagado en el video
+que en el KV (Dianesty: «en todos los gif cambia el color del logo»). Ver las
+[rondas 11 y 12](./adaptaciones-sky-en-claude-design.md#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos).
+
 ### Story en video
 
 Un video vertical de 15,7 s que cuenta la oferta en cinco momentos. Ver [cómo es el story en video](#cómo-es-el-story-en-video).
@@ -132,6 +140,8 @@ Un video vertical de 15,7 s que cuenta la oferta en cinco momentos. Ver [cómo e
 - **Cuántos:** 12, uno por cada mensaje de la grilla por mercado.
 - **Peso:** entre 7,3 y 7,7 MB.
 - **Dónde:** `STORY VIDEO 5 SLIDES`.
+- **Desde el 2026-11-06:** la story y el story en video del lote los exporta Daniela, y el story en video salió de
+  la Grilla del canvas (versión 63) hasta que se itere.
 
 ### PMAX (Google Performance Max)
 
@@ -195,6 +205,31 @@ Desde la tercera ronda son 15 rutas (se sumaron Ayacucho y Talara), cada una con
 en lugar del marcador: ver [Rutas foco con la foto de cada destino](#rutas-foco-con-la-foto-de-cada-destino). Su
 estado de revisión está en las [carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión).
 
+### Rutas foco de Chile y Perú internacional
+
+Desde el 2026-11-06 hay una segunda familia de rutas foco: **16 rutas**, cada una **sólo en popup (1080×1080) y story
+(1080×1920)**. No llevan KV, GIF ni story en video: así lo pidió Daniela. Son 32 piezas.
+
+| Grupo | Rutas | Sale de la plantilla | Bajo el precio |
+|---|---|---|---|
+| Chile, nacional (DOM) | Concepción, Calama y Antofagasta | `HM_CL_KV_DOM` | DESDE / `$000.000` / «Final tramo. Tasas e impuestos incluidos.» |
+| Chile, internacional (INTER) | Cusco, Lima, Punta Cana, São Paulo, Mendoza, Río de Janeiro, Bariloche y Florianópolis | `HM_CL_KV_INTER` | IDA Y VUELTA DESDE / `$000.000` / «Tasas e impuestos incluidos.» |
+| Perú, internacional (INTER) | Santiago, Buenos Aires, Punta Cana, Río de Janeiro y São Paulo | `HM_PE_KV_INTER-RUTA` | IDA Y VUELTA DESDE / `US$000 o S/0,000` / «Final ruta Lima-(destino)-Lima. Tasas e impuestos incluidos.» |
+
+- **El legal depende del tipo de ruta.** Una ruta nacional y una internacional no dicen lo mismo bajo el precio; por
+  eso cada pieza sale de la plantilla de su tipo, nunca de la del otro.
+- **Chile se basa en el KV de Perú, pero sin el logo de PromPerú, sin la dirección y sin la marca de agua.**
+- **El destino va con su nombre completo** («Río de Janeiro», no la sigla).
+- **Origen de la píldora:** «DESDE LIMA» en Perú y «DESDE SANTIAGO» en Chile. El de Chile es una **deducción**: Daniela
+  no lo indicó y está por confirmar.
+- **Cifras:** los precios siguen como marcador (`$000.000`, `US$000`), igual que en el resto del despliegue.
+- **Fotos:** del banco de fotos de cada destino, ninguna generada con IA. Cómo se eligieron y cómo se resuelve la
+  legibilidad del logo está en la [doc de adaptaciones](./adaptaciones-sky-en-claude-design.md#rutas-foco-de-chile-y-perú-internacional-2026-11-06).
+
+Estado: **en revisión** (ver [carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión)).
+
+> Detalle técnico: [scripts del despliegue BLACK, §4.13 «Rutas foco de Chile y Perú internacional»](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+
 ### Plantillas CyberSky (en el canvas)
 
 No son entregables, pero conviene saber que existen: `PlantillaPopup`, `PlantillaPost` y `PlantillaStory` leen la
@@ -224,7 +259,8 @@ Otros nombres:
 
 | Nombre | Qué es |
 |---|---|
-| `HM_PE_RUTA_<CIUDAD>` | Ruta foco de Perú (por ejemplo `HM_PE_RUTA_CUSCO__story.png`) |
+| `HM_PE_RUTA_<CIUDAD>` | Ruta foco doméstica de Perú (por ejemplo `HM_PE_RUTA_CUSCO__story.png`) |
+| `HM_<CL o PE>_<DOM o INTER>_RUTA_<DESTINO>` | Ruta foco de Chile o internacional de Perú (por ejemplo `HM_CL_INTER_RUTA_MENDOZA`); sólo popup y story |
 | `HPH_<ancho>x<alto>_GENERICO` | HPH genérico de Chile |
 | `CL_BANNER-TIKTOK_<PRECIO, DCTO o PRECIO-DCTO>_1920x1080` | Banner TikTok de Chile |
 | `CL_DAT_<DOM o INTER>` | DAT de Chile |
@@ -253,7 +289,8 @@ Los 24 tienen KV fijo, popup, story estática, GIF, MP4 y MP4 con audio. Aparte 
 ### La grilla por mercado (12 mensajes)
 
 Daniela pidió una grilla con los mensajes de cada mercado. Cada mensaje tiene KV, popup, GIF, story estática y **story
-en video**:
+en video** (desde el 2026-11-06 se entregan sólo el popup y el MP4 con audio; story y story en video los exporta
+Daniela):
 
 | Mercado | Mensaje | KV |
 |---|---|---|
@@ -265,7 +302,7 @@ en video**:
 | Perú | Encuentra destinos | `HM_PE_KV_ENCUENTRA` |
 | Argentina | «VOLÁ A Santiago» | `HM_AR_KV_SANTIAGO` |
 | Argentina | «VOLÁ A Lima» | `HM_AR_KV_LIMA` |
-| Uruguay | Volá internacional (fila de 4 banderas) | `HM_UY_KV_BANDERAS` |
+| Uruguay | Volá internacional (fila de 4 banderas; desde la ronda 11, lista con nombre: Punta Cana · Santiago y conexión con 15 destinos · Salvador · Miami, y píldora «DESDE MONTEVIDEO», por confirmar) | `HM_UY_KV_BANDERAS` |
 | Brasil | Voe a Santiago, con el logo Chile Travel | `HM_BR_KV_SANTIAGO` |
 | Brasil | «VOE PARA Peru», con PromPerú | `HM_BR_KV_PERU` |
 | Estados Unidos | Fly international (banderas) | `HM_US_KV_BANDERAS` |
@@ -305,7 +342,8 @@ con la fecha nueva.
   nombre del destino al lado. El aro de 2 px va en los KV con banderas (AR, PE, BR, US y UY), en PE «Encuentra
   destinos», en sus popups, stories, GIF y stories en video, y en el HPH por mercado. La lista de cada mercado sale de
   cinco referencias que mandó Daniela. Ojo con el kit: el archivo «BANDERA CL (CIRCULO)_1» muestra la bandera de
-  **Argentina**, y «PUJ» es Punta Cana (República Dominicana).
+  **Argentina**, y «PUJ» es Punta Cana (República Dominicana). Desde la ronda 12 (2026-11-06) el texto de las listas va
+  **sin sombra**, como todas las letras de la campaña.
 - **Alianzas:** Chile Travel acompaña a Brasil «Voe a Santiago» (es la versión «fuera de Chile»); PromPerú «otros HM»
   acompaña a Brasil «Voe para Peru»; PromPerú «solo HM Perú» va en las rutas foco. En KV y popup el logo de alianza va
   arriba a la derecha.
@@ -340,6 +378,9 @@ referencias de animación que trae el kit (piezas de campañas anteriores).
 | Duración | 3,96 s por vuelta, en bucle infinito |
 | Sonido | Ninguno (un GIF no lleva sonido) |
 | Lo que **no** se mueve | La foto, el logo y el pie con el legal |
+
+Desde el 2026-11-06 esta animación se entrega **sólo en MP4 con audio** (en BT.709), no como GIF; el movimiento es el
+mismo.
 
 **La variante con audio** es el MP4 `_audio`: la misma animación con la pista «AUDIO FINAL PARA LOS GIF» del kit. Su
 golpe cae en 1,37 s, justo cuando el precio queda fijo. La pista venía demasiado alta y se bajó de volumen para que no
@@ -414,13 +455,18 @@ con las piezas corregidas.
 
 ### Carpeta ordenada para el equipo: «BLACK SKY 2026»
 
-Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`. Ahí quedaron 155 archivos:
+Daniela pidió un orden fijo en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`. Al cierre de la cuarta ronda tenía
+155 archivos; las rutas foco de Chile y Perú internacional sumaron después 32 piezas más:
 
 - **Una carpeta por mercado:** `HM CL`, `HM PE`, `HM AR`, `HM UY`, `HM BR` y `HM USA`.
-- **Dentro, una carpeta por formato:** `HPH`, `PMAX` y `GIF + POPUP`. Chile suma `BANNER TIKTOK` y `DAT`, y
-  Perú suma `RUTAS FOCO`.
-- **En `GIF + POPUP`, una carpeta por pieza confirmada**, por ejemplo «VUELA POR CHILE». Cada una trae el
-  popup, la story, el GIF y la story en video.
+- **Dentro, una carpeta por formato:** `HPH`, `PMAX` y `GIF + POPUP`. Chile suma `BANNER TIKTOK`, `DAT` y
+  (desde el 2026-11-06) `RUTAS FOCO`, y Perú suma `RUTAS FOCO`, donde conviven sus 15 rutas domésticas y sus 5
+  internacionales.
+- **Rutas foco:** una carpeta por destino con su popup y su story, `RUTAS FOCO/<DESTINO>/BS_POPUP_<IATA>.png` y
+  `BS_STORY_<IATA>.png`.
+- **En `GIF + POPUP`, una carpeta por pieza confirmada**, por ejemplo «VUELA POR CHILE». Hasta el 2026-11-05 cada una
+  traía el popup, la story, el GIF y la story en video. Desde el 2026-11-06 trae el popup y el MP4 con audio
+  (`BS_GIF_<PIEZA>_AUDIO.mp4`), sin GIF; la story y el story en video los exporta Daniela.
 - **PMAX:** si un mercado tiene más de una agrupación, cada una va en su carpeta («PMAX DOM», «PMAX INTER»…)
   con sus 4 tamaños.
 - **Nombres:** `BS_` + formato o medida + pieza. Por ejemplo `BS_POPUP_DOM`, `BS_GIF_INTER`,
@@ -434,7 +480,8 @@ Las rutas de Perú ya no usan la foto de la mujer del kit. Cada una lleva la fot
 legal, la ubicación y el crédito que indica el CSV de Daniela. Son 15 rutas: se sumaron Ayacucho y Talara.
 Los créditos van en pequeño, en horizontal y sin sombra, en la esquina superior izquierda (en la story, a un tamaño
 algo mayor desde la sexta ronda). Para que el logo se lea, desde la quinta ronda la foto lleva el **gradiente de
-Daniela**: negro, de 69 % arriba a 0, cortado poco después del logo (entre el 42 % y el 50 % del alto según el
+Daniela** (reemplazado en la ronda 11 por el difuminado B; ver abajo): negro, de 69 % arriba a 0, cortado poco
+después del logo (entre el 42 % y el 50 % del alto según el
 formato) para no oscurecer caras ni monumentos. Reemplazó al velo diagonal de la cuarta ronda. Detrás del pie y del
 legal, el degradado inferior es **negro** en las piezas con foto de destino (los KV del kit siguen con el marrón).
 Las sombras redondas, los halos y los cielos inventados siguen rechazados, porque se ven como una mancha. En la story, la marca de agua va pegada arriba a la izquierda y la
@@ -450,26 +497,46 @@ elegir fotos de la temporada del mercado al que va la pieza.
 > Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [scripts, §4.4 a §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 
+### Legibilidad desde las rondas 11 y 12
+
+El 2026-11-06 Dianesty y Daniela cambiaron cómo se logra que el logo, los textos y el legal se lean sobre la foto. Vale
+para el lote «GIF + POPUP» y para las rutas foco de Perú:
+
+- **Difuminado superior B:** negro al 45 % arriba (antes 69 %), con una caída suave, y termina al 85 % del largo del
+  gradiente anterior. Dianesty lo aprobó «en todas» tras ver cuatro variantes.
+- **Los tres caminos de Daniela:** si la foto se lee, va sin gradiente; si no, el difuminado B; si no alcanza, se
+  adapta la foto (reencuadre, quitar elementos, oscurecer el cielo o quitar nubes) en lugar de oscurecer más; y si aún
+  no se ve bien, foto nueva.
+- **Degradado inferior:** negro al 10–15 %, sólo donde el legal o el sello de puntualidad no se leen.
+- **Sin sombras de texto,** sin degradé detrás de las letras, sin sombra lateral y sin velo detrás de las listas.
+- **Píldora rosada de origen con avión:** el avión no se mueve y la píldora crece hacia la derecha hasta 35 px después
+  de la última letra. Vale para toda píldora con avión.
+
+Detalle y motivos en la [doc de adaptaciones](./adaptaciones-sky-en-claude-design.md#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos).
+
 ### Carpetas de estado: aprobado y para revisión
 
 Después de la revisión de Daniela en Frame.io se crearon dos carpetas hermanas de «BLACK SKY 2026», en
 `SKY Campañas/2026/10_Noviembre/`:
 
-| Carpeta | Qué trae (desde la octava ronda, 2026-11-06) |
+| Carpeta | Qué trae (al 2026-11-06) |
 |---|---|
-| **«BLACK SKY 2026 - APROBADO»** | Las 30 piezas de rutas foco, todas con visto bueno de Daniela |
-| **«BLACK SKY 2026 - PARA REVISION»** | Sólo un `LEEME.txt` que dice que no queda nada en revisión (tras la séptima ronda tenía 11 piezas) |
+| **«BLACK SKY 2026 - APROBADO»** | Las 30 piezas de las rutas foco domésticas de Perú, todas con visto bueno de Daniela desde la octava ronda |
+| **«BLACK SKY 2026 - PARA REVISION»** | Las 32 piezas de las rutas foco de Chile y Perú internacional (16 rutas en popup y story), con un `LEEME.txt` que lista las rutas y lo que falta confirmar. Tras la octava ronda había quedado sólo con el `LEEME.txt`; las rondas 11 y 12 le sumaron una copia del lote «GIF + POPUP» (popup y MP4 con audio) y de las rutas de Perú, con `LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt` ([doc de adaptaciones](./adaptaciones-sky-en-claude-design.md#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)) |
 
-- **Estructura:** la misma de «BLACK SKY 2026», hoy sólo con rutas foco, que es lo único que se revisó en Frame:
-  `HM PE/RUTAS FOCO/<CIUDAD>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png`, con el código de aeropuerto de la ciudad
-  (por ejemplo, `HM PE/RUTAS FOCO/PIURA/BS_STORY_PIU.png`).
+- **Estructura:** la misma de «BLACK SKY 2026». Las rutas foco van en `HM PE/RUTAS FOCO/<DESTINO>/` y
+  `HM CL/RUTAS FOCO/<DESTINO>/`, con `BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png` y el código de aeropuerto del
+  destino (por ejemplo, `HM PE/RUTAS FOCO/PIURA/BS_STORY_PIU.png`).
+- **Las rutas en revisión también están en «BLACK SKY 2026».** La entrega directa queda y la carpeta de estado la
+  acompaña con una copia idéntica. En Notion, las 32 subtareas de esas piezas están en «Listo para revisión», con
+  fecha de envío 2026-11-06.
 - **Versión:** cada carpeta tiene la versión vigente de la pieza, con el gradiente nuevo, aunque la aprobación se haya
   dado sobre una versión anterior.
 - **Cambio de estado:** una pieza que pasa de revisión a aprobada (o al revés) se **mueve** de una carpeta a la otra.
   Nada se borra.
 
 > Detalle técnico: [taxonomía, §5.4](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
-> [scripts, §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
+> [scripts, §4.8 y §4.13 «Rutas foco de Chile y Perú internacional»](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 
 ## El canvas de Claude Design
 
@@ -478,8 +545,10 @@ Es un artifact **privado** del operador (<https://claude.ai/artifact/QTy12G38oQY
 «Compartir» y quien lo recibe puede comentar. No es la producción final: lo que se entrega se renderiza aparte.
 
 La tabla muestra las 10 páginas al cierre de la segunda ronda (versión 28). Las rondas siguientes se trabajaron en el
-mismo canvas y con las mismas páginas: versión 40 en la cuarta, 44 en la quinta, 47 en la sexta y **51 en la séptima**,
-la vigente al 2026-11-05.
+mismo canvas: versión 40 en la cuarta, 44 en la quinta, 47 en la sexta y 51 en la séptima. El 2026-11-06 se sumó la
+página de las rutas foco de Chile y Perú internacional (última fila de la tabla) y el canvas quedó en la versión 70.
+Tras la ronda 12 va en la **versión 74**. Las pruebas del difuminado se hicieron en un canvas aparte
+(<https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC>).
 
 | # | Página | Qué hay |
 |---|---|---|
@@ -490,9 +559,10 @@ la vigente al 2026-11-05.
 | 5 | KV Black · Animación GIF | Los 12 KV animados, las 6 referencias del kit y una previa con audio |
 | 6 | KV Black · Popup y Story | 12 popup y 12 story |
 | 7 | KV Black · PMAX y HPH | PMAX de los 12 KV y HPH genérico y por mercado |
-| 8 | KV Black · Grilla por mercado | Los 12 mensajes con KV, popup, GIF, story y story en video, más los KV con banderas de AR y BR |
+| 8 | KV Black · Grilla por mercado | Los 12 mensajes con KV, popup, animación y story, más los KV con banderas de AR y BR. Desde la versión 62 la animación es el MP4 con audio, con controles («MP4 1080×1350 (con audio)»); desde la 63, sin story en video |
 | 9 | KV Black · Rutas foco Perú | 13 rutas con popup y story |
 | 10 | KV Black · Chile KV listo | Banner TikTok, DAT y PMAX de Chile |
+| — | KV Black · Rutas foco Chile y Perú inter | Las 16 rutas foco de Chile y Perú internacional, un tablero por ruta con popup y story lado a lado (agregada el 2026-11-06) |
 
 Las animaciones se ven como videos, porque el canvas muestra los artboards como imágenes quietas. Si a poca distancia
 algunas piezas aparecen rayadas, es que todavía no cargaron; no es un error.
@@ -512,6 +582,11 @@ Desde la octava ronda (2026-11-06) las 30 piezas de rutas foco están aprobadas 
 [carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión)), y la sugerencia de Daniela de centrar y subir el
 logo queda a criterio de SKY.
 
+Las rutas foco de Chile y Perú internacional (2026-11-06) están en revisión y dejan tres pendientes propios: el origen
+de Chile, que se dedujo; el «árbol» que Daniela pidió eliminar, sin saber si es la foto de Buenos Aires o la de Río (no
+se hizo un borrado pagado con IA), y el legal, que se lee débil sobre la foto en el popup de Cusco y en la story de
+Concepción.
+
 | Tema | Qué hay hoy | Qué falta |
 |---|---|---|
 | Brasil «Voe para Peru» | KV con PromPerú «otros HM» | Confirmar si va como pieza de alianza o como KV |
@@ -520,8 +595,10 @@ logo queda a criterio de SKY.
 | Frases del story en video | Nacional desde la referencia; internacional y traducciones propias | Aprobar frases y traducciones |
 | Textos del HPH | Flecha y botón traducidos por Efeonce | Aprobar traducciones |
 | Rutas foco Perú | Ubicación del CSV, o la del nombre de la foto cuando no coinciden (Talara, Piura) | Aprobadas las 30 (2026-11-06); faltan las cifras de SKY |
+| Rutas foco Chile y Perú inter | 32 piezas en «PARA REVISION»; origen de Chile «DESDE SANTIAGO» deducido | Visto bueno de Daniela; confirmar el origen de Chile; aclarar qué «árbol» quitar (¿Buenos Aires o Río?); resolver que el legal se lea sobre la foto en el popup de Cusco y la story de Concepción; precios y fechas del pie |
 | Tapa vertical en español | Recortada de la horizontal | Tapa vertical oficial |
 | Precios y descuentos | Marcadores `000.000` y `00%` | La grilla de precios |
+| Destinos de Estados Unidos y Uruguay (rondas 11 y 12) | US sin Buenos Aires; Uruguay con Miami; origen de Uruguay «DESDE MONTEVIDEO» | Que Dianesty confirme si US suma Buenos Aires, si Miami va en Uruguay y el origen «DESDE MONTEVIDEO», que es un supuesto |
 
 Además siguen abiertas las inconsistencias del kit que SKY debe corregir en su fuente (nombres de archivos cambiados,
 legales trazados, logos de alianza y URL ausentes, derechos de imágenes con marcas de IA). Están listadas en la

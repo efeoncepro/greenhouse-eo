@@ -91,7 +91,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
     // ---------- POPUP 1080x1080 ----------
     {
       const W = 1080, H = 1080, comp = [];
-      if (cluster) comp.push({ input: sombra(W, H), left: 0, top: 0 });
+      if (cluster && process.env.SOMBRA === '1') comp.push({ input: sombra(W, H), left: 0, top: 0 }); // doceava ronda: sin sombra lateral (Dianesty)
       comp.push({ input: piso(W, H, 800, 1080, 0.78), left: 0, top: 0 });
       // Bloque comercial a 0,88 con el precio terminando en y=938: deja 32 px de aire sobre el pie (en el KV son 20).
       const s = 0.88, PB = 938;
@@ -176,7 +176,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
       // El logo arranca en y≈270; el bloque comercial y el pie bajan 350 px para que el pie termine
       // en ~1655 y el rostro quede libre entre el logo y el precio.
       const DL = 250, DB = 350;
-      if (cluster) comp.push({ input: sombra(W, H), left: 0, top: 0 });
+      if (cluster && process.env.SOMBRA === '1') comp.push({ input: sombra(W, H), left: 0, top: 0 }); // doceava ronda: sin sombra lateral (Dianesty)
       if (n === 'HM_CL_KV_DOM_CLUSTER') {
         // Clúster nacional: el bloque comercial y el pie bajan 80 px más (pie hasta ~1735) para que
         // la lista de regiones crezca al 115 % y quede centrada entre el logo y el destino.

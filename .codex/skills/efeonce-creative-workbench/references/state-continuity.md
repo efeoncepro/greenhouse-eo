@@ -12,7 +12,7 @@ fotografía de evento en
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 51 (cierre de la séptima ronda, 2026-11-05; la 40 fue la cuarta); diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | **Versión 72** (2026-11-06, doceava ronda del lote GIF + POPUP: sólo imágenes y tableros `g-gif`); la 70 fue la de las rutas foco de Chile y Perú internacional, la 51 cerró la séptima ronda y la 53 la octava. Pruebas de difuminado en un canvas aparte: https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC. Páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo, la del neón (v57, abajo) y «KV Black · Rutas foco Chile y Perú inter» (`kv-black-rutas-foco`) |
 
 **2026-11-06, neón del logo BLACK:** exploración en el canvas (v57, página «KV Black · Neón del logo (exploración)», ronda 4): neón elegante solo en los dos acentos de esquina del marco, con letras y foto intactas, en tres escalones (acentos · + marco · + letras) más una chispa animada. Las rondas 1–3 se rechazaron (sin impacto, biselada, no elegante). Entregado a Daniela en OneDrive `10_Noviembre/BLACK SKY 2026 - NEON LOGO (PROPUESTA 2026-11-06)/`, con el logo en PNG de 4000 px (ES/PT/EN). Espera que Dianesty (SKY) elija; no cambia piezas aprobadas. Detalle en [sky-black-pipeline.md](sky-black-pipeline.md) §4.10.
 
@@ -70,8 +70,37 @@ taller/kvhm-canvas/doctor.sh` ([sky-black-pipeline.md](sky-black-pipeline.md) §
 foco están aprobadas; sólo faltan las cifras de SKY. Canvas versión 53. Workbench al día en `main` (PR #36, `8ed1c00`).
 Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
 la regla de la flecha también vale para los popups de los KV del kit.
+2026-11-06, rondas novena a doceava (lote GIF + POPUP y rutas de Perú; Daniela y Dianesty en Frame «V2»/«V3» y
+Teams; pipeline §4.11–§4.14): logo BLACK nuevo con el resplandor original; **sin GIF**: la pieza animada se entrega
+sólo como `BS_GIF_<PIEZA>_AUDIO.mp4`, **en BT.709 etiquetado** (el verde del logo caía de 221 a 189); story y story
+video los exporta Daniela; difuminado superior = prueba B (45 % arriba, curva suave) y **sólo si hace falta**
+(`VELO_AUTO=1`), piso negro al 15 % sólo si el pie es claro (`PISO_SUTIL=1`); sin sombras de texto, sin sombra
+lateral ni velo de lista; si el gradiente no alcanza, se adapta la foto (`adaptar-foto.cjs`) y, si aún no, foto nueva;
+píldora rosada de origen adaptativa (`pildora.cjs`: avión fijo, 35 px tras la última letra); Uruguay con lista de
+destinos con nombre y «DESDE MONTEVIDEO» (supuesto). Se corre con `ronda12.sh`. Entregado en OneDrive
+`BLACK SKY 2026/<HM>/GIF + POPUP/<pieza>/` (popup + MP4 con audio) y `HM PE/RUTAS FOCO/<DESTINO>/` (popup + story),
+con copia en `BLACK SKY 2026 - PARA REVISION/` y `LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`. Canvas v74.
+Commits `b6f376bbc2` (ronda 11) y `daf801dbcd` (ronda 12).
+2026-11-06, rutas foco de Chile y Perú internacional: 16 rutas (Chile 3 DOM + 8 INTER, Perú 5 INTER), **sólo popup
+y story**, enviadas a revisión. Dónde está cada cosa:
+
+| Qué | Dónde y estado |
+| --- | --- |
+| Piezas | OneDrive `10_Noviembre/BLACK SKY 2026/HM CL/RUTAS FOCO/` (11) y `HM PE/RUTAS FOCO/` (5); copia idéntica en `BLACK SKY 2026 - PARA REVISION/` con `LEEME.txt`. Al aprobarse, cada pieza pasa a `- APROBADO` |
+| Notion | Las 32 subtareas de pieza en «Listo para revisión», fecha de envío 2026-11-06; las agrupadoras no se tocaron |
+| Canvas | Versión 70, página `kv-black-rutas-foco`; imágenes como assets con ids en `rf-blobs.json` ([sky-design-canvas.md](sky-design-canvas.md), «Rutas foco de Chile y Perú internacional») |
+| Scripts | Taller `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`: `rutas-foco.cjs`, `rutas-foco.sh`, `rf-page.cjs`, `rf-entregar.cjs`, `cielo.cjs` ([sky-black-pipeline.md](sky-black-pipeline.md) §4.13, SSOT) |
+| Commits | En develop, sin push: `04a4c05fbb` (entrega), `065ad465af` (difuminado B, v67), `187b9f2f38` (ajustes de Daniela, v70), `d6c2ba173` (re-render tras la doceava ronda) |
+
+El re-render tras la doceava ronda de la otra sesión salió idéntico píxel a píxel: la entrega y el canvas v70 siguen
+vigentes. 🔴 Los scripts compartidos (`compose.cjs`, `destinos.cjs`, `fotos-destino.json`, `pildora.cjs`,
+`adaptar-foto.cjs`) los edita también la sesión de las rondas; coordinar antes de renderizar.
 
 Pendientes sin confirmar por el operador:
+
+- Rutas foco de Chile y Perú internacional: precios en 000, origen de Chile («DESDE SANTIAGO» inferido) y fechas del
+  pie; legal débil sobre la foto en el popup de Cusco y en la story de Concepción; «el árbol» que Daniela pidió
+  eliminar (no está claro si es Buenos Aires o Río; no se hizo inpainting pagado).
 
 - Segunda ronda BLACK: BR «Voe para Peru» (¿piezas de alianza PromPerú o KV?), «Vuela por Perú» con regiones sin
   fotos (propuesta), «Encuentra destinos» de Chile hecho con el clúster internacional (el pedido decía «clúster inter
@@ -79,6 +108,8 @@ Pendientes sin confirmar por el operador:
   tercera ronda sale del CSV; placeholder sólo en Chiclayo y Talara), tapa vertical en español (recortada de la
   horizontal).
 - Cuarta ronda BLACK: regla de la flecha aplicada también a los popups de los KV del kit, por confirmar con Daniela.
+- Onceava ronda BLACK (Dianesty): ¿USA suma Buenos Aires? ¿Uruguay lleva Miami? «DESDE MONTEVIDEO» en Uruguay es
+  supuesto.
 - Entrega en OneDrive: confirmar que la sincronización terminó (la copia local no prueba que ya
   esté en la nube).
 

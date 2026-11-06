@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-06 por Claude (octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, revisión en Frame.io, fotos de Talara y Piura, stories ampliadas con IA, carpetas aprobado/para revisión y canvas versión 51)
+> **Ultima actualizacion:** 2026-11-06 por Claude (rutas foco de Chile y Perú internacional: 16 rutas en popup y story, en revisión, página propia en el canvas como assets; rondas 11 y 12: sólo MP4 con audio y en BT.709, difuminado B, los tres caminos de Daniela, sin sombras de texto, píldora de origen adaptable, copia para revisión y canvas versión 74; antes, octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, revisión en Frame.io, fotos de Talara y Piura, stories ampliadas con IA, carpetas aprobado/para revisión y canvas versión 51)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
 > [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
@@ -37,6 +37,9 @@ Cada pieza tiene un formato con nombre, tamaño y uso propios: KV (1080×1350), 
 story (1080×1920), GIF, MP4 con y sin audio, story en video, PMAX, HPH, banner TikTok, DAT y rutas foco. Qué es cada
 uno, cuántos se hicieron, dónde quedaron, cómo se leen los nombres de archivo (`HM_<MERCADO>_KV_<TIPO>`) y qué siglas
 no tienen un significado registrado está en el **[Catálogo de formatos SKY](./catalogo-formatos-sky.md)**.
+
+Desde el 2026-11-06 la animación del lote se entrega **sólo como MP4 con audio**, sin GIF (ver
+[Rondas 11 y 12](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)).
 
 > Detalle técnico: [taxonomía técnica de formatos](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md)
 
@@ -146,7 +149,7 @@ Los dos formatos nuevos parten de la **foto original del KV**, re-encuadrada. Nu
 | **Foto** | Re-encuadrada al 80 %, con la cabeza cerca de la parte alta | Re-encuadrada al 113 % del KV, para cubrir todo el alto |
 | **Logo** | Tamaño completo, arriba a la izquierda | Al 130 %, debajo de la zona segura superior |
 | **Bloque comercial** | Destino, precio y badge al 88 %, con el precio terminando sobre el pie | Bajado para dejar libres ~270 px arriba y abajo (zonas de la interfaz de Instagram) |
-| **Pie y legal** | Con un degradado oscuro inferior para que el legal no quede sobre la ropa | Igual, con su propio degradado |
+| **Pie y legal** | Con un degradado oscuro inferior para que el legal no quede sobre la ropa. Desde la ronda 12: negro al 10–15 % y sólo donde el legal o el sello de puntualidad no se leen | Igual, con su propio degradado |
 
 Los KV de clúster tienen ajustes propios: en el clúster nacional, la lista de destinos se reordena en tres columnas en
 el popup y se agranda y centra en la story.
@@ -167,6 +170,11 @@ entrega en tres archivos:
 - **MP4 con audio** (`_audio`): con la pista del kit, cuyo golpe coincide con el momento en que el precio queda fijo;
   se bajó de volumen porque venía demasiado alto.
 
+Así se entregó el 2026-11-05. **Desde el 2026-11-06 no se entrega GIF:** Daniela pidió dejar la animación sólo en
+MP4, «que es mejor formato», y en las carpetas `GIF + POPUP` va únicamente el MP4 con audio
+(`BS_GIF_<PIEZA>_AUDIO.mp4`). Todo MP4 se codifica en el estándar de color BT.709 para que el verde del logo no cambie
+(ver [Rondas 11 y 12](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)).
+
 Sólo se mueven las partes del mensaje (badge, destino, precio y, si la hay, la lista); la foto, el logo y el pie quedan
 quietos. Detalle cuadro a cuadro en el [catálogo](./catalogo-formatos-sky.md#cómo-es-un-gif).
 
@@ -185,6 +193,9 @@ El kit no trae tapa vertical en español: se armó desde la horizontal y queda p
 propias de los mensajes internacionales y sus traducciones. Partes y tiempos en el
 [catálogo](./catalogo-formatos-sky.md#cómo-es-el-story-en-video).
 
+Desde la décima ronda (2026-11-06) la story y el story en video del lote los exporta Daniela, y desde la versión 63 del
+canvas el story en video ya no está en la Grilla (Julio: «luego iteraremos el video»).
+
 > Detalle técnico: [scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
 
 ## Qué hay en el canvas
@@ -198,15 +209,23 @@ propias de los mensajes internacionales y sus traducciones. Partes y tiempos en 
 | KV Black · Animación GIF | Los 12 KV animados, las referencias del kit y una previa con audio |
 | KV Black · Popup y Story | 24 piezas estáticas: 12 popup y 12 story |
 | KV Black · PMAX y HPH | PMAX de los 12 KV y HPH genérico de Chile más cinco mercados con sus banderas |
-| KV Black · Grilla por mercado | Los 12 mensajes por mercado: KV, popup, GIF, story y story en video |
+| KV Black · Grilla por mercado | Los 12 mensajes por mercado: KV, popup, animación y story. Desde la versión 62 la animación es el MP4 con audio, con controles («MP4 1080×1350 (con audio)»); desde la 63, sin story en video |
 | KV Black · Rutas foco Perú | 13 rutas con popup y story |
 | KV Black · Chile KV listo | Banner TikTok, DAT y PMAX de Chile a partir de los editables del kit |
+| KV Black · Rutas foco Chile y Perú inter | Desde la versión 66: un tablero por ruta con popup y story lado a lado |
 
 El operador revisa dejando **comentarios anclados a cada pieza**; las respuestas y correcciones quedan en el mismo
 hilo. El canvas es privado del operador: para que otra persona (por ejemplo Daniela) lo vea y comente, se comparte
 desde «Compartir». Al cierre de la segunda ronda estaba en la versión 28; con la cuarta ronda (2026-11-05), en la
-versión 40; con la quinta, en la 44; con la sexta, en la 47, y con la séptima va en la **versión 51** (vigente). Sigue
-con las mismas 10 páginas.
+versión 40; con la quinta, en la 44; con la sexta, en la 47; con la séptima, en la 51, y tras la ronda 12 (2026-11-06)
+va en la **versión 74** (vigente). Desde la versión 66 tiene 11 páginas. Las pruebas del difuminado de la ronda 11 se
+hicieron en un **canvas aparte** (<https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC>), para no mezclarlas con las
+piezas.
+
+El canvas está al tope de **511 archivos por versión**. Por eso las imágenes de la página de rutas foco de Chile y Perú
+internacional no van como archivos del proyecto sino como **assets** (archivos subidos aparte, que el tablero sólo
+referencia), y al corregir una ruta se republican sólo sus tableros. Esas rutas se republicaron por última vez en la
+versión 70.
 
 > Detalle técnico: [manual, páginas del canvas](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#qué-significan-las-páginas-del-canvas)
 
@@ -235,7 +254,11 @@ fotos; la base de Chile «Encuentra destinos» (su nota hablaba del clúster int
 traducciones del story en video y del HPH; la ubicación de la foto de las rutas foco, y la tapa vertical en español.
 De la cuarta ronda queda uno más: si quiere la regla de la flecha también en los popups de los KV del kit. De la
 séptima queda a criterio de SKY la sugerencia de
-Daniela de centrar y subir el logo. La lista
+Daniela de centrar y subir el logo. De las rutas foco de Chile y Perú internacional quedan su aprobación, el origen de
+Chile (deducido), qué «árbol» quitar y la lectura del legal en dos piezas (ver
+[su sección](#rutas-foco-de-chile-y-perú-internacional-2026-11-06)). De las rondas 11 y 12 quedan tres consultas a
+Dianesty: Buenos Aires en Estados Unidos, Miami en Uruguay y el origen «DESDE MONTEVIDEO» (ver
+[Rondas 11 y 12](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)). La lista
 completa, con lo que hay hoy en cada caso, está en el
 [catálogo](./catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
 
@@ -269,8 +292,8 @@ pieza. El canvas pasó por las versiones 44, 47 y 51.
 
 | Tema | Qué cambió y por qué |
 |---|---|
-| **Gradiente detrás del logo** | Se usa el gradiente que Daniela dejó en el kit (negro, 69 % que baja a 0), en lugar del velo diagonal de la cuarta ronda. Estirado a todo el alto, como en su maqueta, oscurecía caras y monumentos, así que la misma forma se corta poco después del logo: termina entre el 42 % y el 50 % del alto, según el formato. La intensidad ya no se calcula por foto |
-| **Degradado inferior negro** | Detrás del pie y del legal, las piezas con foto de destino llevan un degradado negro (antes era marrón); los KV del kit siguen con el marrón. Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y «Vuela por el Perú» |
+| **Gradiente detrás del logo** | (Reemplazado en la [ronda 11](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos) por el difuminado B, más suave, y desde la ronda 12 sólo cuando hace falta.) Se usa el gradiente que Daniela dejó en el kit (negro, 69 % que baja a 0), en lugar del velo diagonal de la cuarta ronda. Estirado a todo el alto, como en su maqueta, oscurecía caras y monumentos, así que la misma forma se corta poco después del logo: termina entre el 42 % y el 50 % del alto, según el formato. La intensidad ya no se calcula por foto |
+| **Degradado inferior negro** | (Desde la ronda 12: negro al 10–15 % y sólo donde el legal o el sello no se leen.) Detrás del pie y del legal, las piezas con foto de destino llevan un degradado negro (antes era marrón); los KV del kit siguen con el marrón. Por eso se rehicieron el GIF y la story en video de AR Lima, AR Santiago y «Vuela por el Perú» |
 | **Revisión en Frame.io** | Frame no tiene herramienta conectada ni deja responder desde aquí. La revisión se lee abriendo el enlace sin login en el navegador integrado, o desde los avisos que Frame manda por correo. Lo que Daniela aprueba o deja en revisión ordena la entrega (ver abajo) |
 | **Fotos de Talara y Piura** | La foto de cada ruta sale **sólo** de su carpeta «FOTOS PARA PROMPERU». En la quinta ronda Talara tomó una ballena de otro banco de PromPerú porque su carpeta estaba vacía, y Daniela la rechazó: ese banco ya no se usa. Ahora Talara lleva «Playa Las Pocitas» y Piura una foto nueva, «Playa Vichayito». **El nombre del archivo dice la ubicación** y manda sobre el CSV. Daniela movió fotos entre carpetas sin aviso, por eso antes de cada ronda se revisan las carpetas |
 | **Encuadres** | En Iquitos y Chiclayo la foto sube para que el atractivo no quede bajo el precio; Ayacucho se reencuadró para sacar a las personas (sin IA); Trujillo ganó cielo en el popup; el popup de Cusco tiene un degradado inferior más alto para que «Vuela a» se lea, y el crédito de PromPerú de la story subió de tamaño |
@@ -282,11 +305,92 @@ pieza. El canvas pasó por las versiones 44, 47 y 51.
 su misma estructura: «BLACK SKY 2026 - APROBADO» (19 piezas entonces) y «BLACK SKY 2026 - PARA REVISION» (11 piezas y un
 `LEEME.txt` con el cambio de cada una). Sólo cubren las rutas foco, que es lo único revisado en Frame. Cuando una pieza
 cambia de estado se **mueve** de una carpeta a la otra; no se borra. En la octava ronda (2026-11-06) Daniela aprobó todo:
-la story de Pucallpa, tras subir la torre, fue la última. Hoy las 30 piezas están en «APROBADO» y «PARA REVISION» sólo
-tiene un LEEME. «BLACK SKY 2026» y «ENTREGABLES BLACK» también quedaron al día.
+la story de Pucallpa, tras subir la torre, fue la última, y las 30 piezas pasaron a «APROBADO» y «PARA REVISION» quedó
+sólo con un LEEME. «BLACK SKY 2026» y «ENTREGABLES BLACK» también quedaron al día. En las rondas 11 y 12 «PARA REVISION»
+volvió a recibir piezas: una copia del lote «GIF + POPUP» y de las rutas de Perú, con su LEEME (ver
+[Rondas 11 y 12](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)).
 
 > Detalle técnico: [scripts del despliegue BLACK, §4.6 a §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [manual, revisión en Frame.io y carpetas de estado](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7h-leer-la-revisión-de-frameio-y-repartir-aprobado-y-revisión)
+
+## Rutas foco de Chile y Perú internacional (2026-11-06)
+
+Daniela pidió por Teams una segunda familia de rutas foco: 16 rutas de **Chile** (nacionales e internacionales) y de
+**Perú internacional**, **sólo en popup y story**, sin GIF ni story en video. Qué rutas son, de qué plantilla sale
+cada una y qué legal lleva cada tipo está en el
+[catálogo](./catalogo-formatos-sky.md#rutas-foco-de-chile-y-perú-internacional). Lo que define su diseño:
+
+| Tema | Cómo se resolvió |
+|---|---|
+| **Base** | Chile parte del KV de Perú, pero sin el logo de PromPerú, sin la dirección y sin la marca de agua. Cada ruta sale de la plantilla de su tipo, nacional o internacional, porque el legal cambia |
+| **Destino** | Con su nombre completo («Río de Janeiro», no la sigla) y hasta 400 px de ancho, para que los nombres largos no se metan en la muesca de la flecha. Si el destino pasa de 330 px, el bloque con los datos de la oferta se corre un poco a la izquierda para separarlo de la flecha |
+| **Fotos** | Del banco de fotos de cada destino; ninguna generada con IA. Regla de Daniela: el logo nunca sobre cabezas, nada cortado de golpe y espacio libre arriba. Por esa regla se descartaron las fotos con personas bajo el logo (Antofagasta y Bariloche van con paisajes sin personas) y dos de Lima. En la segunda vuelta, Lima pasó a una foto de Miraflores con cielo limpio, Santiago y la story de Punta Cana se reencuadraron y el cielo de Buenos Aires se hizo más azul |
+| **Degradados sólo si hacen falta** | Fueron las primeras piezas con el criterio de Daniela: arriba, el difuminado detrás del logo va **sólo si la foto lo necesita**; abajo, negro al 10–15 % **sólo si el legal no se lee**; si no alcanza, se adapta la foto. El render mide la zona del logo y la del pie de cada pieza y decide solo. La ronda 12 lo llevó al resto del despliegue (ver [los tres caminos](#rondas-11-y-12-sólo-mp4-difuminado-b-y-los-tres-caminos)) |
+| **Píldora de origen adaptable** | También nació aquí: el avión queda fijo y la píldora rosada termina 35 px después de la última letra, creciendo hacia la derecha. La ronda 12 la volvió regla para toda píldora con avión |
+| **Origen** | «DESDE LIMA» en Perú. «DESDE SANTIAGO» en Chile es una **deducción**: Daniela no dio el origen |
+
+**Dónde quedaron y en qué estado.** Se entregaron en «BLACK SKY 2026», en `HM CL/RUTAS FOCO/<DESTINO>/` (11 rutas) y
+`HM PE/RUTAS FOCO/<DESTINO>/` (5 rutas, junto a las 15 domésticas), con una copia idéntica en «BLACK SKY 2026 - PARA
+REVISION» y su `LEEME.txt`. Están **en revisión**: cuando Daniela apruebe una pieza, pasa a «BLACK SKY 2026 -
+APROBADO». En Notion, las 32 subtareas de pieza están en «Listo para revisión», con fecha de envío 2026-11-06. En el
+canvas tienen su propia página, «KV Black · Rutas foco Chile y Perú inter», con un tablero por ruta (popup y story lado
+a lado), republicada por última vez en la versión 70. Cuando la ronda 12 cambió los degradados del resto del
+despliegue, estas rutas se volvieron a generar y salieron idénticas píxel a píxel: la entrega y el canvas siguen
+vigentes.
+
+**Pendiente:** el «árbol» que Daniela pidió eliminar (no está claro si es la foto de Buenos Aires o la de Río; no se
+hizo un borrado pagado con IA); el legal, que se lee débil sobre la foto en el popup de Cusco y en la story de
+Concepción; el origen de Chile, y los precios y fechas del pie, que siguen como marcador.
+
+> Detalle técnico: [scripts del despliegue BLACK, §4.13 «Rutas foco de Chile y Perú internacional»](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
+> [manual, paso 7e-quater](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7e-quater-rehacer-y-entregar-una-ruta-foco-de-chile-o-perú-internacional)
+
+## Rondas 11 y 12: sólo MP4, difuminado B y los tres caminos
+
+Las dos rondas son del 2026-11-06. Los pedidos llegaron de Dianesty y Daniela, por la revisión «V3» en Frame.io y por
+Teams, y tocan el lote «GIF + POPUP» (popup y animación de cada pieza) y las rutas foco de Perú. Varias son **reglas
+para todo lo que viene**, no ajustes de una pieza:
+
+| Tema | Qué se hace ahora y por qué |
+|---|---|
+| **Sólo MP4, sin GIF** | Daniela: «no uses GIF, sólo deja en MP4, que es mejor formato». La animación se entrega sólo como MP4 con audio, `BS_GIF_<PIEZA>_AUDIO.mp4` (el nombre conserva «GIF»). Los GIF del lote salieron de las carpetas de entrega |
+| **Color del MP4** | Dianesty: «en todos los gif cambia el color del logo». El video se codificaba con una norma de color distinta de la que leen Frame, QuickTime y los navegadores, y el verde del logo se veía más apagado. Ahora todo MP4 se codifica y se marca en **BT.709** y el verde vuelve a coincidir con el KV. Vale para cualquier MP4 que se arme desde imágenes |
+| **Difuminado superior B** | Dianesty pidió que fuera «lo mismo para todos y no tan oscuro». Se probaron cuatro variantes en tres piezas, en el canvas de pruebas y en OneDrive (`10_Noviembre/BLACK SKY 2026 - DIFUMINADO (PRUEBAS 2026-11-06)/`). Daniela vio la A y la B iguales y descartó la sombra sólo detrás del logo («está mala»); Dianesty aprobó la **B** «en todas». La B es negro al 45 % arriba (antes 69 %), con una caída suave, y termina antes: al 85 % del largo del gradiente anterior |
+| **Sin sombras de texto** | Dianesty: «le quitamos las sombras». Ninguna letra lleva sombra ni degradé detrás («se nota mucho sobre todo con las transiciones»), y no hay sombra lateral ni velo detrás de las listas de banderas |
+| **Degradado inferior** | Negro al 10–15 %, y sólo donde el legal o el sello de puntualidad no se leen. Antes era marrón, o negro hasta el 80 % |
+| **Píldora rosada de origen** | Regla de Daniela para toda píldora con avión, diga el origen u otra frase: el avión no se mueve, la píldora crece hacia la derecha y termina 35 px después de la última letra. Así se ajusta a cualquier texto sin descentrarse |
+| **Uruguay** | La fila de banderas pasa a lista con el nombre de cada destino: Punta Cana · Santiago y conexión con 15 destinos · Salvador · Miami. Vuelve la píldora de origen, con «DESDE MONTEVIDEO» como supuesto |
+| **Estados Unidos** | Sin el velo que había detrás de la lista de destinos |
+
+**Los tres caminos de Daniela** (Teams, 2026-11-06), para que una foto se lea sin oscurecerla de más:
+
+1. Si la foto se lee a la primera, va **sin gradiente**.
+2. Si no, lleva el **difuminado sutil aprobado** (la B).
+3. Si no alcanza, no se oscurece más: **se adapta la foto**. Se reencuadra, se quitan elementos, se oscurece el cielo
+   o se quitan nubes, sin salir del brandlift.
+4. Si aun así no se ve bien, se hace **una foto nueva** desde cero.
+
+Para los legales de abajo, la foto se apoya en el desenfoque del fondo (bokeh) y el degradado es sutil. Los
+degradados ya no van por defecto: el render pone el difuminado de arriba sólo si el fondo del logo es ruidoso y el
+piso negro sólo si el pie es claro. Donde ni así alcanzaba, se adaptó la foto bajando sus luces en la zona de los
+textos: Perú internacional, Uruguay, PE «Encuentra destinos», «Vuela por el Perú», Chile internacional y Chile
+«Encuentra destinos» (la lista del clúster, que perdió su sombra lateral) y las rutas de Tumbes, Trujillo, Tacna, Cusco
+y Chiclayo.
+
+**Entrega.** En «BLACK SKY 2026», cada pieza del lote está en `<HM>/GIF + POPUP/<pieza>/`, con su popup y su MP4 con
+audio, y cada ruta de Perú en `HM PE/RUTAS FOCO/<DESTINO>/`, con popup y story. Para que Dianesty y Daniela revisen,
+hay una copia en «BLACK SKY 2026 - PARA REVISION» con el archivo
+`LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`.
+
+**Canvas.** El principal quedó en la **versión 74**. En la Grilla, cada animación es el MP4 con audio, con controles,
+y la Grilla ya no tiene story en video. Las pruebas del difuminado viven en su propio canvas
+(<https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC>).
+
+**Pendiente con Dianesty:** si Estados Unidos suma Buenos Aires, si Uruguay lleva Miami y el origen de Uruguay, que
+hoy es «DESDE MONTEVIDEO» por supuesto.
+
+> Detalle técnico: [scripts del despliegue BLACK, §4.12 a §4.14](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
+> [manual, rondas 11 y 12](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7j-rondas-11-y-12-sólo-mp4-difuminado-b-y-tres-caminos)
 
 ## Reglas que se cumplen siempre
 

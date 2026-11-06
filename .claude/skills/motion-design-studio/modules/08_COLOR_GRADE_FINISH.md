@@ -129,6 +129,13 @@ de piel, aunque el prompt sea el mismo. Sin match, la secuencia se ve rota. Disc
 - **Color space de salida:** **Rec.709** para web/broadcast SDR (default); **P3 / Rec.2020 + HDR
   (PQ/HLG)** solo si el destino soporta HDR y el pipeline entero es HDR. **No entregues P3 a un canal
   Rec.709** — se ve desaturado/mal. Etiqueta el color space en el archivo.
+- **MP4 armado con ffmpeg desde cuadros PNG:** sin matriz explícita, ffmpeg convierte
+  RGB → YUV con **BT.601 y sin etiquetar**, y Frame, QuickTime y los navegadores lo decodifican como BT.709: los
+  colores de marca se corren (caso SKY BLACK, 2026-11-06: el verde del logo cayó de 221 a 189 y Dianesty lo notó en
+  todas las piezas). Codificar siempre con
+  `-vf scale=out_color_matrix=bt709:out_range=tv:flags=lanczos+accurate_rnd+full_chroma_int,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv`
+  y verificar con `ffprobe` que `color_space`, `color_primaries` y `color_transfer` digan `bt709`; medir el color
+  decodificando en BT.709, no en el PNG de origen.
 - **Frame rate y resolución:** conserva el frame rate de la pieza (no convertir sin retiming); entrega
   a la resolución del destino. Detalle de spec por red en `social-media-studio`.
 - **Chroma subsampling:** 4:2:0 para entrega estándar; 4:2:2/4:4:4 para masters, HDR o croma/keying.
