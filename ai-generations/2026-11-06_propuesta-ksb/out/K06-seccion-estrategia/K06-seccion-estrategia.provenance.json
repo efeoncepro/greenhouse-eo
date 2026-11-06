@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "f29d722c9635e2a4cbbf818c009c9d8fdaa65aad965dc6e7946bf52a699fefeb",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine.purpose",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:QS2-contigo",
+      "path": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png",
+      "sha256": "af7132283a5b15dd225bea1b3e73911383268867f11f6c6cd5556d9649c783b7"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

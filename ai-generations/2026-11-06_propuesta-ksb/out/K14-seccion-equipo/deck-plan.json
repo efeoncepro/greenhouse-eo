@@ -1,0 +1,41 @@
+{
+  "tenderId": "K14-seccion-equipo",
+  "slides": [
+    {
+      "slideId": "deck-section-cine",
+      "contentType": "deck.section-cine",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 118,
+          "questionTop": 515,
+          "answerTop": 630,
+          "answerPx": 130,
+          "eyebrowPx": "--gl-sec-eyebrow-px=18px",
+          "eyebrowWght": "--gl-sec-eyebrow-wght=500",
+          "eyebrowTracking": "--gl-sec-eyebrow-tracking=0.22em",
+          "eyebrowColor": "--gl-sec-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-sec-question-px=36px",
+          "questionLeading": "--gl-sec-question-leading=1.2",
+          "questionColor": "--gl-sec-question-color=#f4f6f8",
+          "answerLeading": "--gl-sec-answer-leading=0.95",
+          "answerTracking": "--gl-sec-answer-tracking=-0.04em",
+          "answerInset": "--gl-sec-answer-inset=-4px",
+          "questionWidth": "--gl-sc-question-width=400px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:QS1b-un-solo-equipo",
+          "alt": "Una diseñadora y un diseñador de Efeonce revisan pruebas impresas sobre una mesa de luz, mientras un director sonríe detrás"
+        },
+        "voice": {
+          "question": "Siete roles y un solo",
+          "answer": "Contacto",
+          "eyebrow": "Quién lo hace"
+        },
+        "body": "Los siete roles que piden las bases y <strong>un</strong> responsable de cuenta como contraparte única de su equipo."
+      },
+      "template": "SectionCine"
+    }
+  ]
+}

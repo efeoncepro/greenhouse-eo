@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Estrategia 2027",
+    "question": "Cuatro ejes, un mismo",
+    "answer": [
+      "Sistema"
+    ]
+  },
+  "body": "Cada eje responde a un requisito de las bases y se mide contra la **rampa de KPIs** acordada.",
+  "pillars": [
+    {
+      "label": "Conversión",
+      "text": "landings y formularios fuera de ksb.com."
+    },
+    {
+      "label": "Medición",
+      "text": "del clic a la cotización, en su CRM."
+    },
+    {
+      "label": "Demanda y contenido",
+      "text": "por segmento, con un gancho propio."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png",
+    "alt": "Una directora de marketing del cliente explica una curva que sube; a su lado, la estratega de Efeonce la acompaña"
+  }
+}

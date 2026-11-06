@@ -1,0 +1,84 @@
+{
+  "document": "proposal",
+  "line": "growth",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-dawn",
+      "purpose": "01 · portada"
+    },
+    {
+      "recipeId": "decision-difference",
+      "purpose": "02 · resumen ejecutivo"
+    },
+    {
+      "recipeId": "section-classic",
+      "purpose": "03 · sección · comprensión"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "04 · cómo compra KSB"
+    },
+    {
+      "recipeId": "decision-diagnosis-verdict",
+      "purpose": "05 · diagnóstico"
+    },
+    {
+      "recipeId": "section-cine-purpose",
+      "purpose": "06 · sección · estrategia",
+      "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png"
+    },
+    {
+      "recipeId": "decision-traffic-to-revenue",
+      "purpose": "08 · eje 1 · conversión"
+    },
+    {
+      "recipeId": "proposal-service-revops",
+      "purpose": "09 · eje 2 · medición",
+      "plateRef": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png"
+    },
+    {
+      "recipeId": "proposal-service-creative",
+      "purpose": "10 · ejes 3 y 4 · demanda y contenido",
+      "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png"
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "11 · plan 2027"
+    },
+    {
+      "recipeId": "content-measure",
+      "purpose": "12 · rampa de KPIs",
+      "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png"
+    },
+    {
+      "recipeId": "decision-risk",
+      "purpose": "13 · condiciones de los KPIs"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "purpose": "14 · sección · equipo",
+      "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png"
+    },
+    {
+      "recipeId": "section-classic",
+      "purpose": "16 · sección · referencias"
+    },
+    {
+      "recipeId": "section-classic",
+      "purpose": "18 · sección · económica"
+    },
+    {
+      "recipeId": "content-pricing",
+      "purpose": "19 · económica"
+    },
+    {
+      "recipeId": "decision-next-steps",
+      "purpose": "20 · próximos pasos"
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "purpose": "21 · contraportada",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png"
+    }
+  ]
+}

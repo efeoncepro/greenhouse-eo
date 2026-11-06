@@ -16,6 +16,10 @@ Ojeda (`Pamela.Ojeda@ksb.com`), con `Base_Licitacion_MKT_Digital_v2.pdf`:
 - **No habrá reuniones** con agencias en esta etapa; sí con las finalistas (01–03/12).
 - Cierre del 16/11 a las **16:30**.
 
+**Borrador de la oferta técnica (06/11):** 18 láminas compuestas con recetas aprobadas + 5 insertos del brochure 360°,
+en el canvas privado https://claude.ai/artifact/SkxaJtPYQ9KvgjviQsGyEo. Pipeline y pendientes (equipo, certificaciones,
+montos) en `ai-generations/2026-11-06_propuesta-ksb/LEEME.md`.
+
 **Estrategia de abordaje (INTERNO, 06/11):** [ESTRATEGIA-ABORDAJE-INTERNO.md](ESTRATEGIA-ABORDAJE-INTERNO.md):
 GO condicionado a precio (certificaciones declaradas por Julio, evidencia por archivar); decisión el martes 10/11; incumbente probable United Visions.
 

@@ -1,0 +1,37 @@
+{
+  "tenderId": "K03-seccion-comprension",
+  "slides": [
+    {
+      "slideId": "deck-section-classic",
+      "contentType": "deck.section-classic",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "questionTop": 420,
+          "answerTop": 495,
+          "answerPx": 120,
+          "ringCx": "--gl-ring-cx=1420px",
+          "numberTop": "--gl-number-top=430px",
+          "labelTop": "--gl-label-top=640px",
+          "numberPx": "--gl-number-px=190px",
+          "numberWeight": "--gl-number-wght=300",
+          "labelPx": "--gl-label-px=24px",
+          "columnWidth": "--gl-column-width=1080px"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:section-progress-1-of-5-growth"
+        },
+        "progress": {
+          "number": "01",
+          "label": "Sección 1 de 5"
+        },
+        "voice": {
+          "question": "Lo que entendimos de",
+          "answer": "KSB Chile"
+        }
+      },
+      "template": "SectionClassic"
+    }
+  ]
+}

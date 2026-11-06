@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "recipe": "content-measure",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Rampa de KPIs · bases, punto 4.1",
+    "question": "Cumplimiento exigido para la prórroga:",
+    "answer": [
+      "90 %"
+    ]
+  },
+  "body": "de los KPIs del período, según las bases. La meta sube cada trimestre y se mide cada mes.",
+  "measure": {
+    "value": 0.9,
+    "source": "Bases LIC-MKT-2026-001, punto 6.1"
+  },
+  "photo": {
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+    "alt": "Un editor revisa un corte en la línea de tiempo de su pantalla, de noche, con una taza azul al lado"
+  },
+  "figures": [
+    {
+      "value": "200 %",
+      "label": "ROI de publicidad al Q4",
+      "source": "Bases, punto 4.1"
+    },
+    {
+      "value": "3,0",
+      "label": "ROAS de SEM y social, Q4",
+      "source": "Bases, punto 4.1"
+    }
+  ],
+  "use": "proposal"
+}

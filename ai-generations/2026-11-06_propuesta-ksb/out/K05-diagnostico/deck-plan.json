@@ -1,0 +1,280 @@
+{
+  "tenderId": "K05-diagnostico",
+  "slides": [
+    {
+      "slideId": "deck-decision-diagnosis-verdict",
+      "contentType": "deck.decision-diagnosis-verdict",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 196,
+          "answerTop": 330,
+          "answerPx": 150,
+          "answerLeading": "--gl-ls-answer-leading=0.9",
+          "answerTracking": "--gl-ls-answer-tracking=-0.05em",
+          "answerInset": "--gl-ls-answer-inset=-8px",
+          "questionWidth": "--gl-ls-question-width=500px",
+          "bodyTop": 690,
+          "bodyPx": 26,
+          "bodyWidth": 420,
+          "answerShadowY": "--gl-ls-answer-shadow-y=10px",
+          "answerShadowBlur": "--gl-ls-answer-shadow-blur=60px",
+          "answerShadowOpacity": "--gl-ls-answer-shadow-opacity=35%",
+          "answerShadowColor": "--gl-ls-answer-shadow-color=#000000",
+          "lumWidth": "--gl-lum-width=216px",
+          "lumBottom": "--gl-lum-bottom=51px",
+          "docFill": "--gl-ls-doc-color=#ffffff",
+          "docInk": "--gl-ls-doc-ink-color=#0b1f33",
+          "docMuted": "--gl-ls-doc-muted-color=#5f6b7a",
+          "docRule": "--gl-ls-doc-rule-color=#e3e8ee",
+          "docChip": "--gl-ls-doc-chip-color=#f5f7fa",
+          "docShadowY": "--gl-ls-doc-shadow-y=50px",
+          "docShadowBlur": "--gl-ls-doc-shadow-blur=110px",
+          "docShadowColor": "--gl-ls-doc-shadow-color=#000610",
+          "docShadowOpacity": "--gl-ls-doc-shadow-opacity=75%",
+          "docHaloBlur": "--gl-ls-doc-halo-blur=90px",
+          "docHaloColor": "--gl-ls-doc-halo-color=#36c8bf",
+          "docHaloOpacity": "--gl-ls-doc-halo-opacity=22%",
+          "docEdge": "--gl-ls-doc-edge=1px",
+          "docEdgeColor": "--gl-ls-doc-edge-color=#ffffff",
+          "docEdgeOpacity": "--gl-ls-doc-edge-opacity=16%",
+          "reportLeft": "--gl-ddv-left=780px",
+          "reportTop": "--gl-ddv-top=170px",
+          "reportWidth": "--gl-ddv-width=880px",
+          "reportPadTop": "--gl-ddv-pad-top=26px",
+          "reportPadX": "--gl-ddv-pad-x=28px",
+          "reportPadBottom": "--gl-ddv-pad-bottom=24px",
+          "reportRadius": "--gl-ddv-radius=26px",
+          "reportPerspective": "--gl-ddv-perspective=2200px",
+          "reportRotateY": "--gl-ddv-rotate-y=-9deg",
+          "reportRotateX": "--gl-ddv-rotate-x=3deg",
+          "headPadBottom": "--gl-ddv-head-pad-bottom=16px",
+          "headGapBottom": "--gl-ddv-head-gap-bottom=16px",
+          "headRule": "--gl-ddv-head-rule-color=#e3e8ee",
+          "headGap": "--gl-ddv-head-gap=12px",
+          "iconBox": "--gl-ddv-icon-box=40px",
+          "iconRadius": "--gl-ddv-icon-radius=12px",
+          "iconFill": "--gl-ddv-icon-fill-color=#0b1f33",
+          "iconSize": "--gl-ddv-icon=24px",
+          "titlePx": "--gl-ddv-title-px=22px",
+          "titleTracking": "--gl-ddv-title-tracking=-0.015em",
+          "subtitlePx": "--gl-ddv-subtitle-px=13px",
+          "subtitleWeight": "--gl-ddv-subtitle-wght=400",
+          "subtitleGap": "--gl-ddv-subtitle-gap=2px",
+          "subtitleColor": "--gl-ddv-subtitle-color=#5f6b7a",
+          "markPadY": "--gl-ddv-mark-pad-y=6px",
+          "markPadX": "--gl-ddv-mark-pad-x=12px",
+          "markRadius": "--gl-ddv-mark-radius=999px",
+          "markFill": "--gl-ddv-mark-fill-color=#f5f7fa",
+          "markBorder": "--gl-ddv-mark-border=1px",
+          "markBorderColor": "--gl-ddv-mark-border-color=#e3e8ee",
+          "markPx": "--gl-ddv-mark-px=12px",
+          "markWeight": "--gl-ddv-mark-wght=600",
+          "markTracking": "--gl-ddv-mark-tracking=0.08em",
+          "markColor": "--gl-ddv-mark-color=#5f6b7a",
+          "gridGap": "--gl-ddv-grid-gap=14px",
+          "gridColumns": "--gl-ddv-grid-columns=2",
+          "modulePadY": "--gl-ddv-module-pad-y=16px",
+          "modulePadX": "--gl-ddv-module-pad-x=18px",
+          "moduleRadius": "--gl-ddv-module-radius=16px",
+          "moduleFill": "--gl-ddv-module-fill-color=#f5f7fa",
+          "moduleBorder": "--gl-ddv-module-border=1px",
+          "moduleBorderColor": "--gl-ddv-module-border-color=#e3e8ee",
+          "moduleKickerPx": "--gl-ddv-module-kicker-px=12px",
+          "moduleKickerWeight": "--gl-ddv-module-kicker-wght=600",
+          "moduleKickerTracking": "--gl-ddv-module-kicker-tracking=0.1em",
+          "moduleKickerColor": "--gl-ddv-module-kicker-color=#5f6b7a",
+          "moduleTitlePx": "--gl-ddv-module-title-px=20px",
+          "moduleTitleTracking": "--gl-ddv-module-title-tracking=-0.015em",
+          "moduleTitleGapTop": "--gl-ddv-module-title-gap-top=3px",
+          "moduleTitleGapBottom": "--gl-ddv-module-title-gap-bottom=10px",
+          "nodeGap": "--gl-ddv-node-gap=8px",
+          "nodePadY": "--gl-ddv-node-pad-y=7px",
+          "nodePadX": "--gl-ddv-node-pad-x=11px",
+          "nodeRadius": "--gl-ddv-node-radius=999px",
+          "nodeFill": "--gl-ddv-node-fill-color=#ffffff",
+          "nodeBorder": "--gl-ddv-node-border=1px",
+          "nodeBorderColor": "--gl-ddv-node-border-color=#e3e8ee",
+          "nodePx": "--gl-ddv-node-px=13px",
+          "nodeWeight": "--gl-ddv-node-wght=500",
+          "nodeDot": "--gl-ddv-node-dot=9px",
+          "nodeDotFill": "--gl-ddv-node-dot-color=#0b1f33",
+          "nodeDotGap": "--gl-ddv-node-dot-gap=7px",
+          "footnotePx": "--gl-ddv-footnote-px=12px",
+          "footnoteWeight": "--gl-ddv-footnote-wght=400",
+          "footnoteGap": "--gl-ddv-footnote-gap=10px",
+          "footnoteColor": "--gl-ddv-footnote-color=#5f6b7a",
+          "optionGap": "--gl-ddv-option-gap=8px",
+          "optionFlex": "--gl-ddv-option-flex=1",
+          "optionFlexSelected": "--gl-ddv-option-flex-selected=1.6",
+          "optionPadY": "--gl-ddv-option-pad-y=10px",
+          "optionPadX": "--gl-ddv-option-pad-x=6px",
+          "optionRadius": "--gl-ddv-option-radius=12px",
+          "optionPx": "--gl-ddv-option-px=13px",
+          "optionWeight": "--gl-ddv-option-wght=600",
+          "optionSelectedFill": "--gl-ddv-option-selected-fill-color=#0b1f33",
+          "optionSelectedInk": "--gl-ddv-option-selected-color=#ffffff",
+          "optionOtherFill": "--gl-ddv-option-other-fill-color=#ffffff",
+          "optionOtherInk": "--gl-ddv-option-other-color=#5f6b7a",
+          "optionBorder": "--gl-ddv-option-border=1px",
+          "optionBorderColor": "--gl-ddv-option-border-color=#e3e8ee",
+          "conditionPx": "--gl-ddv-condition-px=12px",
+          "conditionWeight": "--gl-ddv-condition-wght=400",
+          "conditionLeading": "--gl-ddv-condition-leading=1.4",
+          "conditionGap": "--gl-ddv-condition-gap=10px",
+          "conditionColor": "--gl-ddv-condition-color=#5f6b7a",
+          "riskGapTop": "--gl-ddv-risk-gap-top=6px",
+          "riskGap": "--gl-ddv-risk-gap=8px",
+          "riskPx": "--gl-ddv-risk-px=13px",
+          "riskWeight": "--gl-ddv-risk-wght=400",
+          "riskIcon": "--gl-ddv-risk-icon=15px",
+          "recordPx": "--gl-ddv-record-px=13px",
+          "recordWeight": "--gl-ddv-record-wght=400",
+          "recordLeading": "--gl-ddv-record-leading=1.5",
+          "waveGap": "--gl-ddv-wave-gap=10px",
+          "wavePadY": "--gl-ddv-wave-pad-y=10px",
+          "wavePadX": "--gl-ddv-wave-pad-x=12px",
+          "waveRadius": "--gl-ddv-wave-radius=12px",
+          "waveFill": "--gl-ddv-wave-fill-color=#ffffff",
+          "waveBorder": "--gl-ddv-wave-border=1px",
+          "waveBorderColor": "--gl-ddv-wave-border-color=#e3e8ee",
+          "waveNamePx": "--gl-ddv-wave-name-px=18px",
+          "waveTitlePx": "--gl-ddv-wave-title-px=13px",
+          "waveTitleWeight": "--gl-ddv-wave-title-wght=600",
+          "waveTitleLeading": "--gl-ddv-wave-title-leading=1.3",
+          "waveTitleGap": "--gl-ddv-wave-title-gap=2px",
+          "waveKickerPx": "--gl-ddv-wave-kicker-px=11px",
+          "waveKickerWeight": "--gl-ddv-wave-kicker-wght=500",
+          "waveKickerTracking": "--gl-ddv-wave-kicker-tracking=0.06em",
+          "waveKickerGap": "--gl-ddv-wave-kicker-gap=4px",
+          "waveKickerColor": "--gl-ddv-wave-kicker-color=#5f6b7a"
+        },
+        "stage": {
+          "src": "asset-ref:layer:ddv-stage"
+        },
+        "platform": {
+          "src": "asset-ref:layer:ddv-platform"
+        },
+        "voice": {
+          "question": "Hoy el lead se pierde",
+          "answer": "clic",
+          "eyebrow": "Diagnóstico · fuentes públicas",
+          "answerLead": "Tras el"
+        },
+        "body": "La pauta está activa; lo que no se ve es qué pasa <strong>después del clic</strong>.",
+        "report": {
+          "icon": "asset-ref:icon:informe-growth-dark-24",
+          "title": "Lectura externa de su marketing digital",
+          "subtitle": "KSB Chile · revisión del 06/11/2026"
+        },
+        "sampleMark": "Fuentes públicas",
+        "moduleState": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "01 · Pauta",
+          "title": "Google, Meta, LinkedIn",
+          "nodes": [
+            {
+              "text": "Google Ads"
+            },
+            {
+              "text": "Meta"
+            },
+            {
+              "text": "LinkedIn"
+            },
+            {
+              "text": "ksb.com"
+            },
+            {
+              "text": "Formulario"
+            },
+            {
+              "text": "CRM"
+            }
+          ],
+          "footnote": "Bibliotecas de anuncios, sitio y redes · 06/11/2026"
+        },
+        "moduleVerdict": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "02 · Destino",
+          "title": "Sitio global",
+          "options": [
+            {
+              "role": "lead",
+              "text": "Medible"
+            },
+            {
+              "role": "rest",
+              "text": "Parcial"
+            },
+            {
+              "role": "rest",
+              "text": "Sin medir"
+            }
+          ],
+          "condition": "Condición: conectar formularios y CRM antes de escalar la inversión"
+        },
+        "moduleRisks": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "03 · Captura",
+          "title": "Formulario externo",
+          "risks": [
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "Leads sin CRM"
+            },
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "CPL sin base"
+            },
+            {
+              "icon": "asset-ref:icon:warning-triangle-15",
+              "text": "Destino genérico"
+            }
+          ]
+        },
+        "moduleRecord": {
+          "span": "--gl-ddv-span=1",
+          "kicker": "04 · Medición",
+          "title": "Sin vista Chile",
+          "record": "Cada hallazgo con su fuente: bibliotecas de anuncios, el sitio y sus redes, revisados el 06/11/2026."
+        },
+        "moduleRoadmap": {
+          "span": "--gl-ddv-span=2",
+          "kicker": "05 · Plan",
+          "title": "Cuatro ejes 2027",
+          "waves": [
+            {
+              "name": "Q1",
+              "title": "Línea base y conversión",
+              "kicker": "Base"
+            },
+            {
+              "name": "Q2–Q3",
+              "title": "Escalado por segmento",
+              "kicker": "Crecimiento"
+            },
+            {
+              "name": "Q4",
+              "title": "Consolidación",
+              "kicker": "Resultado"
+            }
+          ]
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "participantKind": "role",
+          "scale": 1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "compact",
+          "overlay": "none"
+        }
+      },
+      "template": "DecisionDiagnosisVerdict"
+    }
+  ]
+}

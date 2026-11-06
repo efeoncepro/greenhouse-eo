@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "a2e1db3fb55c1ecc72a3d1fe21578661994a8de78bceba20e66fd9950c90e805",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal.dawn",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:ksb-logo-blanco-1200",
+      "path": "ai-generations/2026-11-06_propuesta-ksb/assets/ksb-logo-blanco-1200.png",
+      "sha256": "10f2e13cfc25ee344800f32351068d0919aaa0729b8caab12e30dcaa9db8d699"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "cover-by-hand-portada-dawn-2026-11-06"
+}

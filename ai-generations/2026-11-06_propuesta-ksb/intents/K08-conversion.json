@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-traffic-to-revenue",
+  "voice": {
+    "eyebrow": "Eje 1 · Conversión",
+    "question": "Del anuncio a la cotización, sin tocar",
+    "answer": [
+      "Su sitio"
+    ]
+  },
+  "body": "El sitio lo gobierna la casa matriz: la conversión ocurre en **landings y formularios** que KSB autoriza.",
+  "steps": [
+    {
+      "number": "01",
+      "name": "Anuncio",
+      "description": "Por segmento: minería, agua, riego y distribuidores.",
+      "channel": "Google · LinkedIn · Meta"
+    },
+    {
+      "number": "02",
+      "name": "Landing",
+      "description": "Una por línea, en un dominio que KSB autoriza.",
+      "channel": "Fuera de ksb.com"
+    },
+    {
+      "number": "03",
+      "name": "Lead calificado",
+      "description": "Rubro, faena, equipo y plazo en cada formulario.",
+      "channel": "Formularios · CRM"
+    },
+    {
+      "number": "04",
+      "name": "Cotización",
+      "description": "El área comercial la registra y se mide el cierre.",
+      "channel": "CRM de KSB"
+    }
+  ],
+  "cutLabel": "Hoy la medición se detiene aquí"
+}

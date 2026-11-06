@@ -1,0 +1,61 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Económica",
+    "question": "Tarifa fija, aparte de",
+    "answer": [
+      "Los medios"
+    ]
+  },
+  "body": "Tarifa fija de agencia y una inversión en medios que se gestiona sin margen, en las cuentas de KSB.",
+  "legal": "Valores netos, IVA no incluido. Montos por confirmar en la oferta económica.",
+  "period": "al mes · neto + IVA",
+  "recommended": 2,
+  "recommendedLabel": "Recomendado",
+  "plans": [
+    {
+      "name": "Esencial",
+      "tagline": "Para empezar a medir",
+      "features": [
+        "SEM de intención alta",
+        "LinkedIn por cuentas",
+        "Landings y formularios",
+        "Tablero mensual"
+      ]
+    },
+    {
+      "name": "Integral",
+      "tagline": "Los cuatro canales",
+      "features": [
+        "Todo lo de Esencial",
+        "Social pagado y redes",
+        "Contenidos por segmento",
+        "Medición hasta el cierre",
+        "Tablero semanal"
+      ]
+    },
+    {
+      "name": "Con la red",
+      "tagline": "Para sumar la red",
+      "features": [
+        "Todo lo de Integral",
+        "Programa para distribuidores",
+        "Campaña Expomin 2027",
+        "Revisión trimestral con la gerencia"
+      ]
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Finanzas",
+    "participantKind": "department"
+  }
+}

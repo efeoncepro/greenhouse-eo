@@ -1,0 +1,55 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-risk",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Condiciones de los KPIs",
+    "question": "Cada KPI, con su",
+    "answer": [
+      "Condición"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
+  "body": "Las bases ya condicionan el ROI y el ROAS (punto 6.3). Proponemos lo mismo para los KPIs de funnel.",
+  "headers": {
+    "risk": "El riesgo",
+    "how": "Cómo lo cubrimos"
+  },
+  "risks": [
+    {
+      "risk": "Sin línea base",
+      "name": "Medición en el mes 1",
+      "how": "Costo por lead, conversión y MQL se miden en el Q1 antes de fijar la meta."
+    },
+    {
+      "risk": "Lead sin gestión",
+      "name": "Acuerdo con ventas",
+      "how": "Tiempo de respuesta y resultado registrado en el CRM para cada lead."
+    },
+    {
+      "risk": "Venta fuera de línea",
+      "name": "Conversiones offline",
+      "how": "Las cotizaciones y ventas del CRM vuelven a Google y LinkedIn."
+    },
+    {
+      "risk": "Ciclo largo",
+      "name": "Lectura por trimestre",
+      "how": "Lead-to-customer y retención se leen sobre el ciclo real de venta."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Comercial",
+    "participantKind": "department"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "6938a9855943bae78e27e6d14c99480ad07760489085d738c0fbd073e727f505",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-measure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:P1-deck-lente-edicion",
+      "path": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "sha256": "56916395a01ce3c7f48ecb5fa805f04b3ae96c6dae00cc77e9400efa9bb0770f"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "tenderId": "K12-kpis",
+  "slides": [
+    {
+      "slideId": "deck-content-measure",
+      "contentType": "deck.content-measure",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 150,
+          "questionTop": 215,
+          "answerTop": 270,
+          "answerPx": 300,
+          "bodyTop": 590,
+          "bodyPx": 26,
+          "bodyWidth": 560,
+          "eyebrowPx": "--gl-eyebrow-px=20px",
+          "figurePx": "--gl-figure-px=64px",
+          "notePx": "--gl-note-px=17px",
+          "lensCx": "--gl-lens-cx=1420px",
+          "lensCy": "--gl-lens-cy=600px",
+          "lensR": "--gl-lens-r=359.97px",
+          "lensGrayscale": "--gl-lens-grayscale=1",
+          "lensContrast": "--gl-lens-contrast=1.1",
+          "lensBrightness": "--gl-lens-brightness=0.5",
+          "lensMultiply": "--gl-lens-multiply=0.8",
+          "columnWidth": "--gl-column-width=976.84px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:P1-deck-lente-edicion",
+          "lensSrc": "asset-ref:plate:P1-deck-lente-edicion",
+          "alt": "Un editor revisa un corte en la línea de tiempo de su pantalla, de noche, con una taza azul al lado"
+        },
+        "orbit": {
+          "src": "asset-ref:layer:measure-900-growth"
+        },
+        "voice": {
+          "question": "Cumplimiento exigido para la prórroga:",
+          "answer": "90 %",
+          "eyebrow": "Rampa de KPIs · bases, punto 4.1"
+        },
+        "body": "de los KPIs del período, según las bases. La meta sube cada trimestre y se mide cada mes.",
+        "figures": [
+          {
+            "value": "200 %",
+            "label": "ROI de publicidad al Q4"
+          },
+          {
+            "value": "3,0",
+            "label": "ROAS de SEM y social, Q4"
+          }
+        ],
+        "note": "Bases LIC-MKT-2026-001, punto 6.1"
+      },
+      "template": "ContentMeasure"
+    }
+  ]
+}
