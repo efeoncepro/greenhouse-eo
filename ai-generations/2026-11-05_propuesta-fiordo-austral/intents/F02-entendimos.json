@@ -9,12 +9,12 @@
   "layout": "purpose",
   "voice": {
     "eyebrow": "Lo que entendimos",
-    "question": "Cuatro regiones,",
+    "question": "Hoy, su venta vive en",
     "answer": [
-      "Un CRM"
+      "Planillas"
     ]
   },
-  "body": "Vender contra la especificación de cada cliente, en terreno y en **cuatro regiones**.",
+  "body": "Su equipo vende contra la especificación de cada cliente, en cuatro regiones, y hoy lo registra en **Excel**.",
   "pillars": [
     {
       "label": "4 regiones",

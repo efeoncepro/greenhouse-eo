@@ -49,8 +49,10 @@ add('F01-portada', 'cover-proposal-dawn', d, '01 · portada')
 # 02 · Lo que entendimos
 # 06/11: de content-text a sección de cine con foto propia (FA02: cuatro hilos de luz llegan a una sola esfera).
 d = base(HS, 'B26-salida.json')
-d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': 'Cuatro regiones,', 'answer': ['un CRM']}
-d['body'] = 'Vender contra la especificación de cada cliente, en terreno y en **cuatro regiones**.'
+# 06/11, Julio en el canvas: «¿qué responde esta slide?». «Cuatro regiones, un CRM» afirmaba la solución sin decir el
+# problema: «Lo que entendimos» ahora dice cómo venden hoy (bases y propuesta, bloque 1: «lo hace hoy desde planillas Excel»).
+d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': 'Hoy, su venta vive en', 'answer': ['planillas']}
+d['body'] = 'Su equipo vende contra la especificación de cada cliente, en cuatro regiones, y hoy lo registra en **Excel**.'
 d['pillars'] = [
     {'label': '4 regiones', 'text': 'Asia, Europa, Norteamérica y Sudamérica.'},
     {'label': '6 plantas', 'text': 'harina, aceite e hidrolizados de salmón.'},
