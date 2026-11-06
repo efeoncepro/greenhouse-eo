@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "bf8fa3b5f25a",
+  "key": "bf8fa3b5f25a7b7c93c3668bff392d4a916652b54beecd4affd840154005bd3d",
+  "status": "completed",
+  "createdAt": "2026-11-05T09:46:43.187Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2-base.png",
+    "imageSha256": "d5676914a050fe2f827e4d43d7cff45c85b455459358853723cd5429b098e033",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2-mask.png",
+    "maskSha256": "b9891b36ccbf293c80ef73b1ecccada721420833eb96ae13eb25a64564ddec0c",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same wooden floor and doormat continuing toward the camera, with the door frame edge very out of focus at the lower-left corner. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas.",
+    "providerPrompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same wooden floor and doormat continuing toward the camera, with the door frame edge very out of focus at the lower-left corner. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas."
+  },
+  "mask": {
+    "touchedFraction": 0.8217997685185185,
+    "editable": 6434652,
+    "soft": 381684,
+    "protected": 1478064
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 60.619,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": true,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -20,
+        "scale": 1.04,
+        "stillError": 31.36,
+        "bestError": 17.41,
+        "misaligned": true
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1478064,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6434652,
+        "maxDelta": 231,
+        "meanDelta": 62.426,
+        "worst": {
+          "x": 899,
+          "y": 236
+        }
+      },
+      "seam": {
+        "pixels": 381684,
+        "maxDelta": 202,
+        "meanDelta": 30.16,
+        "worst": {
+          "x": 1001,
+          "y": 341
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1478064,
+        "maxDelta": 250,
+        "meanDelta": 39.357,
+        "worst": {
+          "x": 1159,
+          "y": 995
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1679,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 171
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3522
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

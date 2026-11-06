@@ -1,0 +1,132 @@
+{
+  "asOf": "2026-11-05",
+  "search": {
+    "source": "DataForSEO Labs google/keyword_overview/live, location 2152 Chile, language es",
+    "costUsd": 0.0138,
+    "raw": "keyword-overview-cl.json",
+    "monthlyAvg": {
+      "tiramisu": 33100,
+      "burrata": 6600,
+      "comida italiana": 4400,
+      "restaurante italiano": 2900,
+      "restaurant italiano": 2900,
+      "comida italiana cerca de mi": 1900,
+      "restaurante italiano santiago": 1600,
+      "restaurante peruano santiago": 1600,
+      "restaurante italiano providencia": 590,
+      "pasta fresca": 590,
+      "restaurante italiano las condes": 390,
+      "restaurante italiano vitacura": 390,
+      "trattoria santiago": 110,
+      "pasta fresca santiago": 20,
+      "pizza napolitana santiago": 20
+    },
+    "tiramisuLast12": {
+      "2025-09": 33100,
+      "2025-10": 33100,
+      "2025-11": 33100,
+      "2025-12": 74000,
+      "2026-01": 27100,
+      "2026-02": 27100,
+      "2026-03": 27100,
+      "2026-04": 27100,
+      "2026-05": 33100,
+      "2026-06": 33100,
+      "2026-07": 33100,
+      "2026-08": 33100
+    },
+    "tiramisuDecemberHistory": {
+      "2020": 74000,
+      "2021": 60500,
+      "2022": 74000,
+      "2023": 74000,
+      "2024": 74000,
+      "2025": 74000
+    }
+  },
+  "instagramCompetitors": {
+    "source": "instagram.com perfiles públicos sin sesión; ranking 50 Top Pizza Latinoamérica 2026",
+    "items": [
+      {
+        "handle": "alleria_pizza",
+        "name": "Allería",
+        "comuna": "Providencia",
+        "followers": "293K",
+        "postsWindow": "6 entre 2026-10-06 y 2026-11-03",
+        "format": "mitad reels",
+        "ranking": "N.º 1 Chile"
+      },
+      {
+        "handle": "brunapolipizza",
+        "name": "Bruna Poli",
+        "comuna": "Vitacura",
+        "followers": "60K",
+        "postsWindow": "12 entre 2026-10-11 y 2026-11-04",
+        "format": "4 de 12 reels",
+        "ranking": "N.º 13 Latinoamérica"
+      },
+      {
+        "handle": "stgiovannis",
+        "name": "St. Giovanni's",
+        "comuna": "Vitacura",
+        "followers": "60K",
+        "postsWindow": "9 entre 2026-10-06 y 2026-11-04",
+        "format": "4 de 9 reels",
+        "ranking": "N.º 28 Latinoamérica"
+      },
+      {
+        "handle": "raffaella.cucina",
+        "name": "Raffaella",
+        "comuna": "Las Condes",
+        "followers": "36K",
+        "postsWindow": "9 entre 2026-10-28 y 2026-11-04",
+        "format": "5 de 9 reels",
+        "ranking": "N.º 2 Chile"
+      }
+    ]
+  },
+  "creators": {
+    "source": "instagram.com perfiles públicos sin sesión",
+    "items": [
+      {
+        "handle": "camilachef",
+        "followers": "1M",
+        "focus": "chef; conduce Probando el Barrio (Canal 13)",
+        "lastPostSeen": "2026-11-05"
+      },
+      {
+        "handle": "santiagoadicto",
+        "followers": "800K",
+        "focus": "guía de la ciudad y panoramas",
+        "lastPostSeen": "2026-11-05"
+      },
+      {
+        "handle": "marbrownell",
+        "followers": "296K",
+        "focus": "actriz y cocinera, recetas",
+        "lastPostSeen": "2026-10-29"
+      },
+      {
+        "handle": "mariabelenm",
+        "followers": "9.6K",
+        "focus": "people, food and love",
+        "lastPostSeen": "2026-10-26"
+      },
+      {
+        "handle": "pablitoaldente",
+        "followers": "7.8K (+9.1K TikTok)",
+        "focus": "periodista, series de comida",
+        "lastPostSeen": "2026-11-03"
+      }
+    ],
+    "discarded": [
+      "foodtripchile (sin publicaciones desde 2025-07)"
+    ]
+  },
+  "notVerified": [
+    "handles de Le Due Torri, Da Carla y Rivoli",
+    "tasa de engagement de creadores",
+    "disponibilidad/condiciones de creadores (sin contacto)",
+    "cadencia fuera de la grilla visible"
+  ]
+}

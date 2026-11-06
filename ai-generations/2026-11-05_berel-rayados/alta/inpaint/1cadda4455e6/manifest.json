@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "1cadda4455e6",
+  "key": "1cadda4455e6a980f2ff4b7d2914e3e0a89e75af14e01256a68cd3302d5a8db7",
+  "status": "completed",
+  "createdAt": "2026-11-05T16:15:35.543Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/sala-alta-base.png",
+    "imageSha256": "14b146e0ac5b721d3ee5e7302f5956f602b422a8fced48d187f2cba4bb418ded",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/mask-alta.png",
+    "maskSha256": "cfe7a040ef9ad74897c27533cf8467fa7a5ebc53b44c151ac976dc20aebf21fa",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1800,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Replace only the marked top band so the same flat matte deep blue painted wall simply continues straight upward to the top edge of the image: a tall, uninterrupted wall with the same soft plaster texture, the same color and the same warm afternoon side light from the left. The dark window frame at the far left edge and the narrow white side wall at the far right edge also continue straight upward. No ceiling, no lamps, no shelves, no objects, no text. Everything outside the marked band stays exactly as it is; do not change the framing or the scale.",
+    "providerPrompt": "Replace only the marked top band so the same flat matte deep blue painted wall simply continues straight upward to the top edge of the image: a tall, uninterrupted wall with the same soft plaster texture, the same color and the same warm afternoon side light from the left. The dark window frame at the far left edge and the narrow white side wall at the far right edge also continue straight upward. No ceiling, no lamps, no shelves, no objects, no text. Everything outside the marked band stays exactly as it is; do not change the framing or the scale."
+  },
+  "mask": {
+    "touchedFraction": 0.21333333333333335,
+    "editable": 745472,
+    "soft": 40960,
+    "protected": 2899968
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2048,
+      "height": 1800
+    },
+    "target": {
+      "width": 2032,
+      "height": 1808
+    },
+    "aspectError": 0.012353455818022772,
+    "reason": "la zona con contexto ocupa 78 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0878,
+    "basis": "1 × salida 2032x1808 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 18.497,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.76,
+        "bestError": 5.76,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 2899968,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 745472,
+        "maxDelta": 240,
+        "meanDelta": 18.968,
+        "worst": {
+          "x": 21,
+          "y": 52
+        }
+      },
+      "seam": {
+        "pixels": 40960,
+        "maxDelta": 216,
+        "meanDelta": 9.928,
+        "worst": {
+          "x": 76,
+          "y": 364
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2899968,
+        "maxDelta": 244,
+        "meanDelta": 16.091,
+        "worst": {
+          "x": 665,
+          "y": 1060
+        }
+      },
+      "outputUsd": 0.0878,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1605,
+        "input_tokens_details": {
+          "image_tokens": 1476,
+          "text_tokens": 129
+        },
+        "output_tokens": 2928,
+        "output_tokens_details": {
+          "image_tokens": 2928,
+          "text_tokens": 0
+        },
+        "total_tokens": 4533
+      },
+      "meta": {
+        "size": "2032x1808",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

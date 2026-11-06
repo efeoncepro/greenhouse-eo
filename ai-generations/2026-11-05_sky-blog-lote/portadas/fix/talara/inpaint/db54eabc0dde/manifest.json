@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "db54eabc0dde",
+  "key": "db54eabc0dde566c0c75202ca959fa577754025c42062cb2d6234422b1b6257f",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:04:56.473Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/maestros-r/talara-img1-maestro.png",
+    "imageSha256": "d2cd5c70991122a4d2c4019a2594bd0d6aeb6cef3448e8fa7ccd0ae71a034fd0",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/talara-mask.png",
+    "maskSha256": "21078b20d821730bca50f4310220fdfd3af11cf75042dbf903977fd9b9ea3466",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "beyond the same wooden railing of the hilltop viewpoint, the town of Talara continues downhill toward the bay: rooftops, streets and small trees seen from above, filling the view behind the railing, with no bare earth bank; the wooden railing stays exactly the same; same afternoon light",
+    "providerPrompt": "beyond the same wooden railing of the hilltop viewpoint, the town of Talara continues downhill toward the bay: rooftops, streets and small trees seen from above, filling the view behind the railing, with no bare earth bank; the wooden railing stays exactly the same; same afternoon light"
+  },
+  "mask": {
+    "touchedFraction": 0.10617380401234568,
+    "editable": 761854,
+    "soft": 118794,
+    "protected": 7413752
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 74 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 75.6,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.69,
+        "bestError": 7.69,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7413752,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 761854,
+        "maxDelta": 246,
+        "meanDelta": 81.946,
+        "worst": {
+          "x": 3630,
+          "y": 804
+        }
+      },
+      "seam": {
+        "pixels": 118794,
+        "maxDelta": 230,
+        "meanDelta": 34.9,
+        "worst": {
+          "x": 2984,
+          "y": 1015
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7413752,
+        "maxDelta": 248,
+        "meanDelta": 15.36,
+        "worst": {
+          "x": 3366,
+          "y": 1053
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1582,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 74
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3425
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

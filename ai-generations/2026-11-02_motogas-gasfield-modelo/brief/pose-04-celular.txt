@@ -1,0 +1,5 @@
+Expression: friendly and helpful, open smile, eyes looking at the camera.
+
+POSE AND CAMERA: holding a modern gray smartphone with thin bezels in the left hand, the screen turned toward the viewer and showing only a plain dark blue glowing screen with no text, the right arm raised with the thumb up. THREE-QUARTER VIEW from the front left, eye level.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. Every prop touches the character or is held by it; nothing floats loose. Props carry no letters, numbers or logos. The whole figure fully visible with generous margin, centered.

@@ -1,0 +1,128 @@
+{
+  "id": "colan",
+  "notion_url": "https://app.notion.com/p/40239c2fefe7814b9c16f57e26446148",
+  "titulo": "Playa Colán: cómo llegar desde Piura y por qué elegirla este verano",
+  "slug": "/playa-colan/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de mañana · orienta",
+      "registro": "D",
+      "archivo": "playa-colan-bahia-casonas-pilotes-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando por la orilla de la playa Colán, en Piura, frente a casonas de madera sobre pilotes y un mar verde quieto",
+      "que_muestra": "la orilla ancha y casi plana de la playa Colán, con el mar verde azulado sin olas; a un lado, una hilera de casonas de madera levantadas sobre pilotes frente al agua. Una viajera camina por la orilla con el agua a los tobillos, alejándose. Tienen que leerse a la vez el mar quieto y las casas sobre pilotes.",
+      "hora_clima": "media mañana (el baño del relato); sol alto y cielo despejado; luz natural abundante, sombras abiertas, agua con color verde conservado, maderas con detalle",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, caminando sin pose ni mirada al lente; si aparecen bañistas, lejanos y pequeños; ningún rostro identificable en primer plano",
+      "primer_plano": "el borde de una ola mínima sobre la arena mojada, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera",
+      "ancla_pov": "caminas mar adentro un buen rato y el agua todavía no te pasa de la cintura",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de hoteles, restaurantes ni casas de alquiler reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin olas rompiendo",
+        "sin edificios de concreto dominando el fondo",
+        "sin motos de agua en primer plano"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa Colán con las casonas sobre pilotes en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la línea de casonas sobre pilotes y el mar quieto tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «La iglesia aparece casi de golpe…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "frente a un edificio patrimonial · persona sola · escala media · luz de mediodía",
+      "registro": "E",
+      "archivo": "iglesia-san-lucas-colan-viajero-fachada.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero frente a la fachada de la iglesia San Lucas de Colán, en Piura, con el mar al fondo",
+      "que_muestra": "la fachada de la iglesia San Lucas de Colán completa, sin recortar su frontis ni su remate superior, con el mar visible a un costado; un viajero de pie, de espaldas, mira la fachada desde unos metros. El contenido es la relación iglesia–playa: si el mar no se lee en el cuadro, la imagen pierde su sentido.",
+      "hora_clima": "cerca del mediodía, después del baño del relato; sol alto, cielo despejado; luz natural abundante, sombras abiertas, fachada con detalle sin quemar y con los colores que muestre la referencia real",
+      "personas": "fotografía un acompañante desde unos pasos atrás; el viajero, de espaldas, mira la fachada; nadie mira al lente; ropa ligera de playa, sin logos; ningún rostro identificable; sin fieles ni ceremonias en curso",
+      "primer_plano": "una rama de algarrobo o el borde de un muro bajo, muy cerca del lente y muy fuera de foco, por el borde superior o lateral, sin tapar la fachada",
+      "ancla_pov": "un templo colonial frente a una playa de verano",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni placas legibles",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cambiar la arquitectura de la iglesia (ni torres, ni colores, ni ornamentos que no tenga)",
+        "sin andamios inventados"
+      ],
+      "fidelidad": "edificio patrimonial identificable → requiere foto real REF-01 actual de la fachada de la iglesia San Lucas de Colán en la tarea antes de generar (si no, Bloqueado); la arquitectura debe coincidir con la referencia"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Al final de la tarde, sentado en la terraza de madera de una casona…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + POV desde la terraza",
+      "modificadores": "persona sola · escala media · luz de atardecer",
+      "registro": "E",
+      "archivo": "colan-casona-pilotes-marea-alta-atardecer.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Agua de marea alta corriendo bajo los pilotes de una casona de madera en Colán al atardecer, vista desde su terraza",
+      "que_muestra": "desde la terraza de madera de una casona, mirando hacia abajo y hacia el mar: los tablones del piso en la parte baja del cuadro, la baranda, y debajo, entre los pilotes de algarrobo, el agua de la marea alta; al fondo, la bahía con el sol bajo. Lo que demuestra es que el mar llega hasta debajo de las casas: si no hay agua bajo los pilotes, la imagen no sirve.",
+      "hora_clima": "atardecer, con el sol todavía sobre el horizonte (la tarde del relato); cielo despejado; luz cálida abundante, sombras abiertas sobre la madera, cielo sin quemar",
+      "personas": "fotografía el propio viajero, sentado en la terraza; en cuadro solo sus pies descalzos apoyados en el tablón; ninguna otra persona cerca; ningún rostro",
+      "primer_plano": "el borde de la baranda de madera, muy cerca del lente y muy fuera de foco, por un lateral, sin tapar el agua bajo los pilotes",
+      "ancla_pov": "La marea sube y el mar se mete entre los pilotes, con un rumor suave que no se parece al de una ola",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos ni nombres de casas o restaurantes reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin piscinas ni mobiliario de resort",
+        "sin bebidas con marca",
+        "sin pilotes de concreto (son de algarrobo)"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una casona sobre pilotes de Colán con marea alta en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "PIU",
+      "ciudad": "Piura"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-piura",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Agua quieta y casonas sobre pilotes",
+    "cta": "Ver vuelos a Piura",
+    "archivo": "banner-ruta-lima-piura-colan.webp",
+    "alt": "Banner de SKY de la ruta Lima–Piura: agua quieta y casonas sobre pilotes",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "lobos marinos en isla Foca — excursión secundaria, exige fidelidad de fauna y ya hay guía propia en el blog",
+    "motonáutica en la bahía — marcas y ruido visual; contradice la calma del artículo",
+    "caleta de Paita con barcos — rótulos y nombres pintados de embarcaciones reales",
+    "atardecer puro sobre la bahía — postal intercambiable",
+    "interior de la iglesia — requiere permiso y fidelidad de un espacio de culto"
+  ]
+}

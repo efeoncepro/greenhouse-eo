@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "c86db06e83f8",
+  "key": "c86db06e83f85fddfea6642954f1c96ca54ce7c02777d42e27d8306ffb4ec69f",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:14:21.386Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/tipos-equipaje/img3-maestro.png",
+    "imageSha256": "49afa27790bf9632c589415b4438a8df5c10f3bf707e8c5c50e7e587073f81d8",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3c-mask.png",
+    "maskSha256": "09c99440baad283986b6325b0591924caf3a38aa8c1efe1c3fcbdfff375e9a92",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "The bottom of the same tall charcoal-grey ribbed suitcase standing on the check-in conveyor belt: its lower edge is complete and its four black spinner wheels are fully solid and opaque, each wheel resting on the dark rubber belt with a small contact shadow; the belt surface and the steel rails continue exactly as around this area. Nothing transparent, nothing faded. Same light, colour and focus.",
+    "providerPrompt": "The bottom of the same tall charcoal-grey ribbed suitcase standing on the check-in conveyor belt: its lower edge is complete and its four black spinner wheels are fully solid and opaque, each wheel resting on the dark rubber belt with a small contact shadow; the belt surface and the steel rails continue exactly as around this area. Nothing transparent, nothing faded. Same light, colour and focus."
+  },
+  "mask": {
+    "touchedFraction": 0.05610894097222222,
+    "editable": 0,
+    "soft": 465390,
+    "protected": 7829010
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 33 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 11.342,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.55,
+        "bestError": 3.55,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7829010,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 465390,
+        "maxDelta": 177,
+        "meanDelta": 11.342,
+        "worst": {
+          "x": 2862,
+          "y": 1573
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7829010,
+        "maxDelta": 194,
+        "meanDelta": 7.749,
+        "worst": {
+          "x": 3712,
+          "y": 607
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1601,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 93
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3444
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

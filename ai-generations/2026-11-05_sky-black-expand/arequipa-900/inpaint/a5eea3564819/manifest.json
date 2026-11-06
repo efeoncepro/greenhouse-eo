@@ -1,0 +1,155 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a5eea3564819",
+  "key": "a5eea3564819ee599dd451a9732569efa6fb76780969799f14e5b56f12dcd6dc",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:28:51.732Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/arequipa-900/expand-inputs/0c6c1b50b8f0-canvas.png",
+    "imageSha256": "59320799a2edcc27b671bbe2bba4c63a9ab21c5159041ed2b4d372e59f370814",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/arequipa-900/expand-inputs/0c6c1b50b8f0-mask.png",
+    "maskSha256": "097b6b59f88ca014cf3c948d687eecc90dab0ad850d8edba421f58b0053d3e02",
+    "maskConvention": "white-editable",
+    "width": 900,
+    "height": 1600,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend the photo upward: continue the same clear blue sky above the white stone cathedral bell tower and the snow-capped Misti volcano, completing the tip of the tower spire naturally. Keep the existing photo exactly. No new objects, no birds, no text.",
+    "providerPrompt": "Extend the photo upward: continue the same clear blue sky above the white stone cathedral bell tower and the snow-capped Misti volcano, completing the tip of the tower spire naturally. Keep the existing photo exactly. No new objects, no birds, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3875,
+    "editable": 468900,
+    "soft": 89100,
+    "protected": 882000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 900,
+      "height": 1600
+    },
+    "target": {
+      "width": 896,
+      "height": 1600
+    },
+    "aspectError": 0.004464285714285619,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0266,
+    "basis": "1 × salida 896x1600 medium (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 88.896,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.48,
+        "bestError": 7.48,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 882000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 468900,
+        "maxDelta": 255,
+        "meanDelta": 104.6,
+        "worst": {
+          "x": 533,
+          "y": 2
+        }
+      },
+      "seam": {
+        "pixels": 89100,
+        "maxDelta": 217,
+        "meanDelta": 6.25,
+        "worst": {
+          "x": 613,
+          "y": 521
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 882000,
+        "maxDelta": 209,
+        "meanDelta": 15.188,
+        "worst": {
+          "x": 398,
+          "y": 1465
+        }
+      },
+      "outputUsd": 0.0266,
+      "providerModel": "gpt-image-2.6-flare",
+      "usage": {
+        "input_tokens": 1501,
+        "input_tokens_details": {
+          "image_tokens": 1400,
+          "text_tokens": 101
+        },
+        "output_tokens": 885,
+        "output_tokens_details": {
+          "image_tokens": 885,
+          "text_tokens": 0
+        },
+        "total_tokens": 2386
+      },
+      "meta": {
+        "size": "896x1600",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "expand": {
+    "source": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/556be26d-0508-40ae-90b2-998711ee8289/scratchpad/kvhm-canvas/expand/AREQUIPA_crop900.png",
+    "sourceSha256": "12789448cd706ef8134956eba82920cac6aaed24f72f0fadc7197774b8f6767a",
+    "to": null,
+    "plan": {
+      "canvas": {
+        "width": 900,
+        "height": 1600
+      },
+      "scene": {
+        "left": 0,
+        "top": 520,
+        "width": 900,
+        "height": 1080
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 100
+  }
+}

@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "the edge of a plaza bench",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "cusco-calma",
+ "input": {
+  "id": "cusco-calma",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Plaza de Armas of Cusco, Peru",
+  "escena": "the plaza nearly empty in the first hour of the morning, with the stone facade of the Cathedral and its two towers complete at the back and the hills behind; a woman traveler in warm clothes crosses the plaza diagonally holding a cup of hot drink; a few small distant people sweep, cross or open a door. It must read as a city just waking up, not an agency postcard",
+  "hora": "first hour of the morning",
+  "clima": "cold air, clear dry-season sky, low luminous light with long but open shadows, highlights of stone and sky retained",
+  "primerPlano": "the edge of a plaza bench",
+  "borde": "lower-left corner",
+  "refLugar": "the Plaza de Armas of Cusco with its Cathedral facade, towers, fountain and surrounding colonial arcades",
+  "prohibir": "people posing in traditional costume as decoration, llamas in the plaza, cropped or deformed Cathedral, readable shop signs",
+  "extra": "COMPOSITION, MEASURED: the Cathedral facade with both towers complete sits in the upper half, between 14% and 48% of the frame height and between 25% and 75% of the width, never touching the top edge (sky above the crosses). The woman crossing the plaza is small, at 35–48% of the height. The lower half is the calm plaza paving and the out-of-focus bench edge, mid-dark. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

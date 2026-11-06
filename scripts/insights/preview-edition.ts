@@ -152,6 +152,9 @@ const main = async () => {
 
   console.log(`${report.reportCode} · ${content.facts.length} hechos · ${content.rejections.length} rechazos · ${violations.length} violaciones`)
 
+  // Cada rechazo con su motivo: un capítulo que sale corto casi siempre es una fuente que falló, y sin esto no se ve cuál.
+  for (const rejection of content.rejections) console.log(`  · ${rejection.module}/${rejection.metricId ?? '—'}: ${rejection.reason} — ${rejection.detail}`)
+
   // Un plan que el validador rechaza no se compone: producción tampoco lo haría.
   if (violations.length > 0) {
     for (const violation of violations) console.log(`  ✗ ${violation.where}: ${violation.detail}`)

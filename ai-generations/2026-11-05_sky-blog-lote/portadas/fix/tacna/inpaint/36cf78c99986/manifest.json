@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "36cf78c99986",
+  "key": "36cf78c99986744e8910ee5b547139bb3f15e98239e96a29d4ac7ddb102762df",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:07:47.573Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/tacna/img1-maestro.png",
+    "imageSha256": "99e57cefed2d7f4552715c484bde63fb1c1b4908d0ae12da2c25409a4d4d7665",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/tacna-mask.png",
+    "maskSha256": "a9f9c6c407ad5de7b72068a1bc7a2e67dd0fc9f6608df7244968b32c6d8c0a8f",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same man walking away on the stone plaza: his lower legs and his walking shoes complete and standing on the paving, natural leg length, with a soft short shadow under the shoes; same light",
+    "providerPrompt": "the same man walking away on the stone plaza: his lower legs and his walking shoes complete and standing on the paving, natural leg length, with a soft short shadow under the shoes; same light"
+  },
+  "mask": {
+    "touchedFraction": 0.006834370177469136,
+    "editable": 42423,
+    "soft": 14264,
+    "protected": 8237713
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1774,
+      "top": 1077,
+      "width": 545,
+      "height": 481
+    },
+    "target": {
+      "width": 1088,
+      "height": 960
+    },
+    "aspectError": 0.0002445884798825649,
+    "reason": "la zona con contexto ocupa 3.1 % de la imagen: se genera recortada a 1088x960"
+  },
+  "estimate": {
+    "usd": 0.0461,
+    "basis": "1 × salida 1088x960 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 29.962,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 10.15,
+        "bestError": 10.15,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 8237713,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 42423,
+        "maxDelta": 240,
+        "meanDelta": 36.871,
+        "worst": {
+          "x": 2050,
+          "y": 1287
+        }
+      },
+      "seam": {
+        "pixels": 14264,
+        "maxDelta": 135,
+        "meanDelta": 9.415,
+        "worst": {
+          "x": 2012,
+          "y": 1227
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 8237713,
+        "maxDelta": 140,
+        "meanDelta": 0.362,
+        "worst": {
+          "x": 1802,
+          "y": 1253
+        }
+      },
+      "outputUsd": 0.0461,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1075,
+        "input_tokens_details": {
+          "image_tokens": 1020,
+          "text_tokens": 55
+        },
+        "output_tokens": 1535,
+        "output_tokens_details": {
+          "image_tokens": 1535,
+          "text_tokens": 0
+        },
+        "total_tokens": 2610
+      },
+      "meta": {
+        "size": "1088x960",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

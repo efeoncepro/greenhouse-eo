@@ -1,0 +1,408 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "F08b-reportes",
+  "input": {
+    "artifactId": "F08b-reportes",
+    "slides": [
+      {
+        "slideId": "deck-content-report-formats",
+        "contentType": "deck.content-report-formats",
+        "slots": {
+          "frame": {
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "eyebrowTop": 230,
+            "questionTop": 285,
+            "answerTop": 351,
+            "answerPx": 124,
+            "answerLeading": "--gl-ls-answer-leading=0.95",
+            "answerTracking": "--gl-ls-answer-tracking=-0.035em",
+            "answerInset": "--gl-ls-answer-inset=0px",
+            "questionWidth": "--gl-ls-question-width=640px",
+            "bodyTop": 627,
+            "bodyPx": 26,
+            "bodyWidth": 600,
+            "lumWidth": "--gl-lum-width=160px",
+            "lumBottom": "--gl-lum-bottom=62px",
+            "svBg": "--gl-sv-bg-color=#091951",
+            "svSoft": "--gl-sv-soft-color=#cfe4fa",
+            "svMuted": "--gl-sv-muted-color=#c9d6e2",
+            "svHalo": "--gl-sv-halo-color=#72ded8",
+            "svTealDark": "--gl-sv-teal-dark-color=#0e8c82",
+            "svShadow": "--gl-sv-shadow-color=#000610",
+            "svCardTo": "--gl-sv-card-to-color=#081c30",
+            "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+            "svMiniHeroFrom": "--gl-sv-mini-hero-from-color=#0f4a6e",
+            "svHeroCardTo": "--gl-sv-hero-card-to-color=#0a2640",
+            "svDocTo": "--gl-sv-doc-to-color=#f3f6fa",
+            "svDocInk": "--gl-sv-doc-ink-color=#023c70",
+            "svDocMuted": "--gl-sv-doc-muted-color=#5b6b82",
+            "svDocPanel": "--gl-sv-doc-panel-color=#eef3f9",
+            "svDocBar": "--gl-sv-doc-bar-color=#d3dce8",
+            "svDocDash": "--gl-sv-doc-dash-color=#8a9bb3",
+            "svDocNote": "--gl-sv-doc-note-color=#e8f2fd"
+          },
+          "stage": {
+            "src": "asset-ref:layer:srf-stage"
+          },
+          "beams": {
+            "src": "asset-ref:layer:srf-beams"
+          },
+          "voice": {
+            "question": "El tablero comercial se arma",
+            "answer": "Solo",
+            "eyebrow": "Reportes y dashboards"
+          },
+          "body": "Actividad por vendedor, clientes activos e inactivos y oportunidades por país, al día y con <strong>exportación a Excel</strong>.",
+          "report": {
+            "label": "Tablero comercial · datos de muestra",
+            "trendTitle": "Ganadas vs. meta · 6 meses",
+            "rankingTitle": "Pipeline por país",
+            "reading": "China concentra el pipeline. Dos clientes de España llevan 60 días sin contacto: ya tienen su tarea."
+          },
+          "kpis": [
+            {
+              "label": "Oportunidades abiertas",
+              "value": "48",
+              "delta": "▲ 6"
+            },
+            {
+              "label": "Ganadas en el trimestre",
+              "value": "12",
+              "delta": "▲ 3"
+            },
+            {
+              "label": "Clientes activos",
+              "value": "214",
+              "delta": "▲ 9"
+            }
+          ],
+          "ranking": [
+            {
+              "name": "China",
+              "share": "38%",
+              "bar": "--gl-srf-bar=100%",
+              "role": "lead"
+            },
+            {
+              "name": "Japón",
+              "share": "27%",
+              "bar": "--gl-srf-bar=71.05%",
+              "role": "rest"
+            },
+            {
+              "name": "España",
+              "share": "21%",
+              "bar": "--gl-srf-bar=55.26%",
+              "role": "rest"
+            },
+            {
+              "name": "EE. UU.",
+              "share": "14%",
+              "bar": "--gl-srf-bar=36.84%",
+              "role": "rest"
+            }
+          ],
+          "formats": [
+            {
+              "icon": "asset-ref:icon:correo-revenue-hubspot-dark-40",
+              "title": "Correo",
+              "detail": "Cada lunes",
+              "role": "rest"
+            },
+            {
+              "icon": "asset-ref:icon:web-revenue-hubspot-dark-40",
+              "title": "Web y móvil",
+              "detail": "En terreno",
+              "role": "rest"
+            },
+            {
+              "icon": "asset-ref:icon:presentacion-revenue-hubspot-dark-40",
+              "title": "Dashboard",
+              "detail": "Para el comité",
+              "role": "lead"
+            },
+            {
+              "icon": "asset-ref:icon:contrato-revenue-hubspot-dark-40",
+              "title": "PDF",
+              "detail": "Para circular",
+              "role": "rest"
+            },
+            {
+              "icon": "asset-ref:icon:informe-revenue-hubspot-dark-40",
+              "title": "Presentación",
+              "detail": "Lista para la gerencia",
+              "role": "rest"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-report-formats",
+      "contentType": "deck.content-report-formats",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 230,
+          "questionTop": 285,
+          "answerTop": 351,
+          "answerPx": 124,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.035em",
+          "answerInset": "--gl-ls-answer-inset=0px",
+          "questionWidth": "--gl-ls-question-width=640px",
+          "bodyTop": 627,
+          "bodyPx": 26,
+          "bodyWidth": 600,
+          "lumWidth": "--gl-lum-width=160px",
+          "lumBottom": "--gl-lum-bottom=62px",
+          "svBg": "--gl-sv-bg-color=#091951",
+          "svSoft": "--gl-sv-soft-color=#cfe4fa",
+          "svMuted": "--gl-sv-muted-color=#c9d6e2",
+          "svHalo": "--gl-sv-halo-color=#72ded8",
+          "svTealDark": "--gl-sv-teal-dark-color=#0e8c82",
+          "svShadow": "--gl-sv-shadow-color=#000610",
+          "svCardTo": "--gl-sv-card-to-color=#081c30",
+          "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+          "svMiniHeroFrom": "--gl-sv-mini-hero-from-color=#0f4a6e",
+          "svHeroCardTo": "--gl-sv-hero-card-to-color=#0a2640",
+          "svDocTo": "--gl-sv-doc-to-color=#f3f6fa",
+          "svDocInk": "--gl-sv-doc-ink-color=#023c70",
+          "svDocMuted": "--gl-sv-doc-muted-color=#5b6b82",
+          "svDocPanel": "--gl-sv-doc-panel-color=#eef3f9",
+          "svDocBar": "--gl-sv-doc-bar-color=#d3dce8",
+          "svDocDash": "--gl-sv-doc-dash-color=#8a9bb3",
+          "svDocNote": "--gl-sv-doc-note-color=#e8f2fd"
+        },
+        "stage": {
+          "src": "asset-ref:layer:srf-stage"
+        },
+        "beams": {
+          "src": "asset-ref:layer:srf-beams"
+        },
+        "voice": {
+          "question": "El tablero comercial se arma",
+          "answer": "Solo",
+          "eyebrow": "Reportes y dashboards"
+        },
+        "body": "Actividad por vendedor, clientes activos e inactivos y oportunidades por país, al día y con <strong>exportación a Excel</strong>.",
+        "report": {
+          "label": "Tablero comercial · datos de muestra",
+          "trendTitle": "Ganadas vs. meta · 6 meses",
+          "rankingTitle": "Pipeline por país",
+          "reading": "China concentra el pipeline. Dos clientes de España llevan 60 días sin contacto: ya tienen su tarea."
+        },
+        "kpis": [
+          {
+            "label": "Oportunidades abiertas",
+            "value": "48",
+            "delta": "▲ 6"
+          },
+          {
+            "label": "Ganadas en el trimestre",
+            "value": "12",
+            "delta": "▲ 3"
+          },
+          {
+            "label": "Clientes activos",
+            "value": "214",
+            "delta": "▲ 9"
+          }
+        ],
+        "ranking": [
+          {
+            "name": "China",
+            "share": "38%",
+            "bar": "--gl-srf-bar=100%",
+            "role": "lead"
+          },
+          {
+            "name": "Japón",
+            "share": "27%",
+            "bar": "--gl-srf-bar=71.05%",
+            "role": "rest"
+          },
+          {
+            "name": "España",
+            "share": "21%",
+            "bar": "--gl-srf-bar=55.26%",
+            "role": "rest"
+          },
+          {
+            "name": "EE. UU.",
+            "share": "14%",
+            "bar": "--gl-srf-bar=36.84%",
+            "role": "rest"
+          }
+        ],
+        "formats": [
+          {
+            "icon": "asset-ref:icon:correo-revenue-hubspot-dark-40",
+            "title": "Correo",
+            "detail": "Cada lunes",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:web-revenue-hubspot-dark-40",
+            "title": "Web y móvil",
+            "detail": "En terreno",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:presentacion-revenue-hubspot-dark-40",
+            "title": "Dashboard",
+            "detail": "Para el comité",
+            "role": "lead"
+          },
+          {
+            "icon": "asset-ref:icon:contrato-revenue-hubspot-dark-40",
+            "title": "PDF",
+            "detail": "Para circular",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:informe-revenue-hubspot-dark-40",
+            "title": "Presentación",
+            "detail": "Lista para la gerencia",
+            "role": "rest"
+          }
+        ]
+      },
+      "template": "ContentReportFormats",
+      "contractHash": "f062df01034ea8900c5e1de37fc76c1c15e68f7d718a20c0b38d01c2d916c039",
+      "templateHash": "a7326713cd25e786080e388ea5d98fe108cd8e195497069cbedcac878271b175"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

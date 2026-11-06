@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "29b7bc019199",
+  "key": "29b7bc019199a1ebd293aec809f8ad5aa81c9ff2f7499ef526decf2cbeca9787",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:24:08.504Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/punta-cana/img1-maestro.png",
+    "imageSha256": "3a6aeb70bc53d98e011df1465ae2af773402b48f2dcee2bb095299305599aac5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/puntacana-hz2-mask.png",
+    "maskSha256": "3247afd19d75a976d37d8168d5a07c3072fdd8afd8a85693427f37311eed8589",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same open Caribbean sea continuing calm and turquoise up to a clean, straight, empty horizon under the same blue sky with the same soft clouds; the horizon is ONE perfectly straight, level line at exactly the same height across the whole width, continuous with the horizon at the edges of this area; nothing on the water and nothing in the air in this area: no island, no boats, no parasails, no kites, no birds; same light and colour",
+    "providerPrompt": "the same open Caribbean sea continuing calm and turquoise up to a clean, straight, empty horizon under the same blue sky with the same soft clouds; the horizon is ONE perfectly straight, level line at exactly the same height across the whole width, continuous with the horizon at the edges of this area; nothing on the water and nothing in the air in this area: no island, no boats, no parasails, no kites, no birds; same light and colour"
+  },
+  "mask": {
+    "touchedFraction": 0.08689284336419753,
+    "editable": 0,
+    "soft": 720724,
+    "protected": 7573676
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 88 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 21.433,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.49,
+        "bestError": 3.49,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7573676,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 720724,
+        "maxDelta": 253,
+        "meanDelta": 21.433,
+        "worst": {
+          "x": 2465,
+          "y": 533
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7573676,
+        "maxDelta": 255,
+        "meanDelta": 15.83,
+        "worst": {
+          "x": 3,
+          "y": 540
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1617,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 109
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3460
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

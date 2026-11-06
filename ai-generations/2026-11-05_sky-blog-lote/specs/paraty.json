@@ -1,0 +1,133 @@
+{
+  "id": "paraty",
+  "notion_url": "https://app.notion.com/47163f0fe1cf47688346249e58883422",
+  "titulo": "Paraty, Brasil: por qué ir y cómo organizar tu primera visita",
+  "slug": "/paraty/",
+  "mercado": "CL",
+  "version": "v2 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + D — POV de recorrido",
+      "modificadores": "a la altura de los ojos, como quien acaba de salir a caminar · una o dos personas a lo lejos · escala media · luz temprana · orienta",
+      "registro": "D",
+      "archivo": "paraty-centro-historico-calle-de-piedra-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Calle empedrada del centro histórico de Paraty, húmeda en la mañana, con casas coloniales blancas de puertas y ventanas de colores",
+      "que_muestra": "una calle de pé-de-moleque húmeda, con reflejos suaves, que se aleja entre casas coloniales blancas de puertas y ventanas azules, verdes o amarillas; al fondo de la calle se intuye el mar.",
+      "hora_clima": "temprano en la mañana, con las tiendas a medio abrir (la salida del relato); si el cielo está cubierto, se mantiene y se abren sombras; luz abundante, altas luces conservadas en fachadas blancas y reflejos",
+      "personas": "una o dos personas caminando a lo lejos o abriendo una puerta, en acción espontánea, sin mirar a cámara; ningún rostro identificable en primer plano",
+      "primer_plano": "hojas de una planta en maceta junto a una puerta, muy cerca del lente y muy fuera de foco, en la esquina inferior, sin tapar la calle",
+      "ancla_pov": "las piedras son grandes, redondeadas y desparejas, y algunas siguen frescas y húmedas bajo la suela",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin autos estacionados",
+        "sin cables ni antenas en primer plano",
+        "sin calle inundada (la marea ya bajó)"
+      ],
+      "fidelidad": "sitio Patrimonio Mundial identificable → foto real REF-01 del centro histórico; REF ya adjuntas en la tarea de la pieza (imagen producida y adjunta en la versión del 06/10/2026: revisarla contra este callout antes de aprobar)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; en el cuadrado tienen que sobrevivir la calle de piedra y al menos dos fachadas completas. Punto focal en el tercio central; dejar la mitad superior despejada para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Embarcas a media mañana en el muelle del centro…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la borda de un saveiro · otro pasajero integrado · escala media · luz de media mañana · explica",
+      "registro": "E",
+      "archivo": "paraty-bahia-agua-transparente-saveiro.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Agua verde y transparente de la bahía de Paraty vista desde la borda de un barco de madera, con una isla con selva al fondo",
+      "que_muestra": "la vista desde la borda de un barco de madera hacia el agua verde y transparente, con el fondo visible y algún pez; al fondo, una isla cubierta de selva hasta la arena. El cambio de color del agua es el contenido.",
+      "hora_clima": "media mañana, cielo despejado y mar calmo (el día de bahía del relato); sombras abiertas, altas luces conservadas en los reflejos; verdes y azules naturales, sin saturación de postal",
+      "personas": "fotografía el viajero asomado a la borda, mirando hacia abajo; otro pasajero, de perfil o de espaldas, mira el agua o fotografía la isla; el conductor del barco no aparece; nadie mira al lente ni posa",
+      "primer_plano": "el borde de madera de la borda y un tramo de cuerda, muy cerca del lente y muy fuera de foco, en la esquina inferior, sin tapar el agua",
+      "ancla_pov": "el agua cambia de color: primero gris verdoso y después un verde tan transparente que ves los peces debajo del casco",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin nombre ni logo de barcos u operadores",
+        "sin parlantes a la vista",
+        "sin vista aérea ni de dron",
+        "sin agua de color irreal"
+      ],
+      "fidelidad": "si se identifica una isla o playa concreta, REF-01 real obligatoria; si no, isla genérica coherente con la Mata Atlántica; REF aproximadas ya adjuntas en la tarea (imagen producida y adjunta en la versión del 06/10/2026: revisarla contra este callout antes de aprobar)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «En la Cachoeira do Tobogã, el agua corre sobre una roca lisa…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + B — Viajero integrado",
+      "modificadores": "a la orilla de la poza, mirando la roca hacia arriba · una persona sentada en el borde · escala media · luz de día bajo la selva · demuestra",
+      "registro": "E",
+      "archivo": "paraty-cachoeira-toboga-roca-lisa.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Cachoeira do Tobogã en Paraty: agua corriendo sobre una roca lisa hasta una poza rodeada de Mata Atlántica",
+      "que_muestra": "la lámina de agua que baja sobre la roca lisa y larga del Tobogã hasta la poza, con la Mata Atlántica alrededor. La forma de la roca es el argumento: si no se lee como resbalín natural, la imagen no sirve.",
+      "hora_clima": "de día, con el sol en franjas entre los árboles (la subida del relato); sin lluvia y con el río en nivel normal; sombras abiertas, altas luces conservadas en el agua blanca; verdes naturales y piedra con su color real",
+      "personas": "fotografía el viajero de pie en la orilla de la poza, mirando la roca hacia arriba antes de meterse; una persona sentada en el borde de la poza mira el agua, de espaldas o de perfil; nadie se tira por la roca; ningún rostro identificable",
+      "primer_plano": "hojas de helecho de la Mata Atlántica muy cerca del lente y muy fuera de foco, en un costado, sin tapar la roca",
+      "ancla_pov": "el agua corre sobre una roca lisa y larga, como un resbalín natural, y termina en una poza",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin personas tirándose por la roca ni haciendo acrobacias",
+        "sin agua turbia ni río crecido",
+        "sin letreros del bar o del restaurante cercanos",
+        "sin roca inventada"
+      ],
+      "fidelidad": "lugar real e identificable → foto real REF-01 del Tobogã obligatoria; REF ya adjuntas en la tarea (imagen producida y adjunta en la versión del 06/10/2026: revisarla contra este callout antes de aprobar; sin REF, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.foto",
+    "ruta_texto": "Santiago (SCL) → Río de Janeiro (GIG) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "titular": "Calles de piedra y bahía verde",
+    "cta": "Ver vuelos a Río de Janeiro",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-rio-de-janeiro",
+    "archivo": "banner-ruta-santiago-rio-de-janeiro-paraty.webp",
+    "alt": "Banner de SKY: ruta de Santiago a Río de Janeiro, camino a las calles de piedra y la bahía de Paraty",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo; la mitad foto sale de IMG 1 (calle de piedra) recortada del maestro aprobado, sin texto encima",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "GIG",
+      "ciudad": "Río de Janeiro"
+    },
+    "home_market": "CHL",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)"
+  },
+  "descartes": [
+    "El mar entrando por las calles del centro — repite el centro de la portada y solo pasa con ciertas mareas",
+    "El Saco do Mamanguá desde el barco — compite con IMG 2",
+    "El plato de azul-marinho — intercambiable con otros artículos de comida",
+    "La Costa Verde desde la ventana del bus",
+    "La piscina natural de Trindade"
+  ]
+}

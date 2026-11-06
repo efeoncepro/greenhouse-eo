@@ -1,0 +1,9 @@
+Vertical 4:5 premium 3D advertising key visual for a Chilean gas shop, NO text anywhere.
+
+Scene: a deep saturated red studio set (from bright red #E01800 to deep crimson #7A0000 in the shadows), dramatic low-angle hero shot. A GIANT glossy red 3D alarm clock bursts toward the camera from the upper right of the frame, tilted, breaking through a red satin backdrop that tears open behind it. The clock has two golden bells shaped like small royal crowns on top and a golden striker between them; a clean white dial with only twelve short gold tick marks (no numbers, no letters) and gold hands pointing at ten o'clock. Frozen mid-air around it: shiny gold coins, small gold crown-shaped confetti, red satin shreds and a few glowing sparks, some close to the lens and out of focus for depth.
+
+Lighting and render: strong warm key light from the upper right, golden rim light on the clock, soft volumetric glow behind it, glossy lacquered red and polished gold materials, crisp detail, Octane or Redshift advertising render quality, cinematic depth of field, high contrast, explosive energy.
+
+Layout reserves (keep them clean, calm deep red with a soft gradient, no objects): the TOP 16% of the frame for a logo, and the LEFT 62% of the frame from 28% to 88% of the height for large text. The clock and the burst live in the upper right and right side; debris may cross the edges but not the reserved text area.
+
+No text, no letters, no numbers, no logos, no characters, no people.

@@ -1,0 +1,23 @@
+{
+ "registro": "D",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the edge of the open suitcase",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "liquidos-v2",
+ "input": {
+  "id": "liquidos-v2",
+  "registro": "D",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "table in an ordinary home",
+  "escena": "from the traveler's own eyes, both hands slip a small bottle into a clear resealable plastic bag, held up in the upper half of the frame above the table; around it a small perfume bottle, a tube of cream and a travel shampoo without labels, and beside it an open carry-on suitcase with folded clothes. It reads as packing the liquids bag before a trip, not as a product still life",
+  "hora": "afternoon the day before the trip",
+  "clima": "indoors, abundant natural window light, open shadows, natural colour",
+  "primerPlano": "the edge of the open suitcase",
+  "borde": "bottom edge",
+  "prohibir": "readable text or logos on bottles, tubes or suitcase, recognisable perfume brands, invented millilitre figures on labels, industrial aerosols, cleaning products",
+  "extra": "COMPOSITION, MEASURED: the hands and the clear bag sit only between 15% and 46% of the frame height, centred between 30% and 70% of the width; nothing touches the top edge, with wall or window visible above the hands. The lower half is the calm table top and the out-of-focus suitcase edge, mid-dark. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 50 mm equivalent, close lived detail of hands and objects, intimate without isolating them from the place."
+ }
+}

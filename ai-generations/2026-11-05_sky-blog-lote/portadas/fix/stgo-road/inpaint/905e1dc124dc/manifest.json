@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "905e1dc124dc",
+  "key": "905e1dc124dcb5c3fb593a4793f5fe144d09f3638310feacce84cf424dccef1c",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:17:49.648Z",
+  "inputs": {
+    "image": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/66df63af-b4e5-4d01-9321-b0f71385d38f/scratchpad/stgo1-feet.png",
+    "imageSha256": "abced97dbb967eb38c6df1e51051170c66924a6a9fd0fa52b1266532a21c04b6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/stgo-road-mask.png",
+    "maskSha256": "95de34ed9d3ec2c43ab18f06bb49e48bf2254e43c427eacb498966f266b90864",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "The same wide asphalt avenue continuing toward the camera, now in SHARP FOCUS all the way to the bottom of the frame: crisp asphalt texture, crisp white lane dashes in their same positions and perspective, the warm reflections of the street lamps on the slightly wet asphalt; no bokeh, no blur and no out-of-focus foreground on the road. Same dusk light and colour, no people added, no lettering.",
+    "providerPrompt": "The same wide asphalt avenue continuing toward the camera, now in SHARP FOCUS all the way to the bottom of the frame: crisp asphalt texture, crisp white lane dashes in their same positions and perspective, the warm reflections of the street lamps on the slightly wet asphalt; no bokeh, no blur and no out-of-focus foreground on the road. Same dusk light and colour, no people added, no lettering."
+  },
+  "mask": {
+    "touchedFraction": 0.3668605324074074,
+    "editable": 0,
+    "soft": 3042888,
+    "protected": 5251512
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 28.272,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 9.53,
+        "bestError": 9.53,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 5251512,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 3042888,
+        "maxDelta": 188,
+        "meanDelta": 28.272,
+        "worst": {
+          "x": 2853,
+          "y": 1870
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 5251512,
+        "maxDelta": 255,
+        "meanDelta": 32.274,
+        "worst": {
+          "x": 1221,
+          "y": 867
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1608,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 100
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3451
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

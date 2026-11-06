@@ -1,0 +1,132 @@
+{
+  "id": "copacabana",
+  "notion_url": "https://app.notion.com/1557ee7bebe14257833c60afa81e348e",
+  "titulo": "Año nuevo en Copacabana: cómo vivir el Réveillon en Río de Janeiro",
+  "slug": "/ano-nuevo-en-copacabana/",
+  "mercado": "CL",
+  "version": "v2 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + B — Viajero integrado",
+      "modificadores": "POV a la altura de los ojos desde la arena · personas ambientales · escala amplia · luz del final de la hora azul · orienta",
+      "registro": "D",
+      "archivo": "ano-nuevo-copacabana-arena-ropa-blanca-noche.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Playa de Copacabana de noche el 31 de diciembre, con personas vestidas de blanco en la arena hasta el Morro do Leme",
+      "que_muestra": "la curva de la playa de Copacabana hacia el Leme, con el Morro do Leme nítido al fondo; grupos vestidos de blanco repartidos por la arena, iluminados por la luz de la Av. Atlântica; el mar oscuro a la derecha y el cielo ya sin sol. Debe leerse como llegada a la arena, no como fiesta en su punto máximo.",
+      "hora_clima": "final de la hora azul del 31 de diciembre, cielo ya oscuro y sin sol (la llegada del gancho); noche despejada; luz urbana abundante sobre la arena, sombras abiertas y altas luces conservadas, sin inventar sol ni convertir la escena en día",
+      "personas": "grupos en acción espontánea (llegando, conversando, extendiendo una canga), de espaldas o de perfil; nadie posa ni mira al lente; ningún rostro identificable en primer plano",
+      "primer_plano": "arena con huellas muy cerca del lente y muy fuera de foco, en la esquina inferior, sin tapar el Morro do Leme",
+      "ancla_pov": "una marea de ropa blanca que se estira hasta el Leme y, sobre el mar, un cielo oscuro que espera la medianoche",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin el Copacabana Palace en cuadro",
+        "sin fuegos artificiales todavía",
+        "sin botellas ni copas de vidrio",
+        "sin grafitis ni letreros",
+        "sin reproducir la ceremonia a Iemanjá"
+      ],
+      "fidelidad": "lugar identificable → la curva de la playa, el Morro do Leme y el diseño del calçadão exigen foto real; REF-01a, 01b y 01c ya cargadas en la tarea de la pieza (la imagen está producida y adjunta en la versión del 14/10/2026: revisarla contra este callout antes de aprobar)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; tienen que sobrevivir los grupos de blanco, la curva de la playa y el Morro do Leme. Punto focal centro-izquierda; dejar aire en la mitad superior para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vas a tener que elegir entre dos noches distintas…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido + C — Acción espontánea",
+      "modificadores": "una persona que avanza delante · personas ambientales · escala media · luz de primeras horas de la noche · explica",
+      "registro": "E",
+      "archivo": "ano-nuevo-copacabana-elegir-lugar-arena.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Persona vestida de blanco camina por la arena de Copacabana de noche buscando un lugar para ver los fuegos de año nuevo",
+      "que_muestra": "la arena llenándose en las primeras horas de la noche del 31; delante, una persona vestida de blanco, de espaldas, con una canga doblada bajo el brazo, camina hacia un espacio libre entre grupos, rumbo a la orilla; al fondo y lejos, las luces de un escenario sin pantallas legibles ni marcas.",
+      "hora_clima": "primeras horas de la noche del 31, antes de las once; noche despejada; luz de la avenida y del escenario lejano, abundante y sin convertir la escena en día; sombras abiertas, altas luces conservadas",
+      "personas": "fotografía el viajero que camina detrás, a la altura de los ojos; la persona de blanco avanza de espaldas y mira el espacio libre hacia la orilla; los grupos ambientales conversan o se instalan sin mirar al lente; ningún rostro identificable",
+      "primer_plano": "el borde de una canga blanca muy cerca del lente y muy fuera de foco, en un borde lateral, sin tapar a la persona nítida",
+      "ancla_pov": "Más lejos, hacia la orilla y entre escenarios, la música llega de fondo, hay más espacio y los fuegos se ven sobre el mar sin nada adelante",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin vasos ni botellas de vidrio",
+        "sin logos en coolers ni carpas",
+        "sin pantallas del escenario legibles"
+      ],
+      "fidelidad": "playa identificable → REF-01f y 01d ya cargadas en la tarea de la pieza (imagen producida y adjunta en la versión del 14/10/2026: revisarla contra este callout antes de aprobar)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Diez, nueve, ocho: la cuenta regresiva viaja por la playa…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + D — POV de recorrido",
+      "modificadores": "el viajero entre la gente · siluetas a contraluz · escala del cielo encendido · cierra emoción",
+      "registro": "E",
+      "archivo": "fuegos-ano-nuevo-copacabana-mar-medianoche.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Fuegos artificiales sobre el mar de Copacabana a medianoche, vistos desde la arena entre personas vestidas de blanco",
+      "que_muestra": "los fuegos abiertos sobre el mar, lanzados desde balsas repartidas a lo largo de la playa, con el reflejo de cada color en el agua y humo flotando; en la arena, personas de blanco celebrando de espaldas o en silueta. El reflejo en el agua es el contenido: sin él, la imagen se vuelve una postal intercambiable.",
+      "hora_clima": "medianoche del 31; noche despejada; el destello de los fuegos ilumina la arena y a la gente sin convertir la escena en día; altas luces de los fuegos conservadas, sin quemarlas",
+      "personas": "fotografía el viajero desde la arena, detrás de la gente, mirando al mar; las personas de blanco miran los fuegos, de espaldas o en silueta, abrazándose o con un brazo en alto; nadie dentro del agua; ningún rostro identificable",
+      "primer_plano": "un hombro y un brazo en alto de alguien vestido de blanco, a contraluz, muy cerca del lente y muy fuera de foco, en una esquina inferior, sin tapar los fuegos nítidos",
+      "ancla_pov": "sobre el agua se dibuja una segunda versión de cada color, que se rompe con las olas",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "nadie dentro del mar",
+        "sin vasos ni botellas de vidrio",
+        "drones sin figuras, letras ni logos"
+      ],
+      "fidelidad": "playa y fuegos identificables → REF-01b, 01d y 01e ya cargadas en la tarea de la pieza (imagen producida y adjunta en la versión del 14/10/2026: revisarla contra este callout antes de aprobar)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "ruta_texto": "Santiago (SCL) → Río de Janeiro (GIG) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "titular": "Fuegos sobre el mar de Río",
+    "cta": "Ver vuelos a Río de Janeiro",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-rio-de-janeiro",
+    "archivo": "banner-ruta-santiago-rio-de-janeiro.webp",
+    "alt": "Banner de SKY: ruta de Santiago a Río de Janeiro, con fuegos sobre el mar",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin fuegos artificiales con forma de letras o logos",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "GIG",
+      "ciudad": "Río de Janeiro"
+    },
+    "home_market": "CHL",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)"
+  },
+  "descartes": [
+    "Saltar siete olas en la orilla — repite agua y gente de noche con IMG 3 y roza el baño nocturno que el texto desaconseja",
+    "Pulsera o metro de regreso — señalética y marca del metro con texto legible",
+    "Mañana del 1 de enero en la Av. Atlântica sin autos — rompe la continuidad de la noche",
+    "Llegada al aeropuerto — operativa, aporta poco"
+  ]
+}

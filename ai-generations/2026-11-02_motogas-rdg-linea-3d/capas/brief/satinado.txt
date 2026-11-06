@@ -1,0 +1,3 @@
+Edit image 1. Keep EVERYTHING identical: the object's shape, proportions, design, details, colors, the camera angle, the framing and the flat uniform mid-gray background.
+
+Change ONLY the surface finish of the object: from glossy lacquered plastic and polished metal to a premium SATIN soft-touch finish, like a high-end vinyl designer toy: broad, soft, diffuse highlights that still show volume; NO sharp specular hotspots, NO mirror reflections, NO wet look, NO chrome. Red parts stay a rich saturated red (#D8261C), gold parts become a warm satin brushed gold (not mirror gold), white stays clean white, green stays saturated. Soft studio light from the upper left. Background stays a perfectly flat mid-gray (#808080) with no shadow.

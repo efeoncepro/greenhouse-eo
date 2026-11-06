@@ -1,0 +1,2998 @@
+{
+  "schema_version": 2,
+  "automation_id": "prospecci-n-hubspot-reporte-diario",
+  "run_id": "2026-11-04-0901",
+  "timezone": "America/Santiago",
+  "started_at": "2026-11-04T09:01:10-03:00",
+  "started_at_precision": "primera marca de shell observada",
+  "research_cutoff": "2026-11-04T09:15:05.000-03:00",
+  "week_start_local": "2026-11-02T00:00:00-03:00",
+  "week_end_local": "2026-11-04T09:15:05.000-03:00",
+  "first_pass_48h": {
+    "start": "2026-11-02T09:01:55.000-03:00",
+    "end": "2026-11-04T09:01:55.000-03:00",
+    "filter": "after:2026-11-02, borde por día"
+  },
+  "overlap": {
+    "previous_cut": "2026-11-03T09:01:24-03:00",
+    "from": "2026-10-31T09:01:24-03:00",
+    "caveat": "Variantes sin after y Mercado Público por fecha civil; 429 limita continuidad."
+  },
+  "counts": {
+    "discovery_queries": 60,
+    "weekly_discovery_queries": 52,
+    "weekly_pct": 86.67,
+    "coverage_cells": 20,
+    "qualified_new": 0,
+    "new_hsp": 3,
+    "purchase_controls": 15
+  },
+  "coverage": [
+    {
+      "pais": "Chile",
+      "linea": "SEO/AEO",
+      "query_ids": [
+        "Q1",
+        "Q21"
+      ]
+    },
+    {
+      "pais": "Chile",
+      "linea": "Web",
+      "query_ids": [
+        "Q2",
+        "Q22"
+      ]
+    },
+    {
+      "pais": "Chile",
+      "linea": "Creatividad",
+      "query_ids": [
+        "Q3",
+        "Q23"
+      ]
+    },
+    {
+      "pais": "Chile",
+      "linea": "CRM",
+      "query_ids": [
+        "Q4",
+        "Q24"
+      ]
+    },
+    {
+      "pais": "Chile",
+      "linea": "Medios",
+      "query_ids": [
+        "Q5",
+        "Q25"
+      ]
+    },
+    {
+      "pais": "Perú",
+      "linea": "SEO/AEO",
+      "query_ids": [
+        "Q6",
+        "Q26"
+      ]
+    },
+    {
+      "pais": "Perú",
+      "linea": "Web",
+      "query_ids": [
+        "Q7",
+        "Q27"
+      ]
+    },
+    {
+      "pais": "Perú",
+      "linea": "Creatividad",
+      "query_ids": [
+        "Q8",
+        "Q28"
+      ]
+    },
+    {
+      "pais": "Perú",
+      "linea": "CRM",
+      "query_ids": [
+        "Q9",
+        "Q29"
+      ]
+    },
+    {
+      "pais": "Perú",
+      "linea": "Medios",
+      "query_ids": [
+        "Q10",
+        "Q30"
+      ]
+    },
+    {
+      "pais": "Colombia",
+      "linea": "SEO/AEO",
+      "query_ids": [
+        "Q11",
+        "Q31"
+      ]
+    },
+    {
+      "pais": "Colombia",
+      "linea": "Web",
+      "query_ids": [
+        "Q12",
+        "Q32"
+      ]
+    },
+    {
+      "pais": "Colombia",
+      "linea": "Creatividad",
+      "query_ids": [
+        "Q13",
+        "Q33"
+      ]
+    },
+    {
+      "pais": "Colombia",
+      "linea": "CRM",
+      "query_ids": [
+        "Q14",
+        "Q34"
+      ]
+    },
+    {
+      "pais": "Colombia",
+      "linea": "Medios",
+      "query_ids": [
+        "Q15",
+        "Q35"
+      ]
+    },
+    {
+      "pais": "México",
+      "linea": "SEO/AEO",
+      "query_ids": [
+        "Q16",
+        "Q36"
+      ]
+    },
+    {
+      "pais": "México",
+      "linea": "Web",
+      "query_ids": [
+        "Q17",
+        "Q37"
+      ]
+    },
+    {
+      "pais": "México",
+      "linea": "Creatividad",
+      "query_ids": [
+        "Q18",
+        "Q38"
+      ]
+    },
+    {
+      "pais": "México",
+      "linea": "CRM",
+      "query_ids": [
+        "Q19",
+        "Q39"
+      ]
+    },
+    {
+      "pais": "México",
+      "linea": "Medios",
+      "query_ids": [
+        "Q20",
+        "Q40"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "id": "Q1",
+      "batch_id": "a0",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Chile",
+      "linea": "SEO/AEO",
+      "query": "Chile (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q2",
+      "batch_id": "a0",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Chile",
+      "linea": "Web",
+      "query": "Chile (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q3",
+      "batch_id": "a0",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Chile",
+      "linea": "Creatividad",
+      "query": "Chile (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q4",
+      "batch_id": "a0",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Chile",
+      "linea": "CRM",
+      "query": "Chile (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q5",
+      "batch_id": "a1",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Chile",
+      "linea": "Medios",
+      "query": "Chile (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q6",
+      "batch_id": "a1",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Perú",
+      "linea": "SEO/AEO",
+      "query": "Perú (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q7",
+      "batch_id": "a1",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Perú",
+      "linea": "Web",
+      "query": "Perú (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q8",
+      "batch_id": "a1",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Perú",
+      "linea": "Creatividad",
+      "query": "Perú (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q9",
+      "batch_id": "a2",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Perú",
+      "linea": "CRM",
+      "query": "Perú (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q10",
+      "batch_id": "a2",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Perú",
+      "linea": "Medios",
+      "query": "Perú (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q11",
+      "batch_id": "a2",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Colombia",
+      "linea": "SEO/AEO",
+      "query": "Colombia (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q12",
+      "batch_id": "a2",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Colombia",
+      "linea": "Web",
+      "query": "Colombia (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q13",
+      "batch_id": "a3",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Colombia",
+      "linea": "Creatividad",
+      "query": "Colombia (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q14",
+      "batch_id": "a3",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Colombia",
+      "linea": "CRM",
+      "query": "Colombia (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q15",
+      "batch_id": "a3",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "Colombia",
+      "linea": "Medios",
+      "query": "Colombia (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q16",
+      "batch_id": "a3",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "México",
+      "linea": "SEO/AEO",
+      "query": "México (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q17",
+      "batch_id": "a4",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "México",
+      "linea": "Web",
+      "query": "México (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q18",
+      "batch_id": "a4",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "México",
+      "linea": "Creatividad",
+      "query": "México (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q19",
+      "batch_id": "a4",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "México",
+      "linea": "CRM",
+      "query": "México (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q20",
+      "batch_id": "a4",
+      "checked_at": "2026-11-04T09:01:55.000-03:00",
+      "pais": "México",
+      "linea": "Medios",
+      "query": "México (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (licitación OR convocatoria OR \"buscamos proveedor\" OR \"solicitud de propuesta\") after:2026-11-02",
+      "window": "48h; fecha de filtro por día; verificar borde horario",
+      "filters": {
+        "after": "2026-11-02",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q21",
+      "batch_id": "b0",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "SEO/AEO",
+      "query": "site:linkedin.com/posts Chile (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q22",
+      "batch_id": "b0",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Web",
+      "query": "site:linkedin.com/posts Chile (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q23",
+      "batch_id": "b0",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Creatividad",
+      "query": "site:linkedin.com/posts Chile (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q24",
+      "batch_id": "b0",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "CRM",
+      "query": "site:linkedin.com/posts Chile (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q25",
+      "batch_id": "b1",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Medios",
+      "query": "site:linkedin.com/posts Chile (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q26",
+      "batch_id": "b1",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "SEO/AEO",
+      "query": "site:linkedin.com/posts Perú (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q27",
+      "batch_id": "b1",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Web",
+      "query": "site:linkedin.com/posts Perú (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q28",
+      "batch_id": "b1",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Creatividad",
+      "query": "site:linkedin.com/posts Perú (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q29",
+      "batch_id": "b2",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "CRM",
+      "query": "site:linkedin.com/posts Perú (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q30",
+      "batch_id": "b2",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Medios",
+      "query": "site:linkedin.com/posts Perú (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q31",
+      "batch_id": "b2",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "SEO/AEO",
+      "query": "site:linkedin.com/posts Colombia (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q32",
+      "batch_id": "b2",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Web",
+      "query": "site:linkedin.com/posts Colombia (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q33",
+      "batch_id": "b3",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Creatividad",
+      "query": "site:linkedin.com/posts Colombia (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q34",
+      "batch_id": "b3",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "CRM",
+      "query": "site:linkedin.com/posts Colombia (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q35",
+      "batch_id": "b3",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Medios",
+      "query": "site:linkedin.com/posts Colombia (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q36",
+      "batch_id": "b3",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "SEO/AEO",
+      "query": "site:linkedin.com/posts México (\"servicio SEO\" OR \"posicionamiento orgánico\" OR \"agencia SEO\" OR \"SEO AEO\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q37",
+      "batch_id": "b4",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Web",
+      "query": "site:linkedin.com/posts México (\"rediseño sitio web\" OR \"desarrollo portal web\" OR \"implementación sitio web\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q38",
+      "batch_id": "b4",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Creatividad",
+      "query": "site:linkedin.com/posts México (\"agencia creativa\" OR \"producción audiovisual\" OR \"agencia de contenidos\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q39",
+      "batch_id": "b4",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "CRM",
+      "query": "site:linkedin.com/posts México (HubSpot OR \"implementación CRM\" OR \"integración CRM\") (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q40",
+      "batch_id": "b4",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Medios",
+      "query": "site:linkedin.com/posts México (\"agencia de medios\" OR \"compra de medios\" OR \"pauta digital\" OR programática OR DOOH) (\"buscamos\" OR \"recomienden\" OR \"convocatoria\" OR \"proveedor\") after:2026-11-01",
+      "window": "semana Santiago; LinkedIn público indexado",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q41",
+      "batch_id": "b5",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Transversal",
+      "query": "site:mercadopublico.cl Chile (convocatoria OR licitación OR cotización) (audiovisual OR \"sitio web\" OR CRM OR SEO OR \"plan de medios\") (\"noviembre 2026\" OR after:2026-11-01)",
+      "window": "semana, portales y comprador público; mes explícito de contraste",
+      "filters": {
+        "after": "2026-11-01)",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q42",
+      "batch_id": "b5",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Transversal",
+      "query": "Chile compras proveedores (\"buscamos agencia\" OR \"solicitud de propuesta\" OR \"registro de proveedores\") (marketing OR digital OR web OR CRM) (2026 OR 2027) after:2026-11-01",
+      "window": "semana, compradores y portales privados indexados",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q43",
+      "batch_id": "b5",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Chile",
+      "linea": "Transversal",
+      "query": "Chile (\"licitación\" OR \"términos de referencia\") (\"agencia creativa\" OR \"desarrollo web\" OR SEO OR HubSpot OR \"compra de medios\") noviembre 2026",
+      "window": "solape 72h y contraste sin after; publicación efectiva se valida aparte",
+      "filters": {
+        "after": null,
+        "linkedin_publico": false
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q44",
+      "batch_id": "b5",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Transversal",
+      "query": "site:gob.pe OR site:prod6.seace.gob.pe Perú (convocatoria OR licitación OR cotización) (audiovisual OR \"sitio web\" OR CRM OR SEO OR \"plan de medios\") (\"noviembre 2026\" OR after:2026-11-01)",
+      "window": "semana, portales y comprador público; mes explícito de contraste",
+      "filters": {
+        "after": "2026-11-01)",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q45",
+      "batch_id": "b6",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Transversal",
+      "query": "Perú compras proveedores (\"buscamos agencia\" OR \"solicitud de propuesta\" OR \"registro de proveedores\") (marketing OR digital OR web OR CRM) (2026 OR 2027) after:2026-11-01",
+      "window": "semana, compradores y portales privados indexados",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q46",
+      "batch_id": "b6",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Perú",
+      "linea": "Transversal",
+      "query": "Perú (\"licitación\" OR \"términos de referencia\") (\"agencia creativa\" OR \"desarrollo web\" OR SEO OR HubSpot OR \"compra de medios\") noviembre 2026",
+      "window": "solape 72h y contraste sin after; publicación efectiva se valida aparte",
+      "filters": {
+        "after": null,
+        "linkedin_publico": false
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q47",
+      "batch_id": "b6",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Transversal",
+      "query": "site:community.secop.gov.co OR site:procolombia.co Colombia (convocatoria OR licitación OR cotización) (audiovisual OR \"sitio web\" OR CRM OR SEO OR \"plan de medios\") (\"noviembre 2026\" OR after:2026-11-01)",
+      "window": "semana, portales y comprador público; mes explícito de contraste",
+      "filters": {
+        "after": "2026-11-01)",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q48",
+      "batch_id": "b6",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Transversal",
+      "query": "Colombia compras proveedores (\"buscamos agencia\" OR \"solicitud de propuesta\" OR \"registro de proveedores\") (marketing OR digital OR web OR CRM) (2026 OR 2027) after:2026-11-01",
+      "window": "semana, compradores y portales privados indexados",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q49",
+      "batch_id": "b7",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "Colombia",
+      "linea": "Transversal",
+      "query": "Colombia (\"licitación\" OR \"términos de referencia\") (\"agencia creativa\" OR \"desarrollo web\" OR SEO OR HubSpot OR \"compra de medios\") noviembre 2026",
+      "window": "solape 72h y contraste sin after; publicación efectiva se valida aparte",
+      "filters": {
+        "after": null,
+        "linkedin_publico": false
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q50",
+      "batch_id": "b7",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Transversal",
+      "query": "site:comprasmx.buengobierno.gob.mx OR site:gob.mx México (convocatoria OR licitación OR cotización) (audiovisual OR \"sitio web\" OR CRM OR SEO OR \"plan de medios\") (\"noviembre 2026\" OR after:2026-11-01)",
+      "window": "semana, portales y comprador público; mes explícito de contraste",
+      "filters": {
+        "after": "2026-11-01)",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q51",
+      "batch_id": "b7",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Transversal",
+      "query": "México compras proveedores (\"buscamos agencia\" OR \"solicitud de propuesta\" OR \"registro de proveedores\") (marketing OR digital OR web OR CRM) (2026 OR 2027) after:2026-11-01",
+      "window": "semana, compradores y portales privados indexados",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": false
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q52",
+      "batch_id": "b7",
+      "checked_at": "2026-11-04T09:02:16.000-03:00",
+      "pais": "México",
+      "linea": "Transversal",
+      "query": "México (\"licitación\" OR \"términos de referencia\") (\"agencia creativa\" OR \"desarrollo web\" OR SEO OR HubSpot OR \"compra de medios\") noviembre 2026",
+      "window": "solape 72h y contraste sin after; publicación efectiva se valida aparte",
+      "filters": {
+        "after": null,
+        "linkedin_publico": false
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q53",
+      "batch_id": "c0",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Chile",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Chile\" \"buscamos agencia\" after:2026-11-01",
+      "window": "semana Santiago; LinkedIn indexado, menos operadores",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q54",
+      "batch_id": "c0",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Chile",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Chile\" \"buscamos proveedor\" marketing web CRM audiovisual",
+      "window": "contraste LinkedIn sin filtro temporal",
+      "filters": {
+        "after": null,
+        "linkedin_publico": true
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q55",
+      "batch_id": "c0",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Perú",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Perú\" \"buscamos agencia\" after:2026-11-01",
+      "window": "semana Santiago; LinkedIn indexado, menos operadores",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q56",
+      "batch_id": "c0",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Perú",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Perú\" \"buscamos proveedor\" marketing web CRM audiovisual",
+      "window": "contraste LinkedIn sin filtro temporal",
+      "filters": {
+        "after": null,
+        "linkedin_publico": true
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q57",
+      "batch_id": "c1",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Colombia",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Colombia\" \"buscamos agencia\" after:2026-11-01",
+      "window": "semana Santiago; LinkedIn indexado, menos operadores",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q58",
+      "batch_id": "c1",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "Colombia",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"Colombia\" \"buscamos proveedor\" marketing web CRM audiovisual",
+      "window": "contraste LinkedIn sin filtro temporal",
+      "filters": {
+        "after": null,
+        "linkedin_publico": true
+      },
+      "weekly": false
+    },
+    {
+      "id": "Q59",
+      "batch_id": "c1",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "México",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"México\" \"buscamos agencia\" after:2026-11-01",
+      "window": "semana Santiago; LinkedIn indexado, menos operadores",
+      "filters": {
+        "after": "2026-11-01",
+        "linkedin_publico": true
+      },
+      "weekly": true
+    },
+    {
+      "id": "Q60",
+      "batch_id": "c1",
+      "checked_at": "2026-11-04T09:07:40.000-03:00",
+      "pais": "México",
+      "linea": "Transversal",
+      "query": "site:linkedin.com/posts \"México\" \"buscamos proveedor\" marketing web CRM audiovisual",
+      "window": "contraste LinkedIn sin filtro temporal",
+      "filters": {
+        "after": null,
+        "linkedin_publico": true
+      },
+      "weekly": false
+    }
+  ],
+  "batches": [
+    {
+      "id": "a0",
+      "at": "2026-11-04T09:01:55.000-03:00",
+      "observed": "Fuera de mercado/vacantes/freelance",
+      "sources_returned": [
+        "https://accioncontraelhambre.org/es/licitaciones-tenders-appel-doffres",
+        "https://cuti.org.uy/en/oportunidades-negocio-2/"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "a1",
+      "at": "2026-11-04T09:01:55.000-03:00",
+      "observed": "Contexto, directorios y fuera de mercado",
+      "sources_returned": [
+        "https://accioncontraelhambre.org/es/licitaciones-tenders-appel-doffres"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "a2",
+      "at": "2026-11-04T09:01:55.000-03:00",
+      "observed": "Fuera de mercado y fuentes de contexto",
+      "sources_returned": [
+        "https://cuti.org.uy/en/oportunidades-negocio-2/",
+        "https://accioncontraelhambre.org/es/licitaciones-tenders-appel-doffres",
+        "https://es.linkedin.com/directory/articles/p-3"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "a3",
+      "at": "2026-11-04T09:01:55.000-03:00",
+      "observed": "Vacantes CRM y reportes corporativos",
+      "sources_returned": [
+        "https://cuti.org.uy/en/oportunidades-negocio-2/",
+        "https://accioncontraelhambre.org/es/licitaciones-tenders-appel-doffres"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "a4",
+      "at": "2026-11-04T09:01:55.000-03:00",
+      "observed": "Proveedores y fuera de mercado",
+      "sources_returned": [
+        "https://accioncontraelhambre.org/es/licitaciones-tenders-appel-doffres",
+        "https://cuti.org.uy/en/oportunidades-negocio-2/"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b0",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Sin señal indexada",
+      "sources_returned": [],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b1",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Directorio LinkedIn",
+      "sources_returned": [
+        "https://es.linkedin.com/directory/articles/more-35"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b2",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Directorio LinkedIn",
+      "sources_returned": [
+        "https://es.linkedin.com/directory/articles/more-35"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b3",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Directorio LinkedIn",
+      "sources_returned": [
+        "https://es.linkedin.com/directory/articles/more-35"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b4",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Directorio LinkedIn",
+      "sources_returned": [
+        "https://es.linkedin.com/directory/articles/more-35"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b5",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Proveedores y registro MLP",
+      "sources_returned": [
+        "https://www.ungm.org/Public/Notice/310394"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b6",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "Índices Ean, BibloRed, AAP, UE118 y UNGM; ver lecturas",
+      "sources_returned": [
+        "https://www.ungm.org/Public/Notice/315179",
+        "https://biblored.gov.co/trabaja-con-nosotros/procesos-de-contratacion",
+        "https://www.ungm.org/Public/Notice/292223",
+        "https://www.paho.org/es/contratos-servicios/ops-colombia-busca-contratar-persona-juridica-para-realizar-guion-preproduccion",
+        "https://www.ue118.gob.pe/ps-solicitud-de-propuesta",
+        "https://universidadean.edu.co/la-universidad/convocatorias-proveedores",
+        "https://aap.com.pe/sobrenosotros/convocatorias/"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "b7",
+      "at": "2026-11-04T09:02:16.000-03:00",
+      "observed": "PNUD, UNGM y portales; ver lecturas",
+      "sources_returned": [
+        "https://www.ungm.org/Public/Notice/302231",
+        "https://www.undp.org/es/mexico/licitaciones",
+        "https://www.ungm.org/Public/Notice/294523"
+      ],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "c0",
+      "at": "2026-11-04T09:07:40.000-03:00",
+      "observed": "Perfiles y avisos nominales omitidos; Marca Chile 2025",
+      "sources_returned": [],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    },
+    {
+      "id": "c1",
+      "at": "2026-11-04T09:07:40.000-03:00",
+      "observed": "Perfiles omitidos; oferta de proveedores, RRHH y eventos fuera de alcance",
+      "sources_returned": [],
+      "attribution": "Resultados compartidos del lote; omitidas URLs personales."
+    }
+  ],
+  "validation_queries": [
+    {
+      "pais": "Colombia",
+      "linea": "Creatividad",
+      "queries": [
+        "\"UNAL-MED-2026-4468873\" \"9245680\"",
+        "site:unal.edu.co \"9245680\" PTIES producción contenidos audiovisual",
+        "site:unal.edu.co Universidad Nacional Colombia sede Medellín planta personal docente administrativo 2025 informe gestión",
+        "site:unal.edu.co \"planta\" \"Medellín\" \"personal administrativo\" 2026 dotación"
+      ]
+    },
+    {
+      "pais": "Chile",
+      "linea": "Creatividad/Medios",
+      "queries": [
+        "site:transparencia.sanfelipedeaconcagua.cl OR site:munisanfelipe.cl Municipalidad San Felipe dotación personal planta contrata cuenta pública 2025 2024",
+        "site:ssdelreloncavi.cl Hospital Fresia funcionarios dotación cuenta pública",
+        "\"2741-78-LE26\" \"difusión\" San Felipe",
+        "\"1664-28-L126\" Hospital Fresia licitación",
+        "\"Hospital de Fresia\" \"funcionarios\" dotación Servicio de Salud Del Reloncaví cuenta pública",
+        "\"Municipalidad de San Felipe\" \"dotación\" funcionarios cuenta pública personal planta contrata",
+        "\"Servicio de Salud del Reloncaví\" dotación funcionarios cuenta pública 2024 2025",
+        "site:dipres.gob.cl \"Servicio de Salud del Reloncaví\" \"Dotación máxima de personal\" 2026"
+      ]
+    },
+    {
+      "operation": "find",
+      "terms": [
+        "TOTAL en BCN San Felipe",
+        "Dotación Máxima / Reloncaví en DIPRES",
+        "Hospital de Fresia en Servicio Civil",
+        "noviembre en Ean, AAP y BibloRed",
+        "Medellín en planta docente",
+        "funcionarios en planta UNAL"
+      ]
+    }
+  ],
+  "source_operations": [
+    {
+      "key": "salud",
+      "market": "Chile",
+      "service_lines": [
+        "Web"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=601-17-LE26",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_403",
+      "observation": "Ficha lector 403",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "talca",
+      "market": "Chile",
+      "service_lines": [
+        "Medios"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_403",
+      "observation": "Ficha lector 403",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "fucoa",
+      "market": "Chile",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1108660-11-LE26",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_403",
+      "observation": "Ficha lector 403",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "fonatur",
+      "market": "México",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "reader_empty",
+      "observation": "Lector 0 líneas, alternativa Chrome",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "unicef",
+      "market": "Perú",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/317123",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read",
+      "observation": "Aviso 6/10, ofertas 9/11 23:59 GMT−05 y archivos protegidos",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "aap",
+      "market": "Perú",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://aap.com.pe/sobrenosotros/convocatorias/",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice; búsqueda literal noviembre sin coincidencia",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "ue118",
+      "market": "Perú",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.ue118.gob.pe/ps-solicitud-de-propuesta",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice de solicitudes sin expediente calificado en la muestra",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "seace",
+      "market": "Perú",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://prod6.seace.gob.pe/buscador-publico/contrataciones/106940",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked",
+      "observation": "Detalle SEACE no accesible",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "ean",
+      "market": "Colombia",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://universidadean.edu.co/la-universidad/convocatorias-proveedores",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice de proveedores; contraste literal noviembre sin coincidencia",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "biblored",
+      "market": "Colombia",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://biblored.gov.co/trabaja-con-nosotros/procesos-de-contratacion",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Infraestructura y suministros fuera de alcance en filas revisadas",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "ops",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.paho.org/es/contratos-servicios/ops-colombia-busca-contratar-persona-juridica-para-realizar-guion-preproduccion",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_403",
+      "observation": "OPS 403",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "procolombia",
+      "market": "Colombia",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.procolombia.co/convocatorias-procolombia",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice de ferias y convocatorias",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "p nud",
+      "market": "México",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.undp.org/es/mexico/licitaciones",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice PNUD",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "tianguis",
+      "market": "México",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://tianguisdigital.cdmx.gob.mx/oportunidades.php",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Portada Tianguis; panel no leído",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "wherex",
+      "market": "Regional",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=in_progress&page=1&limit=25",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "login_required",
+      "observation": "Sin inventario",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "plmlp",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://web.proveedoreslocalesmlp.cl/",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Registro de proveedores locales, no compra",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "unfpa",
+      "market": "Perú",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://peru.unfpa.org/es/call-for-submissions",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read_partial",
+      "observation": "Índice UNFPA; muestra sin señal calificada",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "fenavi",
+      "market": "Colombia",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://fenavi.org/categorias/contrataciones/",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_timeout",
+      "observation": "Índice FENAVI timeout",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "zolutions",
+      "market": "Chile",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://es.linkedin.com/posts/zolutions-ai_atenci%C3%B3n-productoras-audiovisuales-alerta-activity-7521616449421864960-ydfv",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read",
+      "observation": "Interés 9/11 23:59 sin zona, no ofertas",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "unicef-original",
+      "market": "Perú",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/DownloadDocument?documentId=2113090&noticeId=317123",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "blocked_403",
+      "observation": "Solicitud original 403",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "comprasmx",
+      "market": "México",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "reader_empty",
+      "observation": "Compras MX sin líneas",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "unicef-medios",
+      "market": "Colombia",
+      "service_lines": [
+        "Medios"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/292223",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read",
+      "observation": "Publicado 25/2, venció 17/3 23:59 GMT−05",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "acnur",
+      "market": "México",
+      "service_lines": [
+        "Web"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/302231",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read",
+      "observation": "Publicado 26/5, venció 3/7 23:59 GMT−06",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "un-women",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/315179",
+      "checked_at": "2026-11-04T09:02:44.000-03:00",
+      "status": "read",
+      "observation": "Publicado 21/9, venció 14/10 19:00 GMT−04",
+      "mode": "lector web; hora inicio lote"
+    },
+    {
+      "key": "601-17-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=601-17-LE26",
+      "checked_at": "2026-11-04T09:03:45.845-03:00",
+      "status": "blocked_403",
+      "observation": "403",
+      "mode": "Chrome"
+    },
+    {
+      "key": "1469-321-L126",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "checked_at": "2026-11-04T09:03:45.848-03:00",
+      "status": "blocked_403",
+      "observation": "403",
+      "mode": "Chrome"
+    },
+    {
+      "key": "1108660-11-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1108660-11-LE26",
+      "checked_at": "2026-11-04T09:03:45.891-03:00",
+      "status": "blocked_403",
+      "observation": "403",
+      "mode": "Chrome"
+    },
+    {
+      "key": "wherex",
+      "market": "Regional",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=in_progress&page=1&limit=25",
+      "checked_at": "2026-11-04T09:03:47.161-03:00",
+      "status": "login_required",
+      "observation": "Sin inventario autenticado.",
+      "mode": "Chrome"
+    },
+    {
+      "key": "fonatur",
+      "market": "México",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "checked_at": "2026-11-04T09:03:49.644-03:00",
+      "status": "read_buyer_detail",
+      "observation": "VIGENTE; cuatro documentos, acta nueva.",
+      "mode": "Chrome"
+    },
+    {
+      "key": "fonatur-acta",
+      "market": "México",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "checked_at": "2026-11-04T09:05:02.995-03:00",
+      "status": "blocked_document",
+      "observation": "Fila sin control accesible o PDF; CAPTCHA es antecedente, no observación hoy.",
+      "mode": "Chrome"
+    },
+    {
+      "key": "unal",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160259",
+      "checked_at": "2026-11-04T09:05:37.247-03:00",
+      "status": "blocked_redirect",
+      "observation": "Chrome redirigió; lector inaccesible, sin calendario ni documentos.",
+      "mode": "lector web y Chrome"
+    },
+    {
+      "key": "31102026",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.529820-03:00",
+      "status": "blocked_429",
+      "observation": "429; sin actualizar éxito.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "01112026",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.529930-03:00",
+      "status": "read",
+      "observation": "6 filas; ver detalles de consulta.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "02112026",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.530017-03:00",
+      "status": "read",
+      "observation": "1633 filas; ver detalles de consulta.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "03112026",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.530080-03:00",
+      "status": "blocked_429",
+      "observation": "429; sin actualizar éxito.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "04112026",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.587493-03:00",
+      "status": "blocked_429",
+      "observation": "429; sin actualizar éxito.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "601-17-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.588510-03:00",
+      "status": "blocked_429",
+      "observation": "429; sin actualizar éxito.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "1469-321-L126",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.621099-03:00",
+      "status": "blocked_429",
+      "observation": "429; sin actualizar éxito.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "1108660-11-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:04:41.626326-03:00",
+      "status": "read",
+      "observation": "1 filas; ver detalles de consulta.",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "1664-28-L126",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:05:57.954857-03:00",
+      "status": "read",
+      "observation": "Publicada",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "2741-78-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:06:00.147390-03:00",
+      "status": "read",
+      "observation": "Publicada",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "519302-9-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:06:02.535687-03:00",
+      "status": "read",
+      "observation": "Cerrada",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "1138297-11-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "checked_at": "2026-11-04T09:06:04.764510-03:00",
+      "status": "read",
+      "observation": "Adjudicada",
+      "mode": "API; ticket omitido"
+    },
+    {
+      "key": "secop",
+      "market": "Colombia",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "checked_at": "2026-11-04T09:03:26.851294-03:00",
+      "status": "read_partial",
+      "observation": "310 filas semanales hasta el máximo del conjunto, 2/11; dos coincidencias.",
+      "mode": "API"
+    },
+    {
+      "key": "contratos-unal",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "checked_at": "2026-11-04T09:05:13.546278-03:00",
+      "status": "read",
+      "observation": "Sin fila por REQ exacto; no prueba ausencia.",
+      "mode": "API"
+    },
+    {
+      "key": "cabrerita",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160758",
+      "checked_at": "2026-11-04T09:04:21.063293-03:00",
+      "status": "blocked",
+      "observation": "Detalle no accesible; equipos fuera de alcance.",
+      "mode": "lector web; hora de lote aproximada"
+    },
+    {
+      "key": "1664-28-L126",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "7 archivos; extractos bases pp.1,4,6–9,14 y A-2/T. P.9 vigencia 60 días desde aceptación de orden o recepción antes; entrega ≤20 días hábiles.",
+      "mode": "CLI documental; hora cota superior"
+    },
+    {
+      "key": "2741-78-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "2 archivos; decreto 4227 pp.1,3–4,10,19–20,30,32,40 y formulario. 7 líneas radiales, 5 digitales; firma futura en 7 días hábiles.",
+      "mode": "CLI documental; hora cota superior"
+    },
+    {
+      "key": "601-17-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "4 archivos; extractos bases parte 1 pp.24–25, parte 2 pp.1 y 7, anexos; no completos.",
+      "mode": "CLI documental; hora cota superior"
+    },
+    {
+      "key": "1138297-11-LE26",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "Extractos Resolución 03355 p.3, bases pp.7,33,51,53 y memorandos; acto, no contrato efectivo.",
+      "mode": "CLI documental; hora cota superior"
+    },
+    {
+      "key": "licitalab",
+      "market": "Chile",
+      "service_lines": [
+        "Transversal"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "checked_at": "2026-11-04T09:03:26.828569-03:00",
+      "status": "login_required",
+      "observation": "Sesión vencida, exit 3 con --no-login. Documentos y extractos sí funcionan.",
+      "mode": "CLI; hora aproximada"
+    },
+    {
+      "key": "contraste",
+      "market": "Chile",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://es.linkedin.com/posts/marcachile_licitaci%C3%B3n-abierta-en-fundaci%C3%B3n-imagen-activity-7397634938176446464-LuAO",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "Cierre publicado 2/12/2025.",
+      "mode": "lector; cota superior"
+    },
+    {
+      "key": "contraste",
+      "market": "Chile",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.dipres.gob.cl/597/articles-355103_doc_pdf.pdf",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "4.190 cargos máximos 2025 de una categoría; no nómina Hospital.",
+      "mode": "lector; cota superior"
+    },
+    {
+      "key": "contraste",
+      "market": "Colombia",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://personal.unal.edu.co/fileadmin/user_upload/Plan_Anual_de_Vacantes_2025_Docentes.pdf",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "98,4 equivalentes de planta aprobada Arquitectura Medellín 2024; no nómina efectiva.",
+      "mode": "lector; cota superior"
+    },
+    {
+      "key": "contraste",
+      "market": "Chile",
+      "service_lines": [
+        "Medios"
+      ],
+      "url": "https://www.bcn.cl/leychile/Navegar?idNorma=1193998",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "Lectura no devolvió nómina efectiva.",
+      "mode": "lector; cota superior"
+    },
+    {
+      "key": "contraste",
+      "market": "Chile",
+      "service_lines": [
+        "Creatividad"
+      ],
+      "url": "https://www.dipres.gob.cl/Decretos/2026/0238_TR.pdf",
+      "checked_at": "2026-11-04T09:07:56-03:00",
+      "status": "read_partial",
+      "observation": "Modificación presupuestaria; no prueba dotación efectiva del Hospital.",
+      "mode": "lector; cota superior"
+    }
+  ],
+  "purchase_controls": [
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0063",
+      "published_at": "2026-11-02T09:37:10.61",
+      "first_seen_at": "2026-11-04T09:04:41.530017-03:00",
+      "deadline_at": "2026-11-11T17:00:00",
+      "zone": null,
+      "stage": "Publicada",
+      "participation": "Publicada; calendario oficial; admisibilidad no acreditada.",
+      "provider": "no encontrado en fuente acotada; no acredita ausencia",
+      "award_act": "no encontrado en fuente acotada; no acredita ausencia",
+      "purchase_order": "no verificado",
+      "contract_status": "Orden futura aceptada según extracto. API Contrato=0 no certifica inexistencia.",
+      "signed_at": "no verificado",
+      "execution_start": "Previsto desde aceptación; efectivo no verificado.",
+      "execution_end": "60 días o recepción antes, entrega ≤20 hábiles; efectivo no verificado.",
+      "documents_read": [
+        "7 archivos; extractos bases pp.1,4,6–9,14 y A-2/T. P.9 vigencia 60 días desde aceptación de orden o recepción antes; entrega ≤20 días hábiles."
+      ],
+      "document_block": "Originales y orden efectiva no leídos; equipo local, derechos y costos por confirmar.",
+      "market": "Chile",
+      "process": "1664-28-L126",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1664-28-L126",
+      "api_source": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "first_seen_precision": "inicio del lote",
+      "last_checked_at": "2026-11-04T09:05:57.954857-03:00",
+      "calendar": {
+        "consultations_end": "2026-11-05T11:00:00",
+        "answers": "2026-11-06T17:00:00",
+        "opening": "2026-11-11T17:01:00",
+        "scheduled_award": "2026-11-18T17:00:00",
+        "zone": null
+      },
+      "line": "Creatividad",
+      "reasoning": "Tope CLP 900000 impuestos incluidos; no recomendar mientras falten datos."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0064",
+      "published_at": "2026-11-02T18:36:01.167",
+      "first_seen_at": "2026-11-04T09:04:41.530017-03:00",
+      "deadline_at": "2026-11-16T16:00:00",
+      "zone": null,
+      "stage": "Publicada",
+      "participation": "Publicada, admite ofertar por línea; admisibilidad vía agencia no verificada.",
+      "provider": "no encontrado en fuente acotada; no acredita ausencia",
+      "award_act": "no encontrado en fuente acotada; no acredita ausencia",
+      "purchase_order": "no verificado",
+      "contract_status": "Escritura privada futura; firma en 7 días hábiles prevista.",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "12 meses previstos; fecha efectiva no verificada.",
+      "documents_read": [
+        "2 archivos; decreto 4227 pp.1,3–4,10,19–20,30,32,40 y formulario. 7 líneas radiales, 5 digitales; firma futura en 7 días hábiles."
+      ],
+      "document_block": "Original, dotación efectiva y prueba exacta de titularidad/autorización/cobertura pendientes.",
+      "market": "Chile",
+      "process": "2741-78-LE26",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=2741-78-LE26",
+      "api_source": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "first_seen_precision": "inicio del lote",
+      "last_checked_at": "2026-11-04T09:06:00.147390-03:00",
+      "calendar": {
+        "consultations_end": "2026-11-05T17:00:00",
+        "answers": "2026-11-09T17:00:00",
+        "opening": "2026-11-16T16:10:00",
+        "scheduled_award": "2026-12-30T13:24:00",
+        "zone": null
+      },
+      "line": "Medios",
+      "reasoning": "No inferir compra programática ni participación acreditada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0065",
+      "published_at": "2026-11-02",
+      "first_seen_at": "2026-11-04T09:03:26.851294-03:00",
+      "deadline_at": null,
+      "zone": null,
+      "stage": "Dataset dice presentación de oferta / régimen especial",
+      "participation": "no verificado",
+      "provider": "Campo No/No Adjudicado no concluyente.",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "Registro de contratos sin filas por REQ exacto; no acredita ausencia.",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Ficha estructurada de procesos y consulta de registro de contratos; ningún contractual."
+      ],
+      "document_block": "Redirección sin expediente/calendario ni documentos.",
+      "market": "Colombia",
+      "line": "Creatividad",
+      "process": "UNAL-MED-2026-4468873 / CO1.REQ.11306473",
+      "primary_source": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160259",
+      "api_source": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "published_at_precision": "día; campo 00:00 sin zona",
+      "last_checked_at": "2026-11-04T09:05:37.247-03:00",
+      "reasoning": "COP 1890000; sin vía comprobada para empresa ni plazo."
+    },
+    {
+      "result": "adjudicada_descartada",
+      "hsp_id": "HSP-0033",
+      "published_at": "2026-09-28T17:57:56.093",
+      "first_seen_at": null,
+      "deadline_at": "2026-10-09T13:00:00",
+      "zone": null,
+      "stage": "Adjudicada",
+      "participation": "Ofertas cerradas 9/10; compra adjudicada.",
+      "provider": "AWNA DIGITAL SPA",
+      "award_act": "Resolución 03355-2026 2/11; API 17:33:12.033 sin zona. CLP 19635000 por unidad.",
+      "purchase_order": "no verificado",
+      "contract_status": "Bases prevén firma posterior; no verificada.",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Extractos Resolución 03355 p.3, bases pp.7,33,51,53 y memorandos; acto, no contrato efectivo."
+      ],
+      "document_block": "Firma, orden y ejecución efectivas no verificadas.",
+      "market": "Chile",
+      "process": "1138297-11-LE26",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1138297-11-LE26",
+      "api_source": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "first_seen_precision": "histórico; no fecha nueva",
+      "last_checked_at": "2026-11-04T09:06:04.764510-03:00",
+      "calendar": {
+        "consultations_end": "2026-10-01T15:00:00",
+        "answers": "2026-10-05T18:00:00",
+        "opening": "2026-10-09T13:01:00",
+        "scheduled_award": "2026-11-05T18:00:00",
+        "zone": null
+      },
+      "line": "Web/Creatividad",
+      "reasoning": "Excluir catálogo; no confundir con 1138297-12-LE26."
+    },
+    {
+      "result": "hold",
+      "hsp_id": null,
+      "published_at": "2026-10-09T15:57:48.54",
+      "first_seen_at": "2026-11-04T09:04:41.530017-03:00",
+      "deadline_at": "2026-11-02T16:00:00",
+      "zone": null,
+      "stage": "Cerrada",
+      "participation": "Cerrada 2/11; no se acreditó reapertura.",
+      "provider": "no encontrado en fuente acotada; no acredita ausencia",
+      "award_act": "no encontrado en fuente acotada; no acredita ausencia",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Ficha de detalle API, no originales."
+      ],
+      "document_block": "Acto, orden, contrato y firma efectiva no leídos.",
+      "market": "Chile",
+      "process": "519302-9-LE26",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=519302-9-LE26",
+      "api_source": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "first_seen_precision": "inicio del lote",
+      "last_checked_at": "2026-11-04T09:06:02.535687-03:00",
+      "calendar": {
+        "consultations_end": "2026-10-19T15:00:00",
+        "answers": "2026-10-22T18:00:00",
+        "opening": "2026-11-02T16:01:00",
+        "scheduled_award": "2026-11-16T18:00:00",
+        "zone": null
+      },
+      "line": "Medios",
+      "reasoning": "Publicación octubre; firma 4/12 sólo estimada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0058",
+      "published_at": "2026-10-26T18:24:00",
+      "first_seen_at": "2026-10-29",
+      "deadline_at": "2026-11-09T11:00:00-06:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Vigente en ficha; preguntas 2/11 11:00, junta 3/11 11:00, fallo 11/11 17:00, inicio previsto 2/12.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Ficha y cuatro metadatos, acta nueva."
+      ],
+      "document_block": "Invitación, acta, anexo y modelo sin lectura. No se acredita admisión.",
+      "market": "México",
+      "line": "Creatividad",
+      "process": "FONATUR IA-21-W3N-021W3N003-N-131-2026",
+      "primary_source": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "last_checked_at": "2026-11-04T09:03:49.644-03:00",
+      "reasoning": "Vigente en ficha; preguntas 2/11 11:00, junta 3/11 11:00, fallo 11/11 17:00, inicio previsto 2/12."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0062",
+      "published_at": "2026-10-30T15:08:29",
+      "first_seen_at": "2026-11-02",
+      "deadline_at": "2026-11-10T15:10:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Calendario 3/11, no recertificado hoy; respuestas previstas 5/11, 24 meses y garantía 5% según ficha anterior.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "4 archivos; extractos bases parte 1 pp.24–25, parte 2 pp.1 y 7, anexos; no completos."
+      ],
+      "document_block": "Ficha 403, API 429 y originales pendientes.",
+      "market": "Chile",
+      "line": "Web",
+      "process": "601-17-LE26",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=601-17-LE26",
+      "last_checked_at": "2026-11-04T09:07:56-03:00",
+      "reasoning": "Calendario 3/11, no recertificado hoy; respuestas previstas 5/11, 24 meses y garantía 5% según ficha anterior."
+    },
+    {
+      "result": "hold",
+      "hsp_id": null,
+      "published_at": "2026-10-06",
+      "first_seen_at": "2026-10-16",
+      "deadline_at": "2026-11-09T23:59:00-05:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Recepción según aviso; elegibilidad no verificada.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Aviso primario e instrucciones."
+      ],
+      "document_block": "Solicitud original 403.",
+      "market": "Perú",
+      "line": "Creatividad",
+      "process": "LRPS-2026-9206550",
+      "primary_source": "https://www.ungm.org/Public/Notice/317123",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Recepción según aviso; elegibilidad no verificada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0053",
+      "published_at": null,
+      "first_seen_at": null,
+      "deadline_at": "2026-11-03T15:00:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Plazo del expediente previo transcurrido; no reapertura acreditada.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [],
+      "document_block": "Ficha 403, API 429, originales pendientes.",
+      "market": "Chile",
+      "line": "Medios",
+      "process": "1469-321-L126",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1469-321-L126",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Plazo del expediente previo transcurrido; no reapertura acreditada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0054",
+      "published_at": "2026-10-23T12:40:22.32",
+      "first_seen_at": "2026-10-25",
+      "deadline_at": "2026-11-02T15:30:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Cerrada, CLP 15 millones, orden prevista; adjudicación 12/11 estimada.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Detalle API."
+      ],
+      "document_block": "Sin adjudicación/OC/contrato efectivos verificados.",
+      "market": "Chile",
+      "line": "Creatividad",
+      "process": "1108660-11-LE26",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1108660-11-LE26",
+      "last_checked_at": "2026-11-04T09:04:41.626326-03:00",
+      "reasoning": "Cerrada, CLP 15 millones, orden prevista; adjudicación 12/11 estimada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0061",
+      "published_at": null,
+      "first_seen_at": "2026-11-01",
+      "deadline_at": null,
+      "zone": null,
+      "stage": null,
+      "participation": "Plazo secundario 2/11 14:00 transcurrido, zona no informada.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [],
+      "document_block": "SEACE sin ficha u original legible.",
+      "market": "Perú",
+      "line": "Creatividad",
+      "process": "CM-21288-2026",
+      "primary_source": "https://prod6.seace.gob.pe/buscador-publico/contrataciones/106940",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Plazo secundario 2/11 14:00 transcurrido, zona no informada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0060",
+      "published_at": null,
+      "first_seen_at": "2026-11-01",
+      "deadline_at": null,
+      "zone": null,
+      "stage": null,
+      "participation": "Referencias de octubre; sin apertura comprobada.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [],
+      "document_block": "Timeout en fuente primaria.",
+      "market": "Colombia",
+      "line": "Creatividad/Medios",
+      "process": "FENAVI 2027",
+      "primary_source": "https://fenavi.org/categorias/contrataciones/",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Referencias de octubre; sin apertura comprobada."
+    },
+    {
+      "result": "hold",
+      "hsp_id": null,
+      "published_at": null,
+      "first_seen_at": "2026-11-03",
+      "deadline_at": "2026-11-09T23:59:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Puerta de interés, no ofertas; escala visible previa 2–10 y comprador final no verificado.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Aviso corporativo."
+      ],
+      "document_block": "Sin bases ni calendario de ofertas.",
+      "market": "Chile",
+      "line": "Creatividad",
+      "process": "Zolutions AI",
+      "primary_source": "https://es.linkedin.com/posts/zolutions-ai_atenci%C3%B3n-productoras-audiovisuales-alerta-activity-7521616449421864960-ydfv",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Puerta de interés, no ofertas; escala visible previa 2–10 y comprador final no verificado."
+    },
+    {
+      "result": "hold",
+      "hsp_id": "HSP-0044",
+      "published_at": "2026-10-29T14:13:00",
+      "first_seen_at": "2026-10-29",
+      "deadline_at": "2026-11-06T14:00:00-05:00",
+      "zone": null,
+      "stage": null,
+      "participation": "Aviso 14:00 Colombia vs ficha 18:00 sin zona; entidad admisible pendiente.",
+      "provider": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Expediente local previo."
+      ],
+      "document_block": "Portal pide login, no recertificación hoy.",
+      "market": "Colombia",
+      "line": "Medios",
+      "process": "SMZ-116",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/purchase-bids/all-react?status=in_progress&page=1&limit=25",
+      "last_checked_at": "2026-11-04T09:02:44.000-03:00",
+      "reasoning": "Aviso 14:00 Colombia vs ficha 18:00 sin zona; entidad admisible pendiente."
+    },
+    {
+      "result": "adjudicada_descartada",
+      "hsp_id": "HSP-0034",
+      "published_at": null,
+      "first_seen_at": null,
+      "deadline_at": null,
+      "zone": null,
+      "stage": null,
+      "participation": "STOP. Deal releído cerrado perdido; no reabrir.",
+      "provider": "DACARTEC",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "2026-10-10",
+      "execution_start": "2026-10-15",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Expediente y exclusión previos; CRM hoy."
+      ],
+      "document_block": "No se reabre expediente.",
+      "market": "Colombia",
+      "line": "CRM",
+      "process": "5600218590 / CO1.REQ.11210476",
+      "primary_source": null,
+      "last_checked_at": "2026-11-04T09:01:41-03:00",
+      "reasoning": "STOP. Deal releído cerrado perdido; no reabrir."
+    }
+  ],
+  "native_operations": [
+    {
+      "system": "Mercado Público v1",
+      "url": "https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json",
+      "queries": [
+        {
+          "q": {
+            "fecha": "31102026",
+            "estado": "todos"
+          },
+          "at": "2026-11-04T09:04:41.529820-03:00",
+          "http": 429,
+          "error": "HTTP error"
+        },
+        {
+          "q": {
+            "fecha": "01112026",
+            "estado": "todos"
+          },
+          "at": "2026-11-04T09:04:41.529930-03:00",
+          "http": 200,
+          "n": 6,
+          "api_error_code": null,
+          "selected": []
+        },
+        {
+          "q": {
+            "fecha": "02112026",
+            "estado": "todos"
+          },
+          "at": "2026-11-04T09:04:41.530017-03:00",
+          "http": 200,
+          "n": 1633,
+          "api_error_code": null,
+          "selected": [
+            {
+              "CodigoExterno": "1138297-11-LE26",
+              "Nombre": "Servicios de implementación integral para el diseño y producción de material promocional y la optimización del sitio web del Catálogo Digital de las Industrias Creativas de la Región de Atacama",
+              "CodigoEstado": 8,
+              "FechaCierre": "2026-10-09T13:00:00"
+            },
+            {
+              "CodigoExterno": "1417913-152-L126",
+              "Nombre": "ADQUISICIÓN DE EQUIPAMIENTO AUDIOVISUAL, INSTRUMENTOS MUSICALES, MOBILIARIO Y ARTÍCULOS COMPLEMENTARIOS PARA PROGRAMAS DE SALUD DE CORMUDESI",
+              "CodigoEstado": 6,
+              "FechaCierre": "2026-11-02T15:00:00"
+            },
+            {
+              "CodigoExterno": "1664-28-L126",
+              "Nombre": "Servicio de grabación, edición y postproducción de 6 cápsulas audiovisuales para Hospital de Fresia",
+              "CodigoEstado": 5,
+              "FechaCierre": "2026-11-11T17:00:00"
+            },
+            {
+              "CodigoExterno": "2741-78-LE26",
+              "Nombre": "CONTRATO SUMINISTRO SERVICIOS DIFUSIÓN EN MEDIOS D",
+              "CodigoEstado": 5,
+              "FechaCierre": "2026-11-16T16:00:00"
+            },
+            {
+              "CodigoExterno": "1108660-11-LE26",
+              "Nombre": "Producción audiovisual y apoyo técnico expo 2026",
+              "CodigoEstado": 6,
+              "FechaCierre": "2026-11-02T15:30:00"
+            },
+            {
+              "CodigoExterno": "519302-9-LE26",
+              "Nombre": "DISEÑO IMPLEMENTACIÓN MEDICION MARKETING DIGITAL",
+              "CodigoEstado": 6,
+              "FechaCierre": "2026-11-02T16:00:00"
+            },
+            {
+              "CodigoExterno": "867990-135-L126",
+              "Nombre": "CDP 91675 CC 102  Adquisición de Equipamiento Audiovisual para el Departamento de Ingeniería Eléctrica USACH.",
+              "CodigoEstado": 5,
+              "FechaCierre": "2026-11-09T15:00:00"
+            },
+            {
+              "CodigoExterno": "3378-68-LP26",
+              "Nombre": "SERVICIO DE PAGO CON TARJETAS DE DÉBITO CRÉDITOS Y PREPAGOS DE FORMA PRESENCIAL AUTOATENCIÓN POR SITIO WEB Y CONCILIACIÓN BIDIRECCIONAL DE TRANSACCIONES PARA EL HMS” POR 60 MESES",
+              "CodigoEstado": 5,
+              "FechaCierre": "2026-11-23T16:00:00"
+            }
+          ]
+        },
+        {
+          "q": {
+            "fecha": "03112026",
+            "estado": "todos"
+          },
+          "at": "2026-11-04T09:04:41.530080-03:00",
+          "http": 429,
+          "error": "HTTP error"
+        },
+        {
+          "q": {
+            "fecha": "04112026",
+            "estado": "todos"
+          },
+          "at": "2026-11-04T09:04:41.587493-03:00",
+          "http": 429,
+          "error": "HTTP error"
+        },
+        {
+          "q": {
+            "codigo": "601-17-LE26"
+          },
+          "at": "2026-11-04T09:04:41.588510-03:00",
+          "http": 429,
+          "error": "HTTP error"
+        },
+        {
+          "q": {
+            "codigo": "1469-321-L126"
+          },
+          "at": "2026-11-04T09:04:41.621099-03:00",
+          "http": 429,
+          "error": "HTTP error"
+        },
+        {
+          "q": {
+            "codigo": "1108660-11-LE26"
+          },
+          "at": "2026-11-04T09:04:41.626326-03:00",
+          "http": 200,
+          "n": 1,
+          "api_error_code": null,
+          "selected": [
+            {
+              "CodigoExterno": "1108660-11-LE26",
+              "Nombre": "Producción audiovisual y apoyo técnico expo 2026",
+              "Estado": "Cerrada",
+              "CodigoEstado": 6,
+              "Fechas": {
+                "FechaCreacion": "2026-10-23T00:35:22.9",
+                "FechaCierre": "2026-11-02T15:30:00",
+                "FechaInicio": "2026-10-23T14:00:00",
+                "FechaFinal": "2026-10-27T16:00:00",
+                "FechaPubRespuestas": "2026-10-29T18:00:00",
+                "FechaActoAperturaTecnica": "2026-11-02T15:45:00",
+                "FechaActoAperturaEconomica": "2026-11-02T15:45:00",
+                "FechaPublicacion": "2026-10-23T12:40:22.32",
+                "FechaAdjudicacion": "2026-11-12T18:00:00",
+                "FechaEstimadaAdjudicacion": "2026-11-12T18:00:00",
+                "FechaSoporteFisico": null,
+                "FechaTiempoEvaluacion": null,
+                "FechaEstimadaFirma": null,
+                "FechasUsuario": null,
+                "FechaVisitaTerreno": null,
+                "FechaEntregaAntecedentes": null
+              },
+              "MontoEstimado": 15000000,
+              "Moneda": "CLP",
+              "Contrato": "2",
+              "Tiempo": null,
+              "UnidadTiempo": "1",
+              "Adjudicacion": null,
+              "item_adjudication_present": false
+            }
+          ]
+        },
+        {
+          "codigo": "1664-28-L126",
+          "at": "2026-11-04T09:05:57.954857-03:00",
+          "http": 200,
+          "CodigoExterno": "1664-28-L126",
+          "Nombre": "Servicio de grabación, edición y postproducción de 6 cápsulas audiovisuales para Hospital de Fresia",
+          "Descripcion": "Contratación de servicios de grabación, edición y postproducción de 6 cápsulas de video verticales (Reels/TikTok, 9:16) de hasta 45 segundos cada una, para difusión de prestaciones, hitos y educación en salud del Hospital de Fresia. Incluye grabación en el hospital, subtítulos, colorización, intro/cierre institucional y música libre de derechos. Financiado por Programa Modelo de Atención Integral de Salud Familiar y Comunitaria en APS. Detalle en bases.",
+          "Estado": "Publicada",
+          "CodigoEstado": 5,
+          "Fechas": {
+            "FechaCreacion": "2026-10-30T12:25:47.25",
+            "FechaCierre": "2026-11-11T17:00:00",
+            "FechaInicio": "2026-11-02T09:37:10.61",
+            "FechaFinal": "2026-11-05T11:00:00",
+            "FechaPubRespuestas": "2026-11-06T17:00:00",
+            "FechaActoAperturaTecnica": "2026-11-11T17:01:00",
+            "FechaActoAperturaEconomica": "2026-11-11T17:01:00",
+            "FechaPublicacion": "2026-11-02T09:37:10.61",
+            "FechaAdjudicacion": "2026-11-18T17:00:00",
+            "FechaEstimadaAdjudicacion": "2026-11-18T17:00:00",
+            "FechaSoporteFisico": null,
+            "FechaTiempoEvaluacion": null,
+            "FechaEstimadaFirma": null,
+            "FechasUsuario": null,
+            "FechaVisitaTerreno": null,
+            "FechaEntregaAntecedentes": null
+          },
+          "MontoEstimado": 900000,
+          "Moneda": "CLP",
+          "Contrato": "0",
+          "Tiempo": null,
+          "UnidadTiempo": "2",
+          "Tipo": "L1",
+          "buyer": {
+            "NombreOrganismo": "SERVICIO SALUD DEL RELONCAVI",
+            "NombreUnidad": "HOSPITAL DE FRESIA",
+            "RegionUnidad": "Región de los Lagos "
+          },
+          "adjudication": null,
+          "item_awards": [],
+          "api_error": null
+        },
+        {
+          "codigo": "2741-78-LE26",
+          "at": "2026-11-04T09:06:00.147390-03:00",
+          "http": 200,
+          "CodigoExterno": "2741-78-LE26",
+          "Nombre": "CONTRATO SUMINISTRO SERVICIOS DIFUSIÓN EN MEDIOS D",
+          "Descripcion": "CONTRATO SUMINISTRO SERVICIOS DE DIFUSIÓN EN MEDIOS DE COMUNICACIÓN",
+          "Estado": "Publicada",
+          "CodigoEstado": 5,
+          "Fechas": {
+            "FechaCreacion": "2026-11-02T17:48:46.837",
+            "FechaCierre": "2026-11-16T16:00:00",
+            "FechaInicio": "2026-11-02T19:00:00",
+            "FechaFinal": "2026-11-05T17:00:00",
+            "FechaPubRespuestas": "2026-11-09T17:00:00",
+            "FechaActoAperturaTecnica": "2026-11-16T16:10:00",
+            "FechaActoAperturaEconomica": "2026-11-16T16:10:00",
+            "FechaPublicacion": "2026-11-02T18:36:01.167",
+            "FechaAdjudicacion": "2026-12-30T13:24:00",
+            "FechaEstimadaAdjudicacion": "2026-12-30T13:24:00",
+            "FechaSoporteFisico": null,
+            "FechaTiempoEvaluacion": null,
+            "FechaEstimadaFirma": null,
+            "FechasUsuario": null,
+            "FechaVisitaTerreno": null,
+            "FechaEntregaAntecedentes": null
+          },
+          "MontoEstimado": 59964000,
+          "Moneda": "CLP",
+          "Contrato": "1",
+          "Tiempo": "12",
+          "UnidadTiempo": "1",
+          "Tipo": "LE",
+          "buyer": {
+            "NombreOrganismo": "I MUNICIPALIDAD DE SAN FELIPE",
+            "NombreUnidad": "SECPLA - MUNISANFE",
+            "RegionUnidad": "Región de Valparaíso "
+          },
+          "adjudication": null,
+          "item_awards": [],
+          "api_error": null
+        },
+        {
+          "codigo": "519302-9-LE26",
+          "at": "2026-11-04T09:06:02.535687-03:00",
+          "http": 200,
+          "CodigoExterno": "519302-9-LE26",
+          "Nombre": "DISEÑO IMPLEMENTACIÓN MEDICION MARKETING DIGITAL",
+          "Descripcion": "El Instituto Nacional de Propiedad Industrial, requiere contratar el “DISEÑO, PLANIFICACIÓN, IMPLEMENTACIÓN, ADMINISTRACIÓN, OPTIMIZACIÓN Y MEDICIÓN DE CAMPAÑAS DE MARKETING DIGITAL PARA LA DIFUSIÓN DE ACTIVIDADES, CONTENIDOS Y HERRAMIENTAS ONLINE”.",
+          "Estado": "Cerrada",
+          "CodigoEstado": 6,
+          "Fechas": {
+            "FechaCreacion": "2026-10-09T10:02:48.157",
+            "FechaCierre": "2026-11-02T16:00:00",
+            "FechaInicio": "2026-10-09T18:01:00",
+            "FechaFinal": "2026-10-19T15:00:00",
+            "FechaPubRespuestas": "2026-10-22T18:00:00",
+            "FechaActoAperturaTecnica": "2026-11-02T16:01:00",
+            "FechaActoAperturaEconomica": "2026-11-02T16:01:00",
+            "FechaPublicacion": "2026-10-09T15:57:48.54",
+            "FechaAdjudicacion": "2026-11-16T18:00:00",
+            "FechaEstimadaAdjudicacion": "2026-11-16T18:00:00",
+            "FechaSoporteFisico": null,
+            "FechaTiempoEvaluacion": null,
+            "FechaEstimadaFirma": "2026-12-04T00:00:00",
+            "FechasUsuario": "1900-01-02T00:00:00",
+            "FechaVisitaTerreno": null,
+            "FechaEntregaAntecedentes": null
+          },
+          "MontoEstimado": null,
+          "Moneda": "CLP",
+          "Contrato": "1",
+          "Tiempo": "3",
+          "UnidadTiempo": "1",
+          "Tipo": "LE",
+          "buyer": {
+            "NombreOrganismo": "INSTITUTO NACIONAL DE PROPIEDAD INDUSTRIAL",
+            "NombreUnidad": "Servicios Generales",
+            "RegionUnidad": "Región Metropolitana de Santiago"
+          },
+          "adjudication": null,
+          "item_awards": [],
+          "api_error": null
+        },
+        {
+          "codigo": "1138297-11-LE26",
+          "at": "2026-11-04T09:06:04.764510-03:00",
+          "http": 200,
+          "CodigoExterno": "1138297-11-LE26",
+          "Nombre": "Servicios de implementación integral para el diseño y producción de material promocional y la optimización del sitio web del Catálogo Digital de las Industrias Creativas de la Región de Atacama",
+          "Descripcion": "ProChile invita a participar en el proceso de contratación para los servicios de implementación integral para el diseño y producción de material promocional y la optimización del sitio web del Catálogo Digital de las Industrias Creativas de la Región de Atacama, con el objeto de fortalecer la difusión y el posicionamiento del sector de las industrias creativas, incrementando la visibilidad y consolidando la gestión comercial de las empresas de la región, con el fin de mejorar su competitividad y apoyar el desarrollo de sus estrategias de internacionalización. “E1O2RT9”",
+          "Estado": "Adjudicada",
+          "CodigoEstado": 8,
+          "Fechas": {
+            "FechaCreacion": "2026-09-25T00:00:00",
+            "FechaCierre": "2026-10-09T13:00:00",
+            "FechaInicio": "2026-09-28T18:00:00",
+            "FechaFinal": "2026-10-01T15:00:00",
+            "FechaPubRespuestas": "2026-10-05T18:00:00",
+            "FechaActoAperturaTecnica": "2026-10-09T13:01:00",
+            "FechaActoAperturaEconomica": "2026-10-09T13:01:00",
+            "FechaPublicacion": "2026-09-28T17:57:56.093",
+            "FechaAdjudicacion": "2026-11-02T17:33:12.033",
+            "FechaEstimadaAdjudicacion": "2026-11-05T18:00:00",
+            "FechaSoporteFisico": null,
+            "FechaTiempoEvaluacion": null,
+            "FechaEstimadaFirma": null,
+            "FechasUsuario": null,
+            "FechaVisitaTerreno": null,
+            "FechaEntregaAntecedentes": null
+          },
+          "MontoEstimado": 21000000,
+          "Moneda": "CLP",
+          "Contrato": "1",
+          "Tiempo": "2",
+          "UnidadTiempo": "1",
+          "Tipo": "LE",
+          "buyer": {
+            "NombreOrganismo": "DIRECCION GENERAL DE PROMOCION DE EXPORTACIONES",
+            "NombreUnidad": "MN FONDO DE TERCEROS",
+            "RegionUnidad": "Región de Atacama "
+          },
+          "adjudication": {
+            "Fecha": "2026-11-02T00:00:00",
+            "Numero": "03355",
+            "Tipo": 2,
+            "NumeroOferentes": 4
+          },
+          "item_awards": [
+            {
+              "NombreProveedor": "AWNA DIGITAL SPA",
+              "Cantidad": 1,
+              "MontoUnitario": 19635000
+            }
+          ],
+          "api_error": null
+        }
+      ],
+      "credential": "Cloud OAuth canónico y secreto server-side; ticket omitido."
+    },
+    {
+      "system": "SECOP II",
+      "urls": [
+        "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+        "https://www.datos.gov.co/resource/jbjy-vk9h.json"
+      ],
+      "queries": [
+        {
+          "q": {
+            "$select": "max(fecha_de_publicacion_del) as last"
+          },
+          "http": 200,
+          "time": "2026-11-04T09:03:26.828569-03:00",
+          "data": [
+            {
+              "last": "2026-11-02T00:00:00.000"
+            }
+          ]
+        },
+        {
+          "q": {
+            "$select": "count(*) as n",
+            "$where": "fecha_de_publicacion_del >= '2026-11-01T22:00:00' AND fecha_de_publicacion_del <= '2026-11-04T07:05:00'"
+          },
+          "http": 200,
+          "time": "2026-11-04T09:03:32.914513-03:00",
+          "data": [
+            {
+              "n": "310"
+            }
+          ]
+        },
+        {
+          "q": {
+            "$select": "nombre_del_procedimiento,entidad,fecha_de_publicacion_del,estado_del_procedimiento,referencia_del_proceso,urlproceso",
+            "$where": "fecha_de_publicacion_del >= '2026-11-01T22:00:00' AND fecha_de_publicacion_del <= '2026-11-04T07:05:00' AND (upper(nombre_del_procedimiento) like '%AUDIOVISUAL%' OR upper(nombre_del_procedimiento) like '%PAUTA%' OR upper(nombre_del_procedimiento) like '%PUBLICIDAD%' OR upper(nombre_del_procedimiento) like '%SITIO WEB%' OR upper(nombre_del_procedimiento) like '%CRM%' OR upper(nombre_del_procedimiento) like '%HUBSPOT%' OR upper(nombre_del_procedimiento) like '%AGENCIA%' OR upper(nombre_del_procedimiento) like '%POSICIONAMIENTO%' OR upper(nombre_del_procedimiento) like '%PORTAL WEB%' OR upper(nombre_del_procedimiento) like '%DIFUSIÓN%' OR upper(nombre_del_procedimiento) like '%MEDIOS DE COMUNICACIÓN%')",
+            "$limit": 100
+          },
+          "http": 200,
+          "time": "2026-11-04T09:03:26.851294-03:00",
+          "data": [
+            {
+              "nombre_del_procedimiento": "SE REQUIERE LA ADQUISICIÓN DE CUATRO (4) UNIDADES AUDIOVISUALES PARA SUMINISTRAR A LAS SEDES (04. LÓPEZ MENDOZA; 05. AGUA COLORADA; 07. PETAQUERO Y 08. LA MESA). COMO PARTE DE LA DOTACIÓN PEDAGÓGICA P",
+              "entidad": "Institución Educativa Cabrerita",
+              "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+              "estado_del_procedimiento": "Publicado",
+              "referencia_del_proceso": "2026-11",
+              "urlproceso": {
+                "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160758"
+              }
+            },
+            {
+              "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PROFESIONALES PARA LA PRODUCCIÓN DE CONTENIDOS AUDIOVISUALES Y PIEZAS GRÁFICAS EN EL MARCO DEL PROYECTO: NO. 9245680 DE 2026. PTIES - IMPLEMENTACIÓN TÉCNICA DE LOS PROGRAMAS DE",
+              "entidad": "UNIVERSIDAD NACIONAL DE COLOMBIA",
+              "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+              "estado_del_procedimiento": "Publicado",
+              "referencia_del_proceso": "UNAL-MED-2026-4468873",
+              "urlproceso": {
+                "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160259"
+              }
+            }
+          ]
+        },
+        {
+          "dataset": "p6dx-8zbt",
+          "q": {
+            "referencia_del_proceso": "UNAL-MED-2026-4468873",
+            "$limit": 5
+          },
+          "at": "2026-11-04T09:04:21.063293-03:00",
+          "status": 200,
+          "n": 1,
+          "keys": [
+            "entidad",
+            "nit_entidad",
+            "departamento_entidad",
+            "ciudad_entidad",
+            "ordenentidad",
+            "codigo_pci",
+            "id_del_proceso",
+            "referencia_del_proceso",
+            "ppi",
+            "id_del_portafolio",
+            "nombre_del_procedimiento",
+            "descripci_n_del_procedimiento",
+            "fase",
+            "fecha_de_publicacion_del",
+            "fecha_de_ultima_publicaci",
+            "fecha_de_publicacion_fase_3",
+            "precio_base",
+            "modalidad_de_contratacion",
+            "justificaci_n_modalidad_de",
+            "duracion",
+            "unidad_de_duracion",
+            "ciudad_de_la_unidad_de",
+            "nombre_de_la_unidad_de",
+            "proveedores_invitados",
+            "proveedores_con_invitacion",
+            "visualizaciones_del",
+            "proveedores_que_manifestaron",
+            "respuestas_al_procedimiento",
+            "respuestas_externas",
+            "conteo_de_respuestas_a_ofertas",
+            "proveedores_unicos_con",
+            "numero_de_lotes",
+            "estado_del_procedimiento",
+            "id_estado_del_procedimiento",
+            "adjudicado",
+            "id_adjudicacion",
+            "codigoproveedor",
+            "departamento_proveedor",
+            "ciudad_proveedor",
+            "valor_total_adjudicacion",
+            "nombre_del_adjudicador",
+            "nombre_del_proveedor",
+            "nit_del_proveedor_adjudicado",
+            "codigo_principal_de_categoria",
+            "estado_de_apertura_del_proceso",
+            "tipo_de_contrato",
+            "subtipo_de_contrato",
+            "categorias_adicionales",
+            "urlproceso",
+            "codigo_entidad",
+            "estado_resumen"
+          ],
+          "records": [
+            {
+              "id_del_proceso": "CO1.REQ.11306473",
+              "referencia_del_proceso": "UNAL-MED-2026-4468873",
+              "fase": "Presentación de oferta",
+              "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+              "precio_base": "1890000",
+              "modalidad_de_contratacion": "Contratación régimen especial",
+              "proveedores_invitados": "0",
+              "proveedores_que_manifestaron": "0",
+              "estado_del_procedimiento": "Publicado",
+              "adjudicado": "No",
+              "valor_total_adjudicacion": "0",
+              "nombre_del_adjudicador": "No Adjudicado",
+              "tipo_de_contrato": "Decreto 092 de 2017"
+            }
+          ]
+        },
+        {
+          "dataset": "jbjy-vk9h",
+          "q": {
+            "proceso_de_compra": "CO1.NTC.11160259",
+            "$limit": 10
+          },
+          "at": "2026-11-04T09:04:29.466167-03:00",
+          "status": 200,
+          "n": 0,
+          "keys": [],
+          "records": []
+        },
+        {
+          "dataset": "jbjy-vk9h",
+          "q": {
+            "id_del_proceso": "CO1.NTC.11160259",
+            "$limit": 10
+          },
+          "at": "2026-11-04T09:04:20.824202-03:00",
+          "error": "HTTP Error 400: Bad Request"
+        },
+        {
+          "q": {
+            "proceso_de_compra": "CO1.REQ.11306473",
+            "$limit": 20
+          },
+          "at": "2026-11-04T09:05:13.546278-03:00",
+          "count": 0,
+          "contracts": []
+        }
+      ],
+      "caveat": "Techo nominal Bogotá 07:05 redondeado; última fila 2/11, sin filas futuras."
+    },
+    {
+      "system": "LicitaLAB",
+      "command": "search --view all --max 200 --no-login",
+      "status": "exit 3",
+      "documents": [
+        "1664-28-L126",
+        "2741-78-LE26",
+        "601-17-LE26"
+      ],
+      "ask_docs": [
+        [
+          "1664-28-L126",
+          "Bases_1664-28-L126: quién puede ofertar, plazo de consultas/ofertas, visita obligatoria, anexos, modalidad de adjudicación y orden de compra o firma, vigencia y entregas. Identifica página, fechas y si existe proveedor ya seleccionado."
+        ],
+        [
+          "2741-78-LE26",
+          "Resolución 4227: identifica fecha y naturaleza del acto, requisitos de medios propios y cobertura local, admisión de agencias, consultas y ofertas, plazo de ejecución, minuta, adjudicatario y orden o firma. Da páginas y no supongas adjudicación por bases."
+        ],
+        [
+          "1138297-11-LE26",
+          "Resolución 03355 del 2 de noviembre de 2026: adjudicatario, monto, modalidad y fecha efectiva de firma u orden de compra e inicio y fin. Señala sólo hechos documentados."
+        ],
+        [
+          "1664-28-L126",
+          "En Bases_1664-28-L126, sección formalización: ¿orden de compra aceptada o contrato escrito? Extrae plazo exacto de ejecución y evento inicial, y condiciones de pago; cita páginas."
+        ],
+        [
+          "2741-78-LE26",
+          "En 4227.pdf, ¿se permite ofertar por línea y qué prueba exacta exige de titularidad, autorización o disponibilidad del medio radial/digital, cobertura y audiencia de San Felipe? Cita páginas y frase."
+        ],
+        [
+          "601-17-LE26",
+          "Ubica secciones y páginas exactas de adjudicación, modalidad de formalización, firma, inicio y duración, garantías y calendario de recepción. Devuelve hechos del documento, sin inferir contrato vigente."
+        ]
+      ]
+    },
+    {
+      "system": "HubSpot",
+      "connector": "UNAUTHORIZED",
+      "fallback": "Agent CLI 0.17.0 OAuth portal 48713323",
+      "deals_read": [
+        "66450601027",
+        "67081021485",
+        "66672959873",
+        "66481946424",
+        "66218288550"
+      ],
+      "task_read": {
+        "id": "119879914252",
+        "status": "NOT_STARTED",
+        "due": "2026-11-03T13:00:00Z"
+      },
+      "search": [
+        {
+          "type": "companies",
+          "filters": [
+            "domain=unal.edu.co",
+            "name~Universidad Nacional de Colombia"
+          ],
+          "found": [
+            "54977353765"
+          ]
+        },
+        {
+          "type": "deals",
+          "filters": [
+            "dealname~4468873",
+            "dealname~9245680"
+          ],
+          "found": []
+        },
+        {
+          "type": "companies",
+          "filters": [
+            "name~San Felipe",
+            "name~Reloncaví",
+            "name~Hospital de Fresia"
+          ],
+          "found": []
+        },
+        {
+          "type": "deals",
+          "filters": [
+            "dealname~1664-28-L126",
+            "dealname~2741-78-LE26"
+          ],
+          "found": []
+        }
+      ],
+      "writes": 0
+    }
+  ],
+  "screening_results": [
+    {
+      "refs": [
+        "CO1.NTC.11160758",
+        "1417913-152-L126",
+        "867990-135-L126",
+        "3378-68-LP26"
+      ],
+      "result": "equipamiento o sistema de pagos, fuera de alcance; sin conclusión contractual"
+    },
+    {
+      "refs": [
+        "1393575-29-LE25"
+      ],
+      "result": "Marca Chile, aviso histórico, cierre diciembre 2025"
+    }
+  ],
+  "actions": [
+    {
+      "entity": "Assetplan",
+      "owner": "Julio y CRM",
+      "due": "2026-11-03T10:00:00-03:00",
+      "next": "Asignar especialista, disponibilidad y respaldo. Tarea vencida."
+    },
+    {
+      "entity": "Qualitor",
+      "owner": "Julio, Legal, Compras",
+      "due": "2026-11-05T14:00:00-03:00",
+      "next": "Resolver entidad admisible y hora de recepción; HOLD."
+    },
+    {
+      "entity": "Fresia/San Felipe",
+      "owner": "agente",
+      "next": "Resolver originales, costo de rodaje y prueba de medio antes de preguntas 5/11."
+    },
+    {
+      "entity": "FONATUR",
+      "owner": "agente",
+      "due": "2026-11-09T11:00:00-06:00",
+      "next": "Recuperar acta e invitación; confirmar admisión."
+    },
+    {
+      "entity": "Mattis",
+      "owner": "Julio y Finance",
+      "next": "Preparar certificado SII; oferta y declaración ya enviadas."
+    }
+  ],
+  "permissions": {
+    "crm": "read_only",
+    "approval_changes": 0,
+    "proposed_crm_batch": null,
+    "credit_spend": 0,
+    "outreach": 0,
+    "submissions": 0,
+    "tasks_created": 0,
+    "commit_push": false
+  },
+  "privacy": "Consultas sin datos personales; resultados nominales omitidos. No raw de LinkedIn, credenciales ni direcciones individuales.",
+  "private_evidence_directory": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-04-0901-radar"
+}

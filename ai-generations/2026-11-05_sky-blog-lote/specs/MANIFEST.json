@@ -1,0 +1,797 @@
+{
+ "actualizado": "2026-11-05",
+ "total": 54,
+ "imagenes_total": 157,
+ "banners": {
+  "listo": 44,
+  "bloqueado": 10
+ },
+ "articulos": [
+  {
+   "id": "copacabana",
+   "notion_url": "https://app.notion.com/1557ee7bebe14257833c60afa81e348e",
+   "titulo": "Año nuevo en Copacabana: cómo vivir el Réveillon en Río de Janeiro",
+   "mercado": "CL/AR",
+   "spec": "copacabana.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Fuegos sobre el mar de Río",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "santiago-ano-nuevo",
+   "notion_url": "https://app.notion.com/40239c2fefe781d9b801d90ac87f25f6",
+   "titulo": "Año Nuevo en Santiago: dónde ver los fuegos y cómo moverte esa noche",
+   "mercado": "CL",
+   "spec": "santiago-ano-nuevo.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Fuegos sobre la Alameda a medianoche",
+   "ruta": {
+    "iata": "ANF",
+    "ciudad": "Antofagasta"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "cajamarca",
+   "notion_url": "https://app.notion.com/64f024371c3c45d9a3bcdbaae36dac7b",
+   "titulo": "Cajamarca sin esperar al carnaval: qué conocer en tu primera escapada",
+   "mercado": "PE",
+   "spec": "cajamarca.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Piedra inca y termas humeantes",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "carnaval-cajamarca",
+   "notion_url": "https://app.notion.com/40239c2fefe781aea295c7fc63f6d72b",
+   "titulo": "Carnaval de Cajamarca: qué ver, cuándo es y cómo organizar el viaje",
+   "mercado": "PE",
+   "spec": "carnaval-cajamarca.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Coplas, clones y calles pintadas",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "cena-chilena",
+   "notion_url": "https://app.notion.com/40239c2fefe7816790d1d808f3ec83fe",
+   "titulo": "Cena navideña chilena: platos típicos y cómo se preparan",
+   "mercado": "CL",
+   "spec": "cena-chilena.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Nochebuena con la familia del sur",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "cena-peruana",
+   "notion_url": "https://app.notion.com/40239c2fefe781c4985ac73d4bee0f74",
+   "titulo": "Cena navideña peruana: qué se sirve en Navidad y por qué",
+   "mercado": "PE",
+   "spec": "cena-peruana.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Santurantikuy y Nochebuena en Cusco",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "check-in",
+   "notion_url": "https://app.notion.com/40239c2fefe78139930cf41f74b720cc",
+   "titulo": "Check-in SKY: cuándo hacerlo y cómo obtener tu tarjeta de embarque",
+   "mercado": "CL/PE",
+   "spec": "check-in.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Sur de Chile, check-in resuelto",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "chiclayo",
+   "notion_url": "https://app.notion.com/8b58f2fc987e4d37944b983327084a33",
+   "titulo": "Chiclayo para amantes de la historia: cómo organizar una ruta de museos y sitios arqueológicos",
+   "mercado": "PE",
+   "spec": "chiclayo.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Oro moche y pirámides de adobe",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "cumbemayo",
+   "notion_url": "https://app.notion.com/40239c2fefe781baa85affe24f51336d",
+   "titulo": "Cumbemayo y Granja Porcón: dos escapadas desde Cajamarca",
+   "mercado": "PE",
+   "spec": "cumbemayo.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Agua tallada en la piedra",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "curanto",
+   "notion_url": "https://app.notion.com/6626722cda004b558522e32dad63cd7b",
+   "titulo": "Curanto al hoyo en Chiloé: dónde y cómo probarlo cocinado bajo tierra",
+   "mercado": "CL",
+   "spec": "curanto.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Piedras calientes y vapor de nalca",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "cusco-calma",
+   "notion_url": "https://app.notion.com/33dcbe79b5634e779b881c5b70741a16",
+   "titulo": "Cusco sin Machu Picchu: un viaje para descubrir la ciudad con más calma",
+   "mercado": "PE/CL",
+   "spec": "cusco-calma.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Campanas, cuestas y caldo de mercado",
+   "ruta": "Lima (LIM) → Cusco (CUZ) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "ayacucho",
+   "notion_url": "https://app.notion.com/40239c2fefe781bc86ffc23a8a35c52a",
+   "titulo": "Cómo llegar a Ayacucho y qué ver en tu primera visita",
+   "mercado": "PE",
+   "spec": "ayacucho.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Arquerías, talleres y una tarde libre",
+   "ruta": "Lima (LIM) → Ayacucho (AYP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "alpaca",
+   "notion_url": "https://app.notion.com/c193e2c676504447b0b5901097d32b62",
+   "titulo": "Del hilo a la prenda: cómo acercarte al tejido de alpaca durante un viaje",
+   "mercado": "PE",
+   "spec": "alpaca.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Telares, colores y montaña en Cusco",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "lodge-selva",
+   "notion_url": "https://app.notion.com/034cd25e8dfd4423943b01a9bc41dfce",
+   "titulo": "Dormir en la selva por primera vez: qué revisar antes de reservar un lodge",
+   "mercado": "PE",
+   "spec": "lodge-selva.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Canoa al amanecer, ranas de noche",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "punta-cana",
+   "notion_url": "https://app.notion.com/40239c2fefe7817c8651e40d40dbdcbc",
+   "titulo": "Dónde queda Punta Cana y cuándo conviene viajar",
+   "mercado": "CL",
+   "spec": "punta-cana.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Arena clara y agua turquesa",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "peru-diciembre",
+   "notion_url": "https://app.notion.com/deeae0d1c8ac4d099733a955cca7a6be",
+   "titulo": "Dónde viajar en Perú en diciembre según los días que tengas libres",
+   "mercado": "PE",
+   "spec": "peru-diciembre.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Cusco, piedra y chocolate caliente",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "candelaria",
+   "notion_url": "https://app.notion.com/40239c2fefe781f4b4a4efea698ff1c0",
+   "titulo": "Fiesta de la Candelaria en Puno: qué ver y cómo organizar el viaje en 2027",
+   "mercado": "PE",
+   "spec": "candelaria.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Bronces, máscaras y febrero en Puno",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "valdivia",
+   "notion_url": "https://app.notion.com/c9859c94706247debc138ee457065b48",
+   "titulo": "Fin de semana en Valdivia con amigos: cerveza, río y lobos marinos",
+   "mercado": "CL",
+   "spec": "valdivia.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Río, fuertes y brindis en grupo",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "iquitos",
+   "notion_url": "https://app.notion.com/2e3e2b2a1199480fa39e318b2d91c752",
+   "titulo": "Iquitos por primera vez: cómo combinar la ciudad con el Amazonas",
+   "mercado": "PE",
+   "spec": "iquitos.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Aguaje en Belén, noche selvática",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "titicaca",
+   "notion_url": "https://app.notion.com/40239c2fefe781a28f88e841c50ba1e8",
+   "titulo": "Lago Titicaca desde Juliaca: cómo organizar Puno y las islas Uros, Taquile y Amantaní",
+   "mercado": "PE",
+   "spec": "titicaca.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Totora, islas y lago sin prisa",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "sauce",
+   "notion_url": "https://app.notion.com/40239c2fefe7810394aefe63a33f31d4",
+   "titulo": "Laguna Azul de Sauce: cómo llegar desde Tarapoto y qué hacer en un día",
+   "mercado": "PE",
+   "spec": "sauce.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Bote, baño y patarashca",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "lamas",
+   "notion_url": "https://app.notion.com/40239c2fefe7814d9391d902a6a3a3c6",
+   "titulo": "Lamas: el pueblo con castillo y barrio nativo cerca de Tarapoto",
+   "mercado": "PE",
+   "spec": "lamas.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Piedra, arcilla y valle verde",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "arequipa",
+   "notion_url": "https://app.notion.com/40239c2fefe781ae9355cd8f0affa578",
+   "titulo": "Lugares turísticos de Arequipa: cómo organizar tres días con el Cañón del Colca",
+   "mercado": "PE",
+   "spec": "arequipa.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Sillar blanco y un cañón profundo",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "tacna",
+   "notion_url": "https://app.notion.com/40239c2fefe781058a5fe63f3a9fb2d3",
+   "titulo": "Lugares turísticos de Tacna: qué visitar en uno o dos días",
+   "mercado": "PE",
+   "spec": "tacna.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Piedra, picante y rocas milenarias",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "liquidos",
+   "notion_url": "https://app.notion.com/40239c2fefe78142aa3ef11bf7ea359b",
+   "titulo": "Líquidos en el avión: cuántos mililitros puedes llevar en cabina",
+   "mercado": "CL/PE",
+   "spec": "liquidos.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Tu neceser completo, sin bolsa",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "mal-altura",
+   "notion_url": "https://app.notion.com/efdadba11cd44eddacaefd6f0b58eebe",
+   "titulo": "Mal de altura en Cusco: cómo prepararte antes y después del vuelo",
+   "mercado": "PE/CL",
+   "spec": "mal-altura.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Primera tarde tranquila, Cusco por delante",
+   "ruta": "Lima (LIM) → Cusco (CUZ) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "yanahuara",
+   "notion_url": "https://app.notion.com/40239c2fefe781ec9361cfceb410871e",
+   "titulo": "Mirador de Yanahuara: cómo llegar y qué ver en el barrio más fotografiado de Arequipa (H1 por confirmar)",
+   "mercado": "PE",
+   "spec": "yanahuara.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Arcos blancos frente al Misti",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "mancora",
+   "notion_url": "https://app.notion.com/58d3beb6a4334b46ac9caa0a096e12d4",
+   "titulo": "Máncora, Vichayito, Punta Sal o Zorritos: qué playa elegir para tu próximo viaje",
+   "mercado": "PE",
+   "spec": "mancora.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Olas, hamaca o mar en calma",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "paraty",
+   "notion_url": "https://app.notion.com/47163f0fe1cf47688346249e58883422",
+   "titulo": "Paraty, Brasil: por qué ir y cómo organizar tu primera visita",
+   "mercado": "CL/AR",
+   "spec": "paraty.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Calles de piedra y bahía verde",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "catacaos",
+   "notion_url": "https://app.notion.com/3911784af13f4eb3974bc44eb59c6a09",
+   "titulo": "Piura más allá de la playa: qué conocer en una escapada a Catacaos",
+   "mercado": "PE",
+   "spec": "catacaos.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Filigrana, paja toquilla y picantería",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "colan",
+   "notion_url": "https://app.notion.com/40239c2fefe7814b9c16f57e26446148",
+   "titulo": "Playa Colán: cómo llegar desde Piura y por qué elegirla este verano",
+   "mercado": "PE",
+   "spec": "colan.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Agua quieta y casonas sobre pilotes",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "buenos-aires-playas",
+   "notion_url": "https://app.notion.com/40239c2fefe78172a316f2f356cff147",
+   "titulo": "Playas cerca de Buenos Aires: cuáles elegir para una escapada de verano",
+   "mercado": "AR",
+   "spec": "buenos-aires-playas.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "El Pacífico, a un vuelo",
+   "ruta": {
+    "iata": "AEP/EZE",
+    "ciudad": "Buenos Aires"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "punta-sal",
+   "notion_url": "https://app.notion.com/40239c2fefe78112ac76c0af757ee2c1",
+   "titulo": "Punta Sal: dónde queda, cómo llegar desde Tumbes y qué hacer en su playa",
+   "mercado": "PE",
+   "spec": "punta-sal.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Mar suave y arena clara",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "lima-3-dias",
+   "notion_url": "https://app.notion.com/325df068860b47a2b905edf73cee6887",
+   "titulo": "Qué hacer en Lima en 3 días: itinerario por zonas para tu primera visita",
+   "mercado": "CL",
+   "spec": "lima-3-dias.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Huacas, cebiche y acantilados",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado CHL; no se produce ni se enlaza hasta que Paid / Ad Ops cree la fila es-cl con URL limpia"
+  },
+  {
+   "id": "talara",
+   "notion_url": "https://app.notion.com/40239c2fefe781469b10d6c610206ccc",
+   "titulo": "Qué hacer en Talara: Cabo Blanco, Lobitos y las playas a minutos del aeropuerto",
+   "mercado": "PE",
+   "spec": "talara.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Olas largas y caletas de pescadores",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER (consultado el 05/11/2026); no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "cancun-maleta",
+   "notion_url": "https://app.notion.com/454a8153dd3e48faa488a8341ba8e641",
+   "titulo": "Qué llevar a Cancún (y qué no): ropa, mar, documentos y aduana",
+   "mercado": "CL",
+   "spec": "cancun-maleta.json",
+   "imagenes": 3,
+   "banner": "bloqueado",
+   "banner_titular": "Tu maleta, lista para el Caribe",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado CHL: SCL → CUN figura 🔴 Archivada al 05/11/2026 (también LIM → CUN, EZE → CUN y GRU → CUN). Sin URL de ruta. No producir hasta que Paid / Ad Ops confirme una ruta activa; si vuelve SCL → CUN, se completa con su URL limpia"
+  },
+  {
+   "id": "selva-maleta",
+   "notion_url": "https://app.notion.com/dd20168becf64e21b9d117e149cd371d",
+   "titulo": "Qué llevar a la selva peruana: una maleta pensada para el calor, la humedad y las excursiones",
+   "mercado": "PE",
+   "spec": "selva-maleta.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Cataratas, lluvia tibia y mototaxis",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "retablo",
+   "notion_url": "https://app.notion.com/c9759009adf9447cb410fd236d05375a",
+   "titulo": "Retablos ayacuchanos: las historias que caben dentro de una caja",
+   "mercado": "PE",
+   "spec": "retablo.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Santos arriba, fiesta abajo",
+   "ruta": "Lima (LIM) → Ayacucho (AYP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "noticia-puntual-cl",
+   "notion_url": "https://app.notion.com/4a6ee1fa7f4341ffa4b997d59215fc6f",
+   "titulo": "SKY es la aerolínea más puntual de Latinoamérica en septiembre de 2026",
+   "mercado": "CL",
+   "spec": "noticia-puntual-cl.json",
+   "imagenes": 2,
+   "banner": "bloqueado",
+   "banner_titular": null,
+   "ruta": null,
+   "motivo_bloqueo": "el beneficio que plantea la nota (puntualidad) se mide sobre toda la operación de SKY en el mes, no por ruta: no hay dato de puntualidad de ninguna ruta 🟢 del mercado Chile con fuente que sostenga un banner, y el research recomienda que la noticia no lleve CTA de venta en el cuerpo"
+  },
+  {
+   "id": "noticia-puntual-pe",
+   "notion_url": "https://app.notion.com/d5330c4aeb564fc29cbb9fae29bfc39f",
+   "titulo": "SKY, la aerolínea más puntual de Latinoamérica en septiembre: qué significa para quien vuela en Perú",
+   "mercado": "PE",
+   "spec": "noticia-puntual-pe.json",
+   "imagenes": 2,
+   "banner": "bloqueado",
+   "banner_titular": null,
+   "ruta": null,
+   "motivo_bloqueo": "la puntualidad de la nota se mide sobre toda la operación de SKY en el mes y no hay dato con fuente de ninguna ruta 🟢 del mercado Perú (ni siquiera está confirmado que la cifra incluya la operación nacional en Perú); el research recomienda que la noticia no lleve CTA de venta en el cuerpo"
+  },
+  {
+   "id": "noticia-talara",
+   "notion_url": "https://app.notion.com/64ee12a9310a4c5c984a3d2a657e022e",
+   "titulo": "SKY inicia vuelos entre Lima y Talara y fortalece su conexión con el norte del Perú",
+   "mercado": "PE",
+   "spec": "noticia-talara.json",
+   "imagenes": 2,
+   "banner": "bloqueado",
+   "banner_titular": "Del aeropuerto a las olas",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER (consultado el 05/11/2026); no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia"
+  },
+  {
+   "id": "noticia-gol-cl",
+   "notion_url": "https://app.notion.com/778c41e441d547f092c1d0c80b2ac96e",
+   "titulo": "SKY y GOL firman código compartido para viajar entre Chile, Perú y Brasil con una sola reserva",
+   "mercado": "CL",
+   "spec": "noticia-gol-cl.json",
+   "imagenes": 2,
+   "banner": "listo",
+   "banner_titular": "Tu próxima escapada a Brasil",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "noticia-gol-pe",
+   "notion_url": "https://app.notion.com/03d0061e05e942ccb570672e68fdabc4",
+   "titulo": "SKY y GOL firman código compartido: qué cambia para quien viaja desde Lima a Brasil",
+   "mercado": "PE",
+   "spec": "noticia-gol-pe.json",
+   "imagenes": 2,
+   "banner": "listo",
+   "banner_titular": "Frente al mar de Río",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "tarapoto",
+   "notion_url": "https://app.notion.com/bd2c39aece51412d878527d2d0d6d40e",
+   "titulo": "Tarapoto en 3 días: cómo repartir tu viaje entre la ciudad, Lamas y Sauce",
+   "mercado": "PE",
+   "spec": "tarapoto.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Cataratas, lagunas y un castillo",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "tipos-equipaje",
+   "notion_url": "https://app.notion.com/40239c2fefe781638df8db5540dc1f8d",
+   "titulo": "Tipos de equipaje en SKY: bolso de mano, equipaje de mano y bodega",
+   "mercado": "CL/PE",
+   "spec": "tipos-equipaje.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Todo tu abrigo viaja en bodega",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "equipaje-bodega",
+   "notion_url": "https://app.notion.com/40239c2fefe781819c86cf08cad29105",
+   "titulo": "Equipaje de bodega SKY: peso, medidas y cómo agregarlo",
+   "mercado": "CL/PE",
+   "spec": "equipaje-bodega.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Tu ropa de nieve, en bodega",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "equipaje-mano",
+   "notion_url": "https://app.notion.com/3ce0e1c86f4b431ba91cc4e5f05843c6",
+   "titulo": "Equipaje de mano SKY: medidas, peso y qué incluye tu tarifa",
+   "mercado": "CL/PE",
+   "spec": "equipaje-mano.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Con Light, tu maleta sube contigo",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "brasil",
+   "notion_url": "https://app.notion.com/40239c2fefe781c99236f383a8351fbf",
+   "titulo": "Viajar a Brasil desde Chile: documentos, moneda y qué saber antes de volar",
+   "mercado": "CL",
+   "spec": "brasil.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "El primer «obrigado» te espera",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "amigos",
+   "notion_url": "https://app.notion.com/e7fcab4192a442fcbfbe41ba6ddef0f9",
+   "titulo": "Viajar con amigos: cómo organizar una escapada cuando no todos quieren lo mismo",
+   "mercado": "CL/PE",
+   "spec": "amigos.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Playa, picantería y tiempo libre",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "ninos-peru",
+   "notion_url": "https://app.notion.com/2380748f992c4216abb79d9214043eeb",
+   "titulo": "Viajar con niños dentro de Perú: cómo organizar una escapada que todos disfruten",
+   "mercado": "PE",
+   "spec": "ninos-peru.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Primeras olas y manglares en familia",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "adulto-mayor",
+   "notion_url": "https://app.notion.com/37eba825849842708a84ed3afb4dd59c",
+   "titulo": "Viajar en avión con un adulto mayor: cómo acompañarlo en cada paso",
+   "mercado": "CL/PE",
+   "spec": "adulto-mayor.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "El sur, a su propio ritmo",
+   "ruta": {
+    "iata": "SCL",
+    "ciudad": "Santiago"
+   },
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "vilcashuaman",
+   "notion_url": "https://app.notion.com/40239c2fefe781619a8ed0b15fe89212",
+   "titulo": "Vilcashuamán: cómo visitar el centro inca cerca de Ayacucho",
+   "mercado": "PE",
+   "spec": "vilcashuaman.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Piedra inca y viento de puna",
+   "ruta": "Lima (LIM) → Ayacucho (AYP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "zorritos",
+   "notion_url": "https://app.notion.com/40239c2fefe781b39608f766d850e7ee",
+   "titulo": "Zorritos y Puerto Pizarro: qué hacer cerca del aeropuerto de Tumbes",
+   "mercado": "PE",
+   "spec": "zorritos.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Ola suave y manglares del norte",
+   "ruta": "Lima (LIM) → Tumbes (TBP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+   "motivo_bloqueo": null
+  },
+  {
+   "id": "manglar",
+   "notion_url": "https://app.notion.com/d89aecf21c984a81a46a20675764a089",
+   "titulo": "Manglares de Tumbes: qué es un manglar y cómo es recorrerlo por primera vez",
+   "mercado": "PE",
+   "spec": "manglar.json",
+   "imagenes": 3,
+   "banner": "listo",
+   "banner_titular": "Raíces, esteros y motor apagado",
+   "ruta": {
+    "iata": "LIM",
+    "ciudad": "Lima"
+   },
+   "motivo_bloqueo": null
+  }
+ ]
+}

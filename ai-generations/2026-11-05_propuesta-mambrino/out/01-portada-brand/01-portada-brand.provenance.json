@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "e02f3c232d16e71e5e7032911dabc4cd543afe736e3dcee5e16f493c4e7654d8",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:trattoria-mambrino-blanco",
+      "path": "ai-generations/2026-11-05_propuesta-mambrino/logos/trattoria-mambrino-blanco.png",
+      "sha256": "4d57a921455f7b166b2a130fb8792637924757cfac23d00b342b90822a6037eb"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

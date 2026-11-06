@@ -1,0 +1,92 @@
+{
+  "tenderId": "F09c-matriz",
+  "slides": [
+    {
+      "slideId": "deck-method-score-ring",
+      "contentType": "deck.method-score-ring",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 150,
+          "bodyTop": 450,
+          "bodyPx": 25,
+          "bodyWidth": 560,
+          "ctaTop": "--gl-sr-cta-top=700px",
+          "ctaPx": "--gl-sr-cta-px=24px",
+          "ctaPadY": "--gl-sr-cta-pad-y=22px",
+          "ctaPadX": "--gl-sr-cta-pad-x=38px",
+          "ctaRadius": "--gl-sr-cta-radius=14px",
+          "ctaUrlPx": "--gl-sr-cta-url-px=20px",
+          "totalLeft": "--gl-sr-total-left=1160px",
+          "totalWidth": "--gl-sr-total-width=300px",
+          "totalTop": "--gl-sr-total-top=456px",
+          "totalPx": "--gl-sr-total-px=110px",
+          "totalLabelTop": "--gl-sr-total-label-top=570px",
+          "totalLabelPx": "--gl-sr-total-label-px=22px",
+          "labelWidth": "--gl-sr-label-width=300px",
+          "labelWeightPx": "--gl-sr-label-weight-px=40px",
+          "labelNamePx": "--gl-sr-label-name-px=18px",
+          "labelNameGap": "--gl-sr-label-name-gap=2px",
+          "sourceLeft": "--gl-sr-source-left=660px",
+          "sourceTop": "--gl-sr-source-top=1000px",
+          "sourcePx": "--gl-sr-source-px=16px"
+        },
+        "ring": {
+          "src": "asset-ref:layer:method-score-ring-revenue-hubspot-39-45-13-3"
+        },
+        "voice": {
+          "question": "Los 74 requisitos, uno a",
+          "answer": "Uno",
+          "eyebrow": "Matriz de cumplimiento"
+        },
+        "body": "Cada requisito de seguridad de las bases, con su respuesta y su evidencia en el anexo.",
+        "total": {
+          "value": "74",
+          "label": "requisitos respondidos"
+        },
+        "labels": [
+          {
+            "left": "--gl-sr-label-left=1611px",
+            "top": "--gl-sr-label-top=386px",
+            "side": "start",
+            "weight": "39",
+            "name": "% cumple con Sales Hub"
+          },
+          {
+            "left": "--gl-sr-label-left=798px",
+            "top": "--gl-sr-label-top=734px",
+            "side": "end",
+            "weight": "45",
+            "name": "% con control de Efeonce"
+          },
+          {
+            "left": "--gl-sr-label-left=830px",
+            "top": "--gl-sr-label-top=229px",
+            "side": "end",
+            "weight": "13",
+            "name": "% en desarrollo, fase 1"
+          },
+          {
+            "left": "--gl-sr-label-left=1280px",
+            "top": "--gl-sr-label-top=175px",
+            "side": "start",
+            "weight": "3",
+            "name": "% no cumple, declarado"
+          }
+        ],
+        "cta": {
+          "text": "Ver la matriz completa",
+          "url": "Anexo · 74 requisitos",
+          "cursorScale": 1.3,
+          "descriptorGapPx": 20
+        },
+        "source": "Matriz de cumplimiento, anexo de esta propuesta"
+      },
+      "template": "MethodScoreRing"
+    }
+  ]
+}

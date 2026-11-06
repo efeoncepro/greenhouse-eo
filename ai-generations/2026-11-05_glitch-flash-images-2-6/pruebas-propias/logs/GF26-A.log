@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.042 (1 × 1413 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/plates/GF26-A.png (edit) …
+  ✓ 2717KB · gpt-image-2.6-sunburst · 2048x1152 · high · complexity high · clave default
+    usage: in 14347 (img 11153 · txt 3194) · out 1413 · total 15760
+done

@@ -1,0 +1,102 @@
+{
+  "id": "noticia-gol-pe",
+  "notion_url": "https://app.notion.com/p/03d0061e05e942ccb570672e68fdabc4",
+  "titulo": "SKY y GOL firman código compartido: qué cambia para quien viaja desde Lima a Brasil",
+  "slug": "/sky-gol-acuerdo-codigo-compartido-peru-brasil/",
+  "mercado": "PE",
+  "version": "v2 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba de la bajada, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de final de tarde · orienta",
+      "registro": "D",
+      "archivo": "viajera-orilla-rio-de-janeiro-atardecer.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera de espaldas en la orilla de una playa de Río de Janeiro al final de la tarde, con los cerros de la ciudad al fondo",
+      "que_muestra": "la orilla de una playa urbana de Río de Janeiro con arena húmeda y ola suave; una viajera camina hacia el agua con las sandalias en la mano; al fondo, los cerros que cierran la bahía y la línea de la ciudad. Debe leerse como llegada a Río, no como postal de resort.",
+      "hora_clima": "final de la tarde de verano (el relato habla de despedir el año frente al mar; se elige la luz previa a la noche para no mostrar fuegos artificiales); cielo despejado o con nubes altas; luz cálida abundante, sombras abiertas, altas luces del cielo conservadas",
+      "personas": "la viajera a media distancia, de espaldas, sin pose ni mirada al lente; otros bañistas lejanos y pequeños, en acciones espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "arena mojada con espuma de la ola muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera",
+      "ancla_pov": "quieres despedir el año frente al mar de Río de Janeiro",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY o GOL",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin fuegos artificiales",
+        "sin multitudes de Año Nuevo",
+        "sin kioscos ni sombrillas con marcas",
+        "sin geografía inventada de la bahía"
+      ],
+      "fidelidad": "lugar identificable (bahía y cerros de Río de Janeiro) → requiere foto real REF-01 de la playa elegida en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la línea del agua y los cerros tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina que este verano quieres despedir el año frente al mar de Río de Janeiro…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "F — Encuentro social",
+      "modificadores": "decisión del viaje · dos personas · escala media · luz de mañana nublada",
+      "registro": "E",
+      "archivo": "amigos-cafe-lima-libreta-segundo-tramo.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Dos amigos en una mesa de café en Lima revisan una libreta de viaje y deciden el segundo tramo de su viaje a Brasil",
+      "que_muestra": "una mesa junto a la ventana de un café, con dos tazas y una libreta abierta con un recorrido dibujado a mano (sin letras legibles); uno de los amigos señala con el lápiz un punto más allá del primero, el otro se inclina para mirar. La imagen muestra la decisión que el acuerdo facilita: sumar un segundo tramo al viaje.",
+      "hora_clima": "media mañana con el cielo gris de Lima detrás del vidrio; luz difusa abundante, exposición abierta, sin inventar sol",
+      "personas": "fotografía un tercer amigo sentado a la mesa, desde su lugar; los dos amigos miran la libreta, de perfil o de tres cuartos, no al lente; ningún rostro identificable en primer plano; fuera del vidrio, transeúntes lejanos y desenfocados",
+      "primer_plano": "el borde de una taza muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar la libreta",
+      "ancla_pov": "ese segundo tramo es justo el que hasta ahora obligaba a una compra aparte",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY o GOL",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin nombre del café ni carta legible",
+        "sin letras ni números legibles en la libreta",
+        "sin pantallas encendidas",
+        "sin mapas con geografía inventada"
+      ],
+      "fidelidad": "café genérico, no identificable como un local real; no requiere REF-01"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "GIG",
+      "ciudad": "Río de Janeiro"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-rio-de-janeiro",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa) · operación anunciada desde el 28/12/2026 (Blog SKY 31/08/2026)",
+    "titular": "Frente al mar de Río",
+    "cta": "Ver vuelos a Río de Janeiro",
+    "archivo": "banner-ruta-lima-rio-de-janeiro.webp",
+    "alt": "Banner de SKY con la ruta Lima–Río de Janeiro: frente al mar de Río",
+    "posicion": "después de «¿Dónde y desde cuándo se compran los boletos combinados?», antes de las preguntas frecuentes",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, sin logo de GOL ni mención a la alianza, sin fechas en el banner, tipografía Metric sin reemplazo",
+    "_callout_literal": "**BANNER 1 · RUTA — va aquí: después de «¿Dónde y desde cuándo se compran los boletos combinados?», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Río de Janeiro (GIG) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · inicio de operación anunciado para el 28/12/2026 · volver a verificar el día de publicación<br />**Titular:** “Frente al mar de Río” (5 palabras; la ruta Lima → Río de Janeiro es el elemento principal y el titular va en segundo nivel, sin repetir H1 ni meta title)<br />**CTA (lo escribe el compositor):** Ver vuelos a Río de Janeiro →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-rio-de-janeiro<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-rio-de-janeiro.webp` · **ALT:** “Banner de SKY con la ruta Lima–Río de Janeiro: frente al mar de Río”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, sin logo de GOL ni mención a la alianza (sus rutas aún no están confirmadas), sin fechas en el banner, tipografía Metric sin reemplazo"
+  },
+  "descartes": [
+    "llegada a Cusco de viajeros brasileños — lugar identificable que exige REF-01 y promete un destino del acuerdo aún no confirmado",
+    "fuegos artificiales de Año Nuevo en Copacabana — multitudes, riesgo de verosimilitud y promesa de fecha",
+    "aviones de SKY y GOL en plataforma — aviones, libreas y logos generados: prohibido",
+    "pantalla con reserva de dos tramos — texto legible"
+  ]
+}

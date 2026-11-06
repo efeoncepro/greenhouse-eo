@@ -1,0 +1,24 @@
+  $ costo estimado ≈ USD 2.802 (7 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/brasil-img1-maestro.png …
+  ✓ 9506KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 927 (img 0 · txt 927) · out 13342 · total 14269
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/check-in-img1-maestro.png …
+  ✓ 10160KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 775 (img 0 · txt 775) · out 13342 · total 14117
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/equipaje-bodega-img1-maestro.png …
+  ✓ 11042KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 753 (img 0 · txt 753) · out 13342 · total 14095
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/liquidos-img1-maestro.png …
+  ✓ 9577KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 778 (img 0 · txt 778) · out 13342 · total 14120
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/tipos-equipaje-img1-maestro.png …
+  ✓ 10290KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 754 (img 0 · txt 754) · out 13342 · total 14096
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/noticia-gol-cl-img1-maestro.png …
+  ✓ 11219KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 766 (img 0 · txt 766) · out 13342 · total 14108
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/noticia-puntual-pe-img1-maestro.png …
+  ✓ 9643KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 763 (img 0 · txt 763) · out 13342 · total 14105
+done
+exit=0

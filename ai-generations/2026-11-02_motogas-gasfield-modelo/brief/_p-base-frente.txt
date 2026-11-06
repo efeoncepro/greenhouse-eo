@@ -1,0 +1,18 @@
+High quality 3D render of this exact character: GASFIELD, the mascot of the Chilean gas shop "Gas Don Julio". Images 1 and 2 are the official 2D drawings of the character and define its SHAPE and PROPORTIONS. Image 3 defines ONLY the 3D MATERIAL and finish; ignore its body shape, its wrench and its phone.
+
+Character invariants (exactly as in images 1 and 2):
+- Body: a domestic LPG gas cylinder shaped like a rounded barrel or lantern, about 1.1 times taller than it is wide, with gently rounded top and bottom shoulders and slightly bulging sides. It is NOT a sphere, NOT a capsule and NOT a tall thin bottle.
+- One horizontal weld seam ring runs around the whole body at about 55% of its height, just below the mouth.
+- On top: a short central valve stub, surrounded by a thin circular protective guard hoop that floats above the shoulders on four thin vertical posts. The hoop diameter is about half the body width.
+- At the bottom: a short, narrower cylindrical foot collar, about 40% of the body width and 8% of the body height. The legs come out of the underside of the body, one on each side of this collar.
+- Color: glossy saturated red only (main #E31917, shadow side #CF1317, warm highlight #EB5F46). Subtle vertical pressing ribs on the body are allowed. No other colors on the body.
+- Face on the upper half of the front: exactly TWO tall oval glossy black eyes with small white highlights, set wide apart at about 30% of the body height; thin black arched eyebrows above them; ONE wide open smile with white teeth and a pink tongue, centered at about 45% of the height. No nose, no ears, no cheeks painted.
+- Limbs: thin, smooth, matte black rubbery noodle limbs. Arms attach on the left and right sides at about 60% of the body height. Hands are round black cartoon mitten-gloves with a thumb. Legs are about half the body height long and end in rounded black oval shoes.
+- Never add text, logos, labels, clothing, hats, accessories, a nose, ears or extra limbs.
+
+Material and style (from image 3): premium soft-touch glossy vinyl designer toy, smooth surfaces, soft specular highlights on the red, matte black rubber for the limbs, hands and shoes, eyes as glossy black domes.
+Expression: friendly, confident open smile.
+
+POSE AND CAMERA: standing upright and relaxed, both arms hanging loosely slightly away from the body, hands open and relaxed, feet slightly apart, weight even. FRONT VIEW at eye level, the camera straight in front of the face: the face, both eyes and the whole front of the body are fully visible and symmetrical, the guard hoop on top is seen almost edge-on as a thin ellipse with all four posts visible.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully visible with generous margin, centered.

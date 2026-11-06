@@ -1,0 +1,26 @@
+{
+  "id": "GF26-B-edit1",
+  "startedUtc": "2026-11-05T11:22:52.257362+00:00",
+  "elapsedCliSeconds": 30.844,
+  "measurement": "CLI wall time including process, credential resolution, upload, provider and file write; not provider latency",
+  "exitCode": 0,
+  "file": "ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/plates/GF26-B-edit1.png",
+  "fileExists": true,
+  "bytes": 2729964,
+  "sha256": "c89b0acc05bbd403ddbece516d88f881297dd165a609a6fdc78ddb4661f0a068",
+  "modelRequested": "gpt-image-2.6-sunburst",
+  "modelReadback": "gpt-image-2.6-sunburst",
+  "quality": "high",
+  "complexity": "low",
+  "sizeRequested": "2048x1152",
+  "usage": {
+    "input_tokens": 1859,
+    "image_input_tokens": 1508,
+    "text_input_tokens": 351,
+    "output_tokens": 1413,
+    "total_tokens": 3272
+  },
+  "postprocessing": "none; raw CLI provider output",
+  "parent": "GF26-B",
+  "request": "GF26-B-edit1-request.json"
+}

@@ -1,0 +1,2 @@
+[      15ms] [WARNING] Allow attribute will take precedence over 'allowfullscreen'. @ http://127.0.0.1:8793/revision.html:42
+[      49ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8793/favicon.ico:0

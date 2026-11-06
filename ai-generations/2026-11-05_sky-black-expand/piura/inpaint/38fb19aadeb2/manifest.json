@@ -1,0 +1,155 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "38fb19aadeb2",
+  "key": "38fb19aadeb27c776f57f4405713a873790951214756537ba47a9ed6c53827c9",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:24:46.374Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/piura/expand-inputs/742e9c342a24-canvas.png",
+    "imageSha256": "fabb499810eed0f2a31fef03ec376b2e062e772d262cb47a019867315c5c1f55",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/piura/expand-inputs/742e9c342a24-mask.png",
+    "maskSha256": "33226b0a5db490b966567bc4f6bbd4dbf2714f7ca7a1784f4dd1e1287d47e2a8",
+    "maskConvention": "white-editable",
+    "width": 800,
+    "height": 1422,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend the photo upward: continue the same clear deep blue tropical sky above the palm trees of Mancora beach and complete the tops of the palm fronds naturally. Keep the existing photo exactly. No new objects, no birds, no clouds, no text.",
+    "providerPrompt": "Extend the photo upward: continue the same clear deep blue tropical sky above the palm trees of Mancora beach and complete the tops of the palm fronds naturally. Keep the existing photo exactly. No new objects, no birds, no clouds, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3108298171589311,
+    "editable": 274400,
+    "soft": 79200,
+    "protected": 784000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 800,
+      "height": 1422
+    },
+    "target": {
+      "width": 800,
+      "height": 1424
+    },
+    "aspectError": 0.0014064697609000264,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0243,
+    "basis": "1 × salida 800x1424 medium (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 60.165,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7,
+        "bestError": 7,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 784000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 274400,
+        "maxDelta": 220,
+        "meanDelta": 74.899,
+        "worst": {
+          "x": 707,
+          "y": 34
+        }
+      },
+      "seam": {
+        "pixels": 79200,
+        "maxDelta": 166,
+        "meanDelta": 9.116,
+        "worst": {
+          "x": 245,
+          "y": 344
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 784000,
+        "maxDelta": 220,
+        "meanDelta": 23.159,
+        "worst": {
+          "x": 489,
+          "y": 596
+        }
+      },
+      "outputUsd": 0.0243,
+      "providerModel": "gpt-image-2.6-flare",
+      "usage": {
+        "input_tokens": 1224,
+        "input_tokens_details": {
+          "image_tokens": 1125,
+          "text_tokens": 99
+        },
+        "output_tokens": 809,
+        "output_tokens_details": {
+          "image_tokens": 809,
+          "text_tokens": 0
+        },
+        "total_tokens": 2033
+      },
+      "meta": {
+        "size": "800x1424",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "expand": {
+    "source": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/556be26d-0508-40ae-90b2-998711ee8289/scratchpad/kvhm-canvas/expand/PIURA_crop.png",
+    "sourceSha256": "e35fb0d8f4de4ddc3f392af98f506e6ff6c7f8b5c9a8754919d2b61f8b591285",
+    "to": null,
+    "plan": {
+      "canvas": {
+        "width": 800,
+        "height": 1422
+      },
+      "scene": {
+        "left": 0,
+        "top": 342,
+        "width": 800,
+        "height": 1080
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 100
+  }
+}

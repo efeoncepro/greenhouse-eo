@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "46552c7e657e",
+  "key": "46552c7e657e15bde747456aec89d324198d3107dc2e081276f8833b550385b0",
+  "status": "completed",
+  "createdAt": "2026-11-05T15:49:17.267Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/clients/berel/.resources-local/photos/espacios/rayados-n4-recamara.png",
+    "imageSha256": "7d6fa0d1cbee6603c60e7224551cb715908212a2edeb2d1c3eea2a411f4b5964",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/mask-playera.png",
+    "maskSha256": "aab4272d44166162ce77984fdb8807df0aa7f12e1611a5d630f041aa873e78db",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1536,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "In the marked area only, centered on the wall above the bed headboard: a framed football jersey hanging straight and level, as a fan's memorabilia shadow box. A slim matte black wooden frame with a white background panel and a glass front with a very faint soft reflection of the window light. Inside, a short-sleeved football jersey laid flat and neatly pinned, front facing the viewer, with wide vertical stripes alternating dark navy blue and white, a navy collar and navy sleeve cuffs. The jersey has NO crest, NO badge, NO brand logo, NO sponsor, NO number and NO printed text: the left chest area is plain stripes. Across the front, a single large handwritten autograph in black permanent marker that is an abstract, illegible flowing scribble with no readable letters or name. A soft natural contact shadow around the frame on the wall, consistent with the daylight coming from the window at the left. Everything outside the marked area stays exactly as it is; do not change the framing or the scale of anything.",
+    "providerPrompt": "In the marked area only, centered on the wall above the bed headboard: a framed football jersey hanging straight and level, as a fan's memorabilia shadow box. A slim matte black wooden frame with a white background panel and a glass front with a very faint soft reflection of the window light. Inside, a short-sleeved football jersey laid flat and neatly pinned, front facing the viewer, with wide vertical stripes alternating dark navy blue and white, a navy collar and navy sleeve cuffs. The jersey has NO crest, NO badge, NO brand logo, NO sponsor, NO number and NO printed text: the left chest area is plain stripes. Across the front, a single large handwritten autograph in black permanent marker that is an abstract, illegible flowing scribble with no readable letters or name. A soft natural contact shadow around the frame on the wall, consistent with the daylight coming from the window at the left. Everything outside the marked area stays exactly as it is; do not change the framing or the scale of anything."
+  },
+  "mask": {
+    "touchedFraction": 0.069427490234375,
+    "editable": 210984,
+    "soft": 7416,
+    "protected": 2927328
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 546,
+      "top": 0,
+      "width": 936,
+      "height": 826
+    },
+    "target": {
+      "width": 1088,
+      "height": 960
+    },
+    "aspectError": 0.00014242985329717423,
+    "reason": "la zona con contexto ocupa 24.6 % de la imagen: se genera recortada a 1088x960"
+  },
+  "estimate": {
+    "usd": 0.0461,
+    "basis": "1 × salida 1088x960 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 81.057,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -5,
+        "scale": 1,
+        "stillError": 5.85,
+        "bestError": 3.62,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 2927328,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 210984,
+        "maxDelta": 216,
+        "meanDelta": 83.8,
+        "worst": {
+          "x": 1177,
+          "y": 269
+        }
+      },
+      "seam": {
+        "pixels": 7416,
+        "maxDelta": 164,
+        "meanDelta": 3.028,
+        "worst": {
+          "x": 862,
+          "y": 109
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2927328,
+        "maxDelta": 193,
+        "meanDelta": 1.719,
+        "worst": {
+          "x": 880,
+          "y": 819
+        }
+      },
+      "outputUsd": 0.0461,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1241,
+        "input_tokens_details": {
+          "image_tokens": 1020,
+          "text_tokens": 221
+        },
+        "output_tokens": 1535,
+        "output_tokens_details": {
+          "image_tokens": 1535,
+          "text_tokens": 0
+        },
+        "total_tokens": 2776
+      },
+      "meta": {
+        "size": "1088x960",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

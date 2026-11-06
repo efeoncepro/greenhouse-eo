@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/v2/hero-plato-lente.png …
+  ✓ 1595KB · gpt-image-2.6-sunburst · 1024x1024 · high · clave personal
+    usage: in 325 (img 0 · txt 325) · out 1756 · total 2081
+done

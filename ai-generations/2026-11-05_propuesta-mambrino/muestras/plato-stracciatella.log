@@ -1,0 +1,4 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/plato-stracciatella.png …
+  ✗ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/plato-stracciatella.png FAILED: fetch failed
+done

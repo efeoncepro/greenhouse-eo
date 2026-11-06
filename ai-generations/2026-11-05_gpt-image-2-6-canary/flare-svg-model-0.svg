@@ -1,0 +1,10 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">
+  <title>Flat paper airplane icon</title>
+  <desc>A simple two-color geometric paper airplane angled from lower left toward upper right.</desc>
+  <g id="paper-airplane">
+    <path id="top-wing" d="M52 391 L977 128 L230 520 Z" fill="#79BFFF" />
+    <path id="right-wing" d="M977 128 L680 793 L408 600 Z" fill="#79BFFF" />
+    <path id="center-fold" d="M230 520 L977 128 L408 600 L312 840 Z" fill="#004B99" />
+    <path id="tail-fold" d="M312 840 L408 600 L506 668 Z" fill="#2F86DD" />
+  </g>
+</svg>

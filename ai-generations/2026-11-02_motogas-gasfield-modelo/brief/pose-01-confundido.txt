@@ -1,0 +1,5 @@
+Expression: puzzled and confused: one eyebrow raised and the other lowered, eyes looking at the paper, mouth a small wavy uncertain line.
+
+POSE AND CAMERA: holding a slightly curled sheet of white paper in the left hand at chest height and reading it, the right hand scratching the top side of the body next to the hoop. THREE-QUARTER VIEW from the front right, eye level.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. Every prop touches the character or is held by it; nothing floats loose. Props carry no letters, numbers or logos. The whole figure fully visible with generous margin, centered.

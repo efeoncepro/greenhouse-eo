@@ -1,0 +1,234 @@
+[
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-0-payload.json",
+    "requested": 700,
+    "returned": 389,
+    "withCpc": 220,
+    "rowsWritten": 700,
+    "costUsd": 0.05868
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-1-payload.json",
+    "requested": 700,
+    "returned": 448,
+    "withCpc": 220,
+    "rowsWritten": 700,
+    "costUsd": 0.06576
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-2-payload.json",
+    "requested": 700,
+    "returned": 417,
+    "withCpc": 187,
+    "rowsWritten": 700,
+    "costUsd": 0.06204
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-3-payload.json",
+    "requested": 700,
+    "returned": 370,
+    "withCpc": 204,
+    "rowsWritten": 700,
+    "costUsd": 0.0564
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-4-payload.json",
+    "requested": 700,
+    "returned": 220,
+    "withCpc": 83,
+    "rowsWritten": 700,
+    "costUsd": 0.0384
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-5-payload.json",
+    "requested": 700,
+    "returned": 350,
+    "withCpc": 153,
+    "rowsWritten": 700,
+    "costUsd": 0.054
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-6-payload.json",
+    "requested": 700,
+    "returned": 342,
+    "withCpc": 161,
+    "rowsWritten": 700,
+    "costUsd": 0.05304
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-7-payload.json",
+    "requested": 700,
+    "returned": 385,
+    "withCpc": 163,
+    "rowsWritten": 700,
+    "costUsd": 0.0582
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-8-payload.json",
+    "requested": 700,
+    "returned": 429,
+    "withCpc": 233,
+    "rowsWritten": 700,
+    "costUsd": 0.06348
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-9-payload.json",
+    "requested": 700,
+    "returned": 352,
+    "withCpc": 233,
+    "rowsWritten": 700,
+    "costUsd": 0.05424
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-10-payload.json",
+    "requested": 700,
+    "returned": 444,
+    "withCpc": 231,
+    "rowsWritten": 700,
+    "costUsd": 0.06528
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-11-payload.json",
+    "requested": 700,
+    "returned": 429,
+    "withCpc": 277,
+    "rowsWritten": 700,
+    "costUsd": 0.06348
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-12-payload.json",
+    "requested": 700,
+    "returned": 339,
+    "withCpc": 204,
+    "rowsWritten": 700,
+    "costUsd": 0.05268
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-13-payload.json",
+    "requested": 700,
+    "returned": 296,
+    "withCpc": 157,
+    "rowsWritten": 700,
+    "costUsd": 0.04752
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-14-payload.json",
+    "requested": 700,
+    "returned": 431,
+    "withCpc": 258,
+    "rowsWritten": 700,
+    "costUsd": 0.06372
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-15-payload.json",
+    "requested": 700,
+    "returned": 236,
+    "withCpc": 133,
+    "rowsWritten": 700,
+    "costUsd": 0.04032
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-16-payload.json",
+    "requested": 700,
+    "returned": 319,
+    "withCpc": 197,
+    "rowsWritten": 700,
+    "costUsd": 0.05028
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-17-payload.json",
+    "requested": 700,
+    "returned": 466,
+    "withCpc": 271,
+    "rowsWritten": 700,
+    "costUsd": 0.06792
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-18-payload.json",
+    "requested": 220,
+    "returned": 114,
+    "withCpc": 69,
+    "rowsWritten": 220,
+    "costUsd": 0.02568
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-0-payload.json",
+    "requested": 700,
+    "returned": 363,
+    "withCpc": 146,
+    "rowsWritten": 700,
+    "costUsd": 0.05556
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-1-payload.json",
+    "requested": 700,
+    "returned": 343,
+    "withCpc": 127,
+    "rowsWritten": 700,
+    "costUsd": 0.05316
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-2-payload.json",
+    "requested": 700,
+    "returned": 285,
+    "withCpc": 102,
+    "rowsWritten": 700,
+    "costUsd": 0.0462
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-3-payload.json",
+    "requested": 700,
+    "returned": 339,
+    "withCpc": 92,
+    "rowsWritten": 700,
+    "costUsd": 0.05268
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-4-payload.json",
+    "requested": 700,
+    "returned": 343,
+    "withCpc": 213,
+    "rowsWritten": 700,
+    "costUsd": 0.05316
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-5-payload.json",
+    "requested": 700,
+    "returned": 403,
+    "withCpc": 151,
+    "rowsWritten": 700,
+    "costUsd": 0.06036
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-6-payload.json",
+    "requested": 700,
+    "returned": 325,
+    "withCpc": 145,
+    "rowsWritten": 700,
+    "costUsd": 0.051
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-7-payload.json",
+    "requested": 700,
+    "returned": 199,
+    "withCpc": 109,
+    "rowsWritten": 700,
+    "costUsd": 0.03588
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-8-payload.json",
+    "requested": 700,
+    "returned": 366,
+    "withCpc": 193,
+    "rowsWritten": 700,
+    "costUsd": 0.05592
+  },
+  {
+    "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-9-payload.json",
+    "requested": 119,
+    "returned": 67,
+    "withCpc": 55,
+    "rowsWritten": 119,
+    "costUsd": 0.02004
+  }
+]

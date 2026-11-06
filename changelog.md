@@ -53,6 +53,11 @@ Cuándo usar cada uno: [manual](docs/manual-de-uso/ai-tooling/generar-y-editar-i
 modelos §5.1. Default de `pnpm ai:image`: `gpt-image-2.5-flare` (decisión del operador; `gpt-image-2` con `--model`);
 el del runtime sigue `gpt-image-2`.
 
+[Glitch Flash publicado](docs/public-site/glitch-flash-images-2-6/README.md) con cuatro pruebas de Nexa y cinco
+Drops. Sus dos videos oficiales ahora se reproducen incrustados: Content Factory admite Vimeo y el runtime de
+Ohio conserva la proporción al reducirse en móvil, incluidos formatos 4:1. Verificados ambos a 1440/390;
+90 tests de autoría y 39 checks con parser WordPress real PASS. Fix desplegado con backup y lectura de vuelta.
+
 ## 2026-11-04 — SKY: adaptaciones en Claude Design (CyberSky Perú y kit BLACK)
 
 Nuevo Design System «SKY Airline — Performance» y canvas de adaptaciones en Claude Design (artifacts privados): 66 piezas

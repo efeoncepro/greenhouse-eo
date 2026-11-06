@@ -1,0 +1,75 @@
+{
+  "tenderId": "F08-automatizaciones",
+  "slides": [
+    {
+      "slideId": "deck-method-staircase",
+      "contentType": "deck.method-staircase",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 176,
+          "bodyTop": 590,
+          "bodyPx": 25,
+          "bodyWidth": 500,
+          "stairX0": "--gl-stair-x0=760px",
+          "stairDx": "--gl-stair-dx=70px",
+          "stairY0": "--gl-stair-y0=798px",
+          "stairDy": "--gl-stair-dy=132px",
+          "levelNamePx": "--gl-level-name-px=76px",
+          "levelTopNamePx": "--gl-level-top-name-px=86px",
+          "levelNumberPx": "--gl-level-number-px=30px",
+          "levelDescriptorPx": "--gl-level-descriptor-px=23px",
+          "notePx": "--gl-note-px=17px",
+          "noteTop": "--gl-note-top=930px",
+          "columnWidth": "--gl-column-width=740px",
+          "slabHeight": "--gl-slab-height=124px"
+        },
+        "voice": {
+          "question": "Las alertas y tareas llegan",
+          "answer": "Solas",
+          "eyebrow": "Automatizaciones"
+        },
+        "body": "Reglas fijas y auditables para que ningún cliente se enfríe y ninguna oportunidad avance sin aprobación.",
+        "levels": [
+          {
+            "name": "Alerta",
+            "descriptor": "cliente que se enfría"
+          },
+          {
+            "name": "Tarea",
+            "descriptor": "después de cada reunión"
+          },
+          {
+            "name": "Seguimiento",
+            "descriptor": "correo y recordatorio"
+          },
+          {
+            "name": "Aprobación",
+            "descriptor": "antes de avanzar la etapa"
+          },
+          {
+            "name": "Cierre próximo",
+            "descriptor": "aviso al vendedor"
+          }
+        ],
+        "note": "Cada regla queda documentada y se prueba antes de activarla.",
+        "selection": {
+          "label": "Comercial",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "level": 1
+        }
+      },
+      "template": "MethodStaircase"
+    }
+  ]
+}

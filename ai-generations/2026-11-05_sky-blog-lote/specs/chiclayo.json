@@ -1,0 +1,128 @@
+{
+  "id": "chiclayo",
+  "notion_url": "https://app.notion.com/p/8b58f2fc987e4d37944b983327084a33",
+  "titulo": "Chiclayo para amantes de la historia: cómo organizar una ruta de museos y sitios arqueológicos",
+  "slug": "/museos-de-chiclayo/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "destino contextual · persona sola · escala amplia · luz de mañana · orienta",
+      "registro": "D",
+      "archivo": "museo-tumbas-reales-sipan-exterior-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero caminando hacia el edificio del Museo Tumbas Reales de Sipán, en Lambayeque, en una mañana soleada",
+      "que_muestra": "el edificio del Museo Tumbas Reales de Sipán, de volumen piramidal truncado y color rojizo, ocupando el fondo del cuadro bajo un cielo claro; un viajero con mochila pequeña camina hacia la entrada por la explanada, a media distancia. Tiene que leerse que la ruta empieza aquí, frente a una arquitectura que recuerda a una huaca, no frente a un museo genérico.",
+      "hora_clima": "mañana soleada, poco después de la apertura (el relato empieza temprano); luz natural abundante y cálida, sombras abiertas, cielo sin quemar",
+      "personas": "el viajero de espaldas o de perfil, caminando sin pose ni mirada al lente; otras personas, si aparecen, lejanas y pequeñas en la explanada; ningún rostro identificable en primer plano",
+      "primer_plano": "hojas de un arbusto del jardín de la explanada muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al viajero ni el edificio",
+      "ancla_pov": "frente a un edificio rojizo con forma de pirámide trunca",
+      "no": [
+        "sin texto ni logos",
+        "sin el letrero del museo legible",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin piezas de oro ni vitrinas (no se permite fotografiar el interior y una pieza inventada es un error atribuible a SKY)",
+        "sin cambiar la forma ni el color real del edificio"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del exterior del Museo Tumbas Reales de Sipán en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el volumen completo del edificio y el viajero tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es media mañana y el calor sube desde el suelo…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde el mirador · otra persona integrada · escala amplia · luz de mediodía",
+      "registro": "E",
+      "archivo": "tucume-valle-de-las-piramides-mirador.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Pirámides de adobe erosionadas del Valle de las Pirámides de Túcume, en Lambayeque, vistas desde el mirador al mediodía",
+      "que_muestra": "la vista desde el mirador de Túcume hacia la llanura, con varias pirámides de adobe erosionadas, de color ocre y surcadas por la lluvia, alineadas hacia el horizonte; en el borde del mirador, una acompañante con sombrero mira el valle. Tiene que leerse que son montañas de barro gastadas, no pirámides de piedra ni ruinas de otra región.",
+      "hora_clima": "media mañana o mediodía, con calor (como en el relato); cielo claro o blanco por la bruma; luz natural intensa pero con sombras abiertas y cielo sin quemar",
+      "personas": "fotografía el viajero desde el mirador, mirando el valle; la acompañante, de espaldas o de perfil, observa las pirámides; nadie camina sobre las estructuras; ningún rostro identificable",
+      "primer_plano": "la baranda de madera del mirador muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar las pirámides",
+      "ancla_pov": "Desde el mirador las ves alineadas en la llanura, ocres contra el cielo blanco del norte",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles del sitio",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin pirámides de piedra, escalonadas o de estilo maya o egipcio",
+        "sin vegetación de selva",
+        "sin personas sobre las pirámides"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la vista desde el mirador de Túcume en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «El tercer día depende de qué historia quieras cerrar…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "destino contextual · persona sola · escala media · luz de mañana",
+      "registro": "E",
+      "archivo": "huaca-rajada-sipan-plataforma-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajera frente a la plataforma excavada de Huaca Rajada, en Sipán, Lambayeque, donde se halló la tumba del Señor de Sipán",
+      "que_muestra": "una viajera de pie junto a la baranda del recorrido, mirando la plataforma de adobe excavada de Huaca Rajada; al fondo, la huaca partida y campos verdes. Demuestra lo que el museo no puede: el lugar real del hallazgo, con su escala y su tierra.",
+      "hora_clima": "mañana soleada del tercer día del relato; luz natural abundante, sombras abiertas, cielo sin quemar",
+      "personas": "fotografía el acompañante desde unos pasos atrás, mirando a la viajera y la huaca; la viajera, de espaldas o de perfil, observa la excavación; nadie dentro del área excavada; ningún rostro identificable",
+      "primer_plano": "un tramo de la baranda del recorrido muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar la plataforma",
+      "ancla_pov": "estás frente a la tierra donde se excavó la tumba",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles del sitio",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin esqueletos ni piezas de oro en la excavación (no se promete lo que no se ve en el sitio)",
+        "sin arqueólogos trabajando",
+        "sin pirámides de piedra"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la plataforma excavada de Huaca Rajada en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "CIX",
+      "ciudad": "Chiclayo"
+    },
+    "home_market": "PER",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (sin fila 🟢 para este mercado)",
+    "titular": "Oro moche y pirámides de adobe",
+    "cta": "Ver vuelos a Chiclayo",
+    "archivo": "banner-ruta-lima-chiclayo.webp",
+    "alt": "Banner de SKY: ruta Lima–Chiclayo, oro moche y pirámides de adobe",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "tocado o pectoral de oro en vitrina (no se permite fotografiar el interior y una réplica generada es un error atribuible a SKY)",
+    "ceviche de mediodía en Chiclayo (sale del eje de historia del artículo)",
+    "mototaxi frente a la plaza de Lambayeque (rótulos de negocios reales y vehículo identificable)",
+    "algarrobos del Bosque de Pómac (lugar con datos pendientes)",
+    "fachada del Museo Brüning (postal sin acción)"
+  ]
+}

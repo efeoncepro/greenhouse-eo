@@ -1,0 +1,16 @@
+### Result
+{"width":390,"scrollWidth":390,"embeds":[{"w":358,"h":360,"ratio":0.9944444444444445,"wrapper":""},{"w":358,"h":160,"ratio":2.2375,"wrapper":""}]}
+### Ran Playwright code
+```js
+await (async (page) => {
+ await page.setViewportSize({width:390,height:844});
+ const embeds=page.locator('.entry-content .wp-block-embed');
+ await embeds.first().scrollIntoViewIfNeeded();
+ await page.screenshot({path:'output/playwright/glitch-images26-review/embedded-speed-mobile-before.png'});
+ return await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,embeds:[...document.querySelectorAll('.entry-content .wp-block-embed')].map(e=>{const f=e.querySelector('iframe'),r=f.getBoundingClientRect();return{w:r.width,h:r.height,ratio:r.width/r.height,wrapper:getComputedStyle(f.parentElement).cssText}})}));
+})(page);
+```
+
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

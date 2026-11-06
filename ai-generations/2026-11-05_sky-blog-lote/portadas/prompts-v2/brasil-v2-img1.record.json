@@ -1,0 +1,25 @@
+{
+ "registro": "E",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the strap of a backpack",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "brasil-v2",
+ "input": {
+  "id": "brasil-v2",
+  "registro": "E",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "departure hall of a generic modern international airport in South America (not a real identifiable airport)",
+  "escena": "the traveler's own hand holds a card-size identity document seen edge-on or from its plain back, together with a folded boarding pass; ahead, out of focus, a calm queue of travelers with backpacks moves toward distant border-control desks in a wide, bright hall with tall windows. It reads as the moment of leaving the country, not as a stressful procedure",
+  "hora": "daytime",
+  "clima": "natural daylight entering through tall windows",
+  "fotografo": "waits in the queue holding the document at chest height in the upper part of the frame, looking down at his own hand",
+  "mirada": "the document and boarding pass in the traveler's hand",
+  "primerPlano": "the strap of a backpack",
+  "borde": "bottom edge",
+  "prohibir": "readable document data, photo or number, real ID card design, PDI or airport signage, readable boarding pass text, faces in focus, airline uniforms",
+  "extra": "COMPOSITION, MEASURED: the hand with the document is raised to the traveler's eye line; hand and document sit only in the upper-centre zone between 15% and 47% of the frame height and between 36% and 64% of the width. The queue ahead is small and distant in that same upper band. The lower half shows only polished floor and the very out-of-focus backpack strap, calm and mid-dark, with no hands or faces. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 50 mm equivalent, close lived detail of hands and objects, intimate without isolating them from the place."
+ }
+}

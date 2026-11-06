@@ -1,0 +1,16 @@
+EL MUNDO DEL REY DEL GAS — kit v01 (2 de noviembre de 2026)
+Estado: aprobación interna pendiente; sin aprobación del cliente.
+
+Qué es: los elementos para componer las piezas del Rey del Gas como escenas de su reino, por capas.
+- 3D satinado (PNG transparente): 17 objetos del reino (palacio, castillos de Lo Prado en rojo y de Cerro Navia en
+  naranjo, camino real, mapa, torre del reloj, trono, cetro, sello, pergamino, tesoro, escudo, trompeta, llama,
+  olla, tetera, estufa).
+- Corte 2D (SVG editable y PNG transparente): el Rey en su trono y con capa, el Paje (5 kg), el Escudero (11 kg),
+  la Guardia (15 kg), el Gigante (45 kg), el Heraldo y El Frío (el villano).
+- Escenarios: el teatro real vacío, 4:5, con el centro libre para componer y el 18 % superior libre para el logo.
+- Pieza hero: «¡Bienvenidos al Reino!», ejemplo de cómo se compone todo junto.
+- Hojas de revisión sobre fondo oscuro.
+
+Reglas: los personajes van siempre en 2D plano (4 colores) y los objetos siempre en 3D satinado; solo el Rey lleva
+corona; cada personaje necesita sombra de contacto y la luz de la escena; ningún objeto entra sin motivo.
+Receta completa: skill motogas-graphic-line, archivo references/mundo-rey-del-gas.md (repo greenhouse-eo).

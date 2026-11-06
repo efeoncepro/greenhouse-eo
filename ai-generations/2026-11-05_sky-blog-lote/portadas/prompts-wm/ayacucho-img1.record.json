@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "el borde de una columna de piedra del portal,",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "ayacucho",
+ "input": {
+  "id": "ayacucho",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Plaza Mayor de Ayacucho (Huamanga), Perú",
+  "escena": "la Plaza Mayor de Ayacucho vista desde bajo sus arquerías de piedra, con techos de tejas rojas sobre los portales y la fachada de la Catedral al fondo, al otro lado de la plaza; un viajero camina por el portal hacia la luz. Debe leerse como plaza colonial andina tranquila, con escala humana. Personas: el viajero a media distancia, de espaldas o de perfil, caminando, sin pose ni mirada al lente; al fondo, personas pequeñas cruzando la plaza o sentadas en las bancas; ningún rostro identificable en primer plano",
+  "hora": "final de la tarde de la llegada, cielo despejado de temporada seca",
+  "clima": "luz cálida y abundante que entra entre los arcos, sombras abiertas bajo el portal, altas luces de la fachada y del cielo conservadas",
+  "primerPlano": "el borde de una columna de piedra del portal,",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales bajo los portales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin desfiles ni procesiones (no hay fiesta en el relato), sin personas con trajes típicos posando, sin la Catedral deformada",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "Plaza Mayor de Ayacucho (Huamanga), Perú (its real forms, scale and spatial relationships)"
+ }
+}

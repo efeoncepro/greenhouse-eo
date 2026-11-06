@@ -1,0 +1,32 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "brand",
+  "voice": {
+    "eyebrow": "Propuesta · Noviembre 2026",
+    "question": "¿Chile ya sabe que llegas?",
+    "answer": [
+      "Muy pronto"
+    ]
+  },
+  "body": "Preparada para **Trattoria Mambrino Chile** · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "clientLogo": {
+    "path": "ai-generations/2026-11-05_propuesta-mambrino/logos/trattoria-mambrino-blanco.png",
+    "alt": "Trattoria Mambrino"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

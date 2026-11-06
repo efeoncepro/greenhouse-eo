@@ -1,0 +1,12 @@
+The reference image is the official mascot "El Rey del Gas": a flat 2D vector cartoon of a red LPG gas cylinder with a tilted yellow crown. Draw a NEW character from HIS SAME WORLD, as if the same illustrator drew another member of his royal court on the same model sheet: same construction, same line, same face style, same proportions logic.
+
+STYLE — non-negotiable, identical to the reference:
+- Flat 2D vector illustration, cel style, 1930s rubber-hose cartoon mascot. NO gradients, NO shading, NO highlights, NO texture, NO 3D, NO drop shadow.
+- Only these colors: pure red #FF0000, yellow #FFC214, pure white #FFFFFF and pure black #000000 (unless a different color is explicitly requested below). Every area is one solid color.
+- Thick black outlines of variable weight, heavier on the lower and right edges, with the same separate black offset stroke under the shoes.
+- Face exactly in the style of the reference: two big white eyes joined like a figure "8" with black oval pupils, one big open "D" smile with white teeth and a red tongue (or the expression requested). No nose, no ears, no eyebrows unless requested.
+- Thin black noodle arms with white 4-finger cartoon gloves; thin black noodle legs with big rounded white shoes.
+- Background: one flat uniform medium gray #808080 filling the whole canvas. No floor, no shadow. No text, no letters, no logos.
+- The character is NOT the King: he does NOT wear a crown. Center the full character with generous gray margin; nothing touches the edges.
+
+NEW CHARACTER — "The Cold" (the villain): a grumpy cartoon storm cloud, NOT a cylinder. Use LIGHT ICE BLUE #8FD8F7 for the cloud body plus white, black and a little dark blue #1E5AA8 for the icicles; no red, no yellow. Puffy cloud body with a few sharp icicles hanging from its bottom, two angry slanted black eyebrows over the "8" eyes, a mischievous frowning mouth blowing a gust of cold wind with three white wind swirls and two small white snowflakes. Thin noodle arms with white gloves, one shaking a fist. Funny villain, not scary.

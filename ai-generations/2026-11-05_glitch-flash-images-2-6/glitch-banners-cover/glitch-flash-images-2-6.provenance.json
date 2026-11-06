@@ -1,0 +1,100 @@
+{
+  "schema": "glitch.edition-provenance.v1",
+  "edition": null,
+  "editionKind": "flash",
+  "slug": "images-2-6",
+  "example": false,
+  "manifest": {
+    "file": "glitch-flash-manifest.json",
+    "sha256": "bca99bbebcde9b2967a2c546b4a66a9f53ff2616df9bc98fc887e4f276f589d7"
+  },
+  "coverTemplate": null,
+  "axis": {
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-brand-assets": "0.4.25",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-ui-contracts": "0.3.40"
+  },
+  "narratorFont": {
+    "family": "Guttery",
+    "status": "licensed",
+    "sha256": "fbf6b68787b5590b24219cc199975305b97927d3794c2616f6f99303ce2bc6cc"
+  },
+  "linkedinLimits": {
+    "maxBytes": 104857600,
+    "maxPages": 300,
+    "uniformPageSize": true,
+    "source": "https://www.linkedin.com/help/linkedin/answer/a518909",
+    "verifiedOn": "2026-09-27"
+  },
+  "assets": [
+    {
+      "ref": "photo:cover",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/GF26-A-cover-source.png",
+        "sha256": "c9d2df9219ca02548f8f5763543f566c8ec4c80b85a0d6529a567155f74e79a3"
+      },
+      "processed": {
+        "sha256": "6b6650ef69811b377587a84a9930e9359da37c3361564e2aaa08075b2a36db5c",
+        "width": 1080,
+        "height": 660
+      }
+    },
+    {
+      "ref": "photo:news",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/plates/GF26-A.png",
+        "sha256": "e692d2b1b77c4cb0ee8e3fb2cba4cd78902517a2cc66e26262e014972f23c2d1"
+      },
+      "processed": {
+        "sha256": "7476facabe0887dc05b46dac03a1aebd4885519bb241f116b4aa68ee26ded532",
+        "width": 1080,
+        "height": 450
+      }
+    },
+    {
+      "ref": "photo:blog-banner",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/GF26-A-cover-source.png",
+        "sha256": "c9d2df9219ca02548f8f5763543f566c8ec4c80b85a0d6529a567155f74e79a3"
+      },
+      "processed": {
+        "sha256": "76b0b0e857d7cd44f5af0ee4c090fb5d7f3193a1b903bf47d5e6ccaeec21ed4a",
+        "width": 1100,
+        "height": 800
+      }
+    }
+  ],
+  "fractures": {
+    "cover": {
+      "cells": 85,
+      "sha256": "6fbba62410006a12b0b48193df61a20ff75e6fad750c5d0f276b463ee0b5fd0d"
+    },
+    "news": {
+      "cells": 103,
+      "sha256": "a1df4e92898c3138b81d51779346d21675e203987851d2879ff857a7dac5e01c"
+    },
+    "blog-banner": {
+      "cells": 150,
+      "sha256": "7b2becaa16abf5aa9d5bd5c1823a12bb1e5ec9edbea3f168bf2a5ee44d51d934"
+    }
+  },
+  "outputs": {
+    "stills": {
+      "catalog": "glitch-stills",
+      "templates": [
+        "blog-banner:FlashBlogBanner"
+      ],
+      "manifestSha256": "9ebdeecd0605c698dae3552463189d91c891be0e978b03a867117a16000f66f9",
+      "pngs": [
+        {
+          "file": "sueltas/01-blog-banner.png",
+          "sha256": "b56520e70c85a480540d37c1e50681f1efa586085e346ce4e56a8443f0f5f26e"
+        }
+      ]
+    }
+  }
+}

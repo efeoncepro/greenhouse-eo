@@ -1,0 +1,5 @@
+Neutral standing pose exactly as in image 1: arms hanging loosely, feet slightly apart.
+
+POSE AND CAMERA: BACK VIEW, camera directly behind the character at eye level. NO face is visible at all: no eyes, no eyebrows, no mouth. The back of the barrel is plain glossy red, with the weld seam running across it, the guard hoop and its four posts and the valve seen from behind, both arms seen from behind hanging at the sides, and the backs of the shoes.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully visible with generous margin, centered.

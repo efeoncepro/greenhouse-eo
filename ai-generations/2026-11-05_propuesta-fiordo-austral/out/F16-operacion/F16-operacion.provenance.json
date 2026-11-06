@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "2bf620b2d4f060bf0c0803fab6884a50881d4f0cf0cc0dab8482b20cbd5774aa",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day-live-console",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:hubspot-icon-data",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-data.svg",
+      "sha256": "1618a4b400d1518e77cf51fbb84627aee5290a8b72612ec186b8aaca4fb8a594"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

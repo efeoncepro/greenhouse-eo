@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1a07a38544d6eb3584e5772d506da4dc430bed9c24965b43a2c77ee437c5d2c2",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal.dawn",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:fiordo-austral-logo-web",
+      "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/assets/fiordo-austral-logo-web.png",
+      "sha256": "e2d8c77e84ae17820ed90ac9c10de948cadfbd273389f81373bf67435526c01d"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "cover-by-hand-portada-dawn-2026-11-06"
+}

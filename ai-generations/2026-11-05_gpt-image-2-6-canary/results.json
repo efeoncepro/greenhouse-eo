@@ -1,0 +1,72 @@
+[
+  {
+    "name": "sunburst26-mask-low",
+    "status": 200,
+    "ms": 22892,
+    "saved": [
+      "ai-generations/2026-11-05_gpt-image-2-6-canary/sunburst26-mask-low-0.png"
+    ],
+    "body": {
+      "created": 1793863436,
+      "background": "opaque",
+      "data": [
+        {
+          "b64_json": "<2080344 chars>",
+          "generation_id": "7f9ed0af-9b2d-4f2b-98ed-743b8556fef8"
+        }
+      ],
+      "output_format": "png",
+      "quality": "low",
+      "safety_identifier": null,
+      "size": "1024x1024",
+      "usage": {
+        "input_tokens": 1060,
+        "input_tokens_details": {
+          "image_tokens": 1024,
+          "text_tokens": 36
+        },
+        "output_tokens": 824,
+        "output_tokens_details": {
+          "image_tokens": 824,
+          "text_tokens": 0
+        },
+        "total_tokens": 1884
+      }
+    }
+  },
+  {
+    "name": "flare26-mask-low",
+    "status": 200,
+    "ms": 10136,
+    "saved": [
+      "ai-generations/2026-11-05_gpt-image-2-6-canary/flare26-mask-low-0.png"
+    ],
+    "body": {
+      "created": 1793863446,
+      "background": "opaque",
+      "data": [
+        {
+          "b64_json": "<2078188 chars>",
+          "generation_id": "245523ff-0218-4c35-bb80-3d3d103990d4"
+        }
+      ],
+      "output_format": "png",
+      "quality": "low",
+      "safety_identifier": null,
+      "size": "1024x1024",
+      "usage": {
+        "input_tokens": 1060,
+        "input_tokens_details": {
+          "image_tokens": 1024,
+          "text_tokens": 36
+        },
+        "output_tokens": 824,
+        "output_tokens_details": {
+          "image_tokens": 824,
+          "text_tokens": 0
+        },
+        "total_tokens": 1884
+      }
+    }
+  }
+]

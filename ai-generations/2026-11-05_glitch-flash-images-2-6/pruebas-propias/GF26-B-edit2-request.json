@@ -1,0 +1,22 @@
+{
+  "id": "GF26-B-edit2",
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "high",
+  "complexity": "low",
+  "size": "2048x1152",
+  "parent": "GF26-B-edit1",
+  "promptFile": "ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/prompts/GF26-B-edit2.txt",
+  "promptSha256": "407c361ebdaed6e07de905e4e549bcb745e71dcdfe31d2de2feea04beef917d4",
+  "references": [
+    {
+      "order": 1,
+      "path": "ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/plates/GF26-B-edit1.png",
+      "sha256": "c89b0acc05bbd403ddbece516d88f881297dd165a609a6fdc78ddb4661f0a068"
+    }
+  ],
+  "markup": {
+    "path": "ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/prompts/GF26-B-edit1-markup.png",
+    "sha256": "b9e599691b2e6e80500f33e7c8b35bcc3d085831b5a8c5e9f38db5b55a3d093b"
+  },
+  "test": "second native markup edit in lineage; no protected-region recomposition"
+}

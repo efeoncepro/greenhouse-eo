@@ -97,6 +97,12 @@ imagen/diseño/ads/social, manual nuevo `generar-y-editar-imagenes-con-gpt-image
 una pieza final real; Batch de 2.5 sin confirmar; `models:inventory`/`freshness` no cuentan los ids de OpenAI; el commit
 `48f6dd6de` y este trabajo siguen sin push.
 
+**Glitch Flash publicado:** [artículo y cierre](docs/public-site/glitch-flash-images-2-6/README.md), post 252401,
+autor Julio, cuatro pruebas crudas de Nexa, cinco Drops. Corrección del operador: dos Vimeo incrustados con
+captions; autoría `youtube | vimeo` y filtro responsive de la clase editorial en el runtime canónico, desplegado
+con hash/backup. Reproducción y ratios 16:9/4:1 comprobados a 1440/390, sin desborde. 90 tests de autoría y
+39 checks del parser WordPress PASS. Código local sin commit/push; backups y hashes de rollback en el cierre.
+
 ## 2026-11-04 — SKY en Claude Design: CyberSky Perú y kit BLACK
 
 **Artifacts privados:** DS [«SKY Airline — Performance»](https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei) (desde las

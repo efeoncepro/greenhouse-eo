@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "arena mojada con espuma",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "ninos-peru",
+ "input": {
+  "id": "ninos-peru",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "playa de Zorritos, Tumbes, Perú",
+  "escena": "la orilla ancha de Zorritos con ola chica y arena húmeda que refleja el cielo; un niño de unos cinco años corre hacia el agua con los brazos abiertos y, unos pasos atrás, su madre lo sigue caminando con las sandalias de los dos en la mano. Debe leerse como playa tranquila de pueblo y primer contacto con el mar. Personas: fotografía el padre, que se quedó atrás en la arena; el niño y la madre de espaldas, sin pose ni mirada al lente; **ningún rostro del menor visible**; otras personas, lejanas y pequeñas",
+  "hora": "final de la tarde, antes de que el sol toque el mar (el día 1 del relato)",
+  "clima": "cielo despejado o con nubes altas, luz cálida abundante, sombras abiertas, altas luces del cielo conservadas",
+  "primerPlano": "arena mojada con espuma",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin rostro del niño, sin el niño solo en el agua ni más allá de las rodillas, sin oleaje fuerte, sin sombrillas ni mobiliario de resort",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "playa de Zorritos, Tumbes, Perú (its real forms, scale and spatial relationships)"
+ }
+}

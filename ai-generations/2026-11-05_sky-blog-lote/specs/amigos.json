@@ -1,0 +1,130 @@
+{
+  "id": "amigos",
+  "notion_url": "https://app.notion.com/p/e7fcab4192a442fcbfbe41ba6ddef0f9",
+  "titulo": "Viajar con amigos: cómo organizar una escapada cuando no todos quieren lo mismo",
+  "slug": "/viaje-con-amigos/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + F (grupo)",
+      "modificadores": "POV del viajero · cuatro amigos · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "amigos-orilla-colan-casas-madera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Grupo de amigos caminando a distintos ritmos por la orilla de la playa de Colán, en Piura, con las casas de madera frente al mar al fondo",
+      "que_muestra": "la orilla ancha y plana de Colán con agua quieta; cuatro amigos caminan separados por pocos metros, cada uno a su ritmo: dos adelante conversando, uno se agacha a mirar algo en la arena y otra va más atrás con las sandalias en la mano; al fondo, la fila de casas de madera frente al mar. Debe leerse como grupo que viaja junto sin ir en fila.",
+      "hora_clima": "media mañana con la arena ya tibia (la llegada a Colán del día 2 del relato); cielo despejado o con nubes altas; luz abundante, sombras abiertas, altas luces del cielo conservadas",
+      "personas": "fotografía el viajero que va último del grupo; los cuatro amigos de espaldas o de perfil, en acciones espontáneas, sin pose ni mirada al lente; ningún rostro identificable en primer plano",
+      "primer_plano": "arena mojada con una línea de espuma muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al grupo",
+      "ancla_pov": "el chat de los cuarenta mensajes termina con una foto del grupo en la orilla de Colán",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin grupo posando ni abrazado mirando a cámara",
+        "sin sombrillas ni mobiliario de resort",
+        "sin oleaje fuerte (el mar de Colán es de oleaje bajo)",
+        "sin casas inventadas que no se parezcan a las de madera sobre pilotes de Colán"
+      ],
+      "fidelidad": "lugar identificable (playa y casas de madera de Colán) → requiere foto real REF-01 de la orilla de Colán con sus casas en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el grupo completo, la línea del agua y las casas de madera tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «El almuerzo es en una picantería…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "F — Encuentro social",
+      "modificadores": "mesa compartida · cuatro amigos · escala media · luz de mediodía",
+      "registro": "E",
+      "archivo": "amigos-picanteria-catacaos-platos-al-centro.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Amigos compartiendo platos al centro de la mesa y una jarra de chicha de jora en una picantería de Catacaos, en Piura",
+      "que_muestra": "una mesa larga de picantería con varios platos al centro, una jarra de chicha de jora y vasos; las manos de los amigos se cruzan sirviéndose de distintos platos, uno acerca su plato a otra para que pruebe. La escena es la regla del día: cada uno prueba algo que no pediría solo.",
+      "hora_clima": "mediodía (el almuerzo del día 1 del relato); luz natural abundante bajo techo, que entra desde la calle; sombras abiertas, sin sol duro sobre la mesa",
+      "personas": "fotografía uno de los amigos, sentado en la cabecera; los otros tres en cuadro de perfil o cuerpo parcial, mirando los platos o conversando entre ellos, nunca al lente; ningún rostro identificable en primer plano; personal del local fuera de cuadro o desenfocado al fondo, con ropa neutra",
+      "primer_plano": "el borde de un vaso de chicha muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar los platos",
+      "ancla_pov": "platos al centro, una jarra de chicha de jora y la regla de que cada uno pruebe algo que no pediría solo",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos ni cartas legibles de restaurantes reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin platos inventados ni cocina de otra región",
+        "sin emplatado de autor",
+        "sin botellas con marcas"
+      ],
+      "fidelidad": "platos y vajilla de picantería piurana → requiere foto real REF-01 de una mesa de picantería del norte del Perú en la tarea antes de generar (si no, Bloqueado); el local es genérico, no identificable"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Al día siguiente toca mar…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "con dos amigos integrados al fondo · escala media · luz de mañana",
+      "registro": "E",
+      "archivo": "amiga-terraza-madera-colan-libro.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Amiga leyendo en la terraza de madera de una casa frente al mar en Colán mientras dos amigos bajan a la playa",
+      "que_muestra": "la terraza de madera de una casa frente al mar, con una silla o una hamaca; una amiga lee con los pies apoyados en la baranda; más allá, ya en la arena y desenfocados, dos amigos caminan hacia el agua. La imagen demuestra el tiempo libre pactado: el grupo se separa sin conflicto.",
+      "hora_clima": "media mañana del día 2 del relato; luz cálida y abundante, sombra abierta bajo el alero, mar claro al fondo con altas luces conservadas",
+      "personas": "fotografía otra persona del grupo desde el interior de la casa, mirando hacia la terraza; la amiga lectora de perfil, concentrada en el libro, no mira al lente; los dos amigos de espaldas, caminando hacia el mar; ningún rostro identificable en primer plano",
+      "primer_plano": "el marco de madera de la puerta de la terraza muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar a la lectora",
+      "ancla_pov": "otra se queda en la terraza con un libro",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin título legible en el libro",
+        "sin piscina ni mobiliario de resort",
+        "sin arquitectura que no sea la de las casas de madera de Colán"
+      ],
+      "fidelidad": "casas de madera de Colán identificables → requiere foto real REF-01 de una terraza de las casas de Colán en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "PIU",
+      "ciudad": "Piura"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-piura",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Playa, picantería y tiempo libre",
+    "cta": "Ver vuelos a Piura",
+    "archivo": "banner-ruta-lima-piura-amigos.webp",
+    "alt": "Banner de SKY con la ruta Lima–Piura: playa, picantería y tiempo libre",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "_callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Piura (PIU) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Playa, picantería y tiempo libre” (5 palabras; la ruta Lima → Piura es el elemento principal y el titular va en segundo nivel, sin repetir H1 ni meta title)<br />**CTA (lo escribe el compositor):** Ver vuelos a Piura →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-piura<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-piura-amigos.webp` · **ALT:** “Banner de SKY con la ruta Lima–Piura: playa, picantería y tiempo libre”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+  },
+  "descartes": [
+    "el chat del grupo en un teléfono — pantalla con texto legible",
+    "taller de filigrana en Catacaos — rostros y manos de artesanos reales; riesgo de personas identificables",
+    "iglesia San Lucas de Colán — plano de destino puro que repite la función de la portada",
+    "grupo brindando a cámara — pose y mirada al lente",
+    "videollamada del presupuesto — pantallas y rostros"
+  ]
+}

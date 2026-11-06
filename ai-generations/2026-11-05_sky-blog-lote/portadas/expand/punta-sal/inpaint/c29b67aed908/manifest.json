@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "c29b67aed908",
+  "key": "c29b67aed9087c9210b6c5a6d9e0b78516ff4f3074584017a534dd5f30b869fe",
+  "status": "completed",
+  "createdAt": "2026-11-05T10:20:13.999Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal-base.png",
+    "imageSha256": "3fa698388812bb3832143e950bdaaca6a0bea00a6b87fb5fa8ba5ea4a2aefcbe",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal-mask.png",
+    "maskSha256": "ee281fd0a12cde12872221887a383eb5053dd67ab33a73e3b82e5d4f441eb608",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same ground of this scene continuing toward the camera in DEEP soft shade: matte, mid-dark and calm, never bright, with no sunlit sand, no bright reflections and no white foam in the lower half, and a real element of the place very out of focus close to the lens at the bottom edge. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas.",
+    "providerPrompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same ground of this scene continuing toward the camera in DEEP soft shade: matte, mid-dark and calm, never bright, with no sunlit sand, no bright reflections and no white foam in the lower half, and a real element of the place very out of focus close to the lens at the bottom edge. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas."
+  },
+  "mask": {
+    "touchedFraction": 0.7270021942515432,
+    "editable": 5561143,
+    "soft": 468904,
+    "protected": 2264353
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 56.976,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.88,
+        "bestError": 5.88,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 2264353,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 5561143,
+        "maxDelta": 202,
+        "meanDelta": 60.095,
+        "worst": {
+          "x": 121,
+          "y": 688
+        }
+      },
+      "seam": {
+        "pixels": 468904,
+        "maxDelta": 158,
+        "meanDelta": 19.983,
+        "worst": {
+          "x": 431,
+          "y": 278
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2264353,
+        "maxDelta": 235,
+        "meanDelta": 19.704,
+        "worst": {
+          "x": 560,
+          "y": 366
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1716,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 208
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3559
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

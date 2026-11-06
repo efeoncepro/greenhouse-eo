@@ -1,0 +1,55 @@
+{
+  "id": "GF26-A",
+  "formato": "16:9",
+  "registro": "cine",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "determinacion"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "objetos": [
+    {
+      "objeto": "traje-bionico-nexa"
+    },
+    {
+      "objeto": "lentes-bionicos-nexa"
+    },
+    {
+      "objeto": "spark-investigacion",
+      "vista": "cine"
+    },
+    {
+      "objeto": "spark-contenido",
+      "vista": "cine"
+    }
+  ],
+  "escena": "SCENE: an expensive live-action science-fiction ACTION MOVIE still, the moment a creative squad launches from a colossal night hangar. Nexa has just taken ONE powerful lateral step forward along a loading ramp, hips and shoulders braced diagonally, body upright rather than leaning toward the camera, framed from the upper thighs up on the RIGHT half. She has determined concentration, not a smiling pose for a portrait. Her head is almost frontal with both eyes visible through the clear glasses, eyes directed to the camera as she commits to the action. Her LEFT forearm is fully visible and extends toward frame-RIGHT, palm up at chest height, clear of the chest emblem, directing a FIST-SIZED azure-white production core 30 cm from her face. Her other arm is lowered naturally and attached to its shoulder, not performing another task. From that core ONE narrow controlled beam travels BACKWARD and RIGHT through a gigantic open delivery gate, carrying a coherent sequence of small rectangular image panels toward the distant right-hand depth. The gate is an immense real physical structure of metal ribs and gantries, NOT a glowing ring. The panels carry abstract landscape imagery, no readable words, no brands, no user interfaces. The core is the ONLY key light: hard azure-white from below and frame-right, the far cheek in deep shadow, the nose shadow legible. A very low cool rear rim outlines her hair without filling the face; the garment itself is navy and neutral ceramic white, never royal blue, skin neutral and human. The Research Spark physically grips her near shoulder, visibly smaller than her head, its weight and tiny hands in contact with the shoulder plate. ONE Content Spark is one metre behind and to her RIGHT, visibly smaller and slightly softer than the near Spark, holding one unlit image panel. EXACTLY TWO Sparks in the picture, not a fan, not clean studio cutouts. The architecture extends 8 to 12 metres behind them, big cold practicals melted into bokeh, thin haze revealing the ONE beam. A little natural motion in a loose hair strand gives the force of the step; eyes, facial texture and hands remain sharp. CAMERA: 85 mm f/1.8, chest-height, approximately 2.8 metres away, shoulders wider than two head widths, natural adult proportions, no huge foreground hand. GEOGRAPHY: her outer elbow is the leftmost subject boundary, just right of the centre. Everything left of it is unlit textured hangar space with faint haze, no lit panels, no robot, no beam. The near black loading-ramp edge is native to the action, below all hands, not a desk. Preserve the bionic suit, its chest isotype and clear bionic glasses exactly from the catalogue references. Small GOLD earrings, no watch, no bracelet, no ring. No cape, no mirrored visor, no explosion, no fireballs, no readable text, no editorial logo or captions. This is fiction, not a real event.",
+  "lecho": {
+    "objeto": "the native near-black matte rubber edge of the loading ramp, ten centimetres from the lens at the bottom of the image, completely out of focus, below all hands and bodies; no reflections and outside the reach of the key light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the unlit textured hangar wall and space on the LEFT, clear of all hands, characters, frames and beams",
+      "tinta": "blanca"
+    }
+  },
+  "desde": "NX7d",
+  "alcance": "nexa",
+  "fondo": "immense structural ribs and gantries at 8 to 12 metres in the hangar on the right, with large cold practical lights melted into bokeh; the architecture is physical, not a black studio void",
+  "nota": "Ficción cinematográfica propia para Glitch Flash Images 2.6. Prueba explícita del operador con motor gpt-image-2.6-sunburst, no cambio de default ni identidad nueva. Fotograma sin texto editorial; la marca física se copia sólo del kit. Se conserva plate crudo para evaluar el modelo antes de firma/composición. La escena es contenido del artículo, no un anuncio de servicio ni una prueba de rendimiento independiente. Falla25 del casebook: el lecho de la rampa ES el primer plano nativo; se omite primerPlano para no inyectar un segundo objeto contradictorio. Aviso de campo ausente revisado.",
+  "llave": {
+    "fuente": "a fist-sized azure-white production core floating immediately above her open LEFT palm",
+    "lado": "below and to frame-RIGHT of her face",
+    "distancia": "30 centimetres from her face",
+    "tamano": "fist-sized"
+  },
+  "fenomeno": {
+    "que": "ONE controlled azure-white beam carries a coherent sequence of image panels from the production core into a gigantic physical delivery gate deep in the hangar",
+    "esServicio": "La dirección creativa convierte una imagen elegida en una entrega coordinada; el fenómeno representa el paso de alternativa a producción, no una promesa de consistencia automática del modelo."
+  }
+}

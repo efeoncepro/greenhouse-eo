@@ -1,0 +1,155 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e42caee227ca",
+  "key": "e42caee227ca4419802248ebb8349a6364373959164e1bf5e74bd22b8ee36997",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:25:47.436Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/pucallpa/expand-inputs/1df978427460-canvas.png",
+    "imageSha256": "0f264ac5d941e44fe99ee180829393bbc298a8b68ee216a308ba32edef38e152",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/pucallpa/expand-inputs/1df978427460-mask.png",
+    "maskSha256": "33226b0a5db490b966567bc4f6bbd4dbf2714f7ca7a1784f4dd1e1287d47e2a8",
+    "maskConvention": "white-editable",
+    "width": 800,
+    "height": 1422,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend the photo upward: continue the same clear even blue sky above the clock tower of Pucallpa, completing the tip of the tower naturally. Keep the existing photo exactly. No new objects, no birds, no text.",
+    "providerPrompt": "Extend the photo upward: continue the same clear even blue sky above the clock tower of Pucallpa, completing the tip of the tower naturally. Keep the existing photo exactly. No new objects, no birds, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3108298171589311,
+    "editable": 274400,
+    "soft": 79200,
+    "protected": 784000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 800,
+      "height": 1422
+    },
+    "target": {
+      "width": 800,
+      "height": 1424
+    },
+    "aspectError": 0.0014064697609000264,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0243,
+    "basis": "1 × salida 800x1424 medium (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 28.619,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.27,
+        "bestError": 5.27,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 784000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 274400,
+        "maxDelta": 215,
+        "meanDelta": 34.539,
+        "worst": {
+          "x": 552,
+          "y": 119
+        }
+      },
+      "seam": {
+        "pixels": 79200,
+        "maxDelta": 22,
+        "meanDelta": 8.108,
+        "worst": {
+          "x": 783,
+          "y": 343
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 784000,
+        "maxDelta": 211,
+        "meanDelta": 18.262,
+        "worst": {
+          "x": 522,
+          "y": 458
+        }
+      },
+      "outputUsd": 0.0243,
+      "providerModel": "gpt-image-2.6-flare",
+      "usage": {
+        "input_tokens": 1219,
+        "input_tokens_details": {
+          "image_tokens": 1125,
+          "text_tokens": 94
+        },
+        "output_tokens": 809,
+        "output_tokens_details": {
+          "image_tokens": 809,
+          "text_tokens": 0
+        },
+        "total_tokens": 2028
+      },
+      "meta": {
+        "size": "800x1424",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "expand": {
+    "source": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/556be26d-0508-40ae-90b2-998711ee8289/scratchpad/kvhm-canvas/expand/PUCALLPA_crop.png",
+    "sourceSha256": "082e997b6217681b817fda5b782117662a2cfa83aa6f05009aff0cf4526e40c0",
+    "to": null,
+    "plan": {
+      "canvas": {
+        "width": 800,
+        "height": 1422
+      },
+      "scene": {
+        "left": 0,
+        "top": 342,
+        "width": 800,
+        "height": 1080
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 100
+  }
+}

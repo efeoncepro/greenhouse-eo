@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/v2/barra-coctel.png …
+  ✓ 2541KB · gpt-image-2.6-sunburst · 1024x1536 · high · clave personal
+    usage: in 278 (img 0 · txt 278) · out 1372 · total 1650
+done

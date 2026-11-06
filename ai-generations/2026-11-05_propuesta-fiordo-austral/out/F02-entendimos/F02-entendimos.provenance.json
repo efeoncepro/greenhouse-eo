@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "bdd7adeb72d2e320df9da6f60d52bb7264d22bf1ecafadfeaa37f9d56883abb2",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine.purpose",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:FA02-cuatro-regiones",
+      "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA02-cuatro-regiones.png",
+      "sha256": "472c0f9b705227aea1dbedd236fe20efaa647b060bfa7924d29058b705c1ca37"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

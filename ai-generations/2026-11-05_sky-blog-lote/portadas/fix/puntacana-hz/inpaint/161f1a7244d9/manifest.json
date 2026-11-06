@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "161f1a7244d9",
+  "key": "161f1a7244d94da33a3f1ecfacad0fead045b5ebf9196c813d82cbcf8aef9af3",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:21:31.296Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/punta-cana/img1-maestro.png",
+    "imageSha256": "3a6aeb70bc53d98e011df1465ae2af773402b48f2dcee2bb095299305599aac5",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/puntacana-hz-mask.png",
+    "maskSha256": "e3fe9821ff1e8292517d4ccc5ab6233a02cf34ab3392a8b362fdd464098200f3",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same open Caribbean sea continuing calm and turquoise up to a clean, straight, empty horizon under the same blue sky with the same soft clouds; nothing on the water and nothing in the air in this area: no island, no boats, no parasails, no kites, no birds; same light and colour",
+    "providerPrompt": "the same open Caribbean sea continuing calm and turquoise up to a clean, straight, empty horizon under the same blue sky with the same soft clouds; nothing on the water and nothing in the air in this area: no island, no boats, no parasails, no kites, no birds; same light and colour"
+  },
+  "mask": {
+    "touchedFraction": 0.054369936342592594,
+    "editable": 0,
+    "soft": 450966,
+    "protected": 7843434
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 47 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 24.987,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 3.69,
+        "bestError": 3.69,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7843434,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 450966,
+        "maxDelta": 253,
+        "meanDelta": 24.987,
+        "worst": {
+          "x": 2299,
+          "y": 534
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7843434,
+        "maxDelta": 255,
+        "meanDelta": 16.805,
+        "worst": {
+          "x": 932,
+          "y": 525
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1587,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 79
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3430
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "tenderId": "F15-soporte",
+  "slides": [
+    {
+      "slideId": "deck-decision-why-us",
+      "contentType": "deck.decision-why-us",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 140,
+          "bodyTop": 450,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "sourceLeft": "--gl-dw-source-left=500px",
+          "sourceTop": "--gl-dw-source-top=1000px",
+          "sourcePx": "--gl-dw-source-px=15px",
+          "gridLeft": "--gl-dw-grid-left=800px",
+          "gridTop": "--gl-dw-grid-top=230px",
+          "cellWidth": "--gl-dw-cell-width=300px",
+          "columnGap": "--gl-dw-column-gap=30px",
+          "rowStep": "--gl-dw-row-step=360px",
+          "ruleStroke": "--gl-dw-rule=2px",
+          "cellPadTop": "--gl-dw-cell-pad-top=20px",
+          "figurePx": "--gl-dw-figure-px=150px",
+          "figureSecondaryPx": "--gl-dw-figure-secondary-px=92px",
+          "figureWght": "--gl-dw-figure-wght=300",
+          "figureTracking": "--gl-dw-figure-tracking=-0.05em",
+          "labelPx": "--gl-dw-label-px=22px",
+          "labelGap": "--gl-dw-label-gap=14px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dw-progress-3-of-4-growth"
+        },
+        "voice": {
+          "question": "Lo crítico, en",
+          "answer": "1 hora",
+          "eyebrow": "Soporte y SLA"
+        },
+        "body": "Lunes a viernes de 9:00 a 18:30 y guardia permanente para lo crítico; mantención mensual.",
+        "facts": [
+          {
+            "size": "small",
+            "value": "≤ 1 h",
+            "label": "S1 crítico: caída o incidente de seguridad"
+          },
+          {
+            "size": "small",
+            "value": "≤ 4 h",
+            "label": "S2 alto: función clave degradada"
+          },
+          {
+            "size": "small",
+            "value": "≤ 1 día",
+            "label": "S3 medio: error de un reporte o usuario"
+          },
+          {
+            "size": "small",
+            "value": "≤ 2 días",
+            "label": "S4 bajo: consultas y mejoras"
+          },
+          {
+            "size": "small",
+            "value": "N1 a N3",
+            "label": "escalamiento hasta HubSpot y Microsoft"
+          },
+          {
+            "size": "small",
+            "value": "Al abrir",
+            "label": "aviso de S1 y S2 por correo y Teams"
+          }
+        ],
+        "source": "Fuente: SLA de esta propuesta",
+        "selection": {
+          "label": "Fiordo Austral",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionWhyUs"
+    }
+  ]
+}

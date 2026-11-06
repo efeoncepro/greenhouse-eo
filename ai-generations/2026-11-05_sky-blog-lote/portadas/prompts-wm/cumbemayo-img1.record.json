@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "matas de pasto de altura",
+ "sinPrimerPlano": null,
+ "borde": "lower-right corner",
+ "id": "cumbemayo",
+ "input": {
+  "id": "cumbemayo",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "bosque de piedras de Cumbemayo, Cajamarca, Perú",
+  "escena": "el bosque de piedras de Cumbemayo: formaciones de roca altas y verticales a ambos lados de un sendero de pasto de altura, con nubes bajas que asoman entre las piedras; una viajera con casaca y mochila pequeña camina hacia el fondo por el sendero y la escala de la roca la hace pequeña. Debe leerse como paisaje de altura con piedra gigante, no como desierto ni como montaña nevada. Personas: la viajera a media distancia, de espaldas, caminando sin pose ni mirada al lente; si aparecen otras personas, lejanas y pequeñas en el sendero; ningún rostro identificable en primer plano",
+  "hora": "media mañana, con nubes bajas o neblina que se levanta (la mañana del relato)",
+  "clima": "sin lluvia; luz difusa abundante, sombras abiertas, cielo blanco sin quemar",
+  "primerPlano": "matas de pasto de altura",
+  "borde": "lower-right corner",
+  "prohibir": "sin texto ni logos, sin rótulos legibles ni carteles del sitio, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin nieve, sin rocas con caras o figuras evidentes (la pareidolia la pone el lector), sin personas trepando las formaciones",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "bosque de piedras de Cumbemayo, Cajamarca, Perú (its real forms, scale and spatial relationships)"
+ }
+}

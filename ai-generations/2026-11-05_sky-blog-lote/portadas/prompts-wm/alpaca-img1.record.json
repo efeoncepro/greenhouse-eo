@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "F",
+ "portada": true,
+ "primerPlano": "el borde de una madeja de fibra teñida",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "alpaca",
+ "input": {
+  "id": "alpaca",
+  "registro": "D",
+  "tipo": "F",
+  "portada": true,
+  "lugar": "patio de tejido del Centro de Textiles Tradicionales en Chinchero, Cusco, Perú",
+  "escena": "un patio de tierra y adobe en Chinchero con una tejedora sentada en el suelo trabajando un telar de cintura, madejas de colores a su lado y cerros andinos al fondo bajo un cielo limpio; la viajera, agachada a unos pasos, mira el telar con atención. Debe leerse como un espacio de trabajo real, sereno, no como escenario para turistas. Personas: la viajera de perfil o de espaldas, mirando el telar y no la cámara; la tejedora de perfil o con el rostro fuera de cuadro o no identificable, concentrada en el tejido, sin posar; nadie mira al lente",
+  "hora": "media mañana, la hora de la visita en el relato",
+  "clima": "cielo despejado, sol de altura; luz abundante, sombras abiertas, altas luces del cielo conservadas",
+  "primerPlano": "el borde de una madeja de fibra teñida",
+  "borde": "lower-left corner",
+  "prohibir": "sin texto ni logos, sin rótulos legibles del centro o de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin rostro identificable de la tejedora, sin trajes convertidos en disfraz, sin alpacas posando en el patio, sin diseños textiles copiados de una comunidad identificable",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 35–50 mm equivalent.",
+  "refLugar": "patio de tejido del Centro de Textiles Tradicionales en Chinchero, Cusco, Perú (its real forms, scale and spatial relationships)"
+ }
+}

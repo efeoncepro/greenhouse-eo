@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "wet sand with the foam of the wave",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "noticia-gol-pe",
+ "input": {
+  "id": "noticia-gol-pe",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "an urban beach in Rio de Janeiro, Brazil, with the mountains that close Guanabara Bay",
+  "escena": "the shoreline of an urban beach with wet sand and a gentle wave; a woman traveler walks toward the water with her sandals in her hand, seen from behind at medium distance; in the background the granite mountains that close the bay, including the Sugarloaf, and the line of the city. It must read as arriving in Rio, not a resort postcard",
+  "hora": "late summer afternoon before dusk",
+  "clima": "clear sky or high clouds, warm abundant light, open shadows, sky highlights retained",
+  "primerPlano": "wet sand with the foam of the wave",
+  "borde": "bottom edge",
+  "refLugar": "the real silhouette and position of the Sugarloaf and the mountains around Guanabara Bay",
+  "prohibir": "fireworks, New Year crowds, branded kiosks or umbrellas, invented bay geography",
+  "extra": "COMPOSITION, MEASURED: the bay mountains with the Sugarloaf and the woman (small, head to feet between 22% and 48% of the frame height, between 42% and 58% of the width) sit in the upper half, mountain tops never touching the top edge. The lower half is calm wet sand and foam, mid-tone, not bright. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

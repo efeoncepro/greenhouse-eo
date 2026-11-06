@@ -1,0 +1,24 @@
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/cena-peruana-a.png …
+  ✓ 9028KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 1338 (img 0 · txt 1338) · out 13342 · total 14680
+done
+cena-peruana-a exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/cena-peruana-b.png …
+  ✓ 9282KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 1338 (img 0 · txt 1338) · out 13342 · total 14680
+done
+cena-peruana-b exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/retablo-a.png (edit) …
+  ✓ 11051KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2890 (img 1521 · txt 1369) · out 13342 · total 16232
+done
+retablo-a exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/retablo-b.png (edit) …
+  ✓ 11768KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2890 (img 1521 · txt 1369) · out 13342 · total 16232
+done
+retablo-b exit=0

@@ -149,10 +149,11 @@ Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVE
 [colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md) ·
 [QA Frame.io](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md).
 
-WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md),
+WordPress: `efeonce-public-site-wordpress`; [Home](docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
 Misceláneas propuestas; Ohio live, Theme Builder sin probar. Elegibilidad ≠ indexación.
-Footer: [estado](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+[Footer](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+[Blog/Vimeo](docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md).
 
 ### Lectura mínima obligatoria
 

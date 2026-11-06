@@ -1,0 +1,101 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "brand",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-progress",
+  "voice": {
+    "eyebrow": "05 · Vívelo",
+    "question": "¿Cómo sigo el trabajo?",
+    "answer": [
+      "A la",
+      "vista"
+    ]
+  },
+  "body": "Ves la grilla del mes en Notion y apruebas cada pieza comentando **sobre** la imagen.",
+  "plan": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "name": "Notion"
+    },
+    "kicker": "En Notion",
+    "title": "Grilla de noviembre",
+    "meta": "Semana 3 de 4",
+    "columns": [
+      {
+        "name": "En curso",
+        "cards": [
+          {
+            "title": "Reel desde el pase",
+            "tag": "Sesión en tienda"
+          },
+          {
+            "title": "Llegamos a Santiago",
+            "tag": "Expectativa"
+          }
+        ]
+      },
+      {
+        "name": "En revisión",
+        "cards": [
+          {
+            "title": "Pasta con langostinos",
+            "tag": "Esperando tu visto bueno",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "name": "Listo",
+        "cards": [
+          {
+            "title": "Cuenta regresiva",
+            "tag": "Historias"
+          },
+          {
+            "title": "Respuestas automáticas",
+            "tag": "Comunidad"
+          }
+        ]
+      }
+    ]
+  },
+  "review": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "name": "Notion"
+    },
+    "kicker": "En Notion",
+    "title": "Pasta y langostinos",
+    "versions": [
+      "v1",
+      "v2"
+    ],
+    "piece": {
+      "plateRef": "ai-generations/2026-11-05_propuesta-mambrino/muestras/jpg/plato-pasta-langostinos.jpg",
+      "alt": "La pieza en revisión: pasta con langostinos en plato cobalto, muestra de dirección"
+    },
+    "pin": "1",
+    "comments": [
+      {
+        "mark": "1",
+        "author": "Mambrino",
+        "version": "v1",
+        "text": "¿Más brillo en la salsa?"
+      },
+      {
+        "own": true,
+        "author": "Efeonce",
+        "version": "v2",
+        "text": "Listo, quedó en la v2."
+      }
+    ],
+    "secondary": "Comentar",
+    "primary": "Aprobar"
+  }
+}

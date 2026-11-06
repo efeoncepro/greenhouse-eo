@@ -1,0 +1,710 @@
+[
+ [
+  "hph/HPH_1200x1200_GENERICO.png",
+  "HM CL/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HPH_300x600_GENERICO.png",
+  "HM CL/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HPH_300x250_GENERICO.png",
+  "HM CL/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HPH_728x90_GENERICO.png",
+  "HM CL/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM__pmax-1080x1080.png",
+  "HM CL/PMAX/PMAX DOM/BS_1080X1080_DOM.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM__pmax-1080x1350.png",
+  "HM CL/PMAX/PMAX DOM/BS_1080X1350_DOM.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM__pmax-1080x1920.png",
+  "HM CL/PMAX/PMAX DOM/BS_1080X1920_DOM.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM__pmax-1200x628.png",
+  "HM CL/PMAX/PMAX DOM/BS_1200X628_DOM.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER__pmax-1080x1080.png",
+  "HM CL/PMAX/PMAX INTER/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER__pmax-1080x1350.png",
+  "HM CL/PMAX/PMAX INTER/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER__pmax-1080x1920.png",
+  "HM CL/PMAX/PMAX INTER/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER__pmax-1200x628.png",
+  "HM CL/PMAX/PMAX INTER/BS_1200X628_INTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM_CLUSTER__pmax-1080x1080.png",
+  "HM CL/PMAX/PMAX DOM CLUSTER/BS_1080X1080_DOM-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM_CLUSTER__pmax-1080x1350.png",
+  "HM CL/PMAX/PMAX DOM CLUSTER/BS_1080X1350_DOM-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM_CLUSTER__pmax-1080x1920.png",
+  "HM CL/PMAX/PMAX DOM CLUSTER/BS_1080X1920_DOM-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_DOM_CLUSTER__pmax-1200x628.png",
+  "HM CL/PMAX/PMAX DOM CLUSTER/BS_1200X628_DOM-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER_CLUSTER__pmax-1080x1080.png",
+  "HM CL/PMAX/PMAX INTER CLUSTER/BS_1080X1080_INTER-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER_CLUSTER__pmax-1080x1350.png",
+  "HM CL/PMAX/PMAX INTER CLUSTER/BS_1080X1350_INTER-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER_CLUSTER__pmax-1080x1920.png",
+  "HM CL/PMAX/PMAX INTER CLUSTER/BS_1080X1920_INTER-CLUSTER.png"
+ ],
+ [
+  "pmax/HM_CL_KV_INTER_CLUSTER__pmax-1200x628.png",
+  "HM CL/PMAX/PMAX INTER CLUSTER/BS_1200X628_INTER-CLUSTER.png"
+ ],
+ [
+  "chile-kv-listo/CL_PMAX_1080x1080.png",
+  "HM CL/PMAX/PMAX PRECIO DCTO/BS_1080X1080_PRECIO-DCTO.png"
+ ],
+ [
+  "chile-kv-listo/CL_PMAX_1080x1350.png",
+  "HM CL/PMAX/PMAX PRECIO DCTO/BS_1080X1350_PRECIO-DCTO.png"
+ ],
+ [
+  "chile-kv-listo/CL_PMAX_1080x1920.png",
+  "HM CL/PMAX/PMAX PRECIO DCTO/BS_1080X1920_PRECIO-DCTO.png"
+ ],
+ [
+  "chile-kv-listo/CL_PMAX_1200x628.png",
+  "HM CL/PMAX/PMAX PRECIO DCTO/BS_1200X628_PRECIO-DCTO.png"
+ ],
+ [
+  "estaticos/HM_CL_KV_DOM_CLUSTER__popup.png",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_POPUP_DOM.png"
+ ],
+ [
+  "estaticos/HM_CL_KV_DOM_CLUSTER__story.png",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_STORY_DOM.png"
+ ],
+ [
+  "HM_CL_KV_DOM_CLUSTER.gif",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_GIF_DOM.gif"
+ ],
+ [
+  "HM_CL_KV_DOM_CLUSTER.mp4",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_GIF_DOM.mp4"
+ ],
+ [
+  "HM_CL_KV_DOM_CLUSTER_audio.mp4",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_GIF_DOM_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_CL_KV_DOM_CLUSTER__story-video.mp4",
+  "HM CL/GIF + POPUP/VUELA POR CHILE/BS_STORYVIDEO_DOM.mp4"
+ ],
+ [
+  "estaticos/HM_CL_KV_INTER_CLUSTER__popup.png",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_POPUP_INTER.png"
+ ],
+ [
+  "estaticos/HM_CL_KV_INTER_CLUSTER__story.png",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_STORY_INTER.png"
+ ],
+ [
+  "HM_CL_KV_INTER_CLUSTER.gif",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_GIF_INTER.gif"
+ ],
+ [
+  "HM_CL_KV_INTER_CLUSTER.mp4",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_GIF_INTER.mp4"
+ ],
+ [
+  "HM_CL_KV_INTER_CLUSTER_audio.mp4",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_GIF_INTER_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_CL_KV_INTER_CLUSTER__story-video.mp4",
+  "HM CL/GIF + POPUP/VUELA INTER/BS_STORYVIDEO_INTER.mp4"
+ ],
+ [
+  "estaticos/HM_CL_KV_ENCUENTRA__popup.png",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_POPUP_DESTINOS.png"
+ ],
+ [
+  "estaticos/HM_CL_KV_ENCUENTRA__story.png",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_STORY_DESTINOS.png"
+ ],
+ [
+  "HM_CL_KV_ENCUENTRA.gif",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS.gif"
+ ],
+ [
+  "HM_CL_KV_ENCUENTRA.mp4",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS.mp4"
+ ],
+ [
+  "HM_CL_KV_ENCUENTRA_audio.mp4",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_CL_KV_ENCUENTRA__story-video.mp4",
+  "HM CL/GIF + POPUP/ENCUENTRA DESTINOS/BS_STORYVIDEO_DESTINOS.mp4"
+ ],
+ [
+  "chile-kv-listo/CL_BANNER-TIKTOK_PRECIO_1920x1080.png",
+  "HM CL/BANNER TIKTOK/BS_1920X1080_PRECIO.png"
+ ],
+ [
+  "chile-kv-listo/CL_BANNER-TIKTOK_DCTO_1920x1080.png",
+  "HM CL/BANNER TIKTOK/BS_1920X1080_DCTO.png"
+ ],
+ [
+  "chile-kv-listo/CL_BANNER-TIKTOK_PRECIO-DCTO_1920x1080.png",
+  "HM CL/BANNER TIKTOK/BS_1920X1080_PRECIO-DCTO.png"
+ ],
+ [
+  "chile-kv-listo/CL_DAT_DOM.png",
+  "HM CL/DAT/BS_DAT_DOM.png"
+ ],
+ [
+  "chile-kv-listo/CL_DAT_INTER.png",
+  "HM CL/DAT/BS_DAT_INTER.png"
+ ],
+ [
+  "hph/HM_PE_KV_INTER__hph-1200x1200.png",
+  "HM PE/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HM_PE_KV_INTER__hph-300x600.png",
+  "HM PE/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HM_PE_KV_INTER__hph-300x250.png",
+  "HM PE/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HM_PE_KV_INTER__hph-728x90.png",
+  "HM PE/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM__pmax-1080x1080.png",
+  "HM PE/PMAX/PMAX DOM/BS_1080X1080_DOM.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM__pmax-1080x1350.png",
+  "HM PE/PMAX/PMAX DOM/BS_1080X1350_DOM.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM__pmax-1080x1920.png",
+  "HM PE/PMAX/PMAX DOM/BS_1080X1920_DOM.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM__pmax-1200x628.png",
+  "HM PE/PMAX/PMAX DOM/BS_1200X628_DOM.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER__pmax-1080x1080.png",
+  "HM PE/PMAX/PMAX INTER/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER__pmax-1080x1350.png",
+  "HM PE/PMAX/PMAX INTER/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER__pmax-1080x1920.png",
+  "HM PE/PMAX/PMAX INTER/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER__pmax-1200x628.png",
+  "HM PE/PMAX/PMAX INTER/BS_1200X628_INTER.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM-RUTA__pmax-1080x1080.png",
+  "HM PE/PMAX/PMAX DOM RUTA/BS_1080X1080_DOM-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM-RUTA__pmax-1080x1350.png",
+  "HM PE/PMAX/PMAX DOM RUTA/BS_1080X1350_DOM-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM-RUTA__pmax-1080x1920.png",
+  "HM PE/PMAX/PMAX DOM RUTA/BS_1080X1920_DOM-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_DOM-RUTA__pmax-1200x628.png",
+  "HM PE/PMAX/PMAX DOM RUTA/BS_1200X628_DOM-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER-RUTA__pmax-1080x1080.png",
+  "HM PE/PMAX/PMAX INTER RUTA/BS_1080X1080_INTER-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER-RUTA__pmax-1080x1350.png",
+  "HM PE/PMAX/PMAX INTER RUTA/BS_1080X1350_INTER-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER-RUTA__pmax-1080x1920.png",
+  "HM PE/PMAX/PMAX INTER RUTA/BS_1080X1920_INTER-RUTA.png"
+ ],
+ [
+  "pmax/HM_PE_KV_INTER-RUTA__pmax-1200x628.png",
+  "HM PE/PMAX/PMAX INTER RUTA/BS_1200X628_INTER-RUTA.png"
+ ],
+ [
+  "estaticos/HM_PE_KV_DOM_REGIONES__popup.png",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_POPUP_DOM.png"
+ ],
+ [
+  "estaticos/HM_PE_KV_DOM_REGIONES__story.png",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_STORY_DOM.png"
+ ],
+ [
+  "HM_PE_KV_DOM_REGIONES.gif",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_GIF_DOM.gif"
+ ],
+ [
+  "HM_PE_KV_DOM_REGIONES.mp4",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_GIF_DOM.mp4"
+ ],
+ [
+  "HM_PE_KV_DOM_REGIONES_audio.mp4",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_GIF_DOM_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_PE_KV_DOM_REGIONES__story-video.mp4",
+  "HM PE/GIF + POPUP/VUELA POR PERU/BS_STORYVIDEO_DOM.mp4"
+ ],
+ [
+  "estaticos/HM_PE_KV_INTER_BANDERAS__popup.png",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_POPUP_INTER.png"
+ ],
+ [
+  "estaticos/HM_PE_KV_INTER_BANDERAS__story.png",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_STORY_INTER.png"
+ ],
+ [
+  "HM_PE_KV_INTER_BANDERAS.gif",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_GIF_INTER.gif"
+ ],
+ [
+  "HM_PE_KV_INTER_BANDERAS.mp4",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_GIF_INTER.mp4"
+ ],
+ [
+  "HM_PE_KV_INTER_BANDERAS_audio.mp4",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_GIF_INTER_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_PE_KV_INTER_BANDERAS__story-video.mp4",
+  "HM PE/GIF + POPUP/VUELA INTER/BS_STORYVIDEO_INTER.mp4"
+ ],
+ [
+  "estaticos/HM_PE_KV_ENCUENTRA__popup.png",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_POPUP_DESTINOS.png"
+ ],
+ [
+  "estaticos/HM_PE_KV_ENCUENTRA__story.png",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_STORY_DESTINOS.png"
+ ],
+ [
+  "HM_PE_KV_ENCUENTRA.gif",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS.gif"
+ ],
+ [
+  "HM_PE_KV_ENCUENTRA.mp4",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS.mp4"
+ ],
+ [
+  "HM_PE_KV_ENCUENTRA_audio.mp4",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_GIF_DESTINOS_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_PE_KV_ENCUENTRA__story-video.mp4",
+  "HM PE/GIF + POPUP/ENCUENTRA DESTINOS/BS_STORYVIDEO_DESTINOS.mp4"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TALARA__popup.png",
+  "HM PE/RUTAS FOCO/TALARA/BS_POPUP_TYL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TALARA__story.png",
+  "HM PE/RUTAS FOCO/TALARA/BS_STORY_TYL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CAJAMARCA__popup.png",
+  "HM PE/RUTAS FOCO/CAJAMARCA/BS_POPUP_CJA.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CAJAMARCA__story.png",
+  "HM PE/RUTAS FOCO/CAJAMARCA/BS_STORY_CJA.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_JULIACA__popup.png",
+  "HM PE/RUTAS FOCO/JULIACA/BS_POPUP_JUL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_JULIACA__story.png",
+  "HM PE/RUTAS FOCO/JULIACA/BS_STORY_JUL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_IQUITOS__popup.png",
+  "HM PE/RUTAS FOCO/IQUITOS/BS_POPUP_IQT.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_IQUITOS__story.png",
+  "HM PE/RUTAS FOCO/IQUITOS/BS_STORY_IQT.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TUMBES__popup.png",
+  "HM PE/RUTAS FOCO/TUMBES/BS_POPUP_TBP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TUMBES__story.png",
+  "HM PE/RUTAS FOCO/TUMBES/BS_STORY_TBP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_AREQUIPA__popup.png",
+  "HM PE/RUTAS FOCO/AREQUIPA/BS_POPUP_AQP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_AREQUIPA__story.png",
+  "HM PE/RUTAS FOCO/AREQUIPA/BS_STORY_AQP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CHICLAYO__popup.png",
+  "HM PE/RUTAS FOCO/CHICLAYO/BS_POPUP_CIX.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CHICLAYO__story.png",
+  "HM PE/RUTAS FOCO/CHICLAYO/BS_STORY_CIX.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TRUJILLO__popup.png",
+  "HM PE/RUTAS FOCO/TRUJILLO/BS_POPUP_TRU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TRUJILLO__story.png",
+  "HM PE/RUTAS FOCO/TRUJILLO/BS_STORY_TRU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_AYACUCHO__popup.png",
+  "HM PE/RUTAS FOCO/AYACUCHO/BS_POPUP_AYP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_AYACUCHO__story.png",
+  "HM PE/RUTAS FOCO/AYACUCHO/BS_STORY_AYP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_PUCALLPA__popup.png",
+  "HM PE/RUTAS FOCO/PUCALLPA/BS_POPUP_PCL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_PUCALLPA__story.png",
+  "HM PE/RUTAS FOCO/PUCALLPA/BS_STORY_PCL.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TARAPOTO__popup.png",
+  "HM PE/RUTAS FOCO/TARAPOTO/BS_POPUP_TPP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TARAPOTO__story.png",
+  "HM PE/RUTAS FOCO/TARAPOTO/BS_STORY_TPP.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CUSCO__popup.png",
+  "HM PE/RUTAS FOCO/CUSCO/BS_POPUP_CUZ.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_CUSCO__story.png",
+  "HM PE/RUTAS FOCO/CUSCO/BS_STORY_CUZ.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_PIURA__popup.png",
+  "HM PE/RUTAS FOCO/PIURA/BS_POPUP_PIU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_PIURA__story.png",
+  "HM PE/RUTAS FOCO/PIURA/BS_STORY_PIU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_JAUJA__popup.png",
+  "HM PE/RUTAS FOCO/JAUJA/BS_POPUP_JAU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_JAUJA__story.png",
+  "HM PE/RUTAS FOCO/JAUJA/BS_STORY_JAU.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TACNA__popup.png",
+  "HM PE/RUTAS FOCO/TACNA/BS_POPUP_TCQ.png"
+ ],
+ [
+  "rutas-peru/HM_PE_RUTA_TACNA__story.png",
+  "HM PE/RUTAS FOCO/TACNA/BS_STORY_TCQ.png"
+ ],
+ [
+  "hph/HM_AR_KV__hph-1200x1200.png",
+  "HM AR/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HM_AR_KV__hph-300x600.png",
+  "HM AR/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HM_AR_KV__hph-300x250.png",
+  "HM AR/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HM_AR_KV__hph-728x90.png",
+  "HM AR/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_AR_KV__pmax-1080x1080.png",
+  "HM AR/PMAX/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_AR_KV__pmax-1080x1350.png",
+  "HM AR/PMAX/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_AR_KV__pmax-1080x1920.png",
+  "HM AR/PMAX/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_AR_KV__pmax-1200x628.png",
+  "HM AR/PMAX/BS_1200X628_INTER.png"
+ ],
+ [
+  "estaticos/HM_AR_KV_SANTIAGO__popup.png",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_POPUP_SCL.png"
+ ],
+ [
+  "estaticos/HM_AR_KV_SANTIAGO__story.png",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_STORY_SCL.png"
+ ],
+ [
+  "HM_AR_KV_SANTIAGO.gif",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_GIF_SCL.gif"
+ ],
+ [
+  "HM_AR_KV_SANTIAGO.mp4",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_GIF_SCL.mp4"
+ ],
+ [
+  "HM_AR_KV_SANTIAGO_audio.mp4",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_GIF_SCL_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_AR_KV_SANTIAGO__story-video.mp4",
+  "HM AR/GIF + POPUP/VOLA A SANTIAGO/BS_STORYVIDEO_SCL.mp4"
+ ],
+ [
+  "estaticos/HM_AR_KV_LIMA__popup.png",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_POPUP_LIM.png"
+ ],
+ [
+  "estaticos/HM_AR_KV_LIMA__story.png",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_STORY_LIM.png"
+ ],
+ [
+  "HM_AR_KV_LIMA.gif",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_GIF_LIM.gif"
+ ],
+ [
+  "HM_AR_KV_LIMA.mp4",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_GIF_LIM.mp4"
+ ],
+ [
+  "HM_AR_KV_LIMA_audio.mp4",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_GIF_LIM_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_AR_KV_LIMA__story-video.mp4",
+  "HM AR/GIF + POPUP/VOLA A LIMA/BS_STORYVIDEO_LIM.mp4"
+ ],
+ [
+  "hph/HM_UY_KV__hph-1200x1200.png",
+  "HM UY/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HM_UY_KV__hph-300x600.png",
+  "HM UY/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HM_UY_KV__hph-300x250.png",
+  "HM UY/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HM_UY_KV__hph-728x90.png",
+  "HM UY/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_UY_KV__pmax-1080x1080.png",
+  "HM UY/PMAX/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_UY_KV__pmax-1080x1350.png",
+  "HM UY/PMAX/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_UY_KV__pmax-1080x1920.png",
+  "HM UY/PMAX/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_UY_KV__pmax-1200x628.png",
+  "HM UY/PMAX/BS_1200X628_INTER.png"
+ ],
+ [
+  "estaticos/HM_UY_KV_BANDERAS__popup.png",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_POPUP_INTER.png"
+ ],
+ [
+  "estaticos/HM_UY_KV_BANDERAS__story.png",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_STORY_INTER.png"
+ ],
+ [
+  "HM_UY_KV_BANDERAS.gif",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_GIF_INTER.gif"
+ ],
+ [
+  "HM_UY_KV_BANDERAS.mp4",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_GIF_INTER.mp4"
+ ],
+ [
+  "HM_UY_KV_BANDERAS_audio.mp4",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_GIF_INTER_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_UY_KV_BANDERAS__story-video.mp4",
+  "HM UY/GIF + POPUP/VOLA INTERNACIONAL/BS_STORYVIDEO_INTER.mp4"
+ ],
+ [
+  "hph/HM_BR_KV__hph-1200x1200.png",
+  "HM BR/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HM_BR_KV__hph-300x600.png",
+  "HM BR/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HM_BR_KV__hph-300x250.png",
+  "HM BR/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HM_BR_KV__hph-728x90.png",
+  "HM BR/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_BR_KV__pmax-1080x1080.png",
+  "HM BR/PMAX/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_BR_KV__pmax-1080x1350.png",
+  "HM BR/PMAX/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_BR_KV__pmax-1080x1920.png",
+  "HM BR/PMAX/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_BR_KV__pmax-1200x628.png",
+  "HM BR/PMAX/BS_1200X628_INTER.png"
+ ],
+ [
+  "estaticos/HM_BR_KV_SANTIAGO__popup.png",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_POPUP_SCL.png"
+ ],
+ [
+  "estaticos/HM_BR_KV_SANTIAGO__story.png",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_STORY_SCL.png"
+ ],
+ [
+  "HM_BR_KV_SANTIAGO.gif",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_GIF_SCL.gif"
+ ],
+ [
+  "HM_BR_KV_SANTIAGO.mp4",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_GIF_SCL.mp4"
+ ],
+ [
+  "HM_BR_KV_SANTIAGO_audio.mp4",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_GIF_SCL_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_BR_KV_SANTIAGO__story-video.mp4",
+  "HM BR/GIF + POPUP/VOE A SANTIAGO/BS_STORYVIDEO_SCL.mp4"
+ ],
+ [
+  "hph/HM_US_KV__hph-1200x1200.png",
+  "HM USA/HPH/BS_1200X1200_INTER.png"
+ ],
+ [
+  "hph/HM_US_KV__hph-300x600.png",
+  "HM USA/HPH/BS_300X600_INTER.png"
+ ],
+ [
+  "hph/HM_US_KV__hph-300x250.png",
+  "HM USA/HPH/BS_300X250_INTER.png"
+ ],
+ [
+  "hph/HM_US_KV__hph-728x90.png",
+  "HM USA/HPH/BS_728X90_INTER.png"
+ ],
+ [
+  "pmax/HM_US_KV__pmax-1080x1080.png",
+  "HM USA/PMAX/BS_1080X1080_INTER.png"
+ ],
+ [
+  "pmax/HM_US_KV__pmax-1080x1350.png",
+  "HM USA/PMAX/BS_1080X1350_INTER.png"
+ ],
+ [
+  "pmax/HM_US_KV__pmax-1080x1920.png",
+  "HM USA/PMAX/BS_1080X1920_INTER.png"
+ ],
+ [
+  "pmax/HM_US_KV__pmax-1200x628.png",
+  "HM USA/PMAX/BS_1200X628_INTER.png"
+ ],
+ [
+  "estaticos/HM_US_KV_BANDERAS__popup.png",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_POPUP_INTER.png"
+ ],
+ [
+  "estaticos/HM_US_KV_BANDERAS__story.png",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_STORY_INTER.png"
+ ],
+ [
+  "HM_US_KV_BANDERAS.gif",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_GIF_INTER.gif"
+ ],
+ [
+  "HM_US_KV_BANDERAS.mp4",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_GIF_INTER.mp4"
+ ],
+ [
+  "HM_US_KV_BANDERAS_audio.mp4",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_GIF_INTER_AUDIO.mp4"
+ ],
+ [
+  "story-video/HM_US_KV_BANDERAS__story-video.mp4",
+  "HM USA/GIF + POPUP/FLY INTERNATIONAL/BS_STORYVIDEO_INTER.mp4"
+ ]
+]

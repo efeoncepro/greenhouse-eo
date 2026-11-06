@@ -1,0 +1,33 @@
+{
+  "tenderId": "F08c-movil",
+  "slides": [
+    {
+      "slideId": "deck-breather",
+      "contentType": "deck.breather",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "questionTop": 380,
+          "answerTop": 440,
+          "answerPx": 132,
+          "questionLeading": "--gl-br-question-leading=1.35",
+          "answerLeading": "--gl-br-answer-leading=1.02",
+          "answerTracking": "--gl-br-answer-tracking=-0.04em"
+        },
+        "photo": {
+          "src": "asset-ref:plate:FA10-en-la-feria",
+          "alt": "En una feria internacional, una gerenta de exportaciones registra en el teléfono la visita que acaba de terminar, con la tarjeta del visitante en la otra mano"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-br-progress-1-of-4-revenue-hubspot"
+        },
+        "voice": {
+          "question": "En planta o en feria,",
+          "answer": "En el móvil"
+        }
+      },
+      "template": "Breather"
+    }
+  ]
+}

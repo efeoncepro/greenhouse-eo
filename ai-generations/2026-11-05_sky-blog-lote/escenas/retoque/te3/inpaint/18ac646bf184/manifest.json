@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "18ac646bf184",
+  "key": "18ac646bf18483894036d0440951be0014811f518b2c32d75c380f8bddeb9c26",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:48:52.695Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/tipos-equipaje/img3-maestro.png",
+    "imageSha256": "43c89c097173f6021b174ef334b3ebbaa69eaf67c582a9d879945c0be21ea1fc",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3-mask.png",
+    "maskSha256": "89ba9ed7f0b3d8f63d39b5fe0a8421f30a8a638c3192475f7c3a10dd8a15605e",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Two corrections so this matches the other photos of the same trip. 1) The backpack on the woman's back is an olive-green technical backpack (muted olive fabric, dark grey straps and zippers), same size, same position and same straps over her shoulder; only its colour changes from black to olive green. 2) The checked suitcase on the check-in belt is a LARGE checked suitcase: a tall charcoal-grey hard-shell spinner with vertical ribs, clearly taller than a cabin bag (about 75 cm high), standing on the belt with its four wheels on the belt; the agent's two hands rest naturally on its top handle with the paper bag tag hanging from the handle. Same airport light, same colours and focus as the rest of the photo; plain unbranded suitcase and plain clothes with no printed marks or lettering.",
+    "providerPrompt": "Two corrections so this matches the other photos of the same trip. 1) The backpack on the woman's back is an olive-green technical backpack (muted olive fabric, dark grey straps and zippers), same size, same position and same straps over her shoulder; only its colour changes from black to olive green. 2) The checked suitcase on the check-in belt is a LARGE checked suitcase: a tall charcoal-grey hard-shell spinner with vertical ribs, clearly taller than a cabin bag (about 75 cm high), standing on the belt with its four wheels on the belt; the agent's two hands rest naturally on its top handle with the paper bag tag hanging from the handle. Same airport light, same colours and focus as the rest of the photo; plain unbranded suitcase and plain clothes with no printed marks or lettering."
+  },
+  "mask": {
+    "touchedFraction": 0.35013286072530864,
+    "editable": 0,
+    "soft": 2904142,
+    "protected": 5390258
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 25.313,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.61,
+        "bestError": 5.61,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 5390258,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 2904142,
+        "maxDelta": 243,
+        "meanDelta": 25.313,
+        "worst": {
+          "x": 2452,
+          "y": 558
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 5390258,
+        "maxDelta": 187,
+        "meanDelta": 10.576,
+        "worst": {
+          "x": 1621,
+          "y": 1582
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1691,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 183
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3534
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

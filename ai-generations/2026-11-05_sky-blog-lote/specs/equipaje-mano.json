@@ -1,0 +1,136 @@
+{
+  "id": "equipaje-mano",
+  "notion_url": "https://app.notion.com/p/3ce0e1c86f4b431ba91cc4e5f05843c6",
+  "titulo": "Equipaje de mano SKY: medidas, peso y qué incluye tu tarifa",
+  "slug": "/equipaje-de-cabina/",
+  "mercado": "CL/PE",
+  "version": "v2 · 05/11/2026 (Aprobación cliente En espera; IMG 1 e IMG 2 ya producidas en v1, IMG 3 nueva)",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1 · anterior: N2_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + POV del viajero",
+      "modificadores": "objetos del viajero · escala media · luz de noche interior · orienta",
+      "registro": "D",
+      "archivo": "maleta-cabina-abierta-noche-anterior.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Maleta de cabina abierta sobre una cama junto a una mochila, la noche antes de un viaje",
+      "que_muestra": "una maleta de cabina abierta, a medio armar, sobre la cama; al lado, una mochila y unas zapatillas en duda. Debe leerse como la noche antes de viajar, con la decisión de qué entra todavía abierta.",
+      "hora_clima": "noche, interior de casa (la noche antes del gancho); luz cálida de lámpara de velador, abundante, sombras abiertas",
+      "personas": "sin personas en cuadro, o solo una mano en el borde; sin rostro",
+      "primer_plano": "el borde de la cama o una prenda doblada muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la maleta",
+      "ancla_pov": "una maleta que en la tienda decía «de cabina», una mochila que se infla con lo último que metiste",
+      "no": [
+        "sin texto ni logos",
+        "sin etiquetas de marca",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin pasajes ni tarjetas de embarque",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin ropa en desorden caótico"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la maleta abierta y la mochila tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2 · anterior: N2_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Que la etiqueta diga «cabina» no garantiza…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "manos del viajero · escala cercana · luz de noche interior",
+      "registro": "E",
+      "archivo": "medir-maleta-cabina-cinta-metrica.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos midiendo con cinta métrica una maleta de cabina, desde las ruedas hasta el asa",
+      "que_muestra": "manos estirando una cinta métrica sobre una maleta de cabina cargada, desde la base de las ruedas hasta el asa, en el living de una casa. La acción de medir con ruedas y asa incluidas es el contenido.",
+      "hora_clima": "noche, interior de casa (la noche antes del relato); luz cálida y abundante, sombras abiertas",
+      "personas": "fotografía el viajero; solo sus manos y antebrazos en cuadro; sin rostro; gesto natural",
+      "primer_plano": "el borde de un sillón o de la mochila muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la cinta métrica",
+      "ancla_pov": "apoyas la cinta métrica bajo las ruedas y la estiras hasta la punta del asa",
+      "no": [
+        "sin texto ni logos",
+        "sin cifras legibles en la cinta o en balanzas",
+        "sin marcas de maleta reconocibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin maleta vacía o abierta"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01"
+    },
+    {
+      "pieza": "N?_IMG-3 · nueva (reemplaza a N2_IMG-2)",
+      "rol": "escena",
+      "posicion": "después del párrafo «En la puerta de embarque, alguien del personal te avisa…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "en la puerta de embarque · persona del personal integrada · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "equipaje-mano-sky-cargador-puerta-embarque.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Pasajero sacando un cargador portátil de su maleta de mano antes de entregarla en la puerta de embarque",
+      "que_muestra": "junto a la puerta de embarque, un pasajero, de tres cuartos de espaldas, abre el bolsillo delantero de su maleta de cabina y saca un cargador portátil; a su lado, las manos de una persona del personal en ropa neutra esperan para recibir la maleta, con una etiqueta en blanco en la mano. Demuestra lo que el texto argumenta: si la maleta baja, lo esencial tiene que ir en el bolso de mano.",
+      "hora_clima": "interior de terminal, de día; luz natural abundante de ventanales, sombras abiertas, colores naturales",
+      "personas": "fotografía un acompañante, un paso atrás; el pasajero mira el bolsillo de su maleta; el personal, de cuerpo parcial (manos y torso, sin rostro), mira la maleta; nadie mira al lente",
+      "primer_plano": "la correa de la mochila del acompañante muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar el cargador",
+      "ancla_pov": "abres el bolsillo delantero y sacas el cargador portátil: no puede ir en la bodega",
+      "no": [
+        "sin texto ni logos",
+        "sin señalética ni números de puerta legibles",
+        "sin colores ni uniformes SKY en el personal",
+        "sin aviones, mangas ni cabinas visibles",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin etiquetas con texto legible"
+      ],
+      "fidelidad": "escena genérica de puerta de embarque (sin aeropuerto identificable) → no requiere REF-01; personal en ropa neutra y cuerpo parcial para no generar uniformes"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "AQP",
+      "ciudad": "Arequipa"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Con Light, tu maleta sube contigo",
+    "cta": "Ver vuelos a Arequipa",
+    "archivo": "banner-ruta-lima-arequipa.webp",
+    "alt": "Banner de SKY de la ruta Lima–Arequipa: con Light, tu maleta sube contigo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Lima (LIM) → Arequipa (AQP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“Con Light, tu maleta sube contigo” (6 palabras; la ruta Lima–Arequipa es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: las tarifas Light, Max y Max Flex incluyen el equipaje de mano",
+      "CTA (lo escribe el compositor)": "Ver vuelos a Arequipa →",
+      "Enlace del banner": "https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-lima-arequipa.webp`",
+      "ALT": "“Banner de SKY de la ruta Lima–Arequipa: con Light, tu maleta sube contigo”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+    }
+  },
+  "descartes": [
+    "mochila bajo el asiento y maleta en el compartimiento (N2_IMG-2 de la v1, ya producida) — cabina generada: fuera de pauta; proponer Archivado",
+    "medidor de equipaje en la puerta de embarque — solo aparece en una fuente secundaria",
+    "abrigo colgado del brazo en la fila de embarque — no aporta a la decisión del texto"
+  ]
+}

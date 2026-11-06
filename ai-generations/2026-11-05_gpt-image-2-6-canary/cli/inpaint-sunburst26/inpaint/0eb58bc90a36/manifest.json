@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0eb58bc90a36",
+  "key": "0eb58bc90a366b64a5fbebb1fd50a5210806b763d8440878a06373f3cee764bc",
+  "status": "completed",
+  "createdAt": "2026-11-05T07:33:45.076Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_gpt-image-2-6-canary/flare-low-complexity-low-0.png",
+    "imageSha256": "6d6e07ca613c69c4d57cb95e69f58192708136eb946737077e74f3b4564d0f6e",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_gpt-image-2-6-canary/mask-mug.png",
+    "maskSha256": "881cfcf343c4421e7cc1c6a343c8a191bbccb96e22a588922e308a0e283a5695",
+    "maskConvention": "white-editable",
+    "width": 1024,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-sunburst",
+    "quality": "low",
+    "seed": null,
+    "count": 1,
+    "prompt": "A small green potted plant on the desk, same light",
+    "providerPrompt": "A small green potted plant on the desk, same light"
+  },
+  "mask": {
+    "touchedFraction": 0.20351791381835938,
+    "editable": 166652,
+    "soft": 46752,
+    "protected": 835172
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1024,
+      "height": 1024
+    },
+    "target": {
+      "width": 1024,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 77 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0247,
+    "basis": "1 × salida 1024x1024 low (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 129.786,
+      "suspectFlatPanel": true,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.39,
+        "bestError": 5.39,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 835172,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 166652,
+        "maxDelta": 255,
+        "meanDelta": 164.052,
+        "worst": {
+          "x": 342,
+          "y": 432
+        }
+      },
+      "seam": {
+        "pixels": 46752,
+        "maxDelta": 246,
+        "meanDelta": 7.64,
+        "worst": {
+          "x": 323,
+          "y": 422
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 835172,
+        "maxDelta": 237,
+        "meanDelta": 12.363,
+        "worst": {
+          "x": 887,
+          "y": 720
+        }
+      },
+      "outputUsd": 0.0247,
+      "providerModel": "gpt-image-2.6-sunburst",
+      "usage": {
+        "input_tokens": 1052,
+        "input_tokens_details": {
+          "image_tokens": 1024,
+          "text_tokens": 28
+        },
+        "output_tokens": 824,
+        "output_tokens_details": {
+          "image_tokens": 824,
+          "text_tokens": 0
+        },
+        "total_tokens": 1876
+      },
+      "meta": {
+        "size": "1024x1024",
+        "quality": "low",
+        "providerMask": true
+      }
+    }
+  ]
+}

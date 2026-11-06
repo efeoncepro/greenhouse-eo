@@ -1,0 +1,5 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/v2-piezas/carrusel-salon.png …
+  ✓ 2868KB · gpt-image-2.6-sunburst · 1024x1536 · high · clave personal
+    usage: in 213 (img 0 · txt 213) · out 1372 · total 1585
+done

@@ -1,0 +1,9 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:image /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts --openai-key personal --model gpt-image-2.5-sunburst --quality high --size 1600x2000 --prompt-file /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-02_motogas-rdg-linea-3d/brief/plantilla-pin.txt --out /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-02_motogas-rdg-linea-3d/mundo-real/plantilla-pin-v01.png
+
+  $ costo estimado ≈ USD 0.071 (1 × 2372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-11-02_motogas-rdg-linea-3d/mundo-real/plantilla-pin-v01.png …
+  ✓ 3676KB · gpt-image-2.5-sunburst · 1600x2000 · high · clave personal
+    usage: in 336 (img 0 · txt 336) · out 2372 · total 2708
+done

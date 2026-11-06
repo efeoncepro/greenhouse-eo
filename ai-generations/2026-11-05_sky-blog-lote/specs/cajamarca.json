@@ -1,0 +1,128 @@
+{
+  "id": "cajamarca",
+  "notion_url": "https://app.notion.com/p/64f024371c3c45d9a3bcdbaae36dac7b",
+  "titulo": "Cajamarca sin esperar al carnaval: qué conocer en tu primera escapada",
+  "slug": "/lugares-turisticos-cajamarca/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de atardecer · orienta",
+      "registro": "D",
+      "archivo": "cajamarca-plaza-de-armas-atardecer-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero cruzando la Plaza de Armas de Cajamarca al atardecer, con las fachadas de piedra de sus iglesias iluminadas",
+      "que_muestra": "la Plaza de Armas de Cajamarca a la hora en que la luz baja y entibia la piedra de las fachadas que la rodean; un viajero con casaca liviana la cruza en diagonal hacia el fondo, con la pileta y los jardines de la plaza a media distancia. Debe leerse como ciudad andina colonial y viva, no como postal vacía.",
+      "hora_clima": "atardecer de la tarde de llegada del relato, con el sol todavía sobre los cerros; cielo despejado o con nubes altas, sin lluvia; luz cálida abundante sobre la piedra, sombras abiertas y cielo con altas luces conservadas",
+      "personas": "el viajero a media distancia, de espaldas o de perfil, caminando sin pose ni mirada al lente; otras personas pequeñas en la plaza, sentadas o caminando, en acciones espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "hojas de un arbusto del jardín de la plaza muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al viajero ni las fachadas",
+      "ancla_pov": "la luz se pone dorada sobre la piedra y la plaza se llena de voces",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin comparsas, disfraces, agua ni pintura de carnaval (el artículo es fuera del carnaval)",
+        "sin fachadas inventadas: la arquitectura tiene que corresponder a la plaza real"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la Plaza de Armas de Cajamarca y sus fachadas en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero, al menos una fachada de piedra reconocible y el cielo del atardecer tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Cuando salgas del circuito, levanta la vista…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "subiendo la escalinata · otra persona integrada · escala media · luz de tarde",
+      "registro": "E",
+      "archivo": "cajamarca-santa-apolonia-escalinata-vista.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Escalinata de piedra del cerro Santa Apolonia en Cajamarca, con los techos de la ciudad y el valle al fondo",
+      "que_muestra": "la vista desde un tramo alto de la escalinata de piedra del cerro Santa Apolonia: los escalones en primer término, una acompañante que sube unos peldaños más arriba y, abajo, los techos de teja de la ciudad, las torres de las iglesias y los cerros verdes del valle. La escalera y la ciudad tienen que leerse a la vez: es el momento en que el lector decide subir para entender el plano.",
+      "hora_clima": "media tarde, antes del atardecer de la plaza (el relato sube después de la visita al centro); cielo despejado o con nubes altas, sin lluvia; luz natural abundante, sombras abiertas, cielo sin quemar",
+      "personas": "fotografía el viajero desde la escalinata, mirando hacia arriba y hacia la ciudad; la acompañante, de espaldas o de perfil, sube y mira el valle; otras personas pequeñas y lejanas en la escalera; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "la baranda o el borde de piedra de un escalón muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la vista de la ciudad",
+      "ancla_pov": "desde arriba entiendes de golpe el plano de la ciudad",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin la Silla del Inca como protagonista (su origen es tradición",
+        "no atribución comprobada)",
+        "sin edificios modernos inventados",
+        "sin nieve ni paisaje de puna: el valle es verde"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la escalinata del cerro Santa Apolonia y de la vista de la ciudad en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es temprano y el frío de la mañana…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "POV de mano · escala cercana · luz de mañana",
+      "registro": "E",
+      "archivo": "banos-del-inca-poza-vapor-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos sobre el borde de una poza de agua termal humeante en los Baños del Inca, Cajamarca, en una mañana fría",
+      "que_muestra": "las manos del viajero apoyadas en el borde de piedra de una poza al aire libre, con el agua caliente humeando y el vapor que se levanta contra la luz fría de la mañana; al fondo, fuera de foco, los muros y techos del complejo. El vapor es el contenido: si no se lee el contraste entre agua caliente y aire frío, la imagen no sirve.",
+      "hora_clima": "primera hora de la mañana, aire frío y seco (la mañana del relato); luz natural limpia que atraviesa el vapor, sombras abiertas, sin sol duro",
+      "personas": "fotografía el viajero sentado en el borde de la poza y mira el agua; solo sus manos y antebrazos en cuadro, con la manga de una casaca recogida; al fondo, si aparecen otras personas, lejanas, pequeñas y vestidas; ningún rostro identificable",
+      "primer_plano": "una toalla doblada sobre el borde de la poza muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar el vapor",
+      "ancla_pov": "Lo primero que ves no es una poza, sino el vapor",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles del complejo ni de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cuerpos en traje de baño en primer plano",
+        "sin estética de spa de lujo con velas o pétalos",
+        "sin agua de color turquesa artificial"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una poza al aire libre del complejo Baños del Inca en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "CJA",
+      "ciudad": "Cajamarca"
+    },
+    "home_market": "PER",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (sin fila 🟢 para este mercado)",
+    "titular": "Piedra inca y termas humeantes",
+    "cta": "Ver vuelos a Cajamarca",
+    "archivo": "banner-ruta-lima-cajamarca.webp",
+    "alt": "Banner de SKY: ruta Lima–Cajamarca, piedra inca y termas humeantes",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "muros de piedra del Cuarto del Rescate (fidelidad crítica de un monumento y riesgo de representarlo mal)",
+    "canal de Cumbemayo entre los frailones (pertenece a la guía de Cumbemayo y Granja Porcón y canibalizaría su portada)",
+    "nichos de las Ventanillas de Otuzco (sitio funerario: exige fidelidad y tono cuidadoso)",
+    "bosque de pinos de Granja Porcón (escena secundaria del artículo)",
+    "fachada de la iglesia Belén (postal de arquitectura intercambiable con la portada)"
+  ]
+}

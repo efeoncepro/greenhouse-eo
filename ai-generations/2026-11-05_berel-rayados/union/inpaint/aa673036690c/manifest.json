@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "aa673036690c",
+  "key": "aa673036690cc08422ef8ea04159d6ca0fb7a9c07f81150dd32682f3eeda7c98",
+  "status": "completed",
+  "createdAt": "2026-11-05T16:16:34.940Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/sala-alta-1.png",
+    "imageSha256": "f61e4ff7576e28caf7225e8f86b69f4ba3d785dbfb486122c2046ca6c06450a2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/mask-union.png",
+    "maskSha256": "c8f5f7e1115f0d8c2d41eebb582a46040f604a8cbfbf0ae8c0d5dd6d44f2014f",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1800,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Repair only the marked horizontal band so there is no visible seam: the flat matte deep blue painted wall is one continuous surface from top to bottom with exactly the same color, brightness and soft plaster texture above and below the band, and the soft daylight gradient from the left continues smoothly. The dark vertical window frame at the far left edge continues as one straight, unbroken vertical line with no horizontal bar, and the narrow white side wall at the far right edge continues straight. No ceiling line, no shelf, no molding, no objects, no text. Everything outside the marked band stays exactly as it is; do not change the framing or the scale.",
+    "providerPrompt": "Repair only the marked horizontal band so there is no visible seam: the flat matte deep blue painted wall is one continuous surface from top to bottom with exactly the same color, brightness and soft plaster texture above and below the band, and the soft daylight gradient from the left continues smoothly. The dark vertical window frame at the far left edge continues as one straight, unbroken vertical line with no horizontal bar, and the narrow white side wall at the far right edge continues straight. No ceiling line, no shelf, no molding, no objects, no text. Everything outside the marked band stays exactly as it is; do not change the framing or the scale."
+  },
+  "mask": {
+    "touchedFraction": 0.14555555555555555,
+    "editable": 425984,
+    "soft": 110592,
+    "protected": 3149824
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2048,
+      "height": 1800
+    },
+    "target": {
+      "width": 2032,
+      "height": 1808
+    },
+    "aspectError": 0.012353455818022772,
+    "reason": "la zona con contexto ocupa 85 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0878,
+    "basis": "1 × salida 2032x1808 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 12.305,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.2,
+        "bestError": 5.2,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3149824,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 425984,
+        "maxDelta": 192,
+        "meanDelta": 13.85,
+        "worst": {
+          "x": 98,
+          "y": 378
+        }
+      },
+      "seam": {
+        "pixels": 110592,
+        "maxDelta": 160,
+        "meanDelta": 6.353,
+        "worst": {
+          "x": 1886,
+          "y": 473
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3149824,
+        "maxDelta": 242,
+        "meanDelta": 16.422,
+        "worst": {
+          "x": 760,
+          "y": 1228
+        }
+      },
+      "outputUsd": 0.0878,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1622,
+        "input_tokens_details": {
+          "image_tokens": 1476,
+          "text_tokens": 146
+        },
+        "output_tokens": 2928,
+        "output_tokens_details": {
+          "image_tokens": 2928,
+          "text_tokens": 0
+        },
+        "total_tokens": 4550
+      },
+      "meta": {
+        "size": "2032x1808",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

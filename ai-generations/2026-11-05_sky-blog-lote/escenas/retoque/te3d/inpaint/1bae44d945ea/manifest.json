@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "1bae44d945ea",
+  "key": "1bae44d945ea49ecb3d4c919f8607f6849bb37a0f8d1a08d2269ef111c0cecd3",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:17:49.661Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/tipos-equipaje/img3-maestro.png",
+    "imageSha256": "49afa27790bf9632c589415b4438a8df5c10f3bf707e8c5c50e7e587073f81d8",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3d-mask.png",
+    "maskSha256": "8896dd4488bb09981afde4f75842267f2d2bb007e2b898a72e0c3bbace09c036",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "A tall medium charcoal-grey hard-shell checked suitcase with vertical ribs stands ENTIRELY on the dark rubber check-in conveyor belt, centred on the belt with a clear gap between the suitcase and the steel side rail on the right: it does not touch, overlap or cover the metal rail or the scanner housing, which stay straight and intact. Its four black spinner wheels are sharp, solid and opaque, each resting on the belt with a small contact shadow. Its top reaches the agent's lower chest; the agent stands behind and rests both hands on the top carry handle, with the paper bag tag hanging from the handle. Plain unbranded suitcase, plain clothes with no printed marks or lettering. Everything in sharp focus, same airport light and colours.",
+    "providerPrompt": "A tall medium charcoal-grey hard-shell checked suitcase with vertical ribs stands ENTIRELY on the dark rubber check-in conveyor belt, centred on the belt with a clear gap between the suitcase and the steel side rail on the right: it does not touch, overlap or cover the metal rail or the scanner housing, which stay straight and intact. Its four black spinner wheels are sharp, solid and opaque, each resting on the belt with a small contact shadow. Its top reaches the agent's lower chest; the agent stands behind and rests both hands on the top carry handle, with the paper bag tag hanging from the handle. Plain unbranded suitcase, plain clothes with no printed marks or lettering. Everything in sharp focus, same airport light and colours."
+  },
+  "mask": {
+    "touchedFraction": 0.25067491319444446,
+    "editable": 0,
+    "soft": 2079198,
+    "protected": 6215202
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 69 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 17.682,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.16,
+        "bestError": 4.16,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 6215202,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 2079198,
+        "maxDelta": 250,
+        "meanDelta": 17.682,
+        "worst": {
+          "x": 2637,
+          "y": 318
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 6215202,
+        "maxDelta": 217,
+        "meanDelta": 9.244,
+        "worst": {
+          "x": 1621,
+          "y": 1582
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1673,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 165
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3516
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

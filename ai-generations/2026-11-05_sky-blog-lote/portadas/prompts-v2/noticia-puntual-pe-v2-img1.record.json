@@ -1,0 +1,23 @@
+{
+ "registro": "D",
+ "tipo": "B",
+ "portada": true,
+ "primerPlano": "the backrest of a waiting-area seat",
+ "sinPrimerPlano": null,
+ "borde": "lower-right corner",
+ "id": "noticia-puntual-pe-v2",
+ "input": {
+  "id": "noticia-puntual-pe-v2",
+  "registro": "D",
+  "tipo": "B",
+  "portada": true,
+  "lugar": "wide, quiet departure lounge of a generic airport (must not imitate the Jorge Chávez terminal architecture)",
+  "escena": "a traveler stands by the large window with a backpack on his shoulder and a boarding pass in his hand, looking outside; beyond the glass a pearl-grey sky and fine drizzle droplets on the window. It reads as calm waiting before an early flight, not as a delay",
+  "hora": "pre-dawn early morning",
+  "clima": "Lima garúa drizzle, even diffuse light, luminous exposure without inventing sun",
+  "primerPlano": "the backrest of a waiting-area seat",
+  "borde": "lower-right corner",
+  "prohibir": "sun or blue sky, readable boarding pass text, flight display screens or clocks with readable time, aircraft through the window, airline uniforms, aircraft of any kind, airport apron, jet bridges",
+  "extra": "COMPOSITION, MEASURED: the man stands farther from the camera; his whole figure, head to feet, spans from 18% to 48% of the frame height, centred between 42% and 58% of the width. Beyond the glass there is ONLY the pale grey drizzle sky and a distant blurred skyline: no aircraft, no apron, no jet bridge, no vehicles. The lower half is calm floor, mid-tone. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

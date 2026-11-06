@@ -1,0 +1,9 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:image /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts --openai-key personal --model gpt-image-2.5-sunburst --quality high --size 1600x1600 --image ai-generations/2026-11-02_motogas-rdg-poses-2d/fuente/rdg-ref-gris-1600.png --prompt-file ai-generations/2026-11-02_motogas-rdg-poses-2d/brief/rdg-09-guino.txt --out ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-09-guino-v01.png
+
+  $ costo estimado ≈ USD 0.079 (1 × 2627 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-09-guino-v01.png (edit) …
+  ✓ 1895KB · gpt-image-2.5-sunburst · 1600x1600 · high · clave personal
+    usage: in 2122 (img 1521 · txt 601) · out 2627 · total 4749
+done

@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "espuma de una ola sobre la arena húmeda",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "peru-diciembre",
+ "input": {
+  "id": "peru-diciembre",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "playa de Punta Sal, Tumbes, Perú",
+  "escena": "la orilla ancha de Punta Sal con mar calmo y arena clara; un viajero camina por la línea del agua hacia el fondo, con una toalla al hombro. Debe leerse como el verano que empieza en la costa norte, no como resort ni como playa del Caribe. Personas: el viajero de espaldas, caminando sin pose ni mirada al lente; otras personas, si aparecen, lejanas y pequeñas; ningún rostro identificable en primer plano",
+  "hora": "mañana soleada de diciembre, como en el relato",
+  "clima": "cielo despejado o con nubes altas, sin lluvia; luz abundante, sombras abiertas, cielo sin quemar",
+  "primerPlano": "espuma de una ola sobre la arena húmeda",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin sombrillas ni mobiliario de resort con marca, sin palmeras de catálogo, sin repetir la escena de la portada de Zorritos (es otra playa y otra hora)",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "playa de Punta Sal, Tumbes, Perú (its real forms, scale and spatial relationships)"
+ }
+}

@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">
+  <title>Geometric two-color rocket icon</title>
+  <desc>Flat stylized rocket angled upward with side fins, circular window, and flame, using two main colors.</desc>
+  <defs>
+    <linearGradient id="rocketBlue" x1="278" y1="760" x2="866" y2="91" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#082766" />
+      <stop offset="1" stop-color="#12428f" />
+    </linearGradient>
+    <linearGradient id="flameOrange" x1="144" y1="917" x2="397" y2="602" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff5a12" />
+      <stop offset="1" stop-color="#ffc833" />
+    </linearGradient>
+  </defs>
+  <g id="rocket" fill="url(#rocketBlue)">
+    <path id="left-fin" d="M324 585c-91 16-172 96-214 209-8 21-14 43-17 66 77-26 168-61 235-113 59-46 87-98 82-153-24-12-52-15-86-9z" />
+    <path id="right-fin" d="M579 637c18 31 22 69 12 113-10 43-30 84-35 126-2 17 7 27 22 20 66-31 128-90 159-159 28-61 26-124 3-183-43 38-95 66-161 83z" />
+    <path id="upper-fin" d="M445 282c-68-3-136 14-195 55-63 43-114 106-148 167-6 11 3 19 15 14 76-32 141-39 193-22 30-75 72-147 135-214z" />
+    <path id="body" d="M302 563c69-158 153-289 264-382C678 87 807 28 888 36c28 3 43 18 42 47-3 81-55 215-145 331-89 115-217 205-374 294-6 4-14 3-20-2l-85-121c-5-5-6-15-4-22z" />
+    <path id="tail-band" d="M302 563c11-25 23-50 35-74 74 23 135 69 178 137-33 25-67 49-104 70-6 4-14 3-20-2l-85-109c-5-5-6-15-4-22z" />
+    <circle id="window" cx="665" cy="334" r="106" />
+  </g>
+  <g id="flame" fill="url(#flameOrange)">
+    <path id="outer-flame" d="M329 586c-80 24-145 84-184 168-32 69-49 145-52 219 94-32 206-76 279-137 61-52 88-108 84-166-30-39-72-69-127-84z" />
+    <path id="inner-flame" d="M348 608c-54 18-95 64-119 130-13 35-23 71-30 104 59-21 121-50 160-84 43-37 63-80 57-128-19-10-42-17-68-22z" />
+  </g>
+</svg>

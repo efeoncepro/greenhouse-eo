@@ -1,0 +1,82 @@
+{
+  "schema": "efeonce.foto.isotipo.v2",
+  "plate": "BRD3-sin-isotipo.png",
+  "salida": "BRD3-sin-isotipo-isotipo.png",
+  "paquete": "@efeoncepro/axis-brand-assets@0.4.25",
+  "archivo": "assets/efeonce-logo-negative.svg",
+  "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+  "marca": "logotipo",
+  "prenda": "oscura",
+  "caja": {
+    "centro": [
+      0.775,
+      0.335
+    ],
+    "ancho": 0.08,
+    "rotacion": 0
+  },
+  "brillo": 0.85,
+  "limpieza": null,
+  "oclusion": {
+    "pixelesEnCaja": 2614,
+    "pixelesDeMarcaTapados": 0
+  },
+  "pliegues": {
+    "intensidad": 1,
+    "relieve": 1
+  },
+  "creado": "2026-11-05T15:02:18.141Z",
+  "acabado": {
+    "veredicto": "aprobado",
+    "salida": "BRD3-sin-isotipo-isotipo-acabado.png",
+    "sha256": "3b82eab95a5ccdabae0fee1c14229611eac84c1bad407fc7dc73ca1de2bdbd78",
+    "recorte": {
+      "archivo": "BRD3-sin-isotipo-isotipo-acabado-recorte.png",
+      "sha256": "3679f71783151cbb9b8434ad1db2db10ade17a8c71908c082a0f864c340de3d8",
+      "caja": {
+        "lado": 512,
+        "left": 1133,
+        "top": 87
+      },
+      "ampliadoA": 1024
+    },
+    "edicion": {
+      "archivo": "BRD3-sin-isotipo-isotipo-acabado-edicion.png",
+      "sha256": "983d16209a791968468d97ebee812d4d8bf03a571cf9e1e3778d7a86dedb4c47"
+    },
+    "modelo": {
+      "solicitado": "gpt-image-2.5-sunburst",
+      "devuelto": "gpt-image-2.5-sunburst",
+      "calidad": "high",
+      "tamano": "1024x1024",
+      "uso": {
+        "entrada": 1280,
+        "salida": 1756,
+        "total": 3036
+      },
+      "costoEstimadoUsd": 0.053
+    },
+    "prompt": "This is a crop of a real photograph: the back of a navy softshell jacket. A small white Efeonce mark (the full wordmark: the letters e-f-e-o-n-c-e where the o is a rocket with three round windows inside an elliptical orbit, with a small sphere on top) was placed flat on it. It is finished, official artwork: keep its shape, every part, its proportions, its white colour, its exact size and its exact position — do NOT redraw, restyle, re-letter, simplify, resize or move it. You are only adding MATERIAL and LIGHT so it reads as a real mark applied to that surface: let it follow the gentle curvature of the surface, pick up the same lighting gradient, the soft rim light and the faint reflections of the scene, lie perfectly flush with the surface as a thin printed decal — NO relief, NO bevel, NO emboss, NO highlight rim around it — with only a tiny edge softness, and carry the same grain, softness and depth of field as the surface around it. Keep everything else in the image exactly as it is: same framing, same surface, same colours. No text, no extra marks.",
+    "promptSha256": "c9b06d15a0bf146c53fc41ed0aac3a8b713855d10a452980d52e4611c4cb46b7",
+    "superficie": "the back of a navy softshell jacket",
+    "mezcla": {
+      "umbralSilueta": 10,
+      "siluetaPx": 2210,
+      "dilatacionPx": 3,
+      "sigmaAlfa": 1.6,
+      "anilloColorPx": 14,
+      "desplazamientoColor": [
+        2.08,
+        1.16,
+        -0.27
+      ]
+    },
+    "verificacion": {
+      "zonaMarcaPx": 8,
+      "cambiadosFueraDeLaMarca": 0,
+      "cambiadosEnLaMarca": 4068
+    },
+    "comparacion": "BRD3-sin-isotipo-isotipo-acabado-comparar.png",
+    "creado": "2026-11-05T15:02:55.168Z"
+  }
+}

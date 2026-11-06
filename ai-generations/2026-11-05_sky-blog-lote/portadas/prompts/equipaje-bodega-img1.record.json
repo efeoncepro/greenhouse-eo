@@ -1,0 +1,22 @@
+{
+ "registro": "D",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the sleeve of the sweater that came out of the suitcase",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "equipaje-bodega",
+ "input": {
+  "id": "equipaje-bodega",
+  "registro": "D",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "hallway of an ordinary apartment",
+  "escena": "from the standing traveler's view, a large suitcase stands upright on a bathroom scale in the hallway, the scale display lit but with no readable number; next to it a sweater and a pair of sneakers that just came out of the suitcase. The suitcase top sits in the upper half of the frame. It reads as a last-minute decision before going to the airport",
+  "hora": "early morning",
+  "clima": "indoors, abundant natural window light, open shadows, natural colour",
+  "primerPlano": "the sleeve of the sweater that came out of the suitcase",
+  "borde": "bottom edge",
+  "prohibir": "readable numbers on the scale, recognisable luggage brands, airline tags"
+ }
+}

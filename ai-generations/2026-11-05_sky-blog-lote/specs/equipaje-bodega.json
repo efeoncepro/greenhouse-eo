@@ -1,0 +1,134 @@
+{
+  "id": "equipaje-bodega",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781819c86cf08cad29105",
+  "titulo": "Equipaje de bodega SKY: peso, medidas y cómo agregarlo",
+  "slug": "/equipaje-de-bodega/",
+  "mercado": "CL/PE",
+  "version": "v1 · 05/11/2026 (Aprobación cliente En espera: no producir hasta aprobación)",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + POV del viajero",
+      "modificadores": "objeto del viajero · escala media · luz de mañana interior · orienta",
+      "registro": "D",
+      "archivo": "equipaje-bodega-sky-maleta-balanza-casa.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Maleta grande cerrada sobre una balanza de baño en el pasillo de una casa, con la luz de la mañana entrando por la ventana",
+      "que_muestra": "desde la mirada del viajero de pie, una maleta grande parada sobre una balanza de baño en el pasillo; la pantalla de la balanza encendida, sin cifra legible; a un lado, un suéter y unas zapatillas que acaban de salir de la maleta. Debe leerse como la decisión de último momento antes del aeropuerto.",
+      "hora_clima": "mañana temprano, interior; luz natural abundante de ventana, sombras abiertas, color natural",
+      "personas": "sin rostro; como mucho, la punta de los pies del viajero en el borde inferior",
+      "primer_plano": "la manga del suéter que salió de la maleta muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la balanza",
+      "ancla_pov": "la maleta sobre la balanza del baño, el número que no baja",
+      "no": [
+        "sin texto ni logos",
+        "sin cifras legibles en la balanza (no se afirma un peso en la imagen)",
+        "sin marcas de maleta reconocibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la maleta completa y la balanza tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «La noche antes, con la maleta abierta sobre la cama…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "manos del viajero · escala cercana · luz de noche interior",
+      "registro": "E",
+      "archivo": "equipaje-bodega-sky-cargador-portatil-mochila.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos sacando un cargador portátil de una maleta grande abierta para pasarlo a una mochila",
+      "que_muestra": "desde los ojos del viajero, una mano saca un cargador portátil de entre la ropa doblada de una maleta grande abierta sobre la cama; la otra sostiene abierta una mochila al lado. El gesto de pasar el cargador de una pieza a la otra es el contenido.",
+      "hora_clima": "noche, interior de casa (la noche antes del relato); luz cálida de lámpara, abundante, sombras abiertas",
+      "personas": "solo las manos y antebrazos del viajero; sin rostro; gesto natural, sin pose de producto",
+      "primer_plano": "la tapa abierta de la maleta muy cerca del lente y muy fuera de foco, por el borde superior, sin tapar las manos",
+      "ancla_pov": "encuentras el cargador portátil al fondo, entre los calcetines, y lo pasas a la mochila",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas de cargador, teléfono o maleta reconocibles",
+        "sin cables enredados que distraigan",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «La cinta empieza a girar…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "en la sala de retiro de equipaje · otras personas integradas · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "equipaje-bodega-sky-cinta-retiro-etiqueta.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero comparando el comprobante de equipaje con la etiqueta de su maleta junto a la cinta de retiro de un aeropuerto",
+      "que_muestra": "desde los ojos del viajero, junto a la cinta de retiro, una mano sostiene el comprobante de equipaje al lado de la etiqueta colgada del asa de una maleta negra; en la cinta, al fondo y fuera de foco, otras maletas negras parecidas. Demuestra el argumento del texto: maletas casi iguales, y lo que las distingue es la etiqueta.",
+      "hora_clima": "interior de terminal de llegada, de día; luz abundante y pareja, sombras abiertas",
+      "personas": "fotografía el viajero, que mira la etiqueta; al fondo, otros pasajeros de espaldas o de perfil esperando sus maletas; nadie mira al lente; sin rostros identificables",
+      "primer_plano": "el borde de la cinta de equipaje muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la etiqueta",
+      "ancla_pov": "miras la etiqueta y la comparas con el comprobante que te dieron en el counter",
+      "no": [
+        "sin texto ni logos",
+        "sin códigos, nombres ni destinos legibles en etiquetas o comprobantes",
+        "sin señalética ni pantallas de aeropuerto legibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "escena genérica de sala de retiro (sin aeropuerto identificable) → no requiere REF-01"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "BRC",
+      "ciudad": "Bariloche"
+    },
+    "home_market": "CHL",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-bariloche",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Tu ropa de nieve, en bodega",
+    "cta": "Ver vuelos a Bariloche",
+    "archivo": "banner-ruta-santiago-bariloche.webp",
+    "alt": "Banner de SKY de la ruta Santiago–Bariloche: tu ropa de nieve, en bodega",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Santiago (SCL) → Bariloche (BRC) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“Tu ropa de nieve, en bodega” (5 palabras; la ruta Santiago–Bariloche es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: las tarifas Standard, Max y Max Flex incluyen una maleta de bodega de hasta 23 kg",
+      "CTA (lo escribe el compositor)": "Ver vuelos a Bariloche →",
+      "Enlace del banner": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-bariloche",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-santiago-bariloche.webp`",
+      "ALT": "“Banner de SKY de la ruta Santiago–Bariloche: tu ropa de nieve, en bodega”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+    }
+  },
+  "descartes": [
+    "maleta en la balanza del counter con personal — ya usada en Tipos de equipaje y exige cuidar uniformes",
+    "bodega del avión con maletas — prohibido: no se generan aviones SKY",
+    "tabla de surf embalada como equipaje especial — condiciones no verificadas en esta versión",
+    "candado en la maleta — no aporta a la decisión del texto"
+  ]
+}

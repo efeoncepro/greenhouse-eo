@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "9c2bbf7679c0",
+  "key": "9c2bbf7679c0045f7987e9f5d5c5fcd0556b57be99b15564a499d68ec81b29f9",
+  "status": "completed",
+  "createdAt": "2026-11-05T11:35:24.000Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/yanahuara-img2-maestro.png",
+    "imageSha256": "a8f15d41cc3397db0d90b6013dd259ec0794e1ea5e83c28f296749a2d68a1d35",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/yanahuara-img2-mask.png",
+    "maskSha256": "629ccf58f780ccff3c66b3968e9da21b9c1cd31b4bdb6a0c7accee7fc3495544",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same carved white sillar stone arch, its face plain and smooth with only natural stone texture and joints, absolutely no carved inscription, no letters and no words; same sunlight and shadows",
+    "providerPrompt": "the same carved white sillar stone arch, its face plain and smooth with only natural stone texture and joints, absolutely no carved inscription, no letters and no words; same sunlight and shadows"
+  },
+  "mask": {
+    "touchedFraction": 0.0653442081404321,
+    "editable": 437661,
+    "soft": 104330,
+    "protected": 7752409
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 74 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 28.072,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.8,
+        "bestError": 4.8,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7752409,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 437661,
+        "maxDelta": 176,
+        "meanDelta": 31.529,
+        "worst": {
+          "x": 1248,
+          "y": 192
+        }
+      },
+      "seam": {
+        "pixels": 104330,
+        "maxDelta": 147,
+        "meanDelta": 13.571,
+        "worst": {
+          "x": 1620,
+          "y": 198
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7752409,
+        "maxDelta": 240,
+        "meanDelta": 14.229,
+        "worst": {
+          "x": 2598,
+          "y": 890
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1561,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 53
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3404
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

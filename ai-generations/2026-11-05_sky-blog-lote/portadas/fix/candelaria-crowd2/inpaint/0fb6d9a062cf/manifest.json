@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "0fb6d9a062cf",
+  "key": "0fb6d9a062cf3f309d6b43ef5f521819795041b2b86b570c31cd1f4f3d5dfcee",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:24:08.494Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/candelaria/img1-maestro.png",
+    "imageSha256": "e1f737fef9425066e0c039db493cbb11f9ebd9ba9dc99a7c5cfaececfed14198",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/candelaria-crowd2-mask.png",
+    "maskSha256": "f02027846de5d25ec2aaef56552b55a2d4714ea774c0f73d956a0ea63314247b",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the spectators standing along the street are a real, varied crowd of Puno: men, women and children of different ages, heights and builds, in different everyday clothes and colours (warm jackets in several colours, ponchos, wool hats, some local women in polleras with bowler hats), each person in a different natural pose: most watch the dancers, a few look further down the parade, one films with a phone, a child sits on a shoulder; no two people dressed or posed alike; every person stands complete on the sidewalk with feet and shoes solid on the curb and a short soft shadow; same scale, same sunny light and same focus as the surroundings",
+    "providerPrompt": "the spectators standing along the street are a real, varied crowd of Puno: men, women and children of different ages, heights and builds, in different everyday clothes and colours (warm jackets in several colours, ponchos, wool hats, some local women in polleras with bowler hats), each person in a different natural pose: most watch the dancers, a few look further down the parade, one films with a phone, a child sits on a shoulder; no two people dressed or posed alike; every person stands complete on the sidewalk with feet and shoes solid on the curb and a short soft shadow; same scale, same sunny light and same focus as the surroundings"
+  },
+  "mask": {
+    "touchedFraction": 0.15175262827932098,
+    "editable": 0,
+    "soft": 1258697,
+    "protected": 7035703
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 58.639,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 10.69,
+        "bestError": 10.69,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7035703,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 1258697,
+        "maxDelta": 253,
+        "meanDelta": 58.639,
+        "worst": {
+          "x": 3131,
+          "y": 831
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7035703,
+        "maxDelta": 248,
+        "meanDelta": 33.874,
+        "worst": {
+          "x": 2782,
+          "y": 572
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1658,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 150
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3501
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

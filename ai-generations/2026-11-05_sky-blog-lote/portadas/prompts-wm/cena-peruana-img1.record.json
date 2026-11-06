@@ -1,0 +1,23 @@
+{
+ "registro": "D",
+ "tipo": "B",
+ "portada": true,
+ "primerPlano": "el borde de una taza de chocolate sobre el mesón,",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "cena-peruana",
+ "input": {
+  "id": "cena-peruana",
+  "registro": "D",
+  "tipo": "B",
+  "portada": true,
+  "lugar": "cocina de una casa peruana en Nochebuena",
+  "escena": "una cocina de casa limeña con la puerta del horno abierta y el pavo dorado en su fuente, con la piel brillante; una persona, de cuerpo parcial y con guante de cocina de tela, lo baña con su jugo usando una cuchara; en el mesón, una olla con chocolate y un panetón todavía en su caja sin marca visible; por la ventana entra luz de tarde de verano. Se tiene que leer como hogar en verano, no como restaurante ni como Navidad nórdica. Personas: una persona de cuerpo parcial (brazos y torso), de espaldas o de perfil, bañando el pavo; fotografía otro integrante de la casa desde la entrada de la cocina, mirando hacia el horno; nadie mira al lente; sin rostro identificable",
+  "hora": "tarde del 24 de diciembre (el «horno encendido desde la tarde» del relato), luz natural cálida y abundante por la ventana, sombras abiertas, sin quemar la ventana",
+  "clima": "el calor del horno puede leerse en un leve vapor",
+  "primerPlano": "el borde de una taza de chocolate sobre el mesón,",
+  "borde": "lower-left corner",
+  "prohibir": "sin texto ni logos, sin cajas ni envases de panetón con marca legible, sin rótulos de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin nieve, chimeneas ni ropa de invierno, sin cocina de restaurante ni uniforme de chef, sin electrodomésticos con marca visible",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

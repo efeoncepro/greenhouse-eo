@@ -1,0 +1,130 @@
+{
+  "id": "mancora",
+  "notion_url": "https://app.notion.com/p/58d3beb6a4334b46ac9caa0a096e12d4",
+  "titulo": "Máncora, Vichayito, Punta Sal o Zorritos: qué playa elegir para tu próximo viaje",
+  "slug": "/mancora/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de final de tarde · orienta",
+      "registro": "D",
+      "archivo": "mancora-orilla-tabla-surf-tarde.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero caminando por la orilla de la playa de Máncora, en Piura, con una tabla de surf bajo el brazo al final de la tarde",
+      "que_muestra": "la orilla de la playa de Máncora con olas que rompen en varias líneas detrás; un viajero sale del agua y camina por la arena húmeda con una tabla de surf bajo el brazo, mojado, hacia el borde derecho del cuadro. Al fondo, lejos y pequeños, otros surfistas en el agua. Tiene que leerse como playa de olas y movimiento, distinta de las tres playas tranquilas del resto del artículo.",
+      "hora_clima": "final de la tarde, con el sol todavía sobre el mar (la tarde del relato); cielo despejado o con nubes altas, sin lluvia; luz cálida abundante, sombras abiertas, espuma y cielo con altas luces conservadas",
+      "personas": "el viajero a media distancia, de perfil o de espaldas, caminando sin pose ni mirada al lente; surfistas del fondo pequeños, en acción espontánea; ningún rostro identificable en primer plano",
+      "primer_plano": "espuma de una ola que se retira sobre la arena, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al viajero",
+      "ancla_pov": "sales del agua con la tabla bajo el brazo, el cuerpo todavía vibrando por la última ola",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas legibles en la tabla ni en la ropa",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin sol ya hundido",
+        "sin poses de surfista para cámara",
+        "sin hoteles de lujo dominando el fondo"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Máncora (orilla y línea de olas) en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero con la tabla y las líneas de olas tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Son las once de la mañana y la hamaca cuelga entre dos palos…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "G — Pausa sensorial + POV de pies",
+      "modificadores": "desde la hamaca · persona sola · escala media · luz de media mañana",
+      "registro": "E",
+      "archivo": "vichayito-hamaca-sombra-mar.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Pies de un viajero en una hamaca a la sombra frente al mar de Vichayito, en la costa norte del Perú",
+      "que_muestra": "el punto de vista de quien está recostado en una hamaca a la sombra: sus pies descalzos en la parte baja del cuadro y, delante, una playa larga y casi vacía, con la ola rompiendo suave y el mar azul hasta el horizonte. La decisión del bloque es esa: bajar el ritmo. La playa tiene que verse ancha y con muy pocas personas, lejanas.",
+      "hora_clima": "media mañana, cerca de las once (la hora del relato); sol alto fuera de la sombra, cielo despejado; luz natural abundante en la playa, sombra abierta y con detalle sobre la hamaca, sin quemar la arena",
+      "personas": "fotografía el propio viajero desde la hamaca, mirando hacia el mar; solo sus pies en cuadro; si aparecen otras personas, lejanas y pequeñas en la orilla, caminando; ningún rostro",
+      "primer_plano": "la tela o la cuerda de la hamaca, muy cerca del lente y muy fuera de foco, por el borde inferior y un lateral, sin tapar la playa",
+      "ancla_pov": "frente a una playa larga donde casi no hay huellas",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de hoteles reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin palmeras de catálogo ni piscinas de resort",
+        "sin bebidas con marca",
+        "sin uñas pintadas ni accesorios que distraigan"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Vichayito en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es temprano y el agua de Punta Sal casi no tiene espuma…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "F — Encuentro social",
+      "modificadores": "familia · adulto y niño de la mano · escala media · luz de mañana",
+      "registro": "E",
+      "archivo": "punta-sal-adulto-nino-orilla-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Adulto y niño de la mano entrando al agua de oleaje suave en la playa de Punta Sal, Tumbes, por la mañana",
+      "que_muestra": "un adulto y un niño, de espaldas, entran de la mano al mar con el agua a la altura de las rodillas; la ola que llega es mínima, sin espuma blanca; la arena clara se curva hacia una punta rocosa al fondo. El contenido es la diferencia con la portada: el mar casi quieto frente a las olas de Máncora. Si el agua se ve agitada, la imagen no sirve.",
+      "hora_clima": "primeras horas de la mañana (el «temprano» del relato); cielo despejado; luz natural luminosa y suave, sombras abiertas, agua con reflejo sin quemar",
+      "personas": "fotografía otro adulto del grupo desde la orilla, de pie, a pocos metros detrás; el adulto y el niño miran hacia el mar, de espaldas al lente, en acción espontánea; ningún rostro identificable; ropa de baño neutra, sin logos",
+      "primer_plano": "el borde de una toalla o de un sombrero de playa sobre la arena, muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar a las personas",
+      "ancla_pov": "Un niño entra de la mano de un adulto, primero hasta los tobillos y después hasta la cintura, y la ola que llega es tan chica que apenas lo empuja",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de hoteles reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostros del niño",
+        "sin flotadores con marcas",
+        "sin olas rompiendo",
+        "sin resorts dominando el fondo"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la orilla de Punta Sal (de preferencia Punta Sal Chica, con su punta rocosa) en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TBP",
+      "ciudad": "Tumbes"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tumbes",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Olas, hamaca o mar en calma",
+    "cta": "Ver vuelos a Tumbes",
+    "archivo": "banner-ruta-lima-tumbes-playas-norte.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tumbes: olas, hamaca o mar en calma",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "atardecer en la orilla de Zorritos — es la portada de la guía de Zorritos; repetirla canibaliza también en imagen",
+    "pozas de Las Pocitas con marea baja — exige hora de marea y fidelidad de roca que no tenemos",
+    "bote de avistamiento de ballenas en Los Órganos — promete un avistamiento que no se garantiza y exige fidelidad de fauna",
+    "calle de Máncora de noche — rótulos de negocios reales y rostros",
+    "mototaxi en la Panamericana — rótulos y marcas"
+  ]
+}

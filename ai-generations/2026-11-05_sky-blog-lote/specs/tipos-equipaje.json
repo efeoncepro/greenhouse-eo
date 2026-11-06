@@ -1,0 +1,137 @@
+{
+  "id": "tipos-equipaje",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781638df8db5540dc1f8d",
+  "titulo": "Tipos de equipaje en SKY: bolso de mano, equipaje de mano y bodega",
+  "slug": "/tipos-de-equipaje/",
+  "mercado": "CL/PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + POV del viajero",
+      "modificadores": "objetos del viajero · escala media · luz de mañana interior · orienta",
+      "registro": "D",
+      "archivo": "tipos-equipaje-sky-tres-piezas-puerta.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Mochila, maleta de mano y maleta grande juntas en el piso de un departamento, junto a la puerta, antes de salir al aeropuerto",
+      "que_muestra": "desde la mirada del viajero de pie, las tres piezas ordenadas de menor a mayor junto a la puerta de un departamento: una mochila, una maleta de mano con ruedas y una maleta grande; sobre la mochila, una chaqueta doblada. Las tres tienen que leerse claramente distintas en tamaño: es la comparación del artículo hecha imagen.",
+      "hora_clima": "mañana temprano, interior; luz natural abundante que entra por una ventana lateral, sombras abiertas, color natural",
+      "personas": "sin personas en cuadro, o solo la punta de las zapatillas del viajero en el borde inferior; sin rostro",
+      "primer_plano": "el borde de la puerta o del marco muy cerca del lente y muy fuera de foco, por el costado izquierdo, sin tapar las maletas",
+      "ancla_pov": "la mochila, la maleta chica y la grande esperando juntas junto a la puerta",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas de maletas reconocibles",
+        "sin etiquetas de aerolínea",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cintas métricas ni cifras (van en la IMG 2)"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01; las proporciones de las tres piezas deben ser verosímiles respecto de las medidas del texto",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; las tres piezas completas tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «La noche antes, con la maleta chica parada sobre la cama…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "manos del viajero · escala cercana · luz de noche interior",
+      "registro": "E",
+      "archivo": "tipos-equipaje-sky-medir-maleta-mano.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos midiendo con una cinta métrica el alto de una maleta de mano con ruedas, incluidas las ruedas y el asa",
+      "que_muestra": "desde los ojos del viajero, una mano sostiene la cinta métrica apoyada bajo las ruedas de una maleta de mano parada y la otra la estira hasta la punta del asa; al lado, una mochila abierta. La acción de medir incluyendo ruedas y asa es el contenido de la imagen.",
+      "hora_clima": "noche, interior de casa (la noche antes del relato); luz cálida de lámpara, abundante, sombras abiertas",
+      "personas": "solo las manos y antebrazos del viajero; sin rostro; gesto natural, sin pose",
+      "primer_plano": "la mochila abierta o el borde de la cama muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la cinta métrica",
+      "ancla_pov": "estiras la cinta métrica desde el suelo hasta la punta del asa",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas de maleta reconocibles",
+        "sin cifras legibles en la cinta métrica (no se fija un número en la imagen)",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «En el counter, la maleta grande sube a la cinta…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "en el counter · persona del personal integrada · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "tipos-equipaje-sky-maleta-bodega-cinta-counter.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Maleta grande con etiqueta de equipaje recién puesta avanzando por la cinta de un counter de aeropuerto",
+      "que_muestra": "una maleta grande con una etiqueta de equipaje en blanco (sin texto legible) en el asa avanza por la cinta detrás del counter; en primer término, el viajero, de espaldas o de perfil, guarda su comprobante y su mochila sigue al hombro. Demuestra que, una vez despachada, solo viaja arriba lo que llevas encima: por eso lo de valor queda en el bolso de mano.",
+      "hora_clima": "interior de terminal, de día; luz abundante y pareja, sombras abiertas, colores naturales",
+      "personas": "fotografía un acompañante, un paso atrás; el viajero mira su comprobante; el personal, de cuerpo parcial (manos, sin rostro) y en ropa neutra, acomoda la maleta; nadie mira al lente",
+      "primer_plano": "el asa de la mochila del viajero muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar la maleta",
+      "ancla_pov": "la maleta grande sube a la cinta con la etiqueta recién puesta y desaparece hacia la bodega",
+      "no": [
+        "sin texto ni logos",
+        "sin etiquetas de equipaje legibles ni códigos reales",
+        "sin señalética ni pantallas de counter legibles",
+        "sin colores ni uniformes SKY en el personal",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cifras de peso legibles"
+      ],
+      "fidelidad": "escena genérica de counter (sin aeropuerto identificable) → no requiere REF-01; personal en ropa neutra y cuerpo parcial para no generar uniformes"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "PUQ",
+      "ciudad": "Punta Arenas"
+    },
+    "home_market": "CHL",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-punta-arenas",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Todo tu abrigo viaja en bodega",
+    "cta": "Ver vuelos a Punta Arenas",
+    "archivo": "banner-ruta-santiago-punta-arenas.webp",
+    "alt": "Banner de SKY de la ruta Santiago–Punta Arenas: todo tu abrigo viaja en bodega",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Santiago (SCL) → Punta Arenas (PUQ) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“Todo tu abrigo viaja en bodega” (6 palabras; la ruta Santiago–Punta Arenas es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: las tarifas Standard, Max y Max Flex incluyen una maleta de bodega de hasta 23 kg",
+      "CTA (lo escribe el compositor)": "Ver vuelos a Punta Arenas →",
+      "Enlace del banner": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-punta-arenas",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-santiago-punta-arenas.webp`",
+      "ALT": "“Banner de SKY de la ruta Santiago–Punta Arenas: todo tu abrigo viaja en bodega”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+    }
+  },
+  "descartes": [
+    "mochila bajo el asiento del avión — prohibido: no se generan cabinas SKY",
+    "pantalla de tarifas en el teléfono — obliga a mostrar una interfaz real",
+    "coche de bebé entregado en la puerta del avión — exige manga y avión",
+    "tabla de surf como equipaje especial — caso minoritario y sin condiciones verificadas en esta versión"
+  ]
+}

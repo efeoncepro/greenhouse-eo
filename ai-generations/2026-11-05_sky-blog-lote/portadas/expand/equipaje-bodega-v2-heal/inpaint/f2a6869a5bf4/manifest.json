@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f2a6869a5bf4",
+  "key": "f2a6869a5bf4480bf81625c0c13c6153d81c26ca85ee64de5fb2dbc594fadf2e",
+  "status": "completed",
+  "createdAt": "2026-11-05T09:52:32.342Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/maestros-z/equipaje-bodega-v2-img1-maestro.png",
+    "imageSha256": "7659e374f581d5961c5f8fb1a57bd4467b2e5c8c91cbb90879e29478d3bf56c4",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/equipaje-bodega-v2-heal-mask.png",
+    "maskSha256": "de171082631a5a8924dedec6416fac015b3370621fbe1761c8e2f945c3b0864e",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Inside the marked band, remove any visible seam, edge, step or colour shift: continue the surrounding photograph so walls, door frames, plants, furniture, fabric, sky, water and ground run continuously and naturally across the band, with the same light, colour, grain and focus as each side. Change nothing else. No people added, no lettering, no aircraft.",
+    "providerPrompt": "Inside the marked band, remove any visible seam, edge, step or colour shift: continue the surrounding photograph so walls, door frames, plants, furniture, fabric, sky, water and ground run continuously and naturally across the band, with the same light, colour, grain and focus as each side. Change nothing else. No people added, no lettering, no aircraft."
+  },
+  "mask": {
+    "touchedFraction": 0.09722222222222222,
+    "editable": 806400,
+    "soft": 0,
+    "protected": 7488000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.598,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 1.99,
+        "bestError": 1.99,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7488000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 806400,
+        "maxDelta": 219,
+        "meanDelta": 23.598,
+        "worst": {
+          "x": 1461,
+          "y": 170
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 7488000,
+        "maxDelta": 255,
+        "meanDelta": 6.992,
+        "worst": {
+          "x": 1781,
+          "y": 1006
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1598,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 90
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3441
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

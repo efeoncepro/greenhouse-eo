@@ -1,0 +1,133 @@
+{
+  "id": "ninos-peru",
+  "notion_url": "https://app.notion.com/p/2380748f992c4216abb79d9214043eeb",
+  "titulo": "Viajar con niños dentro de Perú: cómo organizar una escapada que todos disfruten",
+  "slug": "/viajar-con-ninos-en-peru/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + C (acción espontánea)",
+      "modificadores": "POV del viajero · madre e hijo · escala amplia · luz de final de tarde · orienta",
+      "registro": "D",
+      "archivo": "familia-orilla-zorritos-nino-ola.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Niño corriendo hacia una ola chica en la orilla de la playa de Zorritos, en Tumbes, mientras su madre lo sigue al final de la tarde",
+      "que_muestra": "la orilla ancha de Zorritos con ola chica y arena húmeda que refleja el cielo; un niño de unos cinco años corre hacia el agua con los brazos abiertos y, unos pasos atrás, su madre lo sigue caminando con las sandalias de los dos en la mano. Debe leerse como playa tranquila de pueblo y primer contacto con el mar.",
+      "hora_clima": "final de la tarde, antes de que el sol toque el mar (el día 1 del relato); cielo despejado o con nubes altas, luz cálida abundante, sombras abiertas, altas luces del cielo conservadas",
+      "personas": "fotografía el padre, que se quedó atrás en la arena; el niño y la madre de espaldas, sin pose ni mirada al lente; **ningún rostro del menor visible**; otras personas, lejanas y pequeñas",
+      "primer_plano": "arena mojada con espuma muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al niño",
+      "ancla_pov": "la primera ola tibia que llega hasta los tobillos en la orilla de Zorritos",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostro del niño",
+        "sin el niño solo en el agua ni más allá de las rodillas",
+        "sin oleaje fuerte",
+        "sin sombrillas ni mobiliario de resort"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Zorritos en la tarea antes de generar (si no, Bloqueado). Puede reutilizar la REF-01 del artículo de Zorritos, con un encuadre distinto al de su portada",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el niño, la madre y la línea del agua tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Al día siguiente toca la actividad principal…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la banca de la lancha · niño integrado · escala media · luz de mañana",
+      "registro": "E",
+      "archivo": "nino-lancha-manglar-puerto-pizarro.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Niño con chaleco salvavidas inclinado hacia las raíces de mangle desde una lancha en Puerto Pizarro, Tumbes",
+      "que_muestra": "el interior de una lancha que avanza por un canal angosto de agua quieta; un niño con chaleco salvavidas naranja sin logos, sentado junto a la borda, se inclina con el brazo estirado señalando las raíces de mangle que bajan hasta el agua; el follaje cierra el canal por arriba.",
+      "hora_clima": "primeras horas de la mañana, aire húmedo; luz natural luminosa filtrada por el follaje, sombras abiertas",
+      "personas": "fotografía la madre, sentada detrás del niño; el niño de espaldas o de perfil parcial, **sin rostro visible**, mirando las raíces; el conductor de la lancha fuera de cuadro; nadie mira al lente",
+      "primer_plano": "el borde de la banca de madera de la lancha muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al niño",
+      "ancla_pov": "el niño con el chaleco puesto, inclinado hacia las raíces del mangle, que bajan como patas hasta el agua",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en la lancha",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin chaleco mal puesto ni niño sin chaleco",
+        "sin el niño asomado de forma riesgosa fuera de la borda",
+        "sin cocodrilos ni fauna en el agua",
+        "sin vegetación de selva amazónica"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de un canal de manglar de Puerto Pizarro en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Después, almuerzo en la caleta y regreso para la siesta…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "padre e hijo · escala media · luz de tarde",
+      "registro": "E",
+      "archivo": "nino-siesta-hamaca-terraza-tumbes.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Niño durmiendo la siesta en una hamaca a la sombra mientras su padre lee a su lado en una terraza de Tumbes",
+      "que_muestra": "una terraza sencilla a la sombra, con una hamaca de tela donde duerme un niño con la ropa todavía húmeda de la mañana; a su lado, el padre lee sentado con los pies descalzos; al fondo, desenfocado, el mar o la vegetación del norte con luz de tarde. Demuestra el criterio del artículo: una actividad principal y la tarde libre.",
+      "hora_clima": "primera hora de la tarde, calor del norte; sombra abierta bajo un techo, luz cálida rebotada, fondo luminoso con altas luces conservadas",
+      "personas": "fotografía la madre desde la puerta de la habitación; el niño dormido de espaldas o con el rostro cubierto por la tela de la hamaca, **sin rostro visible**; el padre de perfil, concentrado en el libro, sin mirar al lente",
+      "primer_plano": "el borde de la tela de la hamaca muy cerca del lente y muy fuera de foco, por el borde superior izquierdo, sin tapar al niño",
+      "ancla_pov": "regreso para la siesta. La tarde, otra vez, sin plan",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin título legible en el libro",
+        "sin pantallas encendidas",
+        "sin piscina ni mobiliario de resort",
+        "sin rostro del niño"
+      ],
+      "fidelidad": "terraza genérica de la costa de Tumbes; no requiere REF-01 si el fondo no muestra un lugar identificable"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TBP",
+      "ciudad": "Tumbes"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tumbes",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Primeras olas y manglares en familia",
+    "cta": "Ver vuelos a Tumbes",
+    "archivo": "banner-ruta-lima-tumbes-familia.webp",
+    "alt": "Banner de SKY con la ruta Lima–Tumbes: primeras olas y manglares en familia",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "_callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Tumbes (TBP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Primeras olas y manglares en familia” (6 palabras; la ruta Lima → Tumbes es el elemento principal y el titular va en segundo nivel, sin repetir H1 ni meta title)<br />**CTA (lo escribe el compositor):** Ver vuelos a Tumbes →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-tumbes<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-tumbes-familia.webp` · **ALT:** “Banner de SKY con la ruta Lima–Tumbes: primeras olas y manglares en familia”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, sin niños con rostro visible si se usa receta B, tipografía Metric sin reemplazo"
+  },
+  "descartes": [
+    "counter con documentos del menor — exige texto legible y personal identificable",
+    "zoocriadero de cocodrilos con niños — animales en cautiverio y lectura de riesgo",
+    "baño en Hueso de Ballena — repite la idea de agua tibia de la portada",
+    "niño pegado a la ventana del avión — cabina SKY generada: prohibido",
+    "habitación de hotel con cuna — postal intercambiable"
+  ]
+}

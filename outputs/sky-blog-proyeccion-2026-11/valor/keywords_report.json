@@ -1,0 +1,98 @@
+{
+  "slots": {
+    "eyebrow": "Búsquedas valorizadas",
+    "heroFigure": "−72 %",
+    "heroText": "valor medido al mes: US$ 2.107 hoy contra US$ 7.406 antes de migrar; <strong>sin marca, −81 %</strong>",
+    "tableTitle": "Destinos y rutas perdieron más del 80 %; equipaje y mascotas resisten mejor",
+    "lead": "Valor medido al mes por tema, ago–oct 2026, contra jul–sep 2025, a CPC de Google Ads de hoy.",
+    "boardTitle": "Valor medido por tema, US$ al mes",
+    "legend": {
+      "label": "Hoy, US$ al mes"
+    },
+    "tableColumns": [
+      {
+        "label": "#"
+      },
+      {
+        "label": "Tema (antes de migrar)"
+      },
+      {
+        "label": "Hoy"
+      },
+      {
+        "label": "Cambio"
+      }
+    ],
+    "tableRows": [
+      {
+        "entity": "Equipaje (antes US$ 1.978)",
+        "valueA": "US$ 836",
+        "valueB": "−58 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Destinos en Chile (antes US$ 1.596)",
+        "valueA": "US$ 294",
+        "valueB": "−82 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Rutas internacionales (antes US$ 1.154)",
+        "valueA": "US$ 194",
+        "valueB": "−83 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Otros temas (antes US$ 961)",
+        "valueA": "US$ 324",
+        "valueB": "−66 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Destinos en Perú (antes US$ 634)",
+        "valueA": "US$ 53",
+        "valueB": "−92 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Cambios y devoluciones (antes US$ 534)",
+        "valueA": "US$ 94",
+        "valueB": "−82 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Empleo y tripulación (antes US$ 354)",
+        "valueA": "US$ 181",
+        "valueB": "−49 %",
+        "trend": "down:worse"
+      },
+      {
+        "entity": "Mascotas (antes US$ 196)",
+        "valueA": "US$ 132",
+        "valueB": "−33 %",
+        "trend": "down:worse"
+      }
+    ],
+    "barScaleMax": "US$ 836",
+    "source": {
+      "label": "Fuente",
+      "text": "Search Console de SKY (blog y www) × CPC de Google Ads en Chile y Perú"
+    },
+    "coverage": {
+      "label": "Cobertura",
+      "text": "Búsquedas visibles con CPC: 12 a 15 % de los clics; es un piso"
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que muestra",
+        "text": "El blog perdió sobre todo búsquedas sin marca de destinos y rutas: las de viajeros que todavía no eligen aerolínea."
+      },
+      {
+        "kind": "action",
+        "label": "Qué hacemos",
+        "text": "El lote editorial prioriza destinos de Perú y rutas internacionales; la planilla adjunta trae cada búsqueda con su CPC para seguirla mes a mes."
+      }
+    ]
+  }
+}

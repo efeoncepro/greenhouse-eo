@@ -1,0 +1,5 @@
+Expression: cheerful, confident open smile.
+
+POSE AND CAMERA: the signature pose of the character: standing, the left hand resting on the side of the body like a hand on the hip, the right arm raised with the thumb pointing up, one foot slightly forward. THREE-QUARTER VIEW FROM THE FRONT LEFT, camera slightly above eye level: we see the face and the front of the body turned about 35 degrees to the right of the frame, plus part of the body's left side; the guard hoop on top is seen as an ellipse with three posts clearly visible; the weld seam curves around the body.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully visible with generous margin, centered.

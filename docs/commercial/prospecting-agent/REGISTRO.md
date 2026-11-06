@@ -323,3 +323,25 @@ Compras respondió30Oct13:26:51Santiago: Marketing prepara información y espera
 ### 31/10/2026 09:06 — Radar diario: ofertas enviadas y Leasein en investigación
 
 Cero nuevas compras abiertas verificadas; 64 consultas/60 semanales (93,75%), 20 celdas. Leasein HSP-0059 sólo investigación: evalúa CRM y excluye nuevos contactos HubSpot/Odoo; fecha absoluta no verificada. GANA/LOTI y Mattis ya enviados30Oct, sin duplicar; certificado fiscal Mattis pendiente. Qualitor: HOLD/ruta Colombia; NO-BID modalidad chilena sin aceptación. Talca3Nov/FUCOA2Nov API actual, originales/aclaraciones/contrato pendientes. FONATUR ficha vigente, originales bloqueados. 64 controles, 59HSP/27lotes/32decisiones preservados. Sin CRMwrites/créditos/envíos/postulaciones/commit/push/tareas nuevas. [Reporte](runs/2026-10-31-0906.md) · [Consultas](queries/2026-10-31-0906.json).
+
+### 01/11/2026 09:06 — Radar diario: respuestas de FUCOA y dos investigaciones
+
+Cero nuevas compras abiertas verificadas; 44 consultas de descubrimiento/40 semanales (90,91%), 16 de validación y 20 celdas. FUCOA incorpora acto2026-92: extractos de respuestas leídos, sin original íntegro/contrato/ICP. Talca3Nov y FUCOA2Nov API200; FONATUR ficha actual, originales pendientes. FENAVI HSP-0060 y MTPE Perú HSP-0061 sólo investigación/HOLD; fechas indexadas/secundarias no certifican apertura. Qualitor necesita ruta Colombia aceptada; Mattis certificado fiscal pendiente; izipay espera Compras. 72 controles, 61HSP/27lotes/32decisiones preservados. Sin CRMwrites, créditos, envíos, postulaciones, commit/push ni nuevas tareas. [Reporte](runs/2026-11-01-0906.md) · [Consultas](queries/2026-11-01-0906.json).
+
+
+### 02/11/2026 09:03 — Radar diario: semana nueva y Superintendencia de Salud en investigación
+
+Cero nuevas compras semanales calificadas; 52 consultas de descubrimiento/44 semanales (84,62%), ocho validaciones y 20 celdas. HSP-0062 Superintendencia de Salud: publicación primaria30/10, ofertas10/11 y preguntas2/11; sólo investigación anterior/HOLD, sin originales íntegros, contrato efectivo o ICP acreditado. FUCOA hoy15:30/Talca3Nov15 confirmadas API+Chrome; actoFUCOA adjunto30Oct13:41:48 frente indexación31Oct, visor bloqueado. FONATUR consultas hoy11UTC−6=14Santiago, originales pendientes. Wherex canónico en login; GANA/LOTI y Mattis ya enviados, certificado fiscal Mattis pendiente; Qualitor requiere rutaColombia; izipay espera. 76 controles, 62HSP/27lotes/32decisiones preservados. CRM sólolectura, sin créditos, envíos, ofertas, nuevas tareas, commit/push o cambio de scheduler. [Reporte](runs/2026-11-02-0903.md) · [Consultas y controles](queries/2026-11-02-0903.json).
+
+### 03/11/2026 09:01 — Radar diario: tarea de Assetplan y cierres revisados
+
+Cero nuevas compras semanales calificadas; 52 búsquedas web de descubrimiento, 44 semanales (84,62%), 21 de validación y 20 celdas. Assetplan: tarea interna hoy 10:00 Santiago, propuesta vigente al 30/11. Qualitor sigue en HOLD por ruta Colombia; Talca hoy 15:00, sin originales; FUCOA cerrada. Superintendencia HSP-0062: 330 efectivos en 2024 según fuente oficial, contrato sigue en HOLD. Zolutions y CREZE quedan en screening, sin HSP nuevo. HubSpot sólo lectura; sin créditos, ofertas, envíos, tareas nuevas, commit ni push. [Reporte](runs/2026-11-03-0901.md) · [Consultas y controles](queries/2026-11-03-0901.json).
+
+
+**Radar diario 04/11/2026 — 2026-11-04-0901:** 60 consultas de descubrimiento, 52 semanales (86,7%), 20 celdas. Cero compras nuevas habilitadas para recomendar postulación. Tres investigaciones HOLD: Hospital de Fresia HSP-0063, San Felipe HSP-0064 y Universidad Nacional de Colombia HSP-0065. ProChile 1138297-11-LE26 adjudicada a AWNA Digital; no reabrir. FONATUR lista acta nueva sin original; tarea Assetplan vencida y Qualitor sigue en HOLD. Sin CRM writes, envíos, créditos, ofertas ni tareas adicionales.
+[Reporte](runs/2026-11-04-0901.md) · [Consultas y 15 controles](queries/2026-11-04-0901.json).
+
+
+### 05/11/2026 08:57 — Radar diario: Assetplan avanza de fase; dos investigaciones en HOLD
+
+56 búsquedas web/48 semanales (85,7%), 20 celdas y 19 controles; cero compras nuevas habilitadas. Indian Motos HSP-0066 y Corporación Regional HSP-0067 sólo investigación. Porkcolombia conserva HSP-0022: proveedor nombrado frente a estado abierto, sin expediente resolutorio. Assetplan ahora pide CV/experiencia para tercera fase; Qualitor mantiene hito interno hoy y cierre mañana, sin trasladar prórroga de LIC115 a LIC116. San Felipe requiere conciliar subcontratación; FONATUR acta bloqueada por CAPTCHA. 67IDs/27lotes/32decisiones preservados. Sin CRM writes, créditos, envíos, postulaciones, tareas nuevas, commit/push o scheduler. [Reporte](runs/2026-11-05-0857.md) · [Consultas y controles](queries/2026-11-05-0857.json).

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1273.8 1432.6">
+  <defs>
+    <linearGradient id="Degradado_sin_nombre_151" data-name="Degradado sin nombre 151" x1="196.05" y1="912.35" x2="196.05" y2="-361.45" gradientTransform="translate(440.85 440.85)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000" stop-opacity=".69"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="-79.4" y="79.4" width="1432.6" height="1273.8" transform="translate(1353.2 79.4) rotate(90)" fill="url(#Degradado_sin_nombre_151)"/>
+</svg>

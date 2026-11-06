@@ -1,0 +1,58 @@
+{
+  "url": "https://efeoncepro.com/glitch/glitch-flash-images-2-6/",
+  "checks": {
+    "status200": true,
+    "canonicalExact": true,
+    "indexFollow": true,
+    "h1": true,
+    "fiveDrops": true,
+    "currentOwnSection": true,
+    "ownImagesPresent": true,
+    "ogCover": true,
+    "ogArticle": true,
+    "description": true,
+    "largeImageCard": true,
+    "schemaArticle": true,
+    "schemaAuthor": true,
+    "schemaWebPage": true,
+    "schemaBreadcrumb": true
+  },
+  "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  "canonical": [
+    "https://efeoncepro.com/glitch/glitch-flash-images-2-6/"
+  ],
+  "ogImage": [
+    "https://efeoncepro.com/wp-content/uploads/2026/11/glitch-images-2-6-own-cover.png"
+  ],
+  "h1": [
+    "Glitch Flash: Images 2.6 y la prueba de la segunda corrección"
+  ],
+  "schemaTypes": [
+    [
+      "Article",
+      "BlogPosting"
+    ],
+    [
+      "WebPage",
+      "ItemPage"
+    ],
+    "ImageObject",
+    "BreadcrumbList",
+    "WebSite",
+    "Organization",
+    "Person"
+  ],
+  "headers": {
+    "Content-Type": "text/html; charset=UTF-8",
+    "x-kinsta-cache": "MISS"
+  },
+  "secondAnonymousRead": "pass",
+  "sitemap": [
+    {
+      "loc": "https://efeoncepro.com/glitch/glitch-flash-images-2-6/",
+      "lastmod": "2026-11-05T12:20:03+00:00",
+      "image": "\n\t\t\t"
+    }
+  ],
+  "status": "published-and-critical-checks-pass"
+}

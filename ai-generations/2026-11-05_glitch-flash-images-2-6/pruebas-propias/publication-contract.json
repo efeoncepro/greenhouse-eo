@@ -1,0 +1,32 @@
+{
+  "status": "published; anonymous readback and browser QA passed",
+  "operatorInstruction": "Vamos, tienes gpt images 2.6 en la Cli asi que crea y agrega imagenes nuestras y de nexa en el registro cinematográfico como en una película de acción para sumar pruebas nuestras al artículo",
+  "scope": "Generate own cinematic test images via exact 2.6 CLI, record results, add to the article; no new identity approval or model default change",
+  "articleManifest": "greenhouse-cf-glitch-flash-images-2-6",
+  "authorId": 1,
+  "categoryId": 183,
+  "canonicalOwner": "WordPress",
+  "publication": {
+    "approved": true,
+    "instruction": "Ok publica",
+    "approvedOn": "2026-11-05",
+    "targetPost": 252401,
+    "targetStatus": "publish",
+    "scope": "Current reviewed article including four own Nexa test outputs and cover; no social distribution",
+    "result": {
+      "mode": "publish",
+      "id": 252401,
+      "status": "publish",
+      "authorId": 1,
+      "title": "Glitch Flash: Images 2.6 y la prueba de la segunda corrección",
+      "date": "2026-11-05 12:20:03",
+      "dateGmt": "2026-11-05 12:20:03",
+      "contentSha256": "978054056a217e0debcc619951033a46f7af2998cf464cbe36b406eaf02a88d4",
+      "coverId": 252389,
+      "robotsOverride": "",
+      "permalink": "https://efeoncepro.com/glitch/glitch-flash-images-2-6/",
+      "snapshotOption": "_gh_glitch26_publish_252401_20261105_122003",
+      "cachePurgeResult": "Success: All caches were cleared. Changes usually appear globally within a few minutes."
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "id": "talara",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781469b10d6c610206ccc",
+  "titulo": "Qué hacer en Talara: Cabo Blanco, Lobitos y las playas a minutos del aeropuerto",
+  "slug": "/que-hacer-en-talara/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de final de tarde · orienta",
+      "registro": "D",
+      "archivo": "talara-mirador-bahia-viajero-tarde.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero mirando desde un mirador la bahía de Talara, en Piura, con estructuras petroleras junto al mar al final de la tarde",
+      "que_muestra": "desde lo alto, la bahía de Talara con el mar a un lado y, junto a la costa, estructuras petroleras y la ciudad baja; un viajero de pie, de espaldas, apoyado en una baranda, mira la bahía. Tiene que leerse a la vez el mar y la industria: es la seña de Talara frente a las otras playas del norte.",
+      "hora_clima": "final de la tarde, con el sol todavía sobre el mar; cielo despejado; luz cálida abundante, sombras abiertas, altas luces del cielo y del agua conservadas",
+      "personas": "el viajero a media distancia, de espaldas, sin pose ni mirada al lente; ningún rostro identificable en primer plano",
+      "primer_plano": "el borde de la baranda del mirador, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la bahía",
+      "ancla_pov": "Desde arriba, la bahía se ve dividida en dos: el mar azul a un lado y las estructuras del petróleo al otro",
+      "no": [
+        "sin texto ni logos",
+        "sin logotipos ni nombres legibles de empresas petroleras o de la refinería",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin humo ni llamas inventadas",
+        "sin la estatua del mirador en primer plano (requiere fidelidad aparte)"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la vista de la bahía de Talara desde un mirador de la ciudad en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero, el mar y las estructuras petroleras tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es temprano en Lobitos y ya hay gente en el agua…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "surfista entrando al mar · persona sola · escala media · luz de mañana",
+      "registro": "E",
+      "archivo": "lobitos-surfista-entrando-ola-larga.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Surfista entrando al mar con su tabla en la playa de Lobitos, en Talara, con una ola larga rompiendo al fondo",
+      "que_muestra": "un surfista camina hacia el agua con la tabla bajo el brazo, de espaldas, con el agua a las rodillas; al fondo, una ola larga que rompe en línea desde una punta y corre a lo largo del cuadro, con uno o dos surfistas pequeños encima. La decisión que muestra es entrar o mirar desde la orilla: la ola tiene que leerse larga y ordenada.",
+      "hora_clima": "primeras horas de la mañana (el «temprano» del relato); cielo despejado o con nubes altas; luz natural luminosa y suave, sombras abiertas, espuma y cielo con altas luces conservadas",
+      "personas": "fotografía el viajero sentado en la arena, mirando al mar; el surfista en primer término, de espaldas; los del fondo, pequeños y en acción; nadie mira al lente; ningún rostro identificable; trajes de neopreno sin logos",
+      "primer_plano": "arena seca con huellas, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al surfista",
+      "ancla_pov": "miras cómo una ola larga se abre desde la punta y corre de lado a lado",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas en tablas ni trajes",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin olas gigantes ni tubos de competencia",
+        "sin poses para cámara"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa y la ola de Lobitos en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Los botes se mecen frente a la caleta…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la proa de un bote · escala amplia · luz de mediodía",
+      "registro": "E",
+      "archivo": "cabo-blanco-proa-bote-saliendo-caleta.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Proa de un bote saliendo de la caleta de Cabo Blanco, en Talara, con la punta rocosa y el mar abierto adelante",
+      "que_muestra": "la vista desde la proa de un bote de pesca que se aleja de la caleta: el borde de la proa abajo, el mar abierto adelante y, a un costado, la punta rocosa de Cabo Blanco y otros botes fondeados, pequeños. Lo que demuestra es que aquí el mar se vive desde un bote, no desde la arena: si solo se ve playa, la imagen no sirve.",
+      "hora_clima": "cerca del mediodía; cielo despejado; luz natural abundante, reflejos del mar sin quemar, sombras abiertas",
+      "personas": "fotografía el viajero desde la proa; en cuadro, a lo sumo, la espalda de un pescador en la popa, fuera de foco, en ropa de trabajo sin logos; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "una cuerda enrollada o el borde de la proa, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el mar abierto",
+      "ancla_pov": "Desde la proa, la punta rocosa queda atrás y adelante solo hay mar abierto",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en las embarcaciones",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin peces capturados en primer plano",
+        "sin yates de lujo",
+        "sin plataformas petroleras dominando el cuadro"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la caleta y la punta de Cabo Blanco en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER (consultado el 05/11/2026); no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TYL",
+      "ciudad": "Talara"
+    },
+    "home_market": "PER",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (ruta no catalogada para PER al 05/11/2026)",
+    "titular": "Olas largas y caletas de pescadores",
+    "cta": "Ver vuelos a Talara",
+    "archivo": "banner-ruta-lima-talara.webp",
+    "alt": "Banner de SKY de la ruta Lima–Talara: olas largas y caletas de pescadores",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "tortugas marinas en El Ñuro — promete un avistamiento y exige fidelidad de fauna en un área protegida",
+    "ballena jorobada desde un bote en Los Órganos — sin garantía y fidelidad de fauna",
+    "estatua del Cristo Petrolero — monumento identificable; requiere referencia propia",
+    "plato de cebiche frente a la bahía — intercambiable con cualquier guía de costa",
+    "casas del antiguo campamento de Lobitos — falta fuente y referencia real"
+  ]
+}

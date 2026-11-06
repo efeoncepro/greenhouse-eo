@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "B",
+ "portada": true,
+ "primerPlano": "hojas de un arbusto del jardín de la explanada",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "chiclayo",
+ "input": {
+  "id": "chiclayo",
+  "registro": "D",
+  "tipo": "B",
+  "portada": true,
+  "lugar": "Museo Tumbas Reales de Sipán, Lambayeque, Perú",
+  "escena": "el edificio del Museo Tumbas Reales de Sipán, de volumen piramidal truncado y color rojizo, ocupando el fondo del cuadro bajo un cielo claro; un viajero con mochila pequeña camina hacia la entrada por la explanada, a media distancia. Tiene que leerse que la ruta empieza aquí, frente a una arquitectura que recuerda a una huaca, no frente a un museo genérico. Personas: el viajero de espaldas o de perfil, caminando sin pose ni mirada al lente; otras personas, si aparecen, lejanas y pequeñas en la explanada; ningún rostro identificable en primer plano",
+  "hora": "mañana soleada, poco después de la apertura (el relato empieza temprano)",
+  "clima": "luz natural abundante y cálida, sombras abiertas, cielo sin quemar",
+  "primerPlano": "hojas de un arbusto del jardín de la explanada",
+  "borde": "lower-left corner",
+  "prohibir": "sin texto ni logos, sin el letrero del museo legible, sin rótulos de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin piezas de oro ni vitrinas (no se permite fotografiar el interior y una pieza inventada es un error atribuible a SKY), sin cambiar la forma ni el color real del edificio",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "Museo Tumbas Reales de Sipán, Lambayeque, Perú (its real forms, scale and spatial relationships)"
+ }
+}

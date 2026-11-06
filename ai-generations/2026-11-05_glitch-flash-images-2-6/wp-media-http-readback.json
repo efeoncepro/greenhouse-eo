@@ -1,0 +1,89 @@
+{
+  "method": "GET with normal User-Agent and same-site Referer; default urllib agent received 403",
+  "assets": [
+    {
+      "asset": "own-cover",
+      "status": 200,
+      "mime": "image/png",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "images-2-6-gif-montage-poster",
+      "status": 200,
+      "mime": "image/webp",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "markup-vase-input-gpt-image-2-6",
+      "status": 200,
+      "mime": "image/webp",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "markup-vase-gpt-image-2-6-sunburst",
+      "status": 200,
+      "mime": "image/webp",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "own-a",
+      "status": 200,
+      "mime": "image/png",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "own-b",
+      "status": 200,
+      "mime": "image/png",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "own-edit1",
+      "status": 200,
+      "mime": "image/png",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "own-edit2",
+      "status": 200,
+      "mime": "image/png",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "monkey-lantern-gpt-image-2-6-sunburst",
+      "status": 200,
+      "mime": "image/gif",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "field-and-flour-gpt-image-2-6-sunburst",
+      "status": 200,
+      "mime": "image/svg+xml",
+      "matchesInput": false,
+      "matchesStored": true
+    },
+    {
+      "asset": "infographic-coffee-machine-sp-gpt-image-2-6-sunburst",
+      "status": 200,
+      "mime": "image/webp",
+      "matchesInput": true,
+      "matchesStored": true
+    },
+    {
+      "asset": "billboard-winter-gpt-image-2-6-sunburst",
+      "status": 200,
+      "mime": "image/webp",
+      "matchesInput": true,
+      "matchesStored": true
+    }
+  ]
+}

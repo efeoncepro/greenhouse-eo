@@ -1,0 +1,61 @@
+SKY photographic system. Authentic editorial documentary travel photography of a destination without visible people, photographed as part of one continuous SKY travel reportage by the same photographer.
+
+TYPE OF IMAGE
+Destination photography. The destination is the protagonist. No visible people in frame.
+
+CORE PRINCIPLE
+The place inspires from reality, never from the perfect postcard.
+
+SCENE
+Pucallpa, Peru: the Yarinacocha lagoon in the Amazon with long wooden peque-peque boats tied at a rustic dock and lush green jungle along the water. Framing for advertising: square frame. Keep the top 35% of the frame as calm, clean natural sky with almost no clouds and no landmarks, so a white headline can sit there. Place the recognizable destination in the middle band of the frame, slightly off-center. Put the blurred foreground element in the lower part of the frame, on one side. No people, no text, no signs, no logos.
+
+SUBJECT AND STORY
+The place itself is the main subject, but the image must remain human, accessible and lived-in rather than empty, sterile or postcard-perfect. Even without people visible, the image should still feel inhabited.
+
+Subtle traces of human presence are welcome when appropriate: a chair, table, railing, bicycle, parked vehicle, path, architecture, laundry, boat, café detail, window, or another contextual sign of life.
+
+COMPOSITION
+Observational editorial composition, spontaneous and slightly imperfect. Avoid rigid centering and over-balanced postcard framing. Use asymmetry, depth and natural layering. The destination should feel discovered from within, not observed from a detached tourist viewpoint.
+
+Mandatory immersive foreground layer in every destination photograph. Include at least one environmental element extremely close to the lens, partially cropped and strongly out of focus, occupying approximately 10–25% of the frame.
+
+Possible foreground elements: vegetation, rocks, railings, architectural edges, walls, branches, fabrics, furniture, window edge, or any contextual location-specific object. Do not use human figures as foreground in this category.
+
+Create layered photographic depth: blurred foreground / readable destination / softer distant atmosphere. Allow imperfect crops and partial occlusions if they create intimacy and realism.
+
+SKY COMPOSITION RULE
+Preserve a strong visible presence of natural sky whenever appropriate. If the image is intended for communication or typography, reserve a calm text-safe sky area.
+
+CAMERA
+Documentary travel photography look. Prefer a 35mm lens feeling. Approximately f/2.8. Natural eye-level or observational point of view. Realistic perspective only. No ultra-wide distortion. No architectural catalog precision. No hyper-corrected commercial perspective.
+
+LIGHT
+Natural available light only. Use authentic daylight according to the real destination, weather and time of day. Morning, noon, afternoon or overcast are allowed as long as the image remains believable. The atmosphere must feel natural and observed.
+
+Exposure should be controlled and slightly restrained. Protect highlights in the sky and bright surfaces. Preserve detail in clouds, architecture, sand, water and landscape. Gentle highlight roll-off. No clipped whites.
+
+SKY COLOR SYSTEM
+The sky must remain visually consistent across destinations. Use the SKY reference sky family centered around Hue 210°. The sky should feel natural, restrained and believable. Never turquoise. Never teal. Never electric blue. Never oversaturated.
+
+The upper sky may be slightly deeper and more saturated. The horizon should become progressively lighter and less saturated.
+
+CLOUD RULE
+Low cloud presence. Keep approximately 5–15% of the visible sky occupied by clouds. Clouds should be small, soft, natural and preferably peripheral. Avoid dramatic cloud masses, stormy formations or clouds that dominate the frame.
+
+TEXT-SAFE RULE
+When the image is intended for communication, preserve approximately 30–40% of the frame as a visually calm space for typography. Preferably use a clean sky area. Avoid high-contrast landmarks, architecture, trees or dense clouds within that zone.
+
+COLORIMETRY
+Natural documentary film color with restrained saturation. Warm natural highlights. Neutral midtones. Very subtle olive/cyan separation in cooler shadows, midtones and atmospheric depth. This tonal shift must remain subtle and embedded in the grading, never obvious. Vegetation should render as muted olive, moss or natural green rather than neon tropical green. Earth, sand, architecture and stone should retain muted natural warmth. Warm-neutral whites, never sterile digital white.
+
+FILM RESPONSE
+Analog 35mm documentary film response. Fine organic grain. Gentle optical softness. Natural micro-contrast. Soft highlight roll-off. Dense but detailed shadows. Slightly softened blacks, never crushed. Subtle atmospheric haze when appropriate. No glossy finish. No hyper-sharp tourism look. No HDR.
+
+ATMOSPHERE AND HUMANITY
+Even without people visible, the image should feel approachable and lived-in. Avoid sterile emptiness. Avoid impossible perfection. The emotional value should come from atmosphere, point of view, depth, light and quiet realism.
+
+BRAND PRINCIPLE
+The destination should feel real, desirable and accessible. Never a fantasy object. Never a luxury-resort cliché. The image must feel trustworthy, contemporary and close.
+
+NEGATIVE PROMPT
+postcard view, centered landmark, perfect empty landscape, luxury resort cliché, tourism brochure look, no foreground, sterile scene, fake sky, sky replacement, dramatic clouds, cloud wall, turquoise sky, teal sky, electric blue sky, oversaturated color, tropical neon greens, HDR, glossy finish, hyper-sharp digital look, artificial perspective, empty perfection

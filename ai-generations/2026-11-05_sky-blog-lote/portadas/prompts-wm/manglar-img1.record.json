@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "hojas de mangle de una rama cercana,",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "manglar",
+ "input": {
+  "id": "manglar",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "estero del Santuario Nacional Los Manglares de Tumbes, Perú",
+  "escena": "un estero ancho de agua quieta y oscura, con paredes verdes de mangle a ambos lados y raíces que bajan en arco hasta el agua; a media distancia, una canoa con dos viajeros sentados y un guía de pie que impulsa la embarcación. El agua refleja el cielo claro. Tiene que leerse como manglar (raíz aérea sobre agua salobre), no como río de selva. Personas: fotografiado desde el embarcadero o desde otra embarcación detenida; los dos viajeros miran hacia las raíces de la orilla, de perfil o de espaldas; el guía, de espaldas, impulsa la canoa; nadie mira al lente; ropa neutra, chalecos sin logos; ningún rostro identificable",
+  "hora": "primera hora de la mañana (la entrada del relato)",
+  "clima": "cielo despejado o con bruma ligera que se levanta; luz natural luminosa y suave, sombras abiertas, verdes con detalle y altas luces del cielo conservadas",
+  "primerPlano": "hojas de mangle de una rama cercana,",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin nombres pintados en la embarcación, sin rótulos legibles de negocios reales ni carteles del SERNANP, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin cocodrilos ni fauna en primer plano (no se promete avistamiento), sin lianas, palmeras ni vegetación amazónica",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "estero del Santuario Nacional Los Manglares de Tumbes, Perú (its real forms, scale and spatial relationships)"
+ }
+}

@@ -1,0 +1,27 @@
+{
+    "mode": "apply",
+    "posts": [
+        {
+            "id": 252401,
+            "modified": "2026-11-05 12:20:03",
+            "sha256": "978054056a217e0debcc619951033a46f7af2998cf464cbe36b406eaf02a88d4",
+            "newSha256": "4663870ba414bbfb41b2b69dc8d6d920369a81948e955e60ae660234ab039b5f",
+            "faqSame": true,
+            "faqCount": 0,
+            "styles": {
+                "destacado": 1,
+                "pasos": 1,
+                "recuadro": 0,
+                "centradas": 11
+            },
+            "bytes": [
+                43012,
+                43019
+            ],
+            "snapshot": "_gh_post_republish_252401_20261105_135648",
+            "readback": true,
+            "readbackFaqSame": true,
+            "changedFields": []
+        }
+    ]
+}

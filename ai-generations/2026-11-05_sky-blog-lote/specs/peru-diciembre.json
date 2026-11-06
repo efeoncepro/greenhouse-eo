@@ -1,0 +1,127 @@
+{
+  "id": "peru-diciembre",
+  "notion_url": "https://app.notion.com/p/deeae0d1c8ac4d099733a955cca7a6be",
+  "titulo": "Dónde viajar en Perú en diciembre según los días que tengas libres",
+  "slug": "/a-donde-ir-en-diciembre/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de mañana · orienta",
+      "registro": "D",
+      "archivo": "diciembre-peru-punta-sal-orilla-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero caminando por la orilla de la playa de Punta Sal, en Tumbes, en una mañana soleada de verano",
+      "que_muestra": "la orilla ancha de Punta Sal con mar calmo y arena clara; un viajero camina por la línea del agua hacia el fondo, con una toalla al hombro. Debe leerse como el verano que empieza en la costa norte, no como resort ni como playa del Caribe.",
+      "hora_clima": "mañana soleada de diciembre, como en el relato; cielo despejado o con nubes altas, sin lluvia; luz abundante, sombras abiertas, cielo sin quemar",
+      "personas": "el viajero de espaldas, caminando sin pose ni mirada al lente; otras personas, si aparecen, lejanas y pequeñas; ningún rostro identificable en primer plano",
+      "primer_plano": "espuma de una ola sobre la arena húmeda muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al viajero",
+      "ancla_pov": "el sol de diciembre ya calienta la arena del norte",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin sombrillas ni mobiliario de resort con marca",
+        "sin palmeras de catálogo",
+        "sin repetir la escena de la portada de Zorritos (es otra playa y otra hora)"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Punta Sal en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero, la línea del agua y el horizonte tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Cinco días alcanzan para una ciudad de la sierra…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "persona sola · escala media · luz de tarde nublada",
+      "registro": "E",
+      "archivo": "diciembre-cusco-calle-empedrada-lluvia.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Calle empedrada de Cusco mojada después de un chaparrón de tarde, con una viajera con capa de lluvia",
+      "que_muestra": "una calle angosta y empedrada del centro de Cusco, con la piedra brillante por el agua y muros de piedra a los costados; una viajera con capa de lluvia sube la calle buscando dónde guarecerse. Tiene que leerse la decisión del relato: la lluvia de la tarde se esquiva con el plan, no cancela el viaje.",
+      "hora_clima": "media tarde, justo después de un chaparrón, como en el relato; cielo gris claro que empieza a abrirse; luz difusa abundante, sombras abiertas, sin oscurecer la escena",
+      "personas": "fotografía el acompañante desde unos pasos atrás, mirando a la viajera y la calle; la viajera, de espaldas o de perfil, sube la calle; otras personas pequeñas y lejanas; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "el borde de un alero de madera goteando muy cerca del lente y muy fuera de foco, por el borde superior izquierdo, sin tapar a la viajera",
+      "ancla_pov": "hacia media tarde, una nube gris se cierra sobre los techos y la piedra empieza a brillar con el agua",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin tormenta ni calles inundadas (no se dramatiza la lluvia)",
+        "sin llamas ni personas con trajes típicos posando"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una calle empedrada del centro de Cusco en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Con siete días, diciembre deja de ser un apuro…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "POV de mano · escala cercana · luz de lluvia",
+      "registro": "E",
+      "archivo": "diciembre-selva-terraza-lluvia-jugo.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos sosteniendo un vaso de jugo en una terraza techada frente a la vegetación de la selva bajo la lluvia",
+      "que_muestra": "las manos del viajero con un vaso de jugo frío apoyado en la baranda de madera de una terraza techada; al frente, vegetación densa de selva con la lluvia cayendo en hilos y gotas en las hojas. Demuestra que la lluvia de la selva en diciembre se vive como pausa, no como viaje perdido.",
+      "hora_clima": "media tarde con lluvia tropical, como en el relato; luz difusa abundante y verde, sombras abiertas, sin oscurecer",
+      "personas": "fotografía el viajero sentado en la terraza y mira la lluvia; solo sus manos y antebrazos en cuadro; nadie más en escena",
+      "primer_plano": "gotas sobre la baranda de madera muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el vaso",
+      "ancla_pov": "imagina una terraza techada en Tarapoto mientras cae un aguacero corto",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas en el vaso",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin animales exóticos posando",
+        "sin tormenta eléctrica"
+      ],
+      "fidelidad": "terraza genérica de selva, no identificable: basta REF-ESTILO-D; si Diseño quiere mostrar un lugar concreto de Tarapoto, requiere foto real REF-01"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "CUZ",
+      "ciudad": "Cusco"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-cusco",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Cusco, piedra y chocolate caliente",
+    "cta": "Ver vuelos a Cusco",
+    "archivo": "banner-ruta-lima-cusco.webp",
+    "alt": "Banner de SKY: ruta Lima–Cusco, piedra y chocolate caliente",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "calendario con el 8 y el 9 marcados (texto y números legibles generados)",
+    "Plaza de Armas de Cusco con adornos navideños (fidelidad de decoración de una temporada concreta)",
+    "Machu Picchu entre nubes (postal intercambiable y condiciones de acceso pendientes)",
+    "cena de Navidad en familia (rostros y sin destino)",
+    "cañón del Colca (destino secundario del artículo)"
+  ]
+}

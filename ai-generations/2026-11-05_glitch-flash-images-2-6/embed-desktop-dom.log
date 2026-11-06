@@ -1,0 +1,19 @@
+### Ran Playwright code
+```js
+await (async (page) => {
+ await page.setViewportSize({width:1440,height:1000});
+ await page.goto('https://efeoncepro.com/glitch/glitch-flash-images-2-6/',{waitUntil:'domcontentloaded'});
+ await page.locator('.entry-content iframe[src*="player.vimeo.com"]').first().waitFor({state:'attached'});
+ console.log(JSON.stringify(await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,embeds:[...document.querySelectorAll('.entry-content .wp-block-embed')].map(e=>{const f=e.querySelector('iframe'),r=f?.getBoundingClientRect();return{html:e.outerHTML,frame:f?.src,w:r?.width,h:r?.height}})}))));
+})(page);
+```
+### Page
+- Page URL: https://efeoncepro.com/glitch/glitch-flash-images-2-6/
+- Page Title: Images 2.6: edición, GIF, SVG y precios | Glitch Flash
+- Console: 2 errors, 0 warnings
+### Events
+- New console entries: .playwright-cli/console-2026-11-05T13-56-24-252Z.log#L2-L12
+
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "300b0d5d2a8e",
+  "key": "300b0d5d2a8e49cb9fcfa1ff1e447e28ac747abb037de292528ef4655bdde963",
+  "status": "completed",
+  "createdAt": "2026-11-05T15:42:28.516Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/clients/berel/.resources-local/photos/espacios/rayados-n1-sala.png",
+    "imageSha256": "1f7188f88470ef10e05f53e0582d2418b57ac96c730740fea5190b3925a3d2b6",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/mask-tv.png",
+    "maskSha256": "1d4a7190e47bc2c98a71dcf3222bc5aa2ef0806bad1856c5fe8de477a49f33d5",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1536,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Inside the TV screen only: the picture of a live professional football match broadcast, as displayed on the flat screen. In the center of the screen, a white football in sharp focus flies straight toward the viewer, large, with slight motion blur. Behind it, out of focus, a green pitch, one player running in a jersey with wide vertical blue and white stripes and blue shorts, seen from behind or in profile with the face not recognizable, and a packed stadium crowd in blue and white under floodlights. No crest, no badge, no logos, no sponsors, no shirt numbers, no scoreboard, no broadcaster graphics, no text anywhere. It must look like a real TV picture: natural screen brightness, a faint reflection of the room's window on the glass. Everything outside the screen, including the TV frame, the wall and the furniture, stays exactly as it is.\n Do not change the framing, the camera position or the scale of anything.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nInside the TV screen only: the picture of a live professional football match broadcast, as displayed on the flat screen. In the center of the screen, a white football in sharp focus flies straight toward the viewer, large, with slight motion blur. Behind it, out of focus, a green pitch, one player running in a jersey with wide vertical blue and white stripes and blue shorts, seen from behind or in profile with the face not recognizable, and a packed stadium crowd in blue and white under floodlights. No crest, no badge, no logos, no sponsors, no shirt numbers, no scoreboard, no broadcaster graphics, no text anywhere. It must look like a real TV picture: natural screen brightness, a faint reflection of the room's window on the glass. Everything outside the screen, including the TV frame, the wall and the furniture, stays exactly as it is.\n Do not change the framing, the camera position or the scale of anything.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.09385108947753906,
+    "editable": 290658,
+    "soft": 4572,
+    "protected": 2850498
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2048,
+      "height": 1536
+    },
+    "target": {
+      "width": 2048,
+      "height": 1536
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 54 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0667,
+    "basis": "1 × salida 2048x1536 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 91.127,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.71,
+        "bestError": 2.71,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        7.9,
+        9.47,
+        6.58
+      ],
+      "protected": {
+        "pixels": 2850498,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 290658,
+        "maxDelta": 238,
+        "meanDelta": 91.907,
+        "worst": {
+          "x": 1603,
+          "y": 403
+        }
+      },
+      "seam": {
+        "pixels": 4572,
+        "maxDelta": 171,
+        "meanDelta": 41.51,
+        "worst": {
+          "x": 1691,
+          "y": 541
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 2850498,
+        "maxDelta": 245,
+        "meanDelta": 6.743,
+        "worst": {
+          "x": 1635,
+          "y": 396
+        }
+      },
+      "outputUsd": 0.0667,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3218,
+        "input_tokens_details": {
+          "image_tokens": 2904,
+          "text_tokens": 314
+        },
+        "output_tokens": 2223,
+        "output_tokens_details": {
+          "image_tokens": 2223,
+          "text_tokens": 0
+        },
+        "total_tokens": 5441
+      },
+      "meta": {
+        "size": "2048x1536",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

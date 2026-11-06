@@ -1,0 +1,122 @@
+{
+  "schema": "glitch.edition-provenance.v1",
+  "edition": null,
+  "editionKind": "flash",
+  "slug": "images-2-6",
+  "example": false,
+  "manifest": {
+    "file": "glitch-flash-manifest.json",
+    "sha256": "f80c8e9e8a2844162a246ede11da0f478f7b8041bf2e755793dae47c71b896a4"
+  },
+  "coverTemplate": null,
+  "axis": {
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-brand-assets": "0.4.25",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-ui-contracts": "0.3.40"
+  },
+  "narratorFont": {
+    "family": "Guttery",
+    "status": "licensed",
+    "sha256": "fbf6b68787b5590b24219cc199975305b97927d3794c2616f6f99303ce2bc6cc"
+  },
+  "linkedinLimits": {
+    "maxBytes": 104857600,
+    "maxPages": 300,
+    "uniformPageSize": true,
+    "source": "https://www.linkedin.com/help/linkedin/answer/a518909",
+    "verifiedOn": "2026-09-27"
+  },
+  "assets": [
+    {
+      "ref": "photo:cover",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/plates/GF26-A.png",
+        "sha256": "e692d2b1b77c4cb0ee8e3fb2cba4cd78902517a2cc66e26262e014972f23c2d1"
+      },
+      "processed": {
+        "sha256": "604b77f464f5d66eb300e761d26fc393d56acaa0c5168a76f9f693d577bee232",
+        "width": 1080,
+        "height": 660
+      }
+    },
+    {
+      "ref": "photo:news",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/plates/GF26-A.png",
+        "sha256": "e692d2b1b77c4cb0ee8e3fb2cba4cd78902517a2cc66e26262e014972f23c2d1"
+      },
+      "processed": {
+        "sha256": "7476facabe0887dc05b46dac03a1aebd4885519bb241f116b4aa68ee26ded532",
+        "width": 1080,
+        "height": 450
+      }
+    },
+    {
+      "ref": "photo:blog-banner",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/plates/GF26-A.png",
+        "sha256": "e692d2b1b77c4cb0ee8e3fb2cba4cd78902517a2cc66e26262e014972f23c2d1"
+      },
+      "processed": {
+        "sha256": "b3d3e89e79a5727bccb714a384e7b24cf0e62ba3b7daa7ec5d8016b9b39d83d7",
+        "width": 1100,
+        "height": 800
+      }
+    },
+    {
+      "ref": "photo:blog-news",
+      "kind": "photo",
+      "source": {
+        "path": "pruebas-propias/plates/GF26-A.png",
+        "sha256": "e692d2b1b77c4cb0ee8e3fb2cba4cd78902517a2cc66e26262e014972f23c2d1"
+      },
+      "processed": {
+        "sha256": "18ba52cfa785eb7ae01ce2aa79dcd5fc0fd3ec2e2ffdf7830dcce22ac186cee3",
+        "width": 1600,
+        "height": 600
+      }
+    }
+  ],
+  "fractures": {
+    "cover": {
+      "cells": 100,
+      "sha256": "f71e37f5ee47e777b34dee0af39c4e1a05333f8650b214b5a0adef7479e186d6"
+    },
+    "news": {
+      "cells": 103,
+      "sha256": "a1df4e92898c3138b81d51779346d21675e203987851d2879ff857a7dac5e01c"
+    },
+    "blog-banner": {
+      "cells": 144,
+      "sha256": "169dce919265dfcc412309d346a6a5c43ac0ca03f21779193e55713da689a20b"
+    },
+    "blog-news": {
+      "cells": 150,
+      "sha256": "5a93ec11f48de7990e2be0f166219f258f956d0080b93c71919dc3cbe5404900"
+    }
+  },
+  "outputs": {
+    "stills": {
+      "catalog": "glitch-stills",
+      "templates": [
+        "blog-banner:FlashBlogBanner",
+        "blog-news:FlashNewsBanner"
+      ],
+      "manifestSha256": "7cbfafe704ef06b0271f0e76b557e6b2ae3fad1ad703410b78978cd6b5954054",
+      "pngs": [
+        {
+          "file": "sueltas/01-blog-banner.png",
+          "sha256": "c51427b02c0b130df3d1e6b648d0ad807140403b41e09c308294b1cc6c254aa8"
+        },
+        {
+          "file": "sueltas/02-blog-news.png",
+          "sha256": "b0e61a6f3fbf73548c1a0fc6333cb0938709d9daa2500d00b9b3a13d2b4764e7"
+        }
+      ]
+    }
+  }
+}

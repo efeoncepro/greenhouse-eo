@@ -1,0 +1,23 @@
+{
+ "registro": "D",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the edge of the door frame",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "tipos-equipaje-v2",
+ "input": {
+  "id": "tipos-equipaje-v2",
+  "registro": "D",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "entrance door of an ordinary apartment",
+  "escena": "from the standing traveler's view, three pieces lined up from smallest to largest next to the front door: a backpack, a wheeled carry-on suitcase and a large checked suitcase, with a folded jacket on the backpack. The three must read clearly different in size; their tops sit in the upper half of the frame. It is the article's comparison made image",
+  "hora": "early morning",
+  "clima": "indoors, abundant natural light from a side window, open shadows, natural colour",
+  "primerPlano": "the edge of the door frame",
+  "borde": "lower-left corner",
+  "prohibir": "recognisable luggage brands, airline tags, measuring tapes or figures, people",
+  "extra": "COMPOSITION, MEASURED: the three pieces stand together in the centre of the frame, between 32% and 68% of the width; the top of the tallest handle is at 16% of the frame height and the wheels at 48%. The lower half is empty floor and a doormat, calm and mid-dark; the door frame edge enters only at the lower-left corner. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 50 mm equivalent, close lived detail of hands and objects, intimate without isolating them from the place."
+ }
+}

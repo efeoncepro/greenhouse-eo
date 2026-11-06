@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "5b6722883ea6",
+  "key": "5b6722883ea664c7367b499f39e03929c7355bb2f19f1527d083f859b811d720",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:22:44.722Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/stgo-road/inpaint/905e1dc124dc/candidate-1.png",
+    "imageSha256": "8c4b8ac22c397cab1722eee1e6419b19e7292b1bf043ed24640438a1c368b7db",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/stgo-bush-mask.png",
+    "maskSha256": "e37bf3ac4efb4a1f674e44593a8c3fdcb8ed740f5f235f7547dd21bf5a5e1868",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "In the bottom-left corner, only the leaves of a roadside bush very close to the lens are out of focus, as soft warm bokeh; everywhere else in this area the asphalt avenue, the kerb and the lane dashes are in SHARP FOCUS, matching the sharp road on the right. The boundary between the blurred bush and the sharp road follows the natural rounded outline of the bush leaves, never a straight vertical line. Same dusk light, same wet reflections, no people, no lettering.",
+    "providerPrompt": "In the bottom-left corner, only the leaves of a roadside bush very close to the lens are out of focus, as soft warm bokeh; everywhere else in this area the asphalt avenue, the kerb and the lane dashes are in SHARP FOCUS, matching the sharp road on the right. The boundary between the blurred bush and the sharp road follows the natural rounded outline of the bush leaves, never a straight vertical line. Same dusk light, same wet reflections, no people, no lettering."
+  },
+  "mask": {
+    "touchedFraction": 0.10963396990740741,
+    "editable": 0,
+    "soft": 909348,
+    "protected": 7385052
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 30 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 31.287,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.71,
+        "bestError": 4.71,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7385052,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 909348,
+        "maxDelta": 206,
+        "meanDelta": 31.287,
+        "worst": {
+          "x": 649,
+          "y": 1239
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7385052,
+        "maxDelta": 235,
+        "meanDelta": 17.933,
+        "worst": {
+          "x": 737,
+          "y": 853
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1625,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 117
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3468
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

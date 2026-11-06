@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "juncos o pastizal de ribera",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "buenos-aires-playas",
+ "input": {
+  "id": "buenos-aires-playas",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "costa del Río de la Plata en la Reserva Ecológica Costanera Sur, Buenos Aires",
+  "escena": "la orilla de la Reserva Ecológica Costanera Sur con el Río de la Plata color café que se extiende hasta el horizonte, sin otra costa a la vista; juncos y vegetación de ribera a los lados; una viajera de pie en la orilla, sin meterse al agua, mira el río. Debe leerse como costa de río, no como playa de mar. Personas: la viajera de espaldas o de perfil, quieta, sin pose ni mirada al lente; si aparecen otros visitantes, lejanos, caminando o en bicicleta por el sendero; nadie dentro del agua; ningún rostro identificable",
+  "hora": "final de la tarde de verano, cielo despejado o con nubes altas",
+  "clima": "luz cálida abundante, sombras abiertas y altas luces del cielo conservadas",
+  "primerPlano": "juncos o pastizal de ribera",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin agua azul ni turquesa (el río es café), sin bañistas en el agua, sin arena de playa caribeña, sin carteles legibles de la Reserva",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "costa del Río de la Plata en la Reserva Ecológica Costanera Sur, Buenos Aires (its real forms, scale and spatial relationships)"
+ }
+}

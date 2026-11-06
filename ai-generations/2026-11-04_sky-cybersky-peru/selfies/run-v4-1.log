@@ -1,0 +1,23 @@
+  $ costo estimado ≈ USD 0.527 (7 × 2511 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/ayacucho.png …
+  ✓ 3183KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 541 (img 0 · txt 541) · out 2511 · total 3052
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/cusco.png …
+  ✓ 3422KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 541 (img 0 · txt 541) · out 2511 · total 3052
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/juliaca.png …
+  ✓ 3265KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 554 (img 0 · txt 554) · out 2511 · total 3065
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/talara.png …
+  ✓ 3305KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 562 (img 0 · txt 562) · out 2511 · total 3073
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/tacna.png …
+  ✓ 3048KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 529 (img 0 · txt 529) · out 2511 · total 3040
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/buenos-aires.png …
+  ✓ 3268KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 555 (img 0 · txt 555) · out 2511 · total 3066
+→ ./ai-generations/2026-11-04_sky-cybersky-peru/selfies/fotos-v4/santiago.png …
+  ✓ 3244KB · gpt-image-2.5-flare · 1536x1536 · high · clave personal
+    usage: in 526 (img 0 · txt 526) · out 2511 · total 3037
+done
