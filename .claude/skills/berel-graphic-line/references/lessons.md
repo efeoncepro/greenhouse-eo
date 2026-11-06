@@ -410,6 +410,33 @@
 - **Dónde quedó:** [photography.md](photography.md) §6 y §6 quater, [marker-grid.md](marker-grid.md) §9,
   [qa-review.md](qa-review.md) §2, [video.md](video.md) §5 ter. **Documental.**
 
+## 2026-11-05/06 · Rayados N4: la silla mal construida y un inpaint que cambió el muro
+
+- **Citas:** «no se generó bien la silla»; sobre la primera corrección: «hay una madera que se ve mal al frente de la
+  silla»; sobre la segunda: «te equivocaste con el inpaint».
+- **Qué pasó:** la silla del escritorio del plate N4 tenía el respaldo flotando y las patas traseras fundidas con las del
+  escritorio. La primera corrección con inpaint (`gpt-image-2.6-flare` con máscara) dio una silla con el poste del respaldo
+  bajando por delante del asiento como pata delantera: una pieza imposible. La segunda arregló la silla pero **repintó el
+  muro detrás**: la franja azul, que termina recta en x = 1811 de 2048 desde el techo hasta el escritorio, se ensanchó bajo
+  la cubierta y tapó la pared blanca hasta el zócalo. La zona protegida quedó idéntica bit a bit y el error estaba
+  **dentro** de la máscara, así que el verificador del comando no podía verlo. Lo entregué sin compararlo con el original.
+  Además, una medición de «azul» con umbral `b − r > 40` dio 0 % incluso en el candidato malo: en sombra el azul no
+  cruza ese umbral.
+- **Regla:**
+  1. Para rehacer un mueble se describe su construcción física: cuántas patas, de dónde salen los postes del respaldo
+     (siempre de las patas traseras), que las patas delanteras terminan en el asiento y que ninguna pieza cruza por
+     delante de él. El modelo puede elegir otra orientación (aquí, la silla vista desde atrás); se acepta si es coherente.
+  2. Antes de editar, **mide los bordes del fondo que la máscara va a cubrir** (dónde termina cada franja, el zócalo) y
+     escríbelos en el prompt: «el muro detrás no cambia; la franja termina en el mismo borde vertical que arriba; a la
+     derecha el muro sigue blanco hasta el zócalo».
+  3. Después de editar, compara **antes y después lado a lado** en la zona de la máscara, mirando el píxel; no basta con el
+     PASS del comando ni con un umbral de color. Elige el candidato cuyo borde coincide con el medido.
+  4. Componer piezas Berel exige que el checkout del Workbench esté en una rama que tenga los jobs (`main` o una rama
+     Berel). En la rama de SKY no existen `projects/berel/<pieza>/jobs/`. Nunca encadenes `componer.mjs` con `|| true`:
+     esconde el `ENOENT` y entonces lees una corrida vieja como si fuera nueva.
+- **Dónde quedó:** [workflow.md](workflow.md) §5 bis y [qa-review.md](qa-review.md). Plate
+  `rayados-n4-recamara-playera-silla.png`; jobs en el PR #34 del Workbench. **Documental.**
+
 ## Pendientes que no son lecciones todavía
 
 - Confirmar con Berel `#B3153A` como color oficial, el registro fotográfico (hora dorada vs. luz de día) y la leyenda de tonos.

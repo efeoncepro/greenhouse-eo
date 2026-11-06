@@ -66,6 +66,10 @@ Revisa cada pieza, en este orden:
       respalde (`photography.md` §6 ter).
 - [ ] **Objeto agregado sobre un patrón:** el patrón (franjas, azulejo) sigue continuo detrás y alrededor del objeto;
       la caja del objeto no corta su marco; 0 píxeles distintos fuera de objeto + sombra (`photography.md` §6 quater).
+- [ ] **Zona editada con inpaint** (2026-11-06): antes y después lado a lado al 100 %. El fondo bajo la máscara conserva
+      sus bordes (la franja termina en el mismo x que fuera de la máscara; el zócalo y la pared blanca siguen). Cada
+      mueble rehecho es físicamente posible: patas completas, postes que salen de las patas traseras, nada que cruce por
+      delante del asiento. El PASS del comando no cubre esto (`workflow.md` §5 bis).
 
 Si un punto falla, no se «acepta con nota»: se corrige el plate, el foco (`photo.focal`), el titular
 o el color, y se vuelve a componer.
