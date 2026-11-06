@@ -4,13 +4,13 @@
   "surface": "deck",
   "format": "16x9",
   "use": "proposal",
-  "line": "revenue-hubspot",
-  "theme": "dark",
-  "role": "content",
-  "recipe": "content-bullets",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-why-us",
+  "theme": "light",
   "voice": {
-    "eyebrow": "Soporte y nivel de servicio",
-    "question": "Un incidente crítico se atiende en",
+    "eyebrow": "Soporte y SLA",
+    "question": "Lo crítico, en",
     "answer": [
       "1 hora"
     ]
@@ -19,22 +19,37 @@
     "sections": 4,
     "current": 3
   },
-  "items": [
+  "body": "Guardia permanente para lo crítico y un backlog mensual con indicadores para todo lo demás.",
+  "figures": [
     {
-      "title": "S1 Crítico · ≤ 1 h",
-      "desc": "Caída o incidente de seguridad: guardia permanente, contención en 4 h e informe de causa raíz."
+      "value": "≤ 1 h",
+      "label": "S1 crítico: caída o incidente de seguridad",
+      "source": "SLA de esta propuesta"
     },
     {
-      "title": "S2 Alto · ≤ 4 h",
-      "desc": "Función clave degradada, como Outlook o los registros a Wazuh: resolución en 2 días hábiles."
+      "value": "≤ 4 h",
+      "label": "S2 alto: función clave degradada",
+      "source": "SLA de esta propuesta"
     },
     {
-      "title": "S3 Medio · ≤ 1 día",
-      "desc": "Error de un reporte o de un usuario: resolución en 5 días hábiles."
+      "value": "≤ 1 día",
+      "label": "S3 medio: error de un reporte o usuario",
+      "source": "SLA de esta propuesta"
     },
     {
-      "title": "S4 Bajo · ≤ 2 días",
-      "desc": "Consultas y mejoras, planificadas en el backlog mensual con indicadores de servicio."
+      "value": "≤ 2 días",
+      "label": "S4 bajo: consultas y mejoras",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "4 h",
+      "label": "para contener un incidente S1",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "Mensual",
+      "label": "informe con indicadores de servicio",
+      "source": "SLA de esta propuesta"
     }
   ],
   "selected": 1,

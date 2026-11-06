@@ -6,12 +6,13 @@
   "theme": "dark",
   "role": "cover",
   "recipe": "cover-proposal",
-  "layout": "orbit",
+  "use": "proposal",
+  "layout": "dawn",
+  "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Propuesta técnica · Wherex N.º 428823",
-    "question": "¿Un CRM para todo el equipo?",
+    "question": "Propuesta",
     "answer": [
-      "Propuesta",
       "CRM HubSpot"
     ]
   },
@@ -21,11 +22,6 @@
     "label": "Efeonce",
     "participantKind": "role"
   },
-  "column": {
-    "topPx": 220
-  },
-  "line": "revenue-hubspot",
-  "use": "proposal",
   "clientLogo": {
     "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/assets/fiordo-austral-logo-web.png",
     "alt": "Fiordo Austral"

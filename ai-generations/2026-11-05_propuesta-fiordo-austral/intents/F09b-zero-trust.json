@@ -3,41 +3,71 @@
   "version": "0.1.2",
   "surface": "deck",
   "format": "16x9",
+  "role": "method",
   "use": "proposal",
+  "recipe": "method-identity-consent",
   "line": "revenue-hubspot",
   "theme": "dark",
-  "role": "content",
-  "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Zero Trust con Entra ID",
     "question": "Cada acceso al CRM pasa por",
     "answer": [
-      "Entra ID"
+      "Entra",
+      "ID"
     ]
   },
-  "progress": {
-    "sections": 4,
-    "current": 2
-  },
-  "items": [
+  "body": "SSO obligatorio, MFA y **mínimo privilegio**: cada permiso se concede, se registra y se revoca.",
+  "note": "Ejemplo ilustrativo · los permisos se definen con su equipo de TI",
+  "sources": [
+    "Outlook",
+    "Teams",
+    "App móvil",
+    "Navegador",
+    "API"
+  ],
+  "profileTitle": "Un usuario, 5 accesos",
+  "channels": [
     {
-      "title": "Identidad",
-      "desc": "SSO SAML con Microsoft Entra ID, obligatorio para todos, y altas y bajas por SCIM."
+      "channel": "Contactos",
+      "purpose": "Leer",
+      "permitted": true
     },
     {
-      "title": "Acceso",
-      "desc": "MFA resistente al phishing, Acceso Condicional y control de sesión desde Entra ID."
+      "channel": "Negocios",
+      "purpose": "Editar",
+      "permitted": true
     },
     {
-      "title": "Permisos",
-      "desc": "Mínimo privilegio por usuario y equipo, sin cuentas compartidas ni exportación libre."
+      "channel": "Exportar",
+      "purpose": "Base completa",
+      "permitted": false
     },
     {
-      "title": "Registro",
-      "desc": "Inicios de sesión, seguridad y cambios enviados a Wazuh por un colector de Efeonce."
+      "channel": "Ajustes",
+      "purpose": "Administrar",
+      "permitted": false
     }
   ],
-  "selected": 3,
+  "activations": [
+    {
+      "icon": "sales",
+      "title": "Vendedor",
+      "detail": "Sus clientes ✓",
+      "channel": "Contactos"
+    },
+    {
+      "icon": "sales",
+      "title": "Etapa",
+      "detail": "Con aprobación ✓",
+      "channel": "Negocios"
+    },
+    {
+      "icon": "data",
+      "title": "Wazuh",
+      "detail": "Todo queda registrado",
+      "channel": "Negocios"
+    }
+  ],
   "selection": {
     "target": "object",
     "label": "TI",

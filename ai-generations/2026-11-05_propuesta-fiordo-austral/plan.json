@@ -3,12 +3,13 @@
   "line": "revenue-hubspot",
   "slides": [
     {
-      "recipeId": "cover-proposal-orbit",
+      "recipeId": "cover-proposal-dawn",
       "purpose": "01 · portada"
     },
     {
-      "recipeId": "content-text",
-      "purpose": "02 · lo que entendimos"
+      "recipeId": "section-cine-purpose",
+      "purpose": "02 · lo que entendimos",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA02-cuatro-regiones.png"
     },
     {
       "recipeId": "content-service-lanes",
@@ -40,11 +41,11 @@
       "purpose": "09 · seguridad"
     },
     {
-      "recipeId": "content-bullets",
+      "recipeId": "method-identity-consent",
       "purpose": "11 · zero trust"
     },
     {
-      "recipeId": "content-bullets",
+      "recipeId": "method-score-ring",
       "purpose": "12 · matriz de cumplimiento"
     },
     {
@@ -79,7 +80,7 @@
       "purpose": "14 · capacitación"
     },
     {
-      "recipeId": "content-bullets",
+      "recipeId": "decision-why-us",
       "purpose": "15 · soporte y SLA"
     },
     {
@@ -90,10 +91,6 @@
       "recipeId": "section-cine-team",
       "purpose": "17 · equipo",
       "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
-    },
-    {
-      "recipeId": "content-bullets",
-      "purpose": "18 · costo total"
     },
     {
       "recipeId": "content-pricing-live",

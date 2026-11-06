@@ -1,6 +1,8 @@
 """Propuesta Fiordo Austral (Wherex 428823) — intents de las láminas, sobre los intents aprobados del deck HubSpot
 (2026-10-06) y de la propuesta Assetplan (2026-10-20). Copy desde PROPUESTA-FIORDO-AUSTRAL-428823-PARA-CLAUDE-DESIGN.md.
 Edición: Sales Hub Professional («Pro esbelto», Julio 05/11/2026). Voz (05/11, Julio: «la dinámica de preguntas y respuestas se siente absurda y forzada»): par pregunta–respuesta sólo en 04, 14 y 23; el resto, anillo arriba y esfera abajo como frase en dos tiempos (delta 2026-10-25 de La órbita).
+Impacto visual (06/11, Julio: «eleva el impacto visual considerablemente… todas»): portada `dawn`, 02 a sección de cine con foto propia
+(FA02), Zero Trust a identidad y permisos, matriz a anillo, SLA a muro de cifras, 18 costo retirada (su contenido vive en 19).
 Uso (desde la raíz del repo): python3 ai-generations/2026-11-05_propuesta-fiordo-austral/build-intents.py
 """
 import copy
@@ -35,25 +37,27 @@ def add(key, recipe_id, intent, purpose):
 
 
 # 01 · Portada
-d = base(HS, 'P01-portada.json')
-d['voice'] = {'eyebrow': 'Propuesta técnica · Wherex N.º 428823', 'question': '¿Un CRM para todo el equipo?', 'answer': ['Propuesta', 'CRM HubSpot']}
+d = base(EX, 'deck-cover-proposal-dawn-intent.json')
+# `dawn` (06/11): la órbita sale como el sol con el logo del cliente dentro. render-portada.ts + portada-dawn.css oculta la
+# pregunta (la portada de propuesta dice lo que es); el eyebrow dice «Propuesta técnica».
+d['voice'] = {'eyebrow': 'Propuesta técnica · Wherex N.º 428823', 'question': 'Propuesta', 'answer': ['CRM HubSpot']}
 d['body'] = 'Preparada para **Pesquera Fiordo Austral** · Noviembre 2026'
 d['selection'] = {'target': 'client-logo', 'label': 'Efeonce', 'participantKind': 'role'}
 d['clientLogo'] = {'path': 'ai-generations/2026-11-05_propuesta-fiordo-austral/assets/fiordo-austral-logo-web.png', 'alt': 'Fiordo Austral'}
-add('F01-portada', 'cover-proposal-orbit', d, '01 · portada')
+add('F01-portada', 'cover-proposal-dawn', d, '01 · portada')
 
 # 02 · Lo que entendimos
-d = base(AP, 'A02-necesidad.json')
-d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': 'Cuatro regiones, diez usuarios,', 'answer': ['un CRM']}
-d['progress'] = {'sections': 4, 'current': 1}
-d['body'] = 'Vender contra la especificación de cada cliente, en terreno y en cuatro regiones.'
-d['points'] = [
-    {'name': '4 regiones', 'text': 'Asia, Europa, Norteamérica y Sudamérica'},
-    {'name': '6 plantas', 'text': 'harina, aceite e hidrolizados de salmón'},
-    {'name': '10 usuarios', 'text': 'en el CRM, según las bases'},
+# 06/11: de content-text a sección de cine con foto propia (FA02: cuatro hilos de luz llegan a una sola esfera).
+d = base(HS, 'B26-salida.json')
+d['voice'] = {'eyebrow': 'Lo que entendimos', 'question': 'Cuatro regiones,', 'answer': ['un CRM']}
+d['body'] = 'Vender contra la especificación de cada cliente, en terreno y en **cuatro regiones**.'
+d['pillars'] = [
+    {'label': '4 regiones', 'text': 'Asia, Europa, Norteamérica y Sudamérica.'},
+    {'label': '6 plantas', 'text': 'harina, aceite e hidrolizados de salmón.'},
+    {'label': '10 usuarios', 'text': 'en el CRM, según las bases.'},
 ]
-d['selection'] = {'target': 'answer', 'label': 'Comercial', 'participantKind': 'department'}
-add('F02-entendimos', 'content-text', d, '02 · lo que entendimos')
+d['photo'] = {'register': 'cine', 'subject': 'person', 'plateRef': 'ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA02-cuatro-regiones.png', 'alt': 'Un director de Efeonce sostiene en la palma una esfera de luz a la que llegan cuatro hilos desde cuatro direcciones'}
+add('F02-entendimos', 'section-cine-purpose', d, '02 · lo que entendimos')
 
 # 03 · Qué cubre el CRM
 d = base(HS, 'P05-servicios.json')
@@ -168,32 +172,43 @@ d['ownTeam'] = {'kicker': '¿Y nuestro equipo de TI?', 'title': 'Decide con noso
 add('F09-seguridad', 'decision-difference', d, '09 · seguridad')
 
 # 09b · Zero Trust con Entra ID
-d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': 'Cada acceso al CRM pasa por', 'answer': ['Entra ID']}
-d['progress'] = {'sections': 4, 'current': 2}
-d['items'] = [
-    {'title': 'Identidad', 'desc': 'SSO SAML con Microsoft Entra ID, obligatorio para todos, y altas y bajas por SCIM.'},
-    {'title': 'Acceso', 'desc': 'MFA resistente al phishing, Acceso Condicional y control de sesión desde Entra ID.'},
-    {'title': 'Permisos', 'desc': 'Mínimo privilegio por usuario y equipo, sin cuentas compartidas ni exportación libre.'},
-    {'title': 'Registro', 'desc': 'Inicios de sesión, seguridad y cambios enviados a Wazuh por un colector de Efeonce.'},
+# 06/11: de viñetas a identidad y permisos: una identidad de Entra ID, cinco accesos, permisos concedidos y negados y
+# su registro. (La escalera plana no entra: es variante de la de 08; `section-lens` no admite foto cine.)
+d = base(EX, 'deck-method-identity-consent-intent.json')
+d['use'] = 'proposal'
+d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': 'Cada acceso al CRM pasa por', 'answer': ['Entra', 'ID']}
+d['body'] = 'SSO obligatorio, MFA y **mínimo privilegio**: cada permiso se concede, se registra y se revoca.'
+d['note'] = 'Ejemplo ilustrativo · los permisos se definen con su equipo de TI'
+d['sources'] = ['Outlook', 'Teams', 'App móvil', 'Navegador', 'API']
+d['profileTitle'] = 'Un usuario, 5 accesos'
+d['channels'] = [
+    {'channel': 'Contactos', 'purpose': 'Leer', 'permitted': True},
+    {'channel': 'Negocios', 'purpose': 'Editar', 'permitted': True},
+    {'channel': 'Exportar', 'purpose': 'Base completa', 'permitted': False},
+    {'channel': 'Ajustes', 'purpose': 'Administrar', 'permitted': False},
 ]
-d['selected'] = 3
+d['activations'] = [
+    {'icon': 'sales', 'title': 'Vendedor', 'detail': 'Sus clientes ✓', 'channel': 'Contactos'},
+    {'icon': 'sales', 'title': 'Etapa', 'detail': 'Con aprobación ✓', 'channel': 'Negocios'},
+    {'icon': 'data', 'title': 'Wazuh', 'detail': 'Todo queda registrado', 'channel': 'Negocios'},
+]
 d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
-add('F09b-zero-trust', 'content-bullets', d, '11 · zero trust')
+add('F09b-zero-trust', 'method-identity-consent', d, '11 · zero trust')
 
 # 09c · Matriz de cumplimiento (resumen)
-d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Matriz de cumplimiento', 'question': 'Los 74 requisitos, respondidos', 'answer': ['uno a uno']}
-d['progress'] = {'sections': 4, 'current': 2}
-d['items'] = [
-    {'title': '29 · Cumple', 'desc': 'Requisitos cubiertos por Sales Hub Professional con su configuración.'},
-    {'title': '33 · Parcialmente', 'desc': 'Cubiertos con controles compensatorios de Efeonce, con su limitación declarada.'},
-    {'title': '10 · Desarrollo', 'desc': 'Colector Wazuh, respaldo inmutable, sesión única y recuperación, en la fase 1.'},
-    {'title': '2 · No cumple', 'desc': 'RTO/RPO y ventanas de mantenimiento: HubSpot no los publica; pedimos su declaración.'},
+# 06/11: de viñetas a anillo. La vuelta son 100: los pesos son el % de los 74 (29, 33, 10 y 2 → 39, 45, 13 y 3).
+d = base(EX, 'deck-method-score-ring-intent.json')
+d['voice'] = {'eyebrow': 'Matriz de cumplimiento', 'question': 'Los 74 requisitos, uno a', 'answer': ['uno']}
+d['body'] = 'Cada requisito de seguridad de las bases, con su respuesta y su evidencia en el anexo.'
+d['dimensions'] = [
+    {'name': '% cumple con Sales Hub', 'weight': 39},
+    {'name': '% con control de Efeonce', 'weight': 45},
+    {'name': '% en desarrollo, fase 1', 'weight': 13},
+    {'name': '% no cumple, declarado', 'weight': 3},
 ]
-d['selected'] = 3
-d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
-add('F09c-matriz', 'content-bullets', d, '12 · matriz de cumplimiento')
+d['total'] = {'value': '74', 'label': 'requisitos respondidos', 'source': 'Matriz de cumplimiento, anexo de esta propuesta'}
+d['ctaButton'] = {'text': 'Ver la matriz completa', 'descriptor': 'Anexo · 74 requisitos'}
+add('F09c-matriz', 'method-score-ring', d, '12 · matriz de cumplimiento')
 
 # 09d · Disponibilidad (dato de las bases con fuente)
 d = base(EX, 'deck-content-measure-intent.json')
@@ -238,6 +253,7 @@ add('F10-residencia', 'content-markets', d, '10 · residencia de datos')
 d = base(HS, 'B26-salida.json')
 d['voice'] = {'eyebrow': 'Sin amarras', 'question': 'Si se van, se llevan', 'answer': ['sus datos']}
 d['body'] = 'Sus datos son suyos: entran a HubSpot con **orden** y salen igual de completos.'
+d['pillars'][0]['text'] = 'registros y propiedades cuando lo necesiten.'  # 06/11: la base venía en tuteo
 add('F11-salida', 'section-cine-purpose', d, '11 · salida')
 
 # 12 · Cronograma
@@ -289,18 +305,25 @@ d['stats'] = [
 add('F14-capacitacion', 'content-day-live-library', d, '14 · capacitación')
 
 # 15 · Soporte y SLA
-d = base(AP, 'A051-tiempos.json')
-d['voice'] = {'eyebrow': 'Soporte y nivel de servicio', 'question': 'Un incidente crítico se atiende en', 'answer': ['1 hora']}
+# 06/11: de viñetas a muro de cifras (sólo existe en claro: lámina de Efeonce en growth, como 09e).
+d = base(EX, 'deck-decision-why-us-intent.json')
+d['theme'] = 'light'
+d['line'] = 'growth'
+d['voice'] = {'eyebrow': 'Soporte y SLA', 'question': 'Lo crítico, en', 'answer': ['1 hora']}
 d['progress'] = {'sections': 4, 'current': 3}
-d['items'] = [
-    {'title': 'S1 Crítico · ≤ 1 h', 'desc': 'Caída o incidente de seguridad: guardia permanente, contención en 4 h e informe de causa raíz.'},
-    {'title': 'S2 Alto · ≤ 4 h', 'desc': 'Función clave degradada, como Outlook o los registros a Wazuh: resolución en 2 días hábiles.'},
-    {'title': 'S3 Medio · ≤ 1 día', 'desc': 'Error de un reporte o de un usuario: resolución en 5 días hábiles.'},
-    {'title': 'S4 Bajo · ≤ 2 días', 'desc': 'Consultas y mejoras, planificadas en el backlog mensual con indicadores de servicio.'},
+d['body'] = 'Guardia permanente para lo crítico y un backlog mensual con indicadores para todo lo demás.'
+SLA = 'SLA de esta propuesta'
+d['figures'] = [
+    {'value': '≤ 1 h', 'label': 'S1 crítico: caída o incidente de seguridad', 'source': SLA},
+    {'value': '≤ 4 h', 'label': 'S2 alto: función clave degradada', 'source': SLA},
+    {'value': '≤ 1 día', 'label': 'S3 medio: error de un reporte o usuario', 'source': SLA},
+    {'value': '≤ 2 días', 'label': 'S4 bajo: consultas y mejoras', 'source': SLA},
+    {'value': '4 h', 'label': 'para contener un incidente S1', 'source': SLA},
+    {'value': 'Mensual', 'label': 'informe con indicadores de servicio', 'source': SLA},
 ]
 d['selected'] = 1
 d['selection'] = {'target': 'object', **SEL}
-add('F15-soporte', 'content-bullets', d, '15 · soporte y SLA')
+add('F15-soporte', 'decision-why-us', d, '15 · soporte y SLA')
 
 # 16 · Operación
 d = base(HS, 'P14-operacion.json')
@@ -329,24 +352,13 @@ d['voice'] = {'eyebrow': 'Quién lo implementa', 'question': 'Implementa un equi
 d['body'] = 'Un **equipo asignado**: consultor líder, implementador, especialistas en integraciones, seguridad y datos, y gestión de proyecto.'
 add('F17-equipo', 'section-cine-team', d, '17 · equipo')
 
-# 18 · Costo total
-d = base(HS, 'P-costo.json')
-d['voice'] = {'eyebrow': 'Costo total', 'question': 'Licencias HubSpot y servicios Efeonce,', 'answer': ['por separado']}
-d['progress'] = {'sections': 4, 'current': 4}
-d['items'] = [
-    {'title': 'Licencias HubSpot', 'desc': '10 licencias de Sales Hub Professional: US$ 12.000 al año, facturadas por HubSpot.'},
-    {'title': 'Onboarding de HubSpot', 'desc': 'No aplica cuando implementa un partner certificado: US$ 0.'},
-    {'title': 'Servicios Efeonce', 'desc': 'Implementación, capacitación y soporte: US$ 9.900 + IVA el primer año.'},
-    {'title': 'Licencias Microsoft', 'desc': 'Las que falten, como Entra ID P1, declaradas antes de firmar.'},
-]
-d['selected'] = 3
-d['selection'] = {'target': 'object', **SEL}
-add('F18-costo', 'content-bullets', d, '18 · costo total')
+# 18 · Costo total: retirada el 06/11. Licencias HubSpot, onboarding US$ 0 y servicios ya están en 19; las licencias
+# Microsoft que falten pasan al cuerpo de 19.
 
 # 19 · Inversión (content-pricing live; montos reales con render-pricing-real.ts, como Assetplan)
 d = base(AP, 'A078-inversion-cotizacion.json')
 d['voice'] = {'eyebrow': 'Inversión', 'question': '¿Cuánto invertimos?', 'answer': ['US$ 9.900']}
-d['body'] = 'Servicios Efeonce, más IVA. Las licencias van **aparte**: las factura HubSpot directo a Fiordo Austral.'
+d['body'] = 'Servicios Efeonce, más IVA. Las licencias de HubSpot y de Microsoft van **aparte**: las factura cada fabricante.'
 q = d['quote']
 q['kicker'] = 'Oferta · Wherex 428823'
 q['title'] = 'Para Fiordo Austral'

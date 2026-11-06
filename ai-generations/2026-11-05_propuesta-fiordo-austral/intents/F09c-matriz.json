@@ -3,44 +3,44 @@
   "version": "0.1.2",
   "surface": "deck",
   "format": "16x9",
+  "role": "method",
   "use": "proposal",
+  "recipe": "method-score-ring",
   "line": "revenue-hubspot",
   "theme": "dark",
-  "role": "content",
-  "recipe": "content-bullets",
   "voice": {
     "eyebrow": "Matriz de cumplimiento",
-    "question": "Los 74 requisitos, respondidos",
+    "question": "Los 74 requisitos, uno a",
     "answer": [
-      "uno a uno"
+      "uno"
     ]
   },
-  "progress": {
-    "sections": 4,
-    "current": 2
-  },
-  "items": [
+  "body": "Cada requisito de seguridad de las bases, con su respuesta y su evidencia en el anexo.",
+  "dimensions": [
     {
-      "title": "29 · Cumple",
-      "desc": "Requisitos cubiertos por Sales Hub Professional con su configuración."
+      "name": "% cumple con Sales Hub",
+      "weight": 39
     },
     {
-      "title": "33 · Parcialmente",
-      "desc": "Cubiertos con controles compensatorios de Efeonce, con su limitación declarada."
+      "name": "% con control de Efeonce",
+      "weight": 45
     },
     {
-      "title": "10 · Desarrollo",
-      "desc": "Colector Wazuh, respaldo inmutable, sesión única y recuperación, en la fase 1."
+      "name": "% en desarrollo, fase 1",
+      "weight": 13
     },
     {
-      "title": "2 · No cumple",
-      "desc": "RTO/RPO y ventanas de mantenimiento: HubSpot no los publica; pedimos su declaración."
+      "name": "% no cumple, declarado",
+      "weight": 3
     }
   ],
-  "selected": 3,
-  "selection": {
-    "target": "object",
-    "label": "TI",
-    "participantKind": "department"
+  "total": {
+    "value": "74",
+    "label": "requisitos respondidos",
+    "source": "Matriz de cumplimiento, anexo de esta propuesta"
+  },
+  "ctaButton": {
+    "text": "Ver la matriz completa",
+    "descriptor": "Anexo · 74 requisitos"
   }
 }
