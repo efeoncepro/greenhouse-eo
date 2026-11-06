@@ -23,6 +23,9 @@ const gif = (mk, kv, carpeta, suf) => {
   add(`${kv}.gif`, d + `BS_GIF_${suf}.gif`);
   // Sólo el GIF: el MP4 con el mismo nombre se veía como «exportado dos veces» (Daniela, 2026-11-05).
   add(`story-video/${kv}__story-video.mp4`, d + `BS_STORYVIDEO_${suf}.mp4`);
+  // Novena ronda (Daniela, Frame 2026-11-06: «el GIF no tiene audio»): un GIF no lleva sonido. Va el MP4 con el audio
+  // de la campaña junto al GIF, con sufijo _AUDIO para que no se lea como el mismo archivo exportado dos veces.
+  add(`${kv}_audio.mp4`, d + `BS_GIF_${suf}_AUDIO.mp4`);
 };
 // HM CL
 hph('HM CL', null, 'INTER');

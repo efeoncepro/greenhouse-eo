@@ -8,8 +8,30 @@ const P = {
      '<tspan x="32.2" y="17.58" font-family="Metric-Black, Metric" font-size="112" font-weight="800">000.000 </tspan>'],
     // El oscurecido izquierdo (Raster 4, opacidad .67) empieza en y=6 y deja una franja clara arriba.
     // Se estira 6 px hacia arriba (y=6 → −2, y=1350 → 1350 aprox.); su máscara se transforma con él.
-    ['<g mask="url(#mask)">', '<g mask="url(#mask)" transform="matrix(1 0 0 1.005952 0 -8.036)">']
+    ['<g mask="url(#mask)">', '<g mask="url(#mask)" transform="matrix(1 0 0 1.005952 0 -8.036)">'],
+    // Novena ronda (2026-11-06, Daniela): el sello de puntualidad del clúster venía sin el separador vertical
+    // entre la medalla y el texto. Se agrega con la misma geometría que en HM_CL_KV_INTER.
+    // Novena ronda (Daniela, Frame): el «00%» del badge del clúster iba 12 px más arriba que en HM_CL_KV_INTER y quedaba
+    // pegado a «CON». Se baja a la posición del KV de Chile internacional y «DCTO.» baja lo mismo.
+    ['translate(835.86 878.4) rotate(7.46)', 'translate(834.29 890.39) rotate(7.46)'],
+    ['translate(861.58 917.61) rotate(7.46)', 'translate(860.72 922.59) rotate(7.46)'],
+    ['translate(881.3 920.19) rotate(7.46)', 'translate(880.44 925.17) rotate(7.46)'],
+    ['translate(900.04 922.65) rotate(7.46)', 'translate(899.18 927.63) rotate(7.46)'],
+    ['</svg></svg>', '</svg><line x1="116.07" y1="1248.6" x2="116.07" y2="1301.74" fill="none" stroke="#fff" stroke-miterlimit="10" stroke-width=".34"/></svg>']
   ]
 };
 P['HM_CL_KV_ENCUENTRA.svg'] = P['HM_CL_KV_INTER_CLUSTER.svg'];
+// Novena ronda (Daniela, Frame, popup «Vuela por Chile»): «Chile» iba pegado a «VUELA POR» y el precio a la píldora
+// «DESDE». Ambos bajan hasta quedar centrados en su espacio (Chile entre el antetítulo y la píldora de origen; el
+// precio entre «DESDE» y «Por tramo…»). Se aplica al KV, de modo que popup, story y GIF quedan iguales.
+P['HM_CL_KV_DOM_CLUSTER.svg'] = [
+  ['translate(86.87 1048.72)', 'translate(86.87 1070.72)'],
+  ['<text transform="translate(541.23 1082.79)"', '<text transform="translate(541.23 1095.79)"']
+];
+// Costura de la flecha morada (novena ronda, 2026-11-06, Daniela: «una pequeña línea en la flecha morada en la
+// parte de la cola»): la flecha son tres formas que se tocan en x=537,61 y x=918,96, y el antialias deja una línea.
+// render.cjs ya ensanchaba el cuerpo 1 px por lado, pero sólo si el rect venía sin atributos extra (las variantes
+// de AR llevan transform y data-capa por brecha.cjs) y parts.cjs/layers.cjs no lo hacían: el popup y el GIF salían
+// con la línea. Ahora los tres scripts llaman a esta función.
+P.flecha = (svg) => svg.split('<rect x="537.61" y="879.81" width="381.35"').join('<rect x="536.61" y="879.81" width="383.35"');
 module.exports = P;

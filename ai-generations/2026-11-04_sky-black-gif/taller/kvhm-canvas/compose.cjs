@@ -47,6 +47,9 @@ async function correStory(n) {
   return Math.max(0, pb.x - (db.x + db.w) - BRECHA);
 }
 const has = (n, l) => fs.existsSync(PARTS + n + '__' + l + '.png');
+// Escala del logo en el popup cuando la lista necesita aire (novena ronda). «Vuela por el Perú» sigue la referencia de
+// Daniela: logo más chico y la lista de tres columnas más grande.
+const LOGO_CHICO = { HM_PE_KV_INTER_BANDERAS: 0.86, HM_PE_KV_ENCUENTRA: 0.86, HM_PE_KV_DOM_REGIONES: 0.76 };
 const P = (n, l) => PARTS + n + '__' + l + '.png';
 (async () => {
   const names = fs.readdirSync(PARTS).filter((f) => f.endsWith('__base.png')).map((f) => f.split('__')[0]).filter((n) => !only.length || only.includes(n)).sort();
@@ -83,11 +86,30 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
       } else if (has(n, 'lista')) {
         // Lista de banderas o regiones bajo el logo (variantes 2026-11-04): se escala para caber entre
         // el logo (termina en ~322) y el destino (empieza en ~684), con aire parejo arriba y abajo.
-        comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
-        const lb = await bbox(P(n, 'lista')), top = 336, bot = 664;
+        // Novena ronda (Daniela, Frame, popups de Perú internacional y «Encuentra destinos»): el logo va un poco más
+        // chico y más arriba para que las banderas no queden pegadas al logo ni al texto de abajo.
+        let top = 336;
+        if (LOGO_CHICO[n]) {
+          const gb = await bbox(P(n, 'logo')), k = LOGO_CHICO[n], y = gb.y - 14;
+          comp.push(await place(P(n, 'logo'), k, gb.x, gb.y, gb.x, y));
+          top = Math.round(y + gb.h * k + 34);
+        } else comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
+        const lb = await bbox(P(n, 'lista')), bot = 664;
         const sl = Math.min(1, (bot - top) / lb.h);
         comp.push(await place(P(n, 'lista'), sl, lb.x, lb.y, lb.x, Math.round(top + ((bot - top) - lb.h * sl) / 2)));
         comp.push(await place(P(n, 'destino'), s, 62, 1220, 62, PB));
+      } else if (n === 'HM_UY_KV_BANDERAS') {
+        // Novena ronda (Daniela, Frame): «Internacional» un poquito más grande y las banderas un poquito más arriba.
+        // El destino se arma por franjas del KV: antetítulo (935–975) al 88 %, título (1012–1061) al 98 % con su borde
+        // superior donde iba, y banderas (1115–1166) al 88 %, 14 px más arriba de donde caerían.
+        comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
+        const franja = async (y0, y1) => { const f = __dirname + '/_franja-' + y0 + '.png'; await sharp(P(n, 'destino')).extract({ left: 0, top: 0, width: 1080, height: 1350 }).composite([{ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="${y0}" fill="#000"/><rect y="${y1}" width="1080" height="${1350 - y1}" fill="#000"/></svg>`), blend: 'dest-out' }]).png().toFile(f); return f; };
+        const py = (y) => PB + (y - 1220) * s;
+        comp.push(await place(await franja(900, 990), s, 62, 1220, 62, PB));
+        const tit = await franja(990, 1090), tb = await bbox(tit), kt = 0.98;
+        comp.push(await place(tit, kt, 62, tb.y, 62, Math.round(py(tb.y))));
+        const ban = await franja(1090, 1200), bb = await bbox(ban);
+        comp.push(await place(ban, s, 62, bb.y, 62, Math.round(Math.max(py(bb.y) - 14, py(tb.y) + tb.h * kt + 22))));
       } else {
         comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
         comp.push(await place(P(n, 'destino'), s, 62, 1220, 62, PB));
@@ -106,7 +128,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         if (has(n, 'ubicacion')) comp.push(await place(P(n, 'ubicacion'), 1, 0, 0, 0, 0));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'popup') : await foto(1.45, 1782, -154 * 1.45, W, H); // mujer al 80 % del KV, cabeza en y≈260
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'popup'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.popup && DEST[n].f.popup.piso) || [560, 1080, 0.62]), '#000'), left: 0, top: 0 });
+      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'popup'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.popup && DEST[n].f.popup.piso) || [560, 1080, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
       const cp = credito(n, W, H, 34); if (cp) comp.push({ input: cp, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__popup.png');
     }
@@ -149,7 +171,8 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
       } else {
         comp.push({ input: piso(W, H, 1360, 1660, 0.82), left: 0, top: 0 });
         const corre = await correStory(n);
-        for (const l of ['lista', 'precio', 'destino', 'badge', 'pie']) if (has(n, l)) comp.push(await place(P(n, l), 1, 0, 0, l === 'precio' || l === 'badge' ? -corre : 0, DB));
+        // Novena ronda (Daniela, Frame): la story de «Vuela por el Perú» va sin la lista de regiones por ahora.
+        for (const l of ['lista', 'precio', 'destino', 'badge', 'pie']) if (has(n, l) && !(l === 'lista' && n === 'HM_PE_KV_DOM_REGIONES')) comp.push(await place(P(n, l), 1, 0, 0, l === 'precio' || l === 'badge' ? -corre : 0, DB));
       }
       // Logo de story al 130 %: en 1080×1920 el logo del KV queda chico en proporción al alto.
       // Se ancla por su esquina superior izquierda en (x del KV, 270), justo bajo la zona segura.
@@ -164,7 +187,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         else comp.push(await place(P(n, 'alianza'), 1.1, ab.x + ab.w, ab.y, 1080 - 48, 500));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'story') : await foto(2.04, 2198, 0, W, H); // la fuente cubre 1920 de alto a 2,04 (113 % del KV)
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'story'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.story && DEST[n].f.story.piso) || [1000, 1720, 0.62]), '#000'), left: 0, top: 0 });
+      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'story'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.story && DEST[n].f.story.piso) || [1000, 1720, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
       // Marca de agua pegada arriba también en la story (Daniela, 2026-11-05), como en KV y popup.
       const cs = credito(n, W, H, 40, 18); if (cs) comp.push({ input: cs, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__story.png');

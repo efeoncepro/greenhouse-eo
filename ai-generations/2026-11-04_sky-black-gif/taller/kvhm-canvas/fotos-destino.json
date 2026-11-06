@@ -250,49 +250,14 @@
     ],
     "cred": "© PROMPERÚ"
   },
-  "HM_PE_KV_DOM_REGIONES": {
-    "src": "CAJAMARCA.png",
-    "s": [
-      0.62,
-      0.58
-    ],
-    "promperu": true,
-    "sombra": true
-  },
   "HM_AR_KV_SANTIAGO": {
-    "src": "AR_SANTIAGO.png",
+    "src": "US_SANTIAGO.jpg",
     "s": [
-      0.52,
+      0.7,
       0.5
     ],
-    "nota": "Verano (Daniela 2026-11-05: en Argentina es primavera-verano; la foto con nieve chocaba). Pareja en el Parque Bicentenario con la Costanera. Banco SCL santiago-1129335236.",
-    "f": {
-      "kv": {
-        "z": 1.12,
-        "t": [
-          0.5,
-          0.41
-        ]
-      },
-      "popup": {
-        "z": 1.15,
-        "t": [
-          0.48,
-          0.4
-        ]
-      },
-      "story": {
-        "src": "AR_SANTIAGO_V.jpg",
-        "s": [
-          0.5,
-          0.5
-        ],
-        "t": [
-          0.5,
-          0.5
-        ]
-      }
-    }
+    "nota": "Novena ronda (Daniela, 2026-11-06: «una imagen un poco más limpia en la parte superior»): cielo azul despejado con la Gran Torre y la cordillera, banco «IA Marca/BUENOS AIRES MUJER.jpg» (la foto es de Santiago). Antes: santiago-1129335236 (verano).",
+    "f": {}
   },
   "HM_AR_KV_LIMA": {
     "src": "AR_LIMA.png",
@@ -375,5 +340,40 @@
         "lift": 0.15
       }
     }
+  },
+  "HM_UY_KV_BANDERAS": {
+    "src": "UY_SANTIAGO.jpg",
+    "s": [
+      0.6,
+      0.5
+    ],
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto de Santiago según el brandlift, con espacio para el logo. Banco «IA Marca/SANTIAGO.jpg»."
+  },
+  "HM_US_KV_BANDERAS": {
+    "src": "US_PLAZA.png",
+    "s": [
+      0.72,
+      0.45
+    ],
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Santiago o Lima según el brandlift, con espacio a la izquierda para logo y textos. Banco 01_CHILE/SCL «Imagen de Codex 23 sept 2026, 05_52_07 p.m.» (Plaza de Armas).",
+    "sombra": true
+  },
+  "HM_PE_KV_INTER_BANDERAS": {
+    "src": "PE_BUENOS_AIRES.png",
+    "s": [
+      0.65,
+      0.5
+    ],
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Buenos Aires mientras tanto, según el brandlift, con espacio a la izquierda. Banco 03_ARGENTINA/BUE «Imagen de ChatGPT 29 sept 2026, 16_43_50» (Puerto Madero, Puente de la Mujer).",
+    "sombra": true
+  },
+  "HM_PE_KV_ENCUENTRA": {
+    "src": "PE_FAMILIA.png",
+    "s": [
+      0.74,
+      0.55
+    ],
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto vivencial de una familia haciendo turismo en Perú, con espacio a la izquierda. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio: familia en Sacsayhuamán, Cusco. Prompt y descarte v1 en ai-generations/2026-11-04_sky-black-gif/foto-familia-peru/.",
+    "sombra": true
   }
 }

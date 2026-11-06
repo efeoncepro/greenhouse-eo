@@ -133,7 +133,8 @@ if (require.main === module) (async () => {
           const rc = id && document.getElementById(id) && document.getElementById(id).querySelector('rect'); if (!rc) return 0;
           const x = +rc.getAttribute('x'), y = +rc.getAttribute('y'), w = +rc.getAttribute('width'), h = +rc.getAttribute('height');
           return Math.max(0, Math.min(1080, x + w) - Math.max(0, x)) * Math.max(0, Math.min(1350, y + h) - Math.max(0, y)); };
-        const cand = [...svg.querySelectorAll('use')].filter((e) => (e.getAttribute('xlink:href') || e.getAttribute('href')) === '#image' && !e.closest('defs') && area(e) > 0).sort((a, b) => area(b) - area(a));
+        // En HM_US_KV la foto del kit no es un <use>: viene incrustada como <image> 1672×941 (novena ronda, 2026-11-06).
+        const cand = [...svg.querySelectorAll('use, image')].filter((e) => (e.tagName === 'use' ? (e.getAttribute('xlink:href') || e.getAttribute('href')) === '#image' : e.getAttribute('width') === '1672' && e.getAttribute('height') === '941') && !e.closest('defs') && area(e) > 0).sort((a, b) => area(b) - area(a));
         const u = cand[0];
         if (!u) return { error: 'sin foto del kit' };
         img = document.createElementNS(NS, 'image'); img.id = 'lf-foto-destino';

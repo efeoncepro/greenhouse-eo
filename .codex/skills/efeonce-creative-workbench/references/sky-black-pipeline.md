@@ -565,6 +565,55 @@ y abajo-derecha: los tramos con gradiente blanco→verde y brillo blanco propio)
 - **Pendiente:** que Dianesty (SKY) elija la opción. Aplicarla a las ~150 piezas es otra fase y solo a pedido; la receta
   elegida se documenta aquí y en la skill antes de tocar `logofix`/`compose`.
 
+### 4.11 Novena ronda (2026-11-06): POP-up y GIF (Daniela en Frame y Teams)
+
+Revisión de la carpeta Frame `SKY Airline Q2 2026 / BLACK SKY 2026 / GIF+POPUP`, con 10 carpetas y 21 activos. **Los
+comentarios se leen desde el Chrome de Julio** (Claude in Chrome, con la sesión de Frame ya iniciada; Julio lo pidió el
+2026-11-06). En el panel del navegador Frame pide login, y en los correos de aviso los comentarios llegan cortados o
+sin texto («left 2 comments»). Recetas de lectura:
+
+- Una carpeta abierta por URL directa **no carga los archivos**. Hay que navegar dentro de la app: un clic en la carpeta
+  del árbol (`[data-testid=project-tree--folder][data-asset-id=…]`) y leer
+  `[data-testid=asset-panel-grid-asset-card]` → `data-asset-id`. El visor `…/view/<asset-id>` sí carga directo, pero
+  necesita unos 16 s.
+- Los comentarios son las filas `[role=row]` que empiezan con las iniciales. Antes de leer, se hace clic en todos los
+  «Read more».
+- Las imágenes que Daniela adjunta en un comentario se abren con el botón del adjunto y se miran en la captura. Las de
+  Teams no se pueden bajar: el conector no las entrega, `az` no tiene el permiso `Chat.Read` y Julio denegó el acceso
+  a la app de Teams. En esta ronda, Daniela adjuntó las mismas referencias en Frame.
+
+| Pieza | Cambio | Dónde |
+| --- | --- | --- |
+| Sello de puntualidad sin separador (`HM_CL_KV_INTER_CLUSTER`, `HM_CL_KV_ENCUENTRA`, ambas con la medalla del kit del clúster) | Línea vertical blanca de 0,34 en x=116,07, como en `HM_CL_KV_INTER` | `patches.cjs` (`</svg></svg>` → línea) |
+| «00%» pegado a «CON» en el badge del clúster | Se baja 12 px y «DCTO.» baja lo mismo (posición de `HM_CL_KV_INTER`) | `patches.cjs` |
+| Línea delgada en la cola de la flecha morada (AR Lima y AR Santiago; existía en todas) | Costura entre las 3 formas de la flecha: el cuerpo se ensancha 1 px por lado. `render.cjs` ya lo hacía, pero sólo con el rect sin atributos y no en `parts`/`layers`. Ahora es `patches.cjs → P.flecha(svg)` en los tres | `patches.cjs`, `render/parts/layers.cjs` |
+| «Vuela por Chile»: «Chile» y el precio pegados | «Chile» +22 px, precio +13 px (centrados en su espacio) | `patches.cjs` |
+| Perú internacional | «VUELA A Calama» → «VUELA Internacional» a cuerpo 62 (a 90 chocaba con la flecha). `HM_PE_KV_ENCUENTRA` nace de este archivo con «Destinos» a 90 | `variantes.cjs` (edición en el lugar, idempotente) |
+| «Vuela por el Perú» (`HM_PE_KV_DOM_REGIONES`) | Rediseño según la referencia: mujer del kit (sin Cajamarca, sin PromPerú ni ubicación), «VUELA POR EL / Perú», tres columnas COSTA · SIERRA · SELVA con miniatura redonda (foto aprobada de cada ruta; Pto. Maldonado sale del banco `02_PERU/PEM`) y «Final tramo [destino]–[origen]. / Tasas e impuestos incluidos.». La story va **sin** la lista | `variantes.cjs`, `fotos-destino.json` (se quitó la pieza), `compose.cjs` |
+| Popup de PE internacional, «Encuentra destinos» PE y «Vuela por el Perú» | Logo al 86 % (76 % en «Vuela por el Perú») y 14 px más arriba; la lista gana el aire | `compose.cjs` → `LOGO_CHICO` |
+| Popup UY | «Internacional» al 98 % (antes 88 %) y banderas 14 px más arriba: el destino se arma por franjas del KV | `compose.cjs` |
+| AR «Volá a Santiago» | Origen provisorio «DESDE BUENOS AIRES» a cuerpo 25, con la píldora alargada lo que crece el texto (+59 px). Foto con cielo limpio arriba: banco «IA Marca/BUENOS AIRES MUJER.jpg» (es Santiago) | `variantes.cjs → origen`, `fotos-destino.json` |
+| Fotos nuevas | UY: Santiago (`IA Marca/SANTIAGO.jpg`). USA: Plaza de Armas de Santiago (`01_CHILE/SCL`, Codex 23 sept 05_52_07). PE internacional: Buenos Aires (`03_ARGENTINA/BUE`, ChatGPT 29 sept 16_43_50). PE «Encuentra destinos»: familia en Sacsayhuamán **generada** (abajo). Las piezas con lista sobre foto llevan `sombra` (ahora también en popup y story) | `fotos-destino.json`, `compose.cjs` |
+| «El GIF no tiene audio» (7 GIF) | Un GIF no lleva sonido. Junto al GIF va `BS_GIF_<PIEZA>_AUDIO.mp4` (el `_audio.mp4` de `render-gif.sh`) | `organizar.cjs` |
+
+- **Foto de la familia (Julio aprobó generarla):** el banco sólo tiene selfies cerradas y el badge tapaba la cara.
+  Se armó con el maestro SKY Personas, con `compose.py` del Workbench (sólo cambia la SCENE), y se generó con `pnpm
+  ai:image --openai-key personal --model gpt-image-2.5-sunburst --quality high`. La v1 (1536×1024) dejaba a la familia
+  demasiado grande para 4:5 y 1:1. La v2 (1024×1536) la deja chica, en el tercio derecho y la mitad inferior. Costo
+  ≈ USD 0,08 por las dos. Prompts, escenas y descarte: `OUT/foto-familia-peru/`.
+- `destinos.cjs` ahora acepta la foto del kit como `<image>` 1672×941 incrustada (así viene en `HM_US_KV`), además del
+  `<use href="#image">`.
+- **Orden de la ronda:** `./ronda9.sh`: `variantes` → `destinos` (6) → `brecha` → `render` → `parts` → `compose` →
+  `layers` → `recrop` → `anim-css-gen` → `render-gif.sh` → `story-video`. Corre sobre las 10 piezas y también sobre
+  AR Lima, BR Santiago y BR Perú, que `variantes` reescribe. Antes de `parts` borra las capas viejas de «Vuela por el
+  Perú»: si no, `compose` reponía PromPerú y la ubicación.
+- **Entrega (2026-11-06):** `organizar.cjs` sobre `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`: 55 archivos copiados
+  (11 carpetas `GIF + POPUP` × POPUP, STORY, GIF, GIF_AUDIO y STORYVIDEO; las 10 revisadas más BR «Voe a Santiago», que
+  cambió por la costura de la flecha). Se verificó por tamaño contra el local, sin leer el destino. El canvas de Claude
+  Design **no** se actualizó en esta ronda.
+- **Pendiente fuera del taller:** el contrato de fotos del Workbench (`black-photos.json`) todavía trae la Cajamarca de
+  «Vuela por el Perú» y no incluye las fotos nuevas. Se re-admite con `admitir-black.mjs` en un PR aparte.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

@@ -2,6 +2,21 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
+
+- Se leyeron los comentarios de Daniela en las 10 carpetas Frame `BLACK SKY 2026/GIF+POPUP` (21 activos) desde el
+  Chrome de Julio, con sus dos referencias adjuntas, y el chat de Teams. Se aplicaron todos los cambios en el taller
+  (`ronda9.sh`) y se entregaron en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (`organizar.cjs`): 55 archivos con
+  POPUP, STORY, GIF, GIF_AUDIO (nuevo, el GIF no lleva sonido) y STORYVIDEO en 11 carpetas.
+- Cambios: separador de puntualidad y «00%» en el clúster de Chile; costura de la flecha morada (ahora general en
+  render/parts/layers); «Chile» y precio centrados; «Vuela internacional» en Perú; «Vuela por el Perú» rediseñado
+  (COSTA/SIERRA/SELVA con miniaturas, mujer del kit; story sin lista); logos más chicos en los popups de Perú; UY con
+  título más grande; origen «Buenos Aires» en AR Santiago; fotos del banco para UY, USA, AR Santiago y PE internacional.
+  La familia de «Encuentra destinos» Perú se generó con el maestro SKY (Julio aprobó, ≈ USD 0,08).
+- Detalle y recetas: skill `efeonce-creative-workbench` → `sky-black-pipeline.md` §4.11.
+- Pendiente: revisión de Daniela/SKY. Canvas de Claude Design sin actualizar; contrato de fotos del Workbench
+  (`black-photos.json`) desfasado, se re-admite en un PR aparte.
+
 ## 2026-11-06 — SKY BLACK 2026: Daniela aprobó las 30 rutas foco (Pucallpa story, la última)
 
 Teams 10:28 + Frame «V2»: todo aprobado; la story de Pucallpa no tenía su corrección («subir un poco más la torre, sin
