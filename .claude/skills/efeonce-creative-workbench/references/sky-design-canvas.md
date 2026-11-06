@@ -396,7 +396,7 @@ pipeline §4.7.
 | Ballena de Talara | Fuera: según Daniela, venía de un banco que «ya no usan» |
 | Ayacucho con personas (pedido de Daniela) | Reencuadre sin IA, personas fuera del cuadro |
 | Centrar y subir el logo | Sugerencia de Daniela, no pedido: queda a criterio de SKY |
-| Ayacucho, Chiclayo y story de Pucallpa | Sin visto bueno todavía: siguen en revisión |
+| Ayacucho, Chiclayo y story de Pucallpa | Aprobadas el 2026-11-06 (octava ronda); la story de Pucallpa, tras subir la torre |
 
 ## Lecciones de la plataforma Claude Design
 
@@ -460,8 +460,8 @@ estructura `HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`:
 
 | Carpeta | Contenido |
 | --- | --- |
-| `BLACK SKY 2026 - APROBADO` | 19 piezas con visto bueno |
-| `BLACK SKY 2026 - PARA REVISION` | 11 piezas + `LEEME.txt` |
+| `BLACK SKY 2026 - APROBADO` | Las 30 piezas de rutas foco (desde el 2026-11-06) |
+| `BLACK SKY 2026 - PARA REVISION` | Sólo `LEEME.txt`: no queda nada en revisión |
 
 Las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`) con el último estado conocido. Una pieza
 que cambia de estado **se mueve** de una carpeta a la otra y se sobrescribe con la versión vigente; no se borra.

@@ -11,9 +11,9 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
-## 2026-11-06 — SKY BLACK 2026: piezas aprobadas y story de Pucallpa corregida
+## 2026-11-06 — SKY BLACK 2026: las 30 rutas foco aprobadas
 
-Daniela aprobó todas las rutas foco; la story de Pucallpa quedó corregida (torre más arriba) y espera su visto bueno.
+Daniela aprobó todas las rutas foco; la última fue la story de Pucallpa, con la torre más arriba. Sólo faltan las cifras de SKY.
 
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con precio
 

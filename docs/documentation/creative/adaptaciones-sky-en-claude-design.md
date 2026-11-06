@@ -1,9 +1,9 @@
 # Adaptaciones SKY en Claude Design — Design System, canvas y despliegue de un KV
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (rondas 5 a 7: gradiente de Daniela, degradado inferior negro, revisión en Frame.io, fotos de Talara y Piura, stories ampliadas con IA, carpetas aprobado/para revisión y canvas versión 51)
+> **Ultima actualizacion:** 2026-11-06 por Claude (octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, revisión en Frame.io, fotos de Talara y Piura, stories ampliadas con IA, carpetas aprobado/para revisión y canvas versión 51)
 > **Documentacion tecnica:** [Referencia de la skill: canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md) ·
 > [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md)
@@ -234,7 +234,7 @@ Quedan por confirmar: si Brasil «Voe para Peru» va como pieza de alianza o com
 fotos; la base de Chile «Encuentra destinos» (su nota hablaba del clúster internacional de Perú); las frases y
 traducciones del story en video y del HPH; la ubicación de la foto de las rutas foco, y la tapa vertical en español.
 De la cuarta ronda queda uno más: si quiere la regla de la flecha también en los popups de los KV del kit. De la
-séptima, siguen sin visto bueno Ayacucho, Chiclayo y la story de Pucallpa, y queda a criterio de SKY la sugerencia de
+séptima queda a criterio de SKY la sugerencia de
 Daniela de centrar y subir el logo. La lista
 completa, con lo que hay hoy en cada caso, está en el
 [catálogo](./catalogo-formatos-sky.md#qué-queda-por-confirmar-con-daniela).
@@ -279,10 +279,11 @@ pieza. El canvas pasó por las versiones 44, 47 y 51.
 | **Logo** | Daniela sugirió, sin pedirlo, centrar y subir el logo: queda a criterio de SKY |
 
 **Carpetas de estado.** Tras la segunda revisión en Frame se armaron dos carpetas nuevas junto a «BLACK SKY 2026», con
-su misma estructura: «BLACK SKY 2026 - APROBADO» (19 piezas) y «BLACK SKY 2026 - PARA REVISION» (11 piezas y un
+su misma estructura: «BLACK SKY 2026 - APROBADO» (19 piezas entonces) y «BLACK SKY 2026 - PARA REVISION» (11 piezas y un
 `LEEME.txt` con el cambio de cada una). Sólo cubren las rutas foco, que es lo único revisado en Frame. Cuando una pieza
-cambia de estado se **mueve** de una carpeta a la otra; no se borra. Siguen sin visto bueno Ayacucho, Chiclayo y la
-story de Pucallpa. «BLACK SKY 2026» y «ENTREGABLES BLACK» también quedaron al día.
+cambia de estado se **mueve** de una carpeta a la otra; no se borra. En la octava ronda (2026-11-06) Daniela aprobó todo:
+la story de Pucallpa, tras subir la torre, fue la última. Hoy las 30 piezas están en «APROBADO» y «PARA REVISION» sólo
+tiene un LEEME. «BLACK SKY 2026» y «ENTREGABLES BLACK» también quedaron al día.
 
 > Detalle técnico: [scripts del despliegue BLACK, §4.6 a §4.8](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [manual, revisión en Frame.io y carpetas de estado](../../manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md#7h-leer-la-revisión-de-frameio-y-repartir-aprobado-y-revisión)

@@ -480,8 +480,8 @@ Trujillo y Tumbes completas, la story de Cusco y el popup de Tarapoto. Ajustes:
 
 **Carpetas de estado** (`split.py`, tabla `E` con el último estado conocido): `10_Noviembre/BLACK SKY 2026 - APROBADO` y
 `BLACK SKY 2026 - PARA REVISION`, con la estructura de `BLACK SKY 2026`. Una pieza que cambia de estado **se mueve** entre
-las dos (no se borra) y se sobrescribe con la versión vigente. Ayacucho, Chiclayo y la story de Pucallpa no aparecen en la
-segunda revisión: siguen en revisión.
+las dos (no se borra) y se sobrescribe con la versión vigente. Ayacucho, Chiclayo y la story de Pucallpa no aparecían en la
+segunda revisión; desde la octava ronda (2026-11-06, §4.9) las 30 piezas están aprobadas.
 
 ### 4.9 Octava ronda (2026-11-06): todo aprobado salvo la story de Pucallpa
 
@@ -495,6 +495,9 @@ segunda revisión: siguen en revisión.
 - Estados: `split.py` ahora marca las 15 rutas como aprobadas salvo `PUCALLPA` story, y **mueve** la pieza de una
   carpeta a la otra (antes sólo copiaba y una pieza podía quedar en las dos). «BLACK SKY 2026 - APROBADO» quedó con 29
   piezas y «- PARA REVISION» sólo con `BS_STORY_PCL.png` + LEEME. Canvas versión 53 (sólo cambió esa imagen).
+- **Cierre (2026-11-06):** Daniela aprobó también la story corregida de Pucallpa (vía Julio). `split.py` quedó con las
+  30 piezas en `A`: «APROBADO» tiene las 30 y «PARA REVISION» sólo un LEEME que lo dice. Las rutas foco no tienen
+  pendientes de diseño; faltan las cifras de SKY (§19).
 - Workbench: contrato de fotos re-admitido y **mergeado en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`; conciliado: árbol
   idéntico, gates y pruebas en verde, story byte a byte igual); la
   story que arma el Workbench coincide con la del taller (media 0,13/255). El admisor fallaba al re-admitir (archivos en

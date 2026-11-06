@@ -496,8 +496,8 @@ JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_
 **Aprobado / para revisión (2026-11-05, pedido de Julio tras la revisión en Frame.io):** dos carpetas hermanas de
 `BLACK SKY 2026`, con su misma estructura (`HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`):
 `BLACK SKY 2026 - APROBADO` y `BLACK SKY 2026 - PARA REVISION` (con un `LEEME.txt` del cambio en cada pieza). Tras la
-segunda revisión (séptima ronda): 19 aprobadas y 11 en revisión (Talara, Piura, Cusco popup, Tarapoto story, Ayacucho,
-Chiclayo, Pucallpa story). Se copian los archivos
+segunda revisión (séptima ronda): 19 aprobadas y 11 en revisión. Desde la octava (2026-11-06): **las 30 aprobadas**;
+«PARA REVISION» quedó sólo con su LEEME. Se copian los archivos
 vigentes, con el gradiente nuevo, aunque la aprobación se dio sobre la versión de la cuarta ronda. Script:
 `split.py` (estado por pieza en la tabla `E`); sólo cubre las rutas foco, que son lo único revisado en Frame.
 

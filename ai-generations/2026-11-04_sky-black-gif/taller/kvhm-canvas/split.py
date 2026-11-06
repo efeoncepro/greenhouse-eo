@@ -4,9 +4,9 @@ N=os.path.expanduser('~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeo
 IATA={'AREQUIPA':'AQP','AYACUCHO':'AYP','CAJAMARCA':'CJA','CHICLAYO':'CIX','CUSCO':'CUZ','IQUITOS':'IQT','JAUJA':'JAU','JULIACA':'JUL','PIURA':'PIU','PUCALLPA':'PCL','TACNA':'TCQ','TALARA':'TYL','TARAPOTO':'TPP','TRUJILLO':'TRU','TUMBES':'TBP'}
 # Estado vigente (Daniela, Teams 2026-11-06 10:28 + Frame «V2»: «Marqué todo como aprobado. Sólo la story de Pucallpa
 # no me hizo la corrección que le dejé»). La corrección («subir un poco más la torre, sin que choque con el logo») se
-# aplicó el 2026-11-06 con lift 0.07 y queda en revisión hasta su visto bueno. A = aprobado; R = va a revisión.
+# aplicó el 2026-11-06 con lift 0.07. A = aprobado; R = va a revisión.
 E={c:('A','A') for c in IATA}
-E['PUCALLPA']=('A','R')
+# 2026-11-06: Daniela aprobó también la story de Pucallpa corregida (vía Julio). Todo aprobado.
 DST={'A':N+'/BLACK SKY 2026 - APROBADO','R':N+'/BLACK SKY 2026 - PARA REVISION'}
 apply='--apply' in sys.argv; cnt={'A':0,'R':0}; plan=[]
 for c,(p,s) in E.items():

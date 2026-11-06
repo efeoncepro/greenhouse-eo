@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-06 por Claude (cifras en el Creative Workbench, paso 7i; taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
+> **Ultima actualizacion:** 2026-11-06 por Claude (las 30 rutas foco aprobadas; cifras en el Creative Workbench, paso 7i; taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -399,8 +399,8 @@ Frame ni API, y desde aquí no se puede responder en Frame: las respuestas van p
    No leas los archivos del destino en OneDrive para comparar: se cuelga.
 
 **Qué revisar:** que cada pieza esté en una sola de las dos carpetas; que las cuentas cuadren con lo que dijo Daniela
-(tras la séptima ronda: 19 aprobadas y 11 en revisión); que lo que no aparece en la última revisión (Ayacucho,
-Chiclayo y la story de Pucallpa) siga en revisión.
+(tras la séptima ronda: 19 aprobadas y 11 en revisión; desde la octava, 2026-11-06, las 30 aprobadas); que lo que no
+aparece en la última revisión siga en revisión hasta que Daniela lo apruebe.
 
 ### 7f. Story en video (5 slides)
 

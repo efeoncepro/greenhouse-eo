@@ -1,9 +1,9 @@
 # Catálogo de formatos SKY — Qué pieza es cada una, su tamaño y cómo se nombra
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-11-05 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (rondas 5 a 7: gradiente de Daniela, degradado inferior negro, fotos de Talara y Piura, carpetas «BLACK SKY 2026 - APROBADO» y «BLACK SKY 2026 - PARA REVISION» y canvas versión 51)
+> **Ultima actualizacion:** 2026-11-06 por Claude (octava ronda: las 30 rutas foco aprobadas; antes, rondas 5 a 7: gradiente de Daniela, degradado inferior negro, fotos de Talara y Piura, carpetas «BLACK SKY 2026 - APROBADO» y «BLACK SKY 2026 - PARA REVISION» y canvas versión 51)
 > **Documentacion tecnica:** [Taxonomía técnica de formatos SKY](../../../.claude/skills/efeonce-creative-workbench/references/sky-format-catalog.md) ·
 > [Scripts del despliegue BLACK](../../../.claude/skills/efeonce-creative-workbench/references/sky-black-pipeline.md) ·
 > [Canvas de SKY en Claude Design](../../../.claude/skills/efeonce-creative-workbench/references/sky-design-canvas.md)
@@ -455,10 +455,10 @@ elegir fotos de la temporada del mercado al que va la pieza.
 Después de la revisión de Daniela en Frame.io se crearon dos carpetas hermanas de «BLACK SKY 2026», en
 `SKY Campañas/2026/10_Noviembre/`:
 
-| Carpeta | Qué trae (tras la séptima ronda) |
+| Carpeta | Qué trae (desde la octava ronda, 2026-11-06) |
 |---|---|
-| **«BLACK SKY 2026 - APROBADO»** | 19 piezas con visto bueno de Daniela |
-| **«BLACK SKY 2026 - PARA REVISION»** | 11 piezas ajustadas o sin visto bueno, más un `LEEME.txt` con el cambio de cada una: Talara y Piura (popup y story), Ayacucho y Chiclayo (popup y story), el popup de Cusco y las stories de Tarapoto y Pucallpa |
+| **«BLACK SKY 2026 - APROBADO»** | Las 30 piezas de rutas foco, todas con visto bueno de Daniela |
+| **«BLACK SKY 2026 - PARA REVISION»** | Sólo un `LEEME.txt` que dice que no queda nada en revisión (tras la séptima ronda tenía 11 piezas) |
 
 - **Estructura:** la misma de «BLACK SKY 2026», hoy sólo con rutas foco, que es lo único que se revisó en Frame:
   `HM PE/RUTAS FOCO/<CIUDAD>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png`, con el código de aeropuerto de la ciudad
@@ -508,7 +508,7 @@ destinos» de Chile debe hacerse con el clúster internacional de Perú, como di
 De la cuarta ronda: si Daniela quiere la regla de la flecha (flecha y badge a 40 px del destino) también en los popups
 de los KV del kit. Las próximas rondas se trabajan en una sesión aparte, derivada de esta.
 
-De la séptima ronda: siguen sin visto bueno Ayacucho, Chiclayo y la story de Pucallpa (ver
+Desde la octava ronda (2026-11-06) las 30 piezas de rutas foco están aprobadas (ver
 [carpetas de estado](#carpetas-de-estado-aprobado-y-para-revisión)), y la sugerencia de Daniela de centrar y subir el
 logo queda a criterio de SKY.
 
@@ -519,7 +519,7 @@ logo queda a criterio de SKY.
 | Chile «Encuentra destinos» | Hecho desde el clúster internacional de Chile | Su nota decía «cluster inter de Perú»: confirmar la base |
 | Frases del story en video | Nacional desde la referencia; internacional y traducciones propias | Aprobar frases y traducciones |
 | Textos del HPH | Flecha y botón traducidos por Efeonce | Aprobar traducciones |
-| Rutas foco Perú | Ubicación del CSV, o la del nombre de la foto cuando no coinciden (Talara, Piura) | Visto bueno de Ayacucho, Chiclayo y la story de Pucallpa |
+| Rutas foco Perú | Ubicación del CSV, o la del nombre de la foto cuando no coinciden (Talara, Piura) | Aprobadas las 30 (2026-11-06); faltan las cifras de SKY |
 | Tapa vertical en español | Recortada de la horizontal | Tapa vertical oficial |
 | Precios y descuentos | Marcadores `000.000` y `00%` | La grilla de precios |
 
