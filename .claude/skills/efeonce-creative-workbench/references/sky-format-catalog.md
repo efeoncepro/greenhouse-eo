@@ -1,6 +1,7 @@
 # SKY Performance: catálogo de formatos y taxonomía (campaña BLACK y CyberSky Perú)
 
-Estado al 2026-11-05. Este documento es el **qué**: cada formato que se produjo para SKY Airline (servicio
+Estado al 2026-11-05, más las rutas foco de Chile y Perú internacional del 2026-11-06 (§1.4 y §5.4). Este
+documento es el **qué**: cada formato que se produjo para SKY Airline (servicio
 Performance) en la sesión de Claude Design del 2026-11-04/05, con su tamaño, nombre, origen en el kit,
 zonas, reglas, variantes, carpetas, cantidades y pesos medidos. El **cómo** (scripts, parámetros de render,
 ffmpeg, logofix, capas) está en [sky-black-pipeline.md](sky-black-pipeline.md). El flujo del canvas, la
@@ -69,11 +70,16 @@ Marcas de evidencia: lo que no lleva marca está verificado (archivo medido, scr
 Total: **24 KV** = 12 del kit + 12 creados por Efeonce (10 de la grilla de Daniela + `HM_AR_KV_BANDERAS` y
 `HM_BR_KV_BANDERAS`, que el canvas muestra como «Extra» y sirven de referencia para los HPH por mercado).
 
-### 1.4 Rutas de Perú: `HM_PE_RUTA_<CIUDAD>`
+### 1.4 Rutas foco: `HM_PE_RUTA_<CIUDAD>` y `HM_<CL|PE>_<DOM|INTER>_RUTA_<DESTINO>`
 
-13 KV con el destino en el título: `HM_PE_RUTA_TUMBES`, `JAUJA`, `CUSCO`, `TACNA`, `PUCALLPA`, `CHICLAYO`,
-`PIURA`, `TRUJILLO`, `IQUITOS`, `CAJAMARCA`, `AREQUIPA`, `TARAPOTO`, `JULIACA`. No llevan `KV` en el nombre.
-`<CIUDAD>` en mayúsculas, sin tildes (normalización NFD). Pucallpa venía repetida en el pedido: va una vez.
+Perú doméstico (segunda ronda): 13 KV con el destino en el título: `HM_PE_RUTA_TUMBES`, `JAUJA`, `CUSCO`, `TACNA`,
+`PUCALLPA`, `CHICLAYO`, `PIURA`, `TRUJILLO`, `IQUITOS`, `CAJAMARCA`, `AREQUIPA`, `TARAPOTO`, `JULIACA`. No llevan
+`KV` en el nombre. `<CIUDAD>` en mayúsculas, sin tildes (normalización NFD). Pucallpa venía repetida en el pedido:
+va una vez.
+
+Chile y Perú internacional (2026-11-06): 16 piezas `HM_<CL|PE>_<DOM|INTER>_RUTA_<DESTINO>`, con `DOM` o `INTER`
+explícito porque el tipo cambia el legal (fichas en §5.4). En el texto de la pieza el destino va con su nombre
+completo («Río de Janeiro», no la sigla).
 
 ### 1.5 Sufijos de salida
 
@@ -177,10 +183,10 @@ medidos sobre los archivos entregados.
 | Origen en el kit | No hay plantilla de popup en el kit: se recompone desde las partes del KV y la foto fuente |
 | Elementos | Foto re-encuadrada al 80 % del KV (escala 1,45, cabeza en y≈260) · logo al 100 % arriba a la izquierda · destino, precio y badge al 88 % con el precio terminando en y=938 · pie en y≈972 · degradado inferior marrón `#2a1608` (0 → 0,78 entre y 800 y 1080) |
 | Reglas por tipo | Clúster DOM: lista reordenada en 3 columnas (Norte 6 · Sur 6 · Sur 3) al 90 %. Clúster INTER y Encuentra Chile: lista al 84 % con oscurecido izquierdo. KV con banderas o regiones: lista escalada para caber entre y 336 y 664. Alianza: escala 1, misma posición del KV. Desde la cuarta ronda, flecha de precio y badge corridos a la izquierda hasta 40 px tras el bloque de destino cuando quedan más lejos (también en los KV del kit) y crédito en (40, 34) |
-| Variantes | 24 KV + 13 rutas |
-| Nombre | `<KV>__popup.png` |
-| Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/` |
-| Cantidad | 24 + 13 |
+| Variantes | 24 KV + 13 rutas de Perú + 16 rutas foco de Chile y Perú internacional (§5.4) |
+| Nombre | `<KV>__popup.png`; en «BLACK SKY 2026», `BS_POPUP_<IATA>.png` |
+| Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/`; rutas foco CL/PE inter: sólo en «BLACK SKY 2026» (§5.4) |
+| Cantidad | 24 + 13 + 16 |
 | Peso | 1,67–1,74 MB; rutas 1,69–1,70 MB |
 
 ### 3.3 Story estática 1080×1920
@@ -191,10 +197,10 @@ medidos sobre los archivos entregados.
 | Origen en el kit | Sin plantilla estática en el kit; se recompone desde las partes |
 | Elementos | Foto al 113 % del KV (escala 2,04, cubre 1920 sin inventar cielo) · zonas seguras ~270 px arriba y abajo · logo al 130 % anclado en y=270 · lista, destino, precio, badge y pie +350 px (pie termina ~1655) · degradado inferior 0 → 0,82 entre y 1360 y 1660 |
 | Reglas por tipo | Clúster DOM: bloque y pie +80 px más (pie ~1735), lista al 115 % centrada entre logo y destino. Alianza: escala 1,1, borde derecho en x=1032, tope en y=500 (bajo el avión, que con el logo al 130 % llega a x≈925); sigue vigente para PromPerú «otros HM» (BR «Voe para Peru»). Desde la cuarta ronda: la alianza que en el KV toca la esquina superior derecha (Chile Travel) se ancla a (1080, 0) al 110 %; en las stories con PromPerú, PromPerú centrado en x=540 entre la franja de precio y el pie y la ubicación pegada arriba a la derecha (borde derecho 1040, superior 22); crédito en (40, 34) como en KV y popup; regla de la flecha a 40 px |
-| Variantes | 24 KV + 13 rutas |
-| Nombre | `<KV>__story.png` |
-| Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/` |
-| Cantidad | 24 + 13 |
+| Variantes | 24 KV + 13 rutas de Perú + 16 rutas foco de Chile y Perú internacional (§5.4) |
+| Nombre | `<KV>__story.png`; en «BLACK SKY 2026», `BS_STORY_<IATA>.png` |
+| Local / OneDrive | `estaticos/` → `POPUP Y STORY/`; rutas: `rutas-peru/` → `RUTAS FOCO PERU/`; rutas foco CL/PE inter: sólo en «BLACK SKY 2026» (§5.4) |
+| Cantidad | 24 + 13 + 16 |
 | Peso | 2,32–2,58 MB; rutas 2,34–2,35 MB |
 
 ### 3.4 GIF en bucle 1080×1350
@@ -474,7 +480,8 @@ nube y el proceso se colgaba) y quedó al día; los conteos de esta tabla son lo
 1 Internacionales · 2 Nacionales · 3 Plantillas (CyberSky) · 4 KV Black · HM · 5 KV Black · Animación GIF ·
 6 KV Black · Popup y Story · 7 KV Black · PMAX y HPH · KV Black · Grilla por mercado · KV Black · Rutas foco
 Perú · KV Black · Chile KV listo. El orden de las tres últimas es **inferido** (se agregaron en ese orden
-por script). URL y lecciones de la plataforma: [sky-design-canvas.md](sky-design-canvas.md).
+por script). El 2026-11-06 se sumó «KV Black · Rutas foco Chile y Perú inter» (`kv-black-rutas-foco`, versión 70).
+URL, publicación y lecciones de la plataforma: [sky-design-canvas.md](sky-design-canvas.md).
 
 ### 5.4 «BLACK SKY 2026» (orden pedido por Daniela, 2026-11-05)
 
@@ -482,12 +489,13 @@ Ruta: `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (estaba vacía). 155 arc
 `organizar.cjs` y verificados con `diff -rq`. En la cuarta ronda se actualizaron 73 (el script compara por tamaño
 y fecha, sin leer el destino en OneDrive). Nomenclatura `BS_<MEDIDA o FORMATO>_<PIEZA>`: genéricos
 `INTER` / `DOM` / `DESTINOS`; destinos y rutas foco con IATA (SCL, LIM, AQP, AYP, CJA, CIX, CUZ, IQT, JAU,
-JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_INTER`).
+JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP; desde el 2026-11-06 también CCP, CJC, ANF, PUJ, GRU, MDZ, GIG, BRC, FLN y
+BUE); HPH y PMAX con la medida (`BS_1200X628_INTER`).
 
 | Mercado | HPH | PMAX | GIF + POPUP (una carpeta por pieza) | Otros |
 | --- | --- | --- | --- | --- |
-| `HM CL` | genérico Chile inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM CLUSTER`, `PMAX INTER CLUSTER`, `PMAX PRECIO DCTO` (KV listo) | `VUELA POR CHILE` (DOM_CLUSTER), `VUELA INTER` (INTER_CLUSTER), `ENCUENTRA DESTINOS` | `BANNER TIKTOK` (3), `DAT` (2) |
-| `HM PE` | PE inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM RUTA`, `PMAX INTER RUTA` | `VUELA POR PERU` (DOM_REGIONES), `VUELA INTER` (INTER_BANDERAS), `ENCUENTRA DESTINOS` | `RUTAS FOCO/<CIUDAD>/` (15 × popup + story) |
+| `HM CL` | genérico Chile inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM CLUSTER`, `PMAX INTER CLUSTER`, `PMAX PRECIO DCTO` (KV listo) | `VUELA POR CHILE` (DOM_CLUSTER), `VUELA INTER` (INTER_CLUSTER), `ENCUENTRA DESTINOS` | `BANNER TIKTOK` (3), `DAT` (2), `RUTAS FOCO/<DESTINO>/` (11 × popup + story, 2026-11-06) |
+| `HM PE` | PE inter | `PMAX DOM`, `PMAX INTER`, `PMAX DOM RUTA`, `PMAX INTER RUTA` | `VUELA POR PERU` (DOM_REGIONES), `VUELA INTER` (INTER_BANDERAS), `ENCUENTRA DESTINOS` | `RUTAS FOCO/<CIUDAD>/` (15 DOM + 5 INTER desde el 2026-11-06, × popup + story) |
 | `HM AR` | AR | 4 sueltas | `VOLA A SANTIAGO` (SCL), `VOLA A LIMA` (LIM) | |
 | `HM UY` | UY | 4 sueltas | `VOLA INTERNACIONAL` (UY_BANDERAS) | |
 | `HM BR` | BR | 4 sueltas | `VOE A SANTIAGO` (SCL, con Chile Travel) | |
@@ -497,7 +505,8 @@ JUL, PIU, PCL, TCQ, TYL, TPP, TRU, TBP); HPH y PMAX con la medida (`BS_1200X628_
 `BLACK SKY 2026`, con su misma estructura (`HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`):
 `BLACK SKY 2026 - APROBADO` y `BLACK SKY 2026 - PARA REVISION` (con un `LEEME.txt` del cambio en cada pieza). Tras la
 segunda revisión (séptima ronda): 19 aprobadas y 11 en revisión. Desde la octava (2026-11-06): **las 30 aprobadas**;
-«PARA REVISION» quedó sólo con su LEEME. Se copian los archivos
+«PARA REVISION» quedó sólo con su LEEME, hasta que el mismo día recibió las 32 piezas de las rutas foco de Chile y
+Perú internacional (ver abajo; las copia `rf-entregar.cjs --revision`, no `split.py`). Se copian los archivos
 vigentes, con el gradiente nuevo, aunque la aprobación se dio sobre la versión de la cuarta ronda. Script:
 `split.py` (estado por pieza en la tabla `E`); sólo cubre las rutas foco, que son lo único revisado en Frame.
 
@@ -517,6 +526,26 @@ después del bloque del destino cuando el destino es corto, en KV, popup y story
 Chiclayo y Talara: desde la quinta ronda llevan la foto aprobada de `BANCO DE VIDEOS/02_PERU/PROMPERU/` (Muelle de
 Pimentel y ballena jorobada) y la ubicación del CSV; sus carpetas en `FOTOS PARA PROMPERU` siguen vacías. «Vuela por el Perú» (DOM_REGIONES) lleva la foto de Cajamarca, PromPerú, legal Cajamarca-Lima
 y «Ventanilla de Otuzco - Cajamarca». AR «Volá a Santiago» (de verano desde la cuarta ronda: `santiago-1129335236`) y «Volá a Lima» llevan foto del destino.
+
+**Rutas foco de Chile y Perú internacional (2026-11-06):** 16 rutas, **sólo popup 1080×1080 y story 1080×1920**: sin
+KV entregable, GIF ni story en video (pedido de Daniela por Teams). Chile se basa en el KV de Perú pero **sin el logo de
+PromPerú, «la dirección» ni la marca de agua** (palabras de Daniela). Fotos del banco, ninguna generada. Scripts, umbrales, encuadres y
+procedencia de cada foto: [sky-black-pipeline.md §4.13](sky-black-pipeline.md#413-rutas-foco-de-chile-y-perú-internacional-2026-11-06-sólo-popup-y-story)
+(SSOT; aquí sólo el qué).
+
+| Grupo | Rutas (IATA) | Plantilla | Bajo el precio (legal) | Origen |
+| --- | --- | --- | --- | --- |
+| HM Chile doméstico | Concepción (CCP), Calama (CJC), Antofagasta (ANF) | `HM_CL_KV_DOM` | DESDE / $000.000 / «Final tramo. Tasas e impuestos incluidos.» | «DESDE SANTIAGO» **inferido** (Daniela no lo dio) |
+| HM Chile internacional | Cusco (CUZ), Lima (LIM), Punta Cana (PUJ), São Paulo (GRU), Mendoza (MDZ), Río de Janeiro (GIG), Bariloche (BRC), Florianópolis (FLN) | `HM_CL_KV_INTER` | IDA Y VUELTA DESDE / $000.000 / «Tasas e impuestos incluidos.» | Idem |
+| HM Perú internacional | Santiago (SCL), Buenos Aires (BUE), Punta Cana (PUJ), Río de Janeiro (GIG), São Paulo (GRU) | `HM_PE_KV_INTER-RUTA` | IDA Y VUELTA DESDE / US$000 o S/0,000 / «Final ruta Lima-(destino)-Lima. Tasas e impuestos incluidos.» | «DESDE LIMA» |
+
+- Nombre de trabajo `HM_<CL|PE>_<DOM|INTER>_RUTA_<DESTINO>` (§1.4); en la entrega,
+  `BLACK SKY 2026/HM CL/RUTAS FOCO/<DESTINO>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png` (11 rutas) y
+  `HM PE/RUTAS FOCO/<DESTINO>/` (5 rutas, junto a las 15 domésticas de Perú). Copia idéntica en
+  `BLACK SKY 2026 - PARA REVISION/` con su `LEEME.txt`; al aprobarse, cada pieza pasa a `- APROBADO`.
+- Píldora rosada de origen adaptable (avión fijo, termina 35 px después de la última letra). Destino con tope de
+  400 px; si mide más de 330 px, el bloque de cliente se corre 36 px a la izquierda para separarlo de la flecha.
+- Degradado superior y negro inferior **sólo si hacen falta** (criterio de Daniela; medido por foto en el pipeline).
 
 ## 6. Inconsistencias y pendientes
 
@@ -564,5 +593,8 @@ de Adri dice «cluster inter de Perú»; AR mantiene «DESDE [ORIGEN]».
 | Regla de la flecha en popups de KV originales | Se aplicó a todos los popups (p. ej. «Internacional» se corre 41 px, «Calama» ~108); confirmar que la regla también vale para las piezas del kit |
 | Tapa vertical en español | Recortada de la horizontal |
 | Precios, descuentos, orígenes y fechas de vuelo | Placeholder en todas las piezas |
+| Rutas foco CL/PE inter: origen de Chile | «DESDE SANTIAGO» inferido; Daniela no lo dio |
+| Rutas foco CL/PE inter: legal sobre la foto | Débil en el popup de Cusco y en la story de Concepción |
+| Rutas foco CL/PE inter: «el árbol» que Daniela pidió eliminar | No está claro si es Buenos Aires o Río; no se hizo inpainting pagado |
 | Derechos de la foto del KV y de la medalla | Archivos con rastro de generación por IA: validar antes de pautar |
 | Pregunta de Daniela «¿ese espacio es colaborativo?» | El canvas es privado; se comparte desde «Compartir» y admite comentarios |

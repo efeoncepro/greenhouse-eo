@@ -101,6 +101,14 @@ FILL del photo slot. Proyectar reservas al encuadre efectivo. Una foto 1536×102
 No cambiar texto blanco, paints, coordenadas o añadir scrim para esconder un fondo incompatible.
 Elegir/admitir foto o formato adecuados al brief y medir contraste en la composición final.
 
+**Fotos del banco reencuadradas a popup y story** (rutas foco BLACK, 2026-11-06, pedido de Daniela): el logo nunca
+cae sobre cabezas, nada queda cortado de golpe y hay espacio libre arriba. La foto que no lo cumple se cambia, no se
+tapa: se descartaron Antofagasta con personas y Bariloche con tres personas (van paisajes sin personas), la pareja de
+Punta Cana de Perú, Lima de Argentina y la de Plaza Mayor. En la segunda vuelta Lima pasó a Miraflores con cielo
+limpio (banco `02_PERU/LIM`), Santiago de Perú y la story de Punta Cana se reencuadraron (z 1,25) y Buenos Aires
+recibió un cielo más azul y oscuro (`cielo.cjs`, fuerza 0,5). Ninguna se generó. Procedencia y encuadres por foto en
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.13.
+
 ## Excepción de evento: selfies generadas de CyberSky Perú — 2026-11-04
 
 Fotografía **generada para una campaña de evento**, adaptada en Claude Design

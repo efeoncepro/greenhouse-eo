@@ -11,6 +11,13 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-06 — SKY BLACK 2026: rutas foco de Chile y Perú internacional en revisión
+
+Las 16 rutas foco nuevas (3 domésticas y 8 internacionales de Chile, 5 internacionales de Perú) tienen popup y story
+con el legal de cada tipo de ruta. Ya incorporan los ajustes de Daniela: degradados sólo donde hacen falta, píldora de
+origen ajustada al texto y fotos sin el logo sobre cabezas. Están en OneDrive (también en la carpeta de revisión) y en
+el canvas; faltan los precios, el origen de Chile y las fechas del pie.
+
 ## 2026-11-06 — SKY BLACK 2026: las 30 rutas foco aprobadas
 
 Daniela aprobó todas las rutas foco; la última fue la story de Pucallpa, con la torre más arriba. Sólo faltan las cifras de SKY.
