@@ -2,15 +2,30 @@
 
 ## Status
 
-- Status: `Proposed`
-- Date: `2026-10-27`
-- Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio decide aceptación y apertura.
+- Status: `Accepted` — modelo B
+- Date: `2026-10-27` (propuesta); `2026-11-06` (aceptación)
+- Accepted by: Julio Reyes, 2026-11-06, en sesión con el agente tras la explicación A′/B.
+- Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio aceptó el modelo B el 2026-11-06 y decide la apertura.
 - Scope: cuentas operativas, bridge legacy, contexto autorizado, sync, atribución y reporting por servicio.
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
-- Confidence: `medium`; B recomendado con evidencia local de permisos/Finance/routing/historia; integración y rollout pendientes.
+- Confidence: `medium`; B aceptado con evidencia local de permisos/Finance/routing/historia; integración y rollout pendientes.
 - Validated as of: `2026-11-01`, componentes reales en PostgreSQL efímero (TASK-2094); sin conexión productiva.
-- Epic: [EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md), formalizado 2026-11-06; no cambia este estado Proposed.
+- Epic: [EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md), formalizado 2026-11-06; ejecuta este modelo por tasks dueñas.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
+
+## Aceptación 2026-11-06 — modelo B
+
+Julio aceptó **B: client comercial compartido y contexto Space/Service explícito** después de comparar A′ y B
+con la evidencia de TASK-2094 y la [revisión contra código](../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md).
+A′ queda descartada salvo que se cumpla una condición de *Revisit When*.
+
+Qué cambia: B es el objetivo de diseño para TASK-2096–2102 y las dueñas externas de EPIC-057. Ninguna unidad
+crea un segundo `client` ni un bridge por Space, y todo consumer client-only se convierte a Space/Service
+explícito antes de la apertura.
+
+Qué no cambia: aceptar el modelo no aplica migrations, no crea Spaces ni filas reales, no cambia flags ni
+conexiones y no abre SKY. Cada schema o contrato persistido se revisa en su task, y la apertura sigue en
+TASK-1852 con autorización propia.
 
 ## Revisión inicial 2026-11-01 — Recomendación A′ suspendida
 
@@ -101,10 +116,10 @@ Se propone una Organization con varios Spaces. El Space histórico conserva iden
 indicadores y ediciones de Diseño. La nueva relación Blog SEO/AEO se aloja en un Space propio. Un Space puede
 contener varios Servicios de la misma operación; no se crea una Organization por departamento ni un master Account.
 
-La recomendación técnica actual es **B: client comercial compartido y contexto Space/Service explícito**.
+El modelo aceptado es **B: client comercial compartido y contexto Space/Service explícito**.
 Sustituye la preferencia A′ del simulador del 27-10. Los caminos departamentales deben retirar selección
 implícita y aislamiento client-only antes de abrir. Los consolidados comerciales conservan su dueño y
-autoridad propios. Recomendación no equivale a aceptación ni autoriza insertar filas reales.
+autoridad propios. Aceptar B no autoriza insertar filas reales, aplicar migrations ni hacer provisioning.
 
 El bridge operativo no representa otra empresa, Company de HubSpot, perfil Finance, factura, pago o persona.
 Su representación persistida —campo/relación de owner y rol del bridge— se diseñará en una unidad posterior.
@@ -170,8 +185,8 @@ puede retrasar apertura, antes que producir indicadores o atribuciones incorrect
 
 ### Orden de transición
 
-1. Mantener ADR Proposed; TASK-2073 conserva su cierre como simulación. TASK-2094 recomienda B con componentes
-   reales aislados. Integrar y certificar los contratos siguientes antes de aceptar/aplicar el puente en runtime.
+1. ADR aceptado con B el 2026-11-06; TASK-2073 conserva su cierre como simulación y TASK-2094 su evidencia con
+   componentes reales aislados. Integrar y certificar los contratos siguientes antes de aplicar B en runtime.
 2. U01 contexto/membership/refresh; U02 routing de servicios/fuentes; **U02F owner Finance y selección de
    candidatos**. Estas foundations preceden a U03, incluso si el nuevo Space se pensara crear inactivo.
 3. U03 provisioning hijo idempotente; U04 readers/caches; U05 bindings/historia/ICO/capacidad.
@@ -184,7 +199,7 @@ pausarse de forma acotada y probada. Restaurar sync antiguo tras el split puede 
 
 ## Runtime Contract
 
-Este ADR Proposed no cambia runtime. TASK-2073 sólo añade tooling local con fixtures sintéticos, sin importar
+Aceptar este ADR no cambia runtime por sí mismo. TASK-2073 sólo añade tooling local con fixtures sintéticos, sin importar
 stores, cargar `.env`, abrir sockets, usar credenciales ni ejecutar comandos remotos. No modifica `src/`,
 schemas, migrations, flags, fuentes reales, historial o configuración de SKY.
 
@@ -209,7 +224,7 @@ Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en 
 - Se identifica un consumer client-only que mezcla Finance, cuentas o fuentes y no puede normalizarse.
 - Aparece evidencia de un consumer que impide B; reevaluar el costo de normalizar A′ con owner canónico.
 - Cambia ownership de los dominios, el modelo legal/comercial o el mecanismo de grants.
-- Antes de cualquier migration/provisioning real: aceptar ADR, validar contrato persistido y obtener evidencia
+- Antes de cualquier migration/provisioning real: validar contrato persistido y obtener evidencia
   de transacciones, concurrencia, recuperación y permiso de rollout en las unidades dueñas.
 
 ## Evidencia y límite de aceptación

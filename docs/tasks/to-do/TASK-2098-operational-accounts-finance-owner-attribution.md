@@ -50,7 +50,7 @@ Preservar un client comercial/financiero bajo B y atribuir ingresos/costos al se
 
 ## Architecture Alignment
 
-- [ADR cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): Proposed, B recomendado; no aceptado por registrar esta task.
+- [ADR cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): Accepted 2026-11-06, modelo B.
 - [Modelo 360](../../architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md).
 - [EPIC-057](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md): secuencia y gates.
 
@@ -192,8 +192,8 @@ Preservar un client comercial/financiero bajo B y atribuir ingresos/costos al se
 
 ## Detailed Spec
 
-Implementar el contrato de esta task en su dueño existente. El ADR define el modelo B candidato; su aceptación
-es un gate independiente de la planificación. Los casos negativos de TASK-2094 son regresiones a resolver,
+Implementar el contrato de esta task en su dueño existente. El ADR aceptó el modelo B el 2026-11-06; esa
+aceptación no autoriza migrations, filas reales ni apertura. Los casos negativos de TASK-2094 son regresiones a resolver,
 no comportamiento válido que deba conservarse. Consumidores externos conservan sus tasks y sus criterios.
 
 ## Rollout Plan & Risk Matrix

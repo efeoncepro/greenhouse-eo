@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-057`
-- Status real: `204 pruebas locales PASS; recomendación técnica B por permisos/Finance/routing/historia; integración integral y aceptación ADR pendientes`
+- Status real: `204 pruebas locales PASS; B aceptado en el ADR 2026-11-06 por permisos/Finance/routing/historia; integración integral pendiente`
 - Rank: `2094`
 - Domain: `identity|data|insights`
 - Blocked by: `TASK-2096–2101 y preparación local TASK-2102 para certificación M4; consumers por hito en EPIC-057. Baseline 204 casos ya entregado, sin bloqueo retroactivo.`
@@ -58,7 +58,7 @@ sesión real, Finance, scope por host, calidad por fuente y corrida AEO nativa. 
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 
-ADR Proposed; Organization/Spaces/Service separados. DB local efímera no sustituye migrations autorizadas.
+ADR Accepted 2026-11-06 (modelo B); Organization/Spaces/Service separados. DB local efímera no sustituye migrations autorizadas.
 
 ## Normative Docs
 

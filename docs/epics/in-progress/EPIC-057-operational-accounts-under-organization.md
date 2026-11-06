@@ -6,17 +6,17 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Formalizado y revisado contra código 2026-11-06; TASK-2094 con 204 pruebas locales y B recomendado; siete hijas nuevas to-do; sin split productivo`
+- Status real: `Formalizado y revisado contra código 2026-11-06; TASK-2094 con 204 pruebas locales; ADR aceptado con B el 2026-11-06; siete hijas nuevas to-do; sin split productivo`
 - Rank: `57`
 - Domain: `cross-domain|identity|data|ops`
-- Owner: `Core/Spaces + Identity + Services; Finance/Delivery/ICO/Insights por contrato; Julio acepta ADR y apertura`
+- Owner: `Core/Spaces + Identity + Services; Finance/Delivery/ICO/Insights por contrato; Julio aceptó el ADR (B, 2026-11-06) y decide la apertura`
 - Branch: `Greenhouse develop; checkout compartido, sin worktrees`
 
 ## Summary
 
 Coordina cuentas departamentales bajo un cliente comercial: SKY conserva una Organization y su owner
-financiero, con Diseño y Blog SEO/AEO en Spaces separados. El modelo recomendado es B. La autorización
-actual cubre formalización y commit de documentos; no acepta el ADR ni inicia código, provisioning o release.
+financiero, con Diseño y Blog SEO/AEO en Spaces separados. Julio aceptó el modelo B el 2026-11-06. Esa
+aceptación no inicia código, provisioning ni release: cada uno sigue en su task con autorización propia.
 
 El programa ya tiene investigación y laboratorio en TASK-2094, por eso su lifecycle es in-progress;
 las siete implementaciones nuevas permanecen to-do. El avance de planificación no equivale a despliegue.
@@ -37,7 +37,7 @@ La solución cruza dominios y reutiliza EPIC-045/046/022, sin trasladarles tarea
 
 ## Architecture Alignment
 
-- [ADR dueño: cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), **Proposed**; B recomendado tras prueba local, no aceptación inferida.
+- [ADR dueño: cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), **Accepted** 2026-11-06, modelo B, por decisión explícita de Julio.
 - [Modelo Organization/Space/Service](../../architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md).
 - [Contrato candidato Blog](../../architecture/EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md).
 - [Finance](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [atribución comercial](../../architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md).
@@ -133,7 +133,7 @@ flowchart TD
 
 | Hito | Inputs requeridos | Criterio de salida |
 | --- | --- | --- |
-| M0: decisión y programa | ADR + baseline TASK-2094 | EPIC/task graph registrado; aceptación ADR pendiente de Julio, nunca automática |
+| M0: decisión y programa | ADR + baseline TASK-2094 | EPIC/task graph registrado; ADR aceptado por Julio el 2026-11-06 (B) |
 | M1: foundations locales | TASK-2096/2097/2098/2100 | Contexto, routing, owner y base de readers compatibles; contrato de una cuenta preservado |
 | M2: alta ensayada | TASK-2099 + M1 | Preview y ejecución sintética idempotentes; cero alta real, ni Space inactivo como atajo |
 | M3: medición interna | TASK-2033 + requisitos de TASK-1960; TASK-1655 si falta ventana GSC | GA4/GSC/AEO con receipts válidos; puede desarrollarse sin provisioning real |
@@ -170,7 +170,8 @@ Una ventana GSC faltante sí bloquea el informe que la promete; no se sustituye 
 
 - [x] EPIC, ADR y dueños existentes conciliados; siete nuevas tasks sin duplicar Insights, portal o productores. Evidencia: documentos y QA de formalización 06-11.
 - [x] Baseline previo de 204 pruebas locales vinculado; no presentado como integración productiva.
-- [ ] ADR aceptado explícitamente; schema/contratos de las foundations revisados y aprobados antes de aplicación real.
+- [x] ADR aceptado explícitamente. Evidencia: Julio aceptó el modelo B el 2026-11-06; ver sección *Aceptación* del ADR.
+- [ ] Schema/contratos de las foundations revisados y aprobados antes de aplicación real.
 - [ ] Hijas y slices externos requeridos satisfacen sus criterios y TASK-2094 certifica el alcance habilitable con controles negativos.
 - [ ] Historia Diseño y cliente control conservados por evidencias antes/después; ninguna reclasificación implícita por flags actuales.
 - [ ] GA4/GSC/AEO Blog completos y comparables por período; ausente, parcial y cero observados diferenciados.
@@ -180,7 +181,7 @@ Una ventana GSC faltante sí bloquea el informe que la promete; no se sustituye 
 ## Non-goals
 
 - Otra Organization/Company/client financiero, migración de historia Diseño o asignar resultados anteriores al servicio SEO.
-- Aceptar ADR, desplegar, crear cuentas reales, cambiar flags/conexiones o emitir/enviar reportes por registrar este programa.
+- Desplegar, crear cuentas reales, cambiar flags/conexiones o emitir/enviar reportes por registrar este programa.
 - Nuevo renderer, scheduler, sender, login, grant store o motor SEO/AEO paralelo; tampoco nueva topología de repos.
 - Declarar cerradas tasks existentes o reejecutar sus migraciones/backfills ya entregados.
 
@@ -200,6 +201,13 @@ Corrige tres lecturas: el laboratorio usó una vista de sesión antigua y la vig
 inactivo conserva claims de cookie sin límite; y un período cerrado del P&L operativo se reescribe. También ajusta
 Backend impact, archivos con dueño único y criterios de TASK-2096–2102, más un criterio en TASK-1960 y otro en
 TASK-2094. No cambia dependencias, prioridades ni lifecycle, no acepta el ADR y no inicia implementación.
+
+## Delta 2026-11-06 — ADR aceptado con B
+
+Julio aceptó el modelo B tras la explicación A′/B: un client comercial compartido y Space/Service explícito.
+El ADR pasa a Accepted, `DECISIONS_INDEX` y TASK-2094/2096–2102 lo reflejan, y el servicio SKY Blog deja de
+citar la recomendación A′ del 27-10. No cambia dependencias, prioridades ni lifecycle, y no inicia
+implementación, migrations ni provisioning. Siguiente unidad: TASK-2096.
 
 ## Verification of Planning
 
