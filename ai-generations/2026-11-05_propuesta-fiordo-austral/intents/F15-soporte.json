@@ -19,7 +19,7 @@
     "sections": 4,
     "current": 3
   },
-  "body": "Guardia permanente para lo crítico y un backlog mensual con indicadores para todo lo demás.",
+  "body": "Lunes a viernes de 9:00 a 18:30 y guardia permanente para lo crítico; mantención mensual.",
   "figures": [
     {
       "value": "≤ 1 h",
@@ -42,13 +42,13 @@
       "source": "SLA de esta propuesta"
     },
     {
-      "value": "4 h",
-      "label": "para contener un incidente S1",
+      "value": "N1 a N3",
+      "label": "escalamiento hasta HubSpot y Microsoft",
       "source": "SLA de esta propuesta"
     },
     {
-      "value": "Mensual",
-      "label": "informe con indicadores de servicio",
+      "value": "Al abrir",
+      "label": "aviso de S1 y S2 por correo y Teams",
       "source": "SLA de esta propuesta"
     }
   ],

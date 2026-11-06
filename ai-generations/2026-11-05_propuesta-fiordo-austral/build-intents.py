@@ -151,6 +151,45 @@ d['note'] = 'Cada regla queda documentada y se prueba antes de activarla.'
 d['selection'] = {'target': 'level', 'level': 1, 'label': 'Comercial', 'participantKind': 'department'}
 add('F08-automatizaciones', 'method-staircase', d, '08 · automatizaciones')
 
+# 08b · Reportes y dashboards (06/11, bases §3 e) y g): actividad por vendedor, activos e inactivos, por país,
+# abiertas/ganadas/perdidas, dashboards automáticos y exportación a Excel). Datos de muestra.
+d = base(EX, 'deck-content-report-formats-intent.json')
+d.pop('productMark', None)
+d['voice'] = {'eyebrow': 'Reportes y dashboards', 'question': 'El tablero comercial se arma', 'answer': ['solo']}
+d['body'] = 'Actividad por vendedor, clientes activos e inactivos y oportunidades por país, al día y con **exportación a Excel**.'
+d['reportLabel'] = 'Tablero comercial · datos de muestra'
+d['kpis'] = [
+    {'label': 'Oportunidades abiertas', 'value': '48', 'delta': '▲ 6'},
+    {'label': 'Ganadas en el trimestre', 'value': '12', 'delta': '▲ 3'},
+    {'label': 'Clientes activos', 'value': '214', 'delta': '▲ 9'},
+]
+d['trendTitle'] = 'Ganadas vs. meta · 6 meses'  # leyenda fija de la plantilla oculta con reportes-sin-leyenda.css
+d['rankingTitle'] = 'Pipeline por país'
+d['ranking'] = [
+    {'name': 'China', 'share': 38},
+    {'name': 'Japón', 'share': 27},
+    {'name': 'España', 'share': 21},
+    {'name': 'EE. UU.', 'share': 14},
+]
+d['reading'] = 'China concentra el pipeline. Dos clientes de España llevan 60 días sin contacto: ya tienen su tarea.'
+d['formats'] = [
+    {'icon': 'mail', 'title': 'Correo', 'detail': 'Cada lunes'},
+    {'icon': 'web-mobile', 'title': 'Web y móvil', 'detail': 'En terreno'},
+    {'icon': 'presentation', 'title': 'Dashboard', 'detail': 'Para el comité'},
+    {'icon': 'pdf', 'title': 'PDF', 'detail': 'Para circular'},
+    {'icon': 'deck', 'title': 'Presentación', 'detail': 'Lista para la gerencia'},
+]
+d['highlightedFormat'] = 3
+add('F08b-reportes', 'content-report-formats', d, '08b · reportes y dashboards')
+
+# 08c · App móvil (06/11, bases §3 f): respiro con foto propia FA10 (gerenta de exportaciones de casting, en una feria
+# genérica, registra la visita en el teléfono). Las capacidades van en 03 y en la demo.
+d = base(EX, 'deck-breather-intent.json')
+d['voice'] = {'question': 'En planta o en feria,', 'answer': ['en el móvil']}
+d['progress'] = {'sections': 4, 'current': 1}
+d['photo'] = {'register': 'documental', 'subject': 'person', 'plateRef': 'ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png', 'alt': 'En una feria internacional, una gerenta de exportaciones registra en el teléfono la visita que acaba de terminar, con la tarjeta del visitante en la otra mano'}
+add('F08c-movil', 'breather', d, '08c · app móvil')
+
 # 09 · Seguridad
 d = base(HS, 'B23-seguridad.json')
 d['voice'] = {'eyebrow': 'Seguridad y accesos', 'question': 'El CRM se entrega con sus controles', 'answer': ['encendidos']}
@@ -214,7 +253,7 @@ add('F09c-matriz', 'method-score-ring', d, '12 · matriz de cumplimiento')
 d = base(EX, 'deck-content-measure-intent.json')
 d['version'] = '0.1.2'
 d['voice'] = {'eyebrow': 'Nivel de servicio', 'question': 'Disponibilidad mensual exigida:', 'answer': ['99,9 %']}
-d['body'] = 'mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 %.'
+d['body'] = 'mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 % y su historial en status.hubspot.com.'
 d['measure'] = {'value': 0.999, 'source': 'Bases Wherex 428823, sección 4'}
 d['figures'] = [
     {'value': '99,95 %', 'label': 'meta mensual de HubSpot', 'source': 'Términos de servicio de HubSpot'},
@@ -240,6 +279,22 @@ d['selected'] = 1  # en las filas 2 a 4 la etiqueta de la selección cae sobre l
 d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
 add('F09e-continuidad', 'decision-risk', d, '14 · continuidad e incidentes')
 
+# 09f · Controles técnicos (06/11, bases §4: cifrado, vulnerabilidades, OAuth, sesión única y licencias Microsoft
+# requeridas). «Fuente» es la evidencia y «Dueño», el responsable, como pide la matriz. Valores del anexo.
+d = base(EX, 'deck-content-measure-formulas-intent.json')
+d['use'] = 'proposal'
+d['voice'] = {'eyebrow': 'Controles técnicos', 'question': 'Cada control tiene', 'answer': ['su', 'dueño']}
+d['body'] = 'TLS 1.2 o superior y Entra ID P1: cómo se cumple cada control, su **evidencia** y quién responde.'
+d['note'] = 'Detalle por requisito en la matriz de cumplimiento (anexo)'
+d['metrics'] = [
+    {'glyph': 'seguridad', 'name': 'Cifrado', 'formula': 'TLS obligatorio en tránsito y datos cifrados en reposo', 'source': 'SOC 2 Tipo II', 'owner': 'HubSpot'},
+    {'glyph': 'checklist', 'name': 'Vulnerabilidades', 'formula': 'Pentest independiente y parches de la plataforma', 'source': 'Resumen bajo NDA', 'owner': 'HubSpot'},
+    {'glyph': 'integracion', 'name': 'Integraciones', 'formula': 'Una app OAuth por integración, con alcances mínimos', 'source': 'Revisión trimestral', 'owner': 'Efeonce'},
+    {'glyph': 'reloj', 'name': 'Sesión única', 'formula': 'Control de sesión de Entra ID e inactividad corta', 'source': 'Prueba técnica', 'owner': 'TI y Efeonce'},
+    {'glyph': 'contrato', 'name': 'Licencias Microsoft', 'formula': 'Licencia premium de Entra ID para el Acceso Condicional', 'source': 'Inventario de TI', 'owner': 'Fiordo Austral'},
+]
+add('F09f-controles', 'content-measure-formulas', d, '14b · controles técnicos')
+
 # 10 · Residencia
 d = base(HS, 'B25-residencia.json')
 d['voice'] = {'eyebrow': 'Residencia de datos', 'question': '¿Dónde quedan los datos?', 'answer': ['En Estados', 'Unidos']}
@@ -261,10 +316,10 @@ d = base(HS, 'P11-olas.json')
 d['voice'] = {'eyebrow': 'Implementación · 16 semanas', 'question': 'De la firma a producción,', 'answer': ['16', 'semanas']}
 d['body'] = 'Cada fase se **prueba** antes de la siguiente; la prueba técnica de seguridad es la puerta a producción.'
 d['steps'] = [
-    {'kicker': 'Semanas 1–4', 'name': 'Diseño y seguridad', 'desc': 'Arquitectura firmada, SSO con Entra ID, colector Wazuh y respaldo inmutable.'},
-    {'kicker': 'Semanas 3–8', 'name': 'Configuración', 'desc': 'Propiedades, pipeline, automatizaciones, migración desde Excel e integraciones.'},
-    {'kicker': 'Semanas 9–12', 'name': 'Prueba y puesta', 'desc': 'Aceptación funcional, prueba técnica de seguridad, capacitación y paso a producción.'},
-    {'kicker': 'Semanas 13–16', 'name': 'Estabilización', 'desc': 'Acompañamiento cercano, ajustes, adopción semanal y calidad de datos.'},
+    {'kicker': 'Semanas 1–4', 'name': 'Diseño y seguridad', 'desc': 'Entrega: arquitectura firmada, matriz de roles, SSO con Entra ID y colector Wazuh.'},
+    {'kicker': 'Semanas 3–8', 'name': 'Configuración', 'desc': 'Entrega: CRM configurado, migración cuadrada e integraciones probadas.'},
+    {'kicker': 'Semanas 9–12', 'name': 'Prueba y puesta', 'desc': 'Entrega: actas de aceptación, informe de la prueba técnica y capacitación.'},
+    {'kicker': 'Semanas 13–16', 'name': 'Estabilización', 'desc': 'Entrega: informe de adopción, calidad de datos y manual de operación.'},
 ]
 d['selectedStep'] = 3
 add('F12-cronograma', 'method-waves', d, '12 · cronograma')
@@ -272,7 +327,7 @@ add('F12-cronograma', 'method-waves', d, '12 · cronograma')
 # 13 · Cambios controlados
 d = base(HS, 'P12-dia-a-dia.json')
 d['voice'] = {'eyebrow': 'Cambios controlados', 'question': 'A producción llega', 'answer': ['sólo lo', 'aprobado']}
-d['body'] = 'Nada llega a producción sin su **aprobación**: se prueba con registros de prueba y se explica en un video corto.'
+d['body'] = 'Nada llega a producción sin su **aprobación**: se prueba en una cuenta de pruebas, se valida y se explica en un video.'
 d['release']['kicker'] = 'Cambio 03 · Sales Hub'
 d['release']['title'] = 'Alerta de cliente sin contacto'
 d['release']['icon'] = 'sales'
@@ -311,15 +366,15 @@ d['theme'] = 'light'
 d['line'] = 'growth'
 d['voice'] = {'eyebrow': 'Soporte y SLA', 'question': 'Lo crítico, en', 'answer': ['1 hora']}
 d['progress'] = {'sections': 4, 'current': 3}
-d['body'] = 'Guardia permanente para lo crítico y un backlog mensual con indicadores para todo lo demás.'
+d['body'] = 'Lunes a viernes de 9:00 a 18:30 y guardia permanente para lo crítico; mantención mensual.'
 SLA = 'SLA de esta propuesta'
 d['figures'] = [
     {'value': '≤ 1 h', 'label': 'S1 crítico: caída o incidente de seguridad', 'source': SLA},
     {'value': '≤ 4 h', 'label': 'S2 alto: función clave degradada', 'source': SLA},
     {'value': '≤ 1 día', 'label': 'S3 medio: error de un reporte o usuario', 'source': SLA},
     {'value': '≤ 2 días', 'label': 'S4 bajo: consultas y mejoras', 'source': SLA},
-    {'value': '4 h', 'label': 'para contener un incidente S1', 'source': SLA},
-    {'value': 'Mensual', 'label': 'informe con indicadores de servicio', 'source': SLA},
+    {'value': 'N1 a N3', 'label': 'escalamiento hasta HubSpot y Microsoft', 'source': SLA},
+    {'value': 'Al abrir', 'label': 'aviso de S1 y S2 por correo y Teams', 'source': SLA},
 ]
 d['selected'] = 1
 d['selection'] = {'target': 'object', **SEL}
@@ -397,11 +452,16 @@ add('F20-pasos', 'decision-next-steps', d, '20 · próximos pasos')
 d = base(AP, 'A09-contraportada.json')
 add('F21-contraportada', 'close-proposal-horizon', d, '21 · contraportada')
 
+# 06/11: las bases (§11) piden la oferta técnica y la económica por separado. La inversión se compone, pero queda fuera
+# del plan técnico: va con la oferta económica y en la presentación de adjudicación.
+ECONOMICA = {'F19-inversion'}
 plan = {'document': 'proposal', 'line': 'revenue-hubspot', 'slides': []}
 for key, recipe_id, intent, purpose in slides:
     with open(os.path.join(OUT, key + '.json'), 'w', encoding='utf-8') as fh:
         json.dump(intent, fh, ensure_ascii=False, indent=2)
         fh.write('\n')
+    if key in ECONOMICA:
+        continue
     entry = {'recipeId': recipe_id, 'purpose': purpose}
     photo = intent.get('photo') or {}
     if photo.get('plateRef'):

@@ -1,0 +1,31 @@
+{
+  "id": "FA10-en-la-feria",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "escena": "SCENE (documentary photograph, a real international trade fair hall at the end of the day, NO fantasy, NO glowing effects): the sales manager from the reference portrait, wearing her own tailored charcoal-grey blazer over a plain white top, with no logo and no print anywhere, stands behind the counter of a simple exhibition stand on the RIGHT half of the frame, her face at about 70 % of the frame width and at about 38 % of the frame height, framed from the waist up, camera about two meters away at chest height, 85mm f/2. She has just finished a meeting: with her right hand she holds a current flagship smartphone with very thin bezels at chest height and types the visit into it, eyes down on the screen with a small, satisfied closed-mouth smile; between two fingers of her left hand she holds a visitor's business card, its print tiny and out of focus. She never looks at the lens. The cool white light of the phone screen is her key light: it lights her face from below and in front, the far side of her face falls into soft shadow. Far behind her on the right, out of focus, the aisle of the fair: other stands with cool white and pale blue lights melted into round bokeh, a few distant people as soft silhouettes, banners whose print is far too small and blurred to read. The whole frame is cool and contemporary: nothing warm, amber, orange or golden, no tungsten. The LEFT 45 % of the frame is the dim, calm end of the stand: a plain dark wall in shadow, no lights, no people, no objects, no text. Rich contrast, no logos of any brand, no legible text.",
+  "lecho": {
+    "objeto": "the near, out-of-focus edge of the stand's dark matte counter at the bottom of the frame, outside the phone light",
+    "tono": "DARK, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dim, calm plain wall at the end of the stand on the left 45 % of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Cliente (persona ilustrativa, su ropa, sin marca Efeonce ni del cliente) para el respiro de la app móvil de la propuesta Fiordo Austral (06/11/2026). Feria genérica, sin rubro: la regla del canon no ancla la serie en la categoría del cliente. Casting anclado a su retrato con la receta de piel v3.",
+  "casting": {
+    "vendedora": {
+      "etiqueta": "Gerenta de exportaciones (casting)",
+      "identity": "IDENTITY (critical): the woman is the SAME person shown in the reference portrait: a Chilean export sales manager in her late thirties with shoulder-length dark brown hair with soft natural waves tucked behind one ear, warm light-olive skin, dark brown eyes, natural defined brows and small silver stud earrings. Preserve her face, skin and hair exactly; her pose, expression and light come from the scene. Do not age, beautify or smooth her.",
+      "refs": [
+        "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/casting/ancla-vendedora.png"
+      ],
+      "cuerpo": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/casting/ancla-vendedora.png"
+    }
+  },
+  "identidad": [
+    "vendedora"
+  ]
+}

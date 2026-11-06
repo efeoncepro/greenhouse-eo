@@ -16,7 +16,7 @@
       "aprobado"
     ]
   },
-  "body": "Nada llega a producción sin su **aprobación**: se prueba con registros de prueba y se explica en un video corto.",
+  "body": "Nada llega a producción sin su **aprobación**: se prueba en una cuenta de pruebas, se valida y se explica en un video.",
   "release": {
     "kicker": "Cambio 03 · Sales Hub",
     "title": "Alerta de cliente sin contacto",

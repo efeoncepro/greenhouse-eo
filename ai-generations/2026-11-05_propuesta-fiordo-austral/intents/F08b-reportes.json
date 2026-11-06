@@ -1,0 +1,86 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "recipe": "content-report-formats",
+  "voice": {
+    "eyebrow": "Reportes y dashboards",
+    "question": "El tablero comercial se arma",
+    "answer": [
+      "solo"
+    ]
+  },
+  "body": "Actividad por vendedor, clientes activos e inactivos y oportunidades por país, al día y con **exportación a Excel**.",
+  "reportLabel": "Tablero comercial · datos de muestra",
+  "kpis": [
+    {
+      "label": "Oportunidades abiertas",
+      "value": "48",
+      "delta": "▲ 6"
+    },
+    {
+      "label": "Ganadas en el trimestre",
+      "value": "12",
+      "delta": "▲ 3"
+    },
+    {
+      "label": "Clientes activos",
+      "value": "214",
+      "delta": "▲ 9"
+    }
+  ],
+  "trendTitle": "Ganadas vs. meta · 6 meses",
+  "rankingTitle": "Pipeline por país",
+  "ranking": [
+    {
+      "name": "China",
+      "share": 38
+    },
+    {
+      "name": "Japón",
+      "share": 27
+    },
+    {
+      "name": "España",
+      "share": 21
+    },
+    {
+      "name": "EE. UU.",
+      "share": 14
+    }
+  ],
+  "reading": "China concentra el pipeline. Dos clientes de España llevan 60 días sin contacto: ya tienen su tarea.",
+  "formats": [
+    {
+      "icon": "mail",
+      "title": "Correo",
+      "detail": "Cada lunes"
+    },
+    {
+      "icon": "web-mobile",
+      "title": "Web y móvil",
+      "detail": "En terreno"
+    },
+    {
+      "icon": "presentation",
+      "title": "Dashboard",
+      "detail": "Para el comité"
+    },
+    {
+      "icon": "pdf",
+      "title": "PDF",
+      "detail": "Para circular"
+    },
+    {
+      "icon": "deck",
+      "title": "Presentación",
+      "detail": "Lista para la gerencia"
+    }
+  ],
+  "highlightedFormat": 3
+}

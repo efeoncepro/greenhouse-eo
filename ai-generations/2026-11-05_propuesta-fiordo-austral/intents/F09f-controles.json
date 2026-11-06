@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-measure-formulas",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Controles técnicos",
+    "question": "Cada control tiene",
+    "answer": [
+      "su",
+      "dueño"
+    ]
+  },
+  "body": "TLS 1.2 o superior y Entra ID P1: cómo se cumple cada control, su **evidencia** y quién responde.",
+  "note": "Detalle por requisito en la matriz de cumplimiento (anexo)",
+  "metrics": [
+    {
+      "glyph": "seguridad",
+      "name": "Cifrado",
+      "formula": "TLS obligatorio en tránsito y datos cifrados en reposo",
+      "source": "SOC 2 Tipo II",
+      "owner": "HubSpot"
+    },
+    {
+      "glyph": "checklist",
+      "name": "Vulnerabilidades",
+      "formula": "Pentest independiente y parches de la plataforma",
+      "source": "Resumen bajo NDA",
+      "owner": "HubSpot"
+    },
+    {
+      "glyph": "integracion",
+      "name": "Integraciones",
+      "formula": "Una app OAuth por integración, con alcances mínimos",
+      "source": "Revisión trimestral",
+      "owner": "Efeonce"
+    },
+    {
+      "glyph": "reloj",
+      "name": "Sesión única",
+      "formula": "Control de sesión de Entra ID e inactividad corta",
+      "source": "Prueba técnica",
+      "owner": "TI y Efeonce"
+    },
+    {
+      "glyph": "contrato",
+      "name": "Licencias Microsoft",
+      "formula": "Licencia premium de Entra ID para el Acceso Condicional",
+      "source": "Inventario de TI",
+      "owner": "Fiordo Austral"
+    }
+  ]
+}

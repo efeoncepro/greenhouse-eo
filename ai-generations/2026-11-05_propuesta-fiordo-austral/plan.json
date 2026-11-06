@@ -37,6 +37,15 @@
       "purpose": "08 · automatizaciones"
     },
     {
+      "recipeId": "content-report-formats",
+      "purpose": "08b · reportes y dashboards"
+    },
+    {
+      "recipeId": "breather",
+      "purpose": "08c · app móvil",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png"
+    },
+    {
       "recipeId": "decision-difference",
       "purpose": "09 · seguridad"
     },
@@ -56,6 +65,10 @@
     {
       "recipeId": "decision-risk",
       "purpose": "14 · continuidad e incidentes"
+    },
+    {
+      "recipeId": "content-measure-formulas",
+      "purpose": "14b · controles técnicos"
     },
     {
       "recipeId": "content-markets",
@@ -91,10 +104,6 @@
       "recipeId": "section-cine-team",
       "purpose": "17 · equipo",
       "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
-    },
-    {
-      "recipeId": "content-pricing-live",
-      "purpose": "19 · inversión"
     },
     {
       "recipeId": "decision-next-steps",

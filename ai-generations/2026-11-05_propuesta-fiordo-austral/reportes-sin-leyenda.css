@@ -1,0 +1,4 @@
+/* 08b reportes (06/11/2026): la plantilla `content-report-formats` trae fija la leyenda SEO «Tu marca / Promedio del
+   sector». En el tablero comercial de Fiordo Austral no aplica: se oculta y el título del gráfico dice «Ganadas vs.
+   meta», que explica la línea punteada. Se retira cuando la leyenda venga del intent. */
+.gl-srf-legend { display: none !important; }

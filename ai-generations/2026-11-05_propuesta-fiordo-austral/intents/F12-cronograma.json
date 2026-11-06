@@ -21,22 +21,22 @@
     {
       "kicker": "Semanas 1–4",
       "name": "Diseño y seguridad",
-      "desc": "Arquitectura firmada, SSO con Entra ID, colector Wazuh y respaldo inmutable."
+      "desc": "Entrega: arquitectura firmada, matriz de roles, SSO con Entra ID y colector Wazuh."
     },
     {
       "kicker": "Semanas 3–8",
       "name": "Configuración",
-      "desc": "Propiedades, pipeline, automatizaciones, migración desde Excel e integraciones."
+      "desc": "Entrega: CRM configurado, migración cuadrada e integraciones probadas."
     },
     {
       "kicker": "Semanas 9–12",
       "name": "Prueba y puesta",
-      "desc": "Aceptación funcional, prueba técnica de seguridad, capacitación y paso a producción."
+      "desc": "Entrega: actas de aceptación, informe de la prueba técnica y capacitación."
     },
     {
       "kicker": "Semanas 13–16",
       "name": "Estabilización",
-      "desc": "Acompañamiento cercano, ajustes, adopción semanal y calidad de datos."
+      "desc": "Entrega: informe de adopción, calidad de datos y manual de operación."
     }
   ],
   "selectedStep": 3
