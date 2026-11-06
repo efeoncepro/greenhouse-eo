@@ -220,3 +220,20 @@ Fechas tentativas (se evitaron el 08-12, el 24-12, el 25-12 y el 31-12):
 
 Generador de las fichas: `outputs/sky-blog-plan-diciembre-2026/content-hub.py`. ID de cada página en Notion:
 `content-hub-ids.csv`.
+
+## Proyecto y tareas en «Tareas» del teamspace SKY (06-11-2026)
+
+A pedido de Julio, el mismo día se creó el proyecto **SKY · Producción Creativa - Diciembre 26** (base Proyectos del
+teamspace SKY, 01 al 31-12, `Planificación`, Daniela como propietaria). También se crearon las 40 tareas principales
+**SKY · Artículo 49** a **SKY · Artículo 88**, siguiendo la Fase 8 del Playbook Producción · Blog SKY:
+
+- Numeración consecutiva desde el Artículo 48 de noviembre, en orden de `Fecha de publicación`.
+- Campos: ícono 📝, `Sin empezar`, `Tipo de entregable` Contenido, `Proyecto` del mes y `Artículo Content Hub` = su fila.
+- `Responsables`: Valentina más el diseñador, como en noviembre. Andrés tiene los Artículos 49 a 68 y Melkin los 69 a 88.
+- `Fecha límite`: cinco días hábiles antes de la publicación, sin contar el 08-12 ni el 25-12.
+- Comprobado desde el Content Hub: los 40 artículos tienen exactamente una tarea en `Tareas 1`.
+- Sin subtareas de diseño: el Playbook las crea cuando el texto esté escrito.
+
+**Excepción al Playbook:** la regla pide crear la tarea sólo con `Aprobación cliente` = Aprobado, y los 40 artículos
+siguen en Idea. Lo dice un callout en el proyecto y en cada tarea: si SKY rechaza un artículo, su tarea pasa a Archivado
+y el número no se reutiliza. Generador: `tareas-sky.py`; IDs: `tareas-sky-ids.csv`.
