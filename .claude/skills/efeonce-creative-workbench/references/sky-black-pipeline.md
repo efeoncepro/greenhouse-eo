@@ -505,44 +505,55 @@ segunda revisión; desde la octava ronda (2026-11-06, §4.9) las 30 piezas está
 
 ### 4.10 Neón del logo BLACK (2026-11-06): exploración, esperando la decisión de SKY
 
-SKY pidió, vía Adriana, que el logo «tenga neón» y luego **tres opciones con distintas opacidades**, de la más sutil
-a la más fuerte, para que Dianesty elija; el operador pidió **altísimo impacto visual** y probarlo **con y sin el
-diseño de la pieza**. Ojo: en la segunda ronda SKY había pedido *menos* resplandor (`logofix.cjs`, `GLOW` 0,5 / 0,6);
-esto lo revierte solo si eligen una opción. **No cambia ninguna pieza aprobada ni toca `src2/`**: es una capa de luz
-encima de los PNG del taller.
+SKY pidió, vía Adriana, que el logo «tenga neón» y luego **tres opciones con distintas opacidades** para que Dianesty
+elija. El operador pidió alto impacto, **plano** (sin volumen) y, sobre todo, **elegante**; probado con y sin el diseño
+de la pieza. Ojo: en la segunda ronda SKY había pedido *menos* resplandor (`logofix.cjs`, `GLOW` 0,5 / 0,6); esto lo
+revierte solo si eligen una opción. **No cambia ninguna pieza aprobada ni toca `src2/`**: es una capa de luz encima de
+los PNG del taller.
 
-- **Código:** `$T/exploraciones/neon-logo/`. Vigente: `neon3.cjs` (receta, KV/popup/story) y `extra3.cjs` (logo solo
-  sobre negro, logo sobre la foto sola `parts/<KV>__base` + logo, y encendido animado); `page2.cjs` arma la página del
-  canvas desde `blobs.json` (ids de assets). `neon2.cjs`, `sindiseno.cjs` y `encendido.cjs` son la ronda 1 (rechazada) y
-  `neon3` reusa de `neon2` solo `mascaraKV`. Salidas en `out4/` y `fr4-*/` (fuera de git).
-- **Ronda 1 (canvas v54), rechazada por el operador por falta de impacto:** halo aditivo del mismo verde sobre letras y
-  marco. A tamaño de story no se leía como neón: ablandaba los bordes de «BLACK» (se veía desenfocado), no había
-  penumbra y el halo quedaba corto. No repetirla.
-- **Ronda 2 (canvas v55), rechazada: salía biselada.** Letras nítidas, marco como tubo de núcleo blanco y penumbra,
-  pero las letras se separaban del marco por grosor (σ6 > 0,3) y su **borde** caía en «trazo fino»: recibía el núcleo
-  blanco (filo claro) y, por dentro, el borde suavizado del original mezclado con la penumbra (línea oscura). SKY no
-  quiere volumen: **plano**, con el efecto neón.
-- **Receta vigente (ronda 3, canvas v56, plana):** máscara = píxeles verdes de `parts/<KV>__logo.png`
-  (`G − max(R,B)`) bajo y=134 del KV. **Letras** = núcleo grueso (σ6 > 0,38) **crecido ~10 px** (σ7 > 0,04), para
-  que cubra bordes y trazos de la A; **marco** = el resto. Las letras se **componen como verde plano `#26de00`** encima
-  del halo, con la máscara como cobertura (sin filos, sin sombras, sin restaurar el borde original). Halo exterior de
-  las letras σ 5/20/50 (pesos 1,1/0,6/0,25). El **marco** lleva halo verde `(60,245,25)` en σ 6/22/60/140 (pesos
-  1,5/0,85/0,38/0,16, `1 − e^(−Σ)`) y su trazo solo se aclara a `(150,255,120)` al 55 %: **sin núcleo blanco**.
-  **Penumbra** detrás del letrero: la foto baja hasta 50 % bajo un desenfoque σ90 de la máscara. Avión y textos blancos se
-  re-mezclan al 80 % para que no se tiñan. En story todo escala ×1,3 con la geometría de `compose.cjs`
-  (`(lb.x, lb.y) → (lb.x, 270)`). Desenfoques en **coma flotante** (tres cajas): en 8 bits los σ grandes sobre un
-  trazo de 2 px posterizan.
-- **Las tres opciones = opacidad de esa capa de luz** sobre la pieza actual, como pidió Adriana: 1 · sutil 45 %,
-  2 · medio 72 %, 3 · fuerte 100 % (iguales en la ronda 3). Encendido animado: 78 cuadros a 25 fps (0,5 s apagado, parpadeo de tubo, queda en
-  100 %), MP4 de Tacna KV e Iquitos story.
+**Rondas descartadas (no repetir):**
+
+| Ronda | Canvas | Qué era | Por qué se rechazó |
+| --- | --- | --- | --- |
+| 1 | v54 | Halo aditivo del mismo verde sobre letras y marco | Sin impacto: ablandaba «BLACK» (se veía desenfocado), sin penumbra, halo corto |
+| 2 | v55 | Letras nítidas, marco como tubo de núcleo blanco, penumbra | **Biselada**: el borde de las letras caía en «trazo fino» y recibía filo blanco + línea oscura |
+| 3 | v56 | Letras en verde plano, halo neón en letras y marco, penumbra | **No elegante**: todo brilla a la vez, niebla verde sobre la foto, mancha oscura de la penumbra |
+| — | sin publicar | Neón en todo el marco, halo de 30 px | **Sigue siendo mucho neón**: un rectángulo de ~1.500 px brillando parejo |
+
+**Lección:** de día, el neón no se lee sin ensuciar la foto. La elegancia viene de **reducir la superficie que brilla**,
+no de bajar la opacidad: un halo ceñido (≤ 8 px), sin niebla ni penumbra, y las letras intactas.
+
+**Receta vigente (ronda 4, canvas v57): acentos de esquina.** El logo ya trae dos acentos en el marco (arriba-izquierda
+y abajo-derecha: los tramos con gradiente blanco→verde y brillo blanco propio). Se encienden solo esos dos tramos.
+- **Código:** `$T/exploraciones/neon-logo/neon6.cjs` (receta y máscaras) y `todo6.cjs` (todas las piezas, con y sin
+  diseño, más la chispa); `page2.cjs` arma la página desde `blobs6.json`. Salidas en `out6/` y `fr6-*/` (fuera de git).
+  Los scripts de las rondas 1–3 (`neon2`, `neon3`, `extra3`, `sindiseno`, `encendido`) quedan como historia.
+- **Geometría:** el SVG del logo cae en el KV a **escala 1 con desplazamiento (+59, +53)** (marco: L 84,5 · R 599,5 ·
+  T 134,5 · B 295,5; radio 18,49). Acento arriba-izquierda: lado izquierdo desde y = 176,72+53, esquina y borde superior
+  hasta x = 79,53+59. Acento abajo-derecha: lado derecho desde y = 181,11+53, esquina y borde inferior hasta
+  x = 514,10+59. Peso máximo en la esquina, cae hacia las puntas (`(1 − d/dmax)^1,4`, d a lo largo del trazo). Letras =
+  núcleo grueso (σ6 > 0,38) crecido ~10 px; marco = el resto. En story, ×1,3 con la geometría de `compose.cjs`.
+- **Luz:** núcleo casi blanco `(240,255,235)` (σ 1,1) y halo verde `(80,255,45)` ceñido (σ 3 y 9, pesos 1,1 / 0,45),
+  luz aditiva `1 − e^(−Σ)`. Desenfoques en coma flotante (tres cajas). Sin niebla, sin penumbra, foto intacta.
+
+| Opción | Qué se enciende |
+| --- | --- |
+| 1 · Acentos | Solo los dos acentos de esquina |
+| 2 · + marco | Más una línea fina en todo el marco (σ 2,2, peso 0,5; trazo aclarado 22 %) |
+| 3 · + letras | Más un brillo mínimo en «BLACK» (σ 3/9, pesos 0,75/0,3); la letra se recompone en verde plano `#26de00` |
+
+- **Chispa animada** (GIF y story en video): 80 cuadros a 25 fps. 0,4 s quieto; una luz (cabeza gaussiana de 22 px y
+  estela de 110 px) sale del acento de arriba, recorre el marco en sentido horario hasta el acento de abajo en 0,9 s
+  (ease in-out) y entre 1,15 y 1,6 s se encienden los acentos (opción 1). Coordenada del recorrido = lado más cercano
+  del rectángulo. MP4 de Tacna KV e Iquitos story.
 - **Canvas:** página «KV Black · Neón del logo (exploración)» (`kv-black-neon`), 9 tableros de fila
   (`neon-<formato>-<ciudad>.dc.html`): logo solo sobre negro, logo sobre la foto sola (Tacna clara, Iquitos oscura) y KV,
-  popup y story de ambas; columnas actual · 1 · 2 · 3 · encendido. **La versión ya tenía 495 archivos** (límite 511):
-  las imágenes y videos van como **assets** (`/_blob/…`, no cuentan) y cada fila es un solo tablero. `launch` no se
-  tocó. La copia local `$P/canvas.json` quedó sincronizada con la v56: un script de página que publique desde `$P` la
-  conserva. Los assets de las rondas 1 y 2 siguen en el store sin uso (no se borraron); la ronda 3 reusa los de «actual».
-- **Errores de sharp que costaron una vuelta:** `blur` sobre un buffer de 1 canal devuelve 3 (rayas horizontales):
-  `extractChannel(0)`; `extract` corre antes que `composite` en la misma cadena; `create` no admite 1 canal.
+  popup y story de ambas; columnas actual · 1 · 2 · 3 · chispa. **La versión ya tenía 495 archivos** (límite 511):
+  imágenes y videos van como **assets** (`/_blob/…`, no cuentan) y cada fila es un solo tablero. `launch` no se tocó.
+  La copia local `$P/canvas.json` quedó sincronizada con la v57. Los assets de las rondas 1–3 siguen en el store sin uso.
+- **Errores de sharp que costaron una vuelta:** `blur` sobre un buffer de 1 canal devuelve 3 (rayas): `extractChannel(0)`;
+  `extract` corre antes que `composite` en la misma cadena; `create` no admite 1 canal; en 8 bits los σ grandes sobre un
+  trazo de 2 px posterizan.
 - **Pendiente:** que Dianesty (SKY) elija la opción. Aplicarla a las ~150 piezas es otra fase y solo a pedido; la receta
   elegida se documenta aquí y en la skill antes de tocar `logofix`/`compose`.
 
