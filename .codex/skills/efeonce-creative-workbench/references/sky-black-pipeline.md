@@ -784,6 +784,12 @@ que el logo no esté encima de las cabezas, que haya full espacio arriba».
   canvas **versión 70**: 32 assets nuevos y sólo los 16 tableros (ancla `canvas.json` idéntico al publicado). 🔴 Nunca
   `require('./compose.cjs')`: no tiene guarda de `require.main` y corre sobre todas las piezas. Legal todavía débil
   sobre la foto en el popup de Cusco y el story de Concepción.
+- **Doceava ronda de la otra sesión (commit daf801dbcd):** `rutas-foco.sh` exporta ahora `VELO_AUTO=1 PISO_SUTIL=1`
+  para todo el pipeline (también `destinos.cjs`, que con esos flags decide `lf-cielo`/`lf-piso` del KV) y borra
+  `parts/<pieza>__*` antes de renderizar. Re-render de las 16: popup y story **idénticos píxel a píxel** a lo
+  entregado (los flags ya corrían en `compose.cjs`, el KV no se entrega y las rutas no usan `rutas.cjs`/`banderas.cjs`),
+  así que OneDrive y el canvas v70 siguen vigentes. La píldora de las rutas sigue en `rutas-foco.cjs` (misma regla que
+  `pildora.cjs`, con el id del avión de las plantillas).
 - **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
