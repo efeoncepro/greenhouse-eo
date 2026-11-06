@@ -25,3 +25,7 @@ La [comparación financiera y operativa](../../audits/client-portal/2026-11-01-s
 recomienda conservar un único cliente comercial SKY y separar Diseño/SEO mediante Spaces (opción B).
 Así, ingresos y costos conservan su dueño comercial y se atribuyen a cada servicio con reglas explícitas.
 Falta implementar contexto, routing estable y protección histórica antes de activar esa separación.
+
+La implementación transversal se coordina en [EPIC-057](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Scope y reportes siguen en TASK-2033/1960; biblioteca y distribución en TASK-1849/1848. Sus criterios multi-Space
+están registrados como pendientes; la formalización no activa la capacidad ni modifica reportes anteriores.

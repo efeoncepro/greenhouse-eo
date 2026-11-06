@@ -922,3 +922,8 @@ Spaces explícitos; A′ divide P&L si se rekeyean gastos para pasar el trigger.
 protección temporal en ambos. ICO probado sólo por llamadas simuladas. Evidencia actual:
 `docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/`. Próximo U01 ruta/reader real local;
 integración integral, aceptación ADR y apertura real pendientes. Sin src/producción/historia real modificados.
+
+Formalización 2026-11-06: EPIC-057 + TASK-2096–2102 to-do; TASK-2094 ahora hija, conserva 204 tests históricos.
+Grafo/ownership: `docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md`. Insights/portal
+conservan sus parents y reciben criterios pendientes. Contratos primero, certificación2094 después y gate
+SKY SEO1852 al final; ninguna implementación o ejecución externa por este registro.

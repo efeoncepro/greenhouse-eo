@@ -20,11 +20,11 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `reader`
-- Epic: `none`
+- Epic: `EPIC-057`
 - Status real: `204 pruebas locales PASS; recomendación técnica B por permisos/Finance/routing/historia; integración integral y aceptación ADR pendientes`
 - Rank: `2094`
 - Domain: `identity|data|insights`
-- Blocked by: `none`
+- Blocked by: `TASK-2096–2101 y preparación local TASK-2102 para certificación M4; consumers por hito en EPIC-057. Baseline 204 casos ya entregado, sin bloqueo retroactivo.`
 - Branch: `Greenhouse develop; checkout compartido, sin worktrees`
 
 ## Summary
@@ -240,6 +240,10 @@ Ninguna, repo-only. Elección definitiva/rollout después de evidencia suficient
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057 M4: integrar contratos locales TASK-2096–2102 y slices multi-Space de TASK-2033/1960/1848/1849/1853/1854; pruebas HTTP/API/MCP/cache/export y GVC de sus dueñas, sin duplicar implementación.
+- [ ] Matriz integral enlaza cada caso con evidencia: grants/refresh concurrente/revocación durante write, bindings/replay/batch parcial, allocations, historia as-of/recuperación y tres productores; motor ICO real aislado distinto de mock de llamadas.
+- [ ] Manifest habilitable distingue capacidades verificadas, cerradas y fuentes/ventanas incompletas; briefs1855/1856 sólo obligatorios si se abren. Entregar a TASK-1852 sin autorizar canary real ni exigir cierre total de su foundation.
+
 - [x] Contrato nombra host, producer, binding, periodo, calidad, comparación y cero observado.
 - [x] Runner impide red externa y conexiones compartidas; PG16 efímero se detiene tras la prueba.
 - [x] Componentes actuales de identidad/Finance/Services ejecutados contra PostgreSQL real para A′/B.
@@ -297,3 +301,10 @@ registra alcance, gates y continuidad de bitácoras en el checkout compartido. L
 
 TASK-2033/1960 implementan scope/reporting; foundations Identity/Services/Finance según ADR.
 Las pruebas faltantes de la matriz de seis frentes permanecen visibles y bloquean aceptación no sustentada.
+
+## Delta 2026-11-06 — Adscripción a EPIC-057
+
+[EPIC-057](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md) coordina el trabajo.
+Los 204 casos del 01-11 siguen siendo el baseline, sin nueva corrida ni cambio de recibos. Las nuevas tasks
+implementan contratos; esta task conserva verificación integral local y decisión sustentada. No se crea otra
+QA duplicada. El baseline permite iniciar foundations sin esperar el cierre final de esta misma task.

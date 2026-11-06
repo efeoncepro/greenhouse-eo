@@ -2782,10 +2782,20 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 > Registro 2026-11-01: 2092–2093 verificados libres en filas, notas, `docs/**`, `origin/develop` y ramas justo antes de reservarlos (acceso de colegas del comité comprador en Rooms, decisión del operador del 2026-11-01). Siguiente ID libre TASK-2094.
 
-| `TASK-2094` | `in-progress` | SKY: contrato Blog y validación local con componentes reales sobre PostgreSQL efímero; sin runtime/producción ni historia de Diseño. | `docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md` |
+| `TASK-2094` | `in-progress` | EPIC-057. SKY: contrato Blog y validación local con componentes reales sobre PostgreSQL efímero; sin runtime/producción ni historia de Diseño. | `docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md` |
 
 > Registro 2026-11-01: 2094 libre en filas/reservas/filesystem; conserva TASK-2033/1960 y TASK-2073 complete. Autorización directa para contrato y pruebas locales. Siguiente ID libre TASK-2095.
 
 | `TASK-2095` | `in-progress` | **Efeonce ID: audiencia Rooms y cliente first-party de la CLI de agentes.** EPIC-044; backend-data/integration; P1/Alto/Medio. Enmienda D1-bis del carril de agentes de Rooms (CLI primero): audiencia `AUTH_SERVER_ROOMS_AUDIENCE`, clases `efeonce.mcp.rooms.*` restringidas, cliente público `efeonce-rooms-cli` e introspección por audiencia. | `docs/tasks/in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md` |
 
 > Registro 2026-11-01: 2095 verificado libre en filas, notas, `docs/**` y `origin/develop` justo antes de reservarlo (decisión del operador «CLI primero» para el carril de agentes de Rooms). Siguiente ID libre TASK-2096.
+
+> Reserva 2026-11-06: TASK-2096–2102 para EPIC-057, cuentas operativas por Space; verificados libres en filas, notas de reserva y filesystem. Autorización: formalizar EPIC y dependencias, sin ejecución runtime. Siguiente ID libre TASK-2103.
+
+| `TASK-2096` | `to-do` | **Cuentas operativas: autoridad y contexto por Space.** EPIC-057; U01; backend-data/api; planificación sin implementación. | `docs/tasks/to-do/TASK-2096-operational-space-authority-and-request-context.md` |
+| `TASK-2097` | `to-do` | **Cuentas operativas: routing estable de servicios y fuentes.** EPIC-057; U02; backend-data/sync; planificación sin implementación. | `docs/tasks/to-do/TASK-2097-operational-space-service-source-routing.md` |
+| `TASK-2098` | `to-do` | **Cuentas operativas: owner financiero y atribución por servicio.** EPIC-057; U02F; backend-data/reader; planificación sin implementación. | `docs/tasks/to-do/TASK-2098-operational-accounts-finance-owner-attribution.md` |
+| `TASK-2099` | `to-do` | **Cuentas operativas: plan y command de alta hija idempotente.** EPIC-057; U03; backend-data/command; planificación sin implementación. | `docs/tasks/to-do/TASK-2099-operational-space-provisioning-plan-command.md` |
+| `TASK-2100` | `to-do` | **Cuentas operativas: readers y cachés con aislamiento por Space.** EPIC-057; U04; backend-data/reader; planificación sin implementación. | `docs/tasks/to-do/TASK-2100-operational-space-readers-cache-isolation.md` |
+| `TASK-2101` | `to-do` | **Cuentas operativas: protección temporal de historia y snapshots.** EPIC-057; U05; backend-data/sync; planificación sin implementación. | `docs/tasks/to-do/TASK-2101-operational-space-temporal-history-protection.md` |
+| `TASK-2102` | `to-do` | **Cuentas operativas: operación durable, señales y recuperación.** EPIC-057; U10; backend-data/cron; planificación sin implementación. | `docs/tasks/to-do/TASK-2102-operational-space-durable-operations-recovery.md` |

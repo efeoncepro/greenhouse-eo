@@ -72,6 +72,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-055` | `in-progress` | `docs/epics/in-progress/EPIC-055-public-site-global-navigation.md` |
 | `EPIC-056` | `in-progress` | `docs/epics/in-progress/EPIC-056-eo-portfolio.md` |
 
+| `EPIC-057` | `in-progress` | `docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md` |
+
 ## Siguiente ID disponible
 
-- `EPIC-057`
+- `EPIC-058`

@@ -414,6 +414,10 @@ efecto en la siguiente edición, sin deploy.
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: alcance versionado host+ruta de Blog (`blog.skyairline.com`) se aplica en GA4 (adquisición/actividad diferenciadas), páginas GSC y citas URL del motor AEO; root/otros hosts excluidos y regresión Berel preservada.
+- [ ] EPIC-057: filtro AEO conserva denominador completo del panel y errores/observaciones desconocidas; referrals GA4 no sustituyen corrida nativa. Receipt identifica productor, binding y versión de scope; no se genera ni paga una corrida por formalizar.
+- [ ] EPIC-057: el binding de alcance a Service/Space consume TASK-1960 y TASK-2097; ausencia/borrado de scope falla cerrado, sin ampliar a toda SKY. La conversión host/ruta puede desarrollarse antes de ese binding.
+
 - [x] Existe `greenhouse_growth.seo_content_scope_versions`, append-only, y su migración aborta si la tabla no quedó creada. (Aplicada el 2026-10-12; `to_regclass` y `pgmigrations` verificados.)
 - [x] `setSeoContentScope` crea una versión nueva sólo cuando cambian las reglas o la etiqueta, y rechaza reglas inválidas con error tipado. (Ejercitado contra PostgreSQL real con el alcance de Berel: v1 creada, segunda corrida «sin cambios», regla inválida rechazada sin escribir.)
 - [x] `readSeoOverviewKpisForWindow` con el alcance de Berel devuelve 522 clics en agosto de 2026 y 605 en septiembre para `/articulos` + `/tutoriales`, leídos de PostgreSQL real. (Medido 2026-10-12 con el SQL del reader; con el alcance completo acordado: 661 y 799.)
@@ -497,3 +501,11 @@ efecto en la siguiente edición, sin deploy.
 - Lo que esto cambia: las ediciones que arme el `ops-worker` (ocurrencias programadas) y las creadas desde staging ya miden el alcance de Berel. Las creadas desde Vercel Production siguen midiendo el sitio completo hasta el release a `main`.
 - Sin ejercitar en el runtime desplegado: no se generó ninguna edición nueva después del deploy, así que el alcance en staging y en el worker está desplegado pero no observado en una edición real.
 - `CLAUDE.md governance` quedó rojo en este push por 37 tokens sobre el presupuesto. Ya estaba rojo en el push anterior (`b11d6572f`); ningún commit de este rango toca `CLAUDE.md`.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+U06; filtros y contrato de población. Puede avanzar con fixtures sin alta de Space ni cierre global de EPIC-057.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

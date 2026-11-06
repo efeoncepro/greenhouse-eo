@@ -9,6 +9,7 @@
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
 - Confidence: `medium`; B recomendado con evidencia local de permisos/Finance/routing/historia; integración y rollout pendientes.
 - Validated as of: `2026-11-01`, componentes reales en PostgreSQL efímero (TASK-2094); sin conexión productiva.
+- Epic: [EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md), formalizado 2026-11-06; no cambia este estado Proposed.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
 
 ## Revisión inicial 2026-11-01 — Recomendación A′ suspendida
@@ -199,3 +200,10 @@ anchors de código local. Ambas variantes pasan con primitives explícitas; A′
 predicados client-only modelados y exige normalización Finance previa para evitar un falso candidato único de
 Diseño. No demuestra transacciones, migración o integración real. Typecheck global baseline agotó heap; lint
 global sin errores y 26 warnings existentes. Detalle y recibo reproducible en la evaluación enlazada arriba.
+
+## Programa de ejecución — 2026-11-06
+
+[EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md) registra TASK-2096–2102
+y coordina TASK-2094. Reutiliza las dueñas de EPIC-045/046/022 sin reparentarlas. Su matriz por hitos sustituye
+el listado U00–U10 sin IDs del discovery para planificar; el discovery conserva su fecha y evidencia.
+Formalizar no acepta el ADR, no aplica migrations ni habilita SKY. UI, envío y apertura siguen en sus dueñas.

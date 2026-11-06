@@ -345,6 +345,9 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: schedules y dispatch revalidan principal/capacidad/Space/Service/destinatarios vigentes antes de cada efecto; revocación SEO no invalida Diseño del usuario dual.
+- [ ] EPIC-057: retry tras accepted/ambiguous concilia primero y no duplica envío; auditoría no redistribuye ediciones. Share bearer permanece explícito y no acredita identidad departamental.
+
 - [ ] Arquitectura §9.1: edición emitida genera intención correlacionada para email/in-app/Teamsbot habilitado; cada canal conserva su delivery, dedupe y preferencias. Un fallo parcial no reenvía canales exitosos ni declara entrega global. — **Abierto:** el envío es un intent explícito autorizado por una persona (no se crea al emitir) y no hay in-app/Teams: `NotificationService` no restringe canales (duplicaría el correo) y el resolver Teams sólo resuelve members. Dueños TASK-690–693 / TASK-1849.
 - [ ] Deep link normal lleva a la edición autenticada y conserva contexto tras login; valida cuenta/módulo/acción en servidor. ShareGrant es explícito y separado; GET/scanner no ejecuta acciones ni marca leído. — **Abierto:** la ruta de la edición en el portal es de TASK-1849; `portal_link` responde `not_ready` (`INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE=false`). Sí verificado: ShareGrant separado y el GET público sólo lee (access log mínimo, no marca leído).
 - [ ] Destinatarios cliente se resuelven por persona/usuario canónico sin exigir member laboral; se revalidan al despachar. Teamsbot sin destino autorizado se registra no disponible; no hay publicación a canales generales como fallback. — **Parcial:** resolución por `session_360` sin exigir member y revalidación al despachar verificadas (`delivery.test.ts`); Teams no implementado (ver primer criterio).
@@ -409,3 +412,11 @@ código/runtime; no inventar disponibilidad. Antes de implementar, /goal explíc
 
 - Estado y blockers contrastados con releases y código publicado; evidencia y límites en [2026-10-04-epic-045-closure-review.md](../../audits/insights/2026-10-04-epic-045-closure-review.md).
 - Se conserva `in-progress`: el despliegue y la activación de flags no sustituyen los criterios pendientes de esta task.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+U07/U10; mantiene única implementación de sharing, schedules y delivery; gate de envío real separado del desarrollo local.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

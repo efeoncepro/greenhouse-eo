@@ -1,5 +1,7 @@
 # Epic Index
 
+- [EPIC-057 — Cuentas operativas por Space](in-progress/EPIC-057-operational-accounts-under-organization.md): in-progress por laboratorio TASK-2094; siete nuevas tasks to-do, dependencias Insights/portal sin duplicar; ADR Proposed, sin rollout.
+
 > **Naming vigente para EPIC-020/021/022:** **Efeonce AEO** (capacidad), **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable). Los títulos `AI Visibility Grader`/`AEO Grader` de epics y tasks preservan historia e identificadores del motor; Search Visibility 360 mantiene la oferta SEO+AEO. [ADR](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
 Panel operativo de epics del repo.
@@ -39,7 +41,7 @@ Panel operativo de epics del repo.
 
 - `EPIC-047` — **Portafolio de landings del sitio público: orden de prioridad.** Reancla desde EPIC-019 las 20 tasks de landing y fija su orden en `Rank EPIC-047-01…10`: primero Agencia Creativa (dos URLs indexables compitiendo), luego ASO (pitch activo con Berel), Precios y Agentes del hub HubSpot, después Salesforce y Performance. Content Marketing, Home, Redes Sociales y el Pillar HubSpot se cerraron el mismo día por decisión del operador; los artículos del hub HubSpot (TASK-1402/1404) van fuera del ranking y Contacto es habilitador. EPIC-019 conserva el control plane técnico. [Epic](to-do/EPIC-047-public-site-landing-portfolio-prioritization.md).
 
-- siguiente ID disponible: `EPIC-057`
+- siguiente ID disponible: `EPIC-058`
 - `EPIC-044` — **Efeonce Identity, Native Authorization Server and MCP Federation.** Emisor OAuth/MCP y login base productivos; Rooms primer RP con canary interno real26Oct cerrado OFF para first-party/OTP. Auth PR263/264 retenidas por el operador, sin merge/deploy ni release262. Assurance, migración Greenhouse y demás unidades siguen abiertas. [Epic](in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md).
 - `EPIC-043` — **Payroll Reliability and Agentic API Parity.** Programa P0 para integridad del cálculo/aprobación, historia y Finance, preflight, PDF/email recuperables y operación canónica desde portal, Nexa, Codex y Claude. Doce tasks nuevas TASK-1816–TASK-1827; TASK-731/1214/1215/730 cerradas por supersesión documental. Primero TASK-1816 / ISSUE-130: publicación atómica y aprobación de versión. [Epic](to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
 - `EPIC-042` — **Efeonce Governed Email Presentation Program.** Coordina la migración incremental de marca, firma, footer, contexto, RRSS elegibles, preferencias e identidad/nota legal para los 30 `EmailType`, sin big bang: legacy por defecto, foundation byte-idéntica, cohorts de máximo cuatro tipos, canary y rollback por tipo. `TASK-1764` es la primera child y gobierna policy/decomposición; las implementaciones se reservan sólo tras aceptar el ADR. Spec: `to-do/EPIC-042-efeonce-governed-email-presentation-program.md`.
@@ -84,6 +86,7 @@ Panel operativo de epics del repo.
 
 | Epic ID | Archivo | Priority | Impact | Effort | Lifecycle | Resumen |
 | --- | --- | --- | --- | --- | --- | --- |
+| EPIC-057 | `in-progress/EPIC-057-operational-accounts-under-organization.md` | P1 | Muy alto | Alto | in-progress | Cuentas operativas por Space; B recomendado, siete nuevas tasks y dependencias externas sin duplicar |
 | `EPIC-056` | [EPIC-056-eo-portfolio.md](in-progress/EPIC-056-eo-portfolio.md) | `P1` | `Alto` | `Alto` | `in-progress` | Portafolio de proyectos propio en `/portafolio/` (PDR-028): limpieza de demos de Ohio, plugin con compuerta de cliente, portada y entrada con video, migración. |
 | `EPIC-055` | [EPIC-055-public-site-global-navigation.md](in-progress/EPIC-055-public-site-global-navigation.md) | `P1` | `Alto` | `Alto` | `in-progress` | Navegación global del sitio portable: AXIS `efeonce.site-nav`, plugin «EO Navegación» con documento único (admin + agentes) y fotos en el bucket de AXIS, adaptador WordPress con interruptor, en vivo en todo el sitio desde 2026-10-23 (sin piloto); dock de las landings; Think después. TASK-2040…2043. |
 | `EPIC-054` | [EPIC-054-greenhouse-product-domain-decoupling.md](to-do/EPIC-054-greenhouse-product-domain-decoupling.md) | `P0` | `Muy alto` | `Alto` | `to-do` | Desacople por dominios de producto: Lab y composición de marca a AXIS, Growth y Search Visibility 360 a Marketing Studio, Insights a dominio propio. Diez unidades sin task registrada. |

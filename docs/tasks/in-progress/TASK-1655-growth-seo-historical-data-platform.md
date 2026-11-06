@@ -373,6 +373,8 @@ patrón fuente en `rank-history-bq-mirror.ts`. Puntos load-bearing:
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: declarar cobertura/finalidad de GSC para la propiedad y ventanas exactas del Blog, con fuente/receipt; período ausente bloquea comparación prometida. Cualquier captura/backfill real se somete a autorización independiente.
+
 - [x] `greenhouse_growth_analytics.seo_gsc_history` existe, particionada por fecha + clustered por org, poblada por MERGE idempotente (nunca DELETE by source). **Evidencia histórica:** 07/08: tabla creada, particionada/clustered; mirror MERGE implementado, Slice 1.
 - [x] Backfill ejecutado para TODAS las orgs con `seo_v2`; profundidad ≥6 meses (objetivo 16) verificada con `SELECT MIN(capture_date)` por org. **Evidencia histórica:** 07/08: cohorte entonces elegible Berel + Efeonce; 487/474 días con datos y fechas mínimas registradas en Acceptance criteria additions. No certifica organizaciones incorporadas después.
 - [x] `readSeoPerformance` sirve rango > ventana caliente desde BQ con `source='bigquery'`; shape y honestidad (`null` ≠ 0) idénticos. **Evidencia histórica:** 07/08: lectura por cobertura y 180 días solicitados, 179 servidos desde BQ; paridad de shape. Sin canary nuevo hoy.
@@ -409,3 +411,11 @@ patrón fuente en `rank-history-bq-mirror.ts`. Puntos load-bearing:
 1. ¿Granularidad real de `historical_serps`? (verificar en sandbox — condiciona el Slice 4).
 2. ¿El mirror GSC va por outbox reactivo (como rank) o como paso del batch diario? (Discovery; el batch es más simple, el outbox es el patrón canónico).
 3. ¿La cuenta OAuth de Efeonce tiene permiso Owner en la propiedad GSC de Berel?
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Dueña de historial/cobertura GSC. Dependencia sólo de las ventanas que el informe Blog necesite; no se reejecutan backfills previos.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

@@ -293,6 +293,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: alta/habilitación SKY SEO exige TASK-2099 ensayada, certificación integral local TASK-2094, ADR Accepted, piso compatible TASK-2102 y gate de login/Auth vigente; crear Space incluso inactivo no es un atajo.
+- [ ] EPIC-057: preview revisable nombra IDs/owner/digest/versiones, personas/capacidades/fuentes/destinatarios y compensaciones; apply real requiere autorización específica posterior, nunca se deduce de este plan.
+- [ ] EPIC-057: readback de Diseño/SEO/control verifica identidad, permisos, datos y hash histórico; apertura por capacidad conserva cerradas las superficies no certificadas y pausa sin restaurar writers incompatibles.
+
 - [x] Matriz y manifiesto separan SEO/contenidos Berel y diseño digital Sky; documentan registros/términos ausentes. AEO preservado. [QA y matriz](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 - [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-2063.
 - [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-2063 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
@@ -388,3 +392,11 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 ## Open Questions
 
 Goal y plan P1 aprobados y ejecutados. Blockers vigentes (QA): el apply de Sky se ejecutó el 2026-09-10 por el canal MCP delegado con la autoridad del operador (`EO-APC-ECD63852`; el harness técnico sigue sin poder aprobar writes, por contrato); Berel exige entregar las invitaciones (mensaje) y que las personas activen su acceso; TASK-1687 conserva el destino `cliente.creative_hub` (404 en producción; el operador decidió el 2026-09-10 que Creative Hub ES el módulo de Sky y la página se construye en TASK-1857); Notifications no tiene canal/preferencias en ninguna de las dos organizaciones. El contrato delegado está en Production desde el release `f69b9d32` y su canal completo (allowlist del consumer, scope Entra, federación en `efeonce-mcp` 1.4.0 rev `00052-slt`) desde el 2026-09-10 ~05:30Z; el primer canary punta a punta con token Entra del operador corrió el 2026-09-10 ~07:40Z (preview + apply + replay por el gateway de producción); evidencia en la auditoría de rollout §Apply de Sky.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+U09; dueña única de habilitación. Foundation entregada consumible por UI/QA sin esperar cierre total; el nuevo gate SKY SEO sí espera M4 del EPIC.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

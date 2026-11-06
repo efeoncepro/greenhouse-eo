@@ -1,7 +1,23 @@
 # Task Index
 
+- `TASK-2102` — [Cuentas operativas: operación durable, señales y recuperación](to-do/TASK-2102-operational-space-durable-operations-recovery.md), to-do; EPIC-057 / U10; sin implementación.
+
+- `TASK-2101` — [Cuentas operativas: protección temporal de historia y snapshots](to-do/TASK-2101-operational-space-temporal-history-protection.md), to-do; EPIC-057 / U05; sin implementación.
+
+- `TASK-2100` — [Cuentas operativas: readers y cachés con aislamiento por Space](to-do/TASK-2100-operational-space-readers-cache-isolation.md), to-do; EPIC-057 / U04; sin implementación.
+
+- `TASK-2099` — [Cuentas operativas: plan y command de alta hija idempotente](to-do/TASK-2099-operational-space-provisioning-plan-command.md), to-do; EPIC-057 / U03; sin implementación.
+
+- `TASK-2098` — [Cuentas operativas: owner financiero y atribución por servicio](to-do/TASK-2098-operational-accounts-finance-owner-attribution.md), to-do; EPIC-057 / U02F; sin implementación.
+
+- `TASK-2097` — [Cuentas operativas: routing estable de servicios y fuentes](to-do/TASK-2097-operational-space-service-source-routing.md), to-do; EPIC-057 / U02; sin implementación.
+
+- `TASK-2096` — [Cuentas operativas: autoridad y contexto por Space](to-do/TASK-2096-operational-space-authority-and-request-context.md), to-do; EPIC-057 / U01; sin implementación.
+
+- [EPIC-057: cuentas operativas por Space](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md): TASK-2096–2102 planificadas; TASK-2094 valida; Insights/portal conservan sus dueñas.
+
 - `TASK-2095` — [Efeonce ID: audiencia Rooms y cliente de la CLI](in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md), In Progress; **en producción** desde 2026-11-01 (hotfix PR #267, `auth-server-00172-zcn`): audiencia Rooms, clases restringidas y clientes `efeonce-rooms-cli`/`efeonce-rooms-resource`; aceptada 2026-11-02 con login real. Falta el copy del consentimiento (`75b40772d`, sólo `develop`) en el próximo release completo y el cierre formal.
-- `TASK-2094` — [SKY: contrato y componentes reales](in-progress/TASK-2094-sky-measurement-real-component-local-validation.md), in-progress local; 204 pruebas PASS, recomendación técnica B tras Finance/routing/historia; integración y ADR pendientes, sin producción.
+- `TASK-2094` — [SKY: contrato y componentes reales](in-progress/TASK-2094-sky-measurement-real-component-local-validation.md), in-progress local, EPIC-057; 204 pruebas PASS (01-11), recomendación técnica B tras Finance/routing/historia; integración y ADR pendientes, sin producción.
 - `TASK-2087` — [Rooms: verificador del bearer y `pnpm rooms login`](in-progress/TASK-2087-rooms-delegated-bearer-verifier.md), In Progress; forma directa (D1-bis) **en producción** con el carril encendido (PR #22 y #23, `main@3434ea8`); aceptada 2026-11-02: el agente publicó la sala Volta por CLI con 17 acciones `cli/claude-code`. Falta el cierre formal (`pnpm verify`, tests pendientes) y la forma delegada (TASK-2086/2088).
 
 - `TASK-2083` — [Rooms: página «el acceso se detuvo»](in-progress/TASK-2083-rooms-access-issue-page.md), in-progress; **en producción** 2026-10-31, aprobada por el operador; falta verla en un login humano real.
@@ -69,7 +85,7 @@ Auditoría14/10 de configuración/CAPI/agentes: [docs y skills conciliados](../a
 - `TASK-2036` — [Policy/API/CLI de medición](complete/TASK-2036-growth-measurement-policy-foundation.md), complete; PR255/main9690efad released, alta por datos en producción y Meta Server9 verificados sin redeploy.
 - `TASK-2037` — [Panel de medición](complete/TASK-2037-growth-measurement-configuration-panel.md), complete; mismo contrato que agentes, UI/GVC1440/390 y12 estados PASS, release y readback productivos verificados.
 
-- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2096`.
+- `TASK-2035` — [Medición Growth escalable, CRO, retargeting y suscripciones](in-progress/TASK-2035-growth-measurement-scalable-cro-retargeting-subscriptions.md), in-progress; goal14/10 acotado a configuración escalable y CAPI publicado/verificado PR255; [plan aprobado](plans/TASK-2035-plan.md). Resto del paraguas sin iniciar; siguiente ID disponible: `TASK-2103`.
 
 - `TASK-2034` — [Lead matching Meta y Google](in-progress/TASK-2034-growth-lead-matching-meta-google.md), in-progress/parcial. [Release main2559e9242](../audits/releases/2026-10-18-grader-commercial-measurement-production-release.md) con Grader y clasificación auditada servidos; CI/Deep/smoke/health y watchdog6/6 PASS. GTM6/10, EC ON y13 Forms+Discovery verificados; Grader comercial, Contacto fueraAds, Web quote_request. Primera identidad nativa/recibo Graph/recepción y atribución Ads pendientes; umbrella `TASK-2035`.
 - `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md), in-progress (Slices 1–5 en staging y `ops-worker`; Production sin release); `EPIC-045`.
@@ -2061,7 +2077,7 @@ Reglas de lectura:
 
 ## To Do
 
-- **Comité del comprador en Rooms (creado 2026-11-01).** En B2B compra un comité: el invitado suma a sus colegas. [`TASK-2092`](to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (P1, backend) crea las reglas: aprobación automática del mismo dominio corporativo, otro dominio o correo gratuito con aprobación del equipo, tope de 10 por sala, el colega nunca recibe más permisos ni vigencia. [`TASK-2093`](to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (P1, interfaz, canvas primero) las hace visibles en la sala y en la gestión de invitaciones. Siguiente ID: TASK-2096.
+- **Comité del comprador en Rooms (creado 2026-11-01).** En B2B compra un comité: el invitado suma a sus colegas. [`TASK-2092`](to-do/TASK-2092-rooms-buyer-committee-colleague-access.md) (P1, backend) crea las reglas: aprobación automática del mismo dominio corporativo, otro dominio o correo gratuito con aprobación del equipo, tope de 10 por sala, el colega nunca recibe más permisos ni vigencia. [`TASK-2093`](to-do/TASK-2093-rooms-buyer-committee-colleague-access-ui.md) (P1, interfaz, canvas primero) las hace visibles en la sala y en la gestión de invitaciones. Siguiente ID: TASK-2103.
 - **Carril de agentes de Rooms (creado 2026-10-31).** Implementa el ADR `docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md` (agentes ciudadanos de primera clase). Ya, sin depender de Efeonce ID: [`TASK-2084`](in-progress/TASK-2084-rooms-agent-attribution-reversal-quotas.md) atribución, aviso, reversa y cuotas (P1) → [`TASK-2085`](in-progress/TASK-2085-rooms-agent-activity-surface.md) pantalla «Actividad de agentes» (P1, dirección aprobada, en implementación); [`TASK-2090`](in-progress/TASK-2090-rooms-governed-media-import.md) medios gobernados (P2, en curso: slices 1–3 en local); [`TASK-2091`](in-progress/TASK-2091-rooms-authoring-craft-skill-and-eval.md) skill de oficio + eval (P1, en curso: slices 1–3 en local). CLI primero (enmienda D1-bis, 2026-11-01): [`TASK-2095`](in-progress/TASK-2095-efeonce-id-rooms-audience-cli-first-party-client.md) audiencia Rooms y cliente CLI en Efeonce ID (EPIC-044, In Progress: en producción desde 2026-11-01) → [`TASK-2087`](in-progress/TASK-2087-rooms-delegated-bearer-verifier.md) verificador del bearer + `pnpm rooms login` (In Progress: en producción y aceptada 2026-11-02). MCP remoto después: [`TASK-2086`](to-do/TASK-2086-efeonce-id-interactive-agent-delegation-second-resource.md) canje para el gateway → [`TASK-2088`](to-do/TASK-2088-efeonce-mcp-rooms-provider.md) provider `rooms`. Fuentes: [`TASK-2089`](to-do/TASK-2089-rooms-content-sources-xray-crm.md) Radiografía AEO y CRM (P2, canary bloqueado por 2086).
 
 

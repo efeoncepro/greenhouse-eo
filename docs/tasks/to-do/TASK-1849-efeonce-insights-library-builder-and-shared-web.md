@@ -392,6 +392,9 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: biblioteca/builder/detalle/descarga y enlaces autenticados conservan Space/Service en cada request; usuario dual y cuenta equivocada tienen estados seguros, sin inferir acceso por rol org.
+- [ ] EPIC-057: flow y GVC existentes se amplían para cambio de cuenta, revocación, sesión expirada, respuesta tardía de otra cuenta y múltiples pestañas antes de habilitar el corte.
+
 - [ ] Correo Insights presenta hallazgos útiles, período/corte y CTA a la edición exacta; HTML/plain text y preview desktop/móvil coherentes. Variante autenticada y ShareGrant explícito no se confunden.
 - [ ] Flow/GVC cubre email/in-app/Teamsbot → login si falta sesión → edición/objeto permitido y retorno al servicio; cuenta incorrecta, revocación y retiro tienen estado seguro, sin open redirect ni acción por GET.
 - [ ] Preferencias/notificaciones se enlazan a la superficie canónica de TASK-693; no se crea otro centro en Insights. Estado leído y acción resuelta se distinguen; UI no afirma delivered por un mero accepted.
@@ -445,3 +448,11 @@ unidad se resuelven en sus slices. TASK-1672/1673 conservan la integración espe
 
 Sin preguntas que bloqueen el registro. Confirmar límites, rutas y mapping propuestos en Discovery contra
 código/runtime; no inventar disponibilidad. Antes de implementar, /goal explícito y codex:task-hook.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Consumer UI Insights; reutiliza contexto TASK-2096, reader TASK-1960 y cambio de cuenta de TASK-1854; no otro selector/builder.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

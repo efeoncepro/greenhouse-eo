@@ -328,15 +328,14 @@ y la rama local de Codex `codex/auth-pr-develop-stack` integrada en `develop` (`
 413, OTP con fallo cerrado, Job de rotación (migración sin aplicar) y verificación post-deploy del tráfico. Requiere release a
 `main`; la llave de firma (KMS v1/v2 del 04-09) dispara `auth.keys.rotation_overdue` hacia el 23-11.
 
-## 2026-11-01 — SKY: B recomendado tras pruebas locales
+## 2026-11-06 — SKY: EPIC transversal formalizado
 
-[TASK-2094](docs/tasks/in-progress/TASK-2094-sky-measurement-real-component-local-validation.md):
-[204 pruebas PASS](docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md), 37 nuevas
-Finance/routing/historia. Recomendación B: un owner comercial, Spaces Diseño/SEO separados. El trigger real
-rechaza el owner común con client SEO separado; rekeyear gastos divide P&L. Grants/contexto son necesarios
-en ambos. Writer Notion admite reasignación/eventos antiguos; rebuild histórico usa actividad actual.
-Rollback PG real probado; ICO sólo orden de llamadas simulado, no BigQuery. [ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md).
-Próximo: U01 contexto por Space en ruta/reader real local; después bindings/protección temporal. HTTP/UI,
-concurrencia, historia integral y distribución pendientes. Contrato GA4/GSC/AEO candidato; TASK-2033/1960
-conservan scope/reporting. Sin src/producción/provisioning/envíos ni historia real de Diseño modificados.
-Typecheck focal sin diagnósticos, ESLint focal y task lint PASS; recibo conserva hashes de los componentes ejercitados.
+[EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md) coordina TASK-2094
+(baseline 204 pruebas del 01-11) y siete nuevas TASK-2096–2102, todas to-do: autoridad/contexto, routing,
+Finance, alta hija local, readers/cache, historia y operación durable. Insights/portal mantienen sus dueñas
+2033/1960/1848/1849/1992 y1852–1857; GSC1655 conserva productor. No se reparentan ni duplican.
+[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), B recomendado;
+aceptación/apertura pendientes. Próximo ejecutable: TASK-2096 local, previa toma/plan de implementación.
+Grafo por hitos: foundation1852 consumible; gate SKY SEO1852 espera QA2094. Preparación2102 antes del canary,
+observación después; sin ciclo de cierre total. [QA documental](docs/audits/client-portal/2026-11-06-operational-accounts-epic/README.md).
+Registro y commit sólo documentales; no nueva corrida de tests runtime, no cambios en producción ni historia Diseño.

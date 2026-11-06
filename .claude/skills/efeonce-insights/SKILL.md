@@ -312,3 +312,8 @@ Corte actual: [204 pruebas y recomendación B](../../../docs/audits/client-porta
 37 nuevas Finance/routing/historia: conservar owner comercial único y separar Space/Service. A′ exige
 normalización adicional; B aún necesita contexto/routing/protección temporal integrados. ICO sólo prueba
 llamadas con puerto simulado; nunca freeze/rebuild real para reproducir. Siguiente U01 local; ADR Proposed.
+
+Programa formalizado 06-11: [EPIC-057](../../../docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+TASK-2096–2102 poseen foundations compartidas; TASK-2094 QA local. TASK-2033/1960/1848/1849/1992 conservan
+EPIC-045 y sus deltas multi-Space, sin nuevo renderer/sender/scheduler. Apertura SKY SEO sigue en TASK-1852
+tras evidencia/permiso; registrar el EPIC no acepta ADR ni crea cuentas. Próximo local: TASK-2096.

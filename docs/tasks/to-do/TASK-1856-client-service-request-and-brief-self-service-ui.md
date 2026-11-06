@@ -314,6 +314,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: el formulario muestra la cuenta destino; cambiar contexto con borrador exige preservar o descartar explícitamente, nunca enviar al otro departamento. Flow/GVC incluye expiración/revocación y respuesta perdida.
+
 - [x] Paquete documental detallado: alternativas, pantallas, copy, estados, responsive, flow y motion versionados el 2026-09-09; evidencia en los cuatro documentos enlazados. No acredita implementación.
 - [ ] R56-01..16 verificados: plantillas versionadas, campos por servicio, adjuntos, edición/revisión, recuperación de respuesta perdida y conflicto de versión sin duplicación.
 - [ ] No copy de guardado durable sin command; sesión expirada, dirty state y resultado incierto tienen recuperación comprobada y límites explícitos.
@@ -355,3 +357,11 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 ## Open Questions
 
 Sin preguntas que bloqueen el registro. El plan de ejecución debe resolver los paths/DDL propuestos y readiness real antes de código. Para ejecutar en Codex: /goal explícito y task-hook; este registro no inicia implementación.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Consumer de TASK-1855 y TASK-1854; misma condición de habilitación por capacidad, sin backend duplicado.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

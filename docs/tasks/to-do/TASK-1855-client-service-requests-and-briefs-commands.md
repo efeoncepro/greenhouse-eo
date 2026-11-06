@@ -270,6 +270,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: crear/editar/seguir brief y adjunto valida target Space/Service vigente; doble submit, revocación y cambio de cuenta no reasignan owner ni historial. Consume TASK-2096/2097, sin writer privado.
+
 - [ ] Requisitos del contrato UI detallado conciliados con schema/readers/commands reales y pruebas de comportamiento; documentar cada constraint o destino pendiente antes de habilitar el consumer.
 
 - [ ] DDL sólo después de demostrar ausencia de recurso equivalente; no se duplica BCS, aprobación, contrato ni solicitud de generación Insights.
@@ -301,3 +303,11 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 ## Open Questions
 
 Sin preguntas que bloqueen el registro. El plan de ejecución debe resolver los paths/DDL propuestos y readiness real antes de código. Para ejecutar en Codex: /goal explícito y task-hook; este registro no inicia implementación.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Capacidad de briefs opcional para apertura inicial; si no está certificada, permanece cerrada sin bloquear Insights autenticado.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

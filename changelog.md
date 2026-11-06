@@ -1,9 +1,8 @@
 # changelog.md
 
-**2026-11-01 · SKY, laboratorio local:** [204 pruebas y recomendación B](docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md),
-37 nuevas de Finance, routing e historia. Un cliente comercial con Spaces Diseño/SEO; protección histórica y
-contexto integral aún pendientes; siguiente paso: ruta/reader local por Space. Contrato GA4/GSC/AEO candidato;
-sin producción ni cambios en historia real.
+**2026-11-06 · SKY, planificación transversal:** [EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md)
+formaliza siete tasks y dependencias por hito; reutiliza Insights/portal sin duplicarlos. TASK-2094 conserva
+204 pruebas locales del 01-11 y recomendación B. ADR Proposed; sin implementación ni cambios productivos/históricos.
 
 **2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
 registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary

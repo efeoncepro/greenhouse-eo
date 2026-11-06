@@ -291,3 +291,11 @@ de child-parity pertenecen a otros epics históricos. Esto valida el registro, n
 - Se sincroniza `in-progress` y el censo de hijas; ninguna task pasa a `complete` sin su evidencia pendiente.
 - [Auditoría de cierre](../../audits/insights/2026-10-04-epic-045-closure-review.md): releases #248/#250 confirmados, flags Production exactos ON, 116 pruebas PASS; sin plan congelado post-release en la lectura acotada. TASK-1962 es la candidata más próxima.
 - Historial anterior preservado como evidencia fechada, no estado activo.
+
+## Delta 2026-11-06 — Coordinación con EPIC-057
+
+[EPIC-057: cuentas operativas](../in-progress/EPIC-057-operational-accounts-under-organization.md) provee
+contexto por Space, routing, owner Finance, alta hija, readers compartidos y protección temporal. Las tasks
+de este EPIC conservan parent/lifecycle/ownership; sus deltas y checkboxes registran consumo multi-Space.
+No duplicar informe, selector, builder, renderer, scheduler, sender o login. Dependencias por hito: foundation
+habilitación1852 disponible para construir; apertura SKY SEO1852 posterior a certificación2094 y permiso concreto.

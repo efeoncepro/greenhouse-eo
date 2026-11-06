@@ -268,6 +268,9 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: proyección por Space/Service/período intersecta autoridad vigente y usa cache contextual; usuarios Diseño/SEO/dual no reciben unión implícita, incluso en export o detalle.
+- [ ] EPIC-057: cifras/denominadores provienen de productores y contratos temporales TASK-2101, sin mezclar consolidado corporativo ni recalcular historia al cambiar contexto.
+
 - [ ] Requisitos del contrato UI detallado conciliados con schema/readers/commands reales y pruebas de comportamiento; documentar cada constraint o destino pendiente antes de habilitar el consumer.
 
 - [ ] Muestras de piezas/estados/métricas coinciden con productores y período sin doble conteo de derivados/subtareas.
@@ -299,3 +302,11 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 ## Open Questions
 
 Sin preguntas que bloqueen el registro. El plan de ejecución debe resolver los paths/DDL propuestos y readiness real antes de código. Para ejecutar en Codex: /goal explícito y task-hook; este registro no inicia implementación.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Reader cliente existente; consume TASK-2096/2097/2100 y foundation entregada de TASK-1852; no espera la apertura final para desarrollar con fixtures.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

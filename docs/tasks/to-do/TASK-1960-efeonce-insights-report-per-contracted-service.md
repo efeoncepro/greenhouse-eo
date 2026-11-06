@@ -293,6 +293,11 @@ El operador define los destinatarios de cada informe de Sky y confirma qué proy
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: Proyecto→Servicio vive en un primitive canónico con vigencia y writer dueño; consume Servicio/Fuente→Space de TASK-2097 y no introduce service_id en la FK module_id.
+- [ ] EPIC-057: report, snapshot, schedule y recursos heredan Organization/Space/Service autorizados; listado/detalle/outputs no retornan ediciones ajenas. Ownership histórico e idempotency key no se reevalúan con mappings actuales.
+- [ ] EPIC-057: el informe Blog exige receipts actuales de GA4, GSC y motor AEO con ventana/calendario, población, calidad/finalidad y versión sellados. Parcial/ausente/cero no se confunden; allowPartial no evade el requirement.
+- [ ] EPIC-057: destinatarios y recurrencia se vinculan al servicio y consumen TASK-1848; cada fuente proviene de su reader y se conserva la comparación histórica sin atribuir causalidad al nuevo servicio.
+
 - [ ] Un informe puede declarar un servicio de su misma organización; uno ajeno se rechaza.
 - [ ] La evidencia de entrega de un informe con servicio contiene sólo proyectos de ese servicio, sellados en el snapshot.
 - [ ] Un proyecto sin servicio no entra a ningún informe de servicio y aparece como límite.
@@ -329,3 +334,11 @@ El operador define los destinatarios de cada informe de Sky y confirma qué proy
 ## Delta 2026-10-12 — alcance de contenido (TASK-2033)
 
 - `TASK-2033` agregó un alcance de contenido por ORGANIZACIÓN (reglas de ruta en `greenhouse_growth.seo_content_scope_versions`, sellado en las fuentes de la edición). El alcance por servicio contratado de esta task puede montarse sobre el mismo contrato de reglas y los mismos readers con `scope`; hoy hay una sola versión vigente por organización.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+U07; conserva informe por servicio y primitive Proyecto→Servicio. Consume contratos TASK-2096/2097/2100 y scope TASK-2033; no duplica stores o writers.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.
