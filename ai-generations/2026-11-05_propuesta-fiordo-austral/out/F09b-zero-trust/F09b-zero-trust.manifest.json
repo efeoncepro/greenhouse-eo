@@ -137,44 +137,44 @@
             "src": "asset-ref:layer:method-identity-consent-beams"
           },
           "voice": {
-            "question": "Cada acceso al CRM pasa por",
+            "question": "Un solo inicio de sesión, con",
             "answer": "ID",
-            "eyebrow": "Zero Trust con Entra ID",
+            "eyebrow": "Inicio de sesión único",
             "answerLead": "Entra"
           },
-          "body": "SSO obligatorio, MFA y <strong>mínimo privilegio</strong>: cada permiso se concede, se registra y se revoca.",
+          "body": "Su cuenta de Microsoft para todo: <strong>MFA</strong>, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.",
           "note": "Ejemplo ilustrativo · los permisos se definen con su equipo de TI",
           "sources": [
             {
-              "kicker": "Fuente",
+              "kicker": "Entra desde",
               "name": "Outlook",
               "top": "--gl-mic-source-top=250px"
             },
             {
-              "kicker": "Fuente",
+              "kicker": "Entra desde",
               "name": "Teams",
               "top": "--gl-mic-source-top=360px"
             },
             {
-              "kicker": "Fuente",
+              "kicker": "Entra desde",
               "name": "App móvil",
               "top": "--gl-mic-source-top=470px"
             },
             {
-              "kicker": "Fuente",
+              "kicker": "Entra desde",
               "name": "Navegador",
               "top": "--gl-mic-source-top=580px"
             },
             {
-              "kicker": "Fuente",
-              "name": "API",
+              "kicker": "Entra desde",
+              "name": "Escritorio",
               "top": "--gl-mic-source-top=690px"
             }
           ],
           "profile": {
-            "icon": "asset-ref:file:hubspot-icon-data",
-            "kicker": "Perfil unificado",
-            "title": "Un usuario, 5 accesos"
+            "icon": "asset-ref:file:microsoft-entra-mfa",
+            "kicker": "Microsoft Entra ID",
+            "title": "Una cuenta, 5 accesos"
           },
           "channels": [
             {
@@ -218,9 +218,9 @@
               "top": "--gl-mic-act-top=400px"
             },
             {
-              "icon": "asset-ref:file:hubspot-icon-data",
-              "title": "Wazuh",
-              "detail": "Todo queda registrado",
+              "icon": "asset-ref:file:hubspot-icon-revenue",
+              "title": "Registro",
+              "detail": "Cada acceso, en Wazuh",
               "role": "rest",
               "top": "--gl-mic-act-top=710px"
             }
@@ -379,44 +379,44 @@
           "src": "asset-ref:layer:method-identity-consent-beams"
         },
         "voice": {
-          "question": "Cada acceso al CRM pasa por",
+          "question": "Un solo inicio de sesión, con",
           "answer": "ID",
-          "eyebrow": "Zero Trust con Entra ID",
+          "eyebrow": "Inicio de sesión único",
           "answerLead": "Entra"
         },
-        "body": "SSO obligatorio, MFA y <strong>mínimo privilegio</strong>: cada permiso se concede, se registra y se revoca.",
+        "body": "Su cuenta de Microsoft para todo: <strong>MFA</strong>, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.",
         "note": "Ejemplo ilustrativo · los permisos se definen con su equipo de TI",
         "sources": [
           {
-            "kicker": "Fuente",
+            "kicker": "Entra desde",
             "name": "Outlook",
             "top": "--gl-mic-source-top=250px"
           },
           {
-            "kicker": "Fuente",
+            "kicker": "Entra desde",
             "name": "Teams",
             "top": "--gl-mic-source-top=360px"
           },
           {
-            "kicker": "Fuente",
+            "kicker": "Entra desde",
             "name": "App móvil",
             "top": "--gl-mic-source-top=470px"
           },
           {
-            "kicker": "Fuente",
+            "kicker": "Entra desde",
             "name": "Navegador",
             "top": "--gl-mic-source-top=580px"
           },
           {
-            "kicker": "Fuente",
-            "name": "API",
+            "kicker": "Entra desde",
+            "name": "Escritorio",
             "top": "--gl-mic-source-top=690px"
           }
         ],
         "profile": {
-          "icon": "asset-ref:file:hubspot-icon-data",
-          "kicker": "Perfil unificado",
-          "title": "Un usuario, 5 accesos"
+          "icon": "asset-ref:file:microsoft-entra-mfa",
+          "kicker": "Microsoft Entra ID",
+          "title": "Una cuenta, 5 accesos"
         },
         "channels": [
           {
@@ -460,9 +460,9 @@
             "top": "--gl-mic-act-top=400px"
           },
           {
-            "icon": "asset-ref:file:hubspot-icon-data",
-            "title": "Wazuh",
-            "detail": "Todo queda registrado",
+            "icon": "asset-ref:file:hubspot-icon-revenue",
+            "title": "Registro",
+            "detail": "Cada acceso, en Wazuh",
             "role": "rest",
             "top": "--gl-mic-act-top=710px"
           }

@@ -67,8 +67,8 @@
           "src": "asset-ref:layer:csl-platform"
         },
         "voice": {
-          "question": "Las seis necesidades de las bases,",
-          "answer": "Cubiertas",
+          "question": "Proponemos un CRM hecho para",
+          "answer": "Exportar",
           "eyebrow": "Nuestra propuesta · Sales Hub Professional"
         },
         "lanes": [

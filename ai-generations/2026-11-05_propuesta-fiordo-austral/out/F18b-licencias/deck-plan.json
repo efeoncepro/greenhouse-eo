@@ -1,0 +1,106 @@
+{
+  "tenderId": "F18b-licencias",
+  "slides": [
+    {
+      "slideId": "deck-decision-chart",
+      "contentType": "deck.decision-chart",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 120,
+          "bodyTop": 420,
+          "bodyPx": 25,
+          "bodyWidth": 520,
+          "sourceLeft": "--gl-dch-source-left=500px",
+          "sourceTop": "--gl-dch-source-top=1000px",
+          "sourcePx": "--gl-dch-source-px=15px",
+          "chartLeft": "--gl-dch-chart-left=780px",
+          "chartTop": "--gl-dch-chart-top=330px",
+          "barHeight": "--gl-dch-bar-height=120px",
+          "barStep": "--gl-dch-bar-step=210px",
+          "barRadius": "--gl-dch-bar-radius=10px",
+          "valueInset": "--gl-dch-value-inset=28px",
+          "beforeColor": "--gl-dch-before-color=#c9d2dc",
+          "afterColor": "--gl-dch-after-color=#023c70",
+          "barLabelPx": "--gl-dch-bar-label-px=22px",
+          "barLabelGap": "--gl-dch-bar-label-gap=44px",
+          "barValuePx": "--gl-dch-bar-value-px=64px",
+          "barValueWght": "--gl-dch-bar-value-wght=300",
+          "annotationPx": "--gl-dch-annotation-px=64px",
+          "annotationLeft": "--gl-dch-annotation-left=1440px",
+          "leaderWidth": "--gl-dch-leader-width=70px",
+          "leaderStroke": "--gl-dch-leader-stroke=2px",
+          "leaderGap": "--gl-dch-leader-gap=18px",
+          "noteTop": "--gl-dch-note-top=690px",
+          "notePx": "--gl-dch-note-px=16px",
+          "kpisTop": "--gl-dch-kpis-top=800px",
+          "kpisWidth": "--gl-dch-kpis-width=1640px",
+          "kpisRule": "--gl-dch-kpis-rule=2px",
+          "kpiPadTop": "--gl-dch-kpi-pad-top=18px",
+          "kpiPx": "--gl-dch-kpi-px=64px",
+          "kpiWght": "--gl-dch-kpi-wght=300",
+          "kpiLabelPx": "--gl-dch-kpi-label-px=20px",
+          "kpiLabelGap": "--gl-dch-kpi-label-gap=6px",
+          "bar1Width": "--gl-dch-bar1-width=900px",
+          "bar2Width": "--gl-dch-bar2-width=630px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dch-progress-5-of-5-growth"
+        },
+        "voice": {
+          "question": "Una licencia según",
+          "answer": "Cada rol",
+          "eyebrow": "Licencias por rol"
+        },
+        "body": "Ventas para quien vende, Principal para quien registra y sin costo para quien sólo revisa.",
+        "bars": [
+          {
+            "label": "10 de Ventas",
+            "value": "100"
+          },
+          {
+            "label": "Por rol",
+            "value": "70"
+          }
+        ],
+        "annotation": "−30 %",
+        "note": "Ejemplo: 6 de Ventas, 2 Principal y 2 de sólo lectura, al mes.",
+        "kpis": [
+          {
+            "value": "US$100",
+            "label": "Ventas, al mes"
+          },
+          {
+            "value": "US$50",
+            "label": "Principal, al mes"
+          },
+          {
+            "value": "US$0",
+            "label": "Sólo lectura"
+          },
+          {
+            "value": "3.000",
+            "label": "créditos al mes"
+          }
+        ],
+        "source": "Fuente: precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento",
+        "selection": {
+          "label": "Finanzas",
+          "anchor": "bottom-end",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionChart"
+    }
+  ]
+}

@@ -254,7 +254,7 @@
               "id": "voice",
               "questionId": "question",
               "answerId": "answer",
-              "answerText": "Un CRM"
+              "answerText": "Planillas"
             },
             {
               "kind": "url-bubble",
@@ -299,12 +299,12 @@
   },
   "content": {
     "eyebrow": "Lo que entendimos",
-    "question": "Cuatro regiones,",
+    "question": "Hoy, su venta vive en",
     "answer": [
-      "Un CRM"
+      "Planillas"
     ],
     "answerSphere": "closes-last-line",
-    "body": "Vender contra la especificación de cada cliente, en terreno y en **cuatro regiones**.",
+    "body": "Su equipo vende contra la especificación de cada cliente, en cuatro regiones, y hoy lo registra en **Excel**.",
     "proof": null,
     "measure": null,
     "progress": null,

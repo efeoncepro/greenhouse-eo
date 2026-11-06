@@ -213,7 +213,7 @@
               "id": "voice",
               "questionId": "question",
               "answerId": "answer",
-              "answerText": "Cubiertas"
+              "answerText": "Exportar"
             },
             {
               "kind": "url-bubble",
@@ -231,9 +231,9 @@
   },
   "content": {
     "eyebrow": "Nuestra propuesta · Sales Hub Professional",
-    "question": "Las seis necesidades de las bases,",
+    "question": "Proponemos un CRM hecho para",
     "answer": [
-      "Cubiertas"
+      "Exportar"
     ],
     "answerSphere": "closes-last-line",
     "body": null,

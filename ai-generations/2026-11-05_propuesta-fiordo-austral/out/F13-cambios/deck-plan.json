@@ -175,12 +175,12 @@
           "src": "asset-ref:layer:content-day-release-cycle-beams"
         },
         "voice": {
-          "question": "A producción llega",
-          "answer": "aprobado",
+          "question": "Todo cambio, antes de producción, pasa por",
+          "answer": "control",
           "eyebrow": "Cambios controlados",
-          "answerLead": "Sólo lo"
+          "answerLead": "Prueba y"
         },
-        "body": "Nada llega a producción sin su <strong>aprobación</strong>: se prueba en una cuenta de pruebas, se valida y se explica en un video.",
+        "body": "Se prueba en una cuenta de pruebas con datos de ejemplo, su equipo lo <strong>valida</strong> y recién entonces se publica.",
         "release": {
           "kicker": "Cambio 03 · Sales Hub",
           "title": "Alerta de cliente sin contacto",
@@ -212,7 +212,7 @@
           "initials": "EF"
         },
         "approval": {
-          "tool": "asset-ref:file:tool-loom",
+          "tool": "asset-ref:file:tool-teams",
           "caption": "Qué cambia para ventas, en 3 minutos",
           "cta": "Aprobar cambio"
         },
@@ -220,31 +220,31 @@
           {
             "icon": "asset-ref:file:tool-teams",
             "kicker": "Microsoft Teams",
-            "label": "Nos hablamos",
+            "label": "Video del cambio",
             "left": "--gl-crc-left=700px",
             "top": "--gl-crc-top=150px",
             "iconPx": "--gl-crc-mark-px=64px"
           },
           {
             "icon": "asset-ref:file:tool-microsoft-365",
-            "kicker": "SharePoint",
-            "label": "Documentos del proyecto",
+            "kicker": "Microsoft 365",
+            "label": "Acta en SharePoint",
             "left": "--gl-crc-left=1560px",
             "top": "--gl-crc-top=110px",
             "iconPx": "--gl-crc-mark-px=64px"
           },
           {
-            "icon": "asset-ref:file:tool-loom",
-            "kicker": "Loom",
-            "label": "Se lo mostramos",
-            "left": "--gl-crc-left=1560px",
-            "top": "--gl-crc-top=620px",
-            "iconPx": "--gl-crc-mark-px=72px"
-          },
-          {
             "icon": "asset-ref:file:hubspot-icon-sales",
             "kicker": "HubSpot",
-            "label": "Pruebas controladas",
+            "label": "Cuenta de pruebas",
+            "left": "--gl-crc-left=1560px",
+            "top": "--gl-crc-top=620px",
+            "iconPx": "--gl-crc-mark-px=64px"
+          },
+          {
+            "icon": "asset-ref:file:tool-microsoft-365",
+            "kicker": "Microsoft 365",
+            "label": "Aviso por Outlook",
             "left": "--gl-crc-left=700px",
             "top": "--gl-crc-top=600px",
             "iconPx": "--gl-crc-mark-px=64px"

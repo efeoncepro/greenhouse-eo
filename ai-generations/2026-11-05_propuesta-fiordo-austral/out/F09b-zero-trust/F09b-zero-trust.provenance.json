@@ -1,6 +1,6 @@
 {
   "schema": "efeonce.brand-surface-piece.provenance.v1",
-  "intentSha256": "887cb5f360b01ff235ffae602e3f5b4cf9b0be6f5f593b9f0cac9136e78f1130",
+  "intentSha256": "6233f9343ddf5b2af26f9a955a6de65f9910288d31e1776bef0c6f6295ffc0db",
   "catalog": "graphic-line-deck",
   "contentType": "deck.method-identity-consent",
   "plates": [],
@@ -14,6 +14,11 @@
       "ref": "asset-ref:file:hubspot-icon-sales",
       "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-sales.svg",
       "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb"
+    },
+    {
+      "ref": "asset-ref:file:hubspot-icon-revenue",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-revenue.svg",
+      "sha256": "5eaaaa84c1f24cf9a7911fa9d2df3ac8acf8ed5881eec34ea3499a85b716b542"
     }
   ],
   "axis": {
@@ -21,5 +26,6 @@
     "@efeoncepro/axis-tokens": "0.3.41",
     "@efeoncepro/axis-graphic-line": "0.11.0",
     "@efeoncepro/axis-brand-assets": "0.4.25"
-  }
+  },
+  "adjustment": "patch-F09b-zero-trust-2026-11-06"
 }

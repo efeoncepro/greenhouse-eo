@@ -233,7 +233,7 @@
               "id": "voice",
               "questionId": "question",
               "answerId": "answer",
-              "answerText": "Sólo lo aprobado"
+              "answerText": "Prueba y control"
             },
             {
               "kind": "url-bubble",
@@ -277,13 +277,13 @@
   },
   "content": {
     "eyebrow": "Cambios controlados",
-    "question": "A producción llega",
+    "question": "Todo cambio, antes de producción, pasa por",
     "answer": [
-      "Sólo lo",
-      "aprobado"
+      "Prueba y",
+      "control"
     ],
     "answerSphere": "closes-last-line",
-    "body": "Nada llega a producción sin su **aprobación**: se prueba en una cuenta de pruebas, se valida y se explica en un video.",
+    "body": "Se prueba en una cuenta de pruebas con datos de ejemplo, su equipo lo **valida** y recién entonces se publica.",
     "proof": null,
     "measure": null,
     "progress": null,

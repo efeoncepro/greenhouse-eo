@@ -276,14 +276,14 @@
     "photo": null
   },
   "content": {
-    "eyebrow": "Zero Trust con Entra ID",
-    "question": "Cada acceso al CRM pasa por",
+    "eyebrow": "Inicio de sesión único",
+    "question": "Un solo inicio de sesión, con",
     "answer": [
       "Entra",
       "ID"
     ],
     "answerSphere": "closes-last-line",
-    "body": "SSO obligatorio, MFA y **mínimo privilegio**: cada permiso se concede, se registra y se revoca.",
+    "body": "Su cuenta de Microsoft para todo: **MFA**, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.",
     "proof": null,
     "measure": null,
     "progress": null,
