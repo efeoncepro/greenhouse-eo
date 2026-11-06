@@ -64,7 +64,7 @@ Fuera del Workbench:
 | Expansión de portada y retoque de letras | Greenhouse `pnpm ai:mask` + `pnpm ai:inpaint image` con `gpt-image-2.5-flare` |
 | Referencias reales (REF-01) | Shutterstock (API, licencia Standard) y Wikimedia Commons; procedencia en `refs-ledger/` de la pieza ([sources.md](references/sources.md) §5) |
 | Revisión por versión | Frame.io; estado en Notion |
-| Estrategia SEO del blog, specs de artículos | skill `sky-blog-seo` |
+| Estrategia SEO del blog, specs de artículos | skills `sky-blog-seo` (cuenta) y `sky-blog-seo-editorial` (método; la spec de imagen está en `references/produccion-editorial.md`) |
 
 ## 3. Invariantes
 
@@ -128,7 +128,7 @@ exportación → banners), ver [workflow.md](references/workflow.md) §9.
 
 ## 6. Frontera con otras skills
 
-- `sky-blog-seo`: keyword, intención, estructura del artículo y la spec de cada imagen (qué escena,
+- `sky-blog-seo` y `sky-blog-seo-editorial`: keyword, intención, estructura del artículo y la spec de cada imagen (qué escena,
   qué pregunta responde). Esta skill no decide la escena; la produce.
 - `efeonce-creative-workbench`: reglas del harness (una marca por corrida, recursos sellados, gates).
   Leer su `references/state-continuity.md` al operar en el Workbench.

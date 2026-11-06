@@ -191,7 +191,7 @@ Después se ajustó a mano para asegurar cupo de Perú doméstico y una mezcla d
 ## Carga en el Content Hub (06-11-2026)
 
 Las 40 quedaron en el Content Hub con `Estado` Idea, `Trabajo SEO` (25 «Optimizar URL existente» y 15 «Nuevo»),
-`Temática`, `Formato`, `Enlace` en las reescrituras, Julio como responsable y `Aprobación cliente` vacía. Cada ficha
+`Temática`, `Formato`, `Enlace` en las reescrituras, Valentina Hoyos como responsable (la misma de noviembre) y `Aprobación cliente` vacía. Cada ficha
 lleva el bloque «Tema y enfoque»: tipo de trabajo y 301, métrica, país del lector, ruta, enlaces internos y
 qué revisar antes de redactar. Leído de vuelta: 40 páginas, todas en «Idea», del 01-12 al 29-12.
 

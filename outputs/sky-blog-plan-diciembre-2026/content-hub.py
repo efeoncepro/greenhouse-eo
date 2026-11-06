@@ -8,7 +8,7 @@ import json
 import os
 
 B = 'https://blog.skyairline.com'
-JULIO = 'user://3c2d872b-594c-81f1-826c-0002c1814e08'
+VALENTINA = 'user://3c2d872b-594c-81f1-826c-0002c1814e08'
 CAT = 'ruta Activa en «Precios y Rutas SKY» (revisado el 06-11-2026)'
 SERV = ('confirmar con Natalia que esta guía de servicio cabe en el blog (en noviembre SKY rechazó cambio de '
         'vuelo, mascotas y bebé) y redactar sólo con el Centro de Ayuda vigente.')
@@ -223,7 +223,7 @@ def rewrite(r):
     lines += ['', f'{FOOT} Pieza {rid}.']
     props = {
         'Artículo': title, 'Estado': 'Idea', 'Trabajo SEO': 'Optimizar URL existente', 'Temática': tema,
-        'Tipo': '["Publicación de blog"]', 'Formato': fmt, 'Enlace': full, 'Responsable': f'["{JULIO}"]',
+        'Tipo': '["Publicación de blog"]', 'Formato': fmt, 'Enlace': full, 'Responsable': f'["{VALENTINA}"]',
         'date:Fecha de publicación:start': date, 'date:Fecha de publicación:is_datetime': 0,
     }
     return {'icon': icon, 'properties': props, 'content': '\n'.join(lines)}
@@ -247,7 +247,7 @@ def new(n):
     lines += [f'- <b>Planificación:</b> {PLAN}', f'- <b>Antes de redactar:</b> {antes}', '', f'{FOOT} Pieza {nid}.']
     props = {
         'Artículo': title, 'Estado': 'Idea', 'Trabajo SEO': 'Nuevo', 'Temática': tema,
-        'Tipo': '["Publicación de blog"]', 'Formato': 'Artículo', 'Responsable': f'["{JULIO}"]',
+        'Tipo': '["Publicación de blog"]', 'Formato': 'Artículo', 'Responsable': f'["{VALENTINA}"]',
         'date:Fecha de publicación:start': date, 'date:Fecha de publicación:is_datetime': 0,
     }
     return {'icon': icon, 'properties': props, 'content': '\n'.join(lines)}

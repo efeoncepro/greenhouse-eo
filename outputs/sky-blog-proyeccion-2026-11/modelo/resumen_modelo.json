@@ -1,0 +1,78 @@
+{
+  "R_2026_por_mes": [
+    0.326,
+    0.362,
+    0.364,
+    0.344,
+    0.372,
+    0.362,
+    0.306,
+    0.311,
+    0.383
+  ],
+  "R_media_2026": 0.348,
+  "R_octubre_2026": 0.348,
+  "caida_interanual_octubre_2026": -0.428,
+  "referencia_por_mes": {
+    "ene": 208099,
+    "feb": 157403,
+    "mar": 116320,
+    "abr": 94468,
+    "may": 94104,
+    "jun": 99430,
+    "jul": 110878,
+    "ago": 95710,
+    "sep": 75506,
+    "oct": 70000,
+    "nov": 72281,
+    "dic": 81437
+  },
+  "honorario_usd_mes": 3058,
+  "usd_clp": 980.9,
+  "valor_por_visita_usd": [
+    0.293,
+    0.47
+  ],
+  "hitos": {
+    "Sin intervenir": {
+      "R_0_50": "después de oct-28",
+      "R_0_75": "después de oct-28",
+      "R_0_90": "después de oct-28",
+      "enero_2027_visitas": 38850,
+      "enero_2027_base_tardia": 55146,
+      "enero_2028_visitas": 31080,
+      "abr_sep_2027_promedio": 18697,
+      "abr_sep_2028_promedio": 14958
+    },
+    "Base": {
+      "R_0_50": "oct-28",
+      "R_0_75": "después de oct-28",
+      "R_0_90": "después de oct-28",
+      "enero_2027_visitas": 64511,
+      "enero_2027_base_tardia": 55146,
+      "enero_2028_visitas": 91564,
+      "abr_sep_2027_promedio": 36516,
+      "abr_sep_2028_promedio": 45247
+    },
+    "Estructural bajo": {
+      "R_0_50": "jun-27",
+      "R_0_75": "nov-27",
+      "R_0_90": "después de oct-28",
+      "enero_2027_visitas": 64511,
+      "enero_2027_base_tardia": 55146,
+      "enero_2028_visitas": 157966,
+      "abr_sep_2027_promedio": 49556,
+      "abr_sep_2028_promedio": 74471
+    },
+    "Estructural alto": {
+      "R_0_50": "may-27",
+      "R_0_75": "sep-27",
+      "R_0_90": "nov-27",
+      "enero_2027_visitas": 64511,
+      "enero_2027_base_tardia": 55146,
+      "enero_2028_visitas": 199586,
+      "abr_sep_2027_promedio": 57706,
+      "abr_sep_2028_promedio": 93475
+    }
+  }
+}

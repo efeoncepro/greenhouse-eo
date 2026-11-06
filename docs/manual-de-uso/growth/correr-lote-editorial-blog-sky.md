@@ -3,8 +3,8 @@
 > **Tipo de documento:** Manual de uso
 > **Versión:** 1.0
 > **Creado:** 2026-11-05 por Claude, a partir del lote de 54 artículos de esa fecha
-> **Última actualización:** 2026-11-05 por Claude
-> **Documentación técnica:** [método de lote de la skill `sky-blog-seo`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md) · [caso de noviembre 2026](../../services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md)
+> **Última actualización:** 2026-11-06 por Claude (método movido a la skill `sky-blog-seo-editorial`)
+> **Documentación técnica:** [método de lote de la skill `sky-blog-seo-editorial`](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md) · [caso de noviembre 2026](../../services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md)
 
 ## Para qué sirve
 
@@ -15,7 +15,8 @@ No publica nada.
 
 ## Antes de empezar
 
-- Carga las skills `sky-blog-seo` (con `references/lote-editorial.md`), `seo-aeo` y `dataforseo-operator`.
+- Carga las skills `sky-blog-seo` (marco de la cuenta), `sky-blog-seo-editorial` (con `references/lote-editorial.md`),
+  `seo-aeo` y `dataforseo-operator`.
   Para imágenes, más adelante, `sky-blog-graphic-line`.
 - Ten a mano el [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e):
   manda en voz, estructura e imágenes.
@@ -63,7 +64,7 @@ No publica nada.
 Si se lo pides a un agente, una forma que funcionó:
 
 ```text
-Con las skills sky-blog-seo (references/lote-editorial.md), seo-aeo y dataforseo-operator,
+Con las skills sky-blog-seo, sky-blog-seo-editorial (references/lote-editorial.md), seo-aeo y dataforseo-operator,
 haz el research SEO/AEO de las filas activas del Content Hub de SKY con DataForSEO y escríbelo
 al final de cada página. No cambies propiedades ni publiques. Antes de gastar, muéstrame el preview.
 ```
@@ -101,7 +102,11 @@ al final de cada página. No cambies propiedades ni publiques. Antes de gastar, 
 
 ## Referencias técnicas
 
-- Método y trampas: [`.claude/skills/sky-blog-seo/references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md).
+- Método y trampas: [`.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md).
+- Método editorial completo: skill [`sky-blog-seo-editorial`](../../../.claude/skills/sky-blog-seo-editorial/SKILL.md), con los capítulos
+  [planificación de lotes](../../../.claude/skills/sky-blog-seo-editorial/references/planificacion-de-lotes.md) (plan del mes, carga
+  al Content Hub y tareas) y [producción editorial](../../../.claude/skills/sky-blog-seo-editorial/references/produccion-editorial.md)
+  (Playbook integrado: voz, estructura, imágenes, QA y estados).
 - Caso, bloqueos y pendientes del lote de noviembre: [`LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md`](../../services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md).
 - Marco del servicio: [`docs/services/sky-blog-seo/README.md`](../../services/sky-blog-seo/README.md).
 - CLI de DataForSEO: [manual](dataforseo-cli.md).

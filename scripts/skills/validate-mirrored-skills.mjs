@@ -25,6 +25,14 @@ const mirroredSkills = [
     claude: '.claude/skills/sky-blog-seo',
   },
   {
+    // Método editorial SEO del Blog SKY (auditoría, proyección, lotes, Playbook integrado). Nace byte-identical
+    // el 2026-11-06: si Codex y Claude planifican o producen con métodos distintos, el mismo lote sale con dos normas.
+    id: 'sky-blog-seo-editorial',
+    mode: 'byte-identical',
+    codex: '.codex/skills/sky-blog-seo-editorial',
+    claude: '.claude/skills/sky-blog-seo-editorial',
+  },
+  {
     // CRM y el adapter account-based conservan los mismos permisos y readbacks en ambos agentes.
     id: 'hubspot-as-a-service',
     mode: 'byte-identical',

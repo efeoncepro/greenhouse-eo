@@ -3,7 +3,7 @@
 > **Tipo de documento:** Expediente de servicio (caso de lote editorial)
 > **Versión:** 1.0
 > **Creado:** 2026-11-05 por Claude (sesión «Research SEO/AEO Content Hub»), con las instrucciones de Julio Reyes
-> **Método reutilizable:** [`references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md) de la skill `sky-blog-seo`
+> **Método reutilizable:** [`references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md) de la skill `sky-blog-seo-editorial`
 > **Paso a paso:** [Correr un lote editorial del Blog SKY](../../manual-de-uso/growth/correr-lote-editorial-blog-sky.md)
 > **Imágenes y banners:** fuera de este documento; los gobierna la skill `sky-blog-graphic-line`
 

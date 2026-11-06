@@ -223,8 +223,13 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 - [Discovery de medición del blog, 27-10](../../audits/insights/2026-10-27-sky-blog-discovery/README.md): host URL,
   GA4/GSC, histórico y proyección de citas AEO; las visitas IA en GA4 no sustituyen corridas del motor. BQ vacío
   para SKY en el rango consultado y PG sólo 11–25 de octubre al corte. Los dos dossiers conservan el diagnóstico inicial.
-- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude; método de lote en
-  [`references/lote-editorial.md`](../../../.claude/skills/sky-blog-seo/references/lote-editorial.md).
+- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude: identidad, alcance y estado.
+- [Método editorial del servicio](../../../.claude/skills/sky-blog-seo-editorial/SKILL.md) (skill `sky-blog-seo-editorial`,
+  desde 06-11-2026), por capítulos: [auditoría y diagnóstico](../../../.claude/skills/sky-blog-seo-editorial/references/auditoria-y-diagnostico.md),
+  [proyección, conversión y valor](../../../.claude/skills/sky-blog-seo-editorial/references/proyeccion-conversion-y-valor.md),
+  [planificación de lotes y carga al Content Hub](../../../.claude/skills/sky-blog-seo-editorial/references/planificacion-de-lotes.md),
+  [lote editorial: research a handoff](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md) y
+  [producción editorial (Playbook integrado)](../../../.claude/skills/sky-blog-seo-editorial/references/produccion-editorial.md).
 - [Lote editorial de noviembre 2026](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md) y su
   [manual paso a paso](../../manual-de-uso/growth/correr-lote-editorial-blog-sky.md).
 - [Producción de imágenes del lote de noviembre 2026](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md) y su

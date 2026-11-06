@@ -8,7 +8,7 @@ description: Operador experto de la API DataForSEO v3 para Greenhouse — oficio
 Para valorar clics orgánicos observados con CPC por país, usar la foundation local
 `src/lib/growth/seo/organic-traffic-value/` y el [manual del indicador](../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
 Reutiliza los snapshots Labs y su writer; cobertura y fechas son parte del resultado. El valor nativo con
-ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo`.
+ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo` (marco de la cuenta) y `sky-blog-seo-editorial` (método).
 Efeonce Insights consume el indicador (`readOrganicTrafficValueForWindow`, 2026-11-04) leyendo sólo CPC ya
 capturados: nunca compra; subir cobertura es una compra manual con techo (`.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md`).
 
@@ -357,5 +357,5 @@ proveedor, por lo que límites, paginación y selección de finalistas siguen si
   `src/lib/ai/dataforseo-serp-compare.ts` compara contra `domain ?? url`, así que esos ítems no cuentan para la
   entidad. Hasta corregirlo, recalcular la posición propia desde `breadcrumb`/`website_name` antes de afirmar
   «no aparece». Límites del mismo lote: `serp-compare` admite 20 queries y 20 entidades por panel; `research`,
-  20 seeds por corrida. Método del lote: `.claude/skills/sky-blog-seo/references/lote-editorial.md`.
+  20 seeds por corrida. Método del lote: `.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md` (plan del lote mensual: `planificacion-de-lotes.md`).
 - Precios del arch doc §6 (2026-06) ~20% bajo la doc actual — usar las references y `user_data` para cifras.

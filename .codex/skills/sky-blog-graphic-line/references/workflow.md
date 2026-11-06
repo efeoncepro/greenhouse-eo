@@ -116,7 +116,7 @@ Caso fuente: 54 artículos del 2026-11-05, pieza `projects/sky/blog-lote-2026-11
 
 | Paso | Qué se hace | Herramienta |
 |---|---|---|
-| 1. Specs | `specs/<id>.json` por artículo + `MANIFEST.json` (lo escribe la sesión editorial de `sky-blog-seo`; si difiere de Notion, manda Notion) | — |
+| 1. Specs | `specs/<id>.json` por artículo + `MANIFEST.json` (lo escribe la sesión editorial de `sky-blog-seo-editorial`; si difiere de Notion, manda Notion) | — |
 | 2. Plates | Entradas de `prompt-plate` por imagen: portadas en `plates/portadas-*.json`, escenas en `plates/escenas-img23.json` | — |
 | 3. Brandlift | Bloque de colorimetría y bokeh de la hoja 15 de Daniela Ferreira + lente por tipo, en el campo `extra` | `plates/brandlift.json` |
 | 4. REF-01 | Buscar, mirar en hojas de contacto, leer descripción, licenciar en lote, anotar procedencia | [sources.md](sources.md) §5 |

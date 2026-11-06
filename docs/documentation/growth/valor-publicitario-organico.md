@@ -1,9 +1,9 @@
 # Valor publicitario estimado del tráfico orgánico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-15 (piloto Blog SKY)
-> **Ultima actualizacion:** 2026-11-05 por Claude (1.1: el método se usa fuera de SKY —Berel y el capítulo de búsqueda de Insights—, mide propiedades de dominio y un alcance de contenido; code complete local, rollout pendiente)
+> **Ultima actualizacion:** 2026-11-06 por Claude (1.2: referencia al capítulo de proyección, conversión y valor de la skill `sky-blog-seo-editorial`; 1.1: el método se usa fuera de SKY —Berel y el capítulo de búsqueda de Insights—, mide propiedades de dominio y un alcance de contenido; code complete local, rollout pendiente)
 > **Documentacion tecnica:** [decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md) · [método](../../services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md)
 
 Esta capacidad calcula una referencia monetaria sobre los clics orgánicos visibles del sitio:
@@ -74,4 +74,5 @@ Hoy es un paso manual; la captura mensual automática sólo cubre las keywords s
 
 [Método de cuenta](../../services/sky-blog-seo/INDICADOR_VALOR_ORGANICO_V1.md) ·
 [decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md) ·
-[marco del servicio](../../services/sky-blog-seo/README.md).
+[marco del servicio](../../services/sky-blog-seo/README.md) ·
+[uso en el caso SKY: proyección, conversión y valor](../../../.claude/skills/sky-blog-seo-editorial/references/proyeccion-conversion-y-valor.md).
