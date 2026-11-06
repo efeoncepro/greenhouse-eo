@@ -1,0 +1,215 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:49:01.995Z",
+  "run": "ai-generations/2026-10-24_tarjetas-riel",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-24_tarjetas-riel",
+  "totalBytes": 28385792,
+  "fileCount": 34,
+  "files": [
+    {
+      "path": "edit/R1-pantalla-mask-preview.png",
+      "sizeBytes": 3053270,
+      "sha256": "75040d2e992186717745abdca074ce5f796318d0dc782046b916fb942415afa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla-mask-preview.png"
+    },
+    {
+      "path": "edit/R1-pantalla-mask.png",
+      "sizeBytes": 2695,
+      "sha256": "32d14f8369221fe35b6947892b83ba7780c3ad22703628d1f1eacb9689477240",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla-mask.png"
+    },
+    {
+      "path": "edit/R1-pantalla2-mask-preview.png",
+      "sizeBytes": 3020306,
+      "sha256": "2891b45f0d63b591fb66e98b8d7c137b9c1f7b1ecbdbd2fa53ec8e33a95d3a46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla2-mask-preview.png"
+    },
+    {
+      "path": "edit/R1-pantalla2-mask.png",
+      "sizeBytes": 3719,
+      "sha256": "11a7730db726947a72d90fab96141487b68420084b97f42ed317880105beb838",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla2-mask.png"
+    },
+    {
+      "path": "edit/R1-pantalla3-mask-preview.png",
+      "sizeBytes": 3009926,
+      "sha256": "a2121d8798d87e469d5bed4a52fed6d8f9647769ba9ac622200bcd4a6c3b87f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla3-mask-preview.png"
+    },
+    {
+      "path": "edit/R1-pantalla3-mask.png",
+      "sizeBytes": 3352,
+      "sha256": "f59bccc86733e0077e244bbe4aad5845ea768812a34eded4b6c5b26fdabdec20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/edit/R1-pantalla3-mask.png"
+    },
+    {
+      "path": "final/R1b-agente-agenda-a-card.webp",
+      "sizeBytes": 51442,
+      "sha256": "863de840b9323d698bbb6b15e5ffa7c4a1dbff4d1490cde5cd4b1b8bed3a457e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/final/R1b-agente-agenda-a-card.webp"
+    },
+    {
+      "path": "final/R2b-proceso-pizarra-card.webp",
+      "sizeBytes": 46938,
+      "sha256": "7767ad417e811506a238e06bad17dc52df130729aadd2b0fb0da847260fce495",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/final/R2b-proceso-pizarra-card.webp"
+    },
+    {
+      "path": "final/R3-guia-escritorio-card.webp",
+      "sizeBytes": 52238,
+      "sha256": "04ef8288786a1c08b3b949c09112499838b2c7149c8e0b854cc6f2587d112e34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/final/R3-guia-escritorio-card.webp"
+    },
+    {
+      "path": "plates/R1-agente-agenda-plate.png",
+      "sizeBytes": 1964679,
+      "sha256": "565ffbd4df8df90c7deea4843e08f4361fce1931c0e0ef28d2967bcf119fbbd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R1-agente-agenda-plate.png"
+    },
+    {
+      "path": "plates/R1b-agente-agenda-a-plate.png",
+      "sizeBytes": 2013187,
+      "sha256": "e8a4d89da17e2d764e4d22b5c6e9872aa519075a91bb360fb7ed6600bb736f70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R1b-agente-agenda-a-plate.png"
+    },
+    {
+      "path": "plates/R1b-agente-agenda-b-plate.png",
+      "sizeBytes": 2093041,
+      "sha256": "3b3eb63e9904a4aa45bdc6db29cb79c571fe19a2edfb86819363fbe7e5b6924c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R1b-agente-agenda-b-plate.png"
+    },
+    {
+      "path": "plates/R2-proceso-pizarra-plate.png",
+      "sizeBytes": 1864388,
+      "sha256": "13c28e746ec24bd2716efc2932de9660b3691291939c1d84e6ba65f49f66e675",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R2-proceso-pizarra-plate.png"
+    },
+    {
+      "path": "plates/R2b-proceso-pizarra-plate.png",
+      "sizeBytes": 1840693,
+      "sha256": "11d9b20c10d898ad9c7179c5911913ed634d77cb089bd4a4e613c97c223595e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R2b-proceso-pizarra-plate.png"
+    },
+    {
+      "path": "plates/R3-guia-escritorio-plate.png",
+      "sizeBytes": 2200064,
+      "sha256": "d4a90e47f9eb88a0a10c70deeab33f5453eaf889d756e641616fd6731034d9c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/plates/R3-guia-escritorio-plate.png"
+    },
+    {
+      "path": "subir/tarjeta-riel-agente-ia-agenda-reunion.webp",
+      "sizeBytes": 88342,
+      "sha256": "3b551bb4417db86c563a8a4423cc2b8e397c897098eabf6f847ebce1c35c4212",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/subir/tarjeta-riel-agente-ia-agenda-reunion.webp"
+    },
+    {
+      "path": "subir/tarjeta-riel-guia-web-agentica-escritorio.webp",
+      "sizeBytes": 100260,
+      "sha256": "4e04c48361289a037a64ce1629ea6b939114f5dc35fa6952ed92160b3cb764a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/subir/tarjeta-riel-guia-web-agentica-escritorio.webp"
+    },
+    {
+      "path": "subir/tarjeta-riel-proceso-comercial-pizarra.webp",
+      "sizeBytes": 73920,
+      "sha256": "0832c64a4f13b99284ed0b2e6d922b5049c076fa4f1d8410e6a8d7db177fe9fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/subir/tarjeta-riel-proceso-comercial-pizarra.webp"
+    },
+    {
+      "path": "ver/mask2.png",
+      "sizeBytes": 268155,
+      "sha256": "be1032b22a5ee3ca8a4126af6acc053249b9e2bdf8609fe1ed460c62d4f0eb56",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/mask2.png"
+    },
+    {
+      "path": "ver/R1-agente-agenda-plate.png",
+      "sizeBytes": 509062,
+      "sha256": "332ddf97591a2e62be1b2c5ac9a9bbf8978b55c3c4499e772d981610005f672b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1-agente-agenda-plate.png"
+    },
+    {
+      "path": "ver/R1-pantalla-c1.png",
+      "sizeBytes": 262393,
+      "sha256": "938df3945311b981d5ffa64aee74a4fcc5ae8e0ecb9e6609de3eca8725ae9e41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1-pantalla-c1.png"
+    },
+    {
+      "path": "ver/R1-pantalla-c2.png",
+      "sizeBytes": 264255,
+      "sha256": "e6eff7e8c6ac9b318093918c921562c6b50c1a7abe83b01a0f3efdb6dac98cf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1-pantalla-c2.png"
+    },
+    {
+      "path": "ver/R1b-a-100.png",
+      "sizeBytes": 573692,
+      "sha256": "4b4bc92933a5265c7ae0a817331130b5b9ae712597ce2599131f5223558a1fa8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1b-a-100.png"
+    },
+    {
+      "path": "ver/R1b-agente-agenda-a-plate.png",
+      "sizeBytes": 497270,
+      "sha256": "8a9cf93b5105698a100fd2e804deeede3ea408fcf2b6b06acc635935e3bcbfe5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1b-agente-agenda-a-plate.png"
+    },
+    {
+      "path": "ver/R1b-agente-agenda-b-plate.png",
+      "sizeBytes": 522726,
+      "sha256": "3b26004ea2b5e9f268a3ad99550d903977b2115228bf7fa49286da3192c24a4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1b-agente-agenda-b-plate.png"
+    },
+    {
+      "path": "ver/R1b-pantalla-c1.png",
+      "sizeBytes": 297878,
+      "sha256": "260e58a30b18f3f76e2384bba90256802a613b4465dc071be049ff97a8aa82ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1b-pantalla-c1.png"
+    },
+    {
+      "path": "ver/R1b-pantalla-c2.png",
+      "sizeBytes": 298696,
+      "sha256": "49aee8ea8703f3c70b844b6c054fb2ba9a3aacb761de0fb8863fd30f078a705c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1b-pantalla-c2.png"
+    },
+    {
+      "path": "ver/R1c-pantalla-c1.png",
+      "sizeBytes": 295606,
+      "sha256": "f73a35afba5bfc7d8177aeda80ba2cfeb66f0f09f491976747806a7071bfd0bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1c-pantalla-c1.png"
+    },
+    {
+      "path": "ver/R1c-pantalla-c2.png",
+      "sizeBytes": 290625,
+      "sha256": "69cbc3768a948af070be88ca1f15f69c081341deb2dd7c08ea6c87db0564c430",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R1c-pantalla-c2.png"
+    },
+    {
+      "path": "ver/R2-proceso-pizarra-plate.png",
+      "sizeBytes": 482152,
+      "sha256": "75f7da946a9fe984aa193baf4aa9a41bae446731e6b3ecee10343e4150d39e46",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R2-proceso-pizarra-plate.png"
+    },
+    {
+      "path": "ver/R2b-100.png",
+      "sizeBytes": 520474,
+      "sha256": "f25be405eb7fcf6cc49e6b1667c8369d0f00fd8efd50548349de3a74cb2079a6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R2b-100.png"
+    },
+    {
+      "path": "ver/R2b-proceso-pizarra-plate.png",
+      "sizeBytes": 477587,
+      "sha256": "89d33bb7299e7b1a1c2ae1659c25519a83913c3a75bd0f7bdbe19ef559a624d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R2b-proceso-pizarra-plate.png"
+    },
+    {
+      "path": "ver/R3-100.png",
+      "sizeBytes": 819655,
+      "sha256": "76a31991cbc8b17cb821aec4fb6fba7ef1ba2f1ba0da5d76948e0fe70e4c8266",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R3-100.png"
+    },
+    {
+      "path": "ver/R3-guia-escritorio-plate.png",
+      "sizeBytes": 523106,
+      "sha256": "d51ac6331b77de01722fa02de905b0b88a18f63e2b341b0424c6e99cbd383140",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_tarjetas-riel/ver/R3-guia-escritorio-plate.png"
+    }
+  ]
+}

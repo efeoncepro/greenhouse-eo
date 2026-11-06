@@ -1,0 +1,575 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:56:49.144Z",
+  "run": "ai-generations/2026-11-02_motogas-perrito-lipigas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_motogas-perrito-lipigas",
+  "totalBytes": 215231952,
+  "fileCount": 94,
+  "files": [
+    {
+      "path": "base/perrito-00-base-v01.png",
+      "sizeBytes": 2684962,
+      "sha256": "923e87e5ac7db91421090c27c5b62428ff6075b5ae4987bab39f88baa6adb0f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/base/perrito-00-base-v01.png"
+    },
+    {
+      "path": "entrega/hoja-sobre-amarillo.png",
+      "sizeBytes": 3397397,
+      "sha256": "76b0e3b39f46d22da0724f16bc9ea86de31535b285f54a291f6e3cb2160dc6e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/hoja-sobre-amarillo.png"
+    },
+    {
+      "path": "entrega/hoja-sobre-blanco.png",
+      "sizeBytes": 3333819,
+      "sha256": "d2e5ed1611d4ef7e023555d1bf66a48ca19b62d18de610db8bfc906c1ad2099c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/hoja-sobre-blanco.png"
+    },
+    {
+      "path": "entrega/hoja-sobre-navy.png",
+      "sizeBytes": 3367860,
+      "sha256": "4a089cd12219006610d2307be51eacc340c26e7c8afec573b7c0b8ef72aeef75",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/hoja-sobre-navy.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-00-base-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 3345811,
+      "sha256": "0d229dd8ca6a944002f360ecdc89d2f9e413c35b7f82a44ba492b378926677b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-00-base-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-00-base-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 959472,
+      "sha256": "6f69015088c8ed4d3e0543be0ec7823f8bbe8143b7410a9db33a4dfc83675aa5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-00-base-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-01-ladeado-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 4084118,
+      "sha256": "49cade7d727e762c681812d36adf3c8f614012b455a7f92e891817707ecb0e58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-01-ladeado-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-01-ladeado-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 1006308,
+      "sha256": "0557c1512d17dfc1bcd600a8b1595f525907fc50c67e6610ad336e7181758a51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-01-ladeado-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-02-apuntando-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 4022764,
+      "sha256": "e031851a731d0ed64e6ba1c5941a63ee3beb7a1aeb042403856d9050add04d63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-02-apuntando-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-02-apuntando-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 1058148,
+      "sha256": "6456df558c858c3155a79ff8848c93605192af5b0d6418972d096ee57b6566c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-02-apuntando-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-03-trotando-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 4385719,
+      "sha256": "09f0e5d28f6dce5065e201784b3c8d00cd60ef4d572ebe6429026eb7c9377bc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-03-trotando-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-03-trotando-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 1128572,
+      "sha256": "3b378e0b60a17b8dade6f0d9a27168519521e9c50ede34f741b0b44d7358d539",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-03-trotando-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-04-echado-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 4625000,
+      "sha256": "38814dca6faf0e6ce50c435618b14225fed0f6a428ca23e4fa8eb73ca17fd660",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-04-echado-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-04-echado-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 1370565,
+      "sha256": "ef8eca23bd1678049af926aa3fdfbc8083da7e73e75c1e5903bf419b8a299315",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-04-echado-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-05-celular-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 3778941,
+      "sha256": "d59c442c61f11bdfb977131933bfcab8e41cfb2c1b3271b06dcbbef46bd58443",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-05-celular-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-05-celular-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 1074234,
+      "sha256": "7b0045391f1a138f09382ee625cefdbc601dce28e0a2d405d88f20e40090c544",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-05-celular-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-06-megafono-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 4050875,
+      "sha256": "85194f04bc938314c3a09eaba33450f413f3020f8d4d7842328ff0f4d59e588e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-06-megafono-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-06-megafono-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 987342,
+      "sha256": "e6ac6544f002239ca915851058810d113a63a41b94528a1cda16dd3c7514a380",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-06-megafono-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-07-celebrando-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 3988327,
+      "sha256": "059483e29b0afe844d0d06a20fd2ff93bcfc91d29bb3dd706dca025c18fe239d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-07-celebrando-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-07-celebrando-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 986019,
+      "sha256": "3ac9b5e6197b92c59bdd8b1cb5165c0bacf24d05af1da8c852c9242387076317",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-07-celebrando-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-08-mirando-arriba-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 3502793,
+      "sha256": "3c8f3ed5a12fa0555da12aef6dfbc5d9c599f1e91ad4a50758b5eac8f68811cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-08-mirando-arriba-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/motogas-perrito-lipigas-08-mirando-arriba-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 853120,
+      "sha256": "f912ba8dcd43c66a30379f61817e4a54391c5a3c5298a023e587c7a43e16ab49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/entrega/motogas-perrito-lipigas-08-mirando-arriba-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-04-echado-v01-gris-modelo.png",
+      "sizeBytes": 3258619,
+      "sha256": "c04bde884b3a5459f3428715c76acb79cd7c8c3c827b7ae15bb361e2180586a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-04-echado-v01-gris-modelo.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-04-echado-v01-gris-placa.png",
+      "sizeBytes": 4484928,
+      "sha256": "7d9690d3f16182f400b328c69f79030499737b6023ff085ac5b2a1a66d34e8e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-04-echado-v01-gris-placa.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-04-echado-v01-gris.png",
+      "sizeBytes": 3377641,
+      "sha256": "ed38b1c8548a9a8b642717f23ff96f08c91c079c2cec4243c9e20999bf537641",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-04-echado-v01-gris.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-05-celular-v01-gris-modelo.png",
+      "sizeBytes": 2915964,
+      "sha256": "aa035397bd9f8e93b5d554a0c9f18a4e649d1bda911ab7260e2431e3ef77be62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-05-celular-v01-gris-modelo.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-05-celular-v01-gris-placa.png",
+      "sizeBytes": 3756705,
+      "sha256": "01a17a1ff59a5440fb3606071fe85d4fca87ec6aff24a4f00adc3f81731ff288",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-05-celular-v01-gris-placa.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-05-celular-v01-gris.png",
+      "sizeBytes": 2455818,
+      "sha256": "0a67e3126ddc98cee000f32d0e96048b815099b2ae775f767a7a0b6c12bf2e96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-05-celular-v01-gris.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-06-megafono-v01-gris-modelo.png",
+      "sizeBytes": 2957791,
+      "sha256": "c3dee895b50365ad13d78717667af2d6f760e21ebdceab3ccde46109bb8d2a94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-06-megafono-v01-gris-modelo.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-06-megafono-v01-gris-placa.png",
+      "sizeBytes": 3946650,
+      "sha256": "0f0f1510e8c44181e3ad71538aa2b02bf7e4a6c338f2ab274cda30d4edf84d87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-06-megafono-v01-gris-placa.png"
+    },
+    {
+      "path": "fuente-recorte/perrito-06-megafono-v01-gris.png",
+      "sizeBytes": 2851187,
+      "sha256": "3ba16de948362f83ae8144d925ac3a1bce50c490989123db1acfbdb61985ce8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente-recorte/perrito-06-megafono-v01-gris.png"
+    },
+    {
+      "path": "fuente/lipigas-negro-9.png",
+      "sizeBytes": 1269762,
+      "sha256": "1a2c91e9ae0768fc16bf3b571e5cdfae7016c63570790a4d5312b8148ce07393",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/lipigas-negro-9.png"
+    },
+    {
+      "path": "fuente/lipigas-simbolo-1.png",
+      "sizeBytes": 872755,
+      "sha256": "c181db0e702db45509bbe5884ec830c36438ee258bcaf8ea4cae6a368af1153f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/lipigas-simbolo-1.png"
+    },
+    {
+      "path": "fuente/lipigas-simbolo-1200.png",
+      "sizeBytes": 87834,
+      "sha256": "751e6fc50a5187900a61c5bd10f49c07497936a9ed5f57799a551667451fef33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/lipigas-simbolo-1200.png"
+    },
+    {
+      "path": "fuente/lipigas-simbolo-alfa.png",
+      "sizeBytes": 21007,
+      "sha256": "236ac10250486ee0d834fd7736bdd05973d05a303daca1d31bc99351f016b612",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/lipigas-simbolo-alfa.png"
+    },
+    {
+      "path": "fuente/lipigas-wordmark-alfa.png",
+      "sizeBytes": 167489,
+      "sha256": "afee86dadd0886f2a47f3d9f9defd434b494f650518ca2e294719a57b5677563",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/lipigas-wordmark-alfa.png"
+    },
+    {
+      "path": "fuente/perrito-pieza-primavera-2026.jpg",
+      "sizeBytes": 2141673,
+      "sha256": "70e4f474b0d4fe2190145c48db312546e0462b7e767c5f79d93acc0c2c6dc1bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/perrito-pieza-primavera-2026.jpg"
+    },
+    {
+      "path": "fuente/perrito-recorte-2024.png",
+      "sizeBytes": 243586,
+      "sha256": "b02bbbc54b67086ab8c4a4d591c9534eeec2ebd65eb48d317bafd08c81d092d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/perrito-recorte-2024.png"
+    },
+    {
+      "path": "fuente/ref-cara-detalle.png",
+      "sizeBytes": 1348257,
+      "sha256": "8bfa36366f093d850fade329ea785bb7eaf18534f37e832af098e3b0d4f8eb84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/ref-cara-detalle.png"
+    },
+    {
+      "path": "fuente/ref-cuerpo-1600.png",
+      "sizeBytes": 2112601,
+      "sha256": "9a9ea955ff164bff40a8a5a7804a5667b8c90432ed2f4f1e1056346d52b72a98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/fuente/ref-cuerpo-1600.png"
+    },
+    {
+      "path": "placa/perrito-00-base-v01-placa.png",
+      "sizeBytes": 3345811,
+      "sha256": "0d229dd8ca6a944002f360ecdc89d2f9e413c35b7f82a44ba492b378926677b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-00-base-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-01-ladeado-v01-placa.png",
+      "sizeBytes": 4084118,
+      "sha256": "49cade7d727e762c681812d36adf3c8f614012b455a7f92e891817707ecb0e58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-01-ladeado-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-02-apuntando-v01-placa.png",
+      "sizeBytes": 4022764,
+      "sha256": "e031851a731d0ed64e6ba1c5941a63ee3beb7a1aeb042403856d9050add04d63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-02-apuntando-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-03-trotando-v01-placa.png",
+      "sizeBytes": 4385719,
+      "sha256": "09f0e5d28f6dce5065e201784b3c8d00cd60ef4d572ebe6429026eb7c9377bc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-03-trotando-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-04-echado-v01-placa.png",
+      "sizeBytes": 4625000,
+      "sha256": "38814dca6faf0e6ce50c435618b14225fed0f6a428ca23e4fa8eb73ca17fd660",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-04-echado-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-05-celular-v01-placa.png",
+      "sizeBytes": 3778941,
+      "sha256": "d59c442c61f11bdfb977131933bfcab8e41cfb2c1b3271b06dcbbef46bd58443",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-05-celular-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-06-megafono-v01-placa.png",
+      "sizeBytes": 4050875,
+      "sha256": "85194f04bc938314c3a09eaba33450f413f3020f8d4d7842328ff0f4d59e588e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-06-megafono-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-07-celebrando-v01-placa.png",
+      "sizeBytes": 3988327,
+      "sha256": "059483e29b0afe844d0d06a20fd2ff93bcfc91d29bb3dd706dca025c18fe239d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-07-celebrando-v01-placa.png"
+    },
+    {
+      "path": "placa/perrito-08-mirando-arriba-v01-placa.png",
+      "sizeBytes": 3502793,
+      "sha256": "3c8f3ed5a12fa0555da12aef6dfbc5d9c599f1e91ad4a50758b5eac8f68811cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/placa/perrito-08-mirando-arriba-v01-placa.png"
+    },
+    {
+      "path": "poses/perrito-01-ladeado-v01.png",
+      "sizeBytes": 3434304,
+      "sha256": "5203e37e4484d6e7a0d7654516f188e03828f7f0ac2e6cd35f3317bfdd62a4b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-01-ladeado-v01.png"
+    },
+    {
+      "path": "poses/perrito-02-apuntando-v01.png",
+      "sizeBytes": 3503017,
+      "sha256": "47e95f07a6dda57e2fc3ead3fd419821e6f108ecf856699cd9afa4e345500e7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-02-apuntando-v01.png"
+    },
+    {
+      "path": "poses/perrito-03-trotando-v01.png",
+      "sizeBytes": 3558987,
+      "sha256": "349e0387d5a956e98f820513ed9e747e929b8011e951c1cafd7f1ac815cfaa4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-03-trotando-v01.png"
+    },
+    {
+      "path": "poses/perrito-04-echado-v01.png",
+      "sizeBytes": 3688236,
+      "sha256": "b065331022b8c5ec3c6995324bfe368696f740e4276d0aa656fd639a6f14b961",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-04-echado-v01.png"
+    },
+    {
+      "path": "poses/perrito-05-celular-v01.png",
+      "sizeBytes": 3303191,
+      "sha256": "9866af0a7d2f8887b7049791347ae57185d25d62be09d3cda5cdfa01d321307b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-05-celular-v01.png"
+    },
+    {
+      "path": "poses/perrito-06-megafono-v01.png",
+      "sizeBytes": 3326997,
+      "sha256": "2505d6568e057488ae3e6f300eb3e699dc1a050a10f4a8e4ddd0f37b44f70dbc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-06-megafono-v01.png"
+    },
+    {
+      "path": "poses/perrito-07-celebrando-v01.png",
+      "sizeBytes": 3371491,
+      "sha256": "c31c14538ec37a07994bdaead4c60e6de98a9358264bf034a8601529ad03fcaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-07-celebrando-v01.png"
+    },
+    {
+      "path": "poses/perrito-08-mirando-arriba-v01.png",
+      "sizeBytes": 3224416,
+      "sha256": "51af993e36a9196ac774bb08cedfc246504dabe1f872a096c0f4dd097be3f95d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/poses/perrito-08-mirando-arriba-v01.png"
+    },
+    {
+      "path": "qa/echado-fuentes.png",
+      "sizeBytes": 1350883,
+      "sha256": "da215a297f4e5f1d98b6980f49162188b20c7f5ff955a988b4573d71a6a20e82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/echado-fuentes.png"
+    },
+    {
+      "path": "qa/gris-modelo-cajas.png",
+      "sizeBytes": 4046854,
+      "sha256": "3e9e0730f32cb012a356101f20a8a93d6b224852d36a63c4b60e03245c8c5e51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/gris-modelo-cajas.png"
+    },
+    {
+      "path": "qa/hoja-piloto-con-original.png",
+      "sizeBytes": 4476459,
+      "sha256": "c0dafc91625006dcd76ecaf6d623b79ac8d031d61f511d670d78a3577cfe75ae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/hoja-piloto-con-original.png"
+    },
+    {
+      "path": "qa/hoja-piloto.png",
+      "sizeBytes": 4731018,
+      "sha256": "70239dfc6db35a5025b4d08100a8fa9644df86412bed03ecd6ac3f0675e386aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/hoja-piloto.png"
+    },
+    {
+      "path": "qa/placa-echado.png",
+      "sizeBytes": 1585126,
+      "sha256": "33b9fc4e5da8f059d04b8532b5bd3feee56c23abac723870f55e4b479eddea41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/placa-echado.png"
+    },
+    {
+      "path": "qa/placas-repuestas.png",
+      "sizeBytes": 3025270,
+      "sha256": "3249aade5cedc498f6c4aba9fb962b908ec1b963a8e460e7a06ad0bbdfdf107e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/placas-repuestas.png"
+    },
+    {
+      "path": "qa/placas-vs-original.png",
+      "sizeBytes": 2170203,
+      "sha256": "00644f9e360b24ad1eb986331e6f0b7e775a6b4ccef838059191f96bfe4f94a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/placas-vs-original.png"
+    },
+    {
+      "path": "qa/rescate-blancos.png",
+      "sizeBytes": 2827186,
+      "sha256": "841ec356e59244618c53026e753bc9c080f750337e47a358ee2fcbabb23328c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/rescate-blancos.png"
+    },
+    {
+      "path": "qa/rescate-final.png",
+      "sizeBytes": 2682387,
+      "sha256": "1ae7c9d8a28dae7fcc803c4a0755f8d8927e2bb6d9a397d4d3113c6e8a5432c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/rescate-final.png"
+    },
+    {
+      "path": "qa/rescate-gris.png",
+      "sizeBytes": 2915508,
+      "sha256": "bf859581c3732aa9dee3f912b653028577f8521a50bbf55ba60ceec710abee7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/rescate-gris.png"
+    },
+    {
+      "path": "qa/zoom-borde-antes-despues.png",
+      "sizeBytes": 424035,
+      "sha256": "e4fcaa3166f387c85df1e64ad6f63b37b37a640aafe632c86bd714c32a51a06a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/zoom-borde-antes-despues.png"
+    },
+    {
+      "path": "qa/zoom-borde-limpio.png",
+      "sizeBytes": 797246,
+      "sha256": "e92e5446f5deb496c8204030a740917f4f10a0200379d0d1d40da766e2e1b61f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/zoom-borde-limpio.png"
+    },
+    {
+      "path": "qa/zoom-borde-navy.png",
+      "sizeBytes": 330161,
+      "sha256": "3645158171e759d65b6f9c0423c0ce5b72be561211258a4058e470fe3ffd1b68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/qa/zoom-borde-navy.png"
+    },
+    {
+      "path": "recorte/perrito-00-base-v01-transparente-limpio.png",
+      "sizeBytes": 959472,
+      "sha256": "6f69015088c8ed4d3e0543be0ec7823f8bbe8143b7410a9db33a4dfc83675aa5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-00-base-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-00-base-v01-transparente.png",
+      "sizeBytes": 957403,
+      "sha256": "ea7a6318dffa19694c966ddfc5e41a017626143f7d7f4b0dbd0725bef50c3f73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-00-base-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-01-ladeado-v01-transparente-limpio.png",
+      "sizeBytes": 1006308,
+      "sha256": "0557c1512d17dfc1bcd600a8b1595f525907fc50c67e6610ad336e7181758a51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-01-ladeado-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-01-ladeado-v01-transparente.png",
+      "sizeBytes": 1003082,
+      "sha256": "bb9dad372346b32d60f7f160570f5f1b6dd9f2909da1796d3a508bf303e87281",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-01-ladeado-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-02-apuntando-v01-transparente-limpio.png",
+      "sizeBytes": 1058148,
+      "sha256": "6456df558c858c3155a79ff8848c93605192af5b0d6418972d096ee57b6566c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-02-apuntando-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-02-apuntando-v01-transparente.png",
+      "sizeBytes": 1054867,
+      "sha256": "c78af0bf938a1aa76f9bbc271fc4fdbb537ef537a6aef61994a7d1d210590455",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-02-apuntando-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-03-trotando-v01-transparente-limpio.png",
+      "sizeBytes": 1128572,
+      "sha256": "3b378e0b60a17b8dade6f0d9a27168519521e9c50ede34f741b0b44d7358d539",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-03-trotando-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-03-trotando-v01-transparente.png",
+      "sizeBytes": 1122824,
+      "sha256": "e8bb954cf93885611b93b4d25a11502d91bd06323b72675ea85c4a4d36f3a8fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-03-trotando-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-blanco-limpio.png",
+      "sizeBytes": 1079486,
+      "sha256": "df05249a97cf09a2ac63e1844fe810e1973286b3abaec31d731190632ceeae65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-blanco-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-gris-limpio.png",
+      "sizeBytes": 1041529,
+      "sha256": "ec9e5b22199ee447da6e9a44873c631548f3b51d4ac3bab0caada87b62caa478",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-gris-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-transparente-blanco.png",
+      "sizeBytes": 1074828,
+      "sha256": "15ab5fff31240e1a5f4841c51d1c03d905f4a0b002c084dc7e0f08160672bb5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-transparente-blanco.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-transparente-limpio.png",
+      "sizeBytes": 1370565,
+      "sha256": "ef8eca23bd1678049af926aa3fdfbc8083da7e73e75c1e5903bf419b8a299315",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-transparente-rescatado.png",
+      "sizeBytes": 1085044,
+      "sha256": "f247a00041852cdc8d33467163bc1a9d8317af5f235ff951c03e1b0efcaaac4d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-transparente-rescatado.png"
+    },
+    {
+      "path": "recorte/perrito-04-echado-v01-transparente.png",
+      "sizeBytes": 1042441,
+      "sha256": "f412929282fce969f3abb49f6faa74a55b989ce21e3106973521285731309477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-04-echado-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-05-celular-v01-transparente-limpio.png",
+      "sizeBytes": 1074234,
+      "sha256": "7b0045391f1a138f09382ee625cefdbc601dce28e0a2d405d88f20e40090c544",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-05-celular-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-05-celular-v01-transparente-rescatado.png",
+      "sizeBytes": 866256,
+      "sha256": "449c44a040f9b598adf43893ceae410086296abe25d171a9168f1501301f6578",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-05-celular-v01-transparente-rescatado.png"
+    },
+    {
+      "path": "recorte/perrito-05-celular-v01-transparente.png",
+      "sizeBytes": 905727,
+      "sha256": "9661057d5ab11e7c5b88d0c38eb4f49422fac63998caaa4292c426909371bb6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-05-celular-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-06-megafono-v01-transparente-limpio.png",
+      "sizeBytes": 987342,
+      "sha256": "e6ac6544f002239ca915851058810d113a63a41b94528a1cda16dd3c7514a380",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-06-megafono-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-06-megafono-v01-transparente-rescatado.png",
+      "sizeBytes": 1031668,
+      "sha256": "66dfe9c24690aaa520acf1317fae934d5effca9708094c101c9c5525cd241457",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-06-megafono-v01-transparente-rescatado.png"
+    },
+    {
+      "path": "recorte/perrito-06-megafono-v01-transparente.png",
+      "sizeBytes": 892132,
+      "sha256": "9e35858639a9d65202986a37d192dc168590bee93ebdd8860fa3a97023c941ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-06-megafono-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-07-celebrando-v01-transparente-limpio.png",
+      "sizeBytes": 986019,
+      "sha256": "3ac9b5e6197b92c59bdd8b1cb5165c0bacf24d05af1da8c852c9242387076317",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-07-celebrando-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-07-celebrando-v01-transparente.png",
+      "sizeBytes": 981073,
+      "sha256": "f46efd6b39b52b01965d1b6966bb8c6cd17efb6968e1577eb2ab331ecd284c77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-07-celebrando-v01-transparente.png"
+    },
+    {
+      "path": "recorte/perrito-08-mirando-arriba-v01-transparente-limpio.png",
+      "sizeBytes": 853120,
+      "sha256": "f912ba8dcd43c66a30379f61817e4a54391c5a3c5298a023e587c7a43e16ab49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-08-mirando-arriba-v01-transparente-limpio.png"
+    },
+    {
+      "path": "recorte/perrito-08-mirando-arriba-v01-transparente.png",
+      "sizeBytes": 850056,
+      "sha256": "c82d26ad3c46e1df8ee7613394a8b17bfbff326b6b27cd0465acf11d495ddbd1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-perrito-lipigas/recorte/perrito-08-mirando-arriba-v01-transparente.png"
+    }
+  ]
+}

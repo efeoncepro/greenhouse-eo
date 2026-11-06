@@ -1,0 +1,59 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:48:33.441Z",
+  "run": "ai-generations/2026-10-24_autor-blog",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-24_autor-blog",
+  "totalBytes": 10403531,
+  "fileCount": 8,
+  "files": [
+    {
+      "path": "hoja-legibilidad.png",
+      "sizeBytes": 533120,
+      "sha256": "37089a7c6615d6527f8cb6282a85a309463f4b1924ea2997ecec1441b34094d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/hoja-legibilidad.png"
+    },
+    {
+      "path": "julio-autor-azul-foto-1080.png",
+      "sizeBytes": 2363404,
+      "sha256": "e85e1e36cc9844af5a856b723f01dbbacc43c3d0bcef9fc3ff27f5ef3964a51c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-azul-foto-1080.png"
+    },
+    {
+      "path": "julio-autor-azul-foto-500.png",
+      "sizeBytes": 492109,
+      "sha256": "7896467f23ed5c4720dc9e6bd42817334c35610b553111b9d2788c41f6705d91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-azul-foto-500.png"
+    },
+    {
+      "path": "julio-autor-papel-halo-1080.png",
+      "sizeBytes": 2294188,
+      "sha256": "32ea9053645994751dc080dcc65f079a2233e4c5370a4e218365133ef3fb1bb9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-papel-halo-1080.png"
+    },
+    {
+      "path": "julio-autor-papel-halo-500.png",
+      "sizeBytes": 486218,
+      "sha256": "53ad6b6b7222998f848e8bc46641f7db449f8b57d987b138f524528b92bfd427",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-papel-halo-500.png"
+    },
+    {
+      "path": "julio-autor-teal-growth-1080.png",
+      "sizeBytes": 2396445,
+      "sha256": "5150d3b5b64f0dea73b1f6c5c368c84558e151e7e565a1c729db297f7e50a5c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-teal-growth-1080.png"
+    },
+    {
+      "path": "julio-autor-teal-growth-500.png",
+      "sizeBytes": 499841,
+      "sha256": "8b858654fec618563a333b1226c66b39ac8d9c00d4269c49e8d756d7f6b5e1d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-autor-teal-growth-500.png"
+    },
+    {
+      "path": "julio-capa-reparada.png",
+      "sizeBytes": 1338206,
+      "sha256": "9c88244157d3b890c414fbdd079df06b7fbc8780dc62d0a500b87379d78e28fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-24_autor-blog/julio-capa-reparada.png"
+    }
+  ]
+}

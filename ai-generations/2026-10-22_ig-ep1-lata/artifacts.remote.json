@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:44:56.117Z",
+  "run": "ai-generations/2026-10-22_ig-ep1-lata",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_ig-ep1-lata",
+  "totalBytes": 8773304,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "cuadros-1080x1920/ep1-f1.png",
+      "sizeBytes": 1839563,
+      "sha256": "aead12b717a0413d93d272e06c758a957e98871033e9309e5f9e13df72cbfc14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f1.png"
+    },
+    {
+      "path": "cuadros-1080x1920/ep1-f2.png",
+      "sizeBytes": 1238371,
+      "sha256": "f6d91c8ab3e51b655e7a1d8980610ed1cb808700994115b857ec7331c50be3fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f2.png"
+    },
+    {
+      "path": "cuadros-1080x1920/ep1-f3.png",
+      "sizeBytes": 1835210,
+      "sha256": "f46dc9d857d773b50995ce0118541235290dc893cc13b22d493ba285f61ad4a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f3.png"
+    },
+    {
+      "path": "cuadros-1080x1920/ep1-f4.png",
+      "sizeBytes": 1376911,
+      "sha256": "6fe32bf04c6770aefa0dfe304fdd66e0794ab1253cc522a9271d246ffa49f8d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f4.png"
+    },
+    {
+      "path": "cuadros-1080x1920/ep1-f5.png",
+      "sizeBytes": 1382993,
+      "sha256": "8c5d2a8251c527ada2d4e8908bf02066d14ac8bb54d27eac8cfc18cb09569c56",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f5.png"
+    },
+    {
+      "path": "cuadros-1080x1920/ep1-f6.png",
+      "sizeBytes": 1100256,
+      "sha256": "21a382b211a7836640d6fe2c53c183d71d8d94ed762988f3fc8c3dfc9e996091",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-ep1-lata/cuadros-1080x1920/ep1-f6.png"
+    }
+  ]
+}

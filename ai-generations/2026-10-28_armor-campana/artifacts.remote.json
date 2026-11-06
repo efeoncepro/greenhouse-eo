@@ -1,0 +1,311 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:50:13.561Z",
+  "run": "ai-generations/2026-10-28_armor-campana",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-28_armor-campana",
+  "totalBytes": 116850940,
+  "fileCount": 50,
+  "files": [
+    {
+      "path": "plates/A-riesgo-invisible-v1-1200.jpg",
+      "sizeBytes": 158239,
+      "sha256": "203400d38b36b9bd26008ec3f55c6285d8a6046bd928f72f12c79877df0ca5ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A-riesgo-invisible-v1-1200.jpg"
+    },
+    {
+      "path": "plates/A-riesgo-invisible-v1.png",
+      "sizeBytes": 2916196,
+      "sha256": "7c16c450a42e592de519ace44ebfadbab373077e01c4af9343d945da8c204242",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A-riesgo-invisible-v1.png"
+    },
+    {
+      "path": "plates/A2-no-se-ven-4x5-v2.jpg",
+      "sizeBytes": 239416,
+      "sha256": "8393327c5d4929d27cfe403bd37b53c494513383765904e060b2f34f6b1dea16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A2-no-se-ven-4x5-v2.jpg"
+    },
+    {
+      "path": "plates/A2-no-se-ven-4x5-v2.png",
+      "sizeBytes": 3673393,
+      "sha256": "307452da519796f168c71671a412ea6cfa69224c96430ac9e442f9dc14c4108e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A2-no-se-ven-4x5-v2.png"
+    },
+    {
+      "path": "plates/A2-no-se-ven-v2.jpg",
+      "sizeBytes": 322912,
+      "sha256": "695b930ec439ac41849083ad4b49b75b626035362bcd46efcc4a3f9d98d603f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A2-no-se-ven-v2.jpg"
+    },
+    {
+      "path": "plates/A2-no-se-ven-v2.png",
+      "sizeBytes": 5057647,
+      "sha256": "6bfd46a62b328afc1fb0a8218ef74e7c7ad8316fb4477a0a0b8b3ef79a4a4462",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/A2-no-se-ven-v2.png"
+    },
+    {
+      "path": "plates/C2-filtros-v2.jpg",
+      "sizeBytes": 349259,
+      "sha256": "a11ced74d7cda24ce5b198bc058c92a5e0b82616f951a6483a93e6c07dcb7b94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/C2-filtros-v2.jpg"
+    },
+    {
+      "path": "plates/C2-filtros-v2.png",
+      "sizeBytes": 4036624,
+      "sha256": "8b834021a29f4aac5f0c25993547120aa48ce33f67c4393b1bb5b143e1b18ba4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/C2-filtros-v2.png"
+    },
+    {
+      "path": "plates/E-rosas-v1-1200.jpg",
+      "sizeBytes": 195470,
+      "sha256": "bae89f2c14391df3a973b66ecff99d327c8086220da49172cee15c86f4d55654",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E-rosas-v1-1200.jpg"
+    },
+    {
+      "path": "plates/E-rosas-v1.png",
+      "sizeBytes": 3062117,
+      "sha256": "b61e0baffadd30ce2c4e9bd78e0192eaffbeb82eeca77c1df6c930e67dfd5d55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E-rosas-v1.png"
+    },
+    {
+      "path": "plates/E2-rosas-4x5-v2.jpg",
+      "sizeBytes": 268152,
+      "sha256": "c1c98f890221370352970b61077a3db76b2df481d71accf4fd96584a383292c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E2-rosas-4x5-v2.jpg"
+    },
+    {
+      "path": "plates/E2-rosas-4x5-v2.png",
+      "sizeBytes": 3672255,
+      "sha256": "3f1916a9520d7a297ba75bc278fd0563e65333f3908d820a6bab7e4438ad2069",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E2-rosas-4x5-v2.png"
+    },
+    {
+      "path": "plates/E2-rosas-v2.jpg",
+      "sizeBytes": 382580,
+      "sha256": "08e789dc0b2eb25a690f899eb194063844f3b298e7f226453a9ecc11fbdfbbf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E2-rosas-v2.jpg"
+    },
+    {
+      "path": "plates/E2-rosas-v2.png",
+      "sizeBytes": 5053691,
+      "sha256": "315831e60c148605b0d5ed8890a7b43b32ddb59f437ca8866c9bbb2f1d123706",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/E2-rosas-v2.png"
+    },
+    {
+      "path": "plates/expand-A2-no-se-ven-v2/expand-inputs/b18e160631bc-canvas.png",
+      "sizeBytes": 8417545,
+      "sha256": "223c4568f01a9f815432f5c80fb125e5a07753464e128b3c76184025ec560b96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-A2-no-se-ven-v2/expand-inputs/b18e160631bc-canvas.png"
+    },
+    {
+      "path": "plates/expand-A2-no-se-ven-v2/expand-inputs/b18e160631bc-mask.png",
+      "sizeBytes": 6197,
+      "sha256": "5faf1e9152c196d96290bc06f2d87e17b8d032849407dd83d66f2454bee8e851",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-A2-no-se-ven-v2/expand-inputs/b18e160631bc-mask.png"
+    },
+    {
+      "path": "plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/mask-preview.png",
+      "sizeBytes": 8181750,
+      "sha256": "9a637fa892f5a2e75c90ed5cd96191e78081dccfbbd1735f21a5d744f3450b8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/mask-preview.png"
+    },
+    {
+      "path": "plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/provider-input.png",
+      "sizeBytes": 3557720,
+      "sha256": "5adfffe4a4639cfa9dee91f38b55021183b7a396e59050ad5b490dea7894614f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/provider-input.png"
+    },
+    {
+      "path": "plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/provider-mask.png",
+      "sizeBytes": 2717,
+      "sha256": "c3a286f19c10364fc231123fe8e0b9469fa1eb8730104687b67e42c451f2369f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-A2-no-se-ven-v2/inpaint/47a209427e59/provider-mask.png"
+    },
+    {
+      "path": "plates/expand-E2-rosas-v2/expand-inputs/8f4ee23a4dbd-canvas.png",
+      "sizeBytes": 9077716,
+      "sha256": "b6895e7f6bff7d0510fb5b293400c1454f6dec7fb62d09ae5c2eb71d5003b2b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-E2-rosas-v2/expand-inputs/8f4ee23a4dbd-canvas.png"
+    },
+    {
+      "path": "plates/expand-E2-rosas-v2/expand-inputs/8f4ee23a4dbd-mask.png",
+      "sizeBytes": 6197,
+      "sha256": "5faf1e9152c196d96290bc06f2d87e17b8d032849407dd83d66f2454bee8e851",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-E2-rosas-v2/expand-inputs/8f4ee23a4dbd-mask.png"
+    },
+    {
+      "path": "plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-canvas.png",
+      "sizeBytes": 8179782,
+      "sha256": "bdb728192ff8a6209f4020d10402afc36f908c2c3834afbae21bbc8d4526759a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-canvas.png"
+    },
+    {
+      "path": "plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-mask.png",
+      "sizeBytes": 6197,
+      "sha256": "5faf1e9152c196d96290bc06f2d87e17b8d032849407dd83d66f2454bee8e851",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/expand-inputs/28f0574738a7-mask.png"
+    },
+    {
+      "path": "plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/mask-preview.png",
+      "sizeBytes": 7820011,
+      "sha256": "642d6bc6dd299501e111b594546cebd9b01f3312331d11e7177184f664ad7c0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/mask-preview.png"
+    },
+    {
+      "path": "plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/provider-input.png",
+      "sizeBytes": 3344250,
+      "sha256": "516360d3f61be6a5a40b95fbf60655981f799bf6a275406ffdd7250b3cf171b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/provider-input.png"
+    },
+    {
+      "path": "plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/provider-mask.png",
+      "sizeBytes": 2717,
+      "sha256": "c3a286f19c10364fc231123fe8e0b9469fa1eb8730104687b67e42c451f2369f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/expand-L2-inserto-v2/inpaint/ec758aa02a84/provider-mask.png"
+    },
+    {
+      "path": "plates/L-lentes-v1-1200.jpg",
+      "sizeBytes": 152890,
+      "sha256": "1a7aac017efd618d0b84115bd30e70845da8e20ce81380fba1d4a69c7d032a50",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L-lentes-v1-1200.jpg"
+    },
+    {
+      "path": "plates/L-lentes-v1.png",
+      "sizeBytes": 3103689,
+      "sha256": "2f761b5d2a0754fd548fcbdadfb1a62da7a0af66ce2d1c1bb863de87450e9a7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L-lentes-v1.png"
+    },
+    {
+      "path": "plates/L2-inserto-4x5-v2.jpg",
+      "sizeBytes": 175390,
+      "sha256": "c53eb057ea9bb49e70a319acb479f45a84ea29d2f59b710c092167add61f8238",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L2-inserto-4x5-v2.jpg"
+    },
+    {
+      "path": "plates/L2-inserto-4x5-v2.png",
+      "sizeBytes": 3486706,
+      "sha256": "9a47ab3ef3f5240cc61188c190dc9984c033f1ae44f16e7db8d3161b06665a9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L2-inserto-4x5-v2.png"
+    },
+    {
+      "path": "plates/L2-inserto-v2.jpg",
+      "sizeBytes": 324100,
+      "sha256": "3d2f4cac799d86c0a4c5b8579110b2b72825581083cef7a05a6304f9dbbaf0b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L2-inserto-v2.jpg"
+    },
+    {
+      "path": "plates/L2-inserto-v2.png",
+      "sizeBytes": 5328378,
+      "sha256": "1d52a85dd6e717e4a03c86d737646ff257f1d3f6d7e0d7d6c6279ab15c21b260",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/L2-inserto-v2.png"
+    },
+    {
+      "path": "plates/PE-A-agro-v1.jpg",
+      "sizeBytes": 871378,
+      "sha256": "e2d420ea146493ab3c0811aa4d2368d9009c313fe9527db5dac584559efe95d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-A-agro-v1.jpg"
+    },
+    {
+      "path": "plates/PE-A-agro-v1.png",
+      "sizeBytes": 5333173,
+      "sha256": "59cbbd90e8462b8253baea0bf343f8f366eea37eef88408a58824bd12e20c6ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-A-agro-v1.png"
+    },
+    {
+      "path": "plates/PE-L-llegada-v1.jpg",
+      "sizeBytes": 1105503,
+      "sha256": "49f2633caa7df414de28851dfff189cfc223ac663246855740d3dd8888c101f2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-L-llegada-v1.jpg"
+    },
+    {
+      "path": "plates/PE-L-llegada-v1.png",
+      "sizeBytes": 6061478,
+      "sha256": "a0953adfde26d2914a351d66ea6fa78b15e0a1ff02d16c45044e601e71608fa4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-L-llegada-v1.png"
+    },
+    {
+      "path": "plates/PE-M-mina-v1.jpg",
+      "sizeBytes": 901711,
+      "sha256": "c25bbd9b05764b2d4d7938d01659b9007eeae266d1d064d0ce44f69627892e53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-M-mina-v1.jpg"
+    },
+    {
+      "path": "plates/PE-M-mina-v1.png",
+      "sizeBytes": 5723770,
+      "sha256": "a4aedb3ad52daba08ebaca7c0b7df2619bef20af9b7e68b08d71abdb95b504c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/plates/PE-M-mina-v1.png"
+    },
+    {
+      "path": "refs/ref-f680-producto.jpg",
+      "sizeBytes": 12631,
+      "sha256": "748399ecf24efbafb0b21130e492dc143260f763aac30d65e5335c137e7c608f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-f680-producto.jpg"
+    },
+    {
+      "path": "refs/ref-filtro-701.jpg",
+      "sizeBytes": 32216,
+      "sha256": "06a61a96035545997686fc61c1caddc3bea8896bb9580e8f5a18f87e8f5520b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-filtro-701.jpg"
+    },
+    {
+      "path": "refs/ref-filtro-703.jpg",
+      "sizeBytes": 31034,
+      "sha256": "649f855dd00ba4ea7cf6bc80cb36f1f0ebdb7fb4342384ef0c66abb41aba292b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-filtro-703.jpg"
+    },
+    {
+      "path": "refs/ref-filtro-704.jpg",
+      "sizeBytes": 30567,
+      "sha256": "14d2c51668aee8988eda2c48b1d3b34d538819e1b246b2f337556349c533ce98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-filtro-704.jpg"
+    },
+    {
+      "path": "refs/ref-filtro-706.jpg",
+      "sizeBytes": 35029,
+      "sha256": "f5539d76406ba4babc99e6ecb1ecd0555abf1b3b7682b2e2858a2e4d692983c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-filtro-706.jpg"
+    },
+    {
+      "path": "refs/ref-filtro-793.jpg",
+      "sizeBytes": 25886,
+      "sha256": "93a26d8949f4e4526b9360f541bb2f7bad2a35d4ef89c7462abb9c903c47a518",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-filtro-793.jpg"
+    },
+    {
+      "path": "refs/ref-fullface-puesta.png",
+      "sizeBytes": 1657910,
+      "sha256": "b16fd95467b436b4879f9063ae15c0e14bb8e30693b995ae6f74e424d87d6c4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-fullface-puesta.png"
+    },
+    {
+      "path": "refs/ref-inserto-optico.jpg",
+      "sizeBytes": 52376,
+      "sha256": "6ccb8e7869e08683a0b2cddc2de4ed079195253765f5130a3f349b31a8d1cbfa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/refs/ref-inserto-optico.jpg"
+    },
+    {
+      "path": "retoques/s08-base.png",
+      "sizeBytes": 1632287,
+      "sha256": "a1c0338c1705a6e4c5a329fa701d6c4783ca83e5bbab216a193462b5daf75567",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/retoques/s08-base.png"
+    },
+    {
+      "path": "retoques/s08-limpia.jpg",
+      "sizeBytes": 362052,
+      "sha256": "fcfd01848b2cd6e64b1f680a614330c4d5864511a5475bc0d61d33c4f92c2e09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/retoques/s08-limpia.jpg"
+    },
+    {
+      "path": "retoques/s08-limpia.png",
+      "sizeBytes": 2375878,
+      "sha256": "8ce95130f8d156ebe58f4a487c9d21d3356f2795128a4b153c4199f060a4b360",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/retoques/s08-limpia.png"
+    },
+    {
+      "path": "retoques/s08-mask.png",
+      "sizeBytes": 44158,
+      "sha256": "3a3cde17659d66fc6f27e2ebbfc4c03a74cb4cf4e697d9bcc9d9c1475b56b1c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_armor-campana/retoques/s08-mask.png"
+    }
+  ]
+}

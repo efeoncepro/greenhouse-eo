@@ -1,0 +1,2135 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:48:19.781Z",
+  "run": "ai-generations/2026-10-23_umbral-fintech",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-23_umbral-fintech",
+  "totalBytes": 360314285,
+  "fileCount": 354,
+  "files": [
+    {
+      "path": "activos/logo-umbral-claro.png",
+      "sizeBytes": 20388,
+      "sha256": "731914d6de6408599ffbb92525d6a337e4ae316b48d6ad5b84341429ff8c6835",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/activos/logo-umbral-claro.png"
+    },
+    {
+      "path": "activos/logo-umbral-negro.png",
+      "sizeBytes": 71421,
+      "sha256": "7b0be6c3d65e1331bfd5875947ccf1c65fbd6f2cc39ca68664fb8808c8bb90fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/activos/logo-umbral-negro.png"
+    },
+    {
+      "path": "casting/martina-ancla-v1.png",
+      "sizeBytes": 2293100,
+      "sha256": "91b0da4383cc52476814a931c15e5e6a8f1e6ced6979907478bb13747c053cf4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-ancla-v1.png"
+    },
+    {
+      "path": "casting/martina-ancla-v2-1.png",
+      "sizeBytes": 2498476,
+      "sha256": "1b90b1b2cb90e71a973ab8e7589121b5acdf97cb79dc9ff14967647d4d91f5b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-ancla-v2-1.png"
+    },
+    {
+      "path": "casting/martina-ancla-v2-2.png",
+      "sizeBytes": 2503707,
+      "sha256": "5ce85a16ee5e0294d0514d55924af2b63ab90125dca075eb40e41482939a8ea9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-ancla-v2-2.png"
+    },
+    {
+      "path": "casting/martina-ancla-v3-1.png",
+      "sizeBytes": 2294255,
+      "sha256": "44226e835c00d7269140eae1980ff5e1d0587c404934383201ef978d1b0f9548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-ancla-v3-1.png"
+    },
+    {
+      "path": "casting/martina-ancla-v3-2.png",
+      "sizeBytes": 2366944,
+      "sha256": "2e39ecad3227e8c692dd829ba2e80add0dade57f78ce357662d01b67c3f49ff2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-ancla-v3-2.png"
+    },
+    {
+      "path": "casting/martina-cuerpo-v1.png",
+      "sizeBytes": 2061165,
+      "sha256": "b53e178dc25cde2dfb23fa5e16959e93f22c4b11f095920ce5590d49ff730b90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-cuerpo-v1.png"
+    },
+    {
+      "path": "casting/martina-cuerpo-v2-recorte.png",
+      "sizeBytes": 2109377,
+      "sha256": "e382fdfdeea42ce280f6b5b71669c3d928f75cca44dc3499f78447ab84f7edb0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-cuerpo-v2-recorte.png"
+    },
+    {
+      "path": "casting/martina-cuerpo-v2.png",
+      "sizeBytes": 2494659,
+      "sha256": "975c1953f4604ffba6de829d8b22255037ab9d31f1804ee8e7c6f96e2aabeae1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-cuerpo-v2.png"
+    },
+    {
+      "path": "casting/martina-cuerpo-v3.png",
+      "sizeBytes": 2447604,
+      "sha256": "a0fff2521a4e07cabf78836f053c1c71566d2342d646c29c473f80f5ac8f14b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-cuerpo-v3.png"
+    },
+    {
+      "path": "casting/martina-estilo-a.png",
+      "sizeBytes": 2641041,
+      "sha256": "069c42ffac0007a6e9a0acaddb168211060716b676e1d9d61971fa5b80eeac7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-estilo-a.png"
+    },
+    {
+      "path": "casting/martina-estilo-b.png",
+      "sizeBytes": 2658919,
+      "sha256": "72f93505c49f49f3f0481e8c59eb9dccae5ec44223fe699bb1d5852acc17f1c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/martina-estilo-b.png"
+    },
+    {
+      "path": "casting/tomas-ancla-1.png",
+      "sizeBytes": 2435448,
+      "sha256": "3bcb8e570d857cd4ce14429d8004f7dbeb808af0d844b26219bb16573b5f8570",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/tomas-ancla-1.png"
+    },
+    {
+      "path": "casting/tomas-ancla-2.png",
+      "sizeBytes": 2454303,
+      "sha256": "12d1d72a0735ac3f68096852c4ac775a9916a252bcc59b39acb504c9850ed975",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/tomas-ancla-2.png"
+    },
+    {
+      "path": "casting/tomas-cuerpo.png",
+      "sizeBytes": 2540918,
+      "sha256": "7977d0fc8d92630a04107fee1aad2950ac66aa7cf09075c75eefce3d22aed489",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/tomas-cuerpo.png"
+    },
+    {
+      "path": "casting/vale-ancla-1.png",
+      "sizeBytes": 2396240,
+      "sha256": "6d37556bda31302a018c2bf8e46ab35105161c1e59157fed6fc2c13203ce9be5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/vale-ancla-1.png"
+    },
+    {
+      "path": "casting/vale-ancla-2.png",
+      "sizeBytes": 2527796,
+      "sha256": "4d2651cae404eab643fb219df8328f402d181737897f34e7e3a348081be7aaf8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/vale-ancla-2.png"
+    },
+    {
+      "path": "casting/vale-cuerpo.png",
+      "sizeBytes": 2340111,
+      "sha256": "d4fc5d571b61dc41e7f1c77c6be4a6c9a257f8b40bdc761451a7fc0a012a65f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/casting/vale-cuerpo.png"
+    },
+    {
+      "path": "descartes-ambar/logo-umbral-claro.png",
+      "sizeBytes": 20386,
+      "sha256": "a68b0664bf4abd2650fd9963800a4ec791ff136e36538d2686007ab95955ee74",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/descartes-ambar/logo-umbral-claro.png"
+    },
+    {
+      "path": "descartes-ambar/logo-umbral-negro.png",
+      "sizeBytes": 71606,
+      "sha256": "c130daf85dbdc360a985948f60c3fa86d2b5c0b3929784dac35dfa5fdb3fc438",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/descartes-ambar/logo-umbral-negro.png"
+    },
+    {
+      "path": "descartes-ambar/tarjeta-plana-frente.png",
+      "sizeBytes": 1934346,
+      "sha256": "55f14d8ffefe61683edde4e4872f48d36c6c267e039680e0b4e643217c0efde0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/descartes-ambar/tarjeta-plana-frente.png"
+    },
+    {
+      "path": "estudio-realismo/beautiful-woman-with-freckles-funfair_23-2148281681.jpg",
+      "sizeBytes": 223471,
+      "sha256": "ac311f6a01b5082c588ca440c30077fe4e4f67a3a102be5bbdda60f815a657f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/beautiful-woman-with-freckles-funfair_23-2148281681.jpg"
+    },
+    {
+      "path": "estudio-realismo/close-up-cheerful-young-woman-looking-camera_1262-4777.jpg",
+      "sizeBytes": 164964,
+      "sha256": "f8e4c49af9ec59103863f59479637fea858d76d68bc9c1b04902dd6e0c10521f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/close-up-cheerful-young-woman-looking-camera_1262-4777.jpg"
+    },
+    {
+      "path": "estudio-realismo/close-up-half-face-woman-with-brown-eyes_23-2148331851.jpg",
+      "sizeBytes": 186938,
+      "sha256": "7d9dce7beb74e2df0e4b763cf4970a6c965301e1068e24499f972915cb266d1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/close-up-half-face-woman-with-brown-eyes_23-2148331851.jpg"
+    },
+    {
+      "path": "estudio-realismo/close-up-smiley-woman-posing-city_23-2148937645.jpg",
+      "sizeBytes": 235414,
+      "sha256": "c76cd40ee910bab37219ee7813a461f421ff1613235c2193fd8a79ca626c26af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/close-up-smiley-woman-posing-city_23-2148937645.jpg"
+    },
+    {
+      "path": "estudio-realismo/closeup-ethnic-woman_23-2148206882.jpg",
+      "sizeBytes": 190235,
+      "sha256": "b6e34343eebcc079fcdfbeb3c01e146202b71458f4b23f016b5ad61fbd6f7c99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/closeup-ethnic-woman_23-2148206882.jpg"
+    },
+    {
+      "path": "estudio-realismo/going-out-concept-with-girl-night_23-2148140757.jpg",
+      "sizeBytes": 217838,
+      "sha256": "5e77418fddcd5c006c48804dafd933008337120bcfc96bcc202b8e40a713ccb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/going-out-concept-with-girl-night_23-2148140757.jpg"
+    },
+    {
+      "path": "estudio-realismo/joyful-woman-smiling-while-looking-camera_23-2148281625.jpg",
+      "sizeBytes": 250096,
+      "sha256": "093dfcdc7e23f541695f690af443399a3d03d0d145f4a386b69643202ee07f2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/joyful-woman-smiling-while-looking-camera_23-2148281625.jpg"
+    },
+    {
+      "path": "estudio-realismo/portrait-beautiful-woman-night-city-lights_23-2149024736.jpg",
+      "sizeBytes": 215181,
+      "sha256": "ccd93df8e7dfe2ce3f796342c2a28e8da2072c4bcaa5d9ecb8529ba7d03cb761",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/portrait-beautiful-woman-night-city-lights_23-2149024736.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/001.png",
+      "sizeBytes": 202113,
+      "sha256": "fe664e4d3dcd7195925d248040256e3179c157cdc3bb692dbc8c908940106e1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/001.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/002.png",
+      "sizeBytes": 125290,
+      "sha256": "f9030f795555e22b977b9faec1e3f5a4e809a62191e185bacaa80d9f22af45f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/002.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/003.png",
+      "sizeBytes": 185259,
+      "sha256": "fc1a58cce19ed0a173664ea1a3cca0ac472bb7d5ff669b0ee48da8b475d290e2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/003.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/004.png",
+      "sizeBytes": 118701,
+      "sha256": "52a7bf348613984176b53d7b7cac7cb6ae060f27f7dc64fcab2a33b1ba807680",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/004.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/005.png",
+      "sizeBytes": 213480,
+      "sha256": "ec38d2d47a11e4814fbc8b08ad7b7f99484f6aedb111b6a497ed4252dde08bd2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/005.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/006.png",
+      "sizeBytes": 139482,
+      "sha256": "3b85acaec3ec3dbdb492948bed48a2c67fed52cd91c030d0d887879c21508c92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/006.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/007.png",
+      "sizeBytes": 210149,
+      "sha256": "69e1842f15e6a77314ca6850e794b9290548bece4831104d925e8e53f9bd9d8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/007.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/008.png",
+      "sizeBytes": 177497,
+      "sha256": "6badacdade0e9c77523734b63930815ff9ff77bd8eab33aac3256874fd78594c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/008.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/009.png",
+      "sizeBytes": 261605,
+      "sha256": "5949dca69bdd6b33aaf3fa55e446c5d9f2f7b98790a8f2cc7d46197470dc4208",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/009.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/010.png",
+      "sizeBytes": 291843,
+      "sha256": "df1dbe32180d62e59715f2c26907972d406773e6cb0926f7b6a74a105ebe46b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/010.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/011.png",
+      "sizeBytes": 92971,
+      "sha256": "d8ff97144a43f097f591b0f2e44326fa0bdff5b0a926efb583b8f0bbbdd72903",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/011.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/012.png",
+      "sizeBytes": 118701,
+      "sha256": "52a7bf348613984176b53d7b7cac7cb6ae060f27f7dc64fcab2a33b1ba807680",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/012.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/013.png",
+      "sizeBytes": 276317,
+      "sha256": "09e3ba8d45ca1133c9627fc2a1428c7b929f4464efe0e2a1abdf066be9b5d98c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/013.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/014.png",
+      "sizeBytes": 196400,
+      "sha256": "3e9f17667478d077a4aa3fa50ae3aa6edda76b8ff020c7a0ed83681c7b91daaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/014.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/015.png",
+      "sizeBytes": 202308,
+      "sha256": "5ec520cfaf5eace8bee7e5e42f7a26ea7183b43070b64cc31188fbe64434a533",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/015.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/016.png",
+      "sizeBytes": 210022,
+      "sha256": "3141a89ef0abdd0fce58c5f7b236107e3568168447bc1e7b1944468278945958",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/016.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/017.png",
+      "sizeBytes": 203535,
+      "sha256": "f172359796be1edd60891d3f6a9e66a328fb8d8abfcbaae56416ce9bdc214f64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/017.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/018.png",
+      "sizeBytes": 240712,
+      "sha256": "70b6ec96277dcb49cfce0106f5951fe921f1bd89872ef61386db42f9d1c221fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/018.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/019.png",
+      "sizeBytes": 264918,
+      "sha256": "9c4cc9e978524ce68a15bb65a63d83f26bdda3e2e423dad3764565ab56414415",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/019.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/020.png",
+      "sizeBytes": 190597,
+      "sha256": "46e375f4c35e7b5dfb1a78fd71a13fff647f8d1b991ec285619c67df94fee631",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/020.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/021.png",
+      "sizeBytes": 236823,
+      "sha256": "6f1c3aee149ba5b04d87f54b06d8459cafc554c19068be4097ba5227c6a8eaef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/021.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/022.png",
+      "sizeBytes": 268655,
+      "sha256": "c73e054718261c9a0c02c999c0a355dc24c9685806c96c1186c73dd0d585db6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/022.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/023.png",
+      "sizeBytes": 254840,
+      "sha256": "a8aa5e32fa72f34b657300792a1c8f8560a02f18f65e71f17b22999a1efb99ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/023.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/seq/024.png",
+      "sizeBytes": 255224,
+      "sha256": "8a4215203fd8e06b251bf46ec2cd4373711c066309f554c6a40a7de06fab8b26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/seq/024.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-01-1851079666.jpg",
+      "sizeBytes": 79010,
+      "sha256": "d227f5b5db68a08eb4dd76042ac0734bbd938dff171266665e122ee7495cdf92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-01-1851079666.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-02-732535030.jpg",
+      "sizeBytes": 75696,
+      "sha256": "beaa9b9a0ec45b26889ebb71d094d53d3c9333b8ac720469ec266101518aa9a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-02-732535030.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-03-1404909203.jpg",
+      "sizeBytes": 74312,
+      "sha256": "15b14688c01dda5adf919d5708714a71450e6c8de26e1fb0bff117a29207c30c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-03-1404909203.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-04-1139302811.jpg",
+      "sizeBytes": 47474,
+      "sha256": "c2afbfff65e895e2981ec63b2a396836d90de843ce798430fd452146faef9481",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-04-1139302811.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-05-1544086355.jpg",
+      "sizeBytes": 96215,
+      "sha256": "25df3c8a301c3db8fa0593f7857d5a346f0ea1ffa606146c9fee2467d3edd7c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-05-1544086355.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-06-229031992.jpg",
+      "sizeBytes": 142564,
+      "sha256": "7017c47d90c2c3eb8d1124b6920776f2d1eb87225665bd1dacc4d22e59d9411d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-06-229031992.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-07-208624531.jpg",
+      "sizeBytes": 95018,
+      "sha256": "c67cfe8e3551ae9c6c58827d21e4e7d51d638f576851c166df3c5e33e5a12d52",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-07-208624531.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-08-1362278753.jpg",
+      "sizeBytes": 74152,
+      "sha256": "d6a1acf32274db3db4cc342d5fa2c8f92fef6bcce7c139d2546216588783d675",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-08-1362278753.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-09-291566591.jpg",
+      "sizeBytes": 116717,
+      "sha256": "b0b1dadd05010c4268500fa3ab407b49252965191c9587537fb351d7b4a5223d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-09-291566591.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-10-204978034.jpg",
+      "sizeBytes": 133104,
+      "sha256": "348ab9061e2deea175d645ca01b0ed9cd6ffda9e6d9aaf7c4c21e175bc512da3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-10-204978034.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-11-327026273.jpg",
+      "sizeBytes": 48129,
+      "sha256": "21e27bb40b6350a979777684cdc63d6d83bc5f364401b957127156b2b1d32274",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-11-327026273.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-12-1139302811.jpg",
+      "sizeBytes": 47474,
+      "sha256": "c2afbfff65e895e2981ec63b2a396836d90de843ce798430fd452146faef9481",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-12-1139302811.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-13-438089629.jpg",
+      "sizeBytes": 114707,
+      "sha256": "d013cc21c7fd80485628fc430268643c226109c649550fa1e206cb079d4fbf4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-13-438089629.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-14-438425302.jpg",
+      "sizeBytes": 106386,
+      "sha256": "9e73b7902b27dc713b2f91ce8e4df2e7db6c365ccb6518e10bf6ae17e0af3873",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-14-438425302.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-15-1781557016.jpg",
+      "sizeBytes": 82667,
+      "sha256": "98c080c0e0ca52705983bf8f016739926974e27a81647810ec9737c98ca98b2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-15-1781557016.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-16-1820358830.jpg",
+      "sizeBytes": 78935,
+      "sha256": "e6b1362bc3aaf7234152a64475974e306f2bc8356a1ebcfb19ffac6766e03775",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-16-1820358830.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-17-1833368923.jpg",
+      "sizeBytes": 87422,
+      "sha256": "63be60f6764549b6d7f317094d50023a7abec4809b4426fd1ee2c32921504816",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-17-1833368923.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-18-1918831580.jpg",
+      "sizeBytes": 104691,
+      "sha256": "729a2fcde72d542636e75c254683900a4021c5d3e5ddc48fc9e05a89a7c61556",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-18-1918831580.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-19-2027151800.jpg",
+      "sizeBytes": 136562,
+      "sha256": "48fd20e48f377caf09daa06a5d2f7844af2b3b2182c69ad8b6b17aa3658896ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-19-2027151800.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-20-1281322411.jpg",
+      "sizeBytes": 61580,
+      "sha256": "46246beff2aaedb59ececbf4412937b3b648947b84927329cb27b9008e3209aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-20-1281322411.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-21-2120238068.jpg",
+      "sizeBytes": 78498,
+      "sha256": "58c77d560542fac79bf161ccde6b7f9788cb9cee32a9e3b5c10112cb9c10afa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-21-2120238068.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-22-340277612.jpg",
+      "sizeBytes": 133321,
+      "sha256": "4c3050c67f243007b8625e0948377f19076fa0704fc6ba2b4bf505500203a340",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-22-340277612.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-23-479231734.jpg",
+      "sizeBytes": 140354,
+      "sha256": "38b1cd49b0a2bdf9f5c2b8e65fbeafc0ca0e3016a15df6441df6b769662b6736",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-23-479231734.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock/ss-24-1909570672.jpg",
+      "sizeBytes": 78030,
+      "sha256": "484899f946448fd9b1c7173365908fdd8bb4caefedd8d8009ac6b07139f69dd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock/ss-24-1909570672.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-01-1168007533.jpg",
+      "sizeBytes": 92553,
+      "sha256": "92399336fe9cf1d1a768372e38672747e2c9f6cccbe364f193ac1a04465dc4e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-01-1168007533.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-02-442274284.jpg",
+      "sizeBytes": 91542,
+      "sha256": "33d7b68b75469543851f7109c8e1fd3b4f3349f92f4d3401be1a462fd58508e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-02-442274284.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-03-533719057.jpg",
+      "sizeBytes": 79474,
+      "sha256": "1d387fecbc8482f1a93404479369881fd4b21f6609d29bbd4a1f547790f1abf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-03-533719057.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-04-103970417.jpg",
+      "sizeBytes": 85842,
+      "sha256": "846b4efcc3fe1957baf6a7ee55776b9e26de87371db9bd5bd54ab5b51734a593",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-04-103970417.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-05-711533863.jpg",
+      "sizeBytes": 147813,
+      "sha256": "8635dae1c2f16193a5f91bc0c92f7cee4e0d845deec987bec47e1bc1105295c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-05-711533863.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-06-484830106.jpg",
+      "sizeBytes": 160033,
+      "sha256": "b2dd17f10655900a8892a3ac29da6b31c6d12d8976c0de75959dc79069d4822a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-06-484830106.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-07-273601793.jpg",
+      "sizeBytes": 88690,
+      "sha256": "ce4baaf98ad870d8d97ba9ea7e4a8f6d16b03174dc28069c76176b58222d0429",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-07-273601793.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-08-439457044.jpg",
+      "sizeBytes": 81485,
+      "sha256": "148ccb947b5e541beb327ede50b917c520738e103abbc5db965116a0b0b32b34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-08-439457044.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-09-665756341.jpg",
+      "sizeBytes": 106213,
+      "sha256": "b45ae57764df214926ce7f55e7db70e8067f7b4e1bbacf96fe67ea1f9696ebf2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-09-665756341.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-10-515752618.jpg",
+      "sizeBytes": 73681,
+      "sha256": "ce626804d5a106d16568391aa69319f1b171811509cbbc09fccfef94759f72a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-10-515752618.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-11-437992822.jpg",
+      "sizeBytes": 53419,
+      "sha256": "24dc300f4e35279d19a9ce2129019cabe84ce1ac71d77b1c8b0eb96c7c30b1ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-11-437992822.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/hombre-12-442274332.jpg",
+      "sizeBytes": 104380,
+      "sha256": "21dac8c76f7cf5a3df805218080df91784d5224b32b5507392d77d0e1b4d33d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/hombre-12-442274332.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-13-1200652822.jpg",
+      "sizeBytes": 109037,
+      "sha256": "cc17d4e98bd792c6383bfb48dbbabe448e82fc83a7205e85cff85a47d6a9bb89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-13-1200652822.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-14-1489343600.jpg",
+      "sizeBytes": 123521,
+      "sha256": "7ed22e9193552ecf109ac23efce253b14c49ea91c6310d5588fe948ceaf88894",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-14-1489343600.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-15-1143703502.jpg",
+      "sizeBytes": 84538,
+      "sha256": "dffc10d72590a6112324c90fd3f1fd0f0706b000cc211bc4617f12d7baf60ad9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-15-1143703502.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-16-1136324258.jpg",
+      "sizeBytes": 124437,
+      "sha256": "ecf1b5737454d16c4968d8fd94b47f6f0590ac6f0f32cbababc8c24e71102952",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-16-1136324258.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-17-44924824.jpg",
+      "sizeBytes": 127378,
+      "sha256": "1baf5689f0617f17c14233a7550e370c94be88f8e912be28f47beb64497494fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-17-44924824.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-18-1161883123.jpg",
+      "sizeBytes": 124492,
+      "sha256": "416bad15eacde1c0c3dcfa39bc7b06ef18363471e3522baa262bc29e32af6685",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-18-1161883123.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-19-1224548158.jpg",
+      "sizeBytes": 79579,
+      "sha256": "b0a40f62b31719f4451f0a53fd47b5054fcb158b27266cfb97365b38de762048",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-19-1224548158.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-20-1155505702.jpg",
+      "sizeBytes": 133331,
+      "sha256": "e6c2a60b914e3f29de234d7a5166f791742476b716adb0f598667410de31ce76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-20-1155505702.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-21-1132185755.jpg",
+      "sizeBytes": 101368,
+      "sha256": "1d26d0735d82749533bd83e5b01808f7db21ee2e85b1b771b4dd07058eee8784",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-21-1132185755.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-22-1781557016.jpg",
+      "sizeBytes": 82667,
+      "sha256": "98c080c0e0ca52705983bf8f016739926974e27a81647810ec9737c98ca98b2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-22-1781557016.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-23-1850825419.jpg",
+      "sizeBytes": 104689,
+      "sha256": "015c7bd40b89d0b431f7a64bff285702990736ad008fe8897fb8919664e26c53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-23-1850825419.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/mujer-24-1241545660.jpg",
+      "sizeBytes": 99785,
+      "sha256": "a6f12741ee18637b77ccfe6eadf896214d6244635a50957b68e4668e6e166445",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/mujer-24-1241545660.jpg"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/001.png",
+      "sizeBytes": 225339,
+      "sha256": "60712ec263216a00ad13e6aa478fd7817de721041eb3f2fbd1adfed912046163",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/001.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/002.png",
+      "sizeBytes": 207425,
+      "sha256": "dd6c83469ea489e5ef2de04cc5b7ae9f60103506e3169e1897c86e525b37f961",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/002.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/003.png",
+      "sizeBytes": 194553,
+      "sha256": "80af8b175a89c658dc1e4652f075ba0f83b5b97e48e2e8eaebbf581355dec035",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/003.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/004.png",
+      "sizeBytes": 205497,
+      "sha256": "88ec533e49365c2a440962022688352b934f4af14483a7217235e3f235508607",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/004.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/005.png",
+      "sizeBytes": 290919,
+      "sha256": "817182736f8db7fb2066d0e7251edea959297a5f4e423c81234b7930f88d7d1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/005.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/006.png",
+      "sizeBytes": 306222,
+      "sha256": "72a19a19afce2ad8dc2e1f9a2e3b818c5b5bd7823cbb1e24e6aded3553f35428",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/006.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/007.png",
+      "sizeBytes": 244293,
+      "sha256": "f44ffef7e39f36fc8a87104fc86c5d75fe51d9865d72be03be2c50f9b27f133d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/007.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/008.png",
+      "sizeBytes": 150197,
+      "sha256": "3127250fa670151ad0af14810ce4c7fd88e0786731a99469a78ad2b4046b8256",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/008.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/009.png",
+      "sizeBytes": 245702,
+      "sha256": "debfe62f55b346738a66ace6ecfc51bbabce6505d3c8bd7d1d291aa73cb83976",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/009.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/010.png",
+      "sizeBytes": 180958,
+      "sha256": "6a74a3f5c2b8bd526d11b19d9e94b4ee85409d575fdbd44b7fb89b310d985ebc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/010.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/011.png",
+      "sizeBytes": 142636,
+      "sha256": "85df231cb8390e483eddce39459888a79050fda639b9f62a5c7818cd891460ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/011.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/012.png",
+      "sizeBytes": 222036,
+      "sha256": "9935ffe1dfcb8f2c0f58e2fa0c70ec303456aad44531719edc14dfab15ded875",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/012.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/013.png",
+      "sizeBytes": 221918,
+      "sha256": "6726287b80c118015812d5ff56dd72c6fb7757d0be1f3504009382c47181ec49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/013.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/014.png",
+      "sizeBytes": 244349,
+      "sha256": "46ec43a773fdbcf3c98d3064b0ef2baa3858389eeada02ca58fb302f3201e547",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/014.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/015.png",
+      "sizeBytes": 195601,
+      "sha256": "4d817316727e36889e1791f02cdc18acb76c5a712e050bf6573e82818224d1db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/015.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/016.png",
+      "sizeBytes": 227332,
+      "sha256": "ef94867ce3405f049ba48718998c72f1534c2fde6a0f07902abea355618102fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/016.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/017.png",
+      "sizeBytes": 239718,
+      "sha256": "fd1b83c19c6b4826d52fd000053703fe6816afec316ef70be04536954b06b2f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/017.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/018.png",
+      "sizeBytes": 259086,
+      "sha256": "16520f4e1724e8a66d246ffa13acd9d35229774e3540d15eeec071a4b533e1bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/018.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/019.png",
+      "sizeBytes": 181895,
+      "sha256": "ec19fca713e3f0f6f4ce364618f67f587a25b02963d261d10f2b6f6eeab574d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/019.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/020.png",
+      "sizeBytes": 264369,
+      "sha256": "40624b19e951377672ee3b1c1624d2f40cd40a9332939d559fb2d2243dd06304",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/020.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/021.png",
+      "sizeBytes": 202278,
+      "sha256": "8ea50c637fd6ac0c75b6065340414f79a8fdb88f1b4928218ba0cd88bbd2381e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/021.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/022.png",
+      "sizeBytes": 202308,
+      "sha256": "5ec520cfaf5eace8bee7e5e42f7a26ea7183b43070b64cc31188fbe64434a533",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/022.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/023.png",
+      "sizeBytes": 219664,
+      "sha256": "f8af5a26f0bf018d732081637ae113aa46b3c1f17b0207aa30f79c02c4366d14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/023.png"
+    },
+    {
+      "path": "estudio-realismo/shutterstock2/seq/024.png",
+      "sizeBytes": 202587,
+      "sha256": "076666593eb9cfa3bcf8af7ec06b212b0fc99eace977e555374797cbad2377f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/shutterstock2/seq/024.png"
+    },
+    {
+      "path": "estudio-realismo/young-woman-looking-seriously-camera_171337-12084.jpg",
+      "sizeBytes": 301286,
+      "sha256": "326fcc4f320ef3ed23651a58952f42809dfaa2e437787410b795e76b880be041",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/young-woman-looking-seriously-camera_171337-12084.jpg"
+    },
+    {
+      "path": "estudio-realismo/young-woman-touching-her-face_1268-21276.jpg",
+      "sizeBytes": 108415,
+      "sha256": "9073c7848dcae5b77ae4cb273b280e4a115e149383242d83bb7628f6b87a4307",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/estudio-realismo/young-woman-touching-her-face_1268-21276.jpg"
+    },
+    {
+      "path": "neon/comparativa-neon.png",
+      "sizeBytes": 372431,
+      "sha256": "bf1b356162ac8eff11801e8d4258959aa0f551f119ccca44987713c362550967",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/comparativa-neon.png"
+    },
+    {
+      "path": "neon/logo-cian.png",
+      "sizeBytes": 74254,
+      "sha256": "b9be7fbd06033e1eb71eafe54e73a3e02dfe35a7c67e02715aaae489595ac794",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/logo-cian.png"
+    },
+    {
+      "path": "neon/logo-lima.png",
+      "sizeBytes": 71421,
+      "sha256": "7b0be6c3d65e1331bfd5875947ccf1c65fbd6f2cc39ca68664fb8808c8bb90fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/logo-lima.png"
+    },
+    {
+      "path": "neon/logo-magenta.png",
+      "sizeBytes": 75162,
+      "sha256": "44f5ff8f0878ded5d4c09e0d4c8468285460dd15baa7fdebc0660a8292b5141a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/logo-magenta.png"
+    },
+    {
+      "path": "neon/tarjeta-cian.png",
+      "sizeBytes": 1949401,
+      "sha256": "ba73585459c2921ac950cc9482c0a5915a075ffed636a2fbc11719d7958da1a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/tarjeta-cian.png"
+    },
+    {
+      "path": "neon/tarjeta-lima.png",
+      "sizeBytes": 1943249,
+      "sha256": "b919a2e3a2a4d93475fcf81ec6c7ef47d56d02cb1184029d85282e000086b545",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/tarjeta-lima.png"
+    },
+    {
+      "path": "neon/tarjeta-magenta.png",
+      "sizeBytes": 1941831,
+      "sha256": "d3f6d941906244855adf3dd1c8e30b36bd433dc25f666ceacaf4163e07f36b2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/neon/tarjeta-magenta.png"
+    },
+    {
+      "path": "planos/F2-v1.png",
+      "sizeBytes": 4471340,
+      "sha256": "52813f1ef75efbefaf39ba9b90b8e9e5ff0754a4e624b92efff14b375bfca124",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F2-v1.png"
+    },
+    {
+      "path": "planos/F3-v1.png",
+      "sizeBytes": 4500084,
+      "sha256": "e93b3eca2044e1880e33f992fce99393a2bcfc9f74f91b1eacd61e34d341629d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F3-v1.png"
+    },
+    {
+      "path": "planos/F4-v1.png",
+      "sizeBytes": 5021436,
+      "sha256": "47ea2966093262f88f603961675c8d9b51b4384f9ef3e6216fff730fef750853",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F4-v1.png"
+    },
+    {
+      "path": "planos/F5-v1.png",
+      "sizeBytes": 4421711,
+      "sha256": "cfe67602fd0a1c65de86383279a6565119b84d0ca818e794230de5e0bb0dfd33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F5-v1.png"
+    },
+    {
+      "path": "planos/F6-v1.png",
+      "sizeBytes": 5579433,
+      "sha256": "b09376abf693568df6c796ac55e3016b6fbbb61f8aa0e68754a331618dc2c0b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F6-v1.png"
+    },
+    {
+      "path": "planos/F7-v1.png",
+      "sizeBytes": 4333584,
+      "sha256": "c62b08bf769050ac3a9ee97a2e98d75edf2a44acd270b1d117a8de05fd108cbe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/F7-v1.png"
+    },
+    {
+      "path": "planos/K1-lima-v1.png",
+      "sizeBytes": 3435937,
+      "sha256": "c0ea8ad01e4d1a1c8ea24826c89138c414fbd07a8c1a02f7925b66653793642a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K1-lima-v1.png"
+    },
+    {
+      "path": "planos/K1-v1.png",
+      "sizeBytes": 3604826,
+      "sha256": "5ff01f6a0368331b673bcfac89295f7837bdfc56cc36066206d37e19872d1ec7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K1-v1.png"
+    },
+    {
+      "path": "planos/K2-v1.png",
+      "sizeBytes": 4033799,
+      "sha256": "468a1e1e18e71797200dbd0d50fbc169f96ee46227c80992dd093ff44af167ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K2-v1.png"
+    },
+    {
+      "path": "planos/K2-v3.png",
+      "sizeBytes": 4555104,
+      "sha256": "a2dcfc611f686da6c8965e617a5fdd1a6b8658dd003fc42578beb832f9bcf1f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K2-v3.png"
+    },
+    {
+      "path": "planos/K2-v5.png",
+      "sizeBytes": 4205731,
+      "sha256": "73a1a24397939debfa5598fc203ef3f64279fb1823ad2af941e94d6f70498af8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K2-v5.png"
+    },
+    {
+      "path": "planos/K3-lima-v1.png",
+      "sizeBytes": 4612733,
+      "sha256": "06d6fe6a4db21a8c34825c18351f17a91a231314e386d2062cf02659e414b005",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-lima-v1.png"
+    },
+    {
+      "path": "planos/K3-v1.png",
+      "sizeBytes": 4670725,
+      "sha256": "3bb6cbbe93cc5e3139c88c530610bcd80c2c63cb7664da6b1d759b8beebb9911",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-v1.png"
+    },
+    {
+      "path": "planos/K3-v3.png",
+      "sizeBytes": 4982891,
+      "sha256": "1f588907bdd2d0b517348de68701a47730300bb1640567fb0fbc1e1f3d920e7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-v3.png"
+    },
+    {
+      "path": "planos/K3-v4a.png",
+      "sizeBytes": 4947744,
+      "sha256": "213b61a5e2954c25e97d1d080ce0af569e626d3ba018218f509c72c1cee78f44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-v4a.png"
+    },
+    {
+      "path": "planos/K3-v4b.png",
+      "sizeBytes": 4865646,
+      "sha256": "a7ec4b1f4843f77f5e4ccfe78d670392e86d5d3a4b60d5927e0787f5330d91d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-v4b.png"
+    },
+    {
+      "path": "planos/K3-v5.png",
+      "sizeBytes": 4875912,
+      "sha256": "cf0714c2d7938f87d7def9ba11e59cc36dd8e40fd3b352d31f54ef91bca7b5a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K3-v5.png"
+    },
+    {
+      "path": "planos/K4-lima-v1.png",
+      "sizeBytes": 4347763,
+      "sha256": "2665b385719c722640de3bcb6b6b6c8477e0dbc5fe2c3b3ed20dee6309400d3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K4-lima-v1.png"
+    },
+    {
+      "path": "planos/K4-v1.png",
+      "sizeBytes": 4470129,
+      "sha256": "5b82d2963c7158a8473614042c591946bbf268a04df0eb148b222926f12f0a8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K4-v1.png"
+    },
+    {
+      "path": "planos/K5-v1.png",
+      "sizeBytes": 4540444,
+      "sha256": "ecbf12a0a786653e2f4837b80a93ea573525d503302d37afd6c5af6565a12264",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K5-v1.png"
+    },
+    {
+      "path": "planos/K5-v3.png",
+      "sizeBytes": 5125954,
+      "sha256": "78ac08fc7c40d31a10f2123a96c25aa74311691d604f55a01ae49f54ddc71e29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K5-v3.png"
+    },
+    {
+      "path": "planos/K5-v5.png",
+      "sizeBytes": 4798038,
+      "sha256": "9d2f65050427d62ad42811ff0b463b243c59fff44e211cbdfbbcd5dea84e8ce8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K5-v5.png"
+    },
+    {
+      "path": "planos/K6-lima-v1.png",
+      "sizeBytes": 4873759,
+      "sha256": "e71c40c45f14f1215cde123c17810eb1708d3124737a7c8d61ba7fdd2fe6cfb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K6-lima-v1.png"
+    },
+    {
+      "path": "planos/K6-v1.png",
+      "sizeBytes": 5167327,
+      "sha256": "8f50fe3f7c88be653d0f31656bd39cb8083c7b7fc0660368cfa1adfb9cc79e83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K6-v1.png"
+    },
+    {
+      "path": "planos/K6-v3.png",
+      "sizeBytes": 4791185,
+      "sha256": "a41fbea84b3f31113f7c53a65e07adcd9be18e90a0e82e09b596e909e9f820b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K6-v3.png"
+    },
+    {
+      "path": "planos/K6-v5.png",
+      "sizeBytes": 5057993,
+      "sha256": "92e66be55d38455990037e80b09b96f1f929627202fb09cf5c905a58b15cd0a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K6-v5.png"
+    },
+    {
+      "path": "planos/K7-lima-v1.png",
+      "sizeBytes": 4067326,
+      "sha256": "ac81cc55fbb614acae20569014222b900547e8fe65474c5572ce39f755cb0b57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K7-lima-v1.png"
+    },
+    {
+      "path": "planos/K7-v1.png",
+      "sizeBytes": 4189379,
+      "sha256": "8a40e556da8636b78815037bf78ebee90bd27ff619a8f6f8c750f2e73b66a80c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K7-v1.png"
+    },
+    {
+      "path": "planos/K7-v2.png",
+      "sizeBytes": 4108332,
+      "sha256": "80a882b941734d1c7bcecff5cb7b670ff08eddb69c1d0b2d734bf6b2e18bc205",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/planos/K7-v2.png"
+    },
+    {
+      "path": "preview/K1-v1.jpg",
+      "sizeBytes": 199506,
+      "sha256": "4a443f0df15ba55f1ed7924dad00ef70046be67088f5ef45673fba67ec406b3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K1-v1.jpg"
+    },
+    {
+      "path": "preview/K2-v1.jpg",
+      "sizeBytes": 405170,
+      "sha256": "0898f21413f6df22bce1f323e38d8e760705b2bdeeaad540ac86523db9dc9ebe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K2-v1.jpg"
+    },
+    {
+      "path": "preview/K3-v1.jpg",
+      "sizeBytes": 471628,
+      "sha256": "435fb5b45016d874135557fbda1d731bc6c5d12891bc79d82a1644428352ee8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K3-v1.jpg"
+    },
+    {
+      "path": "preview/K4-v1.jpg",
+      "sizeBytes": 464387,
+      "sha256": "d3fe7f469e890e668f2b8997d1f3e196720aab97fb86f476b20dd20192858013",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K4-v1.jpg"
+    },
+    {
+      "path": "preview/K5-v1.jpg",
+      "sizeBytes": 480239,
+      "sha256": "01325e0402e7afdd9e50b1a7b3be9b2908aa341846ac34f57cecd7596d2d631b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K5-v1.jpg"
+    },
+    {
+      "path": "preview/K6-v1.jpg",
+      "sizeBytes": 507846,
+      "sha256": "f313b8235ddbddd90c729a0a16ed5ea21f47d6c524b2dd8e0939c57286698549",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K6-v1.jpg"
+    },
+    {
+      "path": "preview/K7-v2.jpg",
+      "sizeBytes": 430186,
+      "sha256": "721b298dddb427451919b81efa8c41caad80bebc8f8a4f501d8e5a28be1f2c80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/K7-v2.jpg"
+    },
+    {
+      "path": "preview/logo-umbral-negro.jpg",
+      "sizeBytes": 65700,
+      "sha256": "70908deed756a64259c0f2a8cf6056c4bddb85ad28a5535efc5277cc2096ec5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/logo-umbral-negro.jpg"
+    },
+    {
+      "path": "preview/martina-ancla-v1.jpg",
+      "sizeBytes": 531305,
+      "sha256": "4d4953b8d5dd06c1708883bdeb71efaceb2d6f47de788ad05971123da2eeeb17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/martina-ancla-v1.jpg"
+    },
+    {
+      "path": "preview/martina-cuerpo-v1.jpg",
+      "sizeBytes": 416355,
+      "sha256": "3b107352c88e6a9897024cfe4ede8d7b994cddc94f80bb56297d9f25565aff32",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/martina-cuerpo-v1.jpg"
+    },
+    {
+      "path": "preview/tarjeta-hero-v1.jpg",
+      "sizeBytes": 412248,
+      "sha256": "96c4282a36adbf95be3e52688151c8fd5a664ecf7cd3c7c76f0bd34d714f44cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/tarjeta-hero-v1.jpg"
+    },
+    {
+      "path": "preview/tarjeta-plana-frente.jpg",
+      "sizeBytes": 202539,
+      "sha256": "2b8afc08bf335a374e77952ed4bf88cddc05b8eb68c7464f2a85d545bd514645",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview/tarjeta-plana-frente.jpg"
+    },
+    {
+      "path": "preview2/F2-v1.jpg",
+      "sizeBytes": 449093,
+      "sha256": "f29cf9d0b4e5235f234625035fa14ca6a301956ce2451be706f8b91c80be2076",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F2-v1.jpg"
+    },
+    {
+      "path": "preview2/F3-v1.jpg",
+      "sizeBytes": 434713,
+      "sha256": "9cc526aa36135c0ca9978f069af1dcaecea75790c7a76e0b6c432c1950f6b645",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F3-v1.jpg"
+    },
+    {
+      "path": "preview2/F4-v1.jpg",
+      "sizeBytes": 529769,
+      "sha256": "3e28cb0a66b67f9eef82b3e8890a5a8025317ac8ac463fd5811e5f0a8c521a40",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F4-v1.jpg"
+    },
+    {
+      "path": "preview2/F5-v1.jpg",
+      "sizeBytes": 457003,
+      "sha256": "653d2e0ce0e8c77c3414852eba2335a7bd859624907a263e6925040b0c1b1599",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F5-v1.jpg"
+    },
+    {
+      "path": "preview2/F6-v1.jpg",
+      "sizeBytes": 617424,
+      "sha256": "1dfe84004d7b4c21753085606d445d771e2bd61f6d42d1d6ed2086255b9b45e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F6-v1.jpg"
+    },
+    {
+      "path": "preview2/F7-v1.jpg",
+      "sizeBytes": 406702,
+      "sha256": "5d3396c4b9d62bd2c50fd652204ddea434950d30fd5ace2222958545e55467e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/F7-v1.jpg"
+    },
+    {
+      "path": "preview2/K1-lima-v1.jpg",
+      "sizeBytes": 211014,
+      "sha256": "e1d662ad4e3bc81e4be8ee52e5c0bd4783027333f002e47192d3876fc45faed3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/K1-lima-v1.jpg"
+    },
+    {
+      "path": "preview2/kit-tarjeta-umbral.jpg",
+      "sizeBytes": 131875,
+      "sha256": "26e834b64ee48cdacbb7ca77c222a8eefc2c9ec68376f13e24aaf250a8cdf637",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/kit-tarjeta-umbral.jpg"
+    },
+    {
+      "path": "preview2/logo-umbral-negro.jpg",
+      "sizeBytes": 66608,
+      "sha256": "0d5e0aa3fd3e8e923e6dcccd28e02bf2c76aa2e9a9c9d753b44f420c0aa2101a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/logo-umbral-negro.jpg"
+    },
+    {
+      "path": "preview2/martina-ancla-v3-1.jpg",
+      "sizeBytes": 528709,
+      "sha256": "0d8c23682d13b7ea8d0341d58da3edfcbc338152f5d9624f296f7c3f8a05b988",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/martina-ancla-v3-1.jpg"
+    },
+    {
+      "path": "preview2/martina-estilo-a.jpg",
+      "sizeBytes": 676435,
+      "sha256": "46c48abcdb6d51536c47de671c787749233f78c406624cdc18f113eb574d98bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/martina-estilo-a.jpg"
+    },
+    {
+      "path": "preview2/tomas-ancla-1.jpg",
+      "sizeBytes": 568804,
+      "sha256": "fd54765741569dc20764f7da765e149b165d362f39f984f41aac4b506d757cf8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/tomas-ancla-1.jpg"
+    },
+    {
+      "path": "preview2/tomas-cuerpo.jpg",
+      "sizeBytes": 628712,
+      "sha256": "4f63d070957f3bdb7d735527907973319dadc1d9e53259cb59f4032f4efcb41d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/tomas-cuerpo.jpg"
+    },
+    {
+      "path": "preview2/vale-ancla-1.jpg",
+      "sizeBytes": 576505,
+      "sha256": "690a0c129e2d2a2f95a07816190ce3819811beac3983d7c79cda2123f8277888",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/vale-ancla-1.jpg"
+    },
+    {
+      "path": "preview2/vale-cuerpo.jpg",
+      "sizeBytes": 550171,
+      "sha256": "1bb1c9b0e43f6070d5d8669f169416309fd08274702b8d9cca9b32113545b5b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/preview2/vale-cuerpo.jpg"
+    },
+    {
+      "path": "tarjeta/kit/01-frente.png",
+      "sizeBytes": 1482008,
+      "sha256": "8dd7bc4551fa5e3703e89bdcc023d3850190f728eb88287e9af2a9a304d75b88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/01-frente.png"
+    },
+    {
+      "path": "tarjeta/kit/02-reverso.png",
+      "sizeBytes": 1515696,
+      "sha256": "669c4043dd3c170b37933fe16602accfa68d09899beaad3e678423bc7f1095bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/02-reverso.png"
+    },
+    {
+      "path": "tarjeta/kit/03-tres-cuartos-izq.png",
+      "sizeBytes": 1472248,
+      "sha256": "27a291eb4a5d278d9d7fe68cb9c3bb27d793efec2d674170169d984d1a190484",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/03-tres-cuartos-izq.png"
+    },
+    {
+      "path": "tarjeta/kit/04-tres-cuartos-der.png",
+      "sizeBytes": 1481607,
+      "sha256": "ca9701995875067e02166f95acb2d2c6bd98ca79f7f2bd2b7aadd1b7088f067d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/04-tres-cuartos-der.png"
+    },
+    {
+      "path": "tarjeta/kit/05-canto.png",
+      "sizeBytes": 1449673,
+      "sha256": "f132f5814b007f7bc405c40fc97dcfdd655c4c2e783e7281c9e0ec79a2a3b5c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/05-canto.png"
+    },
+    {
+      "path": "tarjeta/kit/06-contrapicado.png",
+      "sizeBytes": 1474930,
+      "sha256": "95144a707ecf4faef5c3336768f870cd949a506721a0f07acb404836e4076c1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/06-contrapicado.png"
+    },
+    {
+      "path": "tarjeta/kit/07-plana-cenital.png",
+      "sizeBytes": 1495397,
+      "sha256": "3674eaf631dc357ccfffffc82712a758dc5ac7450b97ff4d5ff04762c4f973e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/07-plana-cenital.png"
+    },
+    {
+      "path": "tarjeta/kit/08-plana-rasante.png",
+      "sizeBytes": 1496410,
+      "sha256": "b8000132bd905ed6ceaf819c6d17a3c23ee9ee44b39fb46c181c072f12b6ed77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/08-plana-rasante.png"
+    },
+    {
+      "path": "tarjeta/kit/kit-tarjeta-umbral.png",
+      "sizeBytes": 879956,
+      "sha256": "385b25486b97b253d614e3fd95a4754e409cea6718d71402d81f28743eefaaf5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/kit/kit-tarjeta-umbral.png"
+    },
+    {
+      "path": "tarjeta/tarjeta-hero-lima-v1.png",
+      "sizeBytes": 1866630,
+      "sha256": "7dcc654ef89d29d881d2ae52b261d0b91455e4e6bbc7c8e56396020201fb29cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tarjeta-hero-lima-v1.png"
+    },
+    {
+      "path": "tarjeta/tarjeta-hero-v1.png",
+      "sizeBytes": 1967687,
+      "sha256": "c812a733279cabc8742e069e9bffd66fd28df003776456da2d7b7e55d62ec9eb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tarjeta-hero-v1.png"
+    },
+    {
+      "path": "tarjeta/tarjeta-plana-frente.png",
+      "sizeBytes": 1943249,
+      "sha256": "b919a2e3a2a4d93475fcf81ec6c7ef47d56d02cb1184029d85282e000086b545",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tarjeta-plana-frente.png"
+    },
+    {
+      "path": "tarjeta/tex-frente-emision.png",
+      "sizeBytes": 63856,
+      "sha256": "4543219f5898e4cbcefa316fed308ead71f4a75176710d4f8becff170c505df7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tex-frente-emision.png"
+    },
+    {
+      "path": "tarjeta/tex-frente.png",
+      "sizeBytes": 1699990,
+      "sha256": "071ac59282613aafbab0c236e0eadc15c02a11d1a1789cc59fe2e211c0665f83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tex-frente.png"
+    },
+    {
+      "path": "tarjeta/tex-reverso-emision.png",
+      "sizeBytes": 54953,
+      "sha256": "1947688b4e4351e30fd1266cdc764de4d87b3e941676ef5cf4ed0af2349e4dfd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tex-reverso-emision.png"
+    },
+    {
+      "path": "tarjeta/tex-reverso.png",
+      "sizeBytes": 1668120,
+      "sha256": "57e06faaf93a4eaec6ba4284d04f6579b7f4cf8538d0d80787d8b330c2f53475",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/tarjeta/tex-reverso.png"
+    },
+    {
+      "path": "video/cierre.mp4",
+      "sizeBytes": 335500,
+      "sha256": "a1a792366a015178695413ee475c21e410d13976f974389d136cf104b423aa71",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre.mp4"
+    },
+    {
+      "path": "video/cierre/f0000.png",
+      "sizeBytes": 8513,
+      "sha256": "a69dd2676c6125c8eee73eeb1a9e7d2944d8adaa55f532949947a61a8faa3d83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0000.png"
+    },
+    {
+      "path": "video/cierre/f0001.png",
+      "sizeBytes": 11598,
+      "sha256": "2a4c1ae91a5a92f648c3963ca26cac938271d082405fd6cef44d3df8e4f1eca9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0001.png"
+    },
+    {
+      "path": "video/cierre/f0002.png",
+      "sizeBytes": 18763,
+      "sha256": "dd032190cdd12909110c19d7de069c8c3c5bcb50a5ffb8ea424612fedb1e24fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0002.png"
+    },
+    {
+      "path": "video/cierre/f0003.png",
+      "sizeBytes": 25891,
+      "sha256": "30ef615c35da2c91cc05a6818e3f21f95527a68f772f521ba11f56abb02e83f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0003.png"
+    },
+    {
+      "path": "video/cierre/f0004.png",
+      "sizeBytes": 40687,
+      "sha256": "75b09a56438ae74ef9a5c593acc0e28675446b5661cfb793680ebed8e2801718",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0004.png"
+    },
+    {
+      "path": "video/cierre/f0005.png",
+      "sizeBytes": 55494,
+      "sha256": "94cc5bc6dc9f5ca47d07115ff9f1219468c1bdecbb4cd043407ecf852d5bca9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0005.png"
+    },
+    {
+      "path": "video/cierre/f0006.png",
+      "sizeBytes": 69616,
+      "sha256": "a84563102b321b2f523dfe192c6de68cd048df188958be45b12f201c59891fc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0006.png"
+    },
+    {
+      "path": "video/cierre/f0007.png",
+      "sizeBytes": 81944,
+      "sha256": "a6307d9a7f6d4221299a670e784e2efa8d3e37afabb5deb1097d4e653ddb9b45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0007.png"
+    },
+    {
+      "path": "video/cierre/f0008.png",
+      "sizeBytes": 90404,
+      "sha256": "db9db82a73f67942a89329298f2df0a375247bdf804aedbbe49bec8c9dc31761",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0008.png"
+    },
+    {
+      "path": "video/cierre/f0009.png",
+      "sizeBytes": 103503,
+      "sha256": "d000ac72a6e97fe42032b0af00a53dbcd43015fc25c9f7d3b78ea88c82571c3d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0009.png"
+    },
+    {
+      "path": "video/cierre/f0010.png",
+      "sizeBytes": 107895,
+      "sha256": "13cb0c34b48f6e057498f4ca2ddc94a1e026312e056243e5851eeb9ccdc5a78b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0010.png"
+    },
+    {
+      "path": "video/cierre/f0011.png",
+      "sizeBytes": 114606,
+      "sha256": "8c05e436a96185c023ea13e33f309257a4939d8d9a516737553c0854de1545db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0011.png"
+    },
+    {
+      "path": "video/cierre/f0012.png",
+      "sizeBytes": 120389,
+      "sha256": "a7c7d8e95e98b981af1c53cf37bf7e21ec1c0e65abe7622f68fe80520b24e273",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0012.png"
+    },
+    {
+      "path": "video/cierre/f0013.png",
+      "sizeBytes": 124249,
+      "sha256": "78e6bec4cf1638a61de1335898465b57c109b18b1c65dbfad995edc6394e113d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0013.png"
+    },
+    {
+      "path": "video/cierre/f0014.png",
+      "sizeBytes": 135405,
+      "sha256": "43589ec2bcac01946624a047b547fd52da50e04cdcf1f54666cb8b06138f042e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0014.png"
+    },
+    {
+      "path": "video/cierre/f0015.png",
+      "sizeBytes": 137180,
+      "sha256": "7cfcf2da899bb31e64be7ad3caa49cf0687fda9aa6f01f56a043c52f143d567e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0015.png"
+    },
+    {
+      "path": "video/cierre/f0016.png",
+      "sizeBytes": 140719,
+      "sha256": "dc4c8f2966276c7d0117f4b8ad140a2fc8b6e021736dcac83be6a973cef88c18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0016.png"
+    },
+    {
+      "path": "video/cierre/f0017.png",
+      "sizeBytes": 144001,
+      "sha256": "b3545cba78e08e11cbfb62ba15d827ca52339fc8cb49efa25010189922e225f6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0017.png"
+    },
+    {
+      "path": "video/cierre/f0018.png",
+      "sizeBytes": 149592,
+      "sha256": "51f3efbfd73a7ae98f6f58d60100f6ed657377bce0d8bd98e2e2c87e33148b78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0018.png"
+    },
+    {
+      "path": "video/cierre/f0019.png",
+      "sizeBytes": 151765,
+      "sha256": "4a8403b3fe0d7947caf331afa78ae166c26b9433755a20e2e2b0df078bdc445e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0019.png"
+    },
+    {
+      "path": "video/cierre/f0020.png",
+      "sizeBytes": 158502,
+      "sha256": "5b2b73d61677e071d182f039f5660e3a3a61fcc07963706bd3a4888b4ea34fdd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0020.png"
+    },
+    {
+      "path": "video/cierre/f0021.png",
+      "sizeBytes": 158655,
+      "sha256": "d01f02e2bf0e3231cd4eb53557c301cfd48ac4d8e35f39d05790f94d3a6c53d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0021.png"
+    },
+    {
+      "path": "video/cierre/f0022.png",
+      "sizeBytes": 161841,
+      "sha256": "65b0a495bb210c31462115f4308594ca96d02a433e614b5ee1074960f034c0de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0022.png"
+    },
+    {
+      "path": "video/cierre/f0023.png",
+      "sizeBytes": 166032,
+      "sha256": "12e96a5b7742d3dc408d9a9dd7d2a1c7f902b375e4fe71e3993b2e00ddbbc346",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0023.png"
+    },
+    {
+      "path": "video/cierre/f0024.png",
+      "sizeBytes": 168705,
+      "sha256": "edf75d697353c3cc3a06c0ca1aae6407d5edfef96c9793e993605ffb84879274",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0024.png"
+    },
+    {
+      "path": "video/cierre/f0025.png",
+      "sizeBytes": 172345,
+      "sha256": "f25b8c9f79c0d8af251ae2964645a32d6a9ceb3b5126c071521293eb2b5e7467",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0025.png"
+    },
+    {
+      "path": "video/cierre/f0026.png",
+      "sizeBytes": 173481,
+      "sha256": "4de7e7bf157d4a6f1276d5a00189d456220e4e6048ff143c8cb92837be4f3c95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0026.png"
+    },
+    {
+      "path": "video/cierre/f0027.png",
+      "sizeBytes": 173975,
+      "sha256": "130e7f079773db1589846b8da2261c5a556d670f2ae0e3bf55fa1a40ee44b712",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0027.png"
+    },
+    {
+      "path": "video/cierre/f0028.png",
+      "sizeBytes": 173740,
+      "sha256": "37290c9e21f743ba8ab8af7379c486d471550545668f8e07bf63684f3195acd8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0028.png"
+    },
+    {
+      "path": "video/cierre/f0029.png",
+      "sizeBytes": 174420,
+      "sha256": "e344287abe2b4b7075f74e993ffd92076baaa167a8456af41b8e2ecdef5817ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0029.png"
+    },
+    {
+      "path": "video/cierre/f0030.png",
+      "sizeBytes": 174854,
+      "sha256": "255ba7de5538d64bd19cf9429fcdc1d34e8754c889fb0fa3e328f9c940bb3b3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0030.png"
+    },
+    {
+      "path": "video/cierre/f0031.png",
+      "sizeBytes": 175315,
+      "sha256": "c858a6e4460919afaed71d6f01b562b32599151f132a458ecf2715712447e4b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0031.png"
+    },
+    {
+      "path": "video/cierre/f0032.png",
+      "sizeBytes": 176442,
+      "sha256": "8912b1d6b83f1203804411c7b9a628d08e00c8e73fe773ceb9c9bab3c9e67600",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0032.png"
+    },
+    {
+      "path": "video/cierre/f0033.png",
+      "sizeBytes": 177280,
+      "sha256": "b71b2eccca12fff566a8fd0b83f4de187e6a81e3e0979b27a4a0c1d23b123d28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0033.png"
+    },
+    {
+      "path": "video/cierre/f0034.png",
+      "sizeBytes": 177952,
+      "sha256": "e4d45647454b983d76f2e77a62eb631df9c7fc143b1903cda7a201ef86e2caa4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0034.png"
+    },
+    {
+      "path": "video/cierre/f0035.png",
+      "sizeBytes": 178749,
+      "sha256": "6a748f0ea2b761cf31c48a7132cb12de9e10649b136e800bf1c25e783075911d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0035.png"
+    },
+    {
+      "path": "video/cierre/f0036.png",
+      "sizeBytes": 179142,
+      "sha256": "7d49c5029054a8a9d929f68b6db53499f35bb2ed0bacb2a6728c095f05b3507f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0036.png"
+    },
+    {
+      "path": "video/cierre/f0037.png",
+      "sizeBytes": 179312,
+      "sha256": "5126e8b315733b697cd7a88c0b85b27b7cfa6e435dd816f55a0af24268a3bbb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0037.png"
+    },
+    {
+      "path": "video/cierre/f0038.png",
+      "sizeBytes": 179456,
+      "sha256": "2d0c488eb96ef3f2101f0b6e80dc6431cc64fbd57a75e64365a26157bfbd257e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0038.png"
+    },
+    {
+      "path": "video/cierre/f0039.png",
+      "sizeBytes": 179483,
+      "sha256": "a0efff321b7a2132ba19b1f27058810bdfab2f407bc28524b8517ce723028c2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0039.png"
+    },
+    {
+      "path": "video/cierre/f0040.png",
+      "sizeBytes": 179550,
+      "sha256": "569216e0966cebb6348f5436fb737dc683ad252d4167b42166b37b098e4f4d9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0040.png"
+    },
+    {
+      "path": "video/cierre/f0041.png",
+      "sizeBytes": 179608,
+      "sha256": "dd482a21edc07d92a30aea53c7f8113b480e343d9efe35d37bfc1e64d5c39f9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0041.png"
+    },
+    {
+      "path": "video/cierre/f0042.png",
+      "sizeBytes": 179693,
+      "sha256": "3ba5d5522fb96478b5c744a125afdad90c7d48b1f766623c7769da997b926f9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0042.png"
+    },
+    {
+      "path": "video/cierre/f0043.png",
+      "sizeBytes": 179806,
+      "sha256": "71d778324880446224d1cbd05d7c05fab3031888b19d99c2e683a9abaad0d221",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0043.png"
+    },
+    {
+      "path": "video/cierre/f0044.png",
+      "sizeBytes": 179860,
+      "sha256": "606c9844a309e79c41cf4bb73b698e48c2ef9e57e50d96d278d76fdc706dd350",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0044.png"
+    },
+    {
+      "path": "video/cierre/f0045.png",
+      "sizeBytes": 179860,
+      "sha256": "606c9844a309e79c41cf4bb73b698e48c2ef9e57e50d96d278d76fdc706dd350",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0045.png"
+    },
+    {
+      "path": "video/cierre/f0046.png",
+      "sizeBytes": 179604,
+      "sha256": "a77250b30286da9e6f31deba34cc6658dd4aebfb7fcccc20063b69a11ef65142",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0046.png"
+    },
+    {
+      "path": "video/cierre/f0047.png",
+      "sizeBytes": 179538,
+      "sha256": "172025420ebf24e15844fcc8ac2933648457703aedf7c3f7d8c9d5ffc0d0203a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0047.png"
+    },
+    {
+      "path": "video/cierre/f0048.png",
+      "sizeBytes": 179195,
+      "sha256": "61730157d373d19ed571320827515f47dfd2d59e6a86b0713a3b0bacdc6e1d55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0048.png"
+    },
+    {
+      "path": "video/cierre/f0049.png",
+      "sizeBytes": 179067,
+      "sha256": "7ca885bd820eb776b28fff3c6fef4ab0dc9e519934b6e30099db9d26e3f2daf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0049.png"
+    },
+    {
+      "path": "video/cierre/f0050.png",
+      "sizeBytes": 179161,
+      "sha256": "1367761d9c2360e75a4ffaa25127e74aca1149403bab643363d0a34926fef28e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0050.png"
+    },
+    {
+      "path": "video/cierre/f0051.png",
+      "sizeBytes": 178682,
+      "sha256": "9d9c56478552ac7b62c2d319538f22f5150eec571c21e7fa531bd4cb985e0a05",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0051.png"
+    },
+    {
+      "path": "video/cierre/f0052.png",
+      "sizeBytes": 178498,
+      "sha256": "57d92fead2a2095db90bf63633f356a01f5cfc175025bfb452040cc67d00ffeb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0052.png"
+    },
+    {
+      "path": "video/cierre/f0053.png",
+      "sizeBytes": 178101,
+      "sha256": "2f66b5bae3c03c92dfb96f676e61b3681a6c4df9ba292c469c7257553f0237ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0053.png"
+    },
+    {
+      "path": "video/cierre/f0054.png",
+      "sizeBytes": 177892,
+      "sha256": "3721c7539dc7e7140ff5522e4eb7b8d8dd36d2d91180c89a38d07cf776601114",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0054.png"
+    },
+    {
+      "path": "video/cierre/f0055.png",
+      "sizeBytes": 177541,
+      "sha256": "9b28e40153ac8448978011620da196ca0a87026b2895030af39d2d59b201eed5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0055.png"
+    },
+    {
+      "path": "video/cierre/f0056.png",
+      "sizeBytes": 177434,
+      "sha256": "23f4f8af2a98e5b38bda09e9f17284d0cf26193bdbb4ddb4777b311bcd064eae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0056.png"
+    },
+    {
+      "path": "video/cierre/f0057.png",
+      "sizeBytes": 177450,
+      "sha256": "5ef0902cb8ee76709d574a805fde667d77bf28e3580f0baf9a8c7875d25cdbfa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0057.png"
+    },
+    {
+      "path": "video/cierre/f0058.png",
+      "sizeBytes": 185441,
+      "sha256": "5bf2e487e8de0f4d50b74d86e5e34ff9a3e1805151bce0c86b14f7ba62e99e74",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0058.png"
+    },
+    {
+      "path": "video/cierre/f0059.png",
+      "sizeBytes": 186151,
+      "sha256": "5f32761d9fdb6707914d4148942c4fc60c2a003af275953eb67a88d37626987a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0059.png"
+    },
+    {
+      "path": "video/cierre/f0060.png",
+      "sizeBytes": 186822,
+      "sha256": "04aebc1baa3922b764e066c85890ab301d4777f6fd4ab031077467e901645c8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0060.png"
+    },
+    {
+      "path": "video/cierre/f0061.png",
+      "sizeBytes": 186582,
+      "sha256": "4ca7d64ea2d2af1ba6d34a8fbfdf0a0666266074aad264726691b444adb5a886",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0061.png"
+    },
+    {
+      "path": "video/cierre/f0062.png",
+      "sizeBytes": 186002,
+      "sha256": "3b8a80194a0ccd863255a844f61dc7a75464f97dbd74daed00e0b5317bfb71bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0062.png"
+    },
+    {
+      "path": "video/cierre/f0063.png",
+      "sizeBytes": 186593,
+      "sha256": "d85405c6b4b2e6c6a36fb178fb3ab1c518c168c3aec0c9b21280ffce06d6f3c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0063.png"
+    },
+    {
+      "path": "video/cierre/f0064.png",
+      "sizeBytes": 185711,
+      "sha256": "e7830fe93f4c84aa915d9292406561c0034d006991bc24bd63fde0c3eeef82b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0064.png"
+    },
+    {
+      "path": "video/cierre/f0065.png",
+      "sizeBytes": 185714,
+      "sha256": "266113e87c22d57bf7c8079079b4b7ce5f83165e05ce02f07a9ab68e306bf1b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0065.png"
+    },
+    {
+      "path": "video/cierre/f0066.png",
+      "sizeBytes": 186118,
+      "sha256": "57d1d9f40ce0c3ba9445eb564ac1a0af25909b313eee6572d28e1f3cea6e2921",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0066.png"
+    },
+    {
+      "path": "video/cierre/f0067.png",
+      "sizeBytes": 185686,
+      "sha256": "b5e37316d6a3660657ba9988000878207e9ba5ea8c8f08ced9fa48338a1a77d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0067.png"
+    },
+    {
+      "path": "video/cierre/f0068.png",
+      "sizeBytes": 184957,
+      "sha256": "26021f2459a666a2f66ffb09a0fbcb2395c6c241b4f10915ef6d2a32bf2b1681",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0068.png"
+    },
+    {
+      "path": "video/cierre/f0069.png",
+      "sizeBytes": 184587,
+      "sha256": "8e24d17950e9d626b642dba4990087328c519330b544da5f8855276230f52d3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0069.png"
+    },
+    {
+      "path": "video/cierre/f0070.png",
+      "sizeBytes": 184067,
+      "sha256": "b8d8b0675f5510bd8a4b97d5add79013da1c4346abc34f8cdcdde4b09278634c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0070.png"
+    },
+    {
+      "path": "video/cierre/f0071.png",
+      "sizeBytes": 187252,
+      "sha256": "d5b74c47271b7d151ba39fb029e06fe39cbecba322c015fa824e0c1cc7d76afa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0071.png"
+    },
+    {
+      "path": "video/cierre/f0072.png",
+      "sizeBytes": 189339,
+      "sha256": "656293c93d04a86461f9fda786e4b7f6a687a19e29ba2756900df1618bfb128b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0072.png"
+    },
+    {
+      "path": "video/cierre/f0073.png",
+      "sizeBytes": 190358,
+      "sha256": "7d87cfe3a23dfad1e2a2a6357c114ba4f2944aa1d6d35c6700462d5fe7bc8960",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0073.png"
+    },
+    {
+      "path": "video/cierre/f0074.png",
+      "sizeBytes": 191013,
+      "sha256": "6d2b0398b27f6627cd949dc2e4ebf043b015ec6d7ddf38a801cba61c2f4f4116",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0074.png"
+    },
+    {
+      "path": "video/cierre/f0075.png",
+      "sizeBytes": 191421,
+      "sha256": "eff6f100d9baac714f869de76c219d85e5c153889ff23e7071cc9da7b9fdfcc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0075.png"
+    },
+    {
+      "path": "video/cierre/f0076.png",
+      "sizeBytes": 191270,
+      "sha256": "e75cdb34d3327280cc0dbe5ef2e085549a1108069e04974cf45d902fa1154215",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0076.png"
+    },
+    {
+      "path": "video/cierre/f0077.png",
+      "sizeBytes": 189848,
+      "sha256": "4928d2f780be7821a62fa5f75d784210aae2aa8ae1657563ce759a0999ee1bc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0077.png"
+    },
+    {
+      "path": "video/cierre/f0078.png",
+      "sizeBytes": 189915,
+      "sha256": "ad31d4bc32b1695693f49e642c4bb4dc698e217159d08a1ed85d1086372fbf64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0078.png"
+    },
+    {
+      "path": "video/cierre/f0079.png",
+      "sizeBytes": 195171,
+      "sha256": "7d3fdd88ac3698b2e3a1761ba902b8339fbff7f7d098e50c2b33d2ecbb5e1d9b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0079.png"
+    },
+    {
+      "path": "video/cierre/f0080.png",
+      "sizeBytes": 196068,
+      "sha256": "f8a94b49e40ee9d053ccf3a2038ae53cc198d01d3b27c7955d53bd14cb020f86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0080.png"
+    },
+    {
+      "path": "video/cierre/f0081.png",
+      "sizeBytes": 196409,
+      "sha256": "7eb9f3cb82507c958b6726e985b4ebcb6f00b985c47a6bfe2da74b8f1f03b543",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0081.png"
+    },
+    {
+      "path": "video/cierre/f0082.png",
+      "sizeBytes": 198135,
+      "sha256": "38d63fe384ffcfdf8641533951c52d791542d869cb271ae03dfa5a9451d2ab18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0082.png"
+    },
+    {
+      "path": "video/cierre/f0083.png",
+      "sizeBytes": 197354,
+      "sha256": "6f925f0793cb247d090e528720d3e2f4ae725f672e8c8a434382ba668c73c186",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0083.png"
+    },
+    {
+      "path": "video/cierre/f0084.png",
+      "sizeBytes": 198115,
+      "sha256": "d52eb8cbf5f0bc895140829d871f472f4980189a8fc0d7832dab6718c044f838",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0084.png"
+    },
+    {
+      "path": "video/cierre/f0085.png",
+      "sizeBytes": 197560,
+      "sha256": "9a968681a5897bce688ac06f377106b12b3ab983b8034472b564c28d5579280f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0085.png"
+    },
+    {
+      "path": "video/cierre/f0086.png",
+      "sizeBytes": 198301,
+      "sha256": "ead45a9698e4bd13905fe79cec1c4de6635340fff0b093a4c737f8f8e7a0db9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0086.png"
+    },
+    {
+      "path": "video/cierre/f0087.png",
+      "sizeBytes": 195702,
+      "sha256": "d1edd6528c9ddd7f47460f6540b34cd7303ec3502f5f581a1274b124e23cc398",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0087.png"
+    },
+    {
+      "path": "video/cierre/f0088.png",
+      "sizeBytes": 196178,
+      "sha256": "7f9d3db06c64119946330431ccc9c55a9ba9b6ed81b81e8a3fce499ffc4697b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0088.png"
+    },
+    {
+      "path": "video/cierre/f0089.png",
+      "sizeBytes": 196228,
+      "sha256": "616e39f7b37fe18eba0897dd01de6705637a6bb6c9b7897267a80aa891a29992",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0089.png"
+    },
+    {
+      "path": "video/cierre/f0090.png",
+      "sizeBytes": 195662,
+      "sha256": "1a4bd9796c67f0611bb9425e6fb8768bc81c64c4ca76dc0c125bb561e1dbd640",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0090.png"
+    },
+    {
+      "path": "video/cierre/f0091.png",
+      "sizeBytes": 195465,
+      "sha256": "6e05b83287b85873ac1e65db91c41da1316251e640a3ac026e2f8be4c1613f71",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0091.png"
+    },
+    {
+      "path": "video/cierre/f0092.png",
+      "sizeBytes": 195732,
+      "sha256": "6a25a14e45ac170a741675cd8afdce5441f006db474ec4e2d8564e171b4ac583",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0092.png"
+    },
+    {
+      "path": "video/cierre/f0093.png",
+      "sizeBytes": 194788,
+      "sha256": "eef4f31f3e4525c764207811113b81a933c3d7be0988bb54cdce28447004e8b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0093.png"
+    },
+    {
+      "path": "video/cierre/f0094.png",
+      "sizeBytes": 194275,
+      "sha256": "40a213913d93c777bdad242140374d181556a4085d6b322e83b3e97a28181b73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0094.png"
+    },
+    {
+      "path": "video/cierre/f0095.png",
+      "sizeBytes": 194983,
+      "sha256": "f7064b4046e49ae8ca73a990f6397be66b3839c570c572bef8f770366a49418d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0095.png"
+    },
+    {
+      "path": "video/cierre/f0096.png",
+      "sizeBytes": 192656,
+      "sha256": "8c5c87a2fb94c90814340fdbb2df7e310d8dcc09b92729ddd950bf3110d89ef6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0096.png"
+    },
+    {
+      "path": "video/cierre/f0097.png",
+      "sizeBytes": 192647,
+      "sha256": "647cbbfcdc28b00179ace11045cecbb0d87ca80a2e5559fa9285a492ac339552",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0097.png"
+    },
+    {
+      "path": "video/cierre/f0098.png",
+      "sizeBytes": 192900,
+      "sha256": "5ca63d46cde0df42a88858711e1c3bb51a52f997aee4576eb54adc4f80e3a862",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0098.png"
+    },
+    {
+      "path": "video/cierre/f0099.png",
+      "sizeBytes": 192820,
+      "sha256": "98aa93b4cb04610a0cd1265c6128db71e6f8d480d07c7d774bb1ec374de00c11",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0099.png"
+    },
+    {
+      "path": "video/cierre/f0100.png",
+      "sizeBytes": 192548,
+      "sha256": "e4ed8c9487a4bf529859d8db246d2271eefc2640b6a70b327341f8b76283ebf2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0100.png"
+    },
+    {
+      "path": "video/cierre/f0101.png",
+      "sizeBytes": 192734,
+      "sha256": "72b6a5b9a1e5f26df840ce429495ef0a3801eeec84ccb52d6ae4499738cf2f77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0101.png"
+    },
+    {
+      "path": "video/cierre/f0102.png",
+      "sizeBytes": 193464,
+      "sha256": "2dc7dc329ea3b0ce3a27f911131090b286ad421bebc3f8f0e0fc89b0dc044291",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0102.png"
+    },
+    {
+      "path": "video/cierre/f0103.png",
+      "sizeBytes": 189855,
+      "sha256": "2471b192d416c68ae9a9d9e68950281f4d7b23853556357391e147cf0ce67835",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0103.png"
+    },
+    {
+      "path": "video/cierre/f0104.png",
+      "sizeBytes": 189826,
+      "sha256": "4ede5e04476382493f06fedd8b9a6c3e97fad70ded982c0ee0fa5600182dcceb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0104.png"
+    },
+    {
+      "path": "video/cierre/f0105.png",
+      "sizeBytes": 189862,
+      "sha256": "e13b81971d9d7add28cd85dae100b3eb4fc0d79d45bca2d8abcdf7c5a86ba15b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0105.png"
+    },
+    {
+      "path": "video/cierre/f0106.png",
+      "sizeBytes": 189564,
+      "sha256": "dc318c6886d0a5426b5c39ef31284497cb3193475230fec6f8f2d421dea67878",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0106.png"
+    },
+    {
+      "path": "video/cierre/f0107.png",
+      "sizeBytes": 189513,
+      "sha256": "cb8e9b17bb749e7d0070478c9f42c382c7e279b2797c8533d9f09e6f6cf3527d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0107.png"
+    },
+    {
+      "path": "video/cierre/f0108.png",
+      "sizeBytes": 189257,
+      "sha256": "eb7eeff8ca8f443b34e0e921677c3d91e7e781c840938f080bce2185ee229631",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0108.png"
+    },
+    {
+      "path": "video/cierre/f0109.png",
+      "sizeBytes": 188925,
+      "sha256": "054a82a9f4d5f47690fd91f37293b46185853b21dea82062518e5ceaf3980154",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0109.png"
+    },
+    {
+      "path": "video/cierre/f0110.png",
+      "sizeBytes": 188914,
+      "sha256": "0421e306fc4b9833b59a2895ebe7065c0c824055246208995674bf52c5cc04c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0110.png"
+    },
+    {
+      "path": "video/cierre/f0111.png",
+      "sizeBytes": 188871,
+      "sha256": "d7eb3afe9349e815547e52ee9796b0e2234110220126371957456731ce6ab501",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0111.png"
+    },
+    {
+      "path": "video/cierre/f0112.png",
+      "sizeBytes": 188621,
+      "sha256": "e7d4df283950b8f7e5ea6709f48b62b1950fbae10fc3a36974ccc6d94f832be0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0112.png"
+    },
+    {
+      "path": "video/cierre/f0113.png",
+      "sizeBytes": 188577,
+      "sha256": "df1c2b9b00d37898c42757e20c03aecbfc70a5e00fe17d5432b3000334cbfbdc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0113.png"
+    },
+    {
+      "path": "video/cierre/f0114.png",
+      "sizeBytes": 188454,
+      "sha256": "de8bde90ee903ca09f56655abc4491e1c7d22448c27886cfeadbb5b0b7fbb0e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0114.png"
+    },
+    {
+      "path": "video/cierre/f0115.png",
+      "sizeBytes": 187711,
+      "sha256": "9aa851116d41e4bbabe1504896fdc8f6c95425f3d4b18966f2d52cef6dd6fc91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0115.png"
+    },
+    {
+      "path": "video/cierre/f0116.png",
+      "sizeBytes": 187704,
+      "sha256": "5302ac5a7d828aea8f0072a47a1786846189a6334a7c3155eaca5484a5d56fe6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0116.png"
+    },
+    {
+      "path": "video/cierre/f0117.png",
+      "sizeBytes": 187615,
+      "sha256": "ba9c64653af099a1207b552f62e5c9b9fd6859c5062fda4d876b8c5c4fcf8313",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0117.png"
+    },
+    {
+      "path": "video/cierre/f0118.png",
+      "sizeBytes": 187390,
+      "sha256": "c68532743ea839f30aa8fa5b59e2656718b9c654b24eb4fb71cd5757d5a2b2d1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0118.png"
+    },
+    {
+      "path": "video/cierre/f0119.png",
+      "sizeBytes": 187433,
+      "sha256": "b0e637e01eedeac4edb05d49d6f8eb684ddd1e673ca27e9fb27824aea950b4d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0119.png"
+    },
+    {
+      "path": "video/cierre/f0120.png",
+      "sizeBytes": 187144,
+      "sha256": "63b0d37c790f368796604e2761de9c96fc35fed94b605242d311ef4584877166",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0120.png"
+    },
+    {
+      "path": "video/cierre/f0121.png",
+      "sizeBytes": 186414,
+      "sha256": "f5dd827cd31e5b73bc8dc44597405ce10b4c0b654693ebeb2334b90937ea5cc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0121.png"
+    },
+    {
+      "path": "video/cierre/f0122.png",
+      "sizeBytes": 185864,
+      "sha256": "f7850e72a979d2b9fa99673b85e368bc1f2f49213a86bbc95919d708aa95f026",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0122.png"
+    },
+    {
+      "path": "video/cierre/f0123.png",
+      "sizeBytes": 185970,
+      "sha256": "c90bc04ecda56d94c26285ad3335db41576261832b66b25118b2f1c0e7b94b8d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0123.png"
+    },
+    {
+      "path": "video/cierre/f0124.png",
+      "sizeBytes": 185915,
+      "sha256": "c03b063fdf4a6568151469368f72936347c82e025e79f20280707e6c1211a2e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0124.png"
+    },
+    {
+      "path": "video/cierre/f0125.png",
+      "sizeBytes": 185760,
+      "sha256": "874d6ce4707be422cb5bdc395049120d878266e6992d7d922535a65e500af4e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0125.png"
+    },
+    {
+      "path": "video/cierre/f0126.png",
+      "sizeBytes": 185732,
+      "sha256": "66445b6cdc6d3ea4e4155a291f6833f3ecaed6b5483cad10ed44aa01f865fed6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0126.png"
+    },
+    {
+      "path": "video/cierre/f0127.png",
+      "sizeBytes": 185605,
+      "sha256": "2a1219bfa850df4ba5d11af0286c5db33b9874ee6f2c98c10b8cbd205ed87dcf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0127.png"
+    },
+    {
+      "path": "video/cierre/f0128.png",
+      "sizeBytes": 185555,
+      "sha256": "06131069156bba8bfcedeb403cefc5da36ad48bd14d41b30795c20d986751261",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0128.png"
+    },
+    {
+      "path": "video/cierre/f0129.png",
+      "sizeBytes": 185555,
+      "sha256": "06131069156bba8bfcedeb403cefc5da36ad48bd14d41b30795c20d986751261",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0129.png"
+    },
+    {
+      "path": "video/cierre/f0130.png",
+      "sizeBytes": 186107,
+      "sha256": "95e9da3ba5e7a423a4380d5e54c92566198d746e3829d9f6c9c7e2396f36bd90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0130.png"
+    },
+    {
+      "path": "video/cierre/f0131.png",
+      "sizeBytes": 186107,
+      "sha256": "95e9da3ba5e7a423a4380d5e54c92566198d746e3829d9f6c9c7e2396f36bd90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0131.png"
+    },
+    {
+      "path": "video/cierre/f0132.png",
+      "sizeBytes": 186107,
+      "sha256": "95e9da3ba5e7a423a4380d5e54c92566198d746e3829d9f6c9c7e2396f36bd90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0132.png"
+    },
+    {
+      "path": "video/cierre/f0133.png",
+      "sizeBytes": 186107,
+      "sha256": "95e9da3ba5e7a423a4380d5e54c92566198d746e3829d9f6c9c7e2396f36bd90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0133.png"
+    },
+    {
+      "path": "video/cierre/f0134.png",
+      "sizeBytes": 186107,
+      "sha256": "95e9da3ba5e7a423a4380d5e54c92566198d746e3829d9f6c9c7e2396f36bd90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/cierre/f0134.png"
+    },
+    {
+      "path": "video/kling-ambar/K2.mp4",
+      "sizeBytes": 10031859,
+      "sha256": "6470bf9af8e739ba1909f96569c4adc8688dbcc17fd5b81a540b44534a2a0a1e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-ambar/K2.mp4"
+    },
+    {
+      "path": "video/kling-ambar/K4.mp4",
+      "sizeBytes": 10377749,
+      "sha256": "32200e12663f39b1ff7e0f777f21ba8a6d707e2097c440d693c34988ab434176",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-ambar/K4.mp4"
+    },
+    {
+      "path": "video/kling-ambar/K5.mp4",
+      "sizeBytes": 10457781,
+      "sha256": "528e7eba3cba9a71400edc97d6b041df0aed4b45944b5f1ce9cd92cfe31971a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-ambar/K5.mp4"
+    },
+    {
+      "path": "video/kling-lima/K1.mp4",
+      "sizeBytes": 6673137,
+      "sha256": "062fcc9b274377605690b9c1f87f9392240f6b9d96bb825c130c6550d8777a14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-lima/K1.mp4"
+    },
+    {
+      "path": "video/kling-lima/K3.mp4",
+      "sizeBytes": 9985699,
+      "sha256": "0c90822d404e02e4afd598e632352d247a1d06b044a4b35c3d591f65d84dc11c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-lima/K3.mp4"
+    },
+    {
+      "path": "video/kling-lima/K4.mp4",
+      "sizeBytes": 11112973,
+      "sha256": "4d9f0cb292234cc637bb64339dfaaf8cec1760a8b532bc71247c374f9dc663f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-lima/K4.mp4"
+    },
+    {
+      "path": "video/kling-lima/K6.mp4",
+      "sizeBytes": 9306043,
+      "sha256": "502810043da972bb5933de6dd9658cdb4695e6b1d32560cd767ec735b1903497",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-lima/K6.mp4"
+    },
+    {
+      "path": "video/kling-lima/K7.mp4",
+      "sizeBytes": 9422659,
+      "sha256": "0c69b31931abc434f12e00911650559b09b8a00c5d268328b54f2cd0abdb9208",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/kling-lima/K7.mp4"
+    },
+    {
+      "path": "video/musica-lyria-1.wav",
+      "sizeBytes": 6291544,
+      "sha256": "0dd6be6507074226697d9d2fdb27121eb292b82acff5b087d6d47c7839f28ae6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/musica-lyria-1.wav"
+    },
+    {
+      "path": "video/musica-lyria-2.wav",
+      "sizeBytes": 6291544,
+      "sha256": "eaadcbb704ee0c2af6c8e96e7a09b9351d559700aeda43e117a01fcbd7ce1c61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/musica-lyria-2.wav"
+    },
+    {
+      "path": "video/pruebas/K5-kling4k.mp4",
+      "sizeBytes": 14196072,
+      "sha256": "3064b5fb542a25f4361f0cd70d11f51ca48157b3f7e5dad4a3f3fb5b40cf9c34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_umbral-fintech/video/pruebas/K5-kling4k.mp4"
+    }
+  ]
+}

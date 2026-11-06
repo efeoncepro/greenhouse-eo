@@ -1,0 +1,71 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:43:56.745Z",
+  "run": "ai-generations/2026-10-22_grok-bot-poses-3d",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_grok-bot-poses-3d",
+  "totalBytes": 11768058,
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "brief/comparar-base-v01.png",
+      "sizeBytes": 1247767,
+      "sha256": "ec74a6b05d146a85f2c7c0d1fb6c4eaf0a60a7419055a0c1ac9a531a7ba1c872",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/brief/comparar-base-v01.png"
+    },
+    {
+      "path": "brief/qa-recorte-navy-papel-v01.png",
+      "sizeBytes": 765309,
+      "sha256": "11f3aa88e0684b4dfd275daedcde055cf9ebbd750ad075338e09b03bc33286ff",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/brief/qa-recorte-navy-papel-v01.png"
+    },
+    {
+      "path": "brief/qa-recorte-navy-papel-v01b.png",
+      "sizeBytes": 766436,
+      "sha256": "6610930b02382a3e2a2c962bc7b631226ed382774b6d87653c3b9dc8a1d3c4f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/brief/qa-recorte-navy-papel-v01b.png"
+    },
+    {
+      "path": "brief/qa-recorte-navy-papel-v01c.png",
+      "sizeBytes": 846353,
+      "sha256": "5a50e6c119c9e20deb32c81d78cc0c89d8408adcb10105440f29e3bc6d4c6836",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/brief/qa-recorte-navy-papel-v01c.png"
+    },
+    {
+      "path": "out/base-frente-v01-transparente.png",
+      "sizeBytes": 1354907,
+      "sha256": "a0869fe143df65ab4c254c41a780ff25d5d7ea51beae96ab087e706d4d350f91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/out/base-frente-v01-transparente.png"
+    },
+    {
+      "path": "out/base-frente-v01.png",
+      "sizeBytes": 2576799,
+      "sha256": "042e58be362a9821a430ad5ddac126581a617e1d495d417fdd853faf660e7746",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/out/base-frente-v01.png"
+    },
+    {
+      "path": "out/base-tres-cuartos-v01-transparente.png",
+      "sizeBytes": 1340150,
+      "sha256": "b76266c9bbd2078fd84ffe07a2f2eb95a968126e1bc7bd2d99c633f64c522012",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/out/base-tres-cuartos-v01-transparente.png"
+    },
+    {
+      "path": "out/base-tres-cuartos-v01.png",
+      "sizeBytes": 2682187,
+      "sha256": "fed8d0a1e82c32578af9570672df0d510b3776aeb870041bf6e1c9a63040d641",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/out/base-tres-cuartos-v01.png"
+    },
+    {
+      "path": "ref/ref-01-reposo-oficial-svg.png",
+      "sizeBytes": 120375,
+      "sha256": "264718c80488cc4dace3258204d87c351f6a768cf3d83ccb24b51660923ddf9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/ref/ref-01-reposo-oficial-svg.png"
+    },
+    {
+      "path": "ref/ref-02-reposo-video-autor.png",
+      "sizeBytes": 67775,
+      "sha256": "23549ff32b419cb6e2e9bb263ae421179228a3db514288b27f4d58512825fb66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-poses-3d/ref/ref-02-reposo-video-autor.png"
+    }
+  ]
+}

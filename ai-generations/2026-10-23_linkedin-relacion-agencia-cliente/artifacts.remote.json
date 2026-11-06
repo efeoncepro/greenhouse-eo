@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:47:21.999Z",
+  "run": "ai-generations/2026-10-23_linkedin-relacion-agencia-cliente",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-23_linkedin-relacion-agencia-cliente",
+  "totalBytes": 2142192,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "ojo-de-pez-v1.png",
+      "sizeBytes": 2142192,
+      "sha256": "b84b447a12e74de8bd367ffffe8b4d0eeb93561f1f1b5a2902d7a98e0671dee8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_linkedin-relacion-agencia-cliente/ojo-de-pez-v1.png"
+    }
+  ]
+}

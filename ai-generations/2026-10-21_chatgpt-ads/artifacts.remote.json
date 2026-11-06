@@ -1,0 +1,947 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:28:11.582Z",
+  "run": "ai-generations/2026-10-21_chatgpt-ads",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-21_chatgpt-ads",
+  "totalBytes": 385257451,
+  "fileCount": 156,
+  "files": [
+    {
+      "path": "audio/barrido.wav",
+      "sizeBytes": 144078,
+      "sha256": "5acc641295ff752fd5edfaf539c6ec3c9691b7a1949c96107598df75fb429e60",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/barrido.wav"
+    },
+    {
+      "path": "audio/bus.wav",
+      "sizeBytes": 2304078,
+      "sha256": "d802875b2b52d424dc1d6a6492983c5e830d4479d2785a72ce57e4c3bf4f976e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/bus.wav"
+    },
+    {
+      "path": "audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/clic.wav"
+    },
+    {
+      "path": "audio/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/efeonce-sting.wav"
+    },
+    {
+      "path": "audio/golpe1-a.mp3",
+      "sizeBytes": 50187,
+      "sha256": "6f163b3617be487ce198030f60947884d538135ec78b0fbaa240347e7ffdac64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/golpe1-a.mp3"
+    },
+    {
+      "path": "audio/golpe1-b.mp3",
+      "sizeBytes": 34305,
+      "sha256": "8396e97c0f3ef4cb137d1f7e926157dd3b652ad92fdf2181bfbcc2d3f9da4c92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/golpe1-b.mp3"
+    },
+    {
+      "path": "audio/golpe2-a.mp3",
+      "sizeBytes": 34305,
+      "sha256": "d73ad110c649ed8b4dbf86a907f754d34f9e28bedcf851b354f792d31393440d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/golpe2-a.mp3"
+    },
+    {
+      "path": "audio/mezcla-master.wav",
+      "sizeBytes": 2304078,
+      "sha256": "d6bd66336e91c38ed040f9e8826ca1a188a2a00ac67171de9bd5c09355de629e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/mezcla-master.wav"
+    },
+    {
+      "path": "audio/mezcla-pre.wav",
+      "sizeBytes": 2304078,
+      "sha256": "49d84679686c819f6d26aa9d96975865289c0a9699d027d2111e472157266349",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "audio/musica-a.mp3",
+      "sizeBytes": 354706,
+      "sha256": "03a2c418144130461d15e634a21355be515e8b7f31ee45a952b39ae790de2850",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/musica-a.mp3"
+    },
+    {
+      "path": "audio/musica-b.mp3",
+      "sizeBytes": 354706,
+      "sha256": "c979258c1450ebf5001005f223f5a8edbca2da8d926f3d6882e0b513e4133751",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/musica-b.mp3"
+    },
+    {
+      "path": "audio/riser.wav",
+      "sizeBytes": 144078,
+      "sha256": "9e6e331c18790c9a465383d48e1de75ac15939c6cca03ce933d750c44a480784",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/riser.wav"
+    },
+    {
+      "path": "audio/sub.wav",
+      "sizeBytes": 268878,
+      "sha256": "f8b5ca64b601413d8ccd15d080e6be5503e5d11eb86b0e934a5bc7d6ddb3f7fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/audio/sub.wav"
+    },
+    {
+      "path": "export/efeonce-chatgpt-ads-feed.mp4",
+      "sizeBytes": 17334465,
+      "sha256": "6b0f7257cc5acb1c29ba3a693e56d2fa97d424a37170aee843d518836e7e0d31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/export/efeonce-chatgpt-ads-feed.mp4"
+    },
+    {
+      "path": "export/efeonce-chatgpt-ads-story.mp4",
+      "sizeBytes": 23708741,
+      "sha256": "4ece76816c0708f8b691fdea077e1d7d7b842f88875019c323f798c334999be1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/export/efeonce-chatgpt-ads-story.mp4"
+    },
+    {
+      "path": "export/hoja-feed.png",
+      "sizeBytes": 1214792,
+      "sha256": "2e27e9f97162cac9e41b7c8c231044784ffae4dfa597f15e7644af99b7a52d68",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/export/hoja-feed.png"
+    },
+    {
+      "path": "export/portada-feed.png",
+      "sizeBytes": 1855285,
+      "sha256": "2f907101d6cf7184af2f1f549d176819d2dfc763a7d1b58a30bf5d925eaf7ac1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/export/portada-feed.png"
+    },
+    {
+      "path": "export/portada-story.png",
+      "sizeBytes": 2398302,
+      "sha256": "5b7dca2e7165dc2d17cd4768519307826028eede84401c9364d8d70281cc37e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/export/portada-story.png"
+    },
+    {
+      "path": "v2/audio/barrido.wav",
+      "sizeBytes": 76878,
+      "sha256": "390978061a5da3310907fa4a7c51d29cdc16b35a094e2d4d96ee1d5085f03621",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/barrido.wav"
+    },
+    {
+      "path": "v2/audio/bus.wav",
+      "sizeBytes": 1536078,
+      "sha256": "22dc1267ce39cf14ace5c174a4dce8ec144d4f2acd8399e40edf6f63c0bb2c95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/bus.wav"
+    },
+    {
+      "path": "v2/audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/clic.wav"
+    },
+    {
+      "path": "v2/audio/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/efeonce-sting.wav"
+    },
+    {
+      "path": "v2/audio/golpe1-a.mp3",
+      "sizeBytes": 50187,
+      "sha256": "6f163b3617be487ce198030f60947884d538135ec78b0fbaa240347e7ffdac64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/golpe1-a.mp3"
+    },
+    {
+      "path": "v2/audio/golpe1-b.mp3",
+      "sizeBytes": 34305,
+      "sha256": "8396e97c0f3ef4cb137d1f7e926157dd3b652ad92fdf2181bfbcc2d3f9da4c92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/golpe1-b.mp3"
+    },
+    {
+      "path": "v2/audio/golpe2-a.mp3",
+      "sizeBytes": 34305,
+      "sha256": "d73ad110c649ed8b4dbf86a907f754d34f9e28bedcf851b354f792d31393440d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/golpe2-a.mp3"
+    },
+    {
+      "path": "v2/audio/mezcla-master.wav",
+      "sizeBytes": 1536078,
+      "sha256": "876721ab7fd2c41ee577a8af2ce0d6f6db3d4088a0b5e307c82e500f1ef049b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/mezcla-master.wav"
+    },
+    {
+      "path": "v2/audio/mezcla-pre.wav",
+      "sizeBytes": 1536078,
+      "sha256": "844b545b85aab818a709ddc35ce1942c88a2630bb209e6df36c1ad86e641858b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "v2/audio/musica-b.mp3",
+      "sizeBytes": 354706,
+      "sha256": "c979258c1450ebf5001005f223f5a8edbca2da8d926f3d6882e0b513e4133751",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/musica-b.mp3"
+    },
+    {
+      "path": "v2/audio/riser.wav",
+      "sizeBytes": 144078,
+      "sha256": "9e6e331c18790c9a465383d48e1de75ac15939c6cca03ce933d750c44a480784",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/riser.wav"
+    },
+    {
+      "path": "v2/audio/sub.wav",
+      "sizeBytes": 268878,
+      "sha256": "f8b5ca64b601413d8ccd15d080e6be5503e5d11eb86b0e934a5bc7d6ddb3f7fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/audio/sub.wav"
+    },
+    {
+      "path": "v2/export/efeonce-chatgpt-ads-v2-feed.mp4",
+      "sizeBytes": 5002392,
+      "sha256": "277404cb0e23ea629ad43f4d7d4b91b1bf8f7b505af99f4552387dd486797cad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/efeonce-chatgpt-ads-v2-feed.mp4"
+    },
+    {
+      "path": "v2/export/efeonce-chatgpt-ads-v2-story.mp4",
+      "sizeBytes": 6676923,
+      "sha256": "7e162db2134e87ada665cfa08aa2a37271216322087455a1c7753ab5bbe6b2f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/efeonce-chatgpt-ads-v2-story.mp4"
+    },
+    {
+      "path": "v2/export/hoja-v2-feed.png",
+      "sizeBytes": 782293,
+      "sha256": "47e3ca015c458ceaeb0fb082c4626283a66f8f470a56ba5c89287ed53f401bb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/hoja-v2-feed.png"
+    },
+    {
+      "path": "v2/export/hoja-v2.png",
+      "sizeBytes": 766228,
+      "sha256": "796a40addbc8a30e61bc8a5cf816ae984d2c5e13a610cf12cf31ddea16f33460",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/hoja-v2.png"
+    },
+    {
+      "path": "v2/export/portada-v2-feed.png",
+      "sizeBytes": 842391,
+      "sha256": "9abb2615e05d0e8ec2edacd4ed4d6d4711b26baee6d1bb2ce3ee86e5ae6e742c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/portada-v2-feed.png"
+    },
+    {
+      "path": "v2/export/portada-v2-story.png",
+      "sizeBytes": 1013622,
+      "sha256": "8faffe7ab8486714c58db0b29c6eb414b60a24aa63f8bb1b7933615ba047a4a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/portada-v2-story.png"
+    },
+    {
+      "path": "v2/export/zoom-barra.png",
+      "sizeBytes": 64626,
+      "sha256": "8e0226885d991b2800c539a974d6487e08952aac99d13b3f80a68a1bde4e83a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/export/zoom-barra.png"
+    },
+    {
+      "path": "v2/keys/b-final.jpg",
+      "sizeBytes": 107308,
+      "sha256": "fd834448bd8c0951de011b7eb4d2778813fbde81853e3112825c843bb25b3aee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/b-final.jpg"
+    },
+    {
+      "path": "v2/keys/b-final.png",
+      "sizeBytes": 1249415,
+      "sha256": "07b9ddc337481b871f94551ad5cf58a1db66796c86129c46d8ce36933bed6ed8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/b-final.png"
+    },
+    {
+      "path": "v2/keys/hoja-c.png",
+      "sizeBytes": 521763,
+      "sha256": "fdf1eb4ea3bcac23c2ec476229eb0532a795f3bd288bc56bc1b5d17375dfe44e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/hoja-c.png"
+    },
+    {
+      "path": "v2/keys/hoja-keys.png",
+      "sizeBytes": 978291,
+      "sha256": "e3318dc8eebe3793e3ae019304d4615353c59c48459476763aafcb5895071228",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/hoja-keys.png"
+    },
+    {
+      "path": "v2/keys/k1.jpg",
+      "sizeBytes": 174935,
+      "sha256": "a915cd469c16f016bd1c2a281ab62b3c1fa4b4046c492762efdd7cdcb9086754",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k1.jpg"
+    },
+    {
+      "path": "v2/keys/k1.png",
+      "sizeBytes": 1991072,
+      "sha256": "cac0536e0115505a940ab543277c208084b9b7f8c31e3428055b88a3dd0ae601",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k1.png"
+    },
+    {
+      "path": "v2/keys/k2.jpg",
+      "sizeBytes": 386484,
+      "sha256": "4cbd259d29deeae0befad0d923377675b13ff21bda535acfbc78927a759be4dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k2.jpg"
+    },
+    {
+      "path": "v2/keys/k2.png",
+      "sizeBytes": 2255445,
+      "sha256": "c21b6b794aa5202176a96692f972f5fdcf0aab8d61fd928d50891401eb3a75a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k2.png"
+    },
+    {
+      "path": "v2/keys/k3.jpg",
+      "sizeBytes": 150023,
+      "sha256": "29d30c1e55b8a3f7c3b7ceb071c1a44741e60c9180de83957b5db9a3ca8b3281",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k3.jpg"
+    },
+    {
+      "path": "v2/keys/k3.png",
+      "sizeBytes": 1752697,
+      "sha256": "ad9fb2c03ab6997c2a01c9470349df10fc1a8e632960a95a344f7fd495a20a89",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k3.png"
+    },
+    {
+      "path": "v2/keys/k4.jpg",
+      "sizeBytes": 137757,
+      "sha256": "5c1f81d15a123715b6e3731bf922eeb969d7ab20b675e5031e59983a3a029a3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k4.jpg"
+    },
+    {
+      "path": "v2/keys/k4.png",
+      "sizeBytes": 1802774,
+      "sha256": "7b2f992fc3eddf57ed01340f7aef47518cdf92f658f268ea66d3fe01458d2af7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/keys/k4.png"
+    },
+    {
+      "path": "v2/video/hoja.png",
+      "sizeBytes": 1056473,
+      "sha256": "8c731fac29ce9e7cb53a8fefd131355322b520986906248f5f86a55f6f48c17e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/hoja.png"
+    },
+    {
+      "path": "v2/video/hojaA.png",
+      "sizeBytes": 517914,
+      "sha256": "5673708b6857028d631031c5491a0ce1bfdf1fd8746d6dee66a6e4a66570e417",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/hojaA.png"
+    },
+    {
+      "path": "v2/video/hojaA916.png",
+      "sizeBytes": 541198,
+      "sha256": "6ed5e49b93a323a29ecc3521c530c1e313d13553416e2d39c07e51f096a86743",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/hojaA916.png"
+    },
+    {
+      "path": "v2/video/hojaB.png",
+      "sizeBytes": 538798,
+      "sha256": "648a400442895fcce178e2f30ad60df58e80aa8abe452ca6261882989e4ac24b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/hojaB.png"
+    },
+    {
+      "path": "v2/video/tomaA-916.mp4",
+      "sizeBytes": 5809955,
+      "sha256": "7cec2dc1335ed392c71c2cfe2bc1e4fddffccc7fca22d33a0197a685f42ef722",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/tomaA-916.mp4"
+    },
+    {
+      "path": "v2/video/tomaA.mp4",
+      "sizeBytes": 6891852,
+      "sha256": "f7b0e28e6feca99445f83403428c9b557d75b92c47e66e1c33aff8d58dd86553",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/tomaA.mp4"
+    },
+    {
+      "path": "v2/video/tomaB.mp4",
+      "sizeBytes": 4623631,
+      "sha256": "847f59f49197ef36f15d7f63c9b60cd594c82fb80fc4c2bf7e0bc8efc05144a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/tomaB.mp4"
+    },
+    {
+      "path": "v2/video/tomaC.mp4",
+      "sizeBytes": 4128008,
+      "sha256": "22a5831c7cce6f15bd77b38031232ac13f11d8d1d81881ecbb52baf30b88da90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v2/video/tomaC.mp4"
+    },
+    {
+      "path": "v3/audio/barrido.wav",
+      "sizeBytes": 76878,
+      "sha256": "972c56ddb7450103ea1388009698cffe939767fc748a9d78591e8335e58b8a2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/barrido.wav"
+    },
+    {
+      "path": "v3/audio/bus.wav",
+      "sizeBytes": 2880078,
+      "sha256": "6df72b8bbb9559ab2527f3da9fb36014f9400d73ec4cd782ee3760457969528e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/bus.wav"
+    },
+    {
+      "path": "v3/audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/clic.wav"
+    },
+    {
+      "path": "v3/audio/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/efeonce-sting.wav"
+    },
+    {
+      "path": "v3/audio/golpe1-a.mp3",
+      "sizeBytes": 50187,
+      "sha256": "6f163b3617be487ce198030f60947884d538135ec78b0fbaa240347e7ffdac64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/golpe1-a.mp3"
+    },
+    {
+      "path": "v3/audio/golpe1-b.mp3",
+      "sizeBytes": 34305,
+      "sha256": "8396e97c0f3ef4cb137d1f7e926157dd3b652ad92fdf2181bfbcc2d3f9da4c92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/golpe1-b.mp3"
+    },
+    {
+      "path": "v3/audio/mezcla-master.wav",
+      "sizeBytes": 2880078,
+      "sha256": "c7d835fba9c91b15be18d682ec5de3b44eb992e0a60e2dccbd9686633e88a0ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/mezcla-master.wav"
+    },
+    {
+      "path": "v3/audio/mezcla-pre.wav",
+      "sizeBytes": 2880078,
+      "sha256": "4362f5b35f59df0fce9aefd2f3f1e5b8d918dc7907b89f6a48c3ce0a9a124b85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "v3/audio/musica-b.mp3",
+      "sizeBytes": 354706,
+      "sha256": "c979258c1450ebf5001005f223f5a8edbca2da8d926f3d6882e0b513e4133751",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/musica-b.mp3"
+    },
+    {
+      "path": "v3/audio/riser.wav",
+      "sizeBytes": 144078,
+      "sha256": "9e6e331c18790c9a465383d48e1de75ac15939c6cca03ce933d750c44a480784",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/riser.wav"
+    },
+    {
+      "path": "v3/audio/sub.wav",
+      "sizeBytes": 268878,
+      "sha256": "f8b5ca64b601413d8ccd15d080e6be5503e5d11eb86b0e934a5bc7d6ddb3f7fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/audio/sub.wav"
+    },
+    {
+      "path": "v3/export/efeonce-chatgpt-ads-v3-feed.mp4",
+      "sizeBytes": 7970357,
+      "sha256": "fdbf75c87b492843418b88f30a45b34d322ef522c67db031358bf073725c863d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/export/efeonce-chatgpt-ads-v3-feed.mp4"
+    },
+    {
+      "path": "v3/export/efeonce-chatgpt-ads-v3-story.mp4",
+      "sizeBytes": 10759717,
+      "sha256": "daf8e1e4fc5b9e181aafe1a17fd7688a2a376b71f39267e319aa58d3368092e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/export/efeonce-chatgpt-ads-v3-story.mp4"
+    },
+    {
+      "path": "v3/export/hoja-v3-story.png",
+      "sizeBytes": 886646,
+      "sha256": "d9739a41e71f2a4210d7135796206e57a73f7e15787aa1773da66dce92aa653f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/export/hoja-v3-story.png"
+    },
+    {
+      "path": "v3/export/portada-v3-feed.png",
+      "sizeBytes": 738524,
+      "sha256": "b4bb2b9accef6a987ac597cef56d5426e82c06c07d267a063bb59e0f193046ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/export/portada-v3-feed.png"
+    },
+    {
+      "path": "v3/export/portada-v3-story.png",
+      "sizeBytes": 893119,
+      "sha256": "034d0f0cb698899ed0db9079625dc8196d08556158382bc887aa2a3cb64ace79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v3/export/portada-v3-story.png"
+    },
+    {
+      "path": "v4/audio/barrido.wav",
+      "sizeBytes": 80718,
+      "sha256": "03ab89990a5a4dac9b7952b11ef4cfa2799cb693dd9c0a7aa93d5acc1435f441",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/barrido.wav"
+    },
+    {
+      "path": "v4/audio/bus.wav",
+      "sizeBytes": 2304078,
+      "sha256": "f5f310d8435aa7ce5230b8d132161a394c38796a151e03ea6f8e0a0641d2676f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/bus.wav"
+    },
+    {
+      "path": "v4/audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/clic.wav"
+    },
+    {
+      "path": "v4/audio/efeonce-sting.wav",
+      "sizeBytes": 633702,
+      "sha256": "826ef87b552ce799731f9c6191c6a353ecee4c146b7130ad7214d63614b259ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/efeonce-sting.wav"
+    },
+    {
+      "path": "v4/audio/golpe1-a.mp3",
+      "sizeBytes": 50187,
+      "sha256": "6f163b3617be487ce198030f60947884d538135ec78b0fbaa240347e7ffdac64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/golpe1-a.mp3"
+    },
+    {
+      "path": "v4/audio/golpe1-b.mp3",
+      "sizeBytes": 34305,
+      "sha256": "8396e97c0f3ef4cb137d1f7e926157dd3b652ad92fdf2181bfbcc2d3f9da4c92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/golpe1-b.mp3"
+    },
+    {
+      "path": "v4/audio/kit/cierre-energia.wav",
+      "sizeBytes": 1468902,
+      "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/kit/cierre-energia.wav"
+    },
+    {
+      "path": "v4/audio/kit/pieza-larga-energia.wav",
+      "sizeBytes": 10656102,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/kit/pieza-larga-energia.wav"
+    },
+    {
+      "path": "v4/audio/mezcla-master.wav",
+      "sizeBytes": 2304078,
+      "sha256": "a8a528aff329e19d77f8f9bf3b549f65a8ffaa5987de330f886ba827b0bb3306",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/mezcla-master.wav"
+    },
+    {
+      "path": "v4/audio/mezcla-pre.wav",
+      "sizeBytes": 2304078,
+      "sha256": "0d9a9ca347154e1ab4a0b19eaac565df442359dd81d8e554fea85c48f90a03fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "v4/audio/musica-b.mp3",
+      "sizeBytes": 354706,
+      "sha256": "c979258c1450ebf5001005f223f5a8edbca2da8d926f3d6882e0b513e4133751",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/musica-b.mp3"
+    },
+    {
+      "path": "v4/audio/riser.wav",
+      "sizeBytes": 144078,
+      "sha256": "9e6e331c18790c9a465383d48e1de75ac15939c6cca03ce933d750c44a480784",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/riser.wav"
+    },
+    {
+      "path": "v4/audio/sub.wav",
+      "sizeBytes": 268878,
+      "sha256": "f8b5ca64b601413d8ccd15d080e6be5503e5d11eb86b0e934a5bc7d6ddb3f7fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/audio/sub.wav"
+    },
+    {
+      "path": "v4/export/efeonce-chatgpt-ads-v4-feed.mp4",
+      "sizeBytes": 7046796,
+      "sha256": "81e1645005f9078dd425979f614e89e46cc7c3ca31d17cc73874bdea9d118769",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/export/efeonce-chatgpt-ads-v4-feed.mp4"
+    },
+    {
+      "path": "v4/export/efeonce-chatgpt-ads-v4-story.mp4",
+      "sizeBytes": 8487080,
+      "sha256": "d8f0a11789bdf658597713248979dfe1a3b02a637a778c4880b6c7f585b16569",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/export/efeonce-chatgpt-ads-v4-story.mp4"
+    },
+    {
+      "path": "v4/export/hoja-v4-story.png",
+      "sizeBytes": 839726,
+      "sha256": "8298eec7c40a5b0406c0a1352038ae50e5d270cb710b6b1f979a567c2da2cc5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/export/hoja-v4-story.png"
+    },
+    {
+      "path": "v4/export/portada-v4-feed.png",
+      "sizeBytes": 762338,
+      "sha256": "df5f4b096076f7e467abb8820fe482d56db9ad513967fffb0178028754cdd8e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/export/portada-v4-feed.png"
+    },
+    {
+      "path": "v4/export/portada-v4-story.png",
+      "sizeBytes": 880311,
+      "sha256": "9e600ba25f0fee82bbe54bba5d4cc079411e9cf70ccdb34c0521e471e8f49260",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v4/export/portada-v4-story.png"
+    },
+    {
+      "path": "v5/audio/cierre-energia.wav",
+      "sizeBytes": 1468902,
+      "sha256": "0a64392268471dba6ea3889f0e8c97052f66973117909493831865cb02ceb852",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/cierre-energia.wav"
+    },
+    {
+      "path": "v5/audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/clic.wav"
+    },
+    {
+      "path": "v5/audio/mezcla-master.wav",
+      "sizeBytes": 2304078,
+      "sha256": "25978f2bf44f2bc66d316227e84f352e9555da29fc7b424427a0236c77ebd68d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/mezcla-master.wav"
+    },
+    {
+      "path": "v5/audio/mezcla-pre.wav",
+      "sizeBytes": 2304078,
+      "sha256": "5d9412ee86d7eed446d1324017c41282d889a304f7390c4f7586107fd0dea0a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "v5/audio/pieza-larga-energia.wav",
+      "sizeBytes": 10656102,
+      "sha256": "1b23b0a1801f78290a46ff0243173a8493ad38fd286f13e55ee232cab4a7f4f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/pieza-larga-energia.wav"
+    },
+    {
+      "path": "v5/audio/sub.wav",
+      "sizeBytes": 268878,
+      "sha256": "f8b5ca64b601413d8ccd15d080e6be5503e5d11eb86b0e934a5bc7d6ddb3f7fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/audio/sub.wav"
+    },
+    {
+      "path": "v5/export/efeonce-chatgpt-ads-v5-feed.mp4",
+      "sizeBytes": 6940326,
+      "sha256": "498bc03ee3d05327e7af0aeeaf54301e68a8152abf7c470c1b30661cd5726f2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/export/efeonce-chatgpt-ads-v5-feed.mp4"
+    },
+    {
+      "path": "v5/export/efeonce-chatgpt-ads-v5-story.mp4",
+      "sizeBytes": 8588651,
+      "sha256": "c5fd6b533362a4749acf64f56b99ac13edb6e7ee99f2eff7c62e5198269464c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/export/efeonce-chatgpt-ads-v5-story.mp4"
+    },
+    {
+      "path": "v5/export/portada-v5-feed.png",
+      "sizeBytes": 773034,
+      "sha256": "1f16cfe30d940cf84c7b7ff54441219f1f08d647553bcebc0da20e3e7f985aa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/export/portada-v5-feed.png"
+    },
+    {
+      "path": "v5/export/portada-v5-story.png",
+      "sizeBytes": 909347,
+      "sha256": "da231d19230c935bf7997fcf8e25cec5ecfd46009521a6559050b633dbdccca8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v5/export/portada-v5-story.png"
+    },
+    {
+      "path": "v6/audio/clic.wav",
+      "sizeBytes": 23118,
+      "sha256": "045a12c6f404d9636d36408e0b7606571879953fea1c4aa7480d34d88206937d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/clic.wav"
+    },
+    {
+      "path": "v6/audio/largo-1.mp3",
+      "sizeBytes": 402514,
+      "sha256": "01b09b79be18960e7b5315f6e23f69007585a70064e17d4ce7d30d24f7dd02dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-1.mp3"
+    },
+    {
+      "path": "v6/audio/largo-1.wav",
+      "sizeBytes": 3072078,
+      "sha256": "a9a649fcc765af837461ad7d04e5d962e2f0e872eac12883dd896516ab16f3fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-1.wav"
+    },
+    {
+      "path": "v6/audio/largo-2.mp3",
+      "sizeBytes": 402514,
+      "sha256": "d5276d7cef7b82bfbd1dcc2b74e9f43a24d2e911a52afb09b6282bf8c82a848e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-2.mp3"
+    },
+    {
+      "path": "v6/audio/largo-2.wav",
+      "sizeBytes": 3072078,
+      "sha256": "0547910aa8f886ba8f5e4ca36039c8a9ce48cb8cf7c8e3779cf8b6efa7e50df0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-2.wav"
+    },
+    {
+      "path": "v6/audio/largo-3.mp3",
+      "sizeBytes": 402514,
+      "sha256": "7568d1c5daef1253b6afebd45a2fb602c7588c0b586bc81a874df5c9349d9850",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-3.mp3"
+    },
+    {
+      "path": "v6/audio/largo-3.wav",
+      "sizeBytes": 3072078,
+      "sha256": "ece04c4de9a3118d165c78531e505cb279961a137193d34912c57c35a718bda6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-3.wav"
+    },
+    {
+      "path": "v6/audio/largo-4.mp3",
+      "sizeBytes": 402514,
+      "sha256": "5a26a0e1108310cf9b5aa21b09d872a51d036511f8472473ca715700747fa05c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-4.mp3"
+    },
+    {
+      "path": "v6/audio/largo-4.wav",
+      "sizeBytes": 3072078,
+      "sha256": "e7eba776699623b8dde1a7efb5f0373fb6426bce9fea09ed09cad4b49eefb33b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/largo-4.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-master.wav",
+      "sizeBytes": 2400078,
+      "sha256": "747c01a26e50aa4c6abd1b62d52da1309163570c54bf124d9785fa013f1c96f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-master.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-pre.wav",
+      "sizeBytes": 2400078,
+      "sha256": "7328a4f2fad073cf0aefe5b80f98fe612083ba22b1d5c9b072de2b0f0fde82a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-pre.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-v10-master.wav",
+      "sizeBytes": 2880078,
+      "sha256": "b640c8bbdf58eb1a0e128dc5ef06e5e8f46266cc70ba975e3a0e52d021462e87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v10-master.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-v10-pre.wav",
+      "sizeBytes": 2880078,
+      "sha256": "8943851b52226b1fff9bb146d48da3def86fb8ed24900c752f3a6daeeead328d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v10-pre.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-v25-master.wav",
+      "sizeBytes": 2868558,
+      "sha256": "ca35ba51aa0b6a1beb389766f6d77f91fcaacdfa57c866e22d01f10d7b979373",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v25-master.wav"
+    },
+    {
+      "path": "v6/audio/mezcla-v25-pre.wav",
+      "sizeBytes": 2868558,
+      "sha256": "2ebfb674bbaf74e7689b7e5a343061fc30e4643f5044f3ff4c94fb1f7271432e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla-v25-pre.wav"
+    },
+    {
+      "path": "v6/audio/mezcla15-master.wav",
+      "sizeBytes": 2880078,
+      "sha256": "a0cd411c9242528c2b9bdbe25e97145c3283836c2a2a77e4fd90f49f89382dda",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15-master.wav"
+    },
+    {
+      "path": "v6/audio/mezcla15-pre.wav",
+      "sizeBytes": 2880078,
+      "sha256": "e6df314445debb8172c9b6833c5fec474878e6c778b30da69dba2e0168a17c4a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15-pre.wav"
+    },
+    {
+      "path": "v6/audio/mezcla15n-master.wav",
+      "sizeBytes": 2880078,
+      "sha256": "f20e2d20e17d225facfa18c7e9dc4f2ce811d8d31a9211c71af14f1cc972549b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15n-master.wav"
+    },
+    {
+      "path": "v6/audio/mezcla15n-pre.wav",
+      "sizeBytes": 2880078,
+      "sha256": "ba067b99c3d39d83fcbdb72f0a4cc2556485174628dcd9c8ae6b6d76b423ce54",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/mezcla15n-pre.wav"
+    },
+    {
+      "path": "v6/audio/musica-v10.wav",
+      "sizeBytes": 2889678,
+      "sha256": "ff4c6a338327b4dd2ae8e1ab6fafd8ad8efa472dfde5a0aaec63a16b8be6b009",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/musica-v10.wav"
+    },
+    {
+      "path": "v6/audio/rock-a-sala.wav",
+      "sizeBytes": 2880078,
+      "sha256": "36a13668acfb2c964386ed89d64be03f86c1709e07506676a018aa4c67b9b4ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-a-sala.wav"
+    },
+    {
+      "path": "v6/audio/rock-a.mp3",
+      "sizeBytes": 354706,
+      "sha256": "40b55648b2d312b770113e8b6ca0e3d3b9a45e7437930dd07d83944cbd8a2a45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-a.mp3"
+    },
+    {
+      "path": "v6/audio/rock-a.wav",
+      "sizeBytes": 2688078,
+      "sha256": "a8d39fb050c6bfa207c0fbe3848b5151fc5af4095f9c9be5083bd232c271c467",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-a.wav"
+    },
+    {
+      "path": "v6/audio/rock-b.mp3",
+      "sizeBytes": 354706,
+      "sha256": "9178f2a4f2138abc284a92fb29367505ea9b5b26a1fbf6d09dd7d2924e51d8e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-b.mp3"
+    },
+    {
+      "path": "v6/audio/rock-b.wav",
+      "sizeBytes": 2688078,
+      "sha256": "3b75695d2ed6e588b3c1871a954a29d75a4cf2d346c576cb4194e9518e97dbad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-b.wav"
+    },
+    {
+      "path": "v6/audio/rock-c.mp3",
+      "sizeBytes": 354706,
+      "sha256": "dac7d28d6b17e0fd5f1828842aa5d33f500fb67f78a891d2b200da2e3c2f4c25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-c.mp3"
+    },
+    {
+      "path": "v6/audio/rock-c.wav",
+      "sizeBytes": 2688078,
+      "sha256": "5a62a7ea17ec1f00d11282bdf29fa7353099d7bd86833575696293814505a2b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/rock-c.wav"
+    },
+    {
+      "path": "v6/audio/sala-ir.wav",
+      "sizeBytes": 868878,
+      "sha256": "07e72104101573eb6c0855e2375e7358b2715ec8674573a9e97ff7d49af0d807",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/sala-ir.wav"
+    },
+    {
+      "path": "v6/audio/v25-1.mp3",
+      "sizeBytes": 522322,
+      "sha256": "5ba8eb582457b7f4890b4138aacad54ddf324ba948949af52deae688452d8e09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-1.mp3"
+    },
+    {
+      "path": "v6/audio/v25-1.wav",
+      "sizeBytes": 4032078,
+      "sha256": "d59ba78579fceb8d4932b2915a5dd61ead6c991913dcc00bf8853285fb38fe14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-1.wav"
+    },
+    {
+      "path": "v6/audio/v25-2.mp3",
+      "sizeBytes": 522322,
+      "sha256": "0457fe620b6715f3b2919af836d01f1ecfebe93944324ad3ee3bc92c92f1dcd1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-2.mp3"
+    },
+    {
+      "path": "v6/audio/v25-2.wav",
+      "sizeBytes": 4032078,
+      "sha256": "426e856b3e6cca187b426d663ee3758b11c1e94983ad48f69c2a84b1a52568e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-2.wav"
+    },
+    {
+      "path": "v6/audio/v25-3.mp3",
+      "sizeBytes": 522322,
+      "sha256": "bcac692aedbf993b20b80ae6e2bb2a99a306496c674bf03ef9fd4446d154d595",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-3.mp3"
+    },
+    {
+      "path": "v6/audio/v25-3.wav",
+      "sizeBytes": 4032078,
+      "sha256": "56d249965af7b8e7290b7be316699f5a21949d4f434be2bdad21c5ca9a82a884",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-3.wav"
+    },
+    {
+      "path": "v6/audio/v25-4.mp3",
+      "sizeBytes": 522322,
+      "sha256": "d4e500652862cd2b96dea151d60f1642d88b52d6a54c18f43d32ee0aac632188",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-4.mp3"
+    },
+    {
+      "path": "v6/audio/v25-4.wav",
+      "sizeBytes": 4032078,
+      "sha256": "c6d4ab8228826d47fe940dbbc2d3bdee7b6f57db551eb80a2461a12a1380fb73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/v25-4.wav"
+    },
+    {
+      "path": "v6/audio/wet.wav",
+      "sizeBytes": 960078,
+      "sha256": "a4085f317469ca42a8d822d8d91ce7a9f29851ab4f997cf909a1f96ea3c562e3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/audio/wet.wav"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v10-feed.mp4",
+      "sizeBytes": 7737763,
+      "sha256": "1ffe4444ca55164eb2f99aefbce9d47f32546f14bffea4da6ceacf044fd123d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v10-feed.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v10-story.mp4",
+      "sizeBytes": 9634603,
+      "sha256": "725591a33245529d3ce01315921c2eeb6502f4883d1af1e08727d3525fbda3b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v10-story.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v6-feed.mp4",
+      "sizeBytes": 7062824,
+      "sha256": "13573fc444e44a556f3ad02c9a1687bd70be5077edb97ac5731436914b012409",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v6-feed.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v6-story.mp4",
+      "sizeBytes": 8786542,
+      "sha256": "4e0b86c57cabe125d8c270c2ab4ba7d6e1c90d0f3832ca94f3e7cf0fda567e8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v6-story.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v7-feed.mp4",
+      "sizeBytes": 7779961,
+      "sha256": "7164b7111064d92d28410049438e23569094d557488fc63253df462b68d2dec3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v7-feed.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v7-story.mp4",
+      "sizeBytes": 9674460,
+      "sha256": "ac379a8d513d7562dee442e9be96902da4af798282ee8eb60e466ab1cf6acf66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v7-story.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v8-feed.mp4",
+      "sizeBytes": 7750077,
+      "sha256": "d942c7e86bca0b48d39e07c2ddc614e49b31bcaae00e1259e10a988d52106eba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v8-feed.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v8-story.mp4",
+      "sizeBytes": 9644576,
+      "sha256": "bc8b14f817345998e64fccd0bc4970097a412675a3cd100cbc7c3fc7bf43a4b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v8-story.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v9-feed.mp4",
+      "sizeBytes": 7721439,
+      "sha256": "2b9bcf20d3d46e329414de2b4312cf9b76c10981087681cba91c2773ac8a3331",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v9-feed.mp4"
+    },
+    {
+      "path": "v6/export/efeonce-chatgpt-ads-v9-story.mp4",
+      "sizeBytes": 9618279,
+      "sha256": "0e7bb1dcd7cd7fa51f3bb9b0f81be15fb3c928e7ddbb56fee045f97197d2ebed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/efeonce-chatgpt-ads-v9-story.mp4"
+    },
+    {
+      "path": "v6/export/portada-v10-feed.png",
+      "sizeBytes": 724816,
+      "sha256": "781899dbe2a31ac231936bbee24038193cbc3835e922ddb29d7dbb8e228e5734",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v10-feed.png"
+    },
+    {
+      "path": "v6/export/portada-v10-story.png",
+      "sizeBytes": 858188,
+      "sha256": "b08500eb7b012a9bd336eb23fa8ed7041da2e5a93f0dcfd33bf28527c0757c77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v10-story.png"
+    },
+    {
+      "path": "v6/export/portada-v6-feed.png",
+      "sizeBytes": 725854,
+      "sha256": "9541934d4a2425564ae83b7d57bfc2202eb08e22b727350b6a3d84207b435364",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v6-feed.png"
+    },
+    {
+      "path": "v6/export/portada-v6-story.png",
+      "sizeBytes": 875486,
+      "sha256": "19a8e31476113414c3e043eb0959b346303fbe84c9edf4ba5a236b3b3765bcbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v6-story.png"
+    },
+    {
+      "path": "v6/export/portada-v7-feed.png",
+      "sizeBytes": 724816,
+      "sha256": "781899dbe2a31ac231936bbee24038193cbc3835e922ddb29d7dbb8e228e5734",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v7-feed.png"
+    },
+    {
+      "path": "v6/export/portada-v7-story.png",
+      "sizeBytes": 858188,
+      "sha256": "b08500eb7b012a9bd336eb23fa8ed7041da2e5a93f0dcfd33bf28527c0757c77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v7-story.png"
+    },
+    {
+      "path": "v6/export/portada-v9-feed.png",
+      "sizeBytes": 724816,
+      "sha256": "781899dbe2a31ac231936bbee24038193cbc3835e922ddb29d7dbb8e228e5734",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v9-feed.png"
+    },
+    {
+      "path": "v6/export/portada-v9-story.png",
+      "sizeBytes": 858188,
+      "sha256": "b08500eb7b012a9bd336eb23fa8ed7041da2e5a93f0dcfd33bf28527c0757c77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-21_chatgpt-ads/v6/export/portada-v9-story.png"
+    }
+  ]
+}

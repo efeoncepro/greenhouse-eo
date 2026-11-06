@@ -1,0 +1,101 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:52:56.152Z",
+  "run": "ai-generations/2026-11-02_berel-umbral-vivo",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_berel-umbral-vivo",
+  "totalBytes": 5320995,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "analisis-movimiento/1-cocina-lampara.jpg",
+      "sizeBytes": 22844,
+      "sha256": "96ac2e3eee2c07b7846c8aa7fc63ab7fcdae45a8ed1cbcb2d87e93a28ffc39ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/1-cocina-lampara.jpg"
+    },
+    {
+      "path": "analisis-movimiento/2-n20-cubeta.jpg",
+      "sizeBytes": 37114,
+      "sha256": "8afad68dc09e13502a4059875733ec3d5eb841b60a16b334b0bf5ab775ce5423",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/2-n20-cubeta.jpg"
+    },
+    {
+      "path": "analisis-movimiento/3-n31-mesa.jpg",
+      "sizeBytes": 32420,
+      "sha256": "d181d2b3a89691079032d2d572a79001d1ce58892d2b06ae1902e2cd93bc2a22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/3-n31-mesa.jpg"
+    },
+    {
+      "path": "analisis-movimiento/4-n25-mesa-centro.jpg",
+      "sizeBytes": 24719,
+      "sha256": "031a8ef545432b1d21c4f3c5e594088446a6074ad5ff715e58600ec5af1b969f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/4-n25-mesa-centro.jpg"
+    },
+    {
+      "path": "analisis-movimiento/5-n31-alfombra.jpg",
+      "sizeBytes": 30300,
+      "sha256": "fe09b1630a5455d3d10f8a042eb595ccfa7647b4198f0f6e33b40833f1566f92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/5-n31-alfombra.jpg"
+    },
+    {
+      "path": "analisis-movimiento/6-n25-sofa.jpg",
+      "sizeBytes": 16743,
+      "sha256": "396f7e50164b89c24bac05bb87d444fe80fc24b1f6a804cdba601191b5026c0d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/6-n25-sofa.jpg"
+    },
+    {
+      "path": "analisis-movimiento/7-n46-cobija.jpg",
+      "sizeBytes": 31792,
+      "sha256": "e027ec522a1e77019c3b7fd196a8ffc06de54dd97c52dff1ee07c0b3de4f7399",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/7-n46-cobija.jpg"
+    },
+    {
+      "path": "analisis-movimiento/8-nuestro-seedance-escritorio.jpg",
+      "sizeBytes": 27776,
+      "sha256": "3492696002dc2693f7902191ff7dddf90de5aa3d28bfff97ecf855ef1abc809d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/8-nuestro-seedance-escritorio.jpg"
+    },
+    {
+      "path": "analisis-movimiento/9-nuestro-flux-rebote.jpg",
+      "sizeBytes": 32474,
+      "sha256": "c98e0ee9fdab9672b2d6cd230175da746719757fd1c66564c9938f2b5f5697de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/9-nuestro-flux-rebote.jpg"
+    },
+    {
+      "path": "analisis-movimiento/hoja-comparacion.jpg",
+      "sizeBytes": 101361,
+      "sha256": "dd9abaa6d00260742dedf47daccd6c95d0bb892a4ab793154d007256ce821145",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/hoja-comparacion.jpg"
+    },
+    {
+      "path": "analisis-movimiento/hoja-llegadas-A.jpg",
+      "sizeBytes": 108300,
+      "sha256": "511d1baca9a129f01ed10a5122f3fac09c6f709df9f376a3c14b718a844482b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/hoja-llegadas-A.jpg"
+    },
+    {
+      "path": "analisis-movimiento/hoja-llegadas-B.jpg",
+      "sizeBytes": 73384,
+      "sha256": "e6be6952193654945217b572e09060696706bcdb9250b6598d314b14a365dc1b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/hoja-llegadas-B.jpg"
+    },
+    {
+      "path": "analisis-movimiento/hoja-seedance-forma.jpg",
+      "sizeBytes": 103311,
+      "sha256": "e65b97b02c4dea9d6aa76e0d71bd3e77e5f403a846094b698e1f767c6aea7814",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/analisis-movimiento/hoja-seedance-forma.jpg"
+    },
+    {
+      "path": "chip-3-3703T.png",
+      "sizeBytes": 16050,
+      "sha256": "d4caafd2302dabbf83f797099e4113b4e1e7e3d05d2bbc6cd37c0cedf0637c7e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/chip-3-3703T.png"
+    },
+    {
+      "path": "estudio.png",
+      "sizeBytes": 4662407,
+      "sha256": "29afcf8c6a288574ad9cbc9172273566c87474629fc98a673f8319357fac6a22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-umbral-vivo/estudio.png"
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:52:07.918Z",
+  "run": "ai-generations/2026-11-01_berel-espacios",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-01_berel-espacios",
+  "totalBytes": 115565130,
+  "fileCount": 40,
+  "files": [
+    {
+      "path": "cocina-hoja-de-aguacate.png",
+      "sizeBytes": 4675524,
+      "sha256": "b2423e4a35592d912b3492adcae548645e79471144c90b5bff31f4f28c7c9d18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/cocina-hoja-de-aguacate.png"
+    },
+    {
+      "path": "flare-cocina-hoja-de-aguacate.png",
+      "sizeBytes": 4378879,
+      "sha256": "23fc4b26566c96b6a3445f0631ca72bd909d25180f9b77f44bbd8ee8bf99b2a7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/flare-cocina-hoja-de-aguacate.png"
+    },
+    {
+      "path": "flare-recamara-bien-y-de-buenas.png",
+      "sizeBytes": 4807640,
+      "sha256": "1c8f017122b5f45f8480ca93c8c57b12b59fe9e69e4399cc376ffb3a139d8738",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/flare-recamara-bien-y-de-buenas.png"
+    },
+    {
+      "path": "flare-sala-calor-de-hogar.png",
+      "sizeBytes": 4980073,
+      "sha256": "31cbd29665358171f8615885f82d0fd4b7a706c035cab5c0080d6588d7f82966",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/flare-sala-calor-de-hogar.png"
+    },
+    {
+      "path": "recamara-bien-y-de-buenas.png",
+      "sizeBytes": 5193143,
+      "sha256": "c8d418e659e337d114f7b2320c2675b363aec8bf08a2eaa1bcfb2ef60163f81f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/recamara-bien-y-de-buenas.png"
+    },
+    {
+      "path": "registro-alto/chip-1-3404D.png",
+      "sizeBytes": 16049,
+      "sha256": "c09568add26570c9bc2efda05ff6d26d4bccb9a18560ed8d83764ac1f710c7c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-alto/chip-1-3404D.png"
+    },
+    {
+      "path": "registro-alto/sunburst-recamara-alto.png",
+      "sizeBytes": 4937923,
+      "sha256": "9e3d960b3369e4dde861266aacc0c10d07ecdca413349ee8b62e40d3935f5df6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-alto/sunburst-recamara-alto.png"
+    },
+    {
+      "path": "registro-medio/chip-1-3404D.png",
+      "sizeBytes": 16049,
+      "sha256": "c09568add26570c9bc2efda05ff6d26d4bccb9a18560ed8d83764ac1f710c7c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/chip-1-3404D.png"
+    },
+    {
+      "path": "registro-medio/chip-321N.png",
+      "sizeBytes": 16049,
+      "sha256": "94b13c719617e10b76db7550ae71c2efb9efb834f9e8859981ab4f118f979415",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/chip-321N.png"
+    },
+    {
+      "path": "registro-medio/edit-flare-sala.png",
+      "sizeBytes": 5043072,
+      "sha256": "7c248e82d42ccc088498c0de6fec7d4d3ba52ef3107fb91448e15f05e9435388",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/edit-flare-sala.png"
+    },
+    {
+      "path": "registro-medio/edit-sunburst-sala.png",
+      "sizeBytes": 4905674,
+      "sha256": "d490ebb4afa91866faf6af7806614922fd1cbd8fb6fbd26747cc1b1ce4f6e2c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/edit-sunburst-sala.png"
+    },
+    {
+      "path": "registro-medio/flare-recamara-medio-casa.png",
+      "sizeBytes": 4492156,
+      "sha256": "02e72170aa613d8b4dd4dc707942e98d1954152beca0712632bcf7855f95a964",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/flare-recamara-medio-casa.png"
+    },
+    {
+      "path": "registro-medio/flare-recamara-medio-depto.png",
+      "sizeBytes": 4357712,
+      "sha256": "f6818e12290eaa6cf5a17589dba0899b1f5b6f7edb6cc8b507bc16b7f3bed16b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/flare-recamara-medio-depto.png"
+    },
+    {
+      "path": "registro-medio/ref-flare-recamara-medio.png",
+      "sizeBytes": 4282239,
+      "sha256": "ef16d35b057073e5ff30df49623cee5ca9590001ab5536929e6d1ebb2572fb5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/ref-flare-recamara-medio.png"
+    },
+    {
+      "path": "registro-medio/ref-sunburst-recamara-medio.png",
+      "sizeBytes": 4548210,
+      "sha256": "909c2d12b446c260c09f85f7c4c8919f4e5680f85a1588b9734808411d017070",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/registro-medio/ref-sunburst-recamara-medio.png"
+    },
+    {
+      "path": "ronda-2/bano.png",
+      "sizeBytes": 3997116,
+      "sha256": "ed6871e810be2efb9b9f148b8eb077c52f2335028421a4c37013fe50a06dd81e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/bano.png"
+    },
+    {
+      "path": "ronda-2/chip-1-3605D.png",
+      "sizeBytes": 16049,
+      "sha256": "15999a91e5fa09f47cd9d2f5ea78d9d3e4482b53bf422eac97343a594f7660ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-1-3605D.png"
+    },
+    {
+      "path": "ronda-2/chip-2-1403T.png",
+      "sizeBytes": 16048,
+      "sha256": "5d8988eb548e7a3bab2c5fd2b66b94c7599b3ee748dbf540d7c66c9ccdfc1ec4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-2-1403T.png"
+    },
+    {
+      "path": "ronda-2/chip-3-1307P.png",
+      "sizeBytes": 16050,
+      "sha256": "bf504fd6ba1dc6dc54e1999435a581a1c58ac0d635f457a6ac5ba8ee5baa54e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-3-1307P.png"
+    },
+    {
+      "path": "ronda-2/chip-4-1105D.png",
+      "sizeBytes": 16049,
+      "sha256": "500bda8a2e1308d5414fd19d50732596b77277a2960f2b48a344d7cb653b96ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-4-1105D.png"
+    },
+    {
+      "path": "ronda-2/chip-4-2802P.png",
+      "sizeBytes": 16050,
+      "sha256": "5e61af207219a70b3f8d7d236128d51c549c2f61e58becb774f5e75990438872",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-4-2802P.png"
+    },
+    {
+      "path": "ronda-2/chip-432N.png",
+      "sizeBytes": 16050,
+      "sha256": "3824ae12f241d746c911443bad685844470cd2cab69ff71e6fc62bf017dfe14e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/chip-432N.png"
+    },
+    {
+      "path": "ronda-2/comedor.png",
+      "sizeBytes": 5190949,
+      "sha256": "0c7a11b1433a6db6d30b86d8d4837e3c5cf3ab92e059ca47209e4c084b406b12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/comedor.png"
+    },
+    {
+      "path": "ronda-2/estudio.png",
+      "sizeBytes": 4906447,
+      "sha256": "851d913112c69987163006f79eef7092fef585d00c1c25a5184d4b2eeac70ff6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/estudio.png"
+    },
+    {
+      "path": "ronda-2/fachada.png",
+      "sizeBytes": 4842063,
+      "sha256": "058e5885c2eb1684a3d7cd874fab1bd3f8b06cf9cfe3447f5f468d86bebb3bea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/fachada.png"
+    },
+    {
+      "path": "ronda-2/infantil.png",
+      "sizeBytes": 4415167,
+      "sha256": "c85ec78f30641166e04303e06ffaa8c7953f07aa11b83564f613ef593d9e1638",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/infantil.png"
+    },
+    {
+      "path": "ronda-2/terraza.png",
+      "sizeBytes": 4931833,
+      "sha256": "2c4352f8f83ece5b90ffa6227d7138acc0bdf71118942180a272b427f3f39027",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/terraza.png"
+    },
+    {
+      "path": "ronda-2/v2/bano.png",
+      "sizeBytes": 4440531,
+      "sha256": "c9ca233a84f264cbc2626dedfb7c675999f88a1a6141adac9ffb3cf12cbf844a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/bano.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-1-3605D.png",
+      "sizeBytes": 16049,
+      "sha256": "15999a91e5fa09f47cd9d2f5ea78d9d3e4482b53bf422eac97343a594f7660ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-1-3605D.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-2-1403T.png",
+      "sizeBytes": 16048,
+      "sha256": "5d8988eb548e7a3bab2c5fd2b66b94c7599b3ee748dbf540d7c66c9ccdfc1ec4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-2-1403T.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-3-1307P.png",
+      "sizeBytes": 16050,
+      "sha256": "bf504fd6ba1dc6dc54e1999435a581a1c58ac0d635f457a6ac5ba8ee5baa54e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-3-1307P.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-4-1105D.png",
+      "sizeBytes": 16049,
+      "sha256": "500bda8a2e1308d5414fd19d50732596b77277a2960f2b48a344d7cb653b96ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-4-1105D.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-4-2802P.png",
+      "sizeBytes": 16050,
+      "sha256": "5e61af207219a70b3f8d7d236128d51c549c2f61e58becb774f5e75990438872",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-4-2802P.png"
+    },
+    {
+      "path": "ronda-2/v2/chip-432N.png",
+      "sizeBytes": 16050,
+      "sha256": "3824ae12f241d746c911443bad685844470cd2cab69ff71e6fc62bf017dfe14e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/chip-432N.png"
+    },
+    {
+      "path": "ronda-2/v2/comedor.png",
+      "sizeBytes": 5029851,
+      "sha256": "76d12c60e199549eb727493dd076e89c25503bd2cc33551911a42639a54b7a92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/comedor.png"
+    },
+    {
+      "path": "ronda-2/v2/fachada.png",
+      "sizeBytes": 6052663,
+      "sha256": "fc3a176811ed7b78a623c741d0f3795e0e3569fdb55e9d63c2ae14d210c26f7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/fachada.png"
+    },
+    {
+      "path": "ronda-2/v2/infantil.png",
+      "sizeBytes": 4763241,
+      "sha256": "30b56f6b1a1b55331686df2aecf0cd2f99bb1a93d4b1e7337715133a37e62d5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v2/infantil.png"
+    },
+    {
+      "path": "ronda-2/v3/chip-1-3605D.png",
+      "sizeBytes": 16049,
+      "sha256": "15999a91e5fa09f47cd9d2f5ea78d9d3e4482b53bf422eac97343a594f7660ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v3/chip-1-3605D.png"
+    },
+    {
+      "path": "ronda-2/v3/terraza.png",
+      "sizeBytes": 5035102,
+      "sha256": "91deeb3db1156eb1005672cfd11b1f302cff579f46eeb11e4ad1df26ae42306b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/ronda-2/v3/terraza.png"
+    },
+    {
+      "path": "sala-calor-de-hogar.png",
+      "sizeBytes": 5101134,
+      "sha256": "f39074e84acc10791f91e55e277e021cb9b1c920e47a9d18376d96b1adee84b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-01_berel-espacios/sala-calor-de-hogar.png"
+    }
+  ]
+}

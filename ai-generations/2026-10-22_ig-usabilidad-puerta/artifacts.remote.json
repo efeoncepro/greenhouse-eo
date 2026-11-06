@@ -1,0 +1,131 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:45:06.859Z",
+  "run": "ai-generations/2026-10-22_ig-usabilidad-puerta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_ig-usabilidad-puerta",
+  "totalBytes": 30120553,
+  "fileCount": 20,
+  "files": [
+    {
+      "path": "acabado/U2-compuesto.png",
+      "sizeBytes": 1684512,
+      "sha256": "f5cd52a544761db05c1c44b2c5df7054a5eecbb1292180de31a17eca9b005ca9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/acabado/U2-compuesto.png"
+    },
+    {
+      "path": "acabado/U2-edicion.png",
+      "sizeBytes": 1207433,
+      "sha256": "fb4fcd1cbe6f00ebf53c1af5c10d6c44de77d60ff97c0cbeb8888531244f9a42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/acabado/U2-edicion.png"
+    },
+    {
+      "path": "acabado/U2-recorte.png",
+      "sizeBytes": 1786038,
+      "sha256": "7b8955b644aa485b40024cef3e0da331e146e33d3c09f676723dbefd75cde42d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/acabado/U2-recorte.png"
+    },
+    {
+      "path": "out/preview-390/u1-usabilidad-45.png",
+      "sizeBytes": 320251,
+      "sha256": "cef103558d89a37e039e9e59ec893c38186219de91e82eeaf43dd58bee156a74",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/preview-390/u1-usabilidad-45.png"
+    },
+    {
+      "path": "out/preview-390/u2-usabilidad-45.png",
+      "sizeBytes": 275862,
+      "sha256": "68aab2f5d3805a712968158304a904cba7b06a1dbcf04bd1c7308b24acf09ea1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/preview-390/u2-usabilidad-45.png"
+    },
+    {
+      "path": "out/u1-usabilidad-45.png",
+      "sizeBytes": 1907233,
+      "sha256": "4baf525fec42ddfc760fdc8e294f781111ba0fb60f2640476dfada9620355873",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u1-usabilidad-45.png"
+    },
+    {
+      "path": "out/u2-usabilidad-45.png",
+      "sizeBytes": 1740871,
+      "sha256": "fe1c1222d0718303809ea2baa3a13e5a4f55f62a5ed1b7e9fcef12c1906872b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u2-usabilidad-45.png"
+    },
+    {
+      "path": "out/u3-usabilidad-45.png",
+      "sizeBytes": 1095740,
+      "sha256": "ecd15c3778b89ff48e31f006891ec0fb296a8c93a991199b05bccb1cd27a3700",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u3-usabilidad-45.png"
+    },
+    {
+      "path": "out/u4-usabilidad-45.png",
+      "sizeBytes": 1105158,
+      "sha256": "3825d2dcb121d99382b0b18a0dd43823e2aac2fc05ebfc6df5715d1d455b1c20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u4-usabilidad-45.png"
+    },
+    {
+      "path": "out/u5-usabilidad-45.png",
+      "sizeBytes": 1104799,
+      "sha256": "7e02df5f4f268b877cd6eaf6182e4cb24af1212cb0ec00a854782fb78e6e8ce3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u5-usabilidad-45.png"
+    },
+    {
+      "path": "out/u6-usabilidad-45-portada.png",
+      "sizeBytes": 757136,
+      "sha256": "2188ffc4699fe9e570f49adb95cd66be0425845e5223f48f7605646af7533c91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u6-usabilidad-45-portada.png"
+    },
+    {
+      "path": "out/u6-usabilidad-45-video.mp4",
+      "sizeBytes": 1970244,
+      "sha256": "585d2fd6e09c6a75d3d394b03b5a0f3631a4019282a1569329cc666474282194",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/out/u6-usabilidad-45-video.mp4"
+    },
+    {
+      "path": "plates/U1-puerta-45-cartel.png",
+      "sizeBytes": 1923397,
+      "sha256": "d2dd16b3bd414a67ad21bbbed0150bcd2af39c5b1f86ce8bcf5b4ff88f76ec61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/plates/U1-puerta-45-cartel.png"
+    },
+    {
+      "path": "plates/U1-puerta-45.png",
+      "sizeBytes": 1424807,
+      "sha256": "d9f0d3595298e82bb9c09345b7190a877245fe87a4562dfd9aa31f22f9d2fa76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/plates/U1-puerta-45.png"
+    },
+    {
+      "path": "plates/U2-bodegon-45-cartel.png",
+      "sizeBytes": 1741232,
+      "sha256": "69dabf60536ece4b978825c7df48ff3faf0e3fe857051b1ac66798beec6bf815",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/plates/U2-bodegon-45-cartel.png"
+    },
+    {
+      "path": "plates/U2-bodegon-45.png",
+      "sizeBytes": 1481479,
+      "sha256": "b83ba0a194a91ebe79262503a458ef7f27608fbd5edb7121ccb214d47930a5e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/plates/U2-bodegon-45.png"
+    },
+    {
+      "path": "video/prueba-minimax-h3max.mp4",
+      "sizeBytes": 2115133,
+      "sha256": "676d5d7935fa6af082d4dc286f5786c2677b0e413f7d24f39f19d282cadeec90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/video/prueba-minimax-h3max.mp4"
+    },
+    {
+      "path": "video/prueba2-a-mejor.mp4",
+      "sizeBytes": 2167933,
+      "sha256": "cfe18acfd1e6b4913f08c66ac5438abefd3eb2b5cddee91f00a36ec1b044ee5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/video/prueba2-a-mejor.mp4"
+    },
+    {
+      "path": "video/prueba2-a.mp4",
+      "sizeBytes": 2167933,
+      "sha256": "cfe18acfd1e6b4913f08c66ac5438abefd3eb2b5cddee91f00a36ec1b044ee5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/video/prueba2-a.mp4"
+    },
+    {
+      "path": "video/prueba2-b.mp4",
+      "sizeBytes": 2143362,
+      "sha256": "77cf8b0312da2b023bb743b863a8c537bc3d4ca573d38c30e2a941654a45ce5c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-usabilidad-puerta/video/prueba2-b.mp4"
+    }
+  ]
+}

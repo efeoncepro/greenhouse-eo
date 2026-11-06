@@ -1,0 +1,1181 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:25:09.653Z",
+  "run": "ai-generations/2026-10-19_propuesta-gana-programatica",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-19_propuesta-gana-programatica",
+  "totalBytes": 766443113,
+  "fileCount": 195,
+  "files": [
+    {
+      "path": "deck-v1-19/01-portada.png",
+      "sizeBytes": 496896,
+      "sha256": "06e1ee86541393d1e7c954dc776a1d1ce6e7a16cb31fc120321d1de12dc0a83c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/01-portada.png"
+    },
+    {
+      "path": "deck-v1-19/02-agenda.png",
+      "sizeBytes": 935954,
+      "sha256": "4a16eedd409dc026297ddddea8943fefd6aaac3f8b911fe374607e921b77f080",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/02-agenda.png"
+    },
+    {
+      "path": "deck-v1-19/03-necesidad.png",
+      "sizeBytes": 947143,
+      "sha256": "ea2c30054d29f11cd4630745c99b9aee0dcf513d5218d8c7ecd3e27e40540548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/03-necesidad.png"
+    },
+    {
+      "path": "deck-v1-19/04-modelo.png",
+      "sizeBytes": 936894,
+      "sha256": "6459f2aa9de596629de4ccd38ca8266502938783a7a0aa01235185b28ed8fd9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/04-modelo.png"
+    },
+    {
+      "path": "deck-v1-19/05-basis.png",
+      "sizeBytes": 1018011,
+      "sha256": "fac0578ceff7ead02ea319b57dc812ebb9e8df36fb20131850b8db089678e3fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/05-basis.png"
+    },
+    {
+      "path": "deck-v1-19/06-tecnologia.png",
+      "sizeBytes": 963343,
+      "sha256": "d52caf9b76218ba1dfd8222333c2c0461688565e293bb97517cfc82c9cbd305c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/06-tecnologia.png"
+    },
+    {
+      "path": "deck-v1-19/07-formatos.png",
+      "sizeBytes": 908863,
+      "sha256": "15974d86f839a43b2097255694bbfa469d99671ce1140e9f6843a27cc4d3ddc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/07-formatos.png"
+    },
+    {
+      "path": "deck-v1-19/08-audiencias.png",
+      "sizeBytes": 1584483,
+      "sha256": "03cd8303e3ed4dcea2632d22a447dfb3da41dfec9dcfeebf26ddc047b6fb87a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/08-audiencias.png"
+    },
+    {
+      "path": "deck-v1-19/09-dooh-circuitos.png",
+      "sizeBytes": 1739799,
+      "sha256": "8f72cbd6cd63819da98447afc221eb5af6969102eeb5b5757a911d5487fa7aa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/09-dooh-circuitos.png"
+    },
+    {
+      "path": "deck-v1-19/10-dooh-gana.png",
+      "sizeBytes": 932861,
+      "sha256": "9e56257a20362bdaa04b4e5de13756ef49790e565c537ad68cb5c3a6661f7e41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/10-dooh-gana.png"
+    },
+    {
+      "path": "deck-v1-19/11-calidad.png",
+      "sizeBytes": 656052,
+      "sha256": "32a0e99f6b67f78bd97c4b217a93cdf560cb54fde352198af98b7b4772e8c67c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/11-calidad.png"
+    },
+    {
+      "path": "deck-v1-19/12-plan.png",
+      "sizeBytes": 818931,
+      "sha256": "620e603a9b4f6ae7cf1fed25377504e6015b15fcf52328192645306fa53f3477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/12-plan.png"
+    },
+    {
+      "path": "deck-v1-19/13-entregables.png",
+      "sizeBytes": 1044327,
+      "sha256": "52c1a47b9b599fabf45b9751bcc6649c85ed61fbef82265639a5117365372bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/13-entregables.png"
+    },
+    {
+      "path": "deck-v1-19/14-medicion.png",
+      "sizeBytes": 757585,
+      "sha256": "f49de081c815892ccea214fd4eb953ce0ddecfe0afe940b7f0ec7b17c06556a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/14-medicion.png"
+    },
+    {
+      "path": "deck-v1-19/15-equipo.png",
+      "sizeBytes": 954508,
+      "sha256": "61f888d0d838a0118843e40cec723c3b5c18eb5a8b00e2f333893af91585b613",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/15-equipo.png"
+    },
+    {
+      "path": "deck-v1-19/16-escenarios.png",
+      "sizeBytes": 938330,
+      "sha256": "483cdb80a516825f6d14ae384c3e6beb5b6e12c9828ad63a0d85732dd4c6be48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/16-escenarios.png"
+    },
+    {
+      "path": "deck-v1-19/17-economica.png",
+      "sizeBytes": 874608,
+      "sha256": "d8177926074719162fb28f1d17c61ef24b05f18ee5ef2cbe7015df4309c1e625",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/17-economica.png"
+    },
+    {
+      "path": "deck-v1-19/18-cumplimiento.png",
+      "sizeBytes": 844307,
+      "sha256": "27bc2db7613bcd9693052d742291573b80cc5af8553988c1e9038ddf3984f2c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/18-cumplimiento.png"
+    },
+    {
+      "path": "deck-v1-19/19-contraportada.png",
+      "sizeBytes": 1156092,
+      "sha256": "e875b4cac6e02258d4e021ec0f481aadc7b7a27eea84ff21ea5046bb35981ece",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v1-19/19-contraportada.png"
+    },
+    {
+      "path": "deck-v2-25/01-portada.png",
+      "sizeBytes": 496896,
+      "sha256": "06e1ee86541393d1e7c954dc776a1d1ce6e7a16cb31fc120321d1de12dc0a83c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/01-portada.png"
+    },
+    {
+      "path": "deck-v2-25/02-agenda.png",
+      "sizeBytes": 935954,
+      "sha256": "4a16eedd409dc026297ddddea8943fefd6aaac3f8b911fe374607e921b77f080",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/02-agenda.png"
+    },
+    {
+      "path": "deck-v2-25/03-necesidad.png",
+      "sizeBytes": 947143,
+      "sha256": "ea2c30054d29f11cd4630745c99b9aee0dcf513d5218d8c7ecd3e27e40540548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/03-necesidad.png"
+    },
+    {
+      "path": "deck-v2-25/04-modelo.png",
+      "sizeBytes": 936894,
+      "sha256": "6459f2aa9de596629de4ccd38ca8266502938783a7a0aa01235185b28ed8fd9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/04-modelo.png"
+    },
+    {
+      "path": "deck-v2-25/05-basis.png",
+      "sizeBytes": 1018011,
+      "sha256": "fac0578ceff7ead02ea319b57dc812ebb9e8df36fb20131850b8db089678e3fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/05-basis.png"
+    },
+    {
+      "path": "deck-v2-25/06-ventajas.png",
+      "sizeBytes": 1013124,
+      "sha256": "714ec251e8f29919e7528607733611b8bcd2d807f885d2da5b0b1f9fb140eff2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/06-ventajas.png"
+    },
+    {
+      "path": "deck-v2-25/07-clientes-basis.png",
+      "sizeBytes": 1012103,
+      "sha256": "f07521b0f981a1fe7f3d8e401f237593b525dfddb4d46761ed7622975d5347f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/07-clientes-basis.png"
+    },
+    {
+      "path": "deck-v2-25/08-tecnologia.png",
+      "sizeBytes": 963343,
+      "sha256": "d52caf9b76218ba1dfd8222333c2c0461688565e293bb97517cfc82c9cbd305c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/08-tecnologia.png"
+    },
+    {
+      "path": "deck-v2-25/09-integraciones.png",
+      "sizeBytes": 1009283,
+      "sha256": "5191aecda8db783360f19ad760f9e5f9ddf44606b7b797ab31bde782c43d0c2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/09-integraciones.png"
+    },
+    {
+      "path": "deck-v2-25/10-formatos.png",
+      "sizeBytes": 908863,
+      "sha256": "15974d86f839a43b2097255694bbfa469d99671ce1140e9f6843a27cc4d3ddc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/10-formatos.png"
+    },
+    {
+      "path": "deck-v2-25/11-audiencias.png",
+      "sizeBytes": 1584483,
+      "sha256": "03cd8303e3ed4dcea2632d22a447dfb3da41dfec9dcfeebf26ddc047b6fb87a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/11-audiencias.png"
+    },
+    {
+      "path": "deck-v2-25/12-dooh-circuitos.png",
+      "sizeBytes": 1739799,
+      "sha256": "8f72cbd6cd63819da98447afc221eb5af6969102eeb5b5757a911d5487fa7aa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/12-dooh-circuitos.png"
+    },
+    {
+      "path": "deck-v2-25/13-dooh-gana.png",
+      "sizeBytes": 942890,
+      "sha256": "b36bff46970d052360d1b78d059188e911f3d4006a42e768a075c631e81db69e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/13-dooh-gana.png"
+    },
+    {
+      "path": "deck-v2-25/14-metro-gana.png",
+      "sizeBytes": 1482230,
+      "sha256": "a141c1eff33f07e6cdcc51b75b89bc181f941c7f7f354d2af61c9911bc91b9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/14-metro-gana.png"
+    },
+    {
+      "path": "deck-v2-25/15-mas-ubicaciones.png",
+      "sizeBytes": 1517187,
+      "sha256": "2f1084f4a7ea557560f7817afd000cc24eb1eddd64acddb464d1b5147ad26633",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/15-mas-ubicaciones.png"
+    },
+    {
+      "path": "deck-v2-25/16-calidad.png",
+      "sizeBytes": 656052,
+      "sha256": "32a0e99f6b67f78bd97c4b217a93cdf560cb54fde352198af98b7b4772e8c67c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/16-calidad.png"
+    },
+    {
+      "path": "deck-v2-25/17-plan.png",
+      "sizeBytes": 818931,
+      "sha256": "620e603a9b4f6ae7cf1fed25377504e6015b15fcf52328192645306fa53f3477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/17-plan.png"
+    },
+    {
+      "path": "deck-v2-25/18-entregables.png",
+      "sizeBytes": 1044327,
+      "sha256": "52c1a47b9b599fabf45b9751bcc6649c85ed61fbef82265639a5117365372bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/18-entregables.png"
+    },
+    {
+      "path": "deck-v2-25/19-medicion.png",
+      "sizeBytes": 757585,
+      "sha256": "f49de081c815892ccea214fd4eb953ce0ddecfe0afe940b7f0ec7b17c06556a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/19-medicion.png"
+    },
+    {
+      "path": "deck-v2-25/20-equipo.png",
+      "sizeBytes": 954508,
+      "sha256": "61f888d0d838a0118843e40cec723c3b5c18eb5a8b00e2f333893af91585b613",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/20-equipo.png"
+    },
+    {
+      "path": "deck-v2-25/21-respaldo-basis.png",
+      "sizeBytes": 1040694,
+      "sha256": "10517a2b465f6b5de707a6547b3a4e0ff531087535bacf85426d71aa32077c45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/21-respaldo-basis.png"
+    },
+    {
+      "path": "deck-v2-25/22-escenarios.png",
+      "sizeBytes": 938330,
+      "sha256": "483cdb80a516825f6d14ae384c3e6beb5b6e12c9828ad63a0d85732dd4c6be48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/22-escenarios.png"
+    },
+    {
+      "path": "deck-v2-25/23-economica.png",
+      "sizeBytes": 874608,
+      "sha256": "d8177926074719162fb28f1d17c61ef24b05f18ee5ef2cbe7015df4309c1e625",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/23-economica.png"
+    },
+    {
+      "path": "deck-v2-25/24-cumplimiento.png",
+      "sizeBytes": 848024,
+      "sha256": "84f71a29459529976d5b388baa4c41439651ec8b02f0d792052e281400e719a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/24-cumplimiento.png"
+    },
+    {
+      "path": "deck-v2-25/25-contraportada.png",
+      "sizeBytes": 1156092,
+      "sha256": "e875b4cac6e02258d4e021ec0f481aadc7b7a27eea84ff21ea5046bb35981ece",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck-v2-25/25-contraportada.png"
+    },
+    {
+      "path": "deck/01-portada.png",
+      "sizeBytes": 496896,
+      "sha256": "06e1ee86541393d1e7c954dc776a1d1ce6e7a16cb31fc120321d1de12dc0a83c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/01-portada.png"
+    },
+    {
+      "path": "deck/02-agenda.png",
+      "sizeBytes": 935954,
+      "sha256": "4a16eedd409dc026297ddddea8943fefd6aaac3f8b911fe374607e921b77f080",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/02-agenda.png"
+    },
+    {
+      "path": "deck/03-necesidad.png",
+      "sizeBytes": 947143,
+      "sha256": "ea2c30054d29f11cd4630745c99b9aee0dcf513d5218d8c7ecd3e27e40540548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/03-necesidad.png"
+    },
+    {
+      "path": "deck/04-modelo.png",
+      "sizeBytes": 935825,
+      "sha256": "cb928728c5f8f1cd4a5665945424b6b74d49ff5749fd62d11f86526e89e9ad6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/04-modelo.png"
+    },
+    {
+      "path": "deck/05-basis.png",
+      "sizeBytes": 1018011,
+      "sha256": "fac0578ceff7ead02ea319b57dc812ebb9e8df36fb20131850b8db089678e3fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/05-basis.png"
+    },
+    {
+      "path": "deck/06-ventajas.png",
+      "sizeBytes": 1009173,
+      "sha256": "20c5291ddef9b69650c8aa765cf58b4ca65c78096247257aa2a5f3e2ae1d5492",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/06-ventajas.png"
+    },
+    {
+      "path": "deck/07-clientes-basis.png",
+      "sizeBytes": 1008278,
+      "sha256": "bfa7e9db9100cb330daf9233891fffe41261171a4b246e272495471f29978cdf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/07-clientes-basis.png"
+    },
+    {
+      "path": "deck/08-tecnologia.png",
+      "sizeBytes": 963343,
+      "sha256": "d52caf9b76218ba1dfd8222333c2c0461688565e293bb97517cfc82c9cbd305c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/08-tecnologia.png"
+    },
+    {
+      "path": "deck/09-integraciones.png",
+      "sizeBytes": 1009283,
+      "sha256": "5191aecda8db783360f19ad760f9e5f9ddf44606b7b797ab31bde782c43d0c2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/09-integraciones.png"
+    },
+    {
+      "path": "deck/10-formatos.png",
+      "sizeBytes": 908863,
+      "sha256": "15974d86f839a43b2097255694bbfa469d99671ce1140e9f6843a27cc4d3ddc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/10-formatos.png"
+    },
+    {
+      "path": "deck/11-display-mobile.png",
+      "sizeBytes": 1005668,
+      "sha256": "da2401d43f36839e26fd9912306741d48b24c34db14d4ad81b2e5bbd572c1ea6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/11-display-mobile.png"
+    },
+    {
+      "path": "deck/12-video-ctv.png",
+      "sizeBytes": 964046,
+      "sha256": "6f66521ca14a00267cc498110b15ed310bd0bd6b09d5a2b8d49d642d5fe38db6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/12-video-ctv.png"
+    },
+    {
+      "path": "deck/13-audio-native.png",
+      "sizeBytes": 998436,
+      "sha256": "f3de4a74c98f376c25fabc2192b4a03347746485383f2b7e3bb1b78ea2183beb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/13-audio-native.png"
+    },
+    {
+      "path": "deck/14-audiencias.png",
+      "sizeBytes": 1584483,
+      "sha256": "03cd8303e3ed4dcea2632d22a447dfb3da41dfec9dcfeebf26ddc047b6fb87a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/14-audiencias.png"
+    },
+    {
+      "path": "deck/15-dooh-circuitos.png",
+      "sizeBytes": 1739799,
+      "sha256": "8f72cbd6cd63819da98447afc221eb5af6969102eeb5b5757a911d5487fa7aa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/15-dooh-circuitos.png"
+    },
+    {
+      "path": "deck/16-dooh-gana.png",
+      "sizeBytes": 942890,
+      "sha256": "b36bff46970d052360d1b78d059188e911f3d4006a42e768a075c631e81db69e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/16-dooh-gana.png"
+    },
+    {
+      "path": "deck/17-metro-gana.png",
+      "sizeBytes": 1482230,
+      "sha256": "a141c1eff33f07e6cdcc51b75b89bc181f941c7f7f354d2af61c9911bc91b9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/17-metro-gana.png"
+    },
+    {
+      "path": "deck/18-mas-ubicaciones.png",
+      "sizeBytes": 1517187,
+      "sha256": "2f1084f4a7ea557560f7817afd000cc24eb1eddd64acddb464d1b5147ad26633",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/18-mas-ubicaciones.png"
+    },
+    {
+      "path": "deck/19-calidad.png",
+      "sizeBytes": 656052,
+      "sha256": "32a0e99f6b67f78bd97c4b217a93cdf560cb54fde352198af98b7b4772e8c67c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/19-calidad.png"
+    },
+    {
+      "path": "deck/20-plan.png",
+      "sizeBytes": 818931,
+      "sha256": "620e603a9b4f6ae7cf1fed25377504e6015b15fcf52328192645306fa53f3477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/20-plan.png"
+    },
+    {
+      "path": "deck/21-entregables.png",
+      "sizeBytes": 1044327,
+      "sha256": "52c1a47b9b599fabf45b9751bcc6649c85ed61fbef82265639a5117365372bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/21-entregables.png"
+    },
+    {
+      "path": "deck/22-medicion.png",
+      "sizeBytes": 757585,
+      "sha256": "f49de081c815892ccea214fd4eb953ce0ddecfe0afe940b7f0ec7b17c06556a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/22-medicion.png"
+    },
+    {
+      "path": "deck/23-equipo.png",
+      "sizeBytes": 964486,
+      "sha256": "4a777df6d51084548008ecf34fca589ceb806e76713dcf83ed3636efe07667ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/23-equipo.png"
+    },
+    {
+      "path": "deck/24-respaldo-basis.png",
+      "sizeBytes": 1040694,
+      "sha256": "10517a2b465f6b5de707a6547b3a4e0ff531087535bacf85426d71aa32077c45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/24-respaldo-basis.png"
+    },
+    {
+      "path": "deck/25-escenarios.png",
+      "sizeBytes": 938330,
+      "sha256": "483cdb80a516825f6d14ae384c3e6beb5b6e12c9828ad63a0d85732dd4c6be48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/25-escenarios.png"
+    },
+    {
+      "path": "deck/26-economica.png",
+      "sizeBytes": 894387,
+      "sha256": "743e6c69ca18236b2ea28a3fc41bc59f1a0dd0839e6a2fb02d8e518cf14bd22c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/26-economica.png"
+    },
+    {
+      "path": "deck/27-cumplimiento.png",
+      "sizeBytes": 848536,
+      "sha256": "b8b394e55f1f3d9cf6a728b5a5018b5df78f261240ac94ff5f7a3fd75f35490e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/27-cumplimiento.png"
+    },
+    {
+      "path": "deck/28-contraportada.png",
+      "sizeBytes": 1156092,
+      "sha256": "e875b4cac6e02258d4e021ec0f481aadc7b7a27eea84ff21ea5046bb35981ece",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/deck/28-contraportada.png"
+    },
+    {
+      "path": "laminas/02-agenda.png",
+      "sizeBytes": 935954,
+      "sha256": "4a16eedd409dc026297ddddea8943fefd6aaac3f8b911fe374607e921b77f080",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/02-agenda.png"
+    },
+    {
+      "path": "laminas/03-necesidad.png",
+      "sizeBytes": 947143,
+      "sha256": "ea2c30054d29f11cd4630745c99b9aee0dcf513d5218d8c7ecd3e27e40540548",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/03-necesidad.png"
+    },
+    {
+      "path": "laminas/04-modelo.png",
+      "sizeBytes": 935825,
+      "sha256": "cb928728c5f8f1cd4a5665945424b6b74d49ff5749fd62d11f86526e89e9ad6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/04-modelo.png"
+    },
+    {
+      "path": "laminas/05-basis.png",
+      "sizeBytes": 1018011,
+      "sha256": "fac0578ceff7ead02ea319b57dc812ebb9e8df36fb20131850b8db089678e3fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/05-basis.png"
+    },
+    {
+      "path": "laminas/06-ventajas.png",
+      "sizeBytes": 1009173,
+      "sha256": "20c5291ddef9b69650c8aa765cf58b4ca65c78096247257aa2a5f3e2ae1d5492",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/06-ventajas.png"
+    },
+    {
+      "path": "laminas/07-clientes-basis.png",
+      "sizeBytes": 1008278,
+      "sha256": "bfa7e9db9100cb330daf9233891fffe41261171a4b246e272495471f29978cdf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/07-clientes-basis.png"
+    },
+    {
+      "path": "laminas/09-integraciones.png",
+      "sizeBytes": 1009283,
+      "sha256": "5191aecda8db783360f19ad760f9e5f9ddf44606b7b797ab31bde782c43d0c2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/09-integraciones.png"
+    },
+    {
+      "path": "laminas/10-dooh-gana.png",
+      "sizeBytes": 942890,
+      "sha256": "b36bff46970d052360d1b78d059188e911f3d4006a42e768a075c631e81db69e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/10-dooh-gana.png"
+    },
+    {
+      "path": "laminas/10b-display-mobile.png",
+      "sizeBytes": 1005668,
+      "sha256": "da2401d43f36839e26fd9912306741d48b24c34db14d4ad81b2e5bbd572c1ea6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/10b-display-mobile.png"
+    },
+    {
+      "path": "laminas/10c-video-ctv.png",
+      "sizeBytes": 964046,
+      "sha256": "6f66521ca14a00267cc498110b15ed310bd0bd6b09d5a2b8d49d642d5fe38db6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/10c-video-ctv.png"
+    },
+    {
+      "path": "laminas/10d-audio-native.png",
+      "sizeBytes": 998436,
+      "sha256": "f3de4a74c98f376c25fabc2192b4a03347746485383f2b7e3bb1b78ea2183beb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/10d-audio-native.png"
+    },
+    {
+      "path": "laminas/13-entregables.png",
+      "sizeBytes": 1044327,
+      "sha256": "52c1a47b9b599fabf45b9751bcc6649c85ed61fbef82265639a5117365372bb2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/13-entregables.png"
+    },
+    {
+      "path": "laminas/14-metro-gana.png",
+      "sizeBytes": 1482230,
+      "sha256": "a141c1eff33f07e6cdcc51b75b89bc181f941c7f7f354d2af61c9911bc91b9e1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/14-metro-gana.png"
+    },
+    {
+      "path": "laminas/14c-mas-ubicaciones.png",
+      "sizeBytes": 1517187,
+      "sha256": "2f1084f4a7ea557560f7817afd000cc24eb1eddd64acddb464d1b5147ad26633",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/14c-mas-ubicaciones.png"
+    },
+    {
+      "path": "laminas/15-equipo.png",
+      "sizeBytes": 964486,
+      "sha256": "4a777df6d51084548008ecf34fca589ceb806e76713dcf83ed3636efe07667ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/15-equipo.png"
+    },
+    {
+      "path": "laminas/16-escenarios.png",
+      "sizeBytes": 938330,
+      "sha256": "483cdb80a516825f6d14ae384c3e6beb5b6e12c9828ad63a0d85732dd4c6be48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/16-escenarios.png"
+    },
+    {
+      "path": "laminas/17-economica.png",
+      "sizeBytes": 894387,
+      "sha256": "743e6c69ca18236b2ea28a3fc41bc59f1a0dd0839e6a2fb02d8e518cf14bd22c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/17-economica.png"
+    },
+    {
+      "path": "laminas/18-cumplimiento.png",
+      "sizeBytes": 848536,
+      "sha256": "b8b394e55f1f3d9cf6a728b5a5018b5df78f261240ac94ff5f7a3fd75f35490e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/18-cumplimiento.png"
+    },
+    {
+      "path": "laminas/19-respaldo-basis.png",
+      "sizeBytes": 1040694,
+      "sha256": "10517a2b465f6b5de707a6547b3a4e0ff531087535bacf85426d71aa32077c45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/laminas/19-respaldo-basis.png"
+    },
+    {
+      "path": "logos/basis-clientes/bet-blanco.png",
+      "sizeBytes": 24739,
+      "sha256": "0878e5a2f82a5d4d53c90727aac498f48a1b47898e813fd964549e63dba2ac0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/bet-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/betano-blanco.png",
+      "sizeBytes": 14091,
+      "sha256": "99cc03fb4ee61007f04e2858f8ca0b4e68b364f2a88f5b3b119c6d584e1379dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/betano-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/betfred-blanco.png",
+      "sizeBytes": 5142,
+      "sha256": "3b527867096b8988a8a354b1121958e8f8ac1b2aeda1261cb017ac69f47675d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/betfred-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/betplay-blanco.png",
+      "sizeBytes": 31041,
+      "sha256": "d34c75a46041369c1b6da2e71df0d6e94fa52ce60aada1fdf697b22153277591",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/betplay-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/caliente-blanco.png",
+      "sizeBytes": 37028,
+      "sha256": "94cf3baaa059521634a4211658bed51f593988773b2853d1d0b5b23fa468b897",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/caliente-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/coolbet-blanco.png",
+      "sizeBytes": 49497,
+      "sha256": "f3d03dd64040e4a6041fb83d716501142a18fce1c842daa0039bae66e26c5175",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/coolbet-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image34.png",
+      "sizeBytes": 86305,
+      "sha256": "38b3823c1739cda3e76a3a6d91a35393fc8443ac6fe5fda82bf7a6fb6bd179b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image34.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image35.png",
+      "sizeBytes": 166123,
+      "sha256": "f57c4ddf6b7ea147b188f260798b9a4454897de935b8dd636c336fb631f4ad7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image35.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image36.png",
+      "sizeBytes": 246081,
+      "sha256": "de239ea636996c18ef7012658dbae2821889b9a06dd01fb6f12fae77086acdce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image36.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image37.png",
+      "sizeBytes": 53801,
+      "sha256": "74cbcb92f0660f6778a4f2e7690eb8d289e1162d0856a4962cbbef2d9eae1475",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image37.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image38.png",
+      "sizeBytes": 93343,
+      "sha256": "5a8f15b3da13f3690930dcbf71536c0432a72d50c5d73207b612782709b41f26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image38.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image39.png",
+      "sizeBytes": 70350,
+      "sha256": "91ab01fddbe6bf1390949ebccf73b9abde08e9dfe2436b51a8fdf8d6fa1ae04f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image39.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image40.png",
+      "sizeBytes": 301330,
+      "sha256": "c437967d20171994aeb448e26ca639caaf3970de686379e17e142097d319598a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image40.png"
+    },
+    {
+      "path": "logos/basis-clientes/orig/image41.png",
+      "sizeBytes": 104945,
+      "sha256": "b9b3a97a0ad4e2698b2daa6fe67dd66404f42b7a57df09009ee0134c4c960de5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/orig/image41.png"
+    },
+    {
+      "path": "logos/basis-clientes/rushbet-blanco.png",
+      "sizeBytes": 14724,
+      "sha256": "c9f6a5e6c65a929d01c0f30725a790f2d6ca2f800750a9d23969a49392737d48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/rushbet-blanco.png"
+    },
+    {
+      "path": "logos/basis-clientes/superbet-blanco.png",
+      "sizeBytes": 9441,
+      "sha256": "f57fa12f84ce0103dfdd433ff7ac3ffae3f1e77a42cadd5e2b2143373e7f644d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/logos/basis-clientes/superbet-blanco.png"
+    },
+    {
+      "path": "metro/agua-comp.png",
+      "sizeBytes": 15936456,
+      "sha256": "553f0f8aec9ba9dec7a3a84464eefa2ec6a534736b38dcc82766c4be7b5b12f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/agua-comp.png"
+    },
+    {
+      "path": "metro/agua-final.png",
+      "sizeBytes": 16309897,
+      "sha256": "4b476a9e9fef14713e682e68945cc847055a3de1524ddbdf41aabcdc2bc83158",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/agua-final.png"
+    },
+    {
+      "path": "metro/agua-quadmask.png",
+      "sizeBytes": 30914,
+      "sha256": "3fddb07f230cb38b31df5f85494ba8f149998c25f98ce582276491608a746ab2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/agua-quadmask.png"
+    },
+    {
+      "path": "metro/aguacatala-orig.jpg",
+      "sizeBytes": 1396795,
+      "sha256": "09029ace75f1e583097692579baa32231d33b5a4824d17b8cecf249e9f6d5d58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/aguacatala-orig.jpg"
+    },
+    {
+      "path": "metro/aguacatala.png",
+      "sizeBytes": 16196200,
+      "sha256": "d5a6f96a96c14a843878df92010cc6bc3149fb072c0725065649d7c1617b29a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/aguacatala.png"
+    },
+    {
+      "path": "metro/bello-comp.png",
+      "sizeBytes": 21565691,
+      "sha256": "eee2e76bf2007cb7262b62a6fcf8b7bac3d3cd5682eedf0671f0890884e367f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello-comp.png"
+    },
+    {
+      "path": "metro/bello-final.png",
+      "sizeBytes": 22256913,
+      "sha256": "0a74b4a5590be880c3c13d198a5cd6ebcc62b89463916152ba22915779cee89b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello-final.png"
+    },
+    {
+      "path": "metro/bello-orig.jpg",
+      "sizeBytes": 1907811,
+      "sha256": "9904a73ab00e57ed06df950e85767c686b6162dc6a075899571233a0b174a8fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello-orig.jpg"
+    },
+    {
+      "path": "metro/bello-quadmask.png",
+      "sizeBytes": 34261,
+      "sha256": "07091d0f7bd7cbf94d11a2b02f7bcf2134269518332176306748cd1e9cf58bbc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello-quadmask.png"
+    },
+    {
+      "path": "metro/bello.png",
+      "sizeBytes": 22517891,
+      "sha256": "e69ac6cca5c88bb84a35e5e2ba08cf4ff77e95a0cfc356f3881e21947fcc70d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/bello.png"
+    },
+    {
+      "path": "metro/esc-aguacatala.jpg",
+      "sizeBytes": 273056,
+      "sha256": "1f2a39e2e14aa87df9d19d320b23194df9ed8bc53c688ae5ef043cf00fb0c454",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/esc-aguacatala.jpg"
+    },
+    {
+      "path": "metro/esc-estadio.jpg",
+      "sizeBytes": 305155,
+      "sha256": "fd218b3cf7026a8067f6ef2bc03a8fbea88d29f1c5e877763a31300162c49231",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/esc-estadio.jpg"
+    },
+    {
+      "path": "metro/esc-santafe.jpg",
+      "sizeBytes": 260925,
+      "sha256": "d5f3c719f6b6e83ea513e03ac70da69ad4ecea4c5500a7a9ca75f672976d6a48",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/esc-santafe.jpg"
+    },
+    {
+      "path": "metro/est-comp.png",
+      "sizeBytes": 12859916,
+      "sha256": "df762636e52d4f17df7b0e17305d646a1d00a8674a340a114e504ba1ba3a2206",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-comp.png"
+    },
+    {
+      "path": "metro/est-comp1.png",
+      "sizeBytes": 12858150,
+      "sha256": "7e8370c45071e03436910c2cbbebeb5d031479647b5c61de7c440599465ddd28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-comp1.png"
+    },
+    {
+      "path": "metro/est-final.png",
+      "sizeBytes": 12949715,
+      "sha256": "2ab72facceb659e66b8fb36602ec4d7a9e85f0094552886ed459a0d354dc83a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-final.png"
+    },
+    {
+      "path": "metro/est-mask1.png",
+      "sizeBytes": 25789,
+      "sha256": "cc19ee54ae0637c301233117f108d693af4b64f6e94d1ec879759f91cb9d25b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-mask1.png"
+    },
+    {
+      "path": "metro/est-mask2.png",
+      "sizeBytes": 23710,
+      "sha256": "02e72bac0fe23126cfe17f055549542c4c6de53695628d4e21ea37b4d31c37d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-mask2.png"
+    },
+    {
+      "path": "metro/est-quadmask.png",
+      "sizeBytes": 26081,
+      "sha256": "3bb8e6adf43b932e217849bf73f6f3c5ace427d74d1cad56e4b3eea2febd82cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/est-quadmask.png"
+    },
+    {
+      "path": "metro/estadio-orig.jpg",
+      "sizeBytes": 775040,
+      "sha256": "4bd4ef4cfd5d417f74150e02249c43d97e1928723dd0a664a61c2da411ebd2c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/estadio-orig.jpg"
+    },
+    {
+      "path": "metro/estadio.png",
+      "sizeBytes": 4408753,
+      "sha256": "ea303a58aff153f7cfe0b0ec58aa4be9879fdaf741782049966972a7ec58f7ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/estadio.png"
+    },
+    {
+      "path": "metro/estadio2-orig.jpg",
+      "sizeBytes": 2031182,
+      "sha256": "3fbe10a4a05b9cce45186b27907be7d59336a37b1e6d0aa53fe325529630137a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/estadio2-orig.jpg"
+    },
+    {
+      "path": "metro/estadio2.png",
+      "sizeBytes": 12879961,
+      "sha256": "43953f66290a9a22a95ce03d10c54972de0624a35c57a2d8eeedb12046e4d9b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/estadio2.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1-diff.png",
+      "sizeBytes": 670333,
+      "sha256": "503ded49e10e70856c8daf82b4726d2e0f3689cfa7d3d0b2d7e609ffcfe7262b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1-raw.png",
+      "sizeBytes": 7522258,
+      "sha256": "821e3e2d33547696fa43c162dea459704249e5e0937b27023307e3475f163816",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1.png",
+      "sizeBytes": 14748565,
+      "sha256": "9ada0f2c4af497ccdd17ea34544fa01460a2b58805cd73ab49ed0b9eef4dfea4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/candidate-1.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/mask-preview.png",
+      "sizeBytes": 15772711,
+      "sha256": "56c031aac16ba4f64c25f895cb516ceca38901b038681093e6c49767a6d29a92",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/mask-preview.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/provider-input.png",
+      "sizeBytes": 6741141,
+      "sha256": "26d29b549cd65607173f54a6ed46987e3db72d8cbb5bd60f4bd4c09ac63ca14d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/provider-input.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/provider-mask.png",
+      "sizeBytes": 4663,
+      "sha256": "ead76335e3bc6c2fddb5db4bfccd7394b0b89aa3cd1c61c99f9d36ef25d80b28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/provider-mask.png"
+    },
+    {
+      "path": "metro/fin-agua/inpaint/82a7cbe9d65e/provider-sketch.png",
+      "sizeBytes": 6712441,
+      "sha256": "1afff59ef30b2f4682ba53ce27ce2d34f6c49113fde1ddf6e4bc5ec3c392cec5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-agua/inpaint/82a7cbe9d65e/provider-sketch.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/candidate-1-diff.png",
+      "sizeBytes": 1097836,
+      "sha256": "1edeb336aec9905234f407ccec42e4ddae66983fe84a8d1e34ce60a8de80c1cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/candidate-1-raw.png",
+      "sizeBytes": 8554189,
+      "sha256": "1b513764c959a85e0144441cb893699f2b978c14eee5f9516f37f64ced4acf7a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/candidate-1.png",
+      "sizeBytes": 19476535,
+      "sha256": "36b3ba33c13cb544a5089251571be8fd12f801353d2d2dd62455aac8ce7727c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/candidate-1.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/mask-preview.png",
+      "sizeBytes": 21296932,
+      "sha256": "80a7b3f73b11d08f60c85080820e89bc44a06cae00af0fe420b4f1c27ac98e66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/mask-preview.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/provider-input.png",
+      "sizeBytes": 7627226,
+      "sha256": "21580d7b270237b3b480ca265a65d39150cf8ae4fb97ae60569190fe468cb864",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/provider-input.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/provider-mask.png",
+      "sizeBytes": 4738,
+      "sha256": "72c3e3b145e75175ad20da6c11bf724e9f139ba280ab650cae310da9e30f8ea9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/provider-mask.png"
+    },
+    {
+      "path": "metro/fin-bello/inpaint/49d6eb9efc38/provider-sketch.png",
+      "sizeBytes": 7596472,
+      "sha256": "a4a06e1661beea429522cbedafc18b80afb779e887f0c143c67c0d93eb5173a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-bello/inpaint/49d6eb9efc38/provider-sketch.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/candidate-1-diff.png",
+      "sizeBytes": 229985,
+      "sha256": "e08216ab3fc08ed899590c4b4d8e72e9568e7cca139a0b58095f870a75f6910e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/candidate-1-raw.png",
+      "sizeBytes": 7687463,
+      "sha256": "ac9fd6ad0d30cc7430e3aa112a4d4378593be5af08b39604c0f71208baaa874d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/candidate-1.png",
+      "sizeBytes": 11852898,
+      "sha256": "c6baba4cdaac65fd5de59ac977189f707cac085a69dbf4843a00e7838fcd6682",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/candidate-1.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/mask-preview.png",
+      "sizeBytes": 12826908,
+      "sha256": "89c772de41f9fab7be8ac70aad0e42bacab98ef68e2fd92fa4547c1128723400",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/mask-preview.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/provider-input.png",
+      "sizeBytes": 6678338,
+      "sha256": "eaad298abdd0118e955bd8989b59716a1f8bdcf5b22297e951473755251b5828",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/provider-input.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/provider-mask.png",
+      "sizeBytes": 9186,
+      "sha256": "704019e3dcc4e8f4dfdcc9f6a3f4284dadada8da4a413fa407b3d4db0618d220",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/provider-mask.png"
+    },
+    {
+      "path": "metro/fin-est/inpaint/fbb3b3634eca/provider-sketch.png",
+      "sizeBytes": 6660133,
+      "sha256": "c29a2762abf07edb700f11409c5c6c455feb00051bf5337355be8941cc305882",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-est/inpaint/fbb3b3634eca/provider-sketch.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1-diff.png",
+      "sizeBytes": 747060,
+      "sha256": "1015d52bbf2d5f82eb137509099ec8908100b8d5b7c88899909d72430adfb6f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1-raw.png",
+      "sizeBytes": 9649227,
+      "sha256": "759e3b590bd45e83a4281dfc075c205ca0f80cdeab17524f1ee3cd710f56035d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1.png",
+      "sizeBytes": 25893783,
+      "sha256": "17aa07da839145f75b26e9c7862332586668150ec216975ea629885c3bae8d5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/candidate-1.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/mask-preview.png",
+      "sizeBytes": 27295553,
+      "sha256": "22b9a61c8e0a8a3b587f53ffbf6f582587e92a02bd258678f39398790fa0251c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/mask-preview.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/provider-input.png",
+      "sizeBytes": 9335992,
+      "sha256": "27a7554af22048cbf54db83ed7dd5c13d4225148cd04a0e4b5b91e882283a33f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/provider-input.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/provider-mask.png",
+      "sizeBytes": 11541,
+      "sha256": "9a59c61530a70015887734ee7dee277e00d61c4c4c185b7cc3cff031a071d94f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/provider-mask.png"
+    },
+    {
+      "path": "metro/fin-sf/inpaint/99cfcfb20aa8/provider-sketch.png",
+      "sizeBytes": 9313185,
+      "sha256": "2f008f6cc1a1650e35a16775d0f8957d5fab8a365168ba8abf76c5f77b5bbbca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/fin-sf/inpaint/99cfcfb20aa8/provider-sketch.png"
+    },
+    {
+      "path": "metro/gana-agua.png",
+      "sizeBytes": 1174894,
+      "sha256": "dbde7a83722de3539bb281a4e2005cae76a9a3b865ca5a7d8c42c2cfcc7e95c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-agua.png"
+    },
+    {
+      "path": "metro/gana-dooh.png",
+      "sizeBytes": 1301414,
+      "sha256": "52428e6761c6b97b3f7169b1513f9e671d2a6adeda5fa47a40b0b655fa4eab83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-dooh.png"
+    },
+    {
+      "path": "metro/gana-estadio-tira.png",
+      "sizeBytes": 932633,
+      "sha256": "df6f0f7fbfda80937040905d9331210fcf497c13a7fad240743ccb16ea86ace1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-estadio-tira.png"
+    },
+    {
+      "path": "metro/gana-estadio.png",
+      "sizeBytes": 698274,
+      "sha256": "4da283f0baf498d9c677ce3bf8a38a92322de47fc5514e207f39ded3aea49c8d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-estadio.png"
+    },
+    {
+      "path": "metro/gana-marcador.png",
+      "sizeBytes": 815848,
+      "sha256": "9b97c4180a3ee8854c08ec2faffe08dca2cd15639d54decc3129f19c4b2153b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-marcador.png"
+    },
+    {
+      "path": "metro/gana-santafe.png",
+      "sizeBytes": 861033,
+      "sha256": "8d0b4c17f7586ab4888ac0ed75a729485fac786b63c14095bc5dfd8e1db44f70",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/gana-santafe.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1-diff.png",
+      "sizeBytes": 357392,
+      "sha256": "f828c3499631f57b67c368f354e504829935da59e07b58f7e0094e11f36bd8f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1-raw.png",
+      "sizeBytes": 7462472,
+      "sha256": "52344923ddf089f8236afbd1d58b145903b37b07655209f554ca39f1e3e7d706",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1.png",
+      "sizeBytes": 14229961,
+      "sha256": "398f70f393d0fe7fa59b1e0261b75b80c047cdbf16bcc755acb7c92514164ab1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/candidate-1.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/mask-preview.png",
+      "sizeBytes": 16080514,
+      "sha256": "466630b69bef413b8871f64bc7c4afd30b9bca9be88c364b67d65a0e1b3316bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/mask-preview.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/provider-input.png",
+      "sizeBytes": 6807106,
+      "sha256": "f8143f965973141909fce84b5516d14e8bc11d04e091e59737116c9ecdcfa972",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/provider-input.png"
+    },
+    {
+      "path": "metro/inpaint-agua/inpaint/1d1ece260b1f/provider-mask.png",
+      "sizeBytes": 4678,
+      "sha256": "aa655a2b418c15ada9e68b43da5647dad2a804fa6899998cfaf0dd008567417e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint-agua/inpaint/1d1ece260b1f/provider-mask.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/candidate-1-diff.png",
+      "sizeBytes": 579872,
+      "sha256": "fe6f4ae630ade1b0071c37ef0315eb70970ba392782f2dc03f8edfed64443a9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/candidate-1-diff.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/candidate-1-raw.png",
+      "sizeBytes": 8304815,
+      "sha256": "83c9c18573dabbd562abfa96e90cb0ce16db8e4a43c2dd1ef115ffcaa7694a95",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/candidate-1-raw.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/candidate-1.png",
+      "sizeBytes": 18543975,
+      "sha256": "ed4ee2c4e4ad17035335b40b50ed6a965cf0ebae25d83cb85f87a13d8929271f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/candidate-1.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/mask-preview.png",
+      "sizeBytes": 22299159,
+      "sha256": "6cc6fcd148a1186efbf2085e8560d38dd5826cc42af83271b35f743e042b27d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/mask-preview.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/provider-input.png",
+      "sizeBytes": 7860190,
+      "sha256": "58cdecddbc5523776f720ac7ec715a47f670f68ce6aa211ecad9b3904a3d1eba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/provider-input.png"
+    },
+    {
+      "path": "metro/inpaint/inpaint/fa2aff744028/provider-mask.png",
+      "sizeBytes": 5065,
+      "sha256": "3aa44bbe4eb9f3da4e4f4c6076f7d7c5e08b21cc4fa6261cad2092ac64fdf278",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/inpaint/inpaint/fa2aff744028/provider-mask.png"
+    },
+    {
+      "path": "metro/mask-agua-fin.png",
+      "sizeBytes": 192046,
+      "sha256": "eff57ee02eb46c86828914470b3725156cdefbf154dc43e1ccd125007aad7577",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-agua-fin.png"
+    },
+    {
+      "path": "metro/mask-aguacatala.png",
+      "sizeBytes": 191237,
+      "sha256": "4eaa9f39bc947283ea8e4f7fb6dc8f5f4fca07be102666dc0f3a635a5d01a0e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-aguacatala.png"
+    },
+    {
+      "path": "metro/mask-bello-fin.png",
+      "sizeBytes": 214191,
+      "sha256": "12cc425ac2f862be68f2c492dc0aa42a64fe55434f654be93a96bad10dd970e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-bello-fin.png"
+    },
+    {
+      "path": "metro/mask-est-fin.png",
+      "sizeBytes": 167788,
+      "sha256": "f6d87bfb0ef50403f14d045f760a973d76b474942de5be9e0779303db740e774",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-est-fin.png"
+    },
+    {
+      "path": "metro/mask-pantalla.png",
+      "sizeBytes": 213192,
+      "sha256": "29104366b0d2674f25c4a061a0dc05654920f9900e51ebc627e066616840d7b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-pantalla.png"
+    },
+    {
+      "path": "metro/mask-sf-fin.png",
+      "sizeBytes": 231236,
+      "sha256": "18656d10706429f38bbd6ded9cfc2416499490d282fd7847201b900404b338c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/mask-sf-fin.png"
+    },
+    {
+      "path": "metro/metro-bello-gana-1600.jpg",
+      "sizeBytes": 444743,
+      "sha256": "0a9cfdfc3aa298368020e3e1b1ad4c261b5e0dd7a271cacb0e80ad4087569275",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/metro-bello-gana-1600.jpg"
+    },
+    {
+      "path": "metro/metro-bello-gana.png",
+      "sizeBytes": 22256913,
+      "sha256": "0a74b4a5590be880c3c13d198a5cd6ebcc62b89463916152ba22915779cee89b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/metro-bello-gana.png"
+    },
+    {
+      "path": "metro/santafe-orig.jpg",
+      "sizeBytes": 3119965,
+      "sha256": "e61623c61d121f9dcdf78bfb52480acb0db1dbf40d3784af39f4e217840fca98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/santafe-orig.jpg"
+    },
+    {
+      "path": "metro/santafe.png",
+      "sizeBytes": 27776721,
+      "sha256": "7ebab63a06efa3a968c6df94902d0301a92de227af25721ee75121dc773670be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/santafe.png"
+    },
+    {
+      "path": "metro/sf-comp.png",
+      "sizeBytes": 27426969,
+      "sha256": "3f1f133e0fed6999c49bbfe6374aa139c66932d51bb8fdb53b64356f65902e3b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-comp.png"
+    },
+    {
+      "path": "metro/sf-final.png",
+      "sizeBytes": 27771789,
+      "sha256": "ced8dcb272b564f8cb09fe76a7d10bdae09352b259c9b052a4997f0ef509fa1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-final.png"
+    },
+    {
+      "path": "metro/sf-matte.png",
+      "sizeBytes": 63554,
+      "sha256": "19e6453ecd368d7881e9003a08dc7bfd5e48825e3e266572102077e3dfdd3cad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-matte.png"
+    },
+    {
+      "path": "metro/sf-quadmask.png",
+      "sizeBytes": 44451,
+      "sha256": "c7c1879839bf4549ef9dcae79be616d3cbc25542a1619fdaacd89cd24e6936c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-quadmask.png"
+    },
+    {
+      "path": "metro/sf-warp.png",
+      "sizeBytes": 27289029,
+      "sha256": "6fee31402704f79fe771a9a4d2969958f0d2629ede6158b8b2ab480672b14cfd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/metro/sf-warp.png"
+    },
+    {
+      "path": "out/01-portada/01-deck-cover-proposal.png",
+      "sizeBytes": 496896,
+      "sha256": "06e1ee86541393d1e7c954dc776a1d1ce6e7a16cb31fc120321d1de12dc0a83c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/out/01-portada/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/09-plan/01-deck-decision-plan.png",
+      "sizeBytes": 818931,
+      "sha256": "620e603a9b4f6ae7cf1fed25377504e6015b15fcf52328192645306fa53f3477",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/out/09-plan/01-deck-decision-plan.png"
+    },
+    {
+      "path": "out/12-contraportada/01-deck-close-proposal.png",
+      "sizeBytes": 1156092,
+      "sha256": "e875b4cac6e02258d4e021ec0f481aadc7b7a27eea84ff21ea5046bb35981ece",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/out/12-contraportada/01-deck-close-proposal.png"
+    },
+    {
+      "path": "pdf/economica/deck/26-economica.png",
+      "sizeBytes": 894387,
+      "sha256": "743e6c69ca18236b2ea28a3fc41bc59f1a0dd0839e6a2fb02d8e518cf14bd22c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-19_propuesta-gana-programatica/pdf/economica/deck/26-economica.png"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:57:13.205Z",
+  "run": "ai-generations/2026-11-02_sky-blog-linea",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_sky-blog-linea",
+  "totalBytes": 26708414,
+  "fileCount": 2,
+  "files": [
+    {
+      "path": "cusco-portada-maestro-v2.png",
+      "sizeBytes": 12743756,
+      "sha256": "94c7c05723812e8a8d7065a29921f827eef1dc197501eb548f9ab1be0ded6624",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_sky-blog-linea/cusco-portada-maestro-v2.png"
+    },
+    {
+      "path": "cusco-portada-maestro.png",
+      "sizeBytes": 13964658,
+      "sha256": "85b7657adae34219a171d6c78bb6f8bb83e56a9936cd25ff446e02a18878cf6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_sky-blog-linea/cusco-portada-maestro.png"
+    }
+  ]
+}

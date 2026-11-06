@@ -1,0 +1,263 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:51:27.300Z",
+  "run": "ai-generations/2026-10-30_mattis-propuesta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-30_mattis-propuesta",
+  "totalBytes": 57779097,
+  "fileCount": 42,
+  "files": [
+    {
+      "path": "cover/01-deck-cover-proposal.png",
+      "sizeBytes": 555235,
+      "sha256": "a9e889d65c768a4d3e51e045ef9548672a0e51d3d610d09ba4b08e03a3eaabc4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/cover/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "mattis-logo-on-dark-preview-navy.png",
+      "sizeBytes": 90508,
+      "sha256": "02bd2f58621a31c55778c98ad065ce89bf69e93eefc77c2caad2166e59ddcd5a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/mattis-logo-on-dark-preview-navy.png"
+    },
+    {
+      "path": "mattis-logo-on-dark-preview-white.png",
+      "sizeBytes": 28978,
+      "sha256": "c2c37c4a4587b256f188d9a7dcb72e07abb574d2d8ca4e2664d4a696b12a23d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/mattis-logo-on-dark-preview-white.png"
+    },
+    {
+      "path": "mattis-logo-on-dark.png",
+      "sizeBytes": 72001,
+      "sha256": "5000918444f1d0fe14875d67d95cb4df5686af32abcf39421226ee29aa0f2387",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/mattis-logo-on-dark.png"
+    },
+    {
+      "path": "mattis-logo.png",
+      "sizeBytes": 71441,
+      "sha256": "19b64d11aa401371661964196f1670b5e35a7d60427eadff4728e7ee026ce725",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/mattis-logo.png"
+    },
+    {
+      "path": "tempo/renders/01-fachada-atardecer.png",
+      "sizeBytes": 3011855,
+      "sha256": "6b65e85c5169da37fd212189851d80e467692d39148c0d38577967cd96aeb713",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/01-fachada-atardecer.png"
+    },
+    {
+      "path": "tempo/renders/02-aerea-valle.png",
+      "sizeBytes": 3167786,
+      "sha256": "51e1bf2e86c63e77b63a2c7351446beecbe2f74587f63f00b164351d60eb8c60",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/02-aerea-valle.png"
+    },
+    {
+      "path": "tempo/renders/03-lobby.png",
+      "sizeBytes": 2973338,
+      "sha256": "f82ea289b7507e8b3c89fe0246ff3df6acb977b32316365ba0022938fa7ee0f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/03-lobby.png"
+    },
+    {
+      "path": "tempo/renders/04-living-comedor.png",
+      "sizeBytes": 2514038,
+      "sha256": "4f784787d9f5217231053f2c2e6ed0a1af49309a0f0dcd165cf36290da3f3782",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/04-living-comedor.png"
+    },
+    {
+      "path": "tempo/renders/05-cocina.png",
+      "sizeBytes": 2407488,
+      "sha256": "edb91a901fa29d6cc9dcac7d841e4ea094fd2214fb6185e2e56a087122f111ca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/05-cocina.png"
+    },
+    {
+      "path": "tempo/renders/06-dormitorio.png",
+      "sizeBytes": 2742923,
+      "sha256": "e08e802277875a367e7652dc447c9236a85e65b67dcdbe3925eaa806636c6806",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/06-dormitorio.png"
+    },
+    {
+      "path": "tempo/renders/07-balcon-cafe.png",
+      "sizeBytes": 2250247,
+      "sha256": "3c5aee4dcc5bc182a987a87342aeea3af7f67914fc8db84e4d8d8f7cee06b71d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/07-balcon-cafe.png"
+    },
+    {
+      "path": "tempo/renders/08-terraza-piscina.png",
+      "sizeBytes": 2497859,
+      "sha256": "d8504c57a8fa5e98c14fe96e10c5f9641544c6696a5aff61c26f8435c67c003f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/08-terraza-piscina.png"
+    },
+    {
+      "path": "tempo/renders/09-coworking.png",
+      "sizeBytes": 2610279,
+      "sha256": "e83433e0685220033297a0ade13a66f74799e4b35bd99a1c1062852c7acb3317",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/09-coworking.png"
+    },
+    {
+      "path": "tempo/renders/10-gimnasio-zonas.png",
+      "sizeBytes": 2886741,
+      "sha256": "04d741c44973ff8285c2c8c1ff3dd02da25784b82384b70cecc4096d391eaa6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/10-gimnasio-zonas.png"
+    },
+    {
+      "path": "tempo/renders/11-vertical-fachada.png",
+      "sizeBytes": 2675016,
+      "sha256": "c67659a27672acb4a0f34e834c2b766519e412c5aa3f358a8c2d349a1ab03d62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/11-vertical-fachada.png"
+    },
+    {
+      "path": "tempo/renders/12-vertical-balcon.png",
+      "sizeBytes": 2793742,
+      "sha256": "c67061e708b719240cd4194b4da9619e2859d35169a3b006e86e81e87a6575eb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/12-vertical-balcon.png"
+    },
+    {
+      "path": "tempo/renders/13-contrapicado.png",
+      "sizeBytes": 2438206,
+      "sha256": "72e95b39b31fb4a80656b2306c9151ad42df06a831b61743cd0f9def7d40ca26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/13-contrapicado.png"
+    },
+    {
+      "path": "tempo/renders/14-piscina-nado.png",
+      "sizeBytes": 2475142,
+      "sha256": "9abea9fc78400e368db6c39c3555c5dd5608a8c13884e7c08e4c8f4fe1f98c4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/14-piscina-nado.png"
+    },
+    {
+      "path": "tempo/renders/15-detalle-madera.png",
+      "sizeBytes": 2058500,
+      "sha256": "36becc8ff674aa5ea988d5877b38b8ef6b7bc072afcf4d08d8d8a633cbc5d3b1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/15-detalle-madera.png"
+    },
+    {
+      "path": "tempo/renders/16-sala-ventas.png",
+      "sizeBytes": 2353762,
+      "sha256": "ce1c0ac654c5e06a5316d2d08dbf397ac1beed82dee611c71850dad7ce9c2d0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/16-sala-ventas.png"
+    },
+    {
+      "path": "tempo/renders/17-obra-avance.png",
+      "sizeBytes": 2521811,
+      "sha256": "a013092ef68651d563ae8a061152aca0fce333553e81c6b32889d8e34f52f424",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/17-obra-avance.png"
+    },
+    {
+      "path": "tempo/renders/18-dooh-contexto.png",
+      "sizeBytes": 2621091,
+      "sha256": "703c6e3d3223b9e21acf13e2cbbcd75497b012caa57b8e90130aba602b9e36db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/renders/18-dooh-contexto.png"
+    },
+    {
+      "path": "tempo/web/01-fachada-atardecer.jpg",
+      "sizeBytes": 741143,
+      "sha256": "9820735e35c31deb45c918d38828f0449d72a5b3c53c09aba2853be2089b6f87",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/01-fachada-atardecer.jpg"
+    },
+    {
+      "path": "tempo/web/02-aerea-valle.jpg",
+      "sizeBytes": 761649,
+      "sha256": "498eb9f8437fbcc9e812a5a8025678acd491d9c257ff7f4a75556cc6cc3b81b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/02-aerea-valle.jpg"
+    },
+    {
+      "path": "tempo/web/03-lobby.jpg",
+      "sizeBytes": 687022,
+      "sha256": "3f38691b0a7f951b0e63f14c25837a3ad3b38e0d6d52b7416dec588f9739d74d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/03-lobby.jpg"
+    },
+    {
+      "path": "tempo/web/04-living-comedor.jpg",
+      "sizeBytes": 515573,
+      "sha256": "ebbaefb358108028a26551a6919d9373871e5ed77841ccbf1c9f671bde2c3533",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/04-living-comedor.jpg"
+    },
+    {
+      "path": "tempo/web/05-cocina.jpg",
+      "sizeBytes": 473070,
+      "sha256": "e32a810f670746a16bc905590fda57fa78501fc32cf3efbc577cf0370eacde24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/05-cocina.jpg"
+    },
+    {
+      "path": "tempo/web/06-dormitorio.jpg",
+      "sizeBytes": 563309,
+      "sha256": "46e250b750ce7c92dd64e05e0a7fd46e14dd6175c2a581caa3991e637d0cf69f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/06-dormitorio.jpg"
+    },
+    {
+      "path": "tempo/web/07-balcon-cafe.jpg",
+      "sizeBytes": 466248,
+      "sha256": "1984cd47198ca2a17245937b4035c8c7ad6a6189c6969d45cbcb23d611da2775",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/07-balcon-cafe.jpg"
+    },
+    {
+      "path": "tempo/web/08-terraza-piscina.jpg",
+      "sizeBytes": 541854,
+      "sha256": "689f94d9d0c2c2a0355dc0bbcea116dce812e6a339b94481db8c72bf4324672a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/08-terraza-piscina.jpg"
+    },
+    {
+      "path": "tempo/web/09-coworking.jpg",
+      "sizeBytes": 561934,
+      "sha256": "10dc279fca2dc6f86f71820887628d62b4b5fe46680e6862e35197bd74cd1665",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/09-coworking.jpg"
+    },
+    {
+      "path": "tempo/web/10-gimnasio-zonas.jpg",
+      "sizeBytes": 651642,
+      "sha256": "da5fa06ce0da3310d32a59c010f668ca5a834a3a8a1b6d18f28861af9c929381",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/10-gimnasio-zonas.jpg"
+    },
+    {
+      "path": "tempo/web/11-vertical-fachada.jpg",
+      "sizeBytes": 612034,
+      "sha256": "0f44d9db12be854053f6959e5f7cd26674d19582d248c6a9d3c9018f5939f9fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/11-vertical-fachada.jpg"
+    },
+    {
+      "path": "tempo/web/12-vertical-balcon.jpg",
+      "sizeBytes": 648252,
+      "sha256": "b6896d64c3ac8d9a358ebeee3417ee701eaaadda78a8ff4cb3451df6c8b1e406",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/12-vertical-balcon.jpg"
+    },
+    {
+      "path": "tempo/web/13-contrapicado.jpg",
+      "sizeBytes": 509134,
+      "sha256": "02b5cf3a477ef8d0c6e45d8d6585811ad1d7bc8195f0f00bc86c9e3f926962ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/13-contrapicado.jpg"
+    },
+    {
+      "path": "tempo/web/14-piscina-nado.jpg",
+      "sizeBytes": 554827,
+      "sha256": "07f79127d00a0c5c1c2099e2c67ccecca305bfb42e40b3bb2e824d44d36790de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/14-piscina-nado.jpg"
+    },
+    {
+      "path": "tempo/web/15-detalle-madera.jpg",
+      "sizeBytes": 433026,
+      "sha256": "a30dbe059fe4d1753b20c4ba0f36c5a8532fe124582b6b1300f6f76ff317afe0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/15-detalle-madera.jpg"
+    },
+    {
+      "path": "tempo/web/16-sala-ventas.jpg",
+      "sizeBytes": 490594,
+      "sha256": "1332da91aba8d64d6dcbe2c3394400b93c4a6f08e855f087240a4f6ff296f2a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/16-sala-ventas.jpg"
+    },
+    {
+      "path": "tempo/web/17-obra-avance.jpg",
+      "sizeBytes": 555227,
+      "sha256": "b4e6ef6f0597541ab3e816491c12b313ec2b74a779d65c5db4c18003efb15993",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/17-obra-avance.jpg"
+    },
+    {
+      "path": "tempo/web/mattis-logo-negative.png",
+      "sizeBytes": 90382,
+      "sha256": "664fc1639d8b0862a6feb66b77e76eff4c7d11d19097557d0ff462b3735344e2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/mattis-logo-negative.png"
+    },
+    {
+      "path": "tempo/web/mattis-logo-positive.png",
+      "sizeBytes": 104190,
+      "sha256": "7620cbc567d48770cb1ce1ba63b3db81b3b98c4485f421dd2e0ccab6a09549ad",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-30_mattis-propuesta/tempo/web/mattis-logo-positive.png"
+    }
+  ]
+}

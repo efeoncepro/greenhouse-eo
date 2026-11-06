@@ -1,0 +1,101 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:49:24.067Z",
+  "run": "ai-generations/2026-10-25_icp-infografias",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-25_icp-infografias",
+  "totalBytes": 5853727,
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "review/glyphs.png",
+      "sizeBytes": 42374,
+      "sha256": "291f023597d969cbd199511d7f530c7534d49dbe5644d6e6e49920b1092b837c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/glyphs.png"
+    },
+    {
+      "path": "review/hoja-capas.png",
+      "sizeBytes": 920427,
+      "sha256": "45895fd1c265cf626feaba779329ccf1fc037650a2445390702e5375edf746b0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/hoja-capas.png"
+    },
+    {
+      "path": "review/hoja-filtro.png",
+      "sizeBytes": 1042350,
+      "sha256": "f96764e8103d7c53a7eeea088079237e001921d3526bde88b713172d440df9a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/hoja-filtro.png"
+    },
+    {
+      "path": "review/hoja-v2.png",
+      "sizeBytes": 826060,
+      "sha256": "c97de5913eef00486d68b9687809cc283af4497769df86e6a437bf7bb0863de3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/hoja-v2.png"
+    },
+    {
+      "path": "review/hoja-v4.png",
+      "sizeBytes": 826393,
+      "sha256": "8b1609e4539cf7d5bccbeaf57092903755b7bdbe041c647e6d207650256212dc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/hoja-v4.png"
+    },
+    {
+      "path": "review/icp-cuatro-capas-desktop-dark.png",
+      "sizeBytes": 209964,
+      "sha256": "6e7f0b67359ebc712561fe5e567f94f064913bd52e394df2ea6874f40210686a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-cuatro-capas-desktop-dark.png"
+    },
+    {
+      "path": "review/icp-cuatro-capas-desktop-light.png",
+      "sizeBytes": 202165,
+      "sha256": "b813d62656de3055a2098726131a656aeed49c52b7d435bb43dc666eb3b31743",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-cuatro-capas-desktop-light.png"
+    },
+    {
+      "path": "review/icp-cuatro-capas-mobile-dark.png",
+      "sizeBytes": 232133,
+      "sha256": "37c903d9979548d7de265b468fb28c46fec8509a28f76fdf103d21b9c363a496",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-cuatro-capas-mobile-dark.png"
+    },
+    {
+      "path": "review/icp-cuatro-capas-mobile-light.png",
+      "sizeBytes": 221295,
+      "sha256": "1b7d9d248e557113744ce75853102f8072a056edc224d3fca28314a18814b2e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-cuatro-capas-mobile-light.png"
+    },
+    {
+      "path": "review/icp-filtro-de-cuentas-desktop-dark.png",
+      "sizeBytes": 116734,
+      "sha256": "d396b51d2f558514df2267dc6e5fc35c1c945ec48c7155c31e036b1b80036e97",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-filtro-de-cuentas-desktop-dark.png"
+    },
+    {
+      "path": "review/icp-filtro-de-cuentas-desktop-light.png",
+      "sizeBytes": 117598,
+      "sha256": "c1b742acaa77d8d58e2f6b1489cdcf19aa1606938456274b8d55794521676423",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-filtro-de-cuentas-desktop-light.png"
+    },
+    {
+      "path": "review/icp-filtro-de-cuentas-mobile-dark.png",
+      "sizeBytes": 141255,
+      "sha256": "c09ab1ff6c7d63c8ae4c4094c7bf4df32a654c5a9f6535f1c269c798042a824a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-filtro-de-cuentas-mobile-dark.png"
+    },
+    {
+      "path": "review/icp-filtro-de-cuentas-mobile-light.png",
+      "sizeBytes": 142175,
+      "sha256": "65d5339e63bf207262007c0d1b129dabff3321cd236258edbfe0f5ba78ee7d91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/icp-filtro-de-cuentas-mobile-light.png"
+    },
+    {
+      "path": "review/revision-icp-cuatro-capas.png",
+      "sizeBytes": 469852,
+      "sha256": "fc6552fe2cc624f602f39458d2c4113b36dd152ac9ff468091e87e001ca71c6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/revision-icp-cuatro-capas.png"
+    },
+    {
+      "path": "review/revision-icp-filtro-de-cuentas.png",
+      "sizeBytes": 342952,
+      "sha256": "bb2e3126390868097229727d3234877c7feefa48cd7eda19898b419f006a2990",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_icp-infografias/review/revision-icp-filtro-de-cuentas.png"
+    }
+  ]
+}

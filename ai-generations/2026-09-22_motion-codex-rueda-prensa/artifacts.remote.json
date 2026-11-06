@@ -1,6 +1,6 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-01T22:16:09.006Z",
+  "generatedAt": "2026-11-06T12:18:45.799Z",
   "run": "ai-generations/2026-09-22_motion-codex-rueda-prensa",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-09-22_motion-codex-rueda-prensa",

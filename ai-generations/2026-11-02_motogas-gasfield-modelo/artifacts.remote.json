@@ -1,0 +1,371 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:55:06.063Z",
+  "run": "ai-generations/2026-11-02_motogas-gasfield-modelo",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_motogas-gasfield-modelo",
+  "totalBytes": 112714627,
+  "fileCount": 60,
+  "files": [
+    {
+      "path": "base/gasfield-base-frente-v01.png",
+      "sizeBytes": 2542328,
+      "sha256": "bb8e0cfdc3d9c5601e75e88017b1ba55d61be27b5658910b360dd265cfd76fdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/base/gasfield-base-frente-v01.png"
+    },
+    {
+      "path": "base/gasfield-base-tres-cuartos-v01.png",
+      "sizeBytes": 2621538,
+      "sha256": "3f718a2e7d07fab294906f512a1646af40599e468110f7df297119211dac3364",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/base/gasfield-base-tres-cuartos-v01.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-01-frente-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2556851,
+      "sha256": "44b38e48f47efe61d613a8ec1c8c50b1e2d2545baf247a9fc62a27e467ab7149",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-01-frente-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-02-tres-cuartos-pulgar-arriba-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2559569,
+      "sha256": "ee6a23e529e8eb7bd6ba13cfe676a97370fd2b5f000d6e6086127b01e5da8101",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-02-tres-cuartos-pulgar-arriba-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-03-perfil-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2635565,
+      "sha256": "30018654a67a841ee4cb5396a5d325787fdc0a1e4a802fc72a5e687018058698",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-03-perfil-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-04-tres-cuartos-espalda-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2575513,
+      "sha256": "c1757999b56ed3cf4ef9c66544cbe9d6d68234de4f166dc065b88cee39613cc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-04-tres-cuartos-espalda-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-05-espalda-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2604760,
+      "sha256": "234951309cccee9f9dcde52a1a17d733517feac217353a755e54eb82c2b85410",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-05-espalda-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2646762,
+      "sha256": "626a109ab74e6e4fb4b612d8e90bb1a744aad7ddff4abd1a352077c6d7de2987",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-07-llave-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2683259,
+      "sha256": "0989d93fc7cdeeed8e32624dcf12672c7a45b42d12c70f330a47fd18a9da38e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-07-llave-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-08-celebrando-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2618454,
+      "sha256": "4981d5aba854323b4ccfa90355cae7e1d25d2656f95808d4fe5e10ff11b832a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-08-celebrando-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-09-celular-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2645860,
+      "sha256": "35fc27edb87d069258b3c22fcf1eaa7dc3406f04c399c2378939fec32a5faff9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-09-celular-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/fondo-estudio/motogas-gasfield-3d-10-corriendo-1x1-1600x1600-v01-fondo-estudio.png",
+      "sizeBytes": 2668607,
+      "sha256": "8aecc21dc8daa346f5fdfc5b6e91758764a8770a8a82d72407cf15fa3855f923",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/fondo-estudio/motogas-gasfield-3d-10-corriendo-1x1-1600x1600-v01-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/hoja-fondo-estudio.png",
+      "sizeBytes": 2947119,
+      "sha256": "a1d3876a2caff54636834830401285ddae68fb3c614219432cc2e86007d5acf6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/hoja-fondo-estudio.png"
+    },
+    {
+      "path": "entrega/hoja-transparentes-sobre-navy.png",
+      "sizeBytes": 1364201,
+      "sha256": "651861f0dd5b71feed96d307e40b3c56d8df64802f3708b8d774417fb94b000f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/hoja-transparentes-sobre-navy.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-01-frente-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 468958,
+      "sha256": "a9d8ba87caa06dbccc3afe92499b6715984122c84e7c53096bbbd3bf6396e179",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-01-frente-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-02-tres-cuartos-pulgar-arriba-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 457490,
+      "sha256": "d51788bfe5138c1083af10a4c9a84dfa28e508e25063f22be8367fa0268f7dd7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-02-tres-cuartos-pulgar-arriba-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-03-perfil-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 406354,
+      "sha256": "e4a725f9c0ddef31cf98c4b3bbfa8c6ff14482f706bfec8bf786057906b70d6f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-03-perfil-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-04-tres-cuartos-espalda-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 441463,
+      "sha256": "f706912c51d7b712027f5280b2203a8dc95ad3e7c7d83387c8d5ff972e0481cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-04-tres-cuartos-espalda-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-05-espalda-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 486710,
+      "sha256": "595677e7019bde0114a78e0a01821f522e6f1ea2cf81e48683f57bb0265d3f2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-05-espalda-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 476710,
+      "sha256": "29fedaecddfd13c24c168509a262fcb02c28500c0ab65facb1fd14eec9edeb0b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-07-llave-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 506746,
+      "sha256": "65e9950b14385c213d1f93057b22fbd08524e06b17531d3d3c7de87fbb1da3c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-07-llave-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-08-celebrando-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 468024,
+      "sha256": "03e28c00adcc52c94404a574566f8d82292fe9f3f31f9522805144da5f39d1a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-08-celebrando-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-09-celular-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 499823,
+      "sha256": "f7cc73f3f98ca26d25b23353c3533d88fb08c08830950fbaccd35a68868fa670",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-09-celular-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "entrega/transparente/motogas-gasfield-3d-10-corriendo-1x1-1600x1600-v01-transparente.png",
+      "sizeBytes": 507510,
+      "sha256": "2fc9077d50c275646bb122e5387e4e9de681dc9695db69a91dd99557dace966d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/entrega/transparente/motogas-gasfield-3d-10-corriendo-1x1-1600x1600-v01-transparente.png"
+    },
+    {
+      "path": "fuente-recorte/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-gris.png",
+      "sizeBytes": 2205637,
+      "sha256": "d8e789de88672af41e15481a32185a2e6df3a7470e088cb499a6855bec4d3e00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente-recorte/motogas-gasfield-3d-06-confundido-1x1-1600x1600-v01-gris.png"
+    },
+    {
+      "path": "fuente/gasfield-2d-personaje.png",
+      "sizeBytes": 22787,
+      "sha256": "74921d5dcb75bf8e5f805314a70a0feccccb091061c426e51529f352ca99fb12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/gasfield-2d-personaje.png"
+    },
+    {
+      "path": "fuente/gasfield-3d-freepik-talk.png",
+      "sizeBytes": 2993387,
+      "sha256": "67fa1d6161f19be18509f478debf005f0448f1bbb7283da4d8c592ebf8160001",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/gasfield-3d-freepik-talk.png"
+    },
+    {
+      "path": "fuente/gasfield-dedo-arriba.svg.png",
+      "sizeBytes": 222116,
+      "sha256": "f45b5cc64cbb8b5a7a3ae2bd1115832e7996c1358b9646bb765f345507561f59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/gasfield-dedo-arriba.svg.png"
+    },
+    {
+      "path": "fuente/gasfield-desea-05.png",
+      "sizeBytes": 284363,
+      "sha256": "79608d81c0d8e4b42c725e7861f7058c89e8e61140330866760458b7d64e9b80",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/gasfield-desea-05.png"
+    },
+    {
+      "path": "fuente/propuesta-dj01-2d.png",
+      "sizeBytes": 1429213,
+      "sha256": "e90ae38cebc6cccda70756534116fb0b7eba6c8b28592eb0947308cfd08ad3fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/propuesta-dj01-2d.png"
+    },
+    {
+      "path": "fuente/propuesta-dj02-3d.png",
+      "sizeBytes": 1535620,
+      "sha256": "1fc75391caafa1d81693501bee6d887f4a58e67cb4eef722ff5f66562c9869f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/propuesta-dj02-3d.png"
+    },
+    {
+      "path": "fuente/zips/pensamiento/gas_260.jpg",
+      "sizeBytes": 165904,
+      "sha256": "a856712a70fafb4bbeba53d08d2fb97f0a5bd93870b096902b76853f9d68136a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/zips/pensamiento/gas_260.jpg"
+    },
+    {
+      "path": "fuente/zips/vector-mascota-dibujos-animados-personaje-grupo-pensamiento-cilindro-gas.zip",
+      "sizeBytes": 1280678,
+      "sha256": "60082b7f01228fd1819ad7d22cc08959bd6f0f2eb549e0c1ae911781f834a675",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/fuente/zips/vector-mascota-dibujos-animados-personaje-grupo-pensamiento-cilindro-gas.zip"
+    },
+    {
+      "path": "guias/guia-frente-blender.png",
+      "sizeBytes": 2575387,
+      "sha256": "95e68f8e50d02133eae4db2ba1b8edcc3b1fe9831c521814dce57c0022090a88",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/guias/guia-frente-blender.png"
+    },
+    {
+      "path": "guias/guia-perfil-blender.png",
+      "sizeBytes": 2575585,
+      "sha256": "8e99ee113630d48e8a082f86744b5ac5b93971e1e65bd05f4ef7fc111c1cf83f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/guias/guia-perfil-blender.png"
+    },
+    {
+      "path": "guias/guia-perfil-derecho-blender.png",
+      "sizeBytes": 2624724,
+      "sha256": "d6501f6a7fa721c553a908275a2662c49a6a922ae52eecd2ec2527c4d400682b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/guias/guia-perfil-derecho-blender.png"
+    },
+    {
+      "path": "poses/gasfield-pose-01-confundido-v01.png",
+      "sizeBytes": 2703585,
+      "sha256": "d3ec3dfb252d9ff623fa8eef195e3ea0ac335c926719d7ce91e0766d6fc5106d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/poses/gasfield-pose-01-confundido-v01.png"
+    },
+    {
+      "path": "poses/gasfield-pose-02-llave-v01.png",
+      "sizeBytes": 2740659,
+      "sha256": "dc699c93565a387f943f1625b2bab98cd86963d806e923a706febb1cf9595382",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/poses/gasfield-pose-02-llave-v01.png"
+    },
+    {
+      "path": "poses/gasfield-pose-03-celebrando-v01.png",
+      "sizeBytes": 2652693,
+      "sha256": "2f69afb00b3c504ba40b04c74ebeab1d16bdcf33e26075ed89f38b9216b4806d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/poses/gasfield-pose-03-celebrando-v01.png"
+    },
+    {
+      "path": "poses/gasfield-pose-04-celular-v01.png",
+      "sizeBytes": 2681443,
+      "sha256": "e8d51c0dfe50e10618fbb5b2405af3f8644671358d297c336e4f245c85ae15e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/poses/gasfield-pose-04-celular-v01.png"
+    },
+    {
+      "path": "poses/gasfield-pose-05-corriendo-v01.png",
+      "sizeBytes": 2683408,
+      "sha256": "ed4116d892482bbfd494727f8896f4827e3fb8d97b1487a4643a4686fb3faa93",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/poses/gasfield-pose-05-corriendo-v01.png"
+    },
+    {
+      "path": "ref/01-oficial-dj-2d.png",
+      "sizeBytes": 222116,
+      "sha256": "f45b5cc64cbb8b5a7a3ae2bd1115832e7996c1358b9646bb765f345507561f59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/ref/01-oficial-dj-2d.png"
+    },
+    {
+      "path": "ref/02-stock-idea-2d.png",
+      "sizeBytes": 113319,
+      "sha256": "4ffb958c1a6ed0aa49e40a3e5adf1867dc285d58289886f410597d41675423ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/ref/02-stock-idea-2d.png"
+    },
+    {
+      "path": "ref/03-material-3d.png",
+      "sizeBytes": 1148830,
+      "sha256": "dab5b5adb8444a7f59d2ec574fd85c6f5decbdddf626b5a4ff31691721f67b6c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/ref/03-material-3d.png"
+    },
+    {
+      "path": "ref/04-manual-poses-2d.png",
+      "sizeBytes": 220342,
+      "sha256": "97cbbafd335948218e6903efa267b2220249d9e17abd684d7d7ffbabb111881f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/ref/04-manual-poses-2d.png"
+    },
+    {
+      "path": "satinado/gasfield-base-frente-satinado-v01.png",
+      "sizeBytes": 2556851,
+      "sha256": "44b38e48f47efe61d613a8ec1c8c50b1e2d2545baf247a9fc62a27e467ab7149",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-base-frente-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-base-tres-cuartos-satinado-v01.png",
+      "sizeBytes": 2559569,
+      "sha256": "ee6a23e529e8eb7bd6ba13cfe676a97370fd2b5f000d6e6086127b01e5da8101",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-base-tres-cuartos-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-espalda-satinado-v01.png",
+      "sizeBytes": 2604760,
+      "sha256": "234951309cccee9f9dcde52a1a17d733517feac217353a755e54eb82c2b85410",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-espalda-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-perfil-satinado-v03.png",
+      "sizeBytes": 2607949,
+      "sha256": "0b62bae1393ac4db14477387d9fcf88c7c3691ee285ab505d29b875b2a7c6e64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-perfil-satinado-v03.png"
+    },
+    {
+      "path": "satinado/gasfield-perfil-satinado-v04.png",
+      "sizeBytes": 2635565,
+      "sha256": "30018654a67a841ee4cb5396a5d325787fdc0a1e4a802fc72a5e687018058698",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-perfil-satinado-v04.png"
+    },
+    {
+      "path": "satinado/gasfield-pose-01-confundido-satinado-v01.png",
+      "sizeBytes": 2646762,
+      "sha256": "626a109ab74e6e4fb4b612d8e90bb1a744aad7ddff4abd1a352077c6d7de2987",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-pose-01-confundido-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-pose-02-llave-satinado-v01.png",
+      "sizeBytes": 2683259,
+      "sha256": "0989d93fc7cdeeed8e32624dcf12672c7a45b42d12c70f330a47fd18a9da38e7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-pose-02-llave-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-pose-03-celebrando-satinado-v01.png",
+      "sizeBytes": 2618454,
+      "sha256": "4981d5aba854323b4ccfa90355cae7e1d25d2656f95808d4fe5e10ff11b832a8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-pose-03-celebrando-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-pose-04-celular-satinado-v01.png",
+      "sizeBytes": 2645860,
+      "sha256": "35fc27edb87d069258b3c22fcf1eaa7dc3406f04c399c2378939fec32a5faff9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-pose-04-celular-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-pose-05-corriendo-satinado-v01.png",
+      "sizeBytes": 2668607,
+      "sha256": "8aecc21dc8daa346f5fdfc5b6e91758764a8770a8a82d72407cf15fa3855f923",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-pose-05-corriendo-satinado-v01.png"
+    },
+    {
+      "path": "satinado/gasfield-tres-cuartos-espalda-satinado-v01.png",
+      "sizeBytes": 2575513,
+      "sha256": "c1757999b56ed3cf4ef9c66544cbe9d6d68234de4f166dc065b88cee39613cc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/satinado/gasfield-tres-cuartos-espalda-satinado-v01.png"
+    },
+    {
+      "path": "vistas/gasfield-espalda-v01.png",
+      "sizeBytes": 2600659,
+      "sha256": "346150120728430e3cc5c1bc4b6a94b0c0cc55c0c3635b10f7aa39206de490d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/vistas/gasfield-espalda-v01.png"
+    },
+    {
+      "path": "vistas/gasfield-perfil-v01.png",
+      "sizeBytes": 2593042,
+      "sha256": "400e35df3204da9e0f11116a61d46c82ab10ac7ec0d07c5b211a3842bfed87f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/vistas/gasfield-perfil-v01.png"
+    },
+    {
+      "path": "vistas/gasfield-perfil-v02.png",
+      "sizeBytes": 2586583,
+      "sha256": "c3e85b85da86c3f566d041502fb47a1243a4f25586d5dc1c0f4c95ee4ce82ad2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/vistas/gasfield-perfil-v02.png"
+    },
+    {
+      "path": "vistas/gasfield-tres-cuartos-espalda-v01.png",
+      "sizeBytes": 2659224,
+      "sha256": "d1e70ba4e3750a67a693aa7b1fe3cafc97aabf8e17fb175a1bbb14172fec638e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-gasfield-modelo/vistas/gasfield-tres-cuartos-espalda-v01.png"
+    }
+  ]
+}

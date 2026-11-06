@@ -1,0 +1,143 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:52:47.498Z",
+  "run": "ai-generations/2026-11-02_berel-tomas",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_berel-tomas",
+  "totalBytes": 79146627,
+  "fileCount": 22,
+  "files": [
+    {
+      "path": "01-comedor.png",
+      "sizeBytes": 4746254,
+      "sha256": "bebba36aac1890d20af55711f9617873b47a2efb384b02b6597564f7784b78f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/01-comedor.png"
+    },
+    {
+      "path": "02-recamara.png",
+      "sizeBytes": 4371578,
+      "sha256": "9224cf594bafe0681b54809710198e8ac94768ebda765d95043a53fc614ee3c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/02-recamara.png"
+    },
+    {
+      "path": "03-diagnostico.png",
+      "sizeBytes": 4618781,
+      "sha256": "26dec3a9c45f6d18c0388787ea8c91c57e45de0727fbe87a03c587f92adcbd62",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/03-diagnostico.png"
+    },
+    {
+      "path": "04-exterior.png",
+      "sizeBytes": 5607770,
+      "sha256": "004f9aeade755eb53361fb95442934bbd52dc2bdd2c766b8e1045bf6c975944a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/04-exterior.png"
+    },
+    {
+      "path": "05-azotea.png",
+      "sizeBytes": 4535496,
+      "sha256": "fedefabc451894b04d24519a97748a07fa7ee198cdcea756b944659785df05fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/05-azotea.png"
+    },
+    {
+      "path": "06-cenital-v1-rechazada.png",
+      "sizeBytes": 5621724,
+      "sha256": "8bce9d0042218a0c5d9ef3eacede3d383c5249cf8624c58957f4526227e3dd94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/06-cenital-v1-rechazada.png"
+    },
+    {
+      "path": "06-cenital.png",
+      "sizeBytes": 4967157,
+      "sha256": "f6e5dacf04d44d65f49df14f37b831a48049cc6b437bab4d8ece21c2394c35b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/06-cenital.png"
+    },
+    {
+      "path": "07-proceso.png",
+      "sizeBytes": 4373280,
+      "sha256": "4643f2d5740613eac780a32eec70e98a273b9e22a2999cd928b849eba5bbbbf8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/07-proceso.png"
+    },
+    {
+      "path": "08-taller.png",
+      "sizeBytes": 4952939,
+      "sha256": "60db84fdb88abc62c65f7d9929aa2cb6ccb47103c05dceb5bd22a25ba74eceaa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/08-taller.png"
+    },
+    {
+      "path": "09-herreria.png",
+      "sizeBytes": 4996429,
+      "sha256": "48ed3a08a9f63d8565cb79c62f6b9c4713d8c71a2d556afdacb90c63e65344f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/09-herreria.png"
+    },
+    {
+      "path": "10-personas-v1-rechazada.png",
+      "sizeBytes": 4467945,
+      "sha256": "c540d42218725a40e1169b1e2f3fd5d3e97fb8c7a32ac03b07219adbe77c4c03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/10-personas-v1-rechazada.png"
+    },
+    {
+      "path": "10-personas.png",
+      "sizeBytes": 4650021,
+      "sha256": "a443c512351d5653f814858889708742e8c453edebb5b0c8ed2b8b4f19b2faab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/10-personas.png"
+    },
+    {
+      "path": "11-nocturna.png",
+      "sizeBytes": 4450330,
+      "sha256": "b4297ba23c04aa2bf945fdc8b14087857feeb2ace53c484701e47e0fbc791620",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/11-nocturna.png"
+    },
+    {
+      "path": "12-muestra.png",
+      "sizeBytes": 4250982,
+      "sha256": "477f665091067a349dcc74fc6dd0da381b1e903548bb1ee554ada75464abf63c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/12-muestra.png"
+    },
+    {
+      "path": "13-detalle-v1-rechazada.png",
+      "sizeBytes": 3991169,
+      "sha256": "3c4d3c1d0e3e7af00bc0c6dd0a7faeb2f5cd0693ebef4807b35944c558452495",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/13-detalle-v1-rechazada.png"
+    },
+    {
+      "path": "13-detalle.png",
+      "sizeBytes": 3891665,
+      "sha256": "bc16241c1aff73ffffe81303165d9d0cec5bdcba460c89234de40e10273cb879",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/13-detalle.png"
+    },
+    {
+      "path": "14-comedor-producto.png",
+      "sizeBytes": 4630594,
+      "sha256": "f5110ad56e905d491146ba75c85dde9e9e8b5964095f79f8f4a154fbb44c6d0f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/14-comedor-producto.png"
+    },
+    {
+      "path": "chip-1-3404D.png",
+      "sizeBytes": 4502,
+      "sha256": "36da8c438ee4deb86ed4e64c1751768a73ff7005f0c0d93e6b01c70be1590d38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/chip-1-3404D.png"
+    },
+    {
+      "path": "chip-1-3605D.png",
+      "sizeBytes": 4502,
+      "sha256": "144502d2c7dde545697e1667293bbc3f62031621c1f0e6546fa13c1e0b135202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/chip-1-3605D.png"
+    },
+    {
+      "path": "chip-321N.png",
+      "sizeBytes": 4503,
+      "sha256": "cc1b292be8f01e8efe8f9eaa2834ef8ff7f20c50f2ba8c3ea1e1ff45abb42100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/chip-321N.png"
+    },
+    {
+      "path": "chip-4-1105D.png",
+      "sizeBytes": 4502,
+      "sha256": "b84488d4be1c6c5c6c2a9b64d96eacbfd0b2c2adbf29ae52998f36f26b5652f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/chip-4-1105D.png"
+    },
+    {
+      "path": "chip-405N.png",
+      "sizeBytes": 4504,
+      "sha256": "6cfa4fac01bc725b04989e5d70475e7f06fd7b22e81c97f42ab8438243997c65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-tomas/chip-405N.png"
+    }
+  ]
+}

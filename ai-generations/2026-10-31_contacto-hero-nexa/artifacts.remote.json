@@ -1,0 +1,71 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:51:36.642Z",
+  "run": "ai-generations/2026-10-31_contacto-hero-nexa",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-31_contacto-hero-nexa",
+  "totalBytes": 10506058,
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "plates/cara-100.png",
+      "sizeBytes": 372020,
+      "sha256": "7207243dc9d74a83fb86261706363ade759d73c116f66ff30623093bfbaa44c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/cara-100.png"
+    },
+    {
+      "path": "plates/CT1.png",
+      "sizeBytes": 2057204,
+      "sha256": "604413c8556ad656873f3130b28130a2a1214405bacb6fa3f8ede8fadb7b4050",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/CT1.png"
+    },
+    {
+      "path": "plates/CT1b.png",
+      "sizeBytes": 2135931,
+      "sha256": "57e602c84ed9e145db1e02cfb4b3f9a27a3782069234d772f55158111c2b4869",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/CT1b.png"
+    },
+    {
+      "path": "plates/CT1v-r1.png",
+      "sizeBytes": 2154756,
+      "sha256": "a3b5a9001b93ca579b5c99921c70e22be4392c7df73b4b2538f001ae4278b1fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/CT1v-r1.png"
+    },
+    {
+      "path": "plates/CT1v-web.jpg",
+      "sizeBytes": 223212,
+      "sha256": "18d4009441235ed8feb6a0538a418dabb5bf8ce9b61be8b182787e9a2d5e9611",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/CT1v-web.jpg"
+    },
+    {
+      "path": "plates/CT1v.png",
+      "sizeBytes": 2109345,
+      "sha256": "5756ca5d4ce04bb34bccfce9b44ec9c5291453ab165956de16795d54050da4a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/CT1v.png"
+    },
+    {
+      "path": "plates/emblema-300.png",
+      "sizeBytes": 336543,
+      "sha256": "e6855fa0a8a7cfe6bdb8bbabc99f0133556b924a76639ecaabbf0b7cfc19c0cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/emblema-300.png"
+    },
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 96733,
+      "sha256": "ffa063b95e8ec5d77c85e3a7f886c4a37d473fe18f7edf82a7685743f427fe1a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "voz/nexa-liz-eleven-v4-24s.mp3",
+      "sizeBytes": 402109,
+      "sha256": "ddad8cd149ed6eedcee43d4ad140dc9910517c656d9dba6233600891d3174c08",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/voz/nexa-liz-eleven-v4-24s.mp3"
+    },
+    {
+      "path": "voz/nexa-lucia-actual.mp3",
+      "sizeBytes": 618205,
+      "sha256": "a73e5438d8743e6a271679534466b572516f050b5c341a02324afd3fc571764c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_contacto-hero-nexa/voz/nexa-lucia-actual.mp3"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:47:33.477Z",
+  "run": "ai-generations/2026-10-23_partners-landing",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-23_partners-landing",
+  "totalBytes": 12972390,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "plates/PT1-mesa-convergencia/PT1-mesa-convergencia.png",
+      "sizeBytes": 4170742,
+      "sha256": "260077d6cd78bbb4a857409540dff23570cf04412e8d469acc170aab71718dc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/plates/PT1-mesa-convergencia/PT1-mesa-convergencia.png"
+    },
+    {
+      "path": "plates/PT1b/PT1b-mesa-convergencia-sangre.png",
+      "sizeBytes": 4332746,
+      "sha256": "bf3537769fd79053030b82031fef5d372658a81872c95ef6d9cb56e21bc00506",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/plates/PT1b/PT1b-mesa-convergencia-sangre.png"
+    },
+    {
+      "path": "plates/PT2-fibra-conexion/PT2-fibra-conexion.png",
+      "sizeBytes": 4184568,
+      "sha256": "40def1249af2463121cc299fed74b9772c428a0c283605dca4c9086b6f5be8f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/plates/PT2-fibra-conexion/PT2-fibra-conexion.png"
+    },
+    {
+      "path": "web/fibra.webp",
+      "sizeBytes": 92682,
+      "sha256": "847e14f3a8e728ef2b125cfb22cba01ebc40ac04f8eccdc006791248f771d49b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/web/fibra.webp"
+    },
+    {
+      "path": "web/hero-mesa-sangre.webp",
+      "sizeBytes": 105834,
+      "sha256": "5531fb15f217887b5397e555de09e41cd9e04de98ab6b6ed40c5a67ea2aec799",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/web/hero-mesa-sangre.webp"
+    },
+    {
+      "path": "web/hero-mesa.webp",
+      "sizeBytes": 85818,
+      "sha256": "336ab7887e3d6ab11102e517adf50067b576513dc94b4f6fdbe947e2884fa500",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_partners-landing/web/hero-mesa.webp"
+    }
+  ]
+}
