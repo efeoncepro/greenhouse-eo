@@ -1,0 +1,59 @@
+SKY photographic system. Authentic editorial documentary travel photography with people, photographed as part of one continuous SKY travel reportage by the same photographer.
+
+TYPE OF IMAGE
+People photography. The people are the protagonists. The destination, city, airport or travel context supports the human experience but does not overpower it.
+
+CORE PRINCIPLE
+The human travel experience is the main content. The place is context.
+
+SCENE
+A Chilean family of four on a holiday trip in the Atacama Desert near Calama, northern Chile: mother, father, a girl of about nine and a boy of about six, walking together along a sandy trail among the rust-red rock formations of the Valle de la Luna in warm late-afternoon sun, with the snow-capped Licancabur volcano soft and out of focus far behind them. The boy points ahead at something he has just discovered, the mother leans in to look where he points, the father laughs while holding the girl's hand; light casual travel clothes, sun hats, a small backpack; nobody looks at the camera. Vertical 2:3 frame, medium-wide shot from a few metres away: the family is small in the frame, grouped tightly together inside the right third of the image (between 62% and 95% of the width) and entirely inside the lower half, their heads at about 55% of the frame height. The left 60% of the frame and the whole upper half must stay visually quiet for typography: calm open blue sky and the soft distant desert and volcano, with no faces, no people, no landmarks and no large clouds there. A red rock wall rises only behind the family on the right edge. Foreground: a blurred reddish rock edge very close to the lens at the bottom-left corner, partially cropped and strongly out of focus. Eye-level walking perspective, 35 mm lens feeling.
+
+SUBJECT AND STORY
+The image should show a genuine human travel moment: walking, discovering, looking, resting, smiling naturally, waiting, arriving, sharing, or enjoying a destination. The emotional tone must be candid, real and accessible. No posed tourism-advertising energy. No stock-photo behavior.
+
+COMPOSITION
+Observational editorial composition, spontaneous and slightly imperfect. Subject positioned off-center. Natural asymmetry. No rigid centering. No postcard logic.
+
+Mandatory immersive foreground layer in every people photograph. Include at least one environmental or human element extremely close to the lens, partially cropped and strongly out of focus, occupying approximately 10–25% of the frame.
+
+This foreground may be a passing shoulder, hair moving in front of the lens, a blurred head or back, a person crossing close to camera, vegetation, a railing, a wall edge, architecture, a table edge, a textile, or another location-specific element.
+
+The foreground may partially overlap or frame the protagonists, but it must not compete with them. It should make the viewer feel inside the scene. Create layered photographic depth: blurred foreground / readable protagonists / softer atmospheric background. Allow imperfect crops, partial obstructions and casual framing when they add documentary realism.
+
+SKY COMPOSITION RULE
+The sky is a functional and identity-defining element. Whenever appropriate, preserve a generous visible portion of sky. If the image is intended for communication or typography, reserve a quiet text-safe area in the sky or another calm background area.
+
+CAMERA
+Documentary travel photography look. Prefer a 35mm lens feeling for contextual scenes and a 50mm lens feeling for more intimate moments. Approximately f/2 to f/2.8. Natural eye-level, walking-level or observational passenger perspective. Realistic perspective only. No ultra-wide distortion. No fashion shoot or luxury-advertising camera language.
+
+LIGHT
+Natural available light only. Use authentic light according to the real destination and the real time of day. Morning, noon, afternoon, sunset or overcast conditions are all allowed if they remain believable. The light must feel observed, not artificially created.
+
+Exposure should be controlled and slightly restrained. Preserve detail in bright sky, skin and pale surfaces. Gentle highlight roll-off. No clipped whites.
+
+SKY COLOR SYSTEM
+The sky must remain visually consistent across destinations. Use the SKY reference sky family centered around Hue 210°. The sky should appear natural, restrained and believable. Never turquoise. Never teal. Never electric blue. Never oversaturated.
+
+The upper sky may be slightly deeper and more saturated. The horizon should become progressively lighter, softer and less saturated.
+
+CLOUD RULE
+Low cloud presence. Keep approximately 5–15% of the visible sky occupied by clouds. Clouds should be small, soft, natural and preferably peripheral. Avoid dramatic cloud walls, heavy cloud masses or clouds that invade the text-safe area.
+
+TEXT-SAFE RULE
+When the image is intended for communication, preserve approximately 30–40% of the frame as a visually quiet area for typography. Preferably use a calm sky area. Do not allow faces, buildings, trees, landmarks or large clouds to interfere with that space.
+
+COLORIMETRY
+Natural documentary film color with restrained saturation. Warm natural highlights. Neutral midtones. Very subtle olive/cyan bias in cooler shadows, midtones and atmospheric depth. This green-toned separation must remain subtle and embedded in the grading, never as an obvious filter. Vegetation should lean toward natural muted olive/moss greens rather than tropical neon greens. Warm-neutral whites, never sterile digital white.
+
+FILM RESPONSE
+Analog 35mm documentary film response. Fine organic grain. Gentle optical softness. Natural micro-contrast. Soft highlight roll-off. Dense but detailed shadows. Slightly softened blacks, never crushed. Subtle atmospheric haze when appropriate. No glossy finish. No hyper-sharp tourism look. No HDR.
+
+ATMOSPHERE AND HUMANITY
+People should feel natural, spontaneous and emotionally real. Avoid looking directly into the camera unless the scene truly requires it. Avoid stock smiles, posed perfection, fashion styling or luxury travel clichés. The image should feel contemporary, human and trustworthy.
+
+BRAND PRINCIPLE
+The experience shown must feel like real, accessible travel. Aspirational from reality, never aspirational from luxury. The photograph should feel like a real moment found during a trip, not a tourism campaign cliché.
+
+NEGATIVE PROMPT
+stock photo, travel brochure cliché, luxury tourism look, fake smile, posed couple, fashion campaign, rigid composition, postcard framing, no foreground, empty perfect scene, fake sky, sky replacement, heavy clouds, dramatic clouds, turquoise sky, teal sky, electric blue sky, oversaturated color, tropical neon greens, HDR, glossy finish, hyper-sharp digital look, plastic skin, deformed hands, extra fingers, third-party logos

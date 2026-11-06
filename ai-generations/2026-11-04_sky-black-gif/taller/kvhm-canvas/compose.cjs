@@ -5,7 +5,7 @@ const PARTS = __dirname + '/parts/', OUT = __dirname + '/formatos/';
 const SRC = __dirname + '/foto-fuente.png'; // 1672x941, se usa espejada como en el SVG
 const only = process.argv.slice(2);
 // Foto de destino por pieza (destinos.cjs, 2026-11-05): reemplaza a la mujer del kit donde corresponda.
-const { cubrir, credito, velo, DEST } = require(__dirname + '/destinos.cjs');
+const { cubrir, credito, velo, veloListaSvg, DEST } = require(__dirname + '/destinos.cjs');
 // Regla destino ↔ flecha de precio (brecha.cjs): en popup y story el bloque se reescala, así que se vuelve a medir.
 const { BRECHA } = require(__dirname + '/brecha.cjs');
 async function bbox(file) {
@@ -96,6 +96,10 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         } else comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
         const lb = await bbox(P(n, 'lista')), bot = 664;
         const sl = Math.min(1, (bot - top) / lb.h);
+        if (DEST[n] && DEST[n].veloLista) {
+          const ly = Math.round(top + ((bot - top) - lb.h * sl) / 2);
+          comp.push({ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${veloListaSvg([lb.x, ly, lb.x + lb.w * sl, ly + lb.h * sl])}</svg>`), left: 0, top: 0 });
+        }
         comp.push(await place(P(n, 'lista'), sl, lb.x, lb.y, lb.x, Math.round(top + ((bot - top) - lb.h * sl) / 2)));
         comp.push(await place(P(n, 'destino'), s, 62, 1220, 62, PB));
       } else if (n === 'HM_UY_KV_BANDERAS') {

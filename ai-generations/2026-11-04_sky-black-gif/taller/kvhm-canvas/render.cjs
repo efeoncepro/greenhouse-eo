@@ -9,7 +9,7 @@ const ff = Object.entries(W).map(([n, w]) =>
   const b = await chromium.launch();
   for (const f of (process.argv[2] ? process.argv.slice(2) : fs.readdirSync(D).filter((x) => x.endsWith('.svg')))) {
     let svg = fs.readFileSync(D + f, 'utf8').replace(/^<\?xml[^>]*>/, '').replace('<svg ', '<svg width="1080" height="1350" ');
-    svg = require(SP + '/patches.cjs').flecha(svg);
+    svg = require(SP + '/patches.cjs').logoNuevo(require(SP + '/patches.cjs').flecha(svg));
     for (const [a, z] of (require(SP + '/patches.cjs')[f] || [])) { if (!svg.includes(a)) throw new Error(f + ' sin ' + a); svg = svg.replace(a, z); }
     fs.writeFileSync(SP + '/tmp.html', `<!doctype html><meta charset="utf-8"><style>${ff}body{margin:0}svg{display:block}</style>${svg}`);
     const p = await b.newPage({ viewport: { width: 1080, height: 1350 } });

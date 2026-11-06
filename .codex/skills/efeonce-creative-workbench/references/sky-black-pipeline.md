@@ -619,6 +619,42 @@ sin texto («left 2 comments»). Recetas de lectura:
 - **Pendiente fuera del taller:** el contrato de fotos del Workbench (`black-photos.json`) todavía trae la Cajamarca de
   «Vuela por el Perú» y no incluye las fotos nuevas. Se re-admite con `admitir-black.mjs` en un PR aparte.
 
+### 4.12 Décima ronda (2026-11-06): logo BLACK nuevo + ajustes del Frame «V2»; sólo POP-up y GIF
+
+Daniela, en Teams (14:50): «correcciones que aplican a todas las piezas: actualizar el logo del BLACK por el nuevo que
+hay en carpeta». El Frame `https://f.io/5VFzERtY` (share «V2», 10 carpetas) traía los ajustes del lote. En su
+instrucción: **«sólo GIF y popup»**, porque story y story video los exporta ella y así se ahorran recursos. El lote
+son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
+
+- **Logo nuevo** (`Despliegue Base/KV X HM/LOGO BLACK/`, archivos del 2026-11-06: `SKY_LOGO_BLACK_{ESP,BR,USA}.svg`): es
+  el mismo dibujo que arma `logofix.cjs` (fecha nueva y marco retraído), con **el resplandor original del kit**:
+  3,44/0,8 · 6,02/0,7 · 3,35/0,5. `logofix` lo bajaba (× 0,5 y × 0,6) por el pedido de SKY del 2026-11-04. No se
+  vuelve a correr `logofix`: `patches.cjs → P.logoNuevo(svg)` restituye los cinco filtros `(lf-)outer-glow` en
+  `render`, `parts` y `layers`. **Trampas del archivo nuevo:** `ESP` y `BR` son el mismo archivo (eslogan en español y
+  fecha en **portugués**) y el texto viene trazado. Por eso no se monta el archivo: se conserva la fecha viva por
+  idioma de `logofix`.
+- **Lectura del Frame en un share:** los comentarios se leen igual que en §4.11, pero el recorrido corre en segundo
+  plano dentro de la página (`window.__run(...).then(r => window.__R = r)`), porque `javascript_tool` corta a los 45 s.
+
+| Pieza | Cambio | Dónde |
+| --- | --- | --- |
+| USA | Origen «FROM MIAMI»; gradiente radial muy suave detrás de la lista de banderas (KV y popup) | `variantes.cjs` (`origen`, en el lugar), `destinos.cjs → veloListaSvg` + `fotos-destino.json → veloLista`, `compose.cjs` |
+| AR Lima | Origen «DESDE BUENOS AIRES» | `variantes.cjs` |
+| AR Santiago | Popup reencuadrado para que la chica quede arriba del bloque de precio (`f.popup = { z 1,25, t [0,74; 0,33] }`) | `fotos-destino.json` |
+| Chile «Vuela por Chile» | Origen «DESDE SANTIAGO» | `patches.cjs` |
+| Chile internacional | Foto de Punta Cana (banco `PUJ`, ChatGPT 29 sept 08_34_37), la misma en GIF y popup. El comentario del popup decía «Cusco… la misma que uses para el GIF»: se tomó la del GIF | `fotos-destino.json → capa` |
+| Chile «Encuentra destinos» | Familia en Atacama/Calama, **generada** con el maestro SKY Personas (Julio aprobó; la del banco, 16:9, dejaba la lista sobre la familia) | `fotos-destino.json → capa` |
+| «Vuela por el Perú» | Foto de Cusco: viajera frente a Machu Picchu (banco `CUZ`, `sky-chica-vivencial-machu-picchu-4k`), con `sombra` | `fotos-destino.json` |
+| UY, PE internacional, PE «Encuentra destinos» | Aprobadas; sólo cambia el logo | — |
+
+- **Fotos en los clústeres de Chile:** esos SVG son capas raster de Illustrator; la foto es la capa `Raster_1_Imagen-2`
+  (1080×1350). `destinos.cjs` acepta `capa` en `fotos-destino.json`: cambia la imagen de esa capa en su lugar (con su
+  máscara) y agrega el velo del logo encima de su grupo.
+- Orden: `./ronda10.sh` (`variantes` → `destinos` ×9 → `brecha` → `render`/`parts`/`compose` de 12 → `layers`/`recrop`/
+  `anim-css-gen`/`render-gif` de las 10). Sin story video. Entrega con
+  `ORGANIZAR_SOLO='GIF \+ POPUP/(?!VOE).*/BS_(POPUP|GIF)_' node organizar.cjs …`: popup, GIF y GIF con audio de las 10
+  carpetas. Story y story video en OneDrive quedan los de la novena ronda, con el logo anterior: los exporta Daniela.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

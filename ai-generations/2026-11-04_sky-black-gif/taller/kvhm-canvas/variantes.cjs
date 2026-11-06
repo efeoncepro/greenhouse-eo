@@ -25,7 +25,11 @@ const V = {
   // Novena ronda (Daniela, Frame): origen «Buenos Aires» provisorio en Volá a Santiago (popup y GIF); la píldora se
   // alarga hacia la derecha lo que crece el texto, con el mismo aire a cada lado.
   HM_AR_KV_SANTIAGO: { base: 'HM_AR_KV.svg', t: [['VOLÁ', 'VOLÁ A'], ['Internacional', 'Santiago']], origen: 'DESDE BUENOS AIRES' },
-  HM_AR_KV_LIMA: { base: 'HM_AR_KV.svg', t: [['VOLÁ', 'VOLÁ A'], ['Internacional', 'Lima']] },
+  // Décima ronda (Daniela, Frame V2): origen Buenos Aires en «Volá a Lima» (popup y GIF).
+  HM_AR_KV_LIMA: { base: 'HM_AR_KV.svg', t: [['VOLÁ', 'VOLÁ A'], ['Internacional', 'Lima']], origen: 'DESDE BUENOS AIRES' },
+  // Décima ronda (Daniela, Frame V2): origen Miami en «Fly International» (popup y GIF). Edición en el lugar del KV de
+  // banderas (banderas.cjs): idempotente, la segunda pasada no encuentra «FROM [ORIGEN]» y no toca nada.
+  HM_US_KV_BANDERAS: { base: 'HM_US_KV_BANDERAS.svg', t: [], origen: 'FROM MIAMI' },
   HM_BR_KV_SANTIAGO: { base: 'HM_BR_KV.svg', t: [['Internacional', 'Santiago']], alianza: 'chileTravel' },
   HM_BR_KV_PERU: { base: 'HM_BR_KV.svg', t: [['VOE A', 'VOE PARA'], ['Internacional', 'Peru']], alianza: 'promperuFuera' },
   HM_CL_KV_ENCUENTRA: { base: 'HM_CL_KV_INTER_CLUSTER.svg', t: [['VUELA', 'ENCUENTRA'], ['Internacional', 'Destinos']] },
@@ -60,8 +64,8 @@ const V = {
       return de + ' → ' + a;
     }), cfg.t);
     if (cfg.origen) res.push(await p.evaluate((txt) => {
-      const el = [...document.querySelectorAll('text')].find((e) => e.textContent.replace(/\s+/g, ' ').trim() === 'DESDE [ORIGEN]');
-      if (!el) return 'origen: NO';
+      const el = [...document.querySelectorAll('text')].find((e) => /^(DESDE|FROM) \[ORIGEN\]$/.test(e.textContent.replace(/\s+/g, ' ').trim()));
+      if (!el) return 'origen: NO (ya puesto)';
       const w0 = el.getBBox().width; el.textContent = txt; el.setAttribute('font-size', '25'); const dw = el.getBBox().width - w0;
       const pill = [...document.querySelectorAll('path')].find((e) => /^M61\.83,1132\.41c0-17\.67,14\.33-32,32-32h231/.test(e.getAttribute('d') || ''));
       if (!pill) return 'origen: sin píldora';

@@ -257,7 +257,15 @@
       0.5
     ],
     "nota": "Novena ronda (Daniela, 2026-11-06: «una imagen un poco más limpia en la parte superior»): cielo azul despejado con la Gran Torre y la cordillera, banco «IA Marca/BUENOS AIRES MUJER.jpg» (la foto es de Santiago). Antes: santiago-1129335236 (verano).",
-    "f": {}
+    "f": {
+      "popup": {
+        "z": 1.25,
+        "t": [
+          0.74,
+          0.33
+        ]
+      }
+    }
   },
   "HM_AR_KV_LIMA": {
     "src": "AR_LIMA.png",
@@ -356,7 +364,13 @@
       0.45
     ],
     "nota": "Novena ronda (Daniela, Frame 2026-11-06): Santiago o Lima según el brandlift, con espacio a la izquierda para logo y textos. Banco 01_CHILE/SCL «Imagen de Codex 23 sept 2026, 05_52_07 p.m.» (Plaza de Armas).",
-    "sombra": true
+    "sombra": true,
+    "veloLista": [
+      69,
+      344,
+      444,
+      509
+    ]
   },
   "HM_PE_KV_INTER_BANDERAS": {
     "src": "PE_BUENOS_AIRES.png",
@@ -375,5 +389,32 @@
     ],
     "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto vivencial de una familia haciendo turismo en Perú, con espacio a la izquierda. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio: familia en Sacsayhuamán, Cusco. Prompt y descarte v1 en ai-generations/2026-11-04_sky-black-gif/foto-familia-peru/.",
     "sombra": true
+  },
+  "HM_CL_KV_INTER_CLUSTER": {
+    "src": "CL_PUNTA_CANA.png",
+    "s": [
+      0.62,
+      0.55
+    ],
+    "capa": "Raster_1_Imagen-2",
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): Punta Cana con espacio para textos y logo, según el brandlift. Banco 00_Banco Actualizado/PUJ «Imagen de ChatGPT 29 sept 2026, 08_34_37». En el POP-up Daniela escribió «Cusco… la misma que uses para GIF vuela inter HM Chile»: se usa la misma del GIF."
+  },
+  "HM_CL_KV_ENCUENTRA": {
+    "src": "CL_FAMILIA_CALAMA.png",
+    "s": [
+      0.74,
+      0.62
+    ],
+    "capa": "Raster_1_Imagen-2",
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): familia en el interior de Chile (Calama), según el brandlift; la misma en GIF y POP-up. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio (la del banco, 16:9, dejaba la lista sobre la familia). Prompt en ai-generations/2026-11-04_sky-black-gif/foto-familia-calama/."
+  },
+  "HM_PE_KV_DOM_REGIONES": {
+    "src": "PE_MACHU_PICCHU.jpg",
+    "s": [
+      0.8,
+      0.5
+    ],
+    "sombra": true,
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): foto de Cusco con espacio para textos y logo; la misma en GIF y POP-up. Banco 02_PERU/CUZ «sky-chica-vivencial-machu-picchu-4k-3840x2160» (reducida a 2400 px). Sin PromPerú ni ubicación (siguen fuera desde la novena ronda)."
   }
 }

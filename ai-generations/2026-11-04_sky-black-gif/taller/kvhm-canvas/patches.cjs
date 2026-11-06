@@ -26,7 +26,9 @@ P['HM_CL_KV_ENCUENTRA.svg'] = P['HM_CL_KV_INTER_CLUSTER.svg'];
 // precio entre «DESDE» y «Por tramo…»). Se aplica al KV, de modo que popup, story y GIF quedan iguales.
 P['HM_CL_KV_DOM_CLUSTER.svg'] = [
   ['translate(86.87 1048.72)', 'translate(86.87 1070.72)'],
-  ['<text transform="translate(541.23 1082.79)"', '<text transform="translate(541.23 1095.79)"']
+  ['<text transform="translate(541.23 1082.79)"', '<text transform="translate(541.23 1095.79)"'],
+  // Décima ronda (Daniela, Frame V2): origen Santiago. «SANTIAGO» mide casi lo mismo que «[ORIGEN]» y cabe en la píldora.
+  ['<tspan x="0" y="0">DESDE [ORIGEN] </tspan>', '<tspan x="0" y="0">DESDE SANTIAGO</tspan>']
 ];
 // Costura de la flecha morada (novena ronda, 2026-11-06, Daniela: «una pequeña línea en la flecha morada en la
 // parte de la cola»): la flecha son tres formas que se tocan en x=537,61 y x=918,96, y el antialias deja una línea.
@@ -34,4 +36,13 @@ P['HM_CL_KV_DOM_CLUSTER.svg'] = [
 // de AR llevan transform y data-capa por brecha.cjs) y parts.cjs/layers.cjs no lo hacían: el popup y el GIF salían
 // con la línea. Ahora los tres scripts llaman a esta función.
 P.flecha = (svg) => svg.split('<rect x="537.61" y="879.81" width="381.35"').join('<rect x="536.61" y="879.81" width="383.35"');
+// Logo BLACK nuevo (décima ronda, 2026-11-06, Daniela: «actualizar el logo del BLACK por el nuevo que hay en carpeta»,
+// `Despliegue Base/KV X HM/LOGO BLACK/`, archivos del 2026-11-06). Es el mismo dibujo que arma logofix.cjs (fecha
+// nueva y marco retraído), pero con el resplandor ORIGINAL del kit: logofix lo reducía (desenfoque × 0,5, opacidad ×
+// 0,6, pedido de SKY del 2026-11-04). Medido en los SVG nuevos: 3,44/0,8 · 6,02/0,7 · 3,35/0,5. Se restituye en los
+// cinco filtros outer-glow del logo (con o sin prefijo lf- de las piezas raster), sin volver a correr logofix.
+const NEON = { std: { '1.72': '3.44', '3.01': '6.02', '1.68': '3.35' }, op: { '0.48': '.8', '0.42': '.7', '0.30': '.5' } };
+P.logoNuevo = (svg) => svg.replace(/(<filter id="(?:lf-)?outer-glow-\d+"[\s\S]*?<\/filter>)/g, (f) => f
+  .replace(/stdDeviation="([\d.]+)"/g, (m, v) => `stdDeviation="${NEON.std[v] || v}"`)
+  .replace(/flood-opacity="([\d.]+)"/g, (m, v) => `flood-opacity="${NEON.op[v] || v}"`));
 module.exports = P;

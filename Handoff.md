@@ -2,6 +2,17 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF
+
+- Logo nuevo de Daniela (`Despliegue Base/KV X HM/LOGO BLACK/`): mismo dibujo que el de `logofix` con el resplandor
+  original del kit. Se aplica con `patches.cjs → logoNuevo` en render/parts/layers. Su `ESP` trae la fecha en
+  portugués: se conservó la fecha viva por idioma.
+- Ajustes del Frame V2: orígenes (Miami, Buenos Aires, Santiago), gradiente suave tras las banderas de USA, popup de
+  AR Santiago reencuadrado, fotos de Punta Cana (Chile inter), Calama (familia generada, Julio aprobó ≈ USD 0,04) y
+  Machu Picchu («Vuela por el Perú»). `destinos.cjs` reemplaza ahora la foto en los clústeres raster (`capa`).
+- Entregado en OneDrive `BLACK SKY 2026`: 30 archivos (POP-up, GIF y GIF_AUDIO de las 10 carpetas). Story y story video
+  no se rehicieron (los exporta Daniela). Canvas sin actualizar en esta ronda. Detalle: skill §4.12.
+
 ## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
 
 - Se leyeron los comentarios de Daniela en las 10 carpetas Frame `BLACK SKY 2026/GIF+POPUP` (21 activos) desde el

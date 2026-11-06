@@ -28,7 +28,7 @@ for (const n of ['HM_AR_KV_BANDERAS', 'HM_PE_KV_INTER_BANDERAS', 'HM_BR_KV_BANDE
     let svg = fs.readFileSync(D + f, 'utf8').replace(/^<\?xml[^>]*>/, '').replace('<svg ', '<svg width="1080" height="1350" ')
       .replace('<rect x="537.61" y="879.81" width="381.35" height="339.95" fill="#671e75"/>', '<rect x="536.61" y="879.81" width="383.35" height="339.95" fill="#671e75"/>');
     for (const [a, z] of PATCH[f] || []) { if (!svg.includes(a)) throw new Error(f + ' sin ' + a); svg = svg.replace(a, z); }
-    svg = PATCH.flecha(svg);
+    svg = PATCH.logoNuevo(PATCH.flecha(svg));
     fs.writeFileSync(SP + '/tmp-l.html', `<!doctype html><meta charset="utf-8"><style>${ff}body{margin:0;background:transparent}svg{display:block}</style>${svg}`);
     const p = await b.newPage({ viewport: { width: 1080, height: 1350 } });
     await p.goto('file://' + SP + '/tmp-l.html');

@@ -106,7 +106,14 @@ function credito(n, W, H, y, size = 12) {
   const c = DEST[n] && DEST[n].cred; if (!c) return null;
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><text x="40" y="${y}" font-family="Metric, Metric-Regular, Helvetica" font-size="${size}" letter-spacing=".3" fill="#fff" fill-opacity=".75">${c.replace(/&/g, '&amp;')}</text></svg>`);
 }
-module.exports = { cubrir, credito, velo, veloAlfa, DEST };
+// Velo suave detrás de una lista sobre la foto (décima ronda, Daniela, Frame V2: «el texto de las banderas se pierde un
+// poco con el fondo, ¿podrías poner un gradiente muy suave atrás?»). Elipse negra radial, 40 % al centro → 0 en el borde,
+// que desborda la caja de la lista 90 px a los lados y 70 px arriba y abajo. `caja` = [x0, y0, x1, y1] en el formato.
+function veloListaSvg(caja, id = 'lf-velo-lista') {
+  const [x0, y0, x1, y1] = caja, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = (x1 - x0) / 2 + 90, ry = (y1 - y0) / 2 + 70;
+  return `<radialGradient id="${id}-g"><stop offset="0" stop-color="#000" stop-opacity=".4"/><stop offset=".6" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient><ellipse id="${id}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="url(#${id}-g)"/>`;
+}
+module.exports = { cubrir, credito, velo, veloAlfa, veloListaSvg, DEST };
 
 if (require.main === module) (async () => {
   const { chromium } = require('/Users/jreye/Documents/greenhouse-eo/node_modules/playwright');
@@ -123,9 +130,20 @@ if (require.main === module) (async () => {
     const p = await b.newPage({ viewport: { width: 1080, height: 1350 } });
     await p.goto('file://' + K + '/_de.html');
     await p.evaluate(() => document.fonts.ready);
-    const r = await p.evaluate(([foto, sombra, cred, veloDef]) => {
+    const r = await p.evaluate(([foto, sombra, cred, veloDef, capa, veloLista]) => {
       const NS = 'http://www.w3.org/2000/svg', XL = 'http://www.w3.org/1999/xlink', svg = document.querySelector('svg');
       let img = document.getElementById('lf-foto-destino'), estado = 'actualizada';
+      // Décima ronda (2026-11-06): en los clústeres de Chile (SVG por capas raster de Illustrator) la foto es la capa
+      // 1080×1350 indicada en `capa` (p. ej. «Raster_1_Imagen-2»): se le cambia la imagen en su lugar, con su máscara.
+      if (!img && capa) {
+        const c = document.getElementById(capa);
+        if (!c) return { error: 'sin capa ' + capa };
+        c.id = 'lf-foto-destino'; img = c; estado = 'capa ' + capa;
+        const defs = svg.querySelector('defs') || svg.insertBefore(document.createElementNS(NS, 'defs'), svg.firstChild);
+        defs.insertAdjacentHTML('beforeend', veloDef);
+        let top = c; while (top.parentElement && top.parentElement !== svg) top = top.parentElement;
+        top.insertAdjacentHTML('afterend', '<rect id="lf-cielo" x="0" y="0" width="1080" height="1350" fill="url(#lf-cielo-g)"/>');
+      }
       if (!img) {
         // La foto del kit es <use href="#image"> recortada al lienzo (clippath). Se reemplaza por la del destino.
         // La copia a reemplazar es la que tiene el recorte que más cubre el lienzo (en las variantes no es la primera).
@@ -166,10 +184,12 @@ if (require.main === module) (async () => {
         const x = +rc.getAttribute('x'), y = +rc.getAttribute('y'), w = +rc.getAttribute('width'), h = +rc.getAttribute('height');
         if (x < 1080 && x + w > 0 && y < 1350 && y + h > 0) { u.setAttribute('display', 'none'); ocultas++; }
       }
+      const vl = document.getElementById('lf-velo-lista'); if (vl) { vl.previousElementSibling && vl.previousElementSibling.id === 'lf-velo-lista-g' && vl.previousElementSibling.remove(); vl.remove(); }
+      if (veloLista) { let t = img; while (t.parentElement && t.parentElement !== svg) t = t.parentElement; const cs = document.getElementById('lf-sombra'); (cs || document.getElementById('lf-cielo') || t).insertAdjacentHTML('afterend', veloLista); }
       const old = document.getElementById('lf-credito'); if (old) old.remove();
       if (cred) svg.insertAdjacentHTML('beforeend', `<text id="lf-credito" data-capa="base" x="40" y="34" font-family="Metric-Regular, Metric" font-size="12" letter-spacing=".3" fill="#fff" fill-opacity=".75">${cred.replace(/&/g, '&amp;')}</text>`);
       return { estado, ocultas };
-    }, [foto, !!d.sombra, d.cred || '', veloDef]);
+    }, [foto, !!d.sombra, d.cred || '', veloDef, d.capa || null, d.veloLista ? veloListaSvg(d.veloLista) : null]);
     r.velo = va;
     if (r.error) throw new Error(n + ': ' + r.error);
     // «Vuela por el Perú» (fila del CSV): legal, origen, PromPerú y ubicación como en las rutas.

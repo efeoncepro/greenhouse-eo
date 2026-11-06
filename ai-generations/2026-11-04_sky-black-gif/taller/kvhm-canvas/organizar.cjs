@@ -48,6 +48,9 @@ hph('HM UY', 'HM_UY_KV', 'INTER'); pmax('HM UY', 'HM_UY_KV', 'INTER'); gif('HM U
 hph('HM BR', 'HM_BR_KV', 'INTER'); pmax('HM BR', 'HM_BR_KV', 'INTER'); gif('HM BR', 'HM_BR_KV_SANTIAGO', 'VOE A SANTIAGO', 'SCL');
 hph('HM USA', 'HM_US_KV', 'INTER'); pmax('HM USA', 'HM_US_KV', 'INTER'); gif('HM USA', 'HM_US_KV_BANDERAS', 'FLY INTERNATIONAL', 'INTER');
 
+// Décima ronda (2026-11-06, Daniela: «sólo GIF y popup, así ahorras recursos»): ORGANIZAR_SOLO=<regex> limita la copia a
+// los destinos que calzan (p. ej. 'GIF \+ POPUP/.*/BS_(POPUP|GIF)_'). El plan completo se sigue escribiendo igual.
+if (process.env.ORGANIZAR_SOLO) { const re = new RegExp(process.env.ORGANIZAR_SOLO); const n0 = plan.length; plan.splice(0, plan.length, ...plan.filter(([, d]) => re.test(d))); console.log('filtro', process.env.ORGANIZAR_SOLO, plan.length, 'de', n0); }
 const falta = plan.filter(([s]) => !fs.existsSync(s));
 if (falta.length) { console.log('FALTAN', falta.map(([s]) => path.relative(O, s))); process.exit(1); }
 const dup = plan.map(([, d]) => d).filter((d, i, a) => a.indexOf(d) !== i);
@@ -59,5 +62,5 @@ for (const [s, d] of plan) {
   if (fs.existsSync(d)) { const a = fs.statSync(s), z = fs.statSync(d); if (a.size === z.size && a.mtimeMs <= z.mtimeMs) { igual++; continue; } }
   fs.mkdirSync(path.dirname(d), { recursive: true }); fs.copyFileSync(s, d); n++;
 }
-fs.writeFileSync(__dirname + '/organizar-plan.json', JSON.stringify(plan.map(([s, d]) => [path.relative(O, s), path.relative(DST, d)]), null, 1));
+if (!process.env.ORGANIZAR_SOLO) fs.writeFileSync(__dirname + '/organizar-plan.json', JSON.stringify(plan.map(([s, d]) => [path.relative(O, s), path.relative(DST, d)]), null, 1));
 console.log('plan', plan.length, 'copiados', n, 'ya iguales', igual);
