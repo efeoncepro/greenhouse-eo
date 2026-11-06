@@ -58,7 +58,7 @@ const GRILLA = [
   ['Extra · KV con banderas de Argentina y Brasil (base de los HPH por mercado)', [['HM_AR_KV_BANDERAS', 'Volá internacional · banderas AR'], ['HM_BR_KV_BANDERAS', 'Voe internacional · banderas BR']]]
 ];
 let y = 0;
-c.notes['t-grilla'] = { x: 0, y: -620, text: 'Grilla por mercado · KV 1080×1350, popup 1080×1080, animación en MP4 con audio, story 1080×1920 y story video (5 slides, con audio)', kind: 'title1', maxW: 6900, page: G };
+c.notes['t-grilla'] = { x: 0, y: -620, text: 'Grilla por mercado · KV 1080×1350, popup 1080×1080, animación en MP4 con audio, story 1080×1920', kind: 'title1', maxW: 6900, page: G };
 GRILLA.forEach(([mk, msgs], gi) => {
   c.notes['t-grilla-' + gi] = { x: 0, y: y - 420, text: mk, kind: 'title1', maxW: 5800, page: G };
   for (const [n, t] of msgs) {
@@ -71,7 +71,9 @@ GRILLA.forEach(([mk, msgs], gi) => {
     // del tablero conserva su nombre g-gif-* para no dejar huérfanos en el proyecto publicado.
     board(G, `g-gif-${k}.dc.html`, `MP4 1080×1350 (con audio) · ${t}`, vid(VB[n + '__mp4'], 1080, 1350, true), 1080, 1350, 2320, y);
     board(G, `g-story-${k}.dc.html`, `Story 1080×1920 · ${t}`, img(`formatos/${n}__story.jpg`, `Story ${t}`, 1080, 1920), 1080, 1920, 3480, y);
-    if (VB[n + '__story-video']) board(G, `g-storyv-${k}.dc.html`, `Story video 1080×1920 · ${t}`, vid(VB[n + '__story-video'], 1080, 1920, true), 1080, 1920, 4640, y);
+    // 2026-11-06 (Julio, comentario en el canvas): «este formato en todas ya no es necesario, luego iteraremos el
+    // video». La story en video sale de la Grilla hasta nueva iteración; STORY_VIDEO=1 la vuelve a armar.
+    if (process.env.STORY_VIDEO === '1' && VB[n + '__story-video']) board(G, `g-storyv-${k}.dc.html`, `Story video 1080×1920 · ${t}`, vid(VB[n + '__story-video'], 1080, 1920, true), 1080, 1920, 4640, y);
     y += 1920 + 420;
   }
   y += 300;

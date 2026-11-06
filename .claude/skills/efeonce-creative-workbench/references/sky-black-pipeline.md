@@ -669,6 +669,9 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   (`<KV>_audio.mp4`, ids `"<KV>__mp4"` en `vid-blobs.json`), con controles, y se titulan «MP4 1080×1350 (con audio)».
   El archivo del tablero conserva el nombre `g-gif-*` para no dejar huérfanos. Se publicaron sólo esos 14 y
   `canvas.json` (los títulos parchados sobre la versión publicada, no el `canvas.json` que regenera `new-pages.cjs`).
+- **Canvas: versión 63** (Julio, comentario en el canvas: «este formato en todas ya no es necesario, luego iteraremos el
+  video»). Salieron los 12 tableros `g-storyv-*` de la Grilla (`null` en `files`); `new-pages.cjs` sólo los arma con
+  `STORY_VIDEO=1`. Los ids `__story-video` siguen en `vid-blobs.json` para la próxima iteración.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
