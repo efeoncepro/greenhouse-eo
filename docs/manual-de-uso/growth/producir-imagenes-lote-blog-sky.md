@@ -1,9 +1,9 @@
 # Producir las imágenes de un lote del Blog SKY
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-11-05 por Claude, a partir del lote de 54 artículos de esa fecha
-> **Última actualización:** 2026-11-05 por Claude
+> **Última actualización:** 2026-11-06 por Claude (ronda de revisión de Diseño, entrega V1/V2)
 > **Documentación técnica:** skill [`sky-blog-graphic-line`](../../../.claude/skills/sky-blog-graphic-line/SKILL.md) (flujo de lote en [`references/workflow.md`](../../../.claude/skills/sky-blog-graphic-line/references/workflow.md) §9) · [caso de noviembre 2026](../../services/sky-blog-seo/LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md)
 
 ## Para qué sirve
@@ -90,6 +90,17 @@ Este manual describe lo que se hizo el 2026-11-05. La expansión de portada (ale
     formato: nunca achiques la letra.
 11. **Registra y reporta**: commit en la rama del Workbench (sin push salvo indicación), expediente del lote con conteos,
     bloqueados, costos estimados por partida y observaciones para revisión humana, y lecciones nuevas en la skill.
+12. **Atiende la ronda de revisión de Diseño.**
+    - Lee todo antes de corregir. Barre el enlace de Frame.io en vivo, desde el navegador integrado, con GraphQL y los
+      encabezados de la sesión: los correos de resumen no traen todos los comentarios. Lee también el chat interno en
+      `teams.cloud.microsoft`, porque las capturas no llegan por el conector.
+    - Corrige sobre el maestro instalado:
+      - una zona puntual se repinta con máscara, cubriendo objetos enteros (personas con pies, maletas con ruedas);
+      - un cambio global (cielo, hora, luz) se hace con `ai:image --image <maestro>` sobre la imagen completa.
+    - Después de corregir, vuelve a medir, exporta y recompone los banners afectados.
+    - Si la ronda reemplaza archivos ya entregados, divide la carpeta del artículo en `V1/` (la entrega original) y
+      `V2/` (lo vigente), y suma la columna «Versión» al índice.
+    - Responder en Frame o Teams requiere permiso de Julio.
 
 Si se lo pides a un agente, una forma que funcionó:
 
@@ -140,6 +151,11 @@ Antes de gastar, dime cuántas imágenes y el costo estimado.
 | Wikimedia devuelve error o archivos vacíos | Baja más despacio, con User-Agent identificado; pide la miniatura en un ancho estándar o el original |
 | El buscador trae otro país con el mismo nombre | Lee la descripción y busca en Wikimedia el lugar real |
 | `componer-ruta` dice que la ruta no cabe en el ancho | Usa la receta A en ese formato o acorta el titular; nunca achiques la letra |
+| Tras el retoque, unos pies o una rueda salen transparentes | El borde de la máscara cruzaba el objeto. Restitúyelo desde `salidas/<id>/anteriores/` con una máscara chica y, si repites, cubre el objeto entero |
+| Al oscurecer el cielo aparecen bandas o un rectángulo azul, o se borra una cabeza | No uses máscara ni curvas para un cambio global: edita la imagen completa con `ai:image --image <maestro>` («cambia sólo el cielo») y revisa a las personas al 100 % |
+| El límite entre lo nítido y lo desenfocado es una línea recta | Repinta siguiendo la silueta del objeto (un arbusto, un muro), nunca un borde recto |
+| `componer-ruta` dejó los banners en `jobs/runs` | Pasa `--out projects/sky/<pieza>/runs/banners`: la sincronización toma la corrida más reciente de esa carpeta |
+| Diseño dice que faltan comentarios que no ves | Los correos de Frame.io no los traen todos: barre el enlace compartido en vivo y el chat de Teams |
 
 ## Referencias técnicas
 

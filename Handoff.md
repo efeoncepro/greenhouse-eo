@@ -2,6 +2,33 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — Blog SKY: fichas del Content Hub plegadas en secciones y ronda de revisión de imágenes resuelta
+
+**Content Hub:** Julio: «dejaste la chorrera de texto». Se plegaron 44 fichas del lote de noviembre y de las pruebas de
+octubre. Cada una tiene el callout 🧭 «Cómo leer esta página», el índice y cinco toggles h1: Brief, Research, Artículo
+(con la ficha SEO y el JSON-LD en sus propios toggles), Fuentes y hallazgos, y Producción y cambios. En las de octubre,
+la versión anterior quedó en un toggle 🗄️ y sus subpáginas V1, V2 y V3 siguen intactas.
+
+- El cambio sólo insertó etiquetas con `update_content`; no cambió texto ni propiedades.
+- Se leyeron de vuelta 7 fichas: balance 0 y sin etiquetas literales.
+- Cinco ya venían ordenadas y no se tocaron: Punta Sal, Tipos de equipaje, Zorritos y Año Nuevo en Santiago, con
+  toggles, y Cena chilena, con pestañas.
+- Tampoco se tocaron las fichas Idea de diciembre (sólo brief) ni los temas rechazados.
+- Norma en `sky-blog-seo-editorial/references/lote-editorial.md` §6; generador y verificador en
+  `outputs/sky-blog-content-hub-estructura/`.
+
+**Imágenes de noviembre:** la ronda de Frame.io (35 comentarios de Melkin y Andrés) y del chat de Teams quedó resuelta.
+
+- CTA de escritorio centrado bajo la ruta (Workbench `d5281de`).
+- Retoques con máscaras que cubren objetos enteros; el cielo de N14 IMG 3 se cambió con una edición de la imagen
+  completa; N23 IMG 2 es nueva.
+- OneDrive en `V1/` (la entrega de las 09:11) y `V2/` (lo vigente) en 45 carpetas; 72 archivos difieren y el índice
+  tiene la columna «Versión».
+- Docs: skill `sky-blog-graphic-line` (lecciones, revisión, flujo, banners), sistema visual del Workbench §8.8 y
+  README de la pieza (`70c2adc`), expediente y manual de imágenes.
+- **La respuesta a Diseño en Teams está redactada y sin enviar**, a la espera del permiso de Julio.
+- Sin push en ninguno de los dos repos.
+
 ## 2026-11-06 — SKY BLACK 2026: taller rescatado a carpeta durable y prueba en frío
 
 El taller del kit (scripts, kit corregido `src2/`, fotos de destino, fuentes y copia del canvas) vivía en el
@@ -299,27 +326,3 @@ Inicio del foro 25/11 frente a ítem 01/12; cierre del aviso 06/11 14:00 Colombi
 Wherex Editando / 0 COP / sin archivos; adjudicación, firma y OC no acreditadas en cobertura revisada.
 Gates internos propuestos: Julio/Legal 03/11 y bid/no-bid 05/11, 12:00 Colombia. Sin envío, oferta ni cambio HubSpot.
 OneDrive conserva v1; no se sobrescribió. No hay recordatorio ni comunicación futura programada.
-
-## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
-
-[Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,
-Chile/México/Colombia/Perú; nombres/IDs verificados tras recarga. Persistencia completa, cobertura parcial:
-[diagnóstico Perú](docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) CRM 58→81→106→868 y Growth 789.
-Sede/geografía cambian población; vocabulario ampliado cambia varios términos. No sumar ni calificar conteos.
-Las 100 observaciones de tarjetas previas no validaron compradores excluidos. Skill B2B espejo, política y
-capas documentales separan persistencia/muestra/cobertura, controles conocidos y contrastes por filtro.
-P89 offline preparada, sin evaluación conductual. Variantes temporales sin guardar; las 44 nativas intactas.
-Cupos documentados 50+50, sin prueba de borrado/recuperación ni recepción futura de avisos semanales.
-Listas 54/57 y servicios/Personas 12/5 sin cambio. Sin mensajes, solicitudes, InMail, CRM o scheduler externo.
-Próximo: auditar cobertura de las 20 consultas de personas antes de proponer reemplazos; mantener criterio
-comprador y prioridad agencias/proveedores. Commit local, sin push; cambios concurrentes preservados.
-
-## 2026-10-29 — Home efeoncepro.com «La órbita × Pingback» en producción
-
-[Contrato](docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md) · [manual](docs/manual-de-uso/public-site/operar-home-efeonce.md) ·
-[auditoría](docs/audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md). Home `251731` reemplazada por la landing
-compilada `inicio` (12 widgets, nav/footer canónicos, agenda con CTA `site-nav-discovery-meeting`); rollback
-`_gh_home_orbita_before_20261029_012508`. OG 1200×630 `252184` + metadatos sociales y destacada
-(`_gh_home_orbita_seo_before_20261029_092107`); videos diferidos (0 MB al cargar). A papelera con 301 a `/`: /home-2-2/,
-/home-2/, /home/, /home-prueba/ y cinco demos Ohio. QA vivo 1440/1280/390. Pendiente: editor Elementor, PSI/CWV (cuota),
-push de develop y runtime `af1a785`. Commits locales `5532e6371`…`f86460ec5`.

@@ -16,6 +16,7 @@
 | Ficha SEO y metadatos | En los 54, dentro de cada versión |
 | Callouts de imagen y banner | En los 54: 157 callouts de imagen y 54 de banner (44 listos, 10 bloqueados) |
 | Specs para producción | 54 specs + índice, validadas contra los callouts |
+| Estructura de la página | Desde el 06-11 cada ficha está plegada en secciones: callout de lectura, índice y toggles para Brief, Research, Artículo, Fuentes y Producción. Se ordenaron 44; cinco ya venían ordenadas ([norma](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md)) |
 | Revisión de Valentina | Pendiente |
 | Aprobación de SKY | Pendiente; cuatro artículos ni siquiera tienen aprobación del tema |
 | Publicación en WordPress | **Nada publicado.** No se envió nada a SKY |

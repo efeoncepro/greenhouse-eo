@@ -92,6 +92,18 @@ node brands/sky-airline/blog/scripts/componer-ruta.mjs projects/sky/<pieza>/jobs
 estado en Notion, entregar en OneDrive `SKY Blog SEO › 04 Entregables` la última versión aprobada; WordPress con ALT
 literal, portada sin lazy.
 
+**Entrega versionada.** La entrega vive en `04 Entregables/<mes>/<NN> - <artículo>/`, con un CSV índice del mes. La
+sincronización copia por hash: sólo cambia lo que cambió en la fuente y toma la corrida de banners más reciente.
+
+Cuando una ronda de revisión reemplaza archivos ya entregados:
+
+- la carpeta del artículo se divide en `V1/` (la entrega original) y `V2/` (lo vigente), y las carpetas sin cambios
+  no se tocan;
+- el índice suma la columna «Versión»;
+- después se verifica que V2 sea idéntica a lo vigente.
+
+Procedimiento y conteos del lote de noviembre: [lessons.md](lessons.md), 2026-11-05.
+
 ## 8. Qué va a Git
 
 | Va | No va |

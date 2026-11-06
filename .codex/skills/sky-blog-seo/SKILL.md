@@ -49,6 +49,10 @@ Al 05-11: los 54 artículos activos del Content Hub tienen research SEO/AEO y un
 producción. Nada se publicó ni está aprobado por SKY. Estado, bloqueos y decisiones pendientes:
 [lote de noviembre](../../../docs/services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md).
 
+Al 06-11: cada ficha con research o artículo está plegada en secciones (callout de lectura, índice y toggles h1),
+porque SKY las lee. Una ficha en texto corrido no se entrega ([norma](../sky-blog-seo-editorial/references/lote-editorial.md)).
+La primera ronda de Diseño sobre las imágenes de noviembre quedó resuelta y la entrega en OneDrive, en V1 y V2.
+
 Al 05-11 también quedó lista la proyección a 24 meses pedida en el kickoff (informe A4, planilla de búsquedas
 valorizadas y correo, sin enviar): [PROYECCION_2026-11](../../../docs/services/sky-blog-seo/caso-auditoria-2026-10/PROYECCION_2026-11.md).
 Conversión medida: unas 1.000 personas al mes leen el blog y compran ese mes (2.350 antes de migrar); el evento

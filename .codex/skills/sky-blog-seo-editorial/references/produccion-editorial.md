@@ -190,7 +190,10 @@ Además:
 
 ### Fase 7 · Anexos del artículo
 
-Al final de la página, nunca en el cuerpo publicable.
+Al final de la página, nunca en el cuerpo publicable. La página entera queda plegada en secciones (toggles h1:
+Brief, Research, Artículo, Fuentes y hallazgos, Producción y cambios): los anexos van en las dos últimas. Norma y
+procedimiento: [lote-editorial.md](lote-editorial.md) §6, «Estructura de la ficha». Una ficha en texto corrido no se
+entrega a SKY.
 
 | Anexo | Para quién | Qué lleva |
 | --- | --- | --- |

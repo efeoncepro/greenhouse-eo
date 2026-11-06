@@ -1,7 +1,8 @@
 # Lote de noviembre 2026 · Blog SKY — producción de imágenes
 
 > **Tipo de documento:** Expediente de servicio (producción visual de un lote)
-> **Versión:** 1.0
+> **Versión:** 1.1
+> **Última actualización:** 2026-11-06 por Claude (ronda de revisión de Diseño y entrega V1/V2)
 > **Creado:** 2026-11-05 por Claude (misma sesión que el lote editorial), con las instrucciones de Julio Reyes
 > **Línea gráfica y método:** skill [`sky-blog-graphic-line`](../../../.claude/skills/sky-blog-graphic-line/SKILL.md)
 > (lote en [`references/workflow.md`](../../../.claude/skills/sky-blog-graphic-line/references/workflow.md) §9)
@@ -16,9 +17,37 @@
 | Portadas (IMG 1) | 52 de 54: 43 nuevas y 9 que ya existían; 2 bloqueadas |
 | Escenas (IMG 2–3) | 93 generadas y exportadas de 99 pendientes; 6 bloqueadas; 4 ya existían |
 | Medición y peso | Todas las portadas pasan `medir-portada`; todo bajo 200 KB (fotos) y 150 KB (banners) |
-| Revisión de Diseño y Marca SKY | Pendiente. Todo queda `pending-human-and-pixel-review` |
-| Frame.io, Notion, OneDrive, WordPress | **Nada subido ni publicado** |
+| Revisión de Diseño y Marca SKY | Primera ronda de Diseño resuelta el 05-11; falta la aprobación de Diseño sobre V2 y la de Marca SKY. Todo queda `pending-human-and-pixel-review` |
+| Frame.io, Notion, OneDrive, WordPress | Entregado en OneDrive el 05-11 y revisado en Frame.io: ronda resuelta y entrega en V1/V2 (sección siguiente). **Nada publicado en WordPress** |
 | Git | Workbench: commits `d74319e`, `b81e0df` y `e8b2098` en `claude/sky-blog-visual-system`, **sin push**. Maestros y WebP fuera de Git |
+
+## Ronda de revisión de Diseño (2026-11-05)
+
+El lote se entregó en OneDrive (`SKY Blog SEO › 04 Entregables › 02. Articulos Mes Noviembre`) el 05-11 a las 09:11,
+con un CSV índice. Melkin Hernandez y Andrés Carlosama lo revisaron en Frame.io (35 comentarios) y en el chat interno
+«Sky - SEO | Interno» de Teams. Todo quedó resuelto el mismo día:
+
+| Dónde | Qué se corrigió |
+| --- | --- |
+| N13 IMG 3 | Mochila, altura de la toma, ruedas de la maleta y baranda metálica |
+| N14 portada e IMG 3 | Unión, pareja, pies y foco de la portada; IMG 3 llevada a medianoche, con la dirección y el cielo oscuro |
+| N20, N25, N27, N29, N41, N45 | Portadas (y sus recortes); en N27 también los dos banners |
+| N35 IMG 2, N38 IMG 2, N47 portada e IMG 2, N48 IMG 3 | Escenas y portada observadas |
+| N23 | IMG 2 nueva, que faltaba |
+| 40 banners de escritorio | CTA centrado bajo la ruta dibujada, pedido por Melkin (Workbench `d5281de`) |
+
+La entrega en OneDrive quedó con 45 carpetas divididas en `V1/` (la entrega de las 09:11) y `V2/` (lo vigente). Las
+siete sin cambios quedaron como estaban: N26, N30, N37, N40, N54, N55 y N56. Hay 72 archivos distintos entre V1 y V2,
+y el índice suma la columna «Versión». V1 se reexportó desde los maestros respaldados, así que puede no ser idéntica
+byte a byte a la primera subida.
+
+Pendientes de la ronda:
+- La respuesta a Melkin y Andrés en Teams quedó redactada, sin enviar, a la espera del permiso de Julio.
+- La nota de Daniela sobre banners 1:1 de Chiclayo y Talara con foto de Calama no corresponde a este lote, que no
+  tiene esos jobs. Queda informada.
+
+Reglas nuevas: sistema visual del Workbench (`brands/sky-airline/blog/system/SKY_BLOG_VISUAL_SYSTEM_V1.md` §8.8, commit `70c2adc`)
+y [lecciones del 2026-11-05](../../../.claude/skills/sky-blog-graphic-line/references/lessons.md).
 
 ## Qué pidió Julio
 

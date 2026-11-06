@@ -11,6 +11,14 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-06 — Blog SKY: las fichas del Content Hub se leen por secciones
+
+SKY ya no recibe páginas de texto corrido. Cada ficha con research o artículo se abre en cinco secciones plegables
+(Brief, Research, Artículo, Fuentes y hallazgos, Producción y cambios), con un aviso que indica dónde está el
+artículo. Se ordenaron 44 fichas y el texto no cambió. La primera revisión de Diseño de las imágenes de noviembre
+quedó resuelta: botón centrado bajo la ruta en los banners de escritorio y retoques. La entrega de OneDrive se
+separó en V1 (la original) y V2 (la vigente).
+
 ## 2026-11-06 — SKY BLACK 2026: el taller del kit se puede retomar desde una sesión nueva
 
 El taller dejó la carpeta temporal y vive en `ai-generations/2026-11-04_sky-black-gif/taller/`, con un chequeo de
@@ -528,27 +536,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Un seguimiento HubSpot programado22Oct09:30Quito, salida por respuesta/reunión; deck360 original íntegro.
 - Skills espejo incorporan recuperación de publicaciones, calidad Apollo y readback de firma/envío/calendario.
 - [Evidencia y límites](docs/commercial/follow-up-agent/runs/2026-10-18-indecaucho-katia-hubspot.md); sin push ni nuevos permisos.
-
-## 2026-10-18 — Contexto comercial en la fachada Grader
-
-[Historial interno](docs/changelog/internal/README.md).
-
-- Fachada Grader reutiliza preparación/persistencia/recibo Forms y contexto visitante; CORS gobernado y respuestas privadas.
-- PR257 promueve todo develop81f6ba525 a main2559e9242, árboles idénticos y Vercel4He READY.
-- Grader y clasificación administrativa con auditoría transaccional servidos; canarios y smoke productivo PASS sin leads ficticios.
-- Orquestador39190761785 SUCCESS, manifest released; CI/Deep/smoke PASS, health200 y watchdog6/6 drift0.
-- Sin nuevas migraciones, publicación GTM ni replay; cierre documental propio en develop.
-- Conciliación19/10: transporte Grader/clasificación auditada, Ads/agendas, índices y skills espejo actualizados; TASK-2034 permanece parcial por evidencia comercial real pendiente.
-- Discovery LinkedIn19/10: Insight Tag web, CAPI, consentimiento, dedupe y HubSpot documentados con fuentes oficiales; arquitectura Proposed y skills actualizadas, sin conexión, instalación o eventos. [Preparación](docs/manual-de-uso/growth/preparar-medicion-linkedin.md).
-- Origen/canales19/10: separación conceptual aceptada, discovery readonly293 Deals y schema/backfill propuestos; legacy preservado, consumidores incompletos, cero writes. [ADR y límites](docs/architecture/EFEONCE_COMMERCIAL_ACQUISITION_TAXONOMY_DECISION_V1.md).
-- UI de adquisición19/10: estilos/colores del editor verificados, límite de API/CLI y QA visual separados del schema en docs/skills; nueva presentación propuesta, sin aplicar. [Manual](docs/manual-de-uso/hubspot/normalizar-origen-canales-adquisicion.md#presentación-humana-estilos-colores-y-alcance-de-la-api).
-- [Release](docs/audits/releases/2026-10-18-grader-commercial-measurement-production-release.md); checkout principal develop, WIP ajeno preservado. [Validación y límites](docs/audits/growth/2026-10-18-grader-measurement-release.md).
-
-## 2026-10-18 — Políticas Ads comerciales publicadas y clasificación Web corregida
-
-[Historial interno](docs/changelog/internal/README.md).
-
-- 13 Forms comerciales+Discovery verificados por API;12 altas adicionales, Grader comercial incluido y Contacto general fueraAds.
-- Lead Gen Web quote_request con identidad/versión intactas; writer/CLI canónicos y nueva API interna implementada localmente, sin deploy.
-- 53 pruebas, ESLint y TypeScript PASS. Configuración no prueba recepción/atribución; sin conversiones ficticias ni replay.
-- [Publicación y límites](docs/audits/growth/2026-10-18-commercial-forms-policy-publication.md); WIP ajeno preservado.

@@ -1,9 +1,9 @@
 # Correr un lote editorial del Blog SKY
 
 > **Tipo de documento:** Manual de uso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-11-05 por Claude, a partir del lote de 54 artículos de esa fecha
-> **Última actualización:** 2026-11-06 por Claude (método movido a la skill `sky-blog-seo-editorial`)
+> **Última actualización:** 2026-11-06 por Claude (método movido a la skill `sky-blog-seo-editorial`; ficha plegada en secciones)
 > **Documentación técnica:** [método de lote de la skill `sky-blog-seo-editorial`](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md) · [caso de noviembre 2026](../../services/sky-blog-seo/LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md)
 
 ## Para qué sirve
@@ -53,6 +53,13 @@ No publica nada.
    presentes, «Está bueno SKY.» una sola vez, al menos cuatro H2 en pregunta, sin voseo ni superlativos vacíos,
    ALT iguales en callout y ficha. Después: abre la página y confirma encabezado, callouts, firma, fuentes y
    JSON-LD, una sola vez cada uno.
+6b. **Pliega la ficha en secciones.** SKY lee estas páginas: brief, research, artículo, fuentes y producción
+   seguidos no dejan ver dónde está el artículo. Deja arriba el callout 🧭 «Cómo leer esta página» y el índice, y
+   después cinco toggles de título 1: 📋 Brief · 🔎 Research · ✍️ Artículo (con la ficha SEO y el JSON-LD en sus
+   propios toggles) · 🗂️ Fuentes y hallazgos · 🧪 Producción y cambios. Hazlo con
+   `outputs/sky-blog-content-hub-estructura/genops.py` y `update_content`, en una sola llamada por página. Después
+   confirma con `verify.py`: balance 0, cinco secciones y cero etiquetas sueltas. Si la página ya tiene toggles o
+   pestañas, no la toques.
 7. **Genera las specs.** Una por artículo, copiada literal de los callouts, más un índice con el estado de cada
    banner. Al cerrar, regenera y valida todas contra los borradores: si dos lotes compartieron un script, uno
    pudo pisar al otro.
@@ -97,6 +104,7 @@ al final de cada página. No cambies propiedades ni publiques. Antes de gastar, 
 | En la página aparece `&lt;br` como texto o una tabla se rompe | El salto dentro de callouts y FAQ es la etiqueta `<br />` sin escapar; nunca uses la barra vertical dentro de celdas ni de callouts, y usa `<toggle>` en vez de `<details>` |
 | El JSON-LD no cabe en la tabla | Resúmelo en la fila y pon el código en un bloque aparte debajo |
 | Una spec no coincide con Notion | Manda el callout de Notion; corrige el JSON |
+| Una ficha es una sola columna de texto de 500 líneas o más | Falta plegarla en secciones (paso 6b). No reescribas la página: inserta las etiquetas `<toggle>` con anclas cortas |
 | Una ficha «Nuevo» ya tiene URL publicada | Redacta según lo que diga el research y avisa a Julio; no cambies la propiedad |
 | No puedes leer Search Console en vivo | Usa los exportes de la auditoría y dilo en el research |
 

@@ -31,7 +31,9 @@ Formatos: `ruta` 1408×400 y `ruta-movil` 1080×1080, WebP < 150 KB, con ALT.
 Opción B agrega `"photo": { "file": "../salidas/<foto-aprobada>.webp", "focal": [u, v] }` (sólo desde `projects/sky/`).
 
 **El job no lleva** CTA, etiqueta, colores, fuentes ni coordenadas: el compositor falla si aparecen. El CTA es siempre
-«Ver vuelos a {destino.ciudad}».
+«Ver vuelos a {destino.ciudad}». En `ruta.color` escritorio, el CTA va centrado bajo la ruta dibujada
+(`cta.align = "route"` en el contrato), sin pasar el margen derecho. Lo pidió Melkin el 2026-11-05; el compositor
+reporta `layout.ctaAxis` y la prueba lo exige.
 
 ## 3. Lo que falla cerrado
 

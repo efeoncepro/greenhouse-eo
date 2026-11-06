@@ -75,6 +75,13 @@ REF usadas (REF-ESTILO-D separada de REF-01 reales) · caja del sujeto y foco de
 
 - `qa.approval` del Workbench queda `pending-human-and-pixel-review` siempre.
 - Revisión por versión en Frame.io. Un comentario en Frame.io no reemplaza el cambio de estado en Notion.
+- **Leer la revisión completa antes de corregir.** Los correos de resumen de Frame.io no traen todos los
+  comentarios. Se barre el enlace compartido en vivo, desde el navegador integrado, con GraphQL y los encabezados de
+  la sesión, y además el chat interno en `teams.cloud.microsoft`, donde vienen las capturas
+  ([lessons.md](lessons.md), 2026-11-05). Responder en Frame o Teams requiere permiso del operador.
+- **Corregir la zona, no regenerar.** Una observación sobre una zona se repinta sobre el maestro instalado, con una
+  máscara que cubra objetos enteros. Un cambio global (cielo, hora, luz) se hace con una edición de la imagen
+  completa. Después se vuelve a medir y a exportar. El maestro anterior queda en `salidas/<id>/anteriores/`.
 - Aprueban Diseño (Daniela, Melkin) y, para el estilo, Marca SKY. Entrega final en `SKY Blog SEO › 04 Entregables`
   (sólo la última versión aprobada), luego WordPress.
 - Estado de la ficha y estado de la tarea que no coinciden son un hallazgo (Playbook, 2026-10-14): no se aprueba encima.

@@ -251,7 +251,20 @@ el correo sólo dice «left N comments», el texto se lee en la vista directa de
 un comentario sin texto legible queda como pendiente con nombre, no se adivina. Responder en Frame o Teams requiere
 permiso del operador.
 
-**Dónde.** **Documental.**
+**Corrección del mismo día.** Julio: «Pero es que sale que los dejó en Frame, revisa». Los correos no traían todos los
+comentarios. La fuente completa es el enlace compartido, leído en el navegador integrado:
+
+1. Abrir el enlace compartido.
+2. Interceptar `window.fetch` para copiar los encabezados de la sesión (entre ellos
+   `x-frameio-share-authentication`); si la página se recarga, se pierden y hay que volver a capturarlos.
+3. Consultar `https://api.frame.io/graphql`: carpetas y archivos del share, y por asset
+   `comments { number insertedAt text owner { name } replies }`.
+
+El chat de Teams se lee en `teams.cloud.microsoft` dentro del navegador, porque el conector de Microsoft quita las
+imágenes y los comentarios de Diseño suelen ser capturas marcadas. La revisión se da por resuelta sólo cuando el
+barrido en vivo de Frame y el chat no dejan nada abierto. El 2026-11-05 fueron 35 comentarios en Frame más los del chat.
+
+**Dónde.** [qa-review.md](qa-review.md) §6. **Documental.**
 
 ## 2026-11-05 · El checkout del Workbench es compartido: nunca cambiar de rama para producir
 
@@ -289,3 +302,24 @@ derecho y el arco tiene su propio centro.
 
 **Dónde.** `contracts/sky-blog-recipes.json → ruta.color.cta.align = "route"`, `compose/route-banner.mjs`,
 prueba en `test/route-banner.test.mjs` (`layout.ctaAxis`). **Codificada + prueba** (Workbench `d5281de`).
+
+## 2026-11-05 · Una ronda que reemplaza archivos entregados se entrega en V1 y V2
+
+**Qué pasó.** Las correcciones de la ronda se sincronizaron sobre los archivos que ya estaban en OneDrive y la
+entrega original de las 09:11 se perdió de vista. Julio aceptó organizarla en versiones («Yes, use V2»).
+
+**Regla.** Cuando una ronda reemplaza archivos ya entregados, se reparte así:
+
+- la carpeta del artículo con cambios se divide en `V1/` (la entrega original) y `V2/` (lo vigente);
+- la que no cambió se deja como estaba, sin subcarpetas;
+- V1 se reconstruye desde el maestro más antiguo de `salidas/<id>/anteriores/` y desde la última corrida de banners
+  anterior a la hora de la entrega, que se toma de la fecha de creación del CSV índice;
+- el índice suma la columna «Versión»;
+- la sincronización por hash sigue escribiendo en `V2/`.
+
+Se verifica que V2 coincida byte a byte con lo vigente y se cuentan los pares que difieren. El 2026-11-05 fueron
+45 carpetas divididas, 7 sin cambios y 72 de 261 pares distintos. N23 IMG 2 está sólo en V2 porque no venía en la
+primera entrega. V1 reexportada puede no ser idéntica byte a byte a la primera subida: se dice al entregar.
+
+**Dónde.** [workflow.md](workflow.md) §7. **Documental.**
+

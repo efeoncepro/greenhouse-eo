@@ -107,7 +107,9 @@ Fuera del Workbench:
    Si hay letras legibles, retocarlas con máscara.
 6. `exportar.mjs` (con `--portada` para og y cuadrado). Si no baja de 200 KB, desenfoque leve del maestro (§5 del
    mismo archivo), nunca menos resolución.
-7. QA ([qa-review.md](references/qa-review.md)) → Frame.io → estado en Notion → WordPress.
+7. QA ([qa-review.md](references/qa-review.md)) → Frame.io → estado en Notion → WordPress. Una ronda de revisión se
+   lee completa (Frame en vivo y chat de Teams), se corrige sobre el maestro instalado y, si reemplaza archivos
+   entregados, se entrega en `V1/` y `V2/` ([workflow.md](references/workflow.md) §7).
 8. Banner de ruta, si la spec lo pide: job → `componer-ruta.mjs` → QA → Frame.io.
 9. Toda corrección del operador queda en [lessons.md](references/lessons.md) + contrato + prueba.
 
