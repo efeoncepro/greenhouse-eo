@@ -1,8 +1,74 @@
 # KSB Chile — Agencia de Marketing Digital 2027 (licitación privada)
 
-> **Estado al 05/11/2026:** solicitud de bases **enviada**. Sin bases leídas, sin GO, sin oferta.
-> **Comprador:** KSB Chile S.A., Av. Las Esteras Sur 2851, Quilicura. Filial de KSB (Alemania).
-> **Fase:** `Screening`. La decisión GO/NO-GO depende de la admisibilidad que fijen las bases.
+> **Estado al 06/11/2026:** bases **recibidas y leídas** (LIC-MKT-2026-001); **consultas enviadas** el 06/11 a las
+> 10:12. Sin GO, sin oferta.
+> **Comprador:** KSB Chile S.A., Av. Las Esteras Sur 2851, Quilicura. Filial de KSB SE & Co. KGaA (Alemania).
+> **Fase:** `Screening`. GO/NO-GO condicionado a la respuesta: las bases exigen Google Partners, Meta Business
+> Partner y «HubSpot Premium» como elegibilidad, y Efeonce no tiene Meta ni Google Partners verificado.
+> **Cierre:** lunes **16/11/2026, 16:30** (Santiago).
+
+## Respuesta de KSB (06/11/2026)
+
+Nelson Urbano (`nelson.urbano@ksb.com`, Gerente Marketing) respondió a las 09:27 Santiago (12:27:44Z), CC Pamela
+Ojeda (`Pamela.Ojeda@ksb.com`), con `Base_Licitacion_MKT_Digital_v2.pdf`:
+
+- Las consultas se responden **a cada agencia por separado**; no hay ronda pública ni fecha límite publicada.
+- **No habrá reuniones** con agencias en esta etapa; sí con las finalistas (01–03/12).
+- Cierre del 16/11 a las **16:30**.
+
+**PDF original:** OneDrive `Alineación/4. Comercial/Licitaciones/KSB Chile/01. Bases y anexos originales/Base_Licitacion_MKT_Digital_v2.pdf`
+(413.267 bytes, 4 páginas). **Texto:** [bases-LIC-MKT-2026-001-texto.md](bases/bases-LIC-MKT-2026-001-texto.md).
+
+## Lectura de las bases
+
+- **Alcance:** SEM y social pagado, contenidos, redes y lead generation. **Email marketing y SEO quedan fuera.** La
+  agencia **no puede modificar** ksb.com/es-cl (lo gobierna la casa matriz).
+- **Presupuesto base:** 720 UF por 12 meses (≈ 60 UF/mes). Tarifa fija y medios van separados; no dice si las 720 UF
+  son sólo tarifa.
+- **Elegibilidad:** 5+ años; Google Partners, Meta Business Partner, «HubSpot Premium»; equipo de 7 (AM, estratega,
+  2 paid, content, email + lead gen, analista); medios > 50 UF/mes comprobable; SII, sin conflictos ni
+  incumplimientos, 3 referencias, certificado de viabilidad financiera.
+- **Evaluación:** negocio 20 %, estrategia 20 %, experiencia 20 %, capacidad técnica 15 %, económica 15 %: **suma
+  90 %**. Piso técnico 60/100.
+- **KPIs:** ROI 120 → 160 → 200 %; ROAS 2,0 → 2,5 → 3,0; CPL −8 → −15 %; tráfico orgánico +10 % anual sin SEO; MQL
+  +30 % trimestral; lead-to-customer ≥ 15 % y retención ≥ 80 % sin condicionar a la gestión comercial de KSB.
+  Prórroga con ≥ 90 % de KPIs.
+- **Entrega:** resumen (2 págs), estrategia (10), equipo con CV (3), económica por mes y servicio, 3 referencias con
+  montos comparables, certificaciones y documentación legal. Creatividades y estrategias, propiedad de KSB.
+- **Cronograma:** evaluación técnica 16–25/11; finalistas 01–03/12; ganador 09/12; estrategia 15–28/12; inicio
+  04/01/2027.
+
+### Admisibilidad de Efeonce (cruce 06/11, [registro de partnerships](../../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md))
+
+| Requisito | Estado | Lectura |
+| --- | --- | --- |
+| Google Partners (Ads) | Bienvenida 2024; badge actual no verificado. Partner de Google Cloud ≠ Google Partners | Verificar en el portal |
+| Meta Business Partner | No iniciado | No se obtiene antes del 16/11 |
+| «HubSpot Premium» | Gold Solutions Partner (readback 06/10) | Nivel inexistente; consultado |
+| Equipo 7, medios > 50 UF/mes, referencias, viabilidad financiera | Sin verificar | — |
+| Presupuesto | ≈ 60 UF/mes si es sólo tarifa | Bajo para 7 roles; revisar contra piso de margen |
+
+Si las certificaciones son eliminatorias, Efeonce queda fuera por Meta. El sitio corporativo usa **Marketo**
+(script visto el 06/11); KSB Chile podría usar HubSpot localmente.
+
+## Consultas enviadas (06/11/2026 10:12 Santiago)
+
+Respuesta en el mismo hilo, desde Outlook web con firma gráfica; Para Nelson, CC Pamela, CCO
+`48713323@bcc.hubspot.com`. Readback de Enviados: 13:12:36Z, destinatarios y CCO correctos. HubSpot EMAIL
+120642546293 `SENT`. Preguntas:
+
+1. Certificaciones: ¿excluyentes o puntúan? ¿Qué nivel es «HubSpot Premium»? (se declaró Gold)
+2. ¿720 UF sólo tarifa o incluye medios? ¿Inversión mensual en medios 2027?
+3. La matriz suma 90 %: ¿criterio faltante?
+4. Rol Email + Lead Gen con email fuera del alcance; ¿CRM HubSpot en Chile? ¿Los leads del sitio (Marketo) llegan al CRM?
+5. ¿Sobre qué propiedades y línea base se mide el tráfico orgánico?
+6. ¿Lead-to-customer y retención quedan condicionados como ROI/ROAS? ¿Línea base de MQL?
+7. ¿Qué certificado de viabilidad financiera aceptan? ¿Qué son «montos comparables»?
+8. Formato y canal de entrega, tamaño máximo y fecha límite de consultas.
+
+---
+
+*Corte del 05/11/2026 (histórico):*
 
 ## Señal y fuente
 
@@ -39,7 +105,10 @@ La fecha de presentación se conserva textual; no se registra datetime hasta que
 
 | Objeto | ID | Detalle |
 | --- | --- | --- |
-| Negocio | 67622242568 | `KSB \| CL \| Agencia de marketing digital 2027 \| 2026-11`. Cita programada como entrada administrativa, Licitación, Prospección directa, Efeonce Digital, Strategic Bets, CLP. Sin monto ni cierre. Próximo paso: esperar bases; GO/NO-GO por admisibilidad. |
+| Negocio | 67622242568 | `KSB \| CL \| Agencia de marketing digital 2027 \| 2026-11`. Cita programada como entrada administrativa, Licitación, Prospección directa, Efeonce Digital, Strategic Bets. **06/11:** moneda UF (CLF), presupuesto de licitación 720, ID LIC-MKT-2026-001, cierre 2026-11-16T19:30:00Z, próximo paso «consultas enviadas; GO/NO-GO según respuesta». Monto vacío (sin precio Efeonce). |
+| Contacto | 260888175661 | Nelson Urbano Meza, Gerente Marketing, celular +56 9 6863 9824. HubSpot lo creó al registrar su correo (06/11 12:28Z) con cargo errado; corregido y asociado a empresa y negocio. |
+| Contacto | 260888305444 | Pamela Ojeda (`pamela.ojeda@ksb.com`). HubSpot la creó con el CCO del 06/11; cargo «Graphic Designer» por enriquecimiento automático, **sin verificar**. Asociada a empresa y negocio. |
+| Email | 120642546293 | Consultas del 06/11, `SENT`. |
 | Empresa | 60766270868 | KSB Chile S.A., Chile. Hija de la Company KSB 53965760378 (Alemania). Una automatización puso su ciclo de vida en «Oportunidad». |
 | Contacto | 215349028236 | Buzón `cl.ksb@ksb.com`, reutilizado. |
 | Email | 120622408328 | Solicitud de bases, estado `SENT`, asociada al contacto y al negocio. |
@@ -76,9 +145,10 @@ están leídas, así que este gate queda abierto.
 
 ## Qué falta
 
-1. Recibir las bases y leerlas completas.
-2. Matriz de admisibilidad y GO/NO-GO (certificaciones, equipo 7+, ROI, referencias, presupuesto).
-3. Confirmar hora de cierre, formato de entrega y ronda de consultas.
-4. Opcional: match en Apollo de Nelson Urbano Meza (1 crédito si lo encuentra).
+1. ~~Recibir y leer las bases~~ (06/11). ~~Confirmar hora de cierre~~ (16:30). ~~Enviar consultas~~ (06/11 10:12).
+2. Verificar el estado de Google Partners en su portal.
+3. Esperar respuesta a las consultas y decidir GO/NO-GO. Si las certificaciones son eliminatorias y faltan, NO-GO.
+4. Si hay GO: equipo de 7, referencias con montos comparables, evidencia de medios > 50 UF/mes, certificado de
+   viabilidad financiera y cotización contra el piso de margen; carpetas de trabajo en OneDrive `KSB Chile/02–05`.
 
-Sin oferta técnica, económica, deck, `proposal-studio.json` ni consultas formales mientras no haya bases y GO.
+Sin oferta técnica, económica, deck ni `proposal-studio.json` mientras no haya GO.

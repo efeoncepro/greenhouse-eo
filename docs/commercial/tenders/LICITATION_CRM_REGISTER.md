@@ -1,6 +1,15 @@
 # Registro operativo CRM de licitaciones
 
-## KSB Chile — Agencia de Marketing Digital 2027 — licitación privada — solicitud de bases enviada 05/11/2026
+## KSB Chile — Agencia de Marketing Digital 2027 — licitación privada — bases recibidas y consultas enviadas 06/11/2026
+
+**Delta 06/11/2026:** bases LIC-MKT-2026-001 recibidas de Nelson Urbano (CC Pamela Ojeda) a las 09:27 Santiago;
+cierre **16/11/2026 16:30**. Consultas enviadas por Julio a las 10:12 en el mismo hilo, con firma gráfica y CCO
+(EMAIL 120642546293 `SENT`). Negocio en **UF (CLF)**, presupuesto de licitación 720, ID LIC-MKT-2026-001, cierre
+2026-11-16T19:30:00Z y próximo paso actualizados. Contactos Nelson 260888175661 (Gerente Marketing, celular) y
+Pamela 260888305444 asociados a la empresa y al negocio; ambos los creó HubSpot al registrar los correos, y el cargo
+«Graphic Designer» de Pamela es del enriquecimiento automático, sin verificar. PDF en OneDrive
+`Licitaciones/KSB Chile/01. Bases y anexos originales/`. GO/NO-GO pendiente de las respuestas. Lo siguiente es el
+corte del 05/11.
 
 Estado: `Screening`. Señal en LinkedIn (Nelson Urbano Meza, KSB Chile S.A.), publicada el 05/11/2026; presentación
 16/11/2026 sin hora ni zona; presupuesto base 720 UF/año; vigencia 12 meses + 2 prórrogas.

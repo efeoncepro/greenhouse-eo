@@ -1,6 +1,11 @@
 # Registro operativo general de negocios CRM
 
-## KSB Chile — Agencia de Marketing Digital 2027 — solicitud de bases enviada 05/11/2026
+## KSB Chile — Agencia de Marketing Digital 2027 — consultas enviadas 06/11/2026
+
+**Delta 06/11/2026:** bases LIC-MKT-2026-001 recibidas (cierre 16/11 16:30); consultas enviadas a Nelson Urbano y
+Pamela Ojeda (EMAIL 120642546293 `SENT`). Deal pasado a UF (CLF) con presupuesto de licitación 720, ID, fecha de
+cierre y próximo paso; contactos Nelson 260888175661 y Pamela 260888305444 asociados a empresa y deal. Detalle en el
+[registro de licitaciones](tenders/LICITATION_CRM_REGISTER.md). Lo siguiente es el corte del 05/11.
 
 [Deal 67622242568](https://app.hubspot.com/contacts/48713323/record/0-3/67622242568), **KSB ∣ CL ∣ Agencia de marketing digital 2027 ∣ 2026-11**. Licitación privada detectada en LinkedIn (Nelson Urbano Meza, KSB Chile S.A.) el 05/11/2026. Company nueva KSB Chile S.A. 60766270868, hija de KSB 53965760378 (Alemania); ciclo de vida «Oportunidad» puesto por automatización. Contact buzón `cl.ksb@ksb.com` 215349028236 reutilizado. Cita programada como entrada administrativa; Licitación, Prospección directa, Efeonce Digital, Strategic Bets, CLP; sin monto ni cierre. Presentación 16/11/2026 sin hora ni zona; presupuesto base 720 UF/año. Correo de solicitud de bases enviado por Julio el 05/11/2026 17:23 (EMAIL 120622408328 `SENT`); próximo paso: esperar bases y GO/NO-GO por admisibilidad. Sin bases leídas, GO ni oferta. [Expediente](tenders/ksb-chile-agencia-marketing-digital-2027/README.md).
 
