@@ -7,6 +7,11 @@
 > Partner y «HubSpot Premium» como elegibilidad, y Efeonce no tiene Meta ni Google Partners verificado.
 > **Cierre:** lunes **16/11/2026, 16:30** (Santiago).
 
+## Anexo económico (06/11/2026)
+
+Borradores del Cotizador V3 en dos niveles, en `ai-generations/2026-11-06_propuesta-ksb/anexo-economico/entrega/`
+(Mínimo; Esencial en dos documentos). Precios sin aprobar; supuestos de condiciones en el `LEEME.md` de esa carpeta.
+
 ## Respuestas a las consultas (06/11/2026 14:46)
 
 Nelson envió `Respuestas_Consultas_Agencias_LIC-MKT-2026_v2.pdf` (FAQ oficial). Texto por tema:

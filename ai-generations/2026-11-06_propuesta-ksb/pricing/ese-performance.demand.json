@@ -142,8 +142,48 @@
     ],
     "adjustments": [],
     "taxTreatment": {
-      "kind": "not_resolved"
-    }
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "tax:cl-iva-19",
+      "source": {
+        "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    },
+    "thirdPartyCosts": [
+      {
+        "costId": "media-ksb",
+        "category": "media",
+        "label": "Medios digitales: Google Ads, LinkedIn Ads y Meta",
+        "supplier": "Google, LinkedIn y Meta",
+        "settlement": "client_direct",
+        "amount": "1650543",
+        "currency": "CLP",
+        "quantity": "1",
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "evidence": {
+          "reference": "KSB FAQ V2 06/11/2026: medios minimo recomendado 40 UF/mes, referencial; UF 41.263,57",
+          "effectiveFrom": "2026-11-06",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      }
+    ]
   },
   "work": [
     {

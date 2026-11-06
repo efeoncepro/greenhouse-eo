@@ -25,3 +25,11 @@
   **Riesgo:** el Mínimo no cubre contenidos, redes ni el equipo de 7 que exigen las bases. La lámina 19 pasa a
   `content-pricing` `live` (tres líneas: pauta y leads, contenidos y redes, medios); la receta nunca imprime montos,
   que van en el anexo económico A4.
+
+## 06/11/2026 — Anexo económico A4, dos niveles (Julio: «Sí, arma el anexo»)
+
+- Tres PDF del Cotizador V3 en `anexo-economico/entrega/`: Mínimo (1 documento) y Esencial (Pauta y leads + Contenidos
+  y redes, dos documentos: el cotizador no junta dos cotizaciones en uno). Borradores sin validez comercial.
+- Medios 40 UF/mes como pago directo de KSB, fuera del total; IVA 19 %.
+- Pendiente de Julio: aprobar precios, forma de pago (mensual al cierre), vigencia (90 días), CLP o UF, y verificar el
+  RUT de KSB. Detalle en `anexo-economico/LEEME.md`.

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "KSB · LIC-MKT-2026-001 · Nivel Esencial · 2 de 2",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "KSB Chile S.A.",
+    "taxId": "RUT 96.691.060-7",
+    "unit": "Gerencia de Marketing",
+    "contact": "Nelson Urbano Meza, Gerente de Marketing"
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Nivel Esencial",
+      "Contenidos y redes"
+    ],
+    "subtitle": "Línea editorial técnica, publicaciones en LinkedIn, Instagram y Facebook, y video para YouTube. Es la segunda de dos partes del nivel Esencial.",
+    "netLabel": "Honorarios netos de 12 meses"
+  },
+  "service": {
+    "name": "Agencia de Marketing Digital 2027 · Nivel Esencial · Contenidos y redes"
+  },
+  "scope": {
+    "title": [
+      "Alcance"
+    ],
+    "intro": "Lo que incluyen los contenidos y las redes sociales del nivel Esencial durante los doce meses del servicio.",
+    "rows": [
+      {
+        "title": "Línea editorial",
+        "text": "Línea editorial técnica para los segmentos de KSB y calendario mensual aprobado por la Gerencia de Marketing."
+      },
+      {
+        "title": "Redes sociales",
+        "text": "Dos publicaciones por semana en LinkedIn, Instagram y Facebook, cada una, con su moderación."
+      },
+      {
+        "title": "Video",
+        "text": "Un video al mes para YouTube, con sus cortes para redes."
+      },
+      {
+        "title": "Diseño y textos",
+        "text": "Las piezas de redes y de pauta, y los textos de publicaciones y anuncios."
+      },
+      {
+        "title": "Propiedad",
+        "text": "Las creatividades y estrategias son propiedad de KSB, según las bases."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario",
+    "phases": [
+      {
+        "label": "Diciembre de 2026",
+        "title": "Plan y línea base",
+        "text": "Plan de trabajo, accesos y auditoría de línea base con los históricos de KSB, en las fechas que fijan las bases."
+      },
+      {
+        "label": "Enero a marzo de 2027",
+        "title": "Arranque y rampa",
+        "text": "Salida de campañas, ajuste semanal y primer comité trimestral contra los KPIs de la rampa."
+      },
+      {
+        "label": "Abril a diciembre de 2027",
+        "title": "Optimización y escala",
+        "text": "Optimización por segmento y canal, y decisión de prórroga con los KPIs del año."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Oferta económica"
+    ],
+    "intro": "Honorarios de Efeonce por mes de servicio. El nivel Esencial suma esta oferta y la de Pauta y leads.",
+    "summary": "Valor fijo mensual, con la frecuencia de las bases.",
+    "taxNote": "Valores netos en pesos chilenos. El IVA se agrega al facturar, como piden las bases."
+  },
+  "conditions": {
+    "title": [
+      "Condiciones"
+    ],
+    "rows": [
+      {
+        "title": "Plazo",
+        "text": "Doce meses desde el inicio del servicio, con dos prórrogas posibles según las bases de la licitación."
+      },
+      {
+        "title": "Forma de pago",
+        "text": "Factura mensual por mes de servicio, al cierre de cada mes."
+      },
+      {
+        "title": "Lo que aporta KSB",
+        "text": "Accesos a las cuentas de LinkedIn, Instagram, Facebook y YouTube; el material técnico y de productos; una persona que apruebe piezas y calendario; y respuestas técnicas a tiempo para la moderación."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Noventa días desde la fecha de esta oferta."
+      }
+    ]
+  },
+  "lines": {
+    "fee": {
+      "label": "Honorarios Efeonce · Contenidos y redes",
+      "detail": "LinkedIn, Instagram, Facebook y YouTube",
+      "group": "Servicio"
+    }
+  }
+}

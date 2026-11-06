@@ -33,4 +33,15 @@ if 'adobe-express' in tools:
     a=alloc('adobe-express','current',1,'assigned-user-seat',3,v,f'Redes diseña piezas simples con una licencia de Express del paquete de tres; KSB carga {v} de 3.'); a['seatCapacity']=3; al.append(a)
 d['allocations'] = al
 if 'adobe' in tools or 'adobe-express' in tools: d['fxRecordIds'] = ['fx:CLP:USD']
+# Medios: KSB los paga directo en sus cuentas (FAQ V2, 06/11): fuera de todo total; no cambian el fee.
+if k.endswith('performance'):
+    d['brief']['thirdPartyCosts'] = [{"costId": "media-ksb", "category": "media",
+        "label": ("Medios digitales: Google Ads y LinkedIn Ads" if k.startswith('base') else "Medios digitales: Google Ads, LinkedIn Ads y Meta"), "supplier": "Google, LinkedIn y Meta",
+        "settlement": "client_direct", "amount": "1650543", "currency": "CLP", "quantity": "1", "periodIds": P,
+        "evidence": {"reference": "KSB FAQ V2 06/11/2026: medios minimo recomendado 40 UF/mes, referencial; UF 41.263,57",
+                     "effectiveFrom": "2026-11-06", "effectiveUntil": "2027-12-31", "status": "estimated"}}]
+# IVA: las bases (FAQ V2) piden valores más IVA; servicio afecto prestado en Chile.
+d['brief']['taxTreatment'] = {"kind": "exclusive", "rate": "0.19", "policyRef": "tax:cl-iva-19",
+    "source": {"reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+               "effectiveFrom": "2026-01-01", "effectiveUntil": "9999-12-31", "status": "confirmed"}}
 json.dump(d, open(k+'.demand.json','w'), ensure_ascii=False, indent=2)

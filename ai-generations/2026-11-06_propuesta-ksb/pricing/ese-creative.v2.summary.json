@@ -1,0 +1,1386 @@
+{
+  "schemaVersion": "pricing-v3-composition-summary/1",
+  "version": "pricing-v3-resource-composition/1",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "calculationId": "composition-496be2ef8fab71e46c7ce02e",
+  "replayDigest": "496be2ef8fab71e46c7ce02e6b1f42b38ea10d2b2eece860bfde9c0a14f648b9",
+  "calculationStatus": "calculated",
+  "reviewStatus": "requires_review",
+  "quoteReviewStatus": "requires_review",
+  "engineVersion": "pricing-v3-local/1.3.0",
+  "totals": {
+    "cost": "19504848",
+    "marketAdjustment": "0",
+    "engagementAdjustment": "0",
+    "undiscountedPrice": "35760000",
+    "roundingAdjustment": "296616",
+    "discount": "0",
+    "uplift": "0",
+    "net": "35760000",
+    "marginAmount": "16255152",
+    "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+    "tax": "6794400",
+    "grandTotal": "42554400",
+    "cashCommitment": "19504848",
+    "averageMonthlyNet": "2980000",
+    "currency": "CLP"
+  },
+  "commercialAdjustments": [],
+  "priceRounding": {
+    "currency": "CLP",
+    "multiple": "10000",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "rounding:CLP",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "engagementForm": {
+    "form": "on_going",
+    "priceRatio": "1",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "engagement:on_going",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marginRateRoundedDown": "0.454562",
+  "diagnostics": [],
+  "assumptions": [
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.contenido.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.social.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.diseno.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.copy.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.video.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    }
+  ],
+  "periods": [
+    {
+      "periodId": 1,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 2,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 3,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 4,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 5,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 6,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 7,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 8,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 9,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 10,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 11,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    },
+    {
+      "periodId": 12,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1625404",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2980000",
+        "roundingAdjustment": "24718",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2980000",
+        "marginAmount": "1354596",
+        "marginRate": "0.45456241610738255033557046979865771812080536912751677852348993288590604026845638",
+        "tax": "566200",
+        "grandTotal": "3546200",
+        "cashCommitment": "1625404",
+        "uniformMonthlyNet": "2980000"
+      }
+    }
+  ],
+  "reviewSignals": [
+    {
+      "code": "HISTORICAL_ONLY",
+      "severity": "review",
+      "count": 12,
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "lineIds": [],
+      "paths": [
+        "snapshot.mode"
+      ]
+    },
+    {
+      "code": "ESTIMATED_SOURCE",
+      "severity": "review",
+      "count": 204,
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "lineIds": [
+        "contenido",
+        "social",
+        "diseno",
+        "copy",
+        "video"
+      ],
+      "paths": [
+        "request.lines.0.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-0",
+        "snapshot.resources.fee:ECG-010",
+        "request.lines.1.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-1",
+        "snapshot.resources.fee:ECG-006",
+        "snapshot.resources.composed:metricool",
+        "request.lines.2.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-2",
+        "snapshot.resources.fee:ECG-003",
+        "request.lines.3.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-3",
+        "snapshot.resources.fee:ECG-011",
+        "request.lines.4.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-4",
+        "snapshot.resources.fee:ECG-018",
+        "snapshot.resources.composed:frame-io"
+      ]
+    }
+  ],
+  "marginFloor": {
+    "source": "kernel:MARGIN_BELOW_FLOOR",
+    "flaggedLinePeriods": 0,
+    "lines": []
+  },
+  "toolSelections": {
+    "counts": {
+      "rows": 2100,
+      "included": 192,
+      "clientProvided": 0,
+      "explicitlyExcluded": 0,
+      "notRequiredForWork": 1908
+    },
+    "included": [
+      {
+        "lineId": "contenido",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "contenido",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "contenido",
+        "toolId": "adobe-express",
+        "reasons": [
+          "task:express-design"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "social",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "social",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "social",
+        "toolId": "metricool",
+        "reasons": [
+          "task:social-publishing"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "social",
+        "toolId": "adobe-express",
+        "reasons": [
+          "task:express-design"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "diseno",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "diseno",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "diseno",
+        "toolId": "adobe",
+        "reasons": [
+          "task:visual-design"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "copy",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "copy",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "adobe",
+        "reasons": [
+          "task:video-editing"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "video",
+        "toolId": "frame-io",
+        "reasons": [
+          "task:video-editing"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      }
+    ],
+    "clientProvided": [],
+    "explicitlyExcluded": []
+  },
+  "attributions": [
+    {
+      "toolId": "notion",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "5",
+      "serviceShare": "0.174",
+      "fullMonthlyCost": "120",
+      "attributedMonthlyCost": "20.88",
+      "unallocatedMonthlyCost": "99.12",
+      "consumerCount": 5,
+      "lineIds": [
+        "contenido",
+        "social",
+        "diseno",
+        "copy",
+        "video"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "5",
+      "serviceShare": "0.174",
+      "fullMonthlyCost": "73.5",
+      "attributedMonthlyCost": "12.789",
+      "unallocatedMonthlyCost": "60.711",
+      "consumerCount": 5,
+      "lineIds": [
+        "contenido",
+        "social",
+        "diseno",
+        "copy",
+        "video"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "adobe-express",
+      "priceId": "current",
+      "currency": "CLP",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "1",
+      "serviceShare": "0.083333333333333333",
+      "fullMonthlyCost": "16240",
+      "attributedMonthlyCost": "1353.33333333333332792",
+      "unallocatedMonthlyCost": "14886.66666666666667208",
+      "consumerCount": 2,
+      "lineIds": [
+        "contenido",
+        "social"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "metricool",
+      "priceId": "historical",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "1",
+      "serviceShare": "1",
+      "fullMonthlyCost": "54",
+      "attributedMonthlyCost": "54",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 1,
+      "lineIds": [
+        "social"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "adobe",
+      "priceId": "current",
+      "currency": "CLP",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "1",
+      "serviceShare": "0.123333333333333333",
+      "fullMonthlyCost": "325405.5",
+      "attributedMonthlyCost": "40133.3449999999998915315",
+      "unallocatedMonthlyCost": "285272.1550000000001084685",
+      "consumerCount": 2,
+      "lineIds": [
+        "diseno",
+        "video"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "frame-io",
+      "priceId": "historical",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "1",
+      "serviceShare": "0.12",
+      "fullMonthlyCost": "75",
+      "attributedMonthlyCost": "9",
+      "unallocatedMonthlyCost": "66",
+      "consumerCount": 1,
+      "lineIds": [
+        "video"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  ],
+  "creditBudgets": [],
+  "resourceIncrementalCash": [],
+  "cashLedger": [
+    {
+      "key": "human-monthly-and-once",
+      "amount": "1625404",
+      "currency": "CLP",
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  ],
+  "cashMeaning": "Kernel cashCommitment is attributed modeled commitment, not incremental purchase or an invoice. Incremental cash here covers only declared credit top-ups; seat procurement is not inferred.",
+  "estimateExposure": {
+    "basis": "Shares of the frozen cost components; nothing is recalculated. marginRateLostIfTenPctHigher = 0.10 x costAtRisk / net.",
+    "currency": "CLP",
+    "totalCost": "19504848",
+    "net": "35760000",
+    "estimatedCost": "18603000",
+    "confirmedCost": "901848",
+    "estimatedShareOfCost": "0.953763",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0",
+      "shareOfCost": "0.000000"
+    },
+    "priceInputs": [],
+    "estimatedRules": [
+      {
+        "kind": "allocation_policy",
+        "side": "cost",
+        "ids": [
+          "allocation:shared"
+        ],
+        "lineIds": [
+          "contenido",
+          "social",
+          "diseno",
+          "copy",
+          "video"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "humanCostGoverned": "14907000",
+        "billedFteSetByRuleOn": []
+      },
+      {
+        "kind": "pricing_policy",
+        "side": "price",
+        "ids": [
+          "pricing:ECG-010:creative-managed-service",
+          "pricing:ECG-006:creative-managed-service",
+          "pricing:ECG-003:creative-managed-service",
+          "pricing:ECG-011:creative-managed-service",
+          "pricing:ECG-018:creative-managed-service"
+        ],
+        "lineIds": [
+          "contenido",
+          "social",
+          "diseno",
+          "copy",
+          "video"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      }
+    ],
+    "costInputs": [
+      {
+        "kind": "dedication",
+        "id": "social",
+        "label": "Social Media Manager",
+        "lineIds": [
+          "social"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "4500000",
+        "shareOfCost": "0.230712",
+        "marginRateLostIfTenPctHigher": "0.012584"
+      },
+      {
+        "kind": "dedication",
+        "id": "contenido",
+        "label": "Content Manager",
+        "lineIds": [
+          "contenido"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "3060000",
+        "shareOfCost": "0.156884",
+        "marginRateLostIfTenPctHigher": "0.008558"
+      },
+      {
+        "kind": "dedication",
+        "id": "diseno",
+        "label": "Creative Designer",
+        "lineIds": [
+          "diseno"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "2955000",
+        "shareOfCost": "0.151501",
+        "marginRateLostIfTenPctHigher": "0.008264"
+      },
+      {
+        "kind": "dedication",
+        "id": "video",
+        "label": "Video Editor/Motion Graphics Designer",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "2592000",
+        "shareOfCost": "0.132890",
+        "marginRateLostIfTenPctHigher": "0.007249"
+      },
+      {
+        "kind": "dedication",
+        "id": "copy",
+        "label": "Copywriter",
+        "lineIds": [
+          "copy"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "1800000",
+        "shareOfCost": "0.092285",
+        "marginRateLostIfTenPctHigher": "0.005034"
+      },
+      {
+        "kind": "tool",
+        "id": "metricool",
+        "priceId": "historical",
+        "label": "Metricool",
+        "billing": "month",
+        "lineIds": [
+          "social"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "648000",
+        "shareOfCost": "0.033223",
+        "marginRateLostIfTenPctHigher": "0.001813"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-003",
+        "label": "Historical generic platform fee — ECG-003",
+        "billing": "month",
+        "recordId": "fee:ECG-003",
+        "lineIds": [
+          "diseno"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.030146",
+        "marginRateLostIfTenPctHigher": "0.001645"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-006",
+        "label": "Historical generic platform fee — ECG-006",
+        "billing": "month",
+        "recordId": "fee:ECG-006",
+        "lineIds": [
+          "social"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.030146",
+        "marginRateLostIfTenPctHigher": "0.001645"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-010",
+        "label": "Historical generic platform fee — ECG-010",
+        "billing": "month",
+        "recordId": "fee:ECG-010",
+        "lineIds": [
+          "contenido"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.030146",
+        "marginRateLostIfTenPctHigher": "0.001645"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-011",
+        "label": "Historical generic platform fee — ECG-011",
+        "billing": "month",
+        "recordId": "fee:ECG-011",
+        "lineIds": [
+          "copy"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.030146",
+        "marginRateLostIfTenPctHigher": "0.001645"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-018",
+        "label": "Historical generic platform fee — ECG-018",
+        "billing": "month",
+        "recordId": "fee:ECG-018",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.030146",
+        "marginRateLostIfTenPctHigher": "0.001645"
+      },
+      {
+        "kind": "tool",
+        "id": "frame-io",
+        "priceId": "historical",
+        "label": "Frame.io",
+        "billing": "month",
+        "lineIds": [
+          "video"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "108000",
+        "shareOfCost": "0.005537",
+        "marginRateLostIfTenPctHigher": "0.000303"
+      }
+    ]
+  },
+  "fullDetail": "Derived from the frozen composition artifact. Every selection row, attribution assignment, kernel line with its cost components, per-period diagnostic and credit plan lives in that file under semantic.result.",
+  "runNotices": {
+    "priceDates": {
+      "withinDays": 30,
+      "reviewDue": [],
+      "dueSoon": [
+        {
+          "subject": "tool_price",
+          "ref": "adobe-express:current",
+          "toolId": "adobe-express",
+          "priceId": "current",
+          "label": "Adobe Express",
+          "kind": "review",
+          "date": "2026-11-16",
+          "blocksWith": null,
+          "daysLeft": 10
+        },
+        {
+          "subject": "tool_price",
+          "ref": "adobe:current",
+          "toolId": "adobe",
+          "priceId": "current",
+          "label": "Adobe Creative Cloud Pro",
+          "kind": "review",
+          "date": "2026-11-16",
+          "blocksWith": null,
+          "daysLeft": 10
+        }
+      ],
+      "expired": []
+    }
+  }
+}
