@@ -38,7 +38,8 @@ Créditos Apollo: 2 (un match por persona). No se encontró gerencia de marketin
 
 - Brochure Marketing de Contenidos completo, documento `357058082`
   (`Efeonce-Brochure-Marketing-de-Contenidos.pdf`), enlace nativo para Diana: https://hubs.ly/Q04DydnW0
-  (resuelve a hubspotdocuments.com, 200).
+  (resuelve a hubspotdocuments.com, 200). Segundo enlace para `comercial@rap.cl`: https://hubs.ly/Q04DywFv0
+  (301 → hubspotdocuments.com, 200).
 - Landings comprobadas en vivo (200): redes sociales, agencia creativa, performance marketing, agencia de
   influencers, agenda.
 
@@ -98,6 +99,8 @@ Saludos cordiales,
 | --- | --- | --- |
 | Email (Outlook web, Chrome de Julio) | **Enviado** 06/11/2026 03:14 America/Santiago (06:14:21Z) | Enviados: remitente jreyes@efeoncepro.com, Para dmendoza@schopdog.cl, CC vacío, CCO 48713323@bcc.hubspot.com, cuerpo completo con 7 enlaces, una firma gráfica oficial, sin adjuntos. Borrador persistido verificado por conector antes de enviar. |
 | HubSpot | Registrado | EMAIL `120622649602`, `SENT`, asociado al Contact 260857217837. |
+| Email al canal oficial (Outlook web, Chrome de Julio) | **Enviado** 06/11/2026 05:11 America/Santiago (08:11:17Z) | La publicación indica «Reales interesad@s enviar correo a `comercial@rap.cl`» (visto en una segunda captura de Julio; la primera revisión no lo mostraba). Julio autorizó el envío. Para comercial@rap.cl, CCO 48713323@bcc.hubspot.com, cuerpo con 6 enlaces y firma gráfica oficial; borrador persistido verificado por conector antes de enviar (el primer guardado tenía sólo la firma: se forzó con una edición real). Menciona que también se escribió a Diana. |
+| HubSpot (canal oficial) | Registrado | EMAIL `120605452926`, `SENT`. Contact `260766729054` (`comercial@rap.cl`, buzón oficial del proceso, no persona) lo creó HubSpot al generar el enlace del brochure; asociado a la Company 60776029492 sin etiqueta Primary. El EMAIL también quedó asociado a la Company. |
 | LinkedIn | No solicitado | — |
 
 Lifecycle observado tras el envío (automatización, no juicio comercial): Contact `salesqualifiedlead`, Company `lead`.
