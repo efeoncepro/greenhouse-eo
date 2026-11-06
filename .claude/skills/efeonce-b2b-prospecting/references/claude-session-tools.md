@@ -41,6 +41,10 @@ Borrador y envío por Outlook siguen la [política vigente](../../../../docs/ope
 Un borrador creado no es un envío.
 Si el navegador integrado muestra vencida la sesión de HubSpot, reintentar en Claude in Chrome (el Chrome real
 de Julio) antes de declarar bloqueo; nunca ingresar credenciales. KSB, 05/11/2026: el enlace del brochure salió así.
+Documents de HubSpot: «Crear enlace» está arriba a la derecha en `https://app.hubspot.com/documents/48713323/summary/<documentId>`;
+`presentations/48713323/view/<id>` y `app-na1.hubspotdocuments.com/documents/48713323` dan 404. Brochures completos:
+Marketing de Contenidos `357058082`, Agencia de Marketing 360° `357361299`. Cada destinatario recibe su propio hubs.ly;
+comprobar con `curl -sIL` el 301 a hubspotdocuments.com y el 200 final. SCHOPDOG, 06/11/2026: `https://hubs.ly/Q04DywFv0`.
 
 ## Radar personal
 

@@ -148,8 +148,10 @@ Lecciones del envío de la propuesta a Assetplan desde Outlook web en el navegad
   (`read_resource`), mostraba `bccRecipients: []` aunque la dirección estaba escrita. Se resolvió escribiendo
   la dirección y pulsando **Enter** sobre la sugerencia; luego Enviados mostró el CCO correcto. Hacer clic en la
   sugerencia abrió el complemento HubSpot Sales y una ventana de inicio de sesión de HubSpot que el agente no
-  puede cerrar y que bloquea el JavaScript de la página; Julio la cerró. Resolver con teclado y comprobar el
-  CCO en el borrador guardado por conector antes de enviar.
+  puede cerrar y que bloquea el JavaScript de la página; Julio la cerró. **06/11/2026:** en el correo a
+  `comercial@rap.cl`, Enter dejó la dirección como texto con las sugerencias abiertas y el clic en la
+  sugerencia creó la píldora; ese mismo día, con Diana, Enter había bastado. Usar Enter o clic y confirmar
+  siempre la píldora en el DOM y el CCO en el borrador guardado por conector antes de enviar.
 - **Espacios entre párrafos.** Julio corrigió: «No estás dejando nada de espacios». El cuerpo lleva una línea en
   blanco entre saludo, introducción, resumen con viñetas, inversión, invitación y despedida. Verificarlo leyendo
   el borrador guardado por conector, no sólo el editor.
@@ -207,6 +209,13 @@ Los casos [Lucía / Flesan](../commercial/prospecting-agent/runs/2026-10-24-fles
 regla: corregir el cuerpo visible que no persistió, releer el borrador completo y después el ID nuevo de
 Enviados, con ambos enlaces de Documents, una firma gráfica y Para/CCO exactos. En Yvette, la excepción
 de atribución de correo autorizó ese destinatario y envío; no modifica esta política ni prueba entrega.
+
+**06/11/2026 — inserción programática.** En [SCHOPDOG](../commercial/prospecting-agent/runs/2026-11-06-schopdog-diana.md),
+el cuerpo insertado con `document.execCommand('insertHTML')` antes de la firma se veía completo y Outlook indicaba
+«Borrador guardado», pero la lectura por conector (Borradores + `read_resource`) tenía sólo la firma. Una edición real
+con teclado (clic al final de «Saludos cordiales,», End, espacio, Backspace) y ~8 s de espera lo persistieron: cuerpo,
+6 enlaces, una firma y Para/CCO correctos; envío único (Enviados 08:11:17Z; HubSpot EMAIL `120605452926` SENT). Tras
+una inserción programática, forzar esa edición antes del readback: «Borrador guardado» no acredita el cuerpo persistido.
 
 ### Aplicación Mass Chile — 26/10/2026
 
