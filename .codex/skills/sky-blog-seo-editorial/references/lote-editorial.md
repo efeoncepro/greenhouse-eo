@@ -169,6 +169,7 @@ párrafo repetidas.
 **Verificación después de insertar** (`verify*.py`/`vfy.py` sobre el resultado de `notion-fetch`): una sola
 vez el encabezado ✍️, IMG 1–3, BANNER 1, la firma `Por Equipo editorial del Blog SKY · Actualizado: <fecha>`,
 «Está bueno SKY.», «Fuentes (uso interno)», el bloque ```json y los toggles; cero `&lt;br` y cero `<details>`.
+Después, la ficha se pliega en secciones (§6, «Estructura de la ficha») y se verifica con `verify.py`.
 
 ## 5. Specs de imágenes y banner
 
@@ -199,6 +200,55 @@ antes del handoff. Los scripts del lote vivieron en el scratchpad de la sesión 
 - Evitar `<`, `≤` y `~` sueltos: escribir «menos de», «cerca de».
 - El JSON-LD no cabe en una celda: bloque ```json bajo la tabla.
 - Textos largos: 2–4 inserciones consecutivas al final, en orden. Si una falla, corregir y reintentar sólo esa.
+
+### Estructura de la ficha: secciones plegables, nunca texto corrido
+
+Julio, 06-11-2026: «dejaste la chorrera de texto y no organizaste la información en toggles jerárquicos;
+cuando el cliente vea eso no va a saber qué ver». SKY lee estas fichas. Brief, research, artículo, fuentes y
+producción apilados (500 a 900 líneas) no dejan ver dónde está el artículo. Toda ficha con research o
+artículo queda así, en este orden. El modelo es la ficha de Punta Sal:
+
+1. Callout 🧭 azul: «Cómo leer esta página: cada sección se abre con el triángulo de la izquierda. La 3 es el
+   artículo; las demás son material interno (research, fuentes, producción).»
+2. `<table-of-contents />`.
+3. `<toggle heading="h1">` **📋 Brief del encargo**: el contenido de «Tema y enfoque», sin su H2.
+4. `<toggle heading="h1">` **🔎 Research SEO/AEO · fecha · uso interno**.
+5. `<toggle heading="h1">` **✍️ Artículo vN · fecha · POV «El Viajero»**. Lleva adentro:
+   - el callout 🎥;
+   - `<toggle heading="h2">` **Ficha SEO y metadatos**, con la tabla;
+   - `<toggle color="gray_bg">` **JSON-LD para Dev**, con el bloque ```json;
+   - el cuerpo publicable, abierto, con sus callouts.
+6. `<toggle heading="h1">` **🗂️ Fuentes y hallazgos · uso interno**: la tabla de fuentes y los callouts 🚨.
+7. `<toggle heading="h1">` **🧪 Producción y cambios**: los toggles 🖼️ de imágenes y 📝 de cambios.
+
+Sin separadores `---` entre secciones. Si la página guarda una versión anterior completa (los artículos de
+prueba de octubre), esa versión, con su encuadre, va en un primer toggle **🗄️ Encuadre y versión anterior ·
+solo referencia**. El callout 🧭 lo dice: «La 3 es el artículo vigente. La 1 guarda el encuadre y la versión
+anterior solo como referencia». Las subpáginas (V1, V2, V3) quedan dentro de ese toggle, intactas.
+
+**Cómo aplicarla sobre fichas ya escritas.** No reescribir la página con `replace_content`: obliga a
+reenviarla entera, de 50 a 100 KB. Usar `update_content` con anclas cortas que insertan las etiquetas
+`<toggle>`/`</toggle>` en los límites de cada sección. Todas van en una sola llamada para que la página quede
+balanceada. El generador está en `outputs/sky-blog-content-hub-estructura/genops.py`: toma el resultado de
+`notion-fetch` y produce las anclas, que deben ser únicas en la página. `verify.py` lee la página otra vez y
+exige:
+
+- balance 0;
+- cinco toggles h1;
+- fuera de los toggles, sólo el callout 🧭 y el índice;
+- cero etiquetas literales.
+
+Antes de tocar una página, mirar su estructura: si ya tiene toggles h1 (la ordenó el equipo) o pestañas
+`<tabs>`, no se toca.
+
+Fichas «Idea» sólo con el brief (lote de diciembre, temas rechazados): no hace falta plegarlas. El brief
+recién se pliega cuando la ficha recibe el research.
+
+Caso fuente: el 06-11-2026 se ordenaron 44 fichas del lote de noviembre y de las pruebas de octubre, empezando
+por el piloto de Tarapoto. Cinco ya estaban ordenadas:
+
+- con toggles: Punta Sal, Tipos de equipaje, Zorritos y Año Nuevo en Santiago;
+- con pestañas: Cena de Navidad chilena.
 
 ## 7. Handoff a producción
 
