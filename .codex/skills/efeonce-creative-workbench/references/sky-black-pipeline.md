@@ -664,6 +664,11 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   entrega, quedaron fuera las stories, BR y Chile nacional: `sync-canvas` los había reescrito y se devolvieron a lo
   publicado. Antes de publicar se comprobó que los archivos a reemplazar seguían iguales a la versión 59, porque otra
   sesión había publicado en el medio (cambió otros archivos y `canvas.json` seguía idéntico).
+- **Canvas: versión 62** (Daniela vía Julio, 2026-11-06: «en vez de GIF, esa animación déjala como MP4, que tiene mejor
+  calidad»). Los 14 tableros `g-gif-*` de la Grilla reproducen ahora el MP4 **con audio** que se entrega
+  (`<KV>_audio.mp4`, ids `"<KV>__mp4"` en `vid-blobs.json`), con controles, y se titulan «MP4 1080×1350 (con audio)».
+  El archivo del tablero conserva el nombre `g-gif-*` para no dejar huérfanos. Se publicaron sólo esos 14 y
+  `canvas.json` (los títulos parchados sobre la versión publicada, no el `canvas.json` que regenera `new-pages.cjs`).
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
