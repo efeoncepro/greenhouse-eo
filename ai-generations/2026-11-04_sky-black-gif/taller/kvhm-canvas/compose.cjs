@@ -6,6 +6,34 @@ const SRC = __dirname + '/foto-fuente.png'; // 1672x941, se usa espejada como en
 const only = process.argv.slice(2);
 // Foto de destino por pieza (destinos.cjs, 2026-11-05): reemplaza a la mujer del kit donde corresponda.
 const { cubrir, credito, velo, veloListaSvg, DEST } = require(__dirname + '/destinos.cjs');
+// Criterio de degradados (Daniela, Teams 2026-11-06 17:57 y 18:03; opt-in, hoy sólo lo usan las rutas foco vía rutas-foco.sh):
+// PISO_SUTIL=1 quita el degradado marrón inferior y pone uno negro de 15 % sólo si la zona del destino y el pie es clara;
+// VELO_AUTO=1 aplica el difuminado superior aprobado sólo si el fondo del logo no es «legible a la primera»: cielo muy claro
+// (percentil 80 de la luz > 185), disparejo (desviación > 25) o con textura (borde medio entre píxeles vecinos > 1,5).
+// «Si la foto es legible a la primera, no colocar gradiente; si no, el sutil aprobado; si no alcanza, adaptar la foto.»
+const SUTIL = process.env.PISO_SUTIL === '1', VELO_AUTO = process.env.VELO_AUTO === '1';
+let actual = null;
+async function luz(img, [x0, y0, x1, y1]) {
+  const px = await sharp(img).extract({ left: x0, top: y0, width: x1 - x0, height: y1 - y0 }).removeAlpha().raw().toBuffer();
+  const v = []; for (let i = 0; i < px.length; i += 3) v.push(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]);
+  v.sort((a, b) => a - b); return v[Math.floor(v.length * 0.75)];
+}
+async function ruidoso(img, [x0, y0, x1, y1]) {
+  const w = x1 - x0, g = await sharp(img).extract({ left: x0, top: y0, width: w, height: y1 - y0 }).greyscale().raw().toBuffer();
+  const v = [...g].sort((a, b) => a - b), m = v.reduce((a, b) => a + b, 0) / v.length;
+  const sd = Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length);
+  let e = 0; for (let i = 1; i < g.length; i++) if (i % w) e += Math.abs(g[i] - g[i - 1]); e /= g.length;
+  return v[Math.floor(v.length * 0.8)] > 185 || sd > 25 || e > 1.5;
+}
+const ZONA = { popup: { logo: [60, 40, 700, 330], pie: [0, 880, 1080, 1080] }, story: { logo: [60, 250, 870, 600], pie: [0, 1250, 1080, 1720] } };
+async function fondos(n, bg, W, H, fmt) {
+  const o = (DEST[n].f && DEST[n].f[fmt]) || {}, out = [];
+  if (!VELO_AUTO || await ruidoso(bg, ZONA[fmt].logo)) out.push({ input: await velo(n, bg, W, H, fmt), left: 0, top: 0 });
+  if (!SUTIL) out.push({ input: piso(W, H, ...(o.piso || (fmt === 'popup' ? [560, 1080, 0.62] : [1000, 1720, 0.62])), '#000'), left: 0, top: 0 });
+  else if ((await luz(bg, ZONA[fmt].pie)) > 120) out.push({ input: piso(W, H, ZONA[fmt].pie[1] - 120, H, 0.15, '#000'), left: 0, top: 0 });
+  if (DEST[n].sombra && process.env.SOMBRA === '1') out.push({ input: sombra(W, H), left: 0, top: 0 });
+  return out;
+}
 // Regla destino ↔ flecha de precio (brecha.cjs): en popup y story el bloque se reescala, así que se vuelve a medir.
 const { BRECHA } = require(__dirname + '/brecha.cjs');
 async function bbox(file) {
@@ -37,6 +65,7 @@ function sombra(W, H) {
 // c: color del degradado. #2a1608 (tierra) en los KV del kit; negro en las piezas con foto de destino (Daniela, Teams
 // 2026-11-05: «el gradiente marrón de abajo lo dejaría en negro»).
 function piso(W, H, y0, y1, a, c = '#2a1608') {
+  if (SUTIL && c === '#2a1608' && DEST[actual]) a = 0; // PISO_SUTIL: sin el degradado marrón en las piezas con foto de destino
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" x2="0" y1="${y0 / H}" y2="${y1 / H}"><stop offset="0" stop-color="${c}" stop-opacity="0"/><stop offset="1" stop-color="${c}" stop-opacity="${a}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`;
   return Buffer.from(svg);
 }
@@ -54,6 +83,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
 (async () => {
   const names = fs.readdirSync(PARTS).filter((f) => f.endsWith('__base.png')).map((f) => f.split('__')[0]).filter((n) => !only.length || only.includes(n)).sort();
   for (const n of names) {
+    actual = n;
     const cluster = n.includes('CLUSTER') || n === 'HM_CL_KV_ENCUENTRA';
     // ---------- POPUP 1080x1080 ----------
     {
@@ -132,7 +162,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         if (has(n, 'ubicacion')) comp.push(await place(P(n, 'ubicacion'), 1, 0, 0, 0, 0));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'popup') : await foto(1.45, 1782, -154 * 1.45, W, H); // mujer al 80 % del KV, cabeza en y≈260
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'popup'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.popup && DEST[n].f.popup.piso) || [560, 1080, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra && process.env.SOMBRA === '1' ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
+      if (DEST[n]) comp.unshift(...await fondos(n, bg, W, H, 'popup'));
       const cp = credito(n, W, H, 34); if (cp) comp.push({ input: cp, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__popup.png');
     }
@@ -191,7 +221,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         else comp.push(await place(P(n, 'alianza'), 1.1, ab.x + ab.w, ab.y, 1080 - 48, 500));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'story') : await foto(2.04, 2198, 0, W, H); // la fuente cubre 1920 de alto a 2,04 (113 % del KV)
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'story'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.story && DEST[n].f.story.piso) || [1000, 1720, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra && process.env.SOMBRA === '1' ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
+      if (DEST[n]) comp.unshift(...await fondos(n, bg, W, H, 'story'));
       // Marca de agua pegada arriba también en la story (Daniela, 2026-11-05), como en KV y popup.
       const cs = credito(n, W, H, 40, 18); if (cs) comp.push({ input: cs, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__story.png');

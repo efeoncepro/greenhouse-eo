@@ -14,6 +14,9 @@
 - En revisión: las 32 también en `BLACK SKY 2026 - PARA REVISION/` (misma estructura, LEEME actualizado).
 - Notion: las 32 subtareas de pieza en «Listo para revisión», con fecha de envío 2026-11-06.
 - Difuminado B aprobado por Dianesty aplicado a las 16 rutas: reentregadas en OneDrive (ambas carpetas) y canvas versión 67.
+- Ajustes de Daniela (Teams) y Frame: degradé arriba y piso negro al 15 % sólo cuando hacen falta (flags opcionales `PISO_SUTIL`/`VELO_AUTO`
+  de `compose.cjs`, apagados por defecto), píldora de origen adaptable, fotos nuevas de Lima, Santiago y Buenos Aires.
+  Reentregadas en ambas carpetas y canvas versión 70. Legal débil en el popup de Cusco y el story de Concepción.
 - Pendiente: precios en 000, origen de Chile («DESDE SANTIAGO», inferido) y fechas del pie.
 
 ## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF

@@ -748,6 +748,20 @@ que el logo no esté encima de las cabezas, que haya full espacio arriba».
   render → parts → compose sobre sus nombres, esperando a que la otra sesión dejara de renderizar (comparten temporales).
   Reentregadas en `BLACK SKY 2026` y `- PARA REVISION` (`cmp` ok). Canvas **versión 67**: 32 assets nuevos (ids en
   `rf-blobs.json`) y sólo los 16 tableros republicados.
+- **Ajustes de Daniela (Teams) y Frame, segunda vuelta (2026-11-06):** criterio general: degradé arriba **sólo si hace
+  falta**; abajo, negro al 10–15 % **sólo si hace falta**; si no, se adapta la foto. Va como **flags opcionales de
+  `compose.cjs`** (apagados por defecto, salida idéntica byte a byte sin ellos): `PISO_SUTIL=1` (en piezas con `DEST` el
+  piso café queda en alfa 0; el negro al 15 % sólo si el p75 de la zona del pie supera 120) y `VELO_AUTO=1` (el velo
+  sólo si la zona del logo es ruidosa: p80 > 185, desviación > 25 o bordes > 1,5). `rutas-foco.sh` los prende.
+  **Píldora rosada del origen adaptable** (en `rutas-foco.cjs`): el avión queda fijo, el texto conserva su aire respecto
+  al avión y la píldora termina 35 px después de la última letra, creciendo a la derecha. Con destino > 330 px, el
+  bloque de cliente (caja x 30–540, y 930–1185) se corre 36 px a la izquierda para separarlo de la flecha. Fotos
+  cambiadas: Lima (Miraflores con cielo limpio, `02_PERU/LIM`), Santiago de Perú (`f.popup z 1.25`), Buenos Aires
+  (cielo más azul con `cielo.cjs <in> <out> 0.5`; el «árbol» que pidió eliminar es ambiguo y no se hizo inpainting
+  pagado) y el story de Punta Cana reencuadrado. Reentregadas las 96 copias (`BLACK SKY 2026` + `- PARA REVISION`);
+  canvas **versión 70**: 32 assets nuevos y sólo los 16 tableros (ancla `canvas.json` idéntico al publicado). 🔴 Nunca
+  `require('./compose.cjs')`: no tiene guarda de `require.main` y corre sobre todas las piezas. Legal todavía débil
+  sobre la foto en el popup de Cusco y el story de Concepción.
 - **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`

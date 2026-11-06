@@ -10,5 +10,5 @@ F=""; for n in $N; do F="$F $n.svg"; done
 node brecha.cjs $F
 node render.cjs $F > /dev/null 2>&1
 node parts.cjs $F > /dev/null 2>&1
-node compose.cjs $N > /dev/null
+PISO_SUTIL=1 VELO_AUTO=1 node compose.cjs $N > /dev/null
 echo "rutas foco: $(echo $N | wc -w)"

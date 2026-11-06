@@ -21,16 +21,16 @@ const RUTAS = [
   ['CL', 'DOM', 'Calama', 'CJC', { src: 'RF_CJC.png', s: [0.45, 0.5], f: { kv: { z: 1.2, t: [0.66, 0.38] }, popup: { z: 1.25, t: [0.66, 0.36] } } }, '01_CHILE/(NORTE) CJC/ChatGPT Image 17 sept 2026, 09_55_42 (1) 1'],
   ['CL', 'DOM', 'Antofagasta', 'ANF', { src: 'RF_ANF.jpg', s: [0.6, 0.5] }, '01_CHILE/ANF/sky-antofagasta-acantilados-4k (sin personas: en las fotos con personas quedaban bajo el logo)'],
   ['CL', 'INTER', 'Cusco', 'CUZ', { src: 'PE_MACHU_PICCHU.jpg', s: [0.8, 0.5] }, '02_PERU/CUZ/sky-chica-vivencial-machu-picchu-4k (la misma de «Vuela por el Perú»)'],
-  ['CL', 'INTER', 'Lima', 'LIM', { src: 'RF_LIM.jpg', s: [0.5, 0.5], f: { story: { s: [0.5, 0.3], z: 1.3, t: [0.66, 0.5] } } }, '../02_PERU/(COSTA) LIMA/shutterstock_2493383107 (Miraflores; la de AR cortaba a una de las dos mujeres y la de la Plaza Mayor quedaba bajo el logo)'],
-  ['CL', 'INTER', 'Punta Cana', 'PUJ', { src: 'CL_PUNTA_CANA.png', s: [0.62, 0.55], f: { story: { z: 1.15, t: [0.75, 0.56] } } }, 'PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL «Vuela inter»)'],
+  ['CL', 'INTER', 'Lima', 'LIM', { src: 'RF_LIM.png', s: [0.6, 0.72] }, '02_PERU/LIM/magnific_fotografia-cinematografic_rluc5Abxtc 1 (Miraflores con cielo despejado; Daniela, Frame 2026-11-06: «cambiar la foto, no es buena; usar una del banco actual de Lima»)'],
+  ['CL', 'INTER', 'Punta Cana', 'PUJ', { src: 'CL_PUNTA_CANA.png', s: [0.62, 0.55], f: { story: { z: 1.25, t: [0.74, 0.7] } } }, 'PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL «Vuela inter»)'],
   ['CL', 'INTER', 'São Paulo', 'GRU', { src: 'RF_GRU.png', s: [0.6, 0.45] }, '03_BRASIL/GRU/sky-personas-sao-paulo-couple-4k'],
   ['CL', 'INTER', 'Mendoza', 'MDZ', { src: 'RF_MDZ.png', s: [0.61, 0.5], f: { kv: { t: [0.5, 0.5] }, popup: { t: [0.5, 0.5] } } }, '03_ARGENTINA/MDZ/sky-personas-mendoza-friends-4k'],
   ['CL', 'INTER', 'Río de Janeiro', 'GIG', { src: 'RF_GIG.png', s: [0.37, 0.5], f: { kv: { t: [0.6, 0.5] }, popup: { t: [0.6, 0.5] }, story: { src: 'RF_GIG_V.png', s: [0.5, 0.5] } } }, '03_BRASIL/GIG/GIG-02 (story: GIG-01)'],
   ['CL', 'INTER', 'Bariloche', 'BRC', { src: 'RF_BRC.jpg', s: [0.75, 0.5] }, '../03_ARGENTINA/BARILOCHE (BRC)/shutterstock_2087048275 (sin personas: la del banco nuevo dejaba las cabezas bajo el logo y la del mirador no tenía aire arriba)'],
   ['CL', 'INTER', 'Florianópolis', 'FLN', { src: 'RF_FLN.png', s: [0.63, 0.5], f: { story: { src: 'RF_FLN_V.png', s: [0.6, 0.5] } } }, '03_BRASIL/FLN/FLN-01 (story: FLN-02)'],
-  ['PE', 'INTER', 'Santiago', 'SCL', { src: 'RF_SCL.jpg', s: [0.66, 0.5], f: { kv: { t: [0.64, 0.5] }, popup: { t: [0.64, 0.5] }, story: { src: 'RF_SCL_V.jpg', s: [0.6, 0.5] } } }, '01_CHILE/SCL/santiago-679695892-1920x1080 (story: 1080x1920)'],
-  ['PE', 'INTER', 'Buenos Aires', 'BUE', { src: 'RF_BUE.png', s: [0.62, 0.6] }, '03_ARGENTINA/BUE/Imagen de ChatGPT 29 sept 2026, 16_43_46 (Obelisco)'],
-  ['PE', 'INTER', 'Punta Cana', 'PUJ', { src: 'CL_PUNTA_CANA.png', s: [0.62, 0.55], f: { story: { z: 1.15, t: [0.75, 0.56] } } }, 'PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL; la pareja de 08_34_56 quedaba bajo el logo)'],
+  ['PE', 'INTER', 'Santiago', 'SCL', { src: 'US_SANTIAGO.jpg', s: [0.7, 0.5], f: { popup: { z: 1.25, t: [0.74, 0.33] } } }, 'IA Marca (la de AR «Volá a Santiago», aprobada; Daniela, Frame 2026-11-06: la anterior tenía mucho ruido detrás del logo)'],
+  ['PE', 'INTER', 'Buenos Aires', 'BUE', { src: 'RF_BUE_CIELO.png', s: [0.62, 0.6], f: { popup: { t: [0.62, 0.6] } } }, '03_ARGENTINA/BUE/Imagen de ChatGPT 29 sept 2026, 16_43_46 (Obelisco), cielo más azul y menos claro con cielo.cjs (Daniela, Frame 2026-11-06)'],
+  ['PE', 'INTER', 'Punta Cana', 'PUJ', { src: 'CL_PUNTA_CANA.png', s: [0.62, 0.55], f: { story: { z: 1.25, t: [0.74, 0.7] } } }, 'PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL; la pareja de 08_34_56 quedaba bajo el logo)'],
   ['PE', 'INTER', 'Río de Janeiro', 'GIG', { src: 'RF_GIG.png', s: [0.37, 0.5], f: { kv: { t: [0.6, 0.5] }, popup: { t: [0.6, 0.5] }, story: { src: 'RF_GIG_V.png', s: [0.5, 0.5] } } }, '03_BRASIL/GIG/GIG-02 (story: GIG-01)'],
   ['PE', 'INTER', 'São Paulo', 'GRU', { src: 'RF_GRU.png', s: [0.6, 0.45] }, '03_BRASIL/GRU/sky-personas-sao-paulo-couple-4k']
 ].map(([mk, tipo, d, iata, foto, banco]) => ({ mk, tipo, d, iata, foto, banco, name: `HM_${mk}_${tipo}_RUTA_${slug(d)}` }));
@@ -57,7 +57,36 @@ if (require.main === module) (async () => {
       const w = el.getBBox().width; if (w > 400) { const nf = (90 * 400 / w).toFixed(2); el.setAttribute('font-size', nf); if (ts) ts.setAttribute('font-size', nf); }
       return Math.round(el.getBBox().width);
     }, r.d);
-    log.origen = await p.evaluate(PAGE.origen, 'DESDE ' + o.toUpperCase());
+    // Píldora rosada de origen con avión, adaptativa (Daniela, Teams 2026-11-06 17:57, regla para todo «badge con
+    // avión»): el avión no se mueve, el texto arranca tras el avión con el aire de la plantilla y la píldora crece (o se
+    // achica) hacia la derecha hasta 35 px después de la última letra.
+    log.origen = await p.evaluate((txt) => {
+      const pill = [...document.querySelectorAll('path')].find((e) => e.getAttribute('fill') === '#f8dcfd');
+      const el = [...document.querySelectorAll('text')].find((e) => e.textContent.replace(/\s+/g, ' ').trim() === 'DESDE [ORIGEN]');
+      const avion = document.getElementById('Line_59_Stroke_');
+      if (!pill || !el || !avion) return 'sin píldora';
+      const aire = el.getBoundingClientRect().left - avion.getBoundingClientRect().right; // 11 px en la plantilla
+      el.textContent = txt;
+      const m = el.getAttribute('transform').match(/translate\(([\d.-]+)[ ,]+([\d.-]+)\)/);
+      const dx = avion.getBoundingClientRect().right + aire - el.getBoundingClientRect().left;
+      el.setAttribute('transform', `translate(${(+m[1] + dx).toFixed(2)} ${m[2]})`);
+      const pb = pill.getBBox(), off = pill.getBoundingClientRect().left - pb.x;
+      const der = el.getBoundingClientRect().right - off + 35, L = pb.x, r = pb.height / 2, y = pb.y;
+      pill.setAttribute('d', `M${L.toFixed(2)},${(y + r).toFixed(2)}c0-17.67,14.33-${r},${r}-${r}h${(der - L - 2 * r).toFixed(2)}c17.67,0,${r},14.33,${r},${r}h0c0,17.67-14.33,${r}-${r},${r}H${(L + r).toFixed(2)}c-17.67,0-${r}-14.33-${r}-${r}h0Z`);
+      return Math.round(der - L);
+    }, 'DESDE ' + o.toUpperCase());
+    // Aire entre el destino y la flecha (Daniela, Frame 2026-11-06, stories de Antofagasta, Florianópolis y Punta Cana:
+    // «siempre que la palabra del destino sea muy larga y esté muy cerca de la flecha»): con nombres de más de 330 px el
+    // bloque (antetítulo, destino y píldora) se corre 36 px a la izquierda, al margen del sello de puntualidad.
+    if (log.destino > 330) log.corrido = await p.evaluate(() => {
+      let n = 0;
+      for (const e of document.querySelectorAll('svg path, svg rect, svg text, svg polygon, svg circle, svg use, svg line')) {
+        if (e.closest('defs, clipPath, mask, symbol, pattern') || e.parentElement.closest('text')) continue;
+        const q = e.getBoundingClientRect();
+        if (q.width > 0 && q.left >= 30 && q.right <= 540 && q.top >= 930 && q.bottom <= 1185) { e.setAttribute('transform', ('translate(-36 0) ' + (e.getAttribute('transform') || '')).trim()); n++; }
+      }
+      return n;
+    });
     if (r.mk === 'CL') {
       // Legal bajo el precio (texto vivo en los KV de Chile) y pie «tramo [origen]–[destino]».
       log.legal = await p.evaluate(([tipo, o, d]) => {
