@@ -55,7 +55,7 @@ for (const n of Object.keys(CIU)) filas.push(['foto', n, 1080, 1350, `Sin diseñ
 for (const [fmt, h, nom] of [['kv', 1350, 'KV 1080×1350'], ['popup', 1080, 'Popup 1080×1080'], ['story', 1080 * 0 + 1920, 'Story 1080×1920']])
   for (const n of Object.keys(CIU)) filas.push([fmt, n, 1080, h, `En la pieza · ${nom} · ${CIU[n]}`]);
 c.notes['neon-intro'] = { x: 0, y: -700, page: PAGE, kind: 'title1', maxW: 5400,
-  text: 'Neón del logo BLACK · exploración para que Dianesty elija la intensidad. No reemplaza ninguna pieza aprobada. Columnas: actual · opción 1 sutil · opción 2 medio · opción 3 fuerte · encendido animado para GIF/video.' };
+  text: 'Neón del logo BLACK · ronda 2 (letras nítidas, marco como tubo encendido, penumbra detrás; la opción = opacidad de la luz) para que Dianesty elija. No reemplaza ninguna pieza aprobada. Columnas: actual · opción 1 sutil · opción 2 medio · opción 3 fuerte · encendido animado para GIF/video.' };
 const pub = { 'project/canvas.json': 'project/canvas.json' };
 let y = 0;
 filas.forEach(([fmt, n, w, h, titulo], i) => {

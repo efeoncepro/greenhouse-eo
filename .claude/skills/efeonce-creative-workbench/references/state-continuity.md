@@ -14,7 +14,7 @@ fotografía de evento en
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
 | Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 51 (cierre de la séptima ronda, 2026-11-05; la 40 fue la cuarta); diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
 
-**2026-11-06, neón del logo BLACK:** exploración publicada en el canvas (v54, página «KV Black · Neón del logo (exploración)»): tres intensidades (sutil, medio, fuerte) más un encendido animado, con y sin diseño de pieza. Espera que Dianesty (SKY) elija; no cambia piezas aprobadas. Detalle en [sky-black-pipeline.md](sky-black-pipeline.md) §4.10.
+**2026-11-06, neón del logo BLACK:** exploración en el canvas (v55, página «KV Black · Neón del logo (exploración)», ronda 2; la ronda 1 se rechazó por falta de impacto): letras nítidas, marco como tubo encendido y penumbra detrás, en tres opacidades (sutil 45 %, medio 72 %, fuerte 100 %) más un encendido animado, con y sin diseño de pieza. Espera que Dianesty (SKY) elija; no cambia piezas aprobadas. Detalle en [sky-black-pipeline.md](sky-black-pipeline.md) §4.10.
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas

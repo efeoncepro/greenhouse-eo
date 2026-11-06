@@ -506,38 +506,37 @@ segunda revisión; desde la octava ronda (2026-11-06, §4.9) las 30 piezas está
 ### 4.10 Neón del logo BLACK (2026-11-06): exploración, esperando la decisión de SKY
 
 SKY pidió, vía Adriana, que el logo «tenga neón» y luego **tres opciones con distintas opacidades**, de la más sutil
-a la más fuerte, para que Dianesty elija; el operador pidió alto impacto visual y probarlo **con y sin el diseño de
-la pieza**. Ojo: en la segunda ronda SKY había pedido *menos* resplandor (`logofix.cjs`, `GLOW` 0,5 / 0,6); esto
-lo revierte solo si eligen una opción. **No cambia ninguna pieza aprobada ni toca `src2/`**: es una capa de luz
+a la más fuerte, para que Dianesty elija; el operador pidió **altísimo impacto visual** y probarlo **con y sin el
+diseño de la pieza**. Ojo: en la segunda ronda SKY había pedido *menos* resplandor (`logofix.cjs`, `GLOW` 0,5 / 0,6);
+esto lo revierte solo si eligen una opción. **No cambia ninguna pieza aprobada ni toca `src2/`**: es una capa de luz
 encima de los PNG del taller.
 
-- **Código:** `$T/exploraciones/neon-logo/` (`neon2.cjs` = receta y piezas, `sindiseno.cjs` = logo solo sobre negro
-  y sobre la foto sola `parts/<KV>__base` + logo, `encendido.cjs` = MP4 de encendido, `page2.cjs` = página del canvas,
-  `blobs.json` = ids de los assets). Salidas en `out/` y `fr-*/` (fuera de git). `node neon2.cjs HM_PE_RUTA_TACNA …`.
-- **Receta:** máscara = solo los píxeles verdes de `parts/<KV>__logo.png` (`G − max(R,B)`) por debajo de y=134 del KV
-  (así el avión y sus winglets no brillan). En story la máscara sigue la geometría de `compose.cjs` (logo al 130 %,
-  `(lb.x, lb.y) → (lb.x, 270)`). Luz **aditiva** verde `(70,255,35)` de 3–4 desenfoques (σ 3/12/34/80) con
-  `1 − e^(−L·k·1,6)`, atenuada 70 % dentro del trazo para que el relleno siga siendo el verde de marca; núcleo de tubo
-  casi blanco `(235,255,225)` en los trazos finos (marco) y, más leve, en el centro de las letras; en medio y fuerte,
-  una sombra de escena (`noche`) bajo el halo para que el neón también se lea sobre cielo claro.
-
-| Opción | `k` | núcleo marco / letras | `noche` |
-| --- | --- | --- | --- |
-| 1 · sutil | 0,55 | 0,5 / 0,10 | 0 |
-| 2 · medio | 0,95 | 0,8 / 0,22 | 0,12 |
-| 3 · fuerte | 1,45 | 1,0 / 0,34 | 0,28 |
-
-- **Encendido animado** (para GIF y story en video): 78 cuadros a 25 fps, 0,5 s apagado, parpadeo de tubo y queda en
-  «fuerte»; MP4 de Tacna KV e Iquitos story.
-- **Canvas v54:** página nueva «KV Black · Neón del logo (exploración)» (`kv-black-neon`), 9 tableros de fila
-  (`neon-<formato>-<ciudad>.dc.html`): logo solo sobre negro, logo sobre la foto sola (Tacna clara, Iquitos oscura) y
-  KV, popup y story de ambas; columnas actual · 1 · 2 · 3 · encendido. **La versión ya tenía 495 archivos** (límite 511):
-  las 36 imágenes y 2 videos van como **assets** (`/_blob/…`, no cuentan) y cada fila es un solo tablero. `launch` no
-  se tocó. La copia local `$P/canvas.json` quedó sincronizada con esa página: un script de página que publique desde
-  `$P` la conserva.
-- **Errores que costaron una vuelta:** el `blur` de sharp sobre un buffer de 1 canal devuelve 3 (rayas horizontales):
-  `extractChannel(0)` después; `extract` corre antes que `composite` en la misma cadena de sharp; `create` no admite
-  1 canal.
+- **Código:** `$T/exploraciones/neon-logo/`. Vigente: `neon3.cjs` (receta, KV/popup/story) y `extra3.cjs` (logo solo
+  sobre negro, logo sobre la foto sola `parts/<KV>__base` + logo, y encendido animado); `page2.cjs` arma la página del
+  canvas desde `blobs.json` (ids de assets). `neon2.cjs`, `sindiseno.cjs` y `encendido.cjs` son la ronda 1 (rechazada) y
+  `neon3` reusa de `neon2` solo `mascaraKV`. Salidas en `out3/` y `fr3-*/` (fuera de git).
+- **Ronda 1 (canvas v54), rechazada por el operador por falta de impacto:** halo aditivo del mismo verde sobre letras y
+  marco. A tamaño de story no se leía como neón: ablandaba los bordes de «BLACK» (se veía desenfocado), no había
+  penumbra y el halo quedaba corto. No repetirla.
+- **Receta vigente (ronda 2, canvas v55):** máscara = píxeles verdes de `parts/<KV>__logo.png` (`G − max(R,B)`) bajo
+  y=134 del KV; se separa en **letras** (centro grueso: desenfoque σ6 > 0,3) y **marco** (trazo fino). Las **letras se
+  restauran intactas** encima (nítidas, verde de marca) y solo llevan un brillo exterior leve (σ 5/20). El **marco es el
+  tubo**: núcleo casi blanco `(240,255,232)` y halo verde `(80,255,40)` en σ 6/22/60/140 (pesos 1,5/0,85/0,38/0,16,
+  `1 − e^(−Σ)`). **Penumbra** detrás del letrero: la foto baja hasta 50 % bajo un desenfoque σ90 de la máscara, para
+  que se lea también sobre cielo claro. El avión y los textos blancos se re-mezclan al 80 % para que no se tiñan. En story
+  todo escala ×1,3 con la geometría de `compose.cjs` (`(lb.x, lb.y) → (lb.x, 270)`). Los desenfoques son en **coma
+  flotante** (tres cajas): con buffers de 8 bits, los σ grandes sobre un trazo de 2 px dejaban bandas de posterización.
+- **Las tres opciones = opacidad de esa capa de luz** sobre la pieza actual, como pidió Adriana: 1 · sutil 45 %,
+  2 · medio 72 %, 3 · fuerte 100 %. Encendido animado: 78 cuadros a 25 fps (0,5 s apagado, parpadeo de tubo, queda en
+  100 %), MP4 de Tacna KV e Iquitos story.
+- **Canvas:** página «KV Black · Neón del logo (exploración)» (`kv-black-neon`), 9 tableros de fila
+  (`neon-<formato>-<ciudad>.dc.html`): logo solo sobre negro, logo sobre la foto sola (Tacna clara, Iquitos oscura) y KV,
+  popup y story de ambas; columnas actual · 1 · 2 · 3 · encendido. **La versión ya tenía 495 archivos** (límite 511):
+  las imágenes y videos van como **assets** (`/_blob/…`, no cuentan) y cada fila es un solo tablero. `launch` no se
+  tocó. La copia local `$P/canvas.json` quedó sincronizada con la v55: un script de página que publique desde `$P` la
+  conserva. Los assets de la ronda 1 siguen en el store sin uso (no se borraron).
+- **Errores de sharp que costaron una vuelta:** `blur` sobre un buffer de 1 canal devuelve 3 (rayas horizontales):
+  `extractChannel(0)`; `extract` corre antes que `composite` en la misma cadena; `create` no admite 1 canal.
 - **Pendiente:** que Dianesty (SKY) elija la opción. Aplicarla a las ~150 piezas es otra fase y solo a pedido; la receta
   elegida se documenta aquí y en la skill antes de tocar `logofix`/`compose`.
 
