@@ -677,6 +677,41 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   todas las piezas con foto: único caso más, popup de AR Lima (`f.popup = { t: [0.58, 0.6], z: 1.15 }`, cabezas bajo
   la fecha). Popup de Lima entregado en OneDrive; la story de PE no (las exporta Daniela).
 
+### 4.13 Rutas foco de Chile y Perú internacional (2026-11-06): sólo popup y story
+
+Pedido de Daniela (Teams, 1:1 con Julio, 2:00–4:01 p. m.; listas en Notion): «las rutas foco que te pasé, sólo en Chile y
+Perú, van con el popup y el story»; Chile «puede basarse en el KV de Perú pero sin el logo de PromPerú ni la dirección ni la
+marca de agua»; «importante que distinga entre rutas inter de dom porque cambia el legal»; nombre completo del destino
+(«Río de Janeiro», no la sigla); y «que las fotos encajen en el reencuadre, que no quede nada muy cortado bruscamente y
+que el logo no esté encima de las cabezas, que haya full espacio arriba».
+
+| Lista (Notion) | Rutas | Plantilla | Bajo el precio |
+| --- | --- | --- | --- |
+| «Rutas foco (KV LISTO)», proyecto Black SKY Nov 26 | DOM Concepción, Calama, Antofagasta | `HM_CL_KV_DOM` | DESDE / $000.000 / «Final tramo. Tasas e impuestos incluidos.» |
+| ídem | INTER Cusco, Lima, Punta Cana, São Paulo, Mendoza, Río de Janeiro, Bariloche, Florianópolis | `HM_CL_KV_INTER` | IDA Y VUELTA DESDE / $000.000 / «Tasas e impuestos incluidos.» (el de la plantilla) |
+| BLACK SKY PE 26 («Rutas INTER confirmadas: SCL, GIG, GRU, PUJ y BUE») | Santiago, Buenos Aires, Punta Cana, Río de Janeiro, São Paulo | `HM_PE_KV_INTER-RUTA` | IDA Y VUELTA DESDE / US$000 o S/0,000 / «Final ruta Lima-(destino)-Lima.» + «Tasas e impuestos incluidos.» |
+
+- **Scripts propios** (no tocan los compartidos): `rutas-foco.cjs` (tabla de rutas, SVG en `src2/` y entradas en
+  `fotos-destino.json`), `rutas-foco.sh [HM_…]` (rutas-foco → destinos → brecha → render → parts → compose),
+  `rf-page.cjs <P>` (página del canvas) y `rf-entregar.cjs <OUT> <BLACK SKY 2026> [--dry]` (entrega). Nombres
+  `HM_<CL|PE>_<DOM|INTER>_RUTA_<DESTINO>`; en `parts.cjs` caen en `REG.default` (sin alianza).
+- **Origen:** «DESDE LIMA» en Perú; «DESDE SANTIAGO» en Chile **[inferido: Daniela no lo dio]**. El pie de la plantilla
+  queda tal cual (`[origen]–[destino]`, `[día]`, `[mes]`): fechas sin definir y texto kerneado letra a letra.
+- **Destino:** tope de 400 px (no 430 como `rutas.cjs`): a 430, «Río de Janeiro» y «Florianópolis» entraban en la muesca
+  de la flecha.
+- **Fotos del banco, sin generar** (procedencia en `nota` de cada entrada de `fotos-destino.json`). Descartadas por la
+  regla de las cabezas: Antofagasta con personas (las dos mujeres quedaban bajo el logo; va el acantilado 4K sin
+  personas), Bariloche del banco nuevo (tres personas bajo el logo; va un lago sin personas de
+  `03_ARGENTINA/BARILOCHE (BRC)`), la pareja de Punta Cana de Perú (va la de Chile), Lima de AR (cortaba a una mujer) y
+  la de Plaza Mayor (cara bajo el logo). Lima va con el hombre de Miraflores; su story necesita `z 1.3`.
+- **Canvas: versión 66**, página «KV Black · Rutas foco Chile y Perú inter» (`kv-black-rutas-foco`): un board por ruta
+  con popup y story lado a lado, imágenes como **assets** (`/_blob/`, ids en `rf-blobs.json`). 🔴 El canvas tenía 493 de
+  511 archivos por versión: 64 archivos más (board + JPG por formato) no cabían. Al rehacer una pieza: subir el JPG otra
+  vez como asset (id nuevo), actualizar `rf-blobs.json` y volver a correr `rf-page.cjs`.
+- **Entrega:** `BLACK SKY 2026/HM CL/RUTAS FOCO/<DESTINO>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png` (11 rutas) y lo
+  mismo en `HM PE/RUTAS FOCO/` (5 rutas, junto a las 15 DOM); copia local en `OUT/rutas-foco/`. 64 copias, `cmp` ok.
+- **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
+
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
 Recorre `src2/KV X HM/*.svg` (o los archivos pasados) y escribe `png/<KV>.png` a 1080×1350. Antes del

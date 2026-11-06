@@ -2,6 +2,17 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: rutas foco de Chile y Perú internacional (popup + story)
+
+- 16 rutas (Notion «Rutas foco (KV LISTO)» y BLACK SKY PE 26): CL DOM Concepción, Calama, Antofagasta; CL INTER Cusco,
+  Lima, Punta Cana, São Paulo, Mendoza, Río de Janeiro, Bariloche, Florianópolis; PE INTER Santiago, Buenos Aires,
+  Punta Cana, Río de Janeiro, São Paulo. Copy por tipo de ruta según Daniela (Teams); sin GIF (Daniela: sólo popup y story).
+- Fotos del banco, sin generar; cinco cambiadas para que el logo no quede sobre cabezas. Scripts propios
+  `rutas-foco.cjs/.sh`, `rf-page.cjs`, `rf-entregar.cjs`. Detalle: skill §4.13.
+- Canvas versión 66, página «KV Black · Rutas foco Chile y Perú inter» (imágenes como assets: el canvas está en 509/511
+  archivos). OneDrive `BLACK SKY 2026/HM CL|HM PE/RUTAS FOCO/<DESTINO>/` (32 archivos).
+- Pendiente: precios en 000, origen de Chile («DESDE SANTIAGO», inferido) y fechas del pie.
+
 ## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF
 
 - Logo nuevo de Daniela (`Despliegue Base/KV X HM/LOGO BLACK/`): mismo dibujo que el de `logofix` con el resplandor

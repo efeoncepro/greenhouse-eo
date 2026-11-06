@@ -425,5 +425,275 @@
     ],
     "sombra": true,
     "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): foto de Cusco con espacio para textos y logo; la misma en GIF y POP-up. Banco 02_PERU/CUZ «sky-chica-vivencial-machu-picchu-4k-3840x2160» (reducida a 2400 px). Sin PromPerú ni ubicación (siguen fuera desde la novena ronda)."
+  },
+  "HM_CL_DOM_RUTA_CONCEPCION": {
+    "src": "RF_CCP.jpg",
+    "s": [
+      0.33,
+      0.5
+    ],
+    "f": {
+      "story": {
+        "z": 1.2,
+        "t": [
+          0.72,
+          0.58
+        ]
+      }
+    },
+    "nota": "Rutas foco CL DOM (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/01_CHILE/(CENTRO Y SUR) CCP/sky-personas-concepcion-saltos-del-laja-4k. Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_DOM_RUTA_CALAMA": {
+    "src": "RF_CJC.png",
+    "s": [
+      0.45,
+      0.5
+    ],
+    "f": {
+      "kv": {
+        "z": 1.2,
+        "t": [
+          0.66,
+          0.38
+        ]
+      },
+      "popup": {
+        "z": 1.25,
+        "t": [
+          0.66,
+          0.36
+        ]
+      }
+    },
+    "nota": "Rutas foco CL DOM (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/01_CHILE/(NORTE) CJC/ChatGPT Image 17 sept 2026, 09_55_42 (1) 1. Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_DOM_RUTA_ANTOFAGASTA": {
+    "src": "RF_ANF.jpg",
+    "s": [
+      0.6,
+      0.5
+    ],
+    "nota": "Rutas foco CL DOM (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/01_CHILE/ANF/sky-antofagasta-acantilados-4k (sin personas: en las fotos con personas quedaban bajo el logo). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_CUSCO": {
+    "src": "PE_MACHU_PICCHU.jpg",
+    "s": [
+      0.8,
+      0.5
+    ],
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/02_PERU/CUZ/sky-chica-vivencial-machu-picchu-4k (la misma de «Vuela por el Perú»). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_LIMA": {
+    "src": "RF_LIM.jpg",
+    "s": [
+      0.5,
+      0.5
+    ],
+    "f": {
+      "story": {
+        "s": [
+          0.5,
+          0.3
+        ],
+        "z": 1.3,
+        "t": [
+          0.66,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/../02_PERU/(COSTA) LIMA/shutterstock_2493383107 (Miraflores; la de AR cortaba a una de las dos mujeres y la de la Plaza Mayor quedaba bajo el logo). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_PUNTA_CANA": {
+    "src": "CL_PUNTA_CANA.png",
+    "s": [
+      0.62,
+      0.55
+    ],
+    "f": {
+      "story": {
+        "z": 1.15,
+        "t": [
+          0.75,
+          0.56
+        ]
+      }
+    },
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL «Vuela inter»). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_SAO_PAULO": {
+    "src": "RF_GRU.png",
+    "s": [
+      0.6,
+      0.45
+    ],
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_BRASIL/GRU/sky-personas-sao-paulo-couple-4k. Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_MENDOZA": {
+    "src": "RF_MDZ.png",
+    "s": [
+      0.61,
+      0.5
+    ],
+    "f": {
+      "kv": {
+        "t": [
+          0.5,
+          0.5
+        ]
+      },
+      "popup": {
+        "t": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_ARGENTINA/MDZ/sky-personas-mendoza-friends-4k. Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_RIO_DE_JANEIRO": {
+    "src": "RF_GIG.png",
+    "s": [
+      0.37,
+      0.5
+    ],
+    "f": {
+      "kv": {
+        "t": [
+          0.6,
+          0.5
+        ]
+      },
+      "popup": {
+        "t": [
+          0.6,
+          0.5
+        ]
+      },
+      "story": {
+        "src": "RF_GIG_V.png",
+        "s": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_BRASIL/GIG/GIG-02 (story: GIG-01). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_BARILOCHE": {
+    "src": "RF_BRC.jpg",
+    "s": [
+      0.75,
+      0.5
+    ],
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/../03_ARGENTINA/BARILOCHE (BRC)/shutterstock_2087048275 (sin personas: la del banco nuevo dejaba las cabezas bajo el logo y la del mirador no tenía aire arriba). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_CL_INTER_RUTA_FLORIANOPOLIS": {
+    "src": "RF_FLN.png",
+    "s": [
+      0.63,
+      0.5
+    ],
+    "f": {
+      "story": {
+        "src": "RF_FLN_V.png",
+        "s": [
+          0.6,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco CL INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_BRASIL/FLN/FLN-01 (story: FLN-02). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_PE_INTER_RUTA_SANTIAGO": {
+    "src": "RF_SCL.jpg",
+    "s": [
+      0.66,
+      0.5
+    ],
+    "f": {
+      "kv": {
+        "t": [
+          0.64,
+          0.5
+        ]
+      },
+      "popup": {
+        "t": [
+          0.64,
+          0.5
+        ]
+      },
+      "story": {
+        "src": "RF_SCL_V.jpg",
+        "s": [
+          0.6,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco PE INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/01_CHILE/SCL/santiago-679695892-1920x1080 (story: 1080x1920). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_PE_INTER_RUTA_BUENOS_AIRES": {
+    "src": "RF_BUE.png",
+    "s": [
+      0.62,
+      0.6
+    ],
+    "nota": "Rutas foco PE INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_ARGENTINA/BUE/Imagen de ChatGPT 29 sept 2026, 16_43_46 (Obelisco). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_PE_INTER_RUTA_PUNTA_CANA": {
+    "src": "CL_PUNTA_CANA.png",
+    "s": [
+      0.62,
+      0.55
+    ],
+    "f": {
+      "story": {
+        "z": 1.15,
+        "t": [
+          0.75,
+          0.56
+        ]
+      }
+    },
+    "nota": "Rutas foco PE INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/PUJ/Imagen de ChatGPT 29 sept 2026, 08_34_37 (la misma de CL; la pareja de 08_34_56 quedaba bajo el logo). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_PE_INTER_RUTA_RIO_DE_JANEIRO": {
+    "src": "RF_GIG.png",
+    "s": [
+      0.37,
+      0.5
+    ],
+    "f": {
+      "kv": {
+        "t": [
+          0.6,
+          0.5
+        ]
+      },
+      "popup": {
+        "t": [
+          0.6,
+          0.5
+        ]
+      },
+      "story": {
+        "src": "RF_GIG_V.png",
+        "s": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    "nota": "Rutas foco PE INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_BRASIL/GIG/GIG-02 (story: GIG-01). Sin PromPerú, ubicación ni marca de agua."
+  },
+  "HM_PE_INTER_RUTA_SAO_PAULO": {
+    "src": "RF_GRU.png",
+    "s": [
+      0.6,
+      0.45
+    ],
+    "nota": "Rutas foco PE INTER (Daniela, Teams y Notion 2026-11-06): foto del banco 00_Banco Actualizado/03_BRASIL/GRU/sky-personas-sao-paulo-couple-4k. Sin PromPerú, ubicación ni marca de agua."
   }
 }
