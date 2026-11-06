@@ -33,3 +33,6 @@
 - Medios 40 UF/mes como pago directo de KSB, fuera del total; IVA 19 %.
 - Pendiente de Julio: aprobar precios, forma de pago (mensual al cierre), vigencia (90 días), CLP o UF, y verificar el
   RUT de KSB. Detalle en `anexo-economico/LEEME.md`.
+- Julio (06/11): honorarios en UF para protegerse de la inflación → cláusula «Reajuste en UF» (valor fijado en UF al
+  día de la oferta, facturado en pesos a la UF de cada factura). Los PDF siguen mostrando pesos: el cotizador no emite
+  en UF.

@@ -4,11 +4,12 @@ SUP = {"name": "Efeonce Group SpA", "taxId": "RUT 77.357.182-1", "contact": "Jul
        "email": "jreyes@efeoncepro.com", "phone": "+56 9 3480 2860"}
 BUY = {"name": "KSB Chile S.A.", "taxId": "RUT 96.691.060-7", "unit": "Gerencia de Marketing",
        "contact": "Nelson Urbano Meza, Gerente de Marketing"}
-TAX = "Valores netos en pesos chilenos. El IVA se agrega al facturar, como piden las bases."
+TAX = "Valores netos, reajustables en UF. El IVA se agrega al facturar, como piden las bases."
 MEDIOS = {"title": "Medios", "text": "KSB paga los medios directo a Google, LinkedIn y Meta, en cuentas a su nombre. El monto es el mínimo que recomiendan las bases; sube sólo si la estrategia lo justifica y con aprobación de KSB. Efeonce no cobra comisión sobre los medios."}
 MEDIOS_MIN = {"title": "Medios", "text": MEDIOS["text"].replace("Google, LinkedIn y Meta", "Google y LinkedIn")}
 APORTA_C = {"title": "Lo que aporta KSB", "text": "Accesos a las cuentas de LinkedIn, Instagram, Facebook y YouTube; el material técnico y de productos; una persona que apruebe piezas y calendario; y respuestas técnicas a tiempo para la moderación."}
 COMUNES = [
+ {"title": "Reajuste en UF", "text": "Los valores se fijan en UF al valor del día de esta oferta. Cada factura se emite en pesos chilenos al valor de la UF del día de su emisión, así el precio se mantiene en UF durante todo el contrato."},
  {"title": "Plazo", "text": "Doce meses desde el inicio del servicio, con dos prórrogas posibles según las bases de la licitación."},
  {"title": "Forma de pago", "text": "Factura mensual por mes de servicio, al cierre de cada mes."},
  {"title": "Lo que aporta KSB", "text": "Accesos a GA4, Google Ads, Meta Ads Manager y lectura en SAP C4C; los históricos para la línea base; una persona que apruebe piezas y campañas; y la validación mensual de ventas con el área comercial."},
