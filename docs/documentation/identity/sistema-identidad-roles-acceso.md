@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Última actualización:** 2026-11-01 (Efeonce ID en producción con carrusel; retención levantada)
+> **Última actualización:** 2026-11-06 (cuentas operativas por Space y cierre de sesión de personas desactivadas, TASK-2096)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -369,6 +369,33 @@ Cuando se le **revoca** un rol a una persona, ese rol deja de darle acceso **de 
 Esto importa porque alguien puede haber tenido un rol amplio (p.ej. "Líder de Cuenta" o "Finanzas") que luego se le quita: al revocarlo, su menú vuelve a reflejar únicamente lo que sus roles activos permiten. Si una persona necesita conservar un acceso, hay que **otorgarle el rol activo correspondiente** — nunca dejarlo "heredado" de un rol revocado.
 
 > **Detalle tecnico:** la derivación de `route_groups` en `greenhouse_serving.session_360` aplica el mismo filtro de ciclo de vida (`active` + vigencia) que `role_codes`. Un detector (`identity.session.route_group_drift`, steady=0) alerta si algún usuario tuviera route groups que no provienen de un rol activo. Spec: [TASK-987](../../tasks/complete/TASK-987-session-route-groups-lifecycle-fix.md) / [ISSUE-083](../../issues/resolved/ISSUE-083-session-route-groups-leak-from-revoked-roles.md).
+
+## Una persona desactivada pierde la sesión (TASK-2096)
+
+Cuando se desactiva a una persona, su sesión en el portal se cierra en la siguiente verificación de permisos,
+que ocurre cada 5 minutos. Antes, la sesión abierta conservaba los permisos anteriores sin límite. Lo mismo
+vale para un enlace de acceso por correo pedido antes de la desactivación: ya no abre sesión. En la App, el
+rechazo es inmediato desde antes.
+
+## Cuentas operativas: una empresa, varios Spaces (TASK-2096)
+
+Una misma empresa cliente puede tener más de una cuenta operativa (Space), por ejemplo Diseño y Blog SEO.
+Cada Space se trabaja por separado:
+
+| Situación | Qué pasa |
+| --- | --- |
+| La empresa tiene un solo Space | Todo sigue igual que antes: sus personas trabajan en ese Space. |
+| La empresa tiene varios Spaces | Nadie queda dentro de un Space "por defecto". Cada persona ve sólo los Spaces que se le otorgaron, y elige en cuál trabaja. |
+| Una persona trabaja en ambos | Puede tener permisos distintos en cada uno (por ejemplo, leer en SEO y crear en Diseño). |
+| Se le quita el acceso a un Space | Lo pierde en la siguiente acción y conserva los demás. |
+
+Editar los datos de un Space (nombre, fecha) nunca cambia en qué Space está trabajando alguien.
+
+> **Detalle técnico:** resolver y grants en `src/lib/tenant/space-authority/`; contrato e invariantes en
+> [IDENTITY_WORKFORCE_AGENT_INVARIANTS.md](../../architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+> §Autoridad por cuenta operativa; decisión en el
+> [ADR de cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md).
+> Otorgar y quitar Spaces desde el portal llega con TASK-2099; la apertura de un cliente real, con TASK-1852.
 
 ## Registro de actividad (audit)
 

@@ -90,6 +90,7 @@ const tenantAccessRecordToContext = (tenant: TenantAccessRecord): TenantContext 
   legacyLocale: tenant.legacyLocale,
   effectiveLocale: tenant.effectiveLocale,
   ...(tenant.spaceId ? { spaceId: tenant.spaceId } : {}),
+  ...(tenant.spaceSelectionRequired ? { spaceSelectionRequired: true } : {}),
   ...(tenant.organizationId ? { organizationId: tenant.organizationId } : {}),
   ...(tenant.organizationName ? { organizationName: tenant.organizationName } : {}),
   ...(tenant.memberId ? { memberId: tenant.memberId } : {}),

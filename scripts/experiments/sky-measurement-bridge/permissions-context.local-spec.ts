@@ -27,6 +27,7 @@ import { createFirstPartyAppSession, decodeAppAccessToken, refreshFirstPartyAppS
   resolveAppSessionTenant, revokeFirstPartyAppSession } from '@/lib/api-platform/core/app-sessions'
 import { listAppInsightReports } from '@/lib/api-platform/resources/app-insights-read'
 import type { AppPlatformRequestContext } from '@/lib/api-platform/core/app-auth'
+import { SessionAccessRevokedError } from '@/lib/auth/session-access-revoked'
 import { LocalAccessDenied, selectLocalSpaceContext, revalidateLocalSpaceContext, readLocalBoundReport } from './space-context-candidate'
 
 const secret = 'synthetic-local-secret-never-a-production-key'
@@ -141,15 +142,19 @@ describe.each(['A-prime', 'B'] as const)('permission/context experiment %s', var
   })
   afterEach(async () => { expect(await designDigest()).toEqual(history) })
 
-  it.each(['design', 'seo', 'dual'])('current cookie: %s user has one implicit context, not a selectable grant set', async user => {
+  // TASK-2096 (H1): session_360 comes from the current migration. A client with two active Spaces
+  // (B) gets NO implicit Space and an explicit selection flag; a single-Space client keeps its Space.
+  it.each(['design', 'seo', 'dual'])('cookie: %s user never gets a Space chosen by row order', async user => {
     const token = await cookieRoundTrip(await freshJwt(user))
     const session = await materializeSession(token)
 
-    expect(session.user.spaceId).toBe(variant === 'A-prime' && user === 'seo' ? 'space-seo' : 'space-design')
+    expect(session.user.spaceId).toBe(variant === 'B' ? undefined : user === 'seo' ? 'space-seo' : 'space-design')
+    expect(session.user.spaceSelectionRequired).toBe(variant === 'B')
+    expect(session.user.organizationId).toBe('org-sky')
     expect(session.user.userId).toBe(user)
   })
 
-  it('CURRENT GAP: cookie refresh of dual user follows SEO metadata only in B', async () => {
+  it('cookie refresh of dual user never follows Space metadata (H1 closed)', async () => {
     const token = await freshJwt('dual')
 
     await query(`UPDATE greenhouse_core.spaces SET updated_at='2026-03-01' WHERE space_id='space-seo'`)
@@ -158,8 +163,9 @@ describe.each(['A-prime', 'B'] as const)('permission/context experiment %s', var
     vi.spyOn(Date, 'now').mockReturnValue(now + 300_001)
     const refreshed = await refreshJwt(token)
 
-    expect(refreshed.spaceId).toBe(variant === 'B' ? 'space-seo' : 'space-design')
-    expect(token.spaceId).toBe('space-design')
+    expect(refreshed.spaceId).toBe(token.spaceId)
+    expect(token.spaceId).toBe(variant === 'B' ? undefined : 'space-design')
+    expect(refreshed.spaceSelectionRequired).toBe(variant === 'B')
   })
 
   it('CURRENT GAP: membership revocation does not revoke cookie context after refresh', async () => {
@@ -187,17 +193,25 @@ describe.each(['A-prime', 'B'] as const)('permission/context experiment %s', var
     expect((await refreshJwt(token)).roleCodes).toEqual([])
   })
 
-  it('CURRENT GAP: disabled identity retains old cookie claims after attempted refresh', async () => {
+  it('disabled identity loses its cookie: the refresh throws so NextAuth drops the session (H2 closed)', async () => {
     const token = await freshJwt('seo')
 
     await query(`UPDATE greenhouse_core.client_users SET active=false,status='disabled' WHERE user_id='seo'`)
     vi.spyOn(Date, 'now').mockReturnValue((token.accessClaimsRefreshedAt as number) + 300_001)
-    const refreshed = await refreshJwt(token)
-    const session = await materializeSession(refreshed)
 
-    expect(session.user.roleCodes).toContain('client_manager')
-    expect(refreshed.accessClaimsRefreshedAt).toBe(Date.now())
+    await expect(refreshJwt(token)).rejects.toBeInstanceOf(SessionAccessRevokedError)
     await expect(selectLocalSpaceContext('seo', target('seo'))).rejects.toBeInstanceOf(LocalAccessDenied)
+  })
+
+  it('concurrent refreshes of a disabled identity all fail; none keeps the old claims', async () => {
+    const token = await freshJwt('dual')
+
+    await query(`UPDATE greenhouse_core.client_users SET active=false,status='disabled' WHERE user_id='dual'`)
+    vi.spyOn(Date, 'now').mockReturnValue((token.accessClaimsRefreshedAt as number) + 300_001)
+    const outcomes = await Promise.allSettled([refreshJwt(token), refreshJwt(token), refreshJwt(token)])
+
+    expect(outcomes.map(o => o.status)).toEqual(['rejected', 'rejected', 'rejected'])
+    expect(outcomes.every(o => o.status === 'rejected' && o.reason instanceof SessionAccessRevokedError)).toBe(true)
   })
 
   it.each(['design', 'seo', 'dual'])('CURRENT GAP: real Insights App resource lists both departments for %s despite space query', async user => {
@@ -283,7 +297,7 @@ describe.each(['A-prime', 'B'] as const)('permission/context experiment %s', var
     expect(design.spaceId).toBe('space-design')
     expect(seo.spaceId).toBe('space-seo')
     expect(seo.bridgeClientId).toBe(seoClient)
-    expect(token.spaceId).toBe('space-design')
+    expect(token.spaceId).toBe(variant === 'B' ? undefined : 'space-design')
     expect((await readLocalBoundReport('dual', seo, 'report-seo')).reportId).toBe('report-seo')
     await expect(readLocalBoundReport('dual', seo, 'report-design')).rejects.toBeInstanceOf(LocalAccessDenied)
   })
@@ -346,8 +360,10 @@ describe.each(['A-prime', 'B'] as const)('permission/context experiment %s', var
     await query(`UPDATE greenhouse_core.spaces SET updated_at='2026-03-01' WHERE space_id='space-seo'`)
     const refreshed = await refreshFirstPartyAppSession(original.refreshToken)
 
-    expect(refreshed.tenant.spaceId).toBe(variant === 'B' ? 'space-seo' : 'space-design')
-    expect((await query(`SELECT space_id FROM greenhouse_core.first_party_app_sessions WHERE app_session_id=$1`, [original.appSessionId]))[0]?.space_id).toBe('space-design')
+    // H1 closed: renewal never switches to SEO by metadata; in B there is no implicit Space at all.
+    expect(refreshed.tenant.spaceId).toBe(variant === 'B' ? null : 'space-design')
+    expect(refreshed.tenant.spaceSelectionRequired).toBe(variant === 'B')
+    expect((await query(`SELECT space_id FROM greenhouse_core.first_party_app_sessions WHERE app_session_id=$1`, [original.appSessionId]))[0]?.space_id).toBe(variant === 'B' ? null : 'space-design')
   })
 
   it('App crypto rejects tampered tokens and durable resolver rejects mismatched user', async () => {

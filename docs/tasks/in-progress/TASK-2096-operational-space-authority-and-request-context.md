@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `Tomada 2026-11-06; discovery y plan; sin código. Medido: 0 clientes con más de un Space activo (16 con uno), session_360 = 116 filas para 116 usuarios; H1 latente`
+- Status real: `Code complete local 2026-11-06, rollout pendiente: 4 slices en develop, laboratorio 241/241 sobre PG16 con las migraciones reales; migraciones sin aplicar a la base compartida; falta señal de reliability y revocación durante write`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -245,16 +245,16 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 
 ## Acceptance Criteria
 
-- [ ] Diseño/SEO/dual/sin relación y otra organización pasan una matriz HTTP real local de listas y detalle, sin unión implícita de módulos.
-- [ ] Revocación de SEO conserva Diseño del dual; usuario inactivo, sesión renovada, refresh concurrente y revocación durante write tienen resultado explícito sin claims antiguos autorizantes.
-- [ ] Dos pestañas con contextos distintos no se redirigen por una preferencia global; cambiar updated_at de Space no cambia el contexto efectivo.
-- [ ] Source of truth, API/command y consumidores conciliados con código/schema real; capability + grant + prueba de paridad cuando corresponda.
-- [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
-- [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
-- [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
-- [ ] Con dos Spaces activos del mismo client, la resolución de sesión es determinista y no elige por orden de filas: login, refresh y App devuelven el contexto autorizado o un estado explícito de selección pendiente.
-- [ ] La matriz local carga `session_360` desde la migración vigente, no desde `scripts/setup-postgres-identity-v2.sql`.
-- [ ] Un usuario desactivado pierde sus claims autorizantes en el siguiente refresh de cookie; el caso queda probado junto al de sesión App.
+- [x] Diseño/SEO/dual/sin relación y otra organización pasan una matriz HTTP real local de listas y detalle, sin unión implícita de módulos. Evidencia: `space-authority.local-spec.ts` (rutas App reales `/spaces`, `/spaces/{id}/services`, `/services/{id}`); recurso = Services, no Insights (el vínculo informe→Space es TASK-1960).
+- [ ] Revocación de SEO conserva Diseño del dual; usuario inactivo, sesión renovada, refresh concurrente y revocación durante write tienen resultado explícito sin claims antiguos autorizantes. Verificado todo salvo «revocación durante write»: el contrato todavía no tiene un write por Space; su primer consumidor llega con TASK-2097/2099.
+- [x] Dos pestañas con contextos distintos no se redirigen por una preferencia global; cambiar updated_at de Space no cambia el contexto efectivo. Evidencia: casos «two tabs» y «updated_at» del spec nuevo; `bridge-postgres` y `permissions-context` reescritos.
+- [ ] Source of truth, API/command y consumidores conciliados con código/schema real; capability + grant + prueba de paridad cuando corresponda. Pendiente: el command HTTP de grants (TASK-2099) y la migración de los ~50 consumidores de `spaceId` de sesión (TASK-2100). La autoridad por Space no es capability, así que no hay grant en `runtime.ts`.
+- [x] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo. Evidencia: grant concurrente deja una fila activa, versión vieja rechazada, revocación idempotente, CHECKs de tabla, org de control.
+- [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados. Hecho: DDL, sin backfill, rollback, errores App sanitizados y evento de auditoría en la misma transacción. Falta: señal de reliability (selección pendiente / ambigüedad de sesión).
+- [x] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia. Evidencia: cabecera de mocks del spec nuevo (sólo transporte outbox, audit de login y metadata UI); historia de Diseño sin cambios por digest.
+- [x] Con dos Spaces activos del mismo client, la resolución de sesión es determinista y no elige por orden de filas: login, refresh y App devuelven el contexto autorizado o un estado explícito de selección pendiente. Evidencia: migración `20261106230331669` + `spaceSelectionRequired` en token/sesión/App; salida idéntica a la vista viva para 116 usuarios (READ ONLY).
+- [x] La matriz local carga `session_360` desde la migración vigente, no desde `scripts/setup-postgres-identity-v2.sql`. Evidencia: `run-local.mjs` aplica la sección Up de las migraciones TASK-2096.
+- [x] Un usuario desactivado pierde sus claims autorizantes en el siguiente refresh de cookie; el caso queda probado junto al de sesión App. Evidencia: `session-access-revocation.test.ts` y casos del laboratorio (incluido refresh concurrente); magic link y firmador interno también revisan (H2b).
 
 ## Verification
 
@@ -272,6 +272,24 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No crea emisor, login, UI de selector ni authority MCP paralelos; TASK-1631 conserva binding externo y TASK-1854 consume la enumeración.
+
+## Implementación 2026-11-06 — code complete local, rollout pendiente
+
+Plan y auditoría: [TASK-2096-plan.md](../plans/TASK-2096-plan.md). Cuatro slices en `develop`, sin push:
+
+- **Slice 1 (H2, H2b):** `SessionAccessRevokedError` en el refresh; magic link y firmador interno revisan
+  `active`/`status`. Una falla de lectura conserva el comportamiento previo: el callback lanza (fail-closed).
+- **Slice 2 (H1):** migración `20261106230331669` (una fila por usuario, `space_selection_required`);
+  `identity-store.ts` pide dos filas y lanza `IdentitySessionAmbiguousError`. Medido en READ ONLY: 0 emails/OID/sub
+  ambiguos y salida idéntica a la vista viva.
+- **Slice 3:** tabla `greenhouse_core.space_access_grants` (migración `20261106230745107`), resolver, enumeración,
+  revalidación y store versionado con evento `identity.space_access.*`.
+- **Slice 4:** rutas App `/spaces`, `/spaces/{spaceId}/services`, `/spaces/{spaceId}/services/{serviceId}`.
+  Desvío del plan: el consumidor es Services, que tiene `space_id` propio; Insights espera TASK-1960.
+
+Pendiente para cerrar: aplicar las dos migraciones a la base compartida (autorización explícita), señal de reliability,
+revocación durante un write (primer write por Space), y los gates de cierre `pnpm test` completo y `pnpm build`.
+Manual de uso: no aplica todavía; nadie puede otorgar Spaces sin el command de TASK-2099 (dueño: EPIC-057).
 
 ## Delta 2026-11-06 — Revisión contra código
 

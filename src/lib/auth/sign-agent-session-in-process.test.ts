@@ -50,7 +50,9 @@ const fixtureTenant = {
   organizationId: null,
   organizationName: null,
   memberId: null,
-  identityProfileId: null
+  identityProfileId: null,
+  active: true,
+  status: 'active'
 }
 
 describe('signAgentSessionInProcess', () => {
@@ -67,6 +69,18 @@ describe('signAgentSessionInProcess', () => {
 
   it('returns null when the agent user is missing', async () => {
     vi.mocked(getTenantAccessRecordForAgent).mockResolvedValue(null)
+
+    const result = await signAgentSessionInProcess('agent@greenhouse.efeonce.org')
+
+    expect(result).toBeNull()
+    expect(encode).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ active: false, status: 'active' }],
+    [{ active: true, status: 'disabled' }]
+  ])('refuses to mint a session for a principal that is no longer active (%o)', async state => {
+    vi.mocked(getTenantAccessRecordForAgent).mockResolvedValue({ ...fixtureTenant, ...state } as never)
 
     const result = await signAgentSessionInProcess('agent@greenhouse.efeonce.org')
 

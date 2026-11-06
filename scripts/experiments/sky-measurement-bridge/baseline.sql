@@ -1,5 +1,5 @@
 -- TASK-2094 synthetic dependency tables, NOT a deployment migration or a full schema replica.
--- session_360 is loaded verbatim by the runner from its current source SQL.
+-- session_360 and space_access_grants are loaded by the runner from their real migrations (Up section only).
 CREATE SCHEMA greenhouse_core;
 CREATE SCHEMA greenhouse_finance;
 CREATE SCHEMA greenhouse_serving;
@@ -65,3 +65,10 @@ CREATE TABLE greenhouse_core.space_notion_sources (
 CREATE TABLE greenhouse_insights.insight_editions (edition_id text PRIMARY KEY);
 CREATE TABLE greenhouse_insights.insight_retention_classes (retention_class text PRIMARY KEY);
 INSERT INTO greenhouse_insights.insight_retention_classes VALUES ('evidence_snapshot');
+
+-- TASK-2096: columns/tables the CURRENT session_360 migration reads (identity profile locale and
+-- tenant/organization default locales). Synthetic shape, real names and types.
+CREATE TABLE greenhouse_core.identity_profiles (profile_id text PRIMARY KEY, preferred_locale text);
+ALTER TABLE greenhouse_core.clients ADD COLUMN default_locale text;
+ALTER TABLE greenhouse_core.organizations ADD COLUMN default_locale text;
+ALTER TABLE greenhouse_core.client_users ADD COLUMN locale text;

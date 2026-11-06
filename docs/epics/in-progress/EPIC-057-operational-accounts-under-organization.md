@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Formalizado y revisado contra código 2026-11-06; TASK-2094 con 204 pruebas locales; ADR aceptado con B el 2026-11-06; siete hijas nuevas to-do; sin split productivo`
+- Status real: `Formalizado y revisado contra código 2026-11-06; ADR aceptado con B el 2026-11-06; TASK-2096 code complete local (laboratorio 241/241, migraciones sin aplicar); seis hijas to-do; sin split productivo`
 - Rank: `57`
 - Domain: `cross-domain|identity|data|ops`
 - Owner: `Core/Spaces + Identity + Services; Finance/Delivery/ICO/Insights por contrato; Julio aceptó el ADR (B, 2026-11-06) y decide la apertura`
@@ -208,6 +208,13 @@ Julio aceptó el modelo B tras la explicación A′/B: un client comercial compa
 El ADR pasa a Accepted, `DECISIONS_INDEX` y TASK-2094/2096–2102 lo reflejan, y el servicio SKY Blog deja de
 citar la recomendación A′ del 27-10. No cambia dependencias, prioridades ni lifecycle, y no inicia
 implementación, migrations ni provisioning. Siguiente unidad: TASK-2096.
+
+## Delta 2026-11-06 — TASK-2096 code complete local
+
+U01 implementada en `develop` sin push: revocación de sesión (H2 y magic link), `session_360` determinista (H1),
+grants por Space con resolver y rutas App `/spaces`. El laboratorio de TASK-2094 carga ahora las migraciones reales y
+pasa 241/241. Las dos migraciones no se aplicaron a la base compartida. Desbloquea TASK-2097 en lo local; TASK-1960 sigue
+dueña del vínculo informe→Space que Insights necesita para filtrar por Space.
 
 ## Verification of Planning
 

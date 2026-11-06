@@ -43,11 +43,19 @@ try {
 
   psql('postgres', 'CREATE ROLE sky_test_app LOGIN NOSUPERUSER; CREATE DATABASE sky_bridge_test;')
   psql('sky_bridge_test', readFileSync(join(here, 'baseline.sql'), 'utf8'))
-  const source = readFileSync(join(root, 'scripts/setup-postgres-identity-v2.sql'), 'utf8')
-  const view = source.match(/CREATE OR REPLACE VIEW greenhouse_serving\.session_360 AS[\s\S]*?;/)?.[0]
 
-  if (!view) throw new Error('Current session_360 definition not found; refusing substitute view')
-  psql('sky_bridge_test', view)
+  // TASK-2096: real migrations, Up section only (the Down section must never run here).
+  const migrationUp = file => {
+    const text = readFileSync(join(root, 'migrations', file), 'utf8')
+
+    if (!text.startsWith('-- Up Migration')) throw new Error(`Migration without Up marker: ${file}`)
+
+    return text.split('\n-- Down Migration')[0]
+  }
+
+  psql('sky_bridge_test', 'CREATE ROLE greenhouse_runtime NOLOGIN; GRANT greenhouse_runtime TO sky_test_app;')
+  // session_360 comes from the CURRENT migration, not from scripts/setup-postgres-identity-v2.sql (H1).
+  psql('sky_bridge_test', migrationUp('20261106230331669_task-2096-session-360-deterministic-space.sql'))
   const insights = readFileSync(join(root, 'migrations/20260915100154428_task-1845-insights-foundation.sql'), 'utf8')
   const snapshotTable = insights.match(/CREATE TABLE IF NOT EXISTS greenhouse_insights\.insight_evidence_snapshots \([\s\S]*?\n\);/)?.[0]
   const noDelete = insights.match(/CREATE OR REPLACE FUNCTION greenhouse_insights\.assert_insights_no_delete\(\)[\s\S]*?\$\$ LANGUAGE plpgsql;/)?.[0]
@@ -61,7 +69,15 @@ try {
 
   if (!appTable) throw new Error('Real app session table not found; refusing substitute')
   psql('sky_bridge_test', appTable)
+  // TASK-2096: the real App routes rate-limit and audit through this table.
+  const requestLogTable = appMigration.match(/CREATE TABLE IF NOT EXISTS greenhouse_core\.api_platform_request_logs \([\s\S]*?\n\);/)?.[0]
+
+  if (!requestLogTable) throw new Error('Real API request log table not found; refusing substitute')
+  psql('sky_bridge_test', requestLogTable)
   psql('sky_bridge_test', readFileSync(join(here, 'permissions-baseline.sql'), 'utf8'))
+  psql('sky_bridge_test', migrationUp('20261106230745107_task-2096-space-access-grants.sql'))
+  // Captures grant audit events written through the grant transaction's own client.
+  psql('sky_bridge_test', 'CREATE TABLE sky_experiment.outbox_capture (event_type text, aggregate_id text);')
   psql('sky_bridge_test', readFileSync(join(here, 'finance-routing-baseline.sql'), 'utf8'))
   const allocationSql = readFileSync(join(root, 'migrations/20260507164348236_task-815-direct-service-expense-allocation.sql'), 'utf8')
   const allocationEnd = allocationSql.indexOf('COMMENT ON TABLE greenhouse_finance.expense_service_allocations')

@@ -4,6 +4,7 @@ import { encode } from 'next-auth/jwt'
 
 import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { getTenantAccessRecordForAgent } from '@/lib/tenant/access'
+import { resolveSessionPrincipalRevocation } from '@/lib/auth/session-access-revoked'
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { ROLE_CODES } from '@/config/role-codes'
 import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
@@ -74,6 +75,15 @@ export const signAgentSessionInProcess = async (
 
   if (!tenant) {
     console.warn('[sign-agent-session] no tenant user found', { email: normalizedEmail })
+
+    return null
+  }
+
+  // TASK-2096 (H2b): never mint a session for a principal that is no longer active.
+  const revocation = resolveSessionPrincipalRevocation(tenant)
+
+  if (revocation) {
+    console.warn('[sign-agent-session] principal not active; refusing to mint', { email: normalizedEmail, revocation })
 
     return null
   }

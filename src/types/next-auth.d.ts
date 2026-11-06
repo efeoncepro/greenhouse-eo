@@ -34,6 +34,8 @@ declare module 'next-auth' {
 
     // Account 360
     spaceId?: string
+    /** TASK-2096 — several active Spaces; the Space must be chosen per request. */
+    spaceSelectionRequired?: boolean
     organizationId?: string
     organizationName?: string
 
@@ -80,6 +82,8 @@ declare module 'next-auth' {
 
       // Account 360
       spaceId?: string
+      /** TASK-2096 — several active Spaces; the Space must be chosen per request. */
+      spaceSelectionRequired?: boolean
       organizationId?: string
       organizationName?: string
 
@@ -130,6 +134,8 @@ declare module 'next-auth/jwt' {
 
     // Account 360
     spaceId?: string
+    /** TASK-2096 — several active Spaces; the Space must be chosen per request. */
+    spaceSelectionRequired?: boolean
     organizationId?: string
     organizationName?: string
 

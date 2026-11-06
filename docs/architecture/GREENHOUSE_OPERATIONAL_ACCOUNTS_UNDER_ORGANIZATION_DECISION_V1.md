@@ -245,3 +245,7 @@ global sin errores y 26 warnings existentes. Detalle y recibo reproducible en la
 y coordina TASK-2094. Reutiliza las dueñas de EPIC-045/046/022 sin reparentarlas. Su matriz por hitos sustituye
 el listado U00–U10 sin IDs del discovery para planificar; el discovery conserva su fecha y evidencia.
 Formalizar no acepta el ADR, no aplica migrations ni habilita SKY. UI, envío y apertura siguen en sus dueñas.
+
+U01 (TASK-2096, 2026-11-06) implementa los puntos 1–2 del contrato en local: resolver `src/lib/tenant/space-authority/`,
+tabla `greenhouse_core.space_access_grants` y `session_360` sin elección por orden. Migraciones sin aplicar a la base
+compartida; invariantes en `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Autoridad por cuenta operativa.

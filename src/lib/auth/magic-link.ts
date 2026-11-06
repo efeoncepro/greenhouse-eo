@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import { compare, hash } from 'bcryptjs'
 
 import { recordAuthAttempt } from '@/lib/auth/attempt-tracker'
+import { resolveSessionPrincipalRevocation } from '@/lib/auth/session-access-revoked'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   getTenantAccessRecordByEmail,
@@ -264,6 +265,24 @@ export const consumeMagicLink = async ({
   const fullTenant = await getTenantAccessRecordByUserId(row.user_id).catch(() => null)
 
   if (!fullTenant) {
+    return { ok: false, reason: 'invalid' }
+  }
+
+  // TASK-2096 (H2b): the link may have been requested before the person was disabled.
+  // Re-check at consume time; the redirect stays generic so account status is not disclosed.
+  const revocation = resolveSessionPrincipalRevocation(fullTenant)
+
+  if (revocation) {
+    await recordAuthAttempt({
+      provider: 'magic-link',
+      stage: 'magic_link_consume',
+      outcome: 'rejected',
+      reasonCode: revocation,
+      userIdResolved: fullTenant.userId,
+      email: fullTenant.email,
+      ip
+    })
+
     return { ok: false, reason: 'invalid' }
   }
 

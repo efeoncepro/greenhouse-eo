@@ -916,3 +916,36 @@ Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) 
 - Publicar UI, activar flags, completar SSO y emitir/usar/revocar un token son evidencias distintas. Leer
   runtime y medir deny con token vigente; preservar expiración/cohorte original al restaurar un canary.
   Runbook: [rollout interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+## Autoridad por cuenta operativa (Space) y revocación de sesión (TASK-2096, desde 2026-11-06)
+
+Contrato del modelo B aceptado en
+[`GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md`](../GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
+un client comercial, varios Spaces, contexto Space/Service explícito por request.
+
+- **Sesión determinista.** `greenhouse_serving.session_360` es una fila por usuario
+  (`migrations/20261106230331669_task-2096-session-360-deterministic-space.sql`). `space_id` sólo existe si el client
+  tiene exactamente un Space activo; con más, queda `NULL` y `space_selection_required = true`
+  (`session.user.spaceSelectionRequired`, `TenantContext.spaceSelectionRequired`, `/me`). **NUNCA** ordenar por
+  `updated_at` ni tomar `LIMIT 1` sin unicidad para elegir un Space o un principal: las cuatro lecturas de
+  `identity-store.ts` piden dos filas y lanzan `IdentitySessionAmbiguousError` si llega más de una.
+- **Revocación en el refresh.** Si el principal ya no existe o no está `active`/`status='active'`, el callback
+  `jwt` lanza `SessionAccessRevokedError` (`src/lib/auth/session-access-revoked.ts`): NextAuth borra la cookie y la
+  sesión queda nula. **NUNCA** vaciar los claims en su lugar: el callback `session` asigna un rol primario por
+  defecto cuando faltan roles. El magic link y el firmador interno revisan el mismo predicado antes de emitir.
+- **Autoridad por Space.** `resolveSpaceContext` / `listAuthorizedSpaces` / `revalidateSpaceContext`
+  (`src/lib/tenant/space-authority/`) leen el principal de `client_users` en cada llamada y devuelven
+  `authorized | selection_required | denied`. Reglas: con algún grant activo de la persona en la Organization, sólo
+  cuentan los grants; sin grants, un client con un único Space activo conserva el comportamiento actual; con varios
+  Spaces y sin grant no hay acceso ni departamento por defecto. Los ids del request sólo restringen.
+- **Grants.** `greenhouse_core.space_access_grants` se escribe sólo con `grantSpaceAccess` / `revokeSpaceAccess`
+  (transacción + evento `identity.space_access.granted|revoked`). Versionados, nunca borrados (runtime sin
+  `DELETE`); un contexto elegido con una versión anterior queda `context_stale`. Un grant sólo alcanza a personas del
+  client del Space. **NUNCA** derivar un grant de `person_memberships` (son descriptivas).
+- **Primer consumidor.** App lane `GET /api/platform/app/spaces`, `/spaces/{spaceId}/services` y
+  `/spaces/{spaceId}/services/{serviceId}`: Space ajeno o Service fuera del Space → 404; varios Spaces sin elegir
+  → 409 `space_selection_required`. Insights espera su vínculo informe→Space (TASK-1960) antes de filtrar por Space.
+- **Rollout.** Las dos migraciones existen en `migrations/` y se probaron en PG16 efímero; aplicarlas a la base
+  compartida (dev/staging/prod) requiere autorización explícita. Orden: la vista nueva puede ir antes del código
+  (salida idéntica a la vigente para los 116 usuarios, medido en `READ ONLY` el 2026-11-06, y el código anterior
+  ignora las columnas agregadas); la tabla de grants debe existir antes de que las rutas `/spaces` reciban tráfico.

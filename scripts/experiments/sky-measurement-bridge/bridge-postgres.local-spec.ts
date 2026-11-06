@@ -79,29 +79,32 @@ describe.each(['A-prime', 'B'] as const)('current real components with bridge %s
     await query(`INSERT INTO greenhouse_core.v_client_active_modules VALUES ($1,'module-seo','seo')`, [seoClient])
   })
 
+  // TASK-2096 (H1 closed): the current session_360 migration never picks a Space by row order or
+  // metadata. Shared client B → no implicit Space + explicit selection; A′ keeps its only Space.
   it('characterizes actual session_360 default and module loading, rather than a modeled selector', async () => {
     const session = await getSessionFromPostgresByUserId('user-both')
 
-    expect(session?.space_id).toBe(variant === 'A-prime' ? 'space-design' : 'space-seo')
+    expect(session?.space_id).toBe(variant === 'A-prime' ? 'space-design' : null)
+    expect(session?.space_selection_required).toBe(variant === 'B')
     expect(session?.service_modules.sort()).toEqual(variant === 'A-prime' ? ['design'] : ['design', 'seo'])
     expect(session?.client_id).toBe('client-owner')
   })
 
-  it('characterizes metadata changing the implicit default only for shared-client B', async () => {
+  it('Space metadata never changes the session Space, in either variant', async () => {
     const before = await getSessionFromPostgresByUserId('user-both')
 
     await query(`UPDATE greenhouse_core.spaces SET updated_at='2026-03-01' WHERE space_id='space-design'`)
     const after = await getSessionFromPostgresByUserId('user-both')
 
-    expect(after?.space_id).toBe('space-design')
-    expect(before?.space_id === after?.space_id).toBe(variant === 'A-prime')
+    expect(after?.space_id).toBe(variant === 'A-prime' ? 'space-design' : null)
+    expect(after?.space_id).toBe(before?.space_id)
   })
 
   it('characterizes revoking memberships not revoking the bridge-derived session', async () => {
     await query(`UPDATE greenhouse_core.person_memberships SET active=false WHERE profile_id='person-both'`)
     const session = await getSessionFromPostgresByUserId('user-both')
 
-    expect(session?.space_id).toBe(variant === 'A-prime' ? 'space-design' : 'space-seo')
+    expect(session?.space_id).toBe(variant === 'A-prime' ? 'space-design' : null)
     expect(session?.active).toBe(true)
   })
 

@@ -207,6 +207,8 @@ export const AGGREGATE_TYPES = {
 
   // Identity credential (TASK-451)
   identityCredential: 'identity_credential',
+  // TASK-2096 — per-Space authority of a person over an operational account
+  spaceAccessGrant: 'space_access_grant',
 
   // Person Legal Profile (TASK-784)
   personIdentityDocument: 'person_identity_document',
@@ -835,6 +837,10 @@ export const EVENT_TYPES = {
 
   // Identity credential (TASK-451)
   identityPasswordHashRotated: 'identity.password_hash.rotated',
+
+  // Space access grants (TASK-2096) — non-reactive audit events
+  spaceAccessGranted: 'identity.space_access.granted',
+  spaceAccessRevoked: 'identity.space_access.revoked',
 
   // Person Legal Profile (TASK-784)
   personIdentityDocumentDeclared: 'person.identity_document.declared',
