@@ -138,6 +138,16 @@ Formato: resumen 2 págs, estrategia 10, equipo 3, económica, referencias, cert
 | Certificado de viabilidad financiera | No existe como tal; hay carpeta tributaria y carta bancaria | Depende de la consulta 7 |
 | Precio | 60 UF/mes bajo el piso multicanal | Depende de la consulta 2; preparar dos escenarios |
 
+## 7b. Delta 06/11 14:46 — respuestas de KSB
+
+La consulta 2 se resolvió en el peor caso: **720 UF/año es tope total, honorarios + medios**, con medios
+recomendados ≥ 40 UF/mes. Honorarios posibles: ≈ 20 UF/mes (≈ USD 900) si se respetan los medios; ≈ 60 UF/mes
+(≈ USD 2.700) sólo si KSB pone los medios por fuera, lo que contradice «total». El piso multicanal es USD 5.890/mes:
+**el escenario A queda descartado y el B no llega ni a un sexto del piso.** La económica pesa 25 % y mide la relación
+fee/medios, así que pedir más honorarios penaliza. Las certificaciones puntúan (a favor), pero el CRM es SAP C4C
+(el eje HubSpot pierde peso). Lectura: **NO-GO económico**, salvo que Julio decida entrar como apuesta estratégica
+con alcance mínimo y costo asumido. Se adelanta la decisión del martes 10/11.
+
 ## 8. Escenarios de precio (a validar con el Cotizador V3)
 
 - **A — Alcance completo sobre el presupuesto base.** Los cuatro canales, contenido y redes al precio que da el

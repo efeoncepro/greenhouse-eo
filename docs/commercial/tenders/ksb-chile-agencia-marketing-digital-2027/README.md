@@ -1,11 +1,26 @@
 # KSB Chile — Agencia de Marketing Digital 2027 (licitación privada)
 
-> **Estado al 06/11/2026:** bases **recibidas y leídas** (LIC-MKT-2026-001); **consultas enviadas** el 06/11 a las
-> 10:12. Sin GO, sin oferta.
+> **Estado al 06/11/2026:** bases leídas; consultas enviadas (10:12) y **respondidas** (14:46). Sin GO: con 720 UF
+> totales (honorarios + medios) el precio queda muy bajo el piso. Decisión de Julio pendiente.
 > **Comprador:** KSB Chile S.A., Av. Las Esteras Sur 2851, Quilicura. Filial de KSB SE & Co. KGaA (Alemania).
 > **Fase:** `Screening`. GO/NO-GO condicionado a la respuesta: las bases exigen Google Partners, Meta Business
 > Partner y «HubSpot Premium» como elegibilidad, y Efeonce no tiene Meta ni Google Partners verificado.
 > **Cierre:** lunes **16/11/2026, 16:30** (Santiago).
+
+## Respuestas a las consultas (06/11/2026 14:46)
+
+Nelson envió `Respuestas_Consultas_Agencias_LIC-MKT-2026_v2.pdf` (FAQ oficial). Texto por tema:
+[respuestas-consultas-v2-2026-11-06.md](bases/respuestas-consultas-v2-2026-11-06.md). Lo que cambia:
+
+- **720 UF/año es el total, honorarios + medios**, tope. Medios recomendados ≥ 40 UF/mes: si se respeta, quedan
+  **≈ 20 UF/mes de honorarios** (≈ CLP 825 mil ≈ USD 900, UF 41.263,57), contra un piso multicanal de USD 5.890/mes.
+  KSB evalúa la relación fee/medios. Más IVA.
+- **La económica pesa 25 %** (la matriz suma 100); piso técnico 60/100.
+- Certificaciones **puntúan** (mayor nivel, más puntaje; mínimo una): Gold suma, Google y Meta también.
+- **CRM: SAP C4C**, no HubSpot; lectura para la agencia, traspaso por API «si es viable». ROI sobre valor de OC en C4C.
+- Email fuera; el rol es Lead Generation. Landing pages y micrositios externos permitidos («plus diferencial»).
+- Contenidos en LinkedIn, Facebook, Instagram (2–3 posts/semana cada uno) y YouTube (1–2 videos/mes).
+- Entrega: PDF único a `cl.ksb@ksb.com`, `Efeonce_Propuesta_16112026.pdf`. Retención se excluye si KSB falla.
 
 ## Respuesta de KSB (06/11/2026)
 
