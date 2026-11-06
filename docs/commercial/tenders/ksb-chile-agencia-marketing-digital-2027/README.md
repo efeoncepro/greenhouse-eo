@@ -16,6 +16,9 @@ Ojeda (`Pamela.Ojeda@ksb.com`), con `Base_Licitacion_MKT_Digital_v2.pdf`:
 - **No habrá reuniones** con agencias en esta etapa; sí con las finalistas (01–03/12).
 - Cierre del 16/11 a las **16:30**.
 
+**Estrategia de abordaje (INTERNO, 06/11):** [ESTRATEGIA-ABORDAJE-INTERNO.md](ESTRATEGIA-ABORDAJE-INTERNO.md):
+GO condicionado a certificaciones y precio; decisión el martes 10/11; incumbente probable United Visions.
+
 **PDF original:** OneDrive `Alineación/4. Comercial/Licitaciones/KSB Chile/01. Bases y anexos originales/Base_Licitacion_MKT_Digital_v2.pdf`
 (413.267 bytes, 4 páginas). **Texto:** [bases-LIC-MKT-2026-001-texto.md](bases/bases-LIC-MKT-2026-001-texto.md).
 
