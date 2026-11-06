@@ -18,6 +18,21 @@
 Berel sigue `gated` en `clients/brands.json` (TASK-1945): nada de este flujo autoriza entregar al cliente sin la
 aprobación de Daniela, Andrés o Melkin.
 
+### 0 bis. Una sesión nueva o una persona nueva del equipo (2026-11-06)
+
+Lo que una sesión nueva encuentra sola y lo que hay que tener listo para repetir este flujo con el mismo resultado:
+
+| Qué | Dónde vive | Qué hace falta |
+|---|---|---|
+| Skills `berel-graphic-line` y `berel-content-production` | Greenhouse `.claude/skills/` y `.codex/skills/`, publicadas en `develop` | Un checkout de Greenhouse al día (`git pull`); se cargan solas desde el router de `CLAUDE.md` |
+| Motor, contratos (incluidos los alias de paleta), jobs y `pieza.json` | Workbench `main` | Checkout del Workbench en `main` o en una rama Berel nacida de `main`. **No** en la rama de SKY: ahí no existen los jobs de Berel |
+| Recursos licenciados (Gotham Rounded, catálogo, logos, escudo de Rayados, plates, renders, tapa, música) | `clients/berel/.resources-local/` del Workbench, **solo en la Mac que los tiene**; nunca en Git | En otro equipo, la instalación admitida de esos recursos. Sin ellos, el compositor falla cerrado y las pruebas se saltan (no se sustituyen) |
+| Generación de imagen e inpaint | `pnpm ai:image` y `pnpm ai:inpaint image` en Greenhouse | Perfil de clave OpenAI personal por comando (`OPENAI_API_KEY_PROFILE=personal`), nunca como default |
+| Clip del reel (Seedance 2.0) | Conector MCP de Higgsfield de la sesión Claude | La persona tiene el conector conectado; se carga al iniciar la sesión |
+| Content Hub y tareas | Notion (conector) | La persona tiene acceso al teamspace de Berel |
+| Entrega | OneDrive `Berel - Efeonce - Squad Berel › Workspace Oficial › 04_Entregables` sincronizado en la Mac | La carpeta sincronizada; copiar y comprobar con `cmp` |
+| Revisión del equipo | Canvas «Berel — Banners» (claude.ai, privado del dueño) | Compartir el canvas desde su menú Share con quien revisa. **Claude lee los comentarios del canvas, no los de Frame.io ni las imágenes de Teams**: un ajuste dejado solo en Frame.io o en una captura de Teams hay que copiarlo al canvas o al chat de la sesión |
+
 ## 1. Brief → registro, espacio y color
 
 1. **Color**: nombre + código del brief o de la Wiki de Berel. Nunca de una pieza vieja (caso N41) ni de
