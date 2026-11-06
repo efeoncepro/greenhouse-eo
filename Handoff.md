@@ -14,7 +14,7 @@
   título más grande; origen «Buenos Aires» en AR Santiago; fotos del banco para UY, USA, AR Santiago y PE internacional.
   La familia de «Encuentra destinos» Perú se generó con el maestro SKY (Julio aprobó, ≈ USD 0,08).
 - Detalle y recetas: skill `efeonce-creative-workbench` → `sky-black-pipeline.md` §4.11.
-- Pendiente: revisión de Daniela/SKY. Canvas de Claude Design sin actualizar; contrato de fotos del Workbench
+- Canvas de Claude Design actualizado (versión 59, 62 archivos y 24 videos). Pendiente: revisión de Daniela/SKY; contrato de fotos del Workbench
   (`black-photos.json`) desfasado, se re-admite en un PR aparte.
 
 ## 2026-11-06 — SKY BLACK 2026: Daniela aprobó las 30 rutas foco (Pucallpa story, la última)

@@ -609,8 +609,13 @@ sin texto («left 2 comments»). Recetas de lectura:
   Perú»: si no, `compose` reponía PromPerú y la ubicación.
 - **Entrega (2026-11-06):** `organizar.cjs` sobre `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/`: 55 archivos copiados
   (11 carpetas `GIF + POPUP` × POPUP, STORY, GIF, GIF_AUDIO y STORYVIDEO; las 10 revisadas más BR «Voe a Santiago», que
-  cambió por la costura de la flecha). Se verificó por tamaño contra el local, sin leer el destino. El canvas de Claude
-  Design **no** se actualizó en esta ronda.
+  cambió por la costura de la flecha). Se verificó por tamaño contra el local, sin leer el destino.
+- **Canvas (2026-11-06, a pedido de Julio): versión 59.** `sync-canvas` → 24 MP4 subidos como assets (12 GIF mudos y
+  12 story video, ids nuevos en `vid-blobs.json`) → `new-pages.cjs` y `anim-page.cjs` → publicación de 62 archivos (36
+  imágenes y 26 tableros `g-gif`, `g-storyv` y `anim`), con `canvas.json` como ancla, idéntico al publicado. Dos trampas:
+  `sync-canvas` reescribe todo `kv/` y cambió `kv/HM_CL_KV_DOM.jpg`, que no era de la ronda, así que se restauró desde
+  la versión publicada. Además, `new-pages` sólo reordenó `order` en `canvas.json`: se dejó el publicado. Verificado
+  leyendo lo publicado (el tablero apunta al blob nuevo y la imagen es byte a byte la local).
 - **Pendiente fuera del taller:** el contrato de fotos del Workbench (`black-photos.json`) todavía trae la Cajamarca de
   «Vuela por el Perú» y no incluye las fotos nuevas. Se re-admite con `admitir-black.mjs` en un PR aparte.
 
