@@ -716,6 +716,11 @@ que el logo no esté encima de las cabezas, que haya full espacio arriba».
   **Notion:** las 32 subtareas de pieza en «Listo para revisión» con «Fecha de envío a revisión» 2026-11-06. Son 22 de
   «Rutas foco (KV LISTO)» (`DOM|INTER · <Destino> (IATA) — POPUP|STORY`) y 10 de «Rutas foco INTER» de BLACK SKY PE 26
   (`Post` = popup y `Story` bajo cada ciudad). Las tareas agrupadoras (madre y ciudades) no se tocaron.
+- **Difuminado B (2026-11-06, Dianesty: «mantener esa misma estructura en todas»):** las 16 se rehicieron con el velo
+  nuevo de `destinos.cjs` (sin pasar por `rutas-foco.cjs`, para no reescribir `fotos-destino.json`): destinos → brecha →
+  render → parts → compose sobre sus nombres, esperando a que la otra sesión dejara de renderizar (comparten temporales).
+  Reentregadas en `BLACK SKY 2026` y `- PARA REVISION` (`cmp` ok). Canvas **versión 67**: 32 assets nuevos (ids en
+  `rf-blobs.json`) y sólo los 16 tableros republicados.
 - **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`

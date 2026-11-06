@@ -13,6 +13,7 @@
   archivos). OneDrive `BLACK SKY 2026/HM CL|HM PE/RUTAS FOCO/<DESTINO>/` (32 archivos).
 - En revisión: las 32 también en `BLACK SKY 2026 - PARA REVISION/` (misma estructura, LEEME actualizado).
 - Notion: las 32 subtareas de pieza en «Listo para revisión», con fecha de envío 2026-11-06.
+- Difuminado B aprobado por Dianesty aplicado a las 16 rutas: reentregadas en OneDrive (ambas carpetas) y canvas versión 67.
 - Pendiente: precios en 000, origen de Chile («DESDE SANTIAGO», inferido) y fechas del pie.
 
 ## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF
