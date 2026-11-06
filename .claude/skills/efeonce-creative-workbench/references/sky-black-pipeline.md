@@ -1028,9 +1028,12 @@ kit. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
 ## 19. Construir con cifras en el Creative Workbench (2026-11-06)
 
 Las 39 piezas del kit traen cifras de relleno («000», «00 %», «[ORIGEN]», corchetes del legal). Desde el 2026-11-06 el
-Workbench las construye: familia declarada `brands/sky-airline/campaigns/black-2026/` (rama `claude/sky-black-2026`,
-commit `ca44bd0`, worktree `/Users/jreye/Documents/creative-workbench-sky-black`; sin push ni PR). Su `AGENTS.md`
-manda; este resumen sirve para retomar desde Greenhouse.
+Workbench las construye: familia declarada `brands/sky-airline/campaigns/black-2026/`, **en `main` desde el
+2026-11-06** (PR efeoncepro/creative-workbench#35, squash `a47fea2`; checks gates, native-harness, lab-checks y Vercel
+en verde). Recursos admitidos en `clients/sky/.resources-local/black-2026/` del checkout principal y del worktree
+`creative-workbench-sky-black` (299 archivos con sha256 verificado). Su `AGENTS.md` manda; este resumen sirve para
+retomar desde Greenhouse. Conciliación del merge: el árbol de `main` es idéntico al de la rama probada, gates y 5
+pruebas en verde, y una pieza compuesta desde `main` sale byte a byte igual que en la rama.
 
 - **Qué recibe el job** (`projects/sky/black-sky-2026/jobs/<PIEZA>.json`, uno por pieza, generados con
   `plantilla-black.mjs` con `null` donde falta el dato): `cifras.importes` (en orden de lectura; PE lleva dos:

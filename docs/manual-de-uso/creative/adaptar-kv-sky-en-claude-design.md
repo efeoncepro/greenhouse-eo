@@ -367,8 +367,8 @@ OneDrive tiene sólo en la nube colgaba el proceso. En la cuarta ronda dejó «B
 
 Cuando el diseño está aprobado y sólo faltan precio, descuento, origen o fechas:
 
-1. Abre el job de la pieza en el Workbench: `projects/sky/black-sky-2026/jobs/<PIEZA>.json` (worktree
-   `creative-workbench-sky-black`, rama `claude/sky-black-2026`).
+1. Abre el job de la pieza en el Workbench (ya está en `main`; actualiza tu checkout con `git pull`):
+   `projects/sky/black-sky-2026/jobs/<PIEZA>.json`.
 2. Completa cada `null`: `importes` en el orden en que se leen (en Perú, primero US$ y después S/), `descuento` (sólo el
    número), `campos` (`[ORIGEN]`, `[día]`, `[mes]`…; si un campo aparece dos veces, es una lista). En Perú, Brasil y
    EE. UU. completa también los corchetes de `legal` sin cambiar el resto del texto.

@@ -62,7 +62,7 @@ Continuidad: las rondas siguientes se llevan en la sesión derivada «SKY BLACK:
 canvas». Desde el 2026-11-06 el taller completo (scripts, kit corregido `src2/`, fotos, fuentes y proyecto del canvas) vive
 en `ai-generations/2026-11-04_sky-black-gif/taller/`, sin rutas al scratchpad viejo; se retoma con `bash
 taller/kvhm-canvas/doctor.sh` ([sky-black-pipeline.md](sky-black-pipeline.md) §0 y §17). `scripts/` quedó superada. Desde el 2026-11-06 el Workbench también construye las 39 piezas con cifras
-(familia `brands/sky-airline/campaigns/black-2026/`, rama `claude/sky-black-2026`, commit `ca44bd0`, sin push; jobs con
+(familia `brands/sky-airline/campaigns/black-2026/`, en `main` del Workbench por PR #35, squash `a47fea2`; jobs con
 `null` hasta que SKY dé precios y fechas; [sky-black-pipeline.md](sky-black-pipeline.md) §19).
 Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
 la regla de la flecha también vale para los popups de los KV del kit.

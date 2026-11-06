@@ -14,7 +14,7 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con precio
 
 El Workbench compone las 39 piezas BLACK (KV, popup y story) desde el diseño aprobado y les pone precio, descuento,
-origen y legal desde un job por pieza. Queda en una rama sin publicar, a la espera de las cifras de SKY.
+origen y legal desde un job por pieza. Ya está en `main` del Workbench (PR #35); falta que SKY entregue las cifras.
 
 ## 2026-11-06 — Blog SKY: las fichas del Content Hub se leen por secciones
 
