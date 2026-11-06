@@ -1021,6 +1021,33 @@ Desde la tercera ronda son 15 rutas foco; la cifra vigente es la de esta tabla.
 Frases INTER del brandlift y sus traducciones AR/PT/EN; traducciones de flecha y botón del HPH; BR «Voe
 para Peru» (alianza o KV); «Vuela por Perú» sin fotos; CL «Encuentra destinos» hecho desde el clúster
 internacional de Chile; texto de ubicación de la foto en las rutas; tapa vertical ES recortada; precios y
-descuentos en placeholder; que la regla destino ↔ flecha (§4.5) también valga para los popups de los KV del
+descuentos en placeholder (ya se pueden llenar en el Workbench, §19); que la regla destino ↔ flecha (§4.5) también valga para los popups de los KV del
 kit. Detalle en [sky-design-canvas.md](sky-design-canvas.md) y
 [state-continuity.md](state-continuity.md).
+
+## 19. Construir con cifras en el Creative Workbench (2026-11-06)
+
+Las 39 piezas del kit traen cifras de relleno («000», «00 %», «[ORIGEN]», corchetes del legal). Desde el 2026-11-06 el
+Workbench las construye: familia declarada `brands/sky-airline/campaigns/black-2026/` (rama `claude/sky-black-2026`,
+commit `ca44bd0`, worktree `/Users/jreye/Documents/creative-workbench-sky-black`; sin push ni PR). Su `AGENTS.md`
+manda; este resumen sirve para retomar desde Greenhouse.
+
+- **Qué recibe el job** (`projects/sky/black-sky-2026/jobs/<PIEZA>.json`, uno por pieza, generados con
+  `plantilla-black.mjs` con `null` donde falta el dato): `cifras.importes` (en orden de lectura; PE lleva dos:
+  US$ y S/), `cifras.descuento`, `cifras.campos` (`[ORIGEN]`, `[origen]`, `[destino]`, `[día]`, `[mes]`, `[año]`; un
+  campo repetido es lista) y, en PE/BR/US, `legal` (líneas completas). El compositor rechaza un job con `null`,
+  corchetes o valores sobrantes.
+- **Qué hace**: recompone KV, popup y story desde las capas aprobadas (las de `parts.cjs`, sin las cifras) con el
+  porte literal de `compose.cjs`/`destinos.cjs`, y dibuja las cifras con Metric (fontkit) con la ficha tipográfica de
+  cada tramo del KV. Sin Chromium, providers ni IA. `qa.json` avisa si una cifra o un legal crece más que el diseño
+  aprobado (p. ej. «DESDE BUENOS AIRES» se sale de la píldora en AR Lima) y falla si se sale del lienzo.
+- **Legal trazado**: en PE, BR y US el legal del kit son curvas, no texto. Se borra de la capa pie (x ≥ 395, y ≥ 1232)
+  y se escribe en su misma caja: PE alineado a la derecha, BR y US justificados. La transcripción verificada a ojo está
+  en `black-recipes.json → outlinedLegal.texts` (6 textos; el kit dice «mín.» con 25 pasajes y «min.» con 50).
+- **Paridad medida** con los marcadores: 117 PNG, media ≤ 0,50/255 y ≤ 0,53 % de píxeles > 32 niveles contra el
+  taller; el legal reescrito cae en la caja del original (±1 px).
+- **Admitir otra ronda aprobada** (si Daniela cambia un diseño): en el taller,
+  `node exportar-workbench.cjs <salida>` (capas sin cifras + `slots.json`, Chromium como `parts.cjs`); en el
+  Workbench, `node brands/sky-airline/campaigns/black-2026/scripts/admitir-black.mjs <salida> <taller>`. Correr el
+  exportador en una COPIA del taller: escribe `tmp-x.html` junto a los scripts.
+- **No hace todavía**: GIF/MP4, story en video, PMAX, HPH ni Chile «KV listo». Esos siguen en el taller (§8–§12).

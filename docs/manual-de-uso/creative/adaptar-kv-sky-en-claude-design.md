@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-06 por Claude (taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
+> **Ultima actualizacion:** 2026-11-06 por Claude (cifras en el Creative Workbench, paso 7i; taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -362,6 +362,20 @@ mismo nombre, se detiene. Primero pruébalo en una carpeta local y compáralo co
 Para decidir qué copiar, `organizar.cjs` compara cada archivo por **tamaño y fecha**, sin abrirlo: leer archivos que
 OneDrive tiene sólo en la nube colgaba el proceso. En la cuarta ronda dejó «BLACK SKY 2026» con 155 archivos, y
 «ENTREGABLES BLACK» también quedó al día.
+
+### 7i. Poner las cifras y construir en el Creative Workbench
+
+Cuando el diseño está aprobado y sólo faltan precio, descuento, origen o fechas:
+
+1. Abre el job de la pieza en el Workbench: `projects/sky/black-sky-2026/jobs/<PIEZA>.json` (worktree
+   `creative-workbench-sky-black`, rama `claude/sky-black-2026`).
+2. Completa cada `null`: `importes` en el orden en que se leen (en Perú, primero US$ y después S/), `descuento` (sólo el
+   número), `campos` (`[ORIGEN]`, `[día]`, `[mes]`…; si un campo aparece dos veces, es una lista). En Perú, Brasil y
+   EE. UU. completa también los corchetes de `legal` sin cambiar el resto del texto.
+3. Compón: `node brands/sky-airline/campaigns/black-2026/scripts/componer-black.mjs projects/sky/black-sky-2026/jobs/<PIEZA>.json`.
+4. Abre los PNG de la corrida al 100 % y lee `qa.json`: un aviso de que una cifra o el legal «termina más a la derecha
+   que el diseño aprobado» pide revisar si choca (por ejemplo, un origen largo que se sale de la píldora).
+5. La corrida queda pendiente de revisión humana; la oferta la confirma SKY. El Workbench no publica ni entrega.
 
 ### 7h. Leer la revisión de Frame.io y repartir aprobado y revisión
 

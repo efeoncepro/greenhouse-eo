@@ -2,6 +2,20 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con sus cifras
+
+Pedido de Julio: las piezas aprobadas por Daniela sólo esperan precio; el Workbench tiene que poder construirlas.
+**Workbench** (worktree `/Users/jreye/Documents/creative-workbench-sky-black`, rama `claude/sky-black-2026`, commit
+`ca44bd0`, **sin push ni PR**): familia declarada `brands/sky-airline/campaigns/black-2026/` que recompone KV, popup y
+story de las 39 piezas desde sus capas aprobadas (sha256, fuera de Git en `clients/sky/.resources-local/black-2026/`)
+y dibuja con Metric las cifras del job (importes, descuento, campos del legal vivo AR/UY/CL y el legal completo de
+PE/BR/US, que en el kit viene trazado; transcripción verificada en el contrato). Paridad con marcadores: 117 PNG,
+media ≤ 0,50/255. 39 jobs con `null` en `projects/sky/black-sky-2026/jobs/` hasta que SKY dé precios y fechas.
+**Greenhouse:** `taller/kvhm-canvas/exportar-workbench.cjs` (exporta capas sin cifras + fichas), skill
+`sky-black-pipeline.md` §19 + router + `state-continuity` (espejo `.codex`) y manual SKY 1.10 (paso 7i).
+**Pendiente:** cifras de SKY; PR del Workbench con autorización; fase 2 (GIF/MP4, story en video, PMAX, HPH);
+«DESDE BUENOS AIRES» desborda la píldora de AR Lima (el QA lo avisa).
+
 ## 2026-11-06 — Blog SKY: fichas del Content Hub plegadas en secciones y ronda de revisión de imágenes resuelta
 
 **Content Hub:** Julio: «dejaste la chorrera de texto». Se plegaron 44 fichas del lote de noviembre y de las pruebas de
