@@ -282,9 +282,10 @@
       },
       "popup": {
         "t": [
-          0.55,
-          0.45
-        ]
+          0.58,
+          0.6
+        ],
+        "z": 1.15
       },
       "story": {
         "t": [
@@ -379,7 +380,15 @@
       0.5
     ],
     "nota": "Novena ronda (Daniela, Frame 2026-11-06): Buenos Aires mientras tanto, según el brandlift, con espacio a la izquierda. Banco 03_ARGENTINA/BUE «Imagen de ChatGPT 29 sept 2026, 16_43_50» (Puerto Madero, Puente de la Mujer).",
-    "sombra": true
+    "sombra": true,
+    "f": {
+      "story": {
+        "t": [
+          0.84,
+          0.5
+        ]
+      }
+    }
   },
   "HM_PE_KV_ENCUENTRA": {
     "src": "PE_FAMILIA.png",

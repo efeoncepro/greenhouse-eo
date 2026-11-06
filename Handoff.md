@@ -16,6 +16,7 @@
   `BS_GIF_*_AUDIO.mp4`. `organizar.cjs` ya no entrega `.gif`.
 - Canvas versión 62: los 14 tableros de animación de la Grilla pasan al MP4 con audio, con controles, y se titulan «MP4».
 - Canvas versión 63: sin story video en la Grilla (Julio: se iterará después).
+- Canvas versión 65: caras libres del logo (story PE internacional y popup AR Lima, este también en OneDrive).
 
 ## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
 

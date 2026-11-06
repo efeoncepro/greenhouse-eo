@@ -672,6 +672,10 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
 - **Canvas: versión 63** (Julio, comentario en el canvas: «este formato en todas ya no es necesario, luego iteraremos el
   video»). Salieron los 12 tableros `g-storyv-*` de la Grilla (`null` en `files`); `new-pages.cjs` sólo los arma con
   `STORY_VIDEO=1`. Los ids `__story-video` siguen en `vid-blobs.json` para la próxima iteración.
+- **Canvas: versión 65** (Julio, comentario: «el logo tapa la cara de la chica… aplica ese criterio a todas»). Story de
+  PE internacional: `f.story.t = [0.84, 0.5]` (foto a la derecha; cara libre del logo). Barrido de KV, popup y story de
+  todas las piezas con foto: único caso más, popup de AR Lima (`f.popup = { t: [0.58, 0.6], z: 1.15 }`, cabezas bajo
+  la fecha). Popup de Lima entregado en OneDrive; la story de PE no (las exporta Daniela).
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
 
