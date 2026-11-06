@@ -8,8 +8,9 @@ Teams 10:28 + Frame «V2»: todo aprobado; la story de Pucallpa no tenía su cor
 que choque con el logo», aviso de Frame 2026-11-05 17:05). Corregida con `lift` 0.07 en `fotos-destino.json` (la torre
 sube ~130 px; queda ~30 px bajo el logo). `split.py` mueve piezas entre carpetas: «APROBADO» 29, «PARA REVISION» sólo
 `BS_STORY_PCL.png` + LEEME. «BLACK SKY 2026» (1 archivo) y «ENTREGABLES BLACK» al día; canvas versión 53. Workbench:
-rama `claude/sky-black-2026-pucallpa` commit `074cdc6` (contrato de fotos + admisor idempotente), **sin push ni PR**.
-Pendiente: visto bueno de Daniela a la story de Pucallpa; PR del Workbench con autorización.
+contrato de fotos + admisor idempotente **mergeados en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`;
+conciliado: árbol idéntico, gates y pruebas en verde, story byte a byte igual). Pendiente: visto bueno de Daniela a la
+story de Pucallpa.
 
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con sus cifras
 

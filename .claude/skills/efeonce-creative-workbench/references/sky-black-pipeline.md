@@ -495,7 +495,8 @@ segunda revisión: siguen en revisión.
 - Estados: `split.py` ahora marca las 15 rutas como aprobadas salvo `PUCALLPA` story, y **mueve** la pieza de una
   carpeta a la otra (antes sólo copiaba y una pieza podía quedar en las dos). «BLACK SKY 2026 - APROBADO» quedó con 29
   piezas y «- PARA REVISION» sólo con `BS_STORY_PCL.png` + LEEME. Canvas versión 53 (sólo cambió esa imagen).
-- Workbench: contrato de fotos re-admitido en la rama `claude/sky-black-2026-pucallpa` (commit `074cdc6`, sin push); la
+- Workbench: contrato de fotos re-admitido y **mergeado en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`; conciliado: árbol
+  idéntico, gates y pruebas en verde, story byte a byte igual); la
   story que arma el Workbench coincide con la del taller (media 0,13/255). El admisor fallaba al re-admitir (archivos en
   solo lectura); quedó idempotente.
 
