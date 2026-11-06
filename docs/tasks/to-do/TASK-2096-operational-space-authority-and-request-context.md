@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `api`
+- Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -33,7 +33,7 @@ Integrar contexto Organization/Space/Service por request con autoridad vigente e
 
 ## Why This Task Exists
 
-La sesión puede escoger Space por metadata y el listado de Insights conserva scope organizacional. Las memberships descriptivas no bastan como grants; cookie/App difieren en revocación.
+La vista vigente `session_360` (migración TASK-987) produce una fila por Space activo del client y `identity-store.ts` toma `LIMIT 1` sin `ORDER BY`: con dos Spaces el Space de sesión es arbitrario. El laboratorio probó otra definición, la del script de setup, que ordena por `updated_at`. El listado de Insights conserva scope organizacional. Las memberships descriptivas no bastan como grants. En cookie, un usuario inactivo conserva sus claims anteriores sin límite; la sesión App sí lo rechaza.
 
 ## Goal
 
@@ -78,21 +78,32 @@ La sesión puede escoger Space por metadata y el listado de Insights conserva sc
 ### Files owned
 
 - `src/lib/tenant/identity-store.ts`
+- `src/lib/tenant/access.ts` (`getTenantAccessRecordByUserId`, `TenantAccessRecord.spaceId` y fallback BigQuery)
 - `src/lib/auth.ts`
 - `src/lib/entitlements/effective-reader.ts`
+- `src/lib/api-platform/core/app-sessions.ts`
+- Nueva migración de `greenhouse_serving.session_360` (por `pnpm migrate:create`); la vista vigente vive en `migrations/20260601194051024_task-987-session-route-groups-lifecycle-fix.sql`
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
 
 ### Already exists
 
-- `src/lib/tenant/identity-store.ts`
-- `src/lib/auth.ts`
-- `src/lib/entitlements/effective-reader.ts`
+- `src/lib/tenant/identity-store.ts`: `LIMIT 1` sin orden en las resoluciones por usuario, oid, Google y email.
+- `src/lib/tenant/access.ts`
+- `src/lib/auth.ts`: el refresh reaplica claims; con usuario inactivo sólo renueva la marca de tiempo.
+- `src/lib/entitlements/effective-reader.ts`: hoy sólo lo consume autoridad interna.
+- `src/lib/api-platform/core/app-sessions.ts`: rechaza usuario inactivo; no relee `space_id` en refresh.
+- `src/lib/tenant/current-internal-subject.ts`: precedente de reader estricto independiente de la primera fila de `session_360`, a reutilizar.
+
+### Consumidores que heredan el Space único (inventariar, no owned)
+
+- `src/lib/api-platform/core/app-auth.ts`, `src/lib/sister-platforms/oauth-broker.ts`, `src/lib/sister-platforms/mcp-token-exchange.ts`, `src/lib/auth/magic-link.ts`.
+- `src/lib/efeonce-insights/schedules/tick.ts` y `src/lib/efeonce-insights/delivery/store.ts`: revalidación de autoridad para recurrencia y entrega (TASK-1848 consume el contrato).
 
 ### Gap
 
-La sesión puede escoger Space por metadata y el listado de Insights conserva scope organizacional. Las memberships descriptivas no bastan como grants; cookie/App difieren en revocación.
+La vista vigente `session_360` (migración TASK-987) produce una fila por Space activo del client y `identity-store.ts` toma `LIMIT 1` sin `ORDER BY`: con dos Spaces el Space de sesión es arbitrario. El laboratorio probó otra definición, la del script de setup, que ordena por `updated_at`. El listado de Insights conserva scope organizacional. Las memberships descriptivas no bastan como grants. En cookie, un usuario inactivo conserva sus claims anteriores sin límite; la sesión App sí lo rechaza.
 
 ## Modular Placement Contract
 
@@ -109,7 +120,7 @@ La sesión puede escoger Space por metadata y el listado de Insights conserva sc
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `api`
+- Impacto principal: `api|migration`
 - Source of truth afectado: primitives actuales en Files owned; schema exacto se concilia antes de DDL.
 - Consumidores afectados: rutas, API/MCP, workers y portal autorizados según matriz del EPIC.
 - Runtime target: `local`; preparación para rollout posterior gobernado por TASK-1852.
@@ -241,6 +252,9 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] Con dos Spaces activos del mismo client, la resolución de sesión es determinista y no elige por orden de filas: login, refresh y App devuelven el contexto autorizado o un estado explícito de selección pendiente.
+- [ ] La matriz local carga `session_360` desde la migración vigente, no desde `scripts/setup-postgres-identity-v2.sql`.
+- [ ] Un usuario desactivado pierde sus claims autorizantes en el siguiente refresh de cookie; el caso queda probado junto al de sesión App.
 
 ## Verification
 
@@ -258,3 +272,8 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No crea emisor, login, UI de selector ni authority MCP paralelos; TASK-1631 conserva binding externo y TASK-1854 consume la enumeración.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgos
+H1 y H2: Gap, archivos y criterios corregidos. El contrato no cambia; el defecto vigente es más grave que el descrito.

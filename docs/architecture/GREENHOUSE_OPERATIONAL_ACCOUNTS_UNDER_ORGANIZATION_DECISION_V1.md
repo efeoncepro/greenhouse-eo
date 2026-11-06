@@ -58,6 +58,21 @@ sí revierte una sustitución fallida. ICO fue probado sólo a nivel de llamadas
 Siguiente: U01 contexto por Space en una ruta/reader real local; después bindings y protección temporal.
 No se requiere otra ronda de discovery general para formular esta recomendación.
 
+## Corrección 2026-11-06 — revisión contra código
+
+La [revisión del programa contra el código](../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)
+mantiene B y corrige tres lecturas de la evidencia anterior:
+
+- **Sesión.** El laboratorio cargó `session_360` desde `scripts/setup-postgres-identity-v2.sql`, que ordena por
+  `updated_at`. La vista vigente (migración TASK-987) produce una fila por Space activo del client y
+  `identity-store.ts` toma `LIMIT 1` sin orden. Con dos Spaces el Space de sesión no depende de la metadata, como
+  se afirmó arriba: es arbitrario. El defecto es más grave y el contrato del punto 2 no cambia.
+- **Revocación.** Para un usuario inactivo, el refresh conserva los claims anteriores sin límite de tiempo, no sólo
+  hasta el siguiente refresh.
+- **Finance bajo B.** El falso candidato único de Diseño es un riesgo de A′. Bajo B, una factura sin señal de
+  servicio queda ambigua y sin atribuir: es correcto, pero reduce la cobertura de Diseño y debe medirse. Además,
+  un período cerrado del P&L operativo se reescribe con el estado vigente; la protección temporal lo incluye.
+
 ## Context
 
 SKY tiene una relación histórica de Diseño y suma Blog SEO/AEO con stakeholders distintos. Necesita dos cuentas
@@ -109,11 +124,15 @@ de forma canónica antes del cutover, A′ queda bloqueada; no se acepta duplica
    Un sync ambiguo queda pendiente observable; no elige el primer Space ni vuelve a asignar el servicio.
 4. Fuente→Space tiene ownership inequívoco y no se copia una fuente de Diseño a SEO. Proyecto→Servicio requiere
    binding propio y vigencia: `module_id` referencia `service_modules`, no `services.service_id`.
-5. Finance normaliza bridge→owner comercial **antes** de seleccionar candidatos y pesos. Una factura sin señal
-   de servicio se mantiene sin atribuir; no se asigna a Diseño porque SEO cambió de bridge. Consolidación cuenta
-   hechos por identidad canónica, conserva correcciones/supersessions y no copia snapshots cerrados. Owner común
-   no obliga a una sola factura/contrato ni elimina la atribución por Space/Servicio. Recalcular un periodo previo
-   no reinterpreta su propiedad usando mappings o flags `active` actuales; una reclasificación crea revisión explícita.
+5. Finance conserva un owner comercial único. Bajo B el client es compartido y no hay bridge que normalizar: ningún
+   resolver elige un Space por client con `LIMIT 1` y la selección de candidatos parte de Space/Servicio explícito.
+   Bajo A′ (no recomendado), el owner bridge→comercial se normalizaría **antes** de seleccionar candidatos y pesos.
+   Una factura sin señal de servicio se mantiene sin atribuir y la pérdida de cobertura es observable; no se asigna
+   a Diseño por ser el único candidato. Consolidación cuenta hechos por identidad canónica, conserva
+   correcciones/supersessions y no copia snapshots cerrados. Owner común no obliga a una sola factura/contrato ni
+   elimina la atribución por Space/Servicio. Recalcular un periodo previo no reinterpreta su propiedad usando
+   mappings o flags `active` actuales, y un período cerrado del P&L operativo no se reescribe en su revisión
+   vigente: una reclasificación crea revisión explícita con el primitive de reapertura existente.
 6. Cachés y readers incluyen Space/Service, período y versión de autoridad cuando corresponda; una revocación
    vuelve a evaluarse antes de servir resultados. El org scope no sustituye la cuenta operativa.
 7. Ownership de una edición histórica es inmutable. Un retry busca la clave existente antes de validar el mapping
@@ -171,12 +190,16 @@ schemas, migrations, flags, fuentes reales, historial o configuración de SKY.
 
 Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en el prototipo:
 
-- `src/lib/tenant/identity-store.ts`, `src/lib/auth.ts`, `src/lib/entitlements/effective-reader.ts` (contexto/acceso).
-- `src/lib/services/service-sync.ts`, `src/lib/services/upsert-service-from-hubspot.ts` (routing).
+- `src/lib/tenant/identity-store.ts`, `src/lib/tenant/access.ts`, `src/lib/auth.ts`,
+  `src/lib/entitlements/effective-reader.ts` y la vista `greenhouse_serving.session_360` (contexto/acceso).
+- `src/lib/services/service-sync.ts`, `src/lib/services/upsert-service-from-hubspot.ts`, el intake y handler de
+  webhooks HubSpot, el backfill y los writers Notion→PG (routing; inventario completo en TASK-2097).
 - `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts` y
-  `src/lib/commercial/party/commands/instantiate-client-for-party.ts` (commands existentes, no reutilizar como alta hija).
+  `src/lib/commercial/party/commands/instantiate-client-for-party.ts` (commands existentes, no reutilizar como alta
+  hija); `src/app/api/admin/spaces/route.ts` existe pero rechaza un segundo Space activo y no asigna `numeric_code`.
 - `src/lib/space-notion/space-notion-store.ts`, `src/lib/account-360/facet-cache.ts` (fuentes/cache).
-- `src/lib/service-attribution/materialize.ts` (candidatos Finance).
+- `src/lib/finance/canonical.ts`, `src/lib/service-attribution/materialize.ts` (candidatos Finance) y
+  `src/lib/cost-intelligence/compute-operational-pl.ts` (P&L por período).
 - TASK-1852 conserva habilitación; 1853/1854 métricas/portal; 1960 informe por servicio; 2033 scope de contenido.
   TASK-2073 no implementa sus superficies ni modifica su lifecycle.
 

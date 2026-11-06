@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Formalizado 2026-11-06; TASK-2094 con 204 pruebas locales y B recomendado; siete hijas nuevas to-do; sin split productivo`
+- Status real: `Formalizado y revisado contra código 2026-11-06; TASK-2094 con 204 pruebas locales y B recomendado; siete hijas nuevas to-do; sin split productivo`
 - Rank: `57`
 - Domain: `cross-domain|identity|data|ops`
 - Owner: `Core/Spaces + Identity + Services; Finance/Delivery/ICO/Insights por contrato; Julio acepta ADR y apertura`
@@ -89,6 +89,12 @@ TASK-2097 posee Servicio→Space y Fuente/objeto externo→Space. TASK-1960 pose
 primitive vive en Core/Services: no crea una relación privada de Insights ni usa module_id como service_id.
 TASK-2100 posee scopes/cachés compartidos; TASK-1853 y TASK-1960 conservan sus readers de producto. TASK-2101
 posee protección temporal operativa/ICO/Finance; TASK-1655 conserva la captura histórica GSC.
+
+Cada archivo compartido tiene un solo dueño: `identity-store.ts` es de TASK-2096; `space-notion-store.ts` y
+`project-notion-delivery-to-postgres.ts`, de TASK-2097; `service-attribution/materialize.ts`, de TASK-2098.
+TASK-2099, 2100 y 2102 los consumen. TASK-2101 los modifica sólo después de sus dueños, como ya exige su
+dependencia. El schema por Space del store Insights es de TASK-1960; los carriles App y ecosystem que amplían un
+binding de Space a toda la Organization son de TASK-2100.
 
 ## Dependency Plan
 
@@ -185,6 +191,15 @@ sin producción ni historia Diseño. Revisión de superficies antes de reservar 
 1960, 2033, 1992, 1655, 925, 1631, 1879 y laboratorio2073/2094. Se registran sólo los siete huecos de contratos
 compartidos; el resto añade delta y criterios en su dueña. Prioridad P1/impacto alto/esfuerzo alto son estimaciones
 de planificación, sin prometer plazo. No se lanzan subagentes ni implementación por este registro.
+
+## Delta 2026-11-06 — Revisión contra código
+
+Pedido explícito del operador: revisar el programa y contrastarlo con el código, con subagentes de sólo lectura.
+La [revisión](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md) mantiene B y el grafo.
+Corrige tres lecturas: el laboratorio usó una vista de sesión antigua y la vigente elige Space sin orden; un usuario
+inactivo conserva claims de cookie sin límite; y un período cerrado del P&L operativo se reescribe. También ajusta
+Backend impact, archivos con dueño único y criterios de TASK-2096–2102, más un criterio en TASK-1960 y otro en
+TASK-2094. No cambia dependencias, prioridades ni lifecycle, no acepta el ADR y no inicia implementación.
 
 ## Verification of Planning
 

@@ -243,6 +243,7 @@ Ninguna, repo-only. Elección definitiva/rollout después de evidencia suficient
 - [ ] EPIC-057 M4: integrar contratos locales TASK-2096–2102 y slices multi-Space de TASK-2033/1960/1848/1849/1853/1854; pruebas HTTP/API/MCP/cache/export y GVC de sus dueñas, sin duplicar implementación.
 - [ ] Matriz integral enlaza cada caso con evidencia: grants/refresh concurrente/revocación durante write, bindings/replay/batch parcial, allocations, historia as-of/recuperación y tres productores; motor ICO real aislado distinto de mock de llamadas.
 - [ ] Manifest habilitable distingue capacidades verificadas, cerradas y fuentes/ventanas incompletas; briefs1855/1856 sólo obligatorios si se abren. Entregar a TASK-1852 sin autorizar canary real ni exigir cierre total de su foundation.
+- [ ] El harness carga `session_360` desde la migración vigente (hoy TASK-987), no desde `scripts/setup-postgres-identity-v2.sql`; los casos de sesión del 01-11 se reejecutan contra esa vista y se registra la diferencia.
 
 - [x] Contrato nombra host, producer, binding, periodo, calidad, comparación y cero observado.
 - [x] Runner impide red externa y conexiones compartidas; PG16 efímero se detiene tras la prueba.
@@ -308,3 +309,10 @@ Las pruebas faltantes de la matriz de seis frentes permanecen visibles y bloquea
 Los 204 casos del 01-11 siguen siendo el baseline, sin nueva corrida ni cambio de recibos. Las nuevas tasks
 implementan contratos; esta task conserva verificación integral local y decisión sustentada. No se crea otra
 QA duplicada. El baseline permite iniciar foundations sin esperar el cierre final de esta misma task.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md): un revisor
+reejecutó `run-local.mjs` (204 PASS, mismos siete archivos). Hallazgo H1: `run-local.mjs:46-50` toma la vista de
+sesión del script de setup, que ordena por `updated_at`; la vigente devuelve una fila por Space y la resolución
+toma la primera sin orden. Las conclusiones de sesión del 01-11 describen esa vista antigua. Se agrega el criterio.

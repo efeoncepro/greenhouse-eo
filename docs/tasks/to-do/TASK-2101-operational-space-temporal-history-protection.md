@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `sync`
+- Backend impact: `sync|reader|migration`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2101`
 - Domain: `data|delivery|finance`
 - Blocked by: `TASK-2097, TASK-2098`
@@ -33,7 +33,7 @@ Separar propiedad histórica y mapping vigente; proteger períodos cerrados y re
 
 ## Why This Task Exists
 
-Cambiar active del servicio altera un rebuild pasado; materialización reemplaza todas las organizaciones del período. ICO freeze fuerza DELETE/INSERT incluso locked.
+Cambiar `active` del servicio altera un rebuild pasado; la materialización de atribución e ICO reemplaza todas las organizaciones del período. ICO freeze fuerza DELETE/INSERT incluso locked. `materializeOperationalPl` lee `periodClosed`, pero borra y reinserta la misma revisión de un período cerrado y resuelve client→Space con `DISTINCT ON … active … ORDER BY updated_at`: bajo B un P&L pasado puede cambiar de Space según cuál se editó último.
 
 ## Goal
 
@@ -78,9 +78,10 @@ Cambiar active del servicio altera un rebuild pasado; materialización reemplaza
 
 ### Files owned
 
-- `src/lib/service-attribution/materialize.ts`
 - `src/lib/ico-engine/materialize.ts`
-- `src/lib/sync/project-notion-delivery-to-postgres.ts`
+- `src/lib/cost-intelligence/compute-operational-pl.ts` (protección de período cerrado y client→Space as-of)
+- `src/lib/sync/projections/operational-pl.ts`
+- Modifica después de sus dueños, por dependencia: `src/lib/service-attribution/materialize.ts` (TASK-2098) y `src/lib/sync/project-notion-delivery-to-postgres.ts` (TASK-2097).
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
@@ -90,10 +91,11 @@ Cambiar active del servicio altera un rebuild pasado; materialización reemplaza
 - `src/lib/service-attribution/materialize.ts`
 - `src/lib/ico-engine/materialize.ts`
 - `src/lib/sync/project-notion-delivery-to-postgres.ts`
+- Reutilizar: `runIcoMaterializerCycle` (`src/lib/ico-engine/materialize-orchestrator.ts`) con sus guardas y tracking; `snapshot_revision` + `reopenPeriod` (`src/lib/cost-intelligence/period-closure-store.ts`) como revisión explícita; sellado de `snapshot-store` de Insights.
 
 ### Gap
 
-Cambiar active del servicio altera un rebuild pasado; materialización reemplaza todas las organizaciones del período. ICO freeze fuerza DELETE/INSERT incluso locked.
+Cambiar `active` del servicio altera un rebuild pasado; la materialización de atribución e ICO reemplaza todas las organizaciones del período. ICO freeze fuerza DELETE/INSERT incluso locked. `materializeOperationalPl` lee `periodClosed`, pero borra y reinserta la misma revisión de un período cerrado y resuelve client→Space con `DISTINCT ON … active … ORDER BY updated_at`: bajo B un P&L pasado puede cambiar de Space según cuál se editó último.
 
 ## Modular Placement Contract
 
@@ -110,7 +112,7 @@ Cambiar active del servicio altera un rebuild pasado; materialización reemplaza
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `sync`
+- Impacto principal: `sync|reader|migration`
 - Source of truth afectado: primitives actuales en Files owned; schema exacto se concilia antes de DDL.
 - Consumidores afectados: rutas, API/MCP, workers y portal autorizados según matriz del EPIC.
 - Runtime target: `local`; preparación para rollout posterior gobernado por TASK-1852.
@@ -242,6 +244,9 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] Un período con `closure_status = closed` no se reescribe en su revisión vigente; recalcularlo exige `reopenPeriod` y crea revisión nueva con motivo.
+- [ ] El P&L de un período pasado conserva su Space después de editar o crear otro Space del mismo client.
+- [ ] La reconstrucción ICO pasa por `runIcoMaterializerCycle`, sin un camino DELETE/INSERT paralelo.
 
 ## Verification
 
@@ -259,3 +264,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 Sin backfill real de Diseño ni cambios de bonos/nómina. TASK-1655 conserva historia GSC; TASK-1879 conserva responsabilidad de liderazgo, no se reemplazan.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgo H3: P&L cerrado incluido, archivos con dueño único y primitives a reutilizar.

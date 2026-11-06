@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `cron`
+- Backend impact: `cron|sync|command`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2102`
 - Domain: `ops|data`
 - Blocked by: `TASK-2096, TASK-2097, TASK-2098, TASK-2100, TASK-2101`
@@ -33,7 +33,7 @@ Certificar piso de versión, owner, freshness, conflictos y recuperación de wor
 
 ## Why This Task Exists
 
-Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede reintroducir mezcla. Falta señal operativa por cuenta y procedimiento de pausa selectiva.
+Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede reintroducir mezcla. Falta señal operativa por cuenta y procedimiento de pausa selectiva: existe el interruptor `sync_enabled` pero no su command de desactivar, y `enable-client-ico-sync` sin `spaceId` elige `LIMIT 1` por client.
 
 ## Goal
 
@@ -81,20 +81,26 @@ Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede re
 
 ### Files owned
 
-- `src/lib/sync`
-- `src/lib/observability`
+- `src/lib/ico-engine/enable-client-ico-sync.ts` y su contraparte de pausa por Space (nueva)
+- `src/lib/operations/reactive-circuit-breaker.ts`
+- `src/lib/reliability/registry.ts` y nuevas señales en `src/lib/reliability/queries/`
+- `services/ops-worker` (manifiesto de compatibilidad por proceso)
+- No posee los writers de `src/lib/sync/**`: sus dueños son TASK-2097 (routing) y TASK-2101 (historia); esta task los pausa y observa.
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
 
 ### Already exists
 
-- `src/lib/sync`
-- `src/lib/observability`
+- `space_notion_sources.sync_enabled` como interruptor por Space, reflejado en BigQuery; sólo existe el command de activar.
+- `src/lib/operations/reactive-circuit-breaker.ts`: circuit breaker por proyección, no por tenant.
+- `src/lib/sync/refresh-queue.ts`: coalescing de refrescos.
+- Señales `ico-organization-rollup-coverage`, `reactive-circuit-open`, `outbox-unpublished-lag` y `notion-conformed-drain-freshness` en `src/lib/reliability/queries/`; heartbeat de corridas en `source_sync_runs`.
+- `src/lib/observability` sólo contiene captura y redacción de Sentry; no es el hogar de señales.
 
 ### Gap
 
-Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede reintroducir mezcla. Falta señal operativa por cuenta y procedimiento de pausa selectiva.
+Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede reintroducir mezcla. Falta señal operativa por cuenta y procedimiento de pausa selectiva: existe el interruptor `sync_enabled` pero no su command de desactivar, y `enable-client-ico-sync` sin `spaceId` elige `LIMIT 1` por client.
 
 ## Modular Placement Contract
 
@@ -111,7 +117,7 @@ Cerrar una pantalla no detiene un writer incompatible; un tick o replay puede re
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `cron`
+- Impacto principal: `cron|sync|command`
 - Source of truth afectado: primitives actuales en Files owned; schema exacto se concilia antes de DDL.
 - Consumidores afectados: rutas, API/MCP, workers y portal autorizados según matriz del EPIC.
 - Runtime target: `local`; preparación para rollout posterior gobernado por TASK-1852.
@@ -243,6 +249,9 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] La pausa por Space es un command gobernado sobre `sync_enabled`, con audit, y `enable-client-ico-sync` exige `spaceId` cuando el client tiene más de un Space.
+- [ ] El runbook declara que volver a activar un writer legacy tras el split no es un rollback válido, porque reatribuye datos a Diseño.
+- [ ] Las señales nuevas viven en `src/lib/reliability/queries/`, registradas en `registry.ts`, y reutilizan el heartbeat de `source_sync_runs`.
 
 ## Verification
 
@@ -260,3 +269,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No crea scheduler, sender ni token store: TASK-1848 los conserva. La preparación precede a QA; operación real sucede después de apertura, sin dependencia circular de cierre total.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgo H12: archivos acotados a los dueños reales, primitives existentes y criterios de pausa.

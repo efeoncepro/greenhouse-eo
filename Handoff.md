@@ -339,3 +339,7 @@ aceptación/apertura pendientes. Próximo ejecutable: TASK-2096 local, previa to
 Grafo por hitos: foundation1852 consumible; gate SKY SEO1852 espera QA2094. Preparación2102 antes del canary,
 observación después; sin ciclo de cierre total. [QA documental](docs/audits/client-portal/2026-11-06-operational-accounts-epic/README.md).
 Registro y commit sólo documentales; no nueva corrida de tests runtime, no cambios en producción ni historia Diseño.
+Revisión contra código el mismo día ([hallazgos](docs/audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)):
+B se mantiene. Laboratorio usaba `session_360` del script de setup; la vigente elige Space sin orden. Cookie de usuario
+inactivo conserva claims sin límite; un P&L cerrado se reescribe. Tasks 2096–2102 con impact/archivos/criterios
+corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin código ni producción. Disco local al 98%.

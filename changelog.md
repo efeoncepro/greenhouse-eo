@@ -3,6 +3,7 @@
 **2026-11-06 · SKY, planificación transversal:** [EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md)
 formaliza siete tasks y dependencias por hito; reutiliza Insights/portal sin duplicarlos. TASK-2094 conserva
 204 pruebas locales del 01-11 y recomendación B. ADR Proposed; sin implementación ni cambios productivos/históricos.
+Revisión contra código: sesión, revocación y P&L cerrado corregidos.
 
 **2026-10-31 · Prospección:** [cierre Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md):
 registro de rebote frente a email verificado, consentimiento de Apollo por persona y conciliación de Primary

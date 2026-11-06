@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2100`
 - Domain: `identity|data`
 - Blocked by: `TASK-2096, TASK-2097`
@@ -33,7 +33,7 @@ Convertir los readers y caches compartidos a contexto explícito sin perder el c
 
 ## Why This Task Exists
 
-Account360 agrega todos los Spaces de la Organization; cachés y defaults pueden mezclar datos cuando ambos Spaces comparten client.
+Account360 agrega todos los Spaces de la Organization y su caché se indexa sólo por Organization y facet. El caché del workspace, el resolver del portal y su enablement (puente Notion por `client_id`) no llevan Space. Los carriles App y ecosystem convierten un binding de Space en toda la Organization para Insights y SEO. Unas 78 rutas leen `tenant.clientId` o `session.user.clientId`; `api/analytics/delivery` usa el client como `space_id` de BigQuery.
 
 ## Goal
 
@@ -79,8 +79,12 @@ Account360 agrega todos los Spaces de la Organization; cachés y defaults pueden
 ### Files owned
 
 - `src/lib/account-360/resolve-scope.ts`
-- `src/lib/account-360/facet-cache.ts`
-- `src/lib/tenant/identity-store.ts`
+- `src/lib/account-360/facet-cache.ts` y `src/lib/account-360/facet-cache-invalidation.ts`
+- `src/lib/account-360/account-complete-360.ts`, `src/lib/account-360/organization-economics.ts`, `src/lib/account-360/organization-projects.ts`
+- `src/lib/organization-workspace/cache.ts`
+- `src/lib/client-portal/readers/native/module-resolver.ts` y `src/lib/client-portal/enablement/reader.ts`
+- `src/lib/api-platform/resources/app-insights-scope.ts`, `src/lib/api-platform/resources/ecosystem-insights-scope.ts`, `src/lib/api-platform/resources/ecosystem-growth-seo.ts`
+- Consume sin poseer: `src/lib/tenant/identity-store.ts` (dueño TASK-2096).
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
@@ -93,7 +97,7 @@ Account360 agrega todos los Spaces de la Organization; cachés y defaults pueden
 
 ### Gap
 
-Account360 agrega todos los Spaces de la Organization; cachés y defaults pueden mezclar datos cuando ambos Spaces comparten client.
+Account360 agrega todos los Spaces de la Organization y su caché se indexa sólo por Organization y facet. El caché del workspace, el resolver del portal y su enablement (puente Notion por `client_id`) no llevan Space. Los carriles App y ecosystem convierten un binding de Space en toda la Organization para Insights y SEO. Unas 78 rutas leen `tenant.clientId` o `session.user.clientId`; `api/analytics/delivery` usa el client como `space_id` de BigQuery.
 
 ## Modular Placement Contract
 
@@ -242,6 +246,9 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] Las claves de caché de Account360, workspace y resolver del portal incluyen Space (y Service o versión de autoridad cuando aplica); la invalidación acepta Space.
+- [ ] Un binding App o ecosystem de alcance Space no lee Insights ni SEO de otro Space de la misma Organization.
+- [ ] El inventario de rutas que leen `tenant.clientId` o `session.user.clientId` clasifica cada una como compatible, convertida o cerrada a SEO, incluida `api/analytics/delivery`.
 
 ## Verification
 
@@ -259,3 +266,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 TASK-1853 conserva la proyección cliente por servicio; TASK-1960 el reader de informes; TASK-1849 y TASK-1854 la UI. Aquí se cambia la base compartida, no se duplican esas superficies.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgo H10: readers, caches y carriles añadidos; el schema del store Insights queda en TASK-1960.

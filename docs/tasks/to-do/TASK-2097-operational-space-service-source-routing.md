@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `sync`
+- Backend impact: `sync|webhook|migration`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2097`
 - Domain: `data|crm|delivery`
 - Blocked by: `TASK-2096`
@@ -33,7 +33,7 @@ Fijar Servicio→Space y fuente/objeto externo→Space mediante writers canónic
 
 ## Why This Task Exists
 
-El upsert acepta reasignación de owner y eventos antiguos; targetSpaceIds sólo limita eliminación. El adapter de sync y el upsert Services tienen contratos incompatibles caracterizados en el laboratorio.
+El sync resuelve el Space con `LIMIT 1` sin orden ni filtro `active` y el upsert reasigna `space_id` en cada replay (`ON CONFLICT … DO UPDATE SET space_id`). El intake asíncrono, el handler de webhooks y el backfill tienen su propio `LIMIT 1`. `targetSpaceIds` sólo limita la limpieza. No hay unicidad de base Notion por Space: la misma base puede registrarse en dos Spaces y el último writer gana. El adapter pasa `client_id` como `hubspotCompanyId`.
 
 ## Goal
 
@@ -77,10 +77,15 @@ El upsert acepta reasignación de owner y eventos antiguos; targetSpaceIds sólo
 
 ### Files owned
 
-- `src/lib/services/service-sync.ts`
+- `src/lib/services/service-sync.ts` (incluye `createSpaceForClient`, que bajo B no puede crear ni elegir un Space)
 - `src/lib/services/upsert-service-from-hubspot.ts`
-- `src/lib/space-notion/space-notion-store.ts`
-- `src/lib/sync/project-notion-delivery-to-postgres.ts`
+- `src/lib/sync/projections/hubspot-services-intake.ts` (carril asíncrono de webhooks)
+- `src/lib/webhooks/handlers/hubspot-services.ts` (carril síncrono)
+- `scripts/services/backfill-from-hubspot.ts`
+- `src/lib/space-notion/space-notion-store.ts` (dueño único; TASK-2099 lo consume)
+- `src/lib/sync/project-notion-delivery-to-postgres.ts` (dueño único; TASK-2101 lo modifica después, por dependencia)
+- `scripts/sync-source-runtime-projections.ts` (segundo writer de `greenhouse_delivery.projects`)
+- Nueva migración de unicidad Fuente→Space (por `pnpm migrate:create`)
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
@@ -91,10 +96,12 @@ El upsert acepta reasignación de owner y eventos antiguos; targetSpaceIds sólo
 - `src/lib/services/upsert-service-from-hubspot.ts`
 - `src/lib/space-notion/space-notion-store.ts`
 - `src/lib/sync/project-notion-delivery-to-postgres.ts`
+- Callers del sync de servicios: `src/app/api/integrations/hubspot/services/sync/route.ts`, `src/app/api/admin/integrations/hubspot/orphan-services/route.ts`, `src/app/api/admin/ops/services-sync/route.ts`, `src/app/api/cron/services-sync/route.ts`, `src/lib/cron-orchestrators/index.ts`.
+- `services.notion_project_id`: puntero único escrito desde HubSpot; señal existente Proyecto→Servicio que TASK-1960 debe absorber o retirar.
 
 ### Gap
 
-El upsert acepta reasignación de owner y eventos antiguos; targetSpaceIds sólo limita eliminación. El adapter de sync y el upsert Services tienen contratos incompatibles caracterizados en el laboratorio.
+El sync resuelve el Space con `LIMIT 1` sin orden ni filtro `active` y el upsert reasigna `space_id` en cada replay (`ON CONFLICT … DO UPDATE SET space_id`). El intake asíncrono, el handler de webhooks y el backfill tienen su propio `LIMIT 1`. `targetSpaceIds` sólo limita la limpieza. No hay unicidad de base Notion por Space: la misma base puede registrarse en dos Spaces y el último writer gana. El adapter pasa `client_id` como `hubspotCompanyId`.
 
 ## Modular Placement Contract
 
@@ -111,7 +118,7 @@ El upsert acepta reasignación de owner y eventos antiguos; targetSpaceIds sólo
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `sync`
+- Impacto principal: `sync|webhook|migration`
 - Source of truth afectado: primitives actuales en Files owned; schema exacto se concilia antes de DDL.
 - Consumidores afectados: rutas, API/MCP, workers y portal autorizados según matriz del EPIC.
 - Runtime target: `local`; preparación para rollout posterior gobernado por TASK-1852.
@@ -243,6 +250,10 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] Cada carril (cron diario, webhook síncrono, intake asíncrono, backfill, rutas admin y writers Notion→PG) resuelve el destino con el mismo resolver; ninguno conserva un `LIMIT 1` propio por company o client.
+- [ ] Un replay o evento antiguo no cambia el `space_id` de un servicio ya asignado; el cambio exige expected version o queda como conflicto observable.
+- [ ] Una base Notion no puede quedar registrada en dos Spaces: la restricción existe en schema y el intento produce error canónico.
+- [ ] Con dos Spaces bajo el mismo client, el sync no crea ni elige un Space por defecto y el adapter deja de pasar `client_id` como company de HubSpot.
 
 ## Verification
 
@@ -260,3 +271,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No construye otro sync ni provisiona Notion: TASK-925 conserva adopción de teamspaces; TASK-1960 posee el vínculo Proyecto→Servicio.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgos H7 y H8: carriles, archivos y criterios completados.

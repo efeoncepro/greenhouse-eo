@@ -53,3 +53,8 @@ pendientes. Los dos archivos editoriales src con WIP previo quedan fuera del com
 Próxima unidad de implementación: TASK-2096, contexto/autoridad en ruta y reader reales locales. La toma de esa
 task conserva el preflight/hook y plan aplicables; este registro no la inicia. El EPIC es el mapa de dependencias,
 el ADR es la propuesta arquitectónica y cada task mantiene sus criterios de ejecución/validación.
+
+## Corrección posterior — 2026-11-06
+
+La [revisión contra código](../2026-11-06-operational-accounts-code-review/README.md) recontó los enlaces relativos
+agregados por el commit de formalización: son 119 (118 únicos), no 110; todos resuelven.

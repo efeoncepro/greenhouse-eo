@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `reader`
+- Backend impact: `reader|command|migration`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2098`
 - Domain: `finance|data`
 - Blocked by: `TASK-2096, TASK-2097`
@@ -33,7 +33,7 @@ Preservar un client comercial/financiero bajo B y atribuir ingresos/costos al se
 
 ## Why This Task Exists
 
-client_id todavía determina agrupación y pesos; un owner equivocado divide P&L. El reparto por ingresos es estimación, no esfuerzo real departamental.
+`canonical.ts` resuelve el Space Finance por client con `LIMIT 1` (el más reciente) y silencia errores. El materializer cae de Space a client y a Organization para elegir candidatos; los ingresos nunca pasan `spaceId`. Bajo B una factura sin señal de servicio queda ambigua y sin atribuir: es correcto, pero reduce la cobertura de Diseño, igual que el fallback laboral que exige un único servicio por client. Crear o aprobar una asignación no emite evento y la suma del trigger no bloquea el gasto. El reparto por ingresos es estimación; la atribución v2 ya conoce `service_id` y no se usa. `materialize.ts` contiene FX inline existente.
 
 ## Goal
 
@@ -62,6 +62,8 @@ client_id todavía determina agrupación y pesos; un owner equivocado divide P&L
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
 - `docs/architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` y skill obligatoria `greenhouse-finance-accounting-operator`: `economic_category` para análisis, sin FX inline nuevo, writes por outbox/proyección.
+- `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`: `commercial_cost_attribution_v2` ya trae `service_id` desde asignaciones de equipo.
 
 ## Dependencies & Impact
 
@@ -81,7 +83,10 @@ client_id todavía determina agrupación y pesos; un owner equivocado divide P&L
 - `src/lib/finance/canonical.ts`
 - `src/lib/finance/expense-service-allocations.ts`
 - `src/lib/finance/postgres-store-intelligence.ts`
-- `src/lib/service-attribution/materialize.ts`
+- `src/lib/service-attribution/materialize.ts` (dueño único; TASK-2101 lo modifica después, por dependencia)
+- `src/lib/sync/projections/service-attribution.ts` (eventos que disparan la re-materialización)
+- `src/lib/commercial-cost-attribution/member-period-attribution.ts` (client→Space por `DISTINCT ON … ORDER BY updated_at`)
+- Nueva migración si la concurrencia de asignaciones requiere lock o constraint (por `pnpm migrate:create`)
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
@@ -95,7 +100,7 @@ client_id todavía determina agrupación y pesos; un owner equivocado divide P&L
 
 ### Gap
 
-client_id todavía determina agrupación y pesos; un owner equivocado divide P&L. El reparto por ingresos es estimación, no esfuerzo real departamental.
+`canonical.ts` resuelve el Space Finance por client con `LIMIT 1` (el más reciente) y silencia errores. El materializer cae de Space a client y a Organization para elegir candidatos; los ingresos nunca pasan `spaceId`. Bajo B una factura sin señal de servicio queda ambigua y sin atribuir: es correcto, pero reduce la cobertura de Diseño, igual que el fallback laboral que exige un único servicio por client. Crear o aprobar una asignación no emite evento y la suma del trigger no bloquea el gasto. El reparto por ingresos es estimación; la atribución v2 ya conoce `service_id` y no se usa. `materialize.ts` contiene FX inline existente.
 
 ## Modular Placement Contract
 
@@ -112,7 +117,7 @@ client_id todavía determina agrupación y pesos; un owner equivocado divide P&L
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `reader`
+- Impacto principal: `reader|command|migration`
 - Source of truth afectado: primitives actuales en Files owned; schema exacto se concilia antes de DDL.
 - Consumidores afectados: rutas, API/MCP, workers y portal autorizados según matriz del EPIC.
 - Runtime target: `local`; preparación para rollout posterior gobernado por TASK-1852.
@@ -244,6 +249,12 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] Ningún resolver Finance elige el Space por client con `LIMIT 1`; con dos Spaces el resultado es explícito o ambiguo, nunca el más reciente, y los errores no se silencian.
+- [ ] La pérdida de cobertura de Diseño por facturas sin señal de servicio se mide antes y después con fixtures, y se expone como unresolved con motivo.
+- [ ] Crear, aprobar o rechazar una asignación emite el evento que re-materializa el período afectado.
+- [ ] Dos asignaciones concurrentes sobre el mismo gasto no superan su total; la prueba de carrera corre contra PostgreSQL real.
+- [ ] La atribución laboral usa la fuente explícita por `service_id` cuando existe y declara el método cuando cae al reparto por ingresos.
+- [ ] El cambio no agrega FX inline nuevo y los consumidores analíticos usan `economic_category`.
 
 ## Verification
 
@@ -261,3 +272,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No cambia impuestos, facturación, nómina ni histórico fiscal. TASK-2101 posee protección temporal; este piso financiero debe existir antes de TASK-2099.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgos H4, H5 y H6: impacto, archivos, normas y criterios ampliados.

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-057`
-- Status real: `Planificada 2026-11-06; sin implementación; autorización actual sólo documental`
+- Status real: `Planificada 2026-11-06; corregida contra código el mismo día; sin implementación`
 - Rank: `2099`
 - Domain: `identity|data`
 - Blocked by: `TASK-2096, TASK-2097, TASK-2098`
@@ -33,7 +33,7 @@ Entregar preview y command de alta de Space bajo Organization/client existentes.
 
 ## Why This Task Exists
 
-El alta comercial existente crea contexto financiero y rechaza otro cliente; crear incluso un Space inactivo puede alterar resolvers legacy.
+El alta comercial existente crea contexto financiero y rechaza otro cliente; el wizard reutiliza el Space más antiguo y fija `space-${clientId}`. `POST /api/admin/spaces` inserta sin `numeric_code`, que es `NOT NULL` sin default, así que hoy fallaría. `numeric_code` tiene dos dígitos y es único global: hay un tope de 100 Spaces. Crear incluso un Space inactivo altera resolvers legacy que no filtran `active`.
 
 ## Goal
 
@@ -79,9 +79,10 @@ El alta comercial existente crea contexto financiero y rechaza otro cliente; cre
 
 ### Files owned
 
-- `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts`
-- `src/lib/commercial/party/commands/instantiate-client-for-party.ts`
-- `src/lib/space-notion/space-notion-store.ts`
+- Nuevo command de alta de Space hijo en `src/lib/client-lifecycle/commands/` [verificar nombre al implementar]
+- `src/app/api/admin/spaces/route.ts` (convertir en adapter del command o retirarlo)
+- `src/lib/services/allocate-space-numeric-code.ts`
+- Consume sin poseer: `src/lib/space-notion/space-notion-store.ts` (dueño TASK-2097); no modifica `provision-client-from-wizard.ts` ni `instantiate-client-for-party.ts`, que el ADR prohíbe reutilizar como alta hija.
 - Esta spec; cambios futuros sólo dentro de la responsabilidad descrita, coordinados con dueños existentes.
 
 ## Current Repo State
@@ -91,10 +92,12 @@ El alta comercial existente crea contexto financiero y rechaza otro cliente; cre
 - `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts`
 - `src/lib/commercial/party/commands/instantiate-client-for-party.ts`
 - `src/lib/space-notion/space-notion-store.ts`
+- `src/app/api/admin/spaces/route.ts`: crea un Space para un client existente, pero responde 409 si ya hay uno activo, puede crear una Organization nueva y no tiene transacción, idempotencia, audit ni outbox.
+- `src/lib/services/allocate-space-numeric-code.ts`: lo usan el wizard y `service-sync.ts`.
 
 ### Gap
 
-El alta comercial existente crea contexto financiero y rechaza otro cliente; crear incluso un Space inactivo puede alterar resolvers legacy.
+El alta comercial existente crea contexto financiero y rechaza otro cliente; el wizard reutiliza el Space más antiguo y fija `space-${clientId}`. `POST /api/admin/spaces` inserta sin `numeric_code`, que es `NOT NULL` sin default, así que hoy fallaría. `numeric_code` tiene dos dígitos y es único global: hay un tope de 100 Spaces. Crear incluso un Space inactivo altera resolvers legacy que no filtran `active`.
 
 ## Modular Placement Contract
 
@@ -243,6 +246,9 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [ ] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo.
 - [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados.
 - [ ] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia.
+- [ ] El command asigna `numeric_code` con el allocator existente y el plan declara cuántos códigos quedan; agotar el espacio de códigos devuelve error canónico, nunca un código reutilizado.
+- [ ] `POST /api/admin/spaces` queda como adapter del command, con su transacción e idempotencia, o se retira; no queda un segundo camino de alta.
+- [ ] El command no invoca el wizard ni `instantiate-client-for-party`, y no crea Organization ni client.
 
 ## Verification
 
@@ -260,3 +266,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 ## Follow-ups
 
 No ejecuta alta de SKY ni suscripciones externas. TASK-1852 conserva habilitación real; no sustituye TASK-925 Notion ni el portal TASK-1854.
+
+## Delta 2026-11-06 — Revisión contra código
+
+[Revisión del programa](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md), hallazgo H9: archivos, estado existente y criterios corregidos.

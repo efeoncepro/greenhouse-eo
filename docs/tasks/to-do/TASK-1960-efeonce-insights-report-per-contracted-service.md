@@ -297,6 +297,7 @@ El operador define los destinatarios de cada informe de Sky y confirma qué proy
 - [ ] EPIC-057: report, snapshot, schedule y recursos heredan Organization/Space/Service autorizados; listado/detalle/outputs no retornan ediciones ajenas. Ownership histórico e idempotency key no se reevalúan con mappings actuales.
 - [ ] EPIC-057: el informe Blog exige receipts actuales de GA4, GSC y motor AEO con ventana/calendario, población, calidad/finalidad y versión sellados. Parcial/ausente/cero no se confunden; allowPartial no evade el requirement.
 - [ ] EPIC-057: destinatarios y recurrencia se vinculan al servicio y consumen TASK-1848; cada fuente proviene de su reader y se conserva la comparación histórica sin atribuir causalidad al nuevo servicio.
+- [ ] EPIC-057: request, report y edition persisten Space y Service; la clave de idempotencia, hoy `(organization_id, idempotency_key)`, no permite que una solicitud de un Space devuelva la edición de otro.
 
 - [ ] Un informe puede declarar un servicio de su misma organización; uno ajeno se rechaza.
 - [ ] La evidencia de entrega de un informe con servicio contiene sólo proyectos de ese servicio, sellados en el snapshot.
@@ -342,3 +343,9 @@ U07; conserva informe por servicio y primitive Proyecto→Servicio. Consume cont
 [EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
 Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
 ni autoriza cambios productivos, envíos o historia de Diseño.
+
+## Delta 2026-11-06 — Revisión de EPIC-057 contra código
+
+[Hallazgo H11](../../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md): ninguna tabla de
+`greenhouse_insights` guarda `space_id` ni `service_id` y la idempotencia es por Organization. Se agrega el criterio de
+schema; los carriles App y ecosystem que amplían un binding de Space quedan en TASK-2100.
