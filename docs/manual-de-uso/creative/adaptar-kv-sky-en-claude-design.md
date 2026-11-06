@@ -1,9 +1,9 @@
 # Adaptar un KV de SKY en Claude Design — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-11-04 por Claude
-> **Ultima actualizacion:** 2026-11-05 por Claude (rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
+> **Ultima actualizacion:** 2026-11-06 por Claude (taller rescatado a carpeta durable, chequeo de arranque y prueba en frío; antes, 2026-11-05, rondas 5 a 7: fuente única de las fotos de ruta, gradiente de Daniela y degradado negro, ampliar una story con IA, leer la revisión de Frame.io y repartir aprobado y revisión)
 > **Modulo:** Creative · SKY Airline (servicio Performance, creativo) · Claude Design
 > **Ruta en portal:** no aplica: el trabajo vive en dos artifacts privados de claude.ai (Design System y canvas) y
 > en el taller local `ai-generations/`
@@ -66,7 +66,13 @@ PNG) se renderizan en local con las mismas plantillas.
 4. **La fuente Metric Medium no está en el Design System**, pero las piezas la usan. Para los renders locales se toma
    de OneDrive, en «SKY Campañas/00_Assets/00_Brand-Assets/2. Tipografias/Metric_family/». Los SVG del kit no traen
    fuente de respaldo: sin Metric instalada, el render sale con otra letra.
-5. **Autorización de gasto.** Generar fotos con IA cuesta dinero. Pide autorización explícita al operador antes de
+5. **Si retomas el kit BLACK desde una sesión nueva**, el taller (scripts, kit corregido, fotos, fuentes y copia del
+   canvas) está en `ai-generations/2026-11-04_sky-black-gif/taller/`. Corre primero
+   `bash ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/doctor.sh`: solo lee y dice «LISTO» o qué falta.
+   Antes de cambiar algo, prueba en una copia que `./rehacer-destinos.sh` deja las piezas iguales (cifras esperadas
+   en la skill, `sky-black-pipeline.md` §17.1). Si falta una imagen, puede estar archivada: `pnpm ai-gen:where` y
+   `pnpm ai-gen:pull`; nunca la regeneres.
+6. **Autorización de gasto.** Generar fotos con IA cuesta dinero. Pide autorización explícita al operador antes de
    cualquier generación y usa la clave que él indique (en el caso fuente, su clave personal con
    `pnpm ai:image --openai-key personal`).
 
@@ -369,7 +375,7 @@ Frame ni API, y desde aquí no se puede responder en Frame: las respuestas van p
 2. **Respaldo:** los avisos que Frame manda desde `notifications@frame.io` al Outlook del operador traen todos los
    comentarios y cambios de estado. Úsalos si el navegador falla, o para confirmar que no se escapó nada.
 3. Anota por pieza (popup y story de cada ruta) si quedó aprobada o vuelve a revisión, y qué se cambió.
-4. **Reparte con `split.py`** (en `ai-generations/2026-11-04_sky-black-gif/scripts/`). Actualiza su tabla `E` con el
+4. **Reparte con `split.py`** (en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`). Actualiza su tabla `E` con el
    último estado de cada pieza y córrelo primero sin `--apply` para ver el plan; con `--apply` copia la versión vigente
    a `10_Noviembre/BLACK SKY 2026 - APROBADO` o `BLACK SKY 2026 - PARA REVISION`, con la estructura
    `HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`.

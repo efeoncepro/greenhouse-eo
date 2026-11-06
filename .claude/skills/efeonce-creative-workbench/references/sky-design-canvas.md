@@ -424,7 +424,7 @@ Fuera de Git (no versionados), en el checkout de Greenhouse:
 
 | Ruta | Contenido |
 | --- | --- |
-| `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; `scripts/` (copia vigente tras la cuarta ronda: incluye `logofix`, `banderas`, `variantes`, `rutas`, `destinos`, `brecha`, `rehacer-destinos.sh`, `organizar`, `chile-refs`, `story-video`, `render-gif.sh` y `vid-blobs.json` con los ids nuevos de video) |
+| `ai-generations/2026-11-04_sky-black-gif/` | 24 GIF + MP4 + `*_audio.mp4` (12 KV originales y 12 de la grilla); `kv/` (37 KV PNG, incluidos los nuevos y las rutas); `estaticos/` (popups y stories); `rutas-peru/` (13 popup + 13 story); `chile-kv-listo/` (TikTok, DAT y PMAX en 1x y `_2x`); `story-video/` (12 MP4); `pmax/`; `hph/`; **`taller/`** (desde el 2026-11-06, el taller completo y vigente: `kvhm-canvas/` con scripts, kit corregido `src2/`, fotos de destino, fuentes, `doctor.sh` y `split.py`, más `canvas/project`; en git va solo el código, ver [sky-black-pipeline.md](sky-black-pipeline.md) §17); `scripts/` (copia anterior al rescate, **superada**) |
 | `ai-generations/2026-11-04_sky-cybersky-peru/` | Selfies generadas, grado de color y scripts |
 
 **Entrega en OneDrive (2026-11-05, a pedido del operador).** Los entregables de
@@ -463,7 +463,7 @@ estructura `HM PE/RUTAS FOCO/<CIUDAD>/BS_{POPUP|STORY}_<IATA>.png`:
 | `BLACK SKY 2026 - APROBADO` | 19 piezas con visto bueno |
 | `BLACK SKY 2026 - PARA REVISION` | 11 piezas + `LEEME.txt` |
 
-Las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/scripts/`) con el último estado conocido. Una pieza
+Las arma `split.py` (en `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`) con el último estado conocido. Una pieza
 que cambia de estado **se mueve** de una carpeta a la otra y se sobrescribe con la versión vigente; no se borra.
 Detalle en pipeline §4.8. Las expansiones con IA quedan en `ai-generations/2026-11-05_sky-black-expand/`.
 

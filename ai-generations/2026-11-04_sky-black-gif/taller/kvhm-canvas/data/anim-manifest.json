@@ -1,0 +1,677 @@
+{
+ "HM_AR_KV": {
+  "badge": {
+   "file": "HM_AR_KV__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_AR_KV__base.jpg"
+  },
+  "destino": {
+   "file": "HM_AR_KV__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 400,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_AR_KV__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_BR_KV": {
+  "badge": {
+   "file": "HM_BR_KV__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_BR_KV__base.jpg"
+  },
+  "destino": {
+   "file": "HM_BR_KV__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 400,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_BR_KV__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_CL_KV_DOM_CLUSTER": {
+  "badge": {
+   "file": "HM_CL_KV_DOM_CLUSTER__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_CL_KV_DOM_CLUSTER__base.jpg"
+  },
+  "destino": {
+   "file": "HM_CL_KV_DOM_CLUSTER__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_CL_KV_DOM_CLUSTER__lista.png",
+   "x": 80,
+   "y": 304,
+   "w": 412,
+   "h": 558
+  },
+  "precio": {
+   "file": "HM_CL_KV_DOM_CLUSTER__precio.png",
+   "x": 409,
+   "y": 875,
+   "w": 638,
+   "h": 349
+  }
+ },
+ "HM_CL_KV_DOM": {
+  "badge": {
+   "file": "HM_CL_KV_DOM__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_CL_KV_DOM__base.jpg"
+  },
+  "destino": {
+   "file": "HM_CL_KV_DOM__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_CL_KV_DOM__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_CL_KV_INTER_CLUSTER": {
+  "badge": {
+   "file": "HM_CL_KV_INTER_CLUSTER__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_CL_KV_INTER_CLUSTER__base.jpg"
+  },
+  "lista": {
+   "file": "HM_CL_KV_INTER_CLUSTER__lista.png",
+   "x": 62,
+   "y": 362,
+   "w": 491,
+   "h": 718
+  },
+  "precio": {
+   "file": "HM_CL_KV_INTER_CLUSTER__precio.png",
+   "x": 409,
+   "y": 875,
+   "w": 638,
+   "h": 349
+  }
+ },
+ "HM_CL_KV_INTER": {
+  "badge": {
+   "file": "HM_CL_KV_INTER__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_CL_KV_INTER__base.jpg"
+  },
+  "destino": {
+   "file": "HM_CL_KV_INTER__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_CL_KV_INTER__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_DOM-RUTA": {
+  "badge": {
+   "file": "HM_PE_KV_DOM-RUTA__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_DOM-RUTA__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_DOM-RUTA__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_PE_KV_DOM-RUTA__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_DOM": {
+  "badge": {
+   "file": "HM_PE_KV_DOM__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_DOM__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_DOM__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_PE_KV_DOM__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_INTER-RUTA": {
+  "badge": {
+   "file": "HM_PE_KV_INTER-RUTA__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_INTER-RUTA__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_INTER-RUTA__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_PE_KV_INTER-RUTA__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_INTER": {
+  "badge": {
+   "file": "HM_PE_KV_INTER__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_INTER__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_INTER__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_PE_KV_INTER__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_US_KV": {
+  "badge": {
+   "file": "HM_US_KV__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_US_KV__base.jpg"
+  },
+  "destino": {
+   "file": "HM_US_KV__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 396,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_US_KV__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_UY_KV": {
+  "badge": {
+   "file": "HM_UY_KV__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_UY_KV__base.jpg"
+  },
+  "destino": {
+   "file": "HM_UY_KV__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 400,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_UY_KV__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "KV": {},
+ "X": {},
+ "HM_AR_KV_BANDERAS": {
+  "badge": {
+   "file": "HM_AR_KV_BANDERAS__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_AR_KV_BANDERAS__base.jpg"
+  },
+  "destino": {
+   "file": "HM_AR_KV_BANDERAS__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 400,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_AR_KV_BANDERAS__lista.png",
+   "x": 65,
+   "y": 340,
+   "w": 429,
+   "h": 370
+  },
+  "precio": {
+   "file": "HM_AR_KV_BANDERAS__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_INTER_BANDERAS": {
+  "badge": {
+   "file": "HM_PE_KV_INTER_BANDERAS__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_INTER_BANDERAS__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_INTER_BANDERAS__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_PE_KV_INTER_BANDERAS__lista.png",
+   "x": 65,
+   "y": 340,
+   "w": 365,
+   "h": 444
+  },
+  "precio": {
+   "file": "HM_PE_KV_INTER_BANDERAS__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_BR_KV_BANDERAS": {
+  "badge": {
+   "file": "HM_BR_KV_BANDERAS__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_BR_KV_BANDERAS__base.jpg"
+  },
+  "destino": {
+   "file": "HM_BR_KV_BANDERAS__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 400,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_BR_KV_BANDERAS__lista.png",
+   "x": 65,
+   "y": 340,
+   "w": 369,
+   "h": 444
+  },
+  "precio": {
+   "file": "HM_BR_KV_BANDERAS__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_US_KV_BANDERAS": {
+  "badge": {
+   "file": "HM_US_KV_BANDERAS__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_US_KV_BANDERAS__base.jpg"
+  },
+  "destino": {
+   "file": "HM_US_KV_BANDERAS__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 396,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_US_KV_BANDERAS__lista.png",
+   "x": 65,
+   "y": 340,
+   "w": 385,
+   "h": 174
+  },
+  "precio": {
+   "file": "HM_US_KV_BANDERAS__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_UY_KV_BANDERAS": {
+  "badge": {
+   "file": "HM_UY_KV_BANDERAS__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_UY_KV_BANDERAS__base.jpg"
+  },
+  "destino": {
+   "file": "HM_UY_KV_BANDERAS__destino.png",
+   "x": 61,
+   "y": 931,
+   "w": 396,
+   "h": 241
+  },
+  "precio": {
+   "file": "HM_UY_KV_BANDERAS__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_AR_KV_SANTIAGO": {
+  "badge": {
+   "file": "HM_AR_KV_SANTIAGO__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_AR_KV_SANTIAGO__base.jpg"
+  },
+  "destino": {
+   "file": "HM_AR_KV_SANTIAGO__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_AR_KV_SANTIAGO__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_AR_KV_LIMA": {
+  "badge": {
+   "file": "HM_AR_KV_LIMA__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_AR_KV_LIMA__base.jpg"
+  },
+  "destino": {
+   "file": "HM_AR_KV_LIMA__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_AR_KV_LIMA__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_BR_KV_SANTIAGO": {
+  "badge": {
+   "file": "HM_BR_KV_SANTIAGO__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_BR_KV_SANTIAGO__base.jpg"
+  },
+  "destino": {
+   "file": "HM_BR_KV_SANTIAGO__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 275,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_BR_KV_SANTIAGO__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_BR_KV_PERU": {
+  "badge": {
+   "file": "HM_BR_KV_PERU__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_BR_KV_PERU__base.jpg"
+  },
+  "destino": {
+   "file": "HM_BR_KV_PERU__destino.png",
+   "x": 57,
+   "y": 931,
+   "w": 268,
+   "h": 238
+  },
+  "precio": {
+   "file": "HM_BR_KV_PERU__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_CL_KV_ENCUENTRA": {
+  "badge": {
+   "file": "HM_CL_KV_ENCUENTRA__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_CL_KV_ENCUENTRA__base.jpg"
+  },
+  "lista": {
+   "file": "HM_CL_KV_ENCUENTRA__lista.png",
+   "x": 62,
+   "y": 362,
+   "w": 454,
+   "h": 718
+  },
+  "precio": {
+   "file": "HM_CL_KV_ENCUENTRA__precio.png",
+   "x": 409,
+   "y": 875,
+   "w": 638,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_ENCUENTRA": {
+  "badge": {
+   "file": "HM_PE_KV_ENCUENTRA__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_ENCUENTRA__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_ENCUENTRA__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 326,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_PE_KV_ENCUENTRA__lista.png",
+   "x": 65,
+   "y": 340,
+   "w": 365,
+   "h": 444
+  },
+  "precio": {
+   "file": "HM_PE_KV_ENCUENTRA__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ },
+ "HM_PE_KV_DOM_REGIONES": {
+  "badge": {
+   "file": "HM_PE_KV_DOM_REGIONES__badge.png",
+   "x": 800,
+   "y": 767,
+   "w": 210,
+   "h": 212
+  },
+  "base": {
+   "file": "HM_PE_KV_DOM_REGIONES__base.jpg"
+  },
+  "destino": {
+   "file": "HM_PE_KV_DOM_REGIONES__destino.png",
+   "x": 80,
+   "y": 931,
+   "w": 304,
+   "h": 238
+  },
+  "lista": {
+   "file": "HM_PE_KV_DOM_REGIONES__lista.png",
+   "x": 80,
+   "y": 354,
+   "w": 394,
+   "h": 379
+  },
+  "precio": {
+   "file": "HM_PE_KV_DOM_REGIONES__precio.png",
+   "x": 408,
+   "y": 875,
+   "w": 640,
+   "h": 349
+  }
+ }
+}

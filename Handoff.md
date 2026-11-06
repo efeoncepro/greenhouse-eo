@@ -2,6 +2,18 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-06 — SKY BLACK 2026: taller rescatado a carpeta durable y prueba en frío
+
+El taller del kit (scripts, kit corregido `src2/`, fotos de destino, fuentes y copia del canvas) vivía en el
+scratchpad temporal de otra sesión (`/private/tmp/…/556be26d…`), que se borra al reiniciar. Quedó en
+`ai-generations/2026-11-04_sky-black-gif/taller/` (≈ 1 GB en disco; en git sólo el código: 54 archivos, 384 KB, con
+`taller/.gitignore`; kit, fotos y fuentes con licencia quedan fuera). Rutas fijas al scratchpad reemplazadas por rutas
+relativas; nuevo `doctor.sh` (chequeo de arranque, solo lectura). **Prueba en frío:** un agente sin contexto, con solo la
+skill, copió el taller y corrió `rehacer-destinos.sh`: «LISTO», 21 piezas rehechas en ≈ 1 min 40 s y `formatos/` 78/78
+byte-idénticos (42 reescritos). `png/` varía unos píxeles en las piezas con flecha corrida (tolerancia documentada).
+Skill `efeonce-creative-workbench` (`sky-black-pipeline.md` §0, §4.5, §17 y §17.1; `state-continuity`;
+`sky-design-canvas`; espejo `.codex`) y manual SKY 1.9. `OUT/scripts/` quedó superada. Sin push.
+
 ## 2026-11-05 — Insights Berel octubre «sólo blog»: clics completos (ISSUE-191), valor estimado y redes
 
 **Código (develop, sin push ni release):** `f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`. El capítulo SEO de

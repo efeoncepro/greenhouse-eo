@@ -11,6 +11,11 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-06 — SKY BLACK 2026: el taller del kit se puede retomar desde una sesión nueva
+
+El taller dejó la carpeta temporal y vive en `ai-generations/2026-11-04_sky-black-gif/taller/`, con un chequeo de
+arranque (`doctor.sh`). Una sesión nueva, sin contexto, reconstruyó las piezas byte a byte siguiendo sólo la skill.
+
 ## 2026-11-05 — Insights: el capítulo de búsqueda cuenta todos los clics de Google, valor estimado y visitas desde redes
 
 Code complete local, rollout pendiente (sin push ni release). El capítulo SEO toma sus totales del control de Search

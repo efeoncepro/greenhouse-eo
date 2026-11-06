@@ -1,6 +1,6 @@
 # SKY BLACK: pipeline de producción local, script por script
 
-Estado al 2026-11-05. Este documento es el **cómo**: qué script produce cada pieza de la campaña BLACK
+Estado al 2026-11-06 (taller rescatado a carpeta durable, §0 y §17). Este documento es el **cómo**: qué script produce cada pieza de la campaña BLACK
 (kit «Despliegue Base»), qué lee, qué escribe, con qué parámetros y en qué orden. El **qué** (taxonomía,
 tamaños, nombres y fichas de cada formato) está en [sky-format-catalog.md](sky-format-catalog.md). El
 resumen operativo, las decisiones del operador y las lecciones de Claude Design están en
@@ -14,14 +14,20 @@ OneDrive es la carpeta de entrega nueva (§14).
 
 ## 0. Convenciones, dependencias y patrón de render
 
-| Alias | Ruta en la sesión original (2026-11-04) |
+🔴 **Desde el 2026-11-06 el taller vive en una carpeta durable** (ya no en el scratchpad de la sesión original, que
+se borra al reiniciar el Mac). Para retomar desde una sesión nueva, ver §17: `bash $K/doctor.sh` primero.
+
+| Alias | Ruta vigente (desde 2026-11-06) |
 | --- | --- |
-| `S` | `/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/556be26d-0508-40ae-90b2-998711ee8289/scratchpad` |
-| `K` | `$S/kvhm-canvas` (directorio de trabajo de todos los scripts) |
-| `P` | `$S/canvas/project` (copia local del proyecto del canvas de Claude Design) |
+| `T` | `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-04_sky-black-gif/taller` |
+| `K` | `$T/kvhm-canvas` (directorio de trabajo de todos los scripts; los scripts se ubican solos con `__dirname`) |
+| `P` | `$T/canvas/project` (copia local del proyecto del canvas de Claude Design; los scripts la buscan en `$K/../canvas/project`) |
 | `SRC` | `~/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Sky - Efeonce - General/SKY Campañas/2026/10_Noviembre/Despliegue Base/` |
-| `OUT` | `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-04_sky-black-gif` (no versionado) |
+| `OUT` | `/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-04_sky-black-gif` (= `$K/../..`) |
 | `S2` | `$K/src2/` (copia corregida de las fuentes; ver §3) |
+
+La ruta original del 2026-11-04 (`/private/tmp/claude-501/…/556be26d-…/scratchpad`) es **histórica**: ningún
+script la usa ya. `OUT/scripts/` es la copia anterior al rescate y quedó **superada** por `$K`; no la uses.
 
 **Dependencias:**
 
@@ -328,8 +334,9 @@ publicar → copiar a `OUT` → `organizar.cjs`.
 Once comentarios en el canvas: ocho de Daniela y tres más (aro de las banderas, PromPerú centrado en Cajamarca, marca de agua y ubicación pegadas arriba). Todo se reconstruye con `./rehacer-destinos.sh`, que ahora corre
 `brecha.cjs` sobre variantes y rutas antes de `render` (la lista del script incluye también `HM_BR_KV_SANTIAGO`,
 `HM_BR_KV_PERU` y `HM_PE_KV_ENCUENTRA`, además de las rutas, `DOM_REGIONES` y AR Santiago y Lima), y luego
-`node compose.cjs` sobre **todas** las piezas (la regla de la flecha cambia también los popups de los KV
-originales). Canvas al cierre: versión 40.
+`node compose.cjs` sobre **las 21 piezas de esa lista** (popup + story de cada una: 42 PNG). Los popups de los KV
+originales del kit no se recomponen aquí: si cambia la regla de la flecha para ellos, se corre `compose.cjs` aparte
+(corregido el 2026-11-06; antes decía «todas las piezas», y el script nunca lo hizo). Canvas al cierre: versión 40.
 
 - **Velo del logo (`destinos.cjs` → `veloAlfa`, `veloSvg`, `velo`).** El degradado plano 20 % → 0 cruzaba todo el
   ancho, apagaba elementos de la foto a la derecha (faro de Lima) y no aseguraba el contraste con cielo claro
@@ -373,14 +380,14 @@ originales). Canvas al cierre: versión 40.
   izquierda de la flecha.
 - Se regeneraron GIF de AR Lima, AR Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con
   banderas (AR, PE, BR, US, UY y PE «Encuentra»), y la story en video de las nueve que la tienen entre ellas.
-  Los ids nuevos de esos videos están en `vid-blobs.json` (copia en `OUT/scripts/`); las páginas del canvas se
+  Los ids nuevos de esos videos están en `vid-blobs.json` (en `$K`); las páginas del canvas se
   regeneraron con ellos (§13.3).
 - **Entrega:** `organizar.cjs` (ya comparando por tamaño y fecha, §4.4) dejó «BLACK SKY 2026» con 155 archivos, 73
   de ellos actualizados en esta ronda, y `ENTREGABLES BLACK (Efeonce 2026-11-05)/` se puso al día con
   `rsync -a` **sin `--checksum`** (§14).
 - **Continuidad:** las rondas siguientes siguen en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del
-  canvas». La copia vigente de los scripts es `OUT/scripts/` (con rutas del scratchpad viejo que hay que adaptar,
-  §17).
+  canvas». Desde el 2026-11-06 el taller vive en `$T` y se retoma con `doctor.sh` (§0 y §17); `OUT/scripts/` quedó
+  superada y no hay rutas que adaptar.
 - **Pendiente:** confirmar con Daniela que la regla de la flecha también vale para los popups de los KV del kit
   (§18).
 
@@ -843,8 +850,8 @@ puede subir: el audio viaja como pista de un MP4.
 3. Recién entonces correr `anim-page.cjs` y `new-pages.cjs`, que leen esos ids.
 
 Volver a subir un video genera **id nuevo**: actualizar `vid-blobs.json` y regenerar las páginas. Caso
-2026-11-05 (cuarta ronda): los GIF y stories en video regenerados (§4.5) tienen ids nuevos; la copia vigente
-de `vid-blobs.json` está en `OUT/scripts/`.
+2026-11-05 (cuarta ronda): los GIF y stories en video regenerados (§4.5) tienen ids nuevos; el `vid-blobs.json`
+vigente está en `$K`.
 
 ### 13.4 Publicar el proyecto
 
@@ -947,31 +954,67 @@ Cada lote se revisa **mirando** una hoja de contacto, no sólo con métricas:
 
 ## 17. Re-ejecutar en otra sesión
 
-El scratchpad de la sesión original es temporal. Antes de correr nada:
+Rescate y prueba en frío del 2026-11-06. Una sesión nueva retoma así, sin adaptar nada a mano:
 
-1. **Recuperar los scripts.** El 2026-11-05 `OUT/scripts/` se resincronizó con las versiones finales del
-   scratchpad. Contiene todos los `*.cjs`/`*.sh` de `K`, `hph/*.cjs` con la misma estructura, los
-   `*-files.json` de las páginas, `vid-blobs.json` y `foto-fuente.png`. En `data/` están `bbox.json`
-   (va a `parts/`), `anim-manifest.json` (va a `anim/manifest.json`), los dos archivos de hechos y los
-   inventarios medidos del kit y de los entregables, con sus scripts `inv.sh`/`inv-kit.py`. Las fuentes
-   no se copian porque tienen licencia: reponerlas desde OneDrive. Tras la cuarta ronda, esa copia es la
-   vigente (incluye `brecha.cjs`, `destinos.cjs`, `rehacer-destinos.sh`, `organizar.cjs` y el `vid-blobs.json`
-   con los ids nuevos); la sesión derivada «SKY BLACK: siguientes rondas de ajustes del canvas» parte de ella.
-2. **Reponer insumos** en el nuevo `K`: `Metric-*.otf` (desde OneDrive `Metric_family`),
-   `hph/SourceSans3-Regular.otf`, `foto-fuente.png` (extraer el `<image>` embebido de un KV estándar),
-   `P/ref/audio-gif.mp3` (copia del MP3 del kit) y un `P/` con el proyecto del canvas (bajarlo con
-   `Artifact` `read`/`list` `scope: files` si hace falta regenerar páginas).
-3. **Ajustar rutas absolutas.** Fijas a la sesión vieja: `render.cjs`, `parts.cjs`, `layers.cjs` (`D`),
-   `render-gif.sh` (`K`, `AUD`), `hph/{generic,market,render-ref,probe,ellipses}.cjs` (`K`, `H`, `SP`). A
-   OneDrive: `logofix`, `banderas`, `variantes`, `rutas`, `story-video`. A `OUT`: `render-gif.sh`,
-   `story-video.cjs`. A `node_modules` de Greenhouse: todos. Los demás usan `__dirname`.
-   Comprobar con `grep -n "/private/tmp\|OneDrive\|ai-generations\|node_modules" *.cjs *.sh hph/*.cjs`.
-4. **Volver a listar el kit** (crece) y revisar que los textos que buscan `variantes`, `rutas`,
-   `market.cjs` y `patches.cjs` sigan existiendo; los scripts avisan con `NO` o lanzan error.
-5. **Correr en el orden de §1**, de a uno, y mirar la hoja de contacto de cada lote (§15).
-6. **Rehacer `parts/bbox.json`** si cambian las partes, antes de `banners.cjs` y `hph/market.cjs`.
-7. No escribir en las carpetas del kit; entregar en una carpeta nueva fechada (§14). Gasto de IA: ninguno
-   en este pipeline; sólo con autorización explícita y la clave que indique el operador.
+1. **Leer el estado** en [state-continuity.md](state-continuity.md) (corte SKY) y la ronda más reciente de §4.
+2. **Chequeo de arranque**: `bash /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/doctor.sh`.
+   Solo lee. Verifica Node, Playwright con Chromium, sharp, ffmpeg (libx264, aac, palettegen, xfade, amix,
+   alimiter), python3, las cinco Metric y Source Sans, `src2/` con los SVG del kit corregido, que existan todas
+   las fotos que pide `fotos-destino.json`, `foto-fuente.png`, el proyecto del canvas, `vid-blobs.json`, que no
+   quede ninguna ruta al scratchpad viejo y que OneDrive deje listar «Despliegue Base». Sale con `0` y
+   «LISTO»; con `1`, la lista de lo que falta.
+3. **Si falta una imagen del taller**: puede haberse archivado (ver
+   `docs/operations/AI_GENERATIONS_STORAGE_V1.md`). `pnpm ai-gen:where ai-generations/2026-11-04_sky-black-gif/taller`
+   y `pnpm ai-gen:pull ai-generations/2026-11-04_sky-black-gif`. Nunca regenerarla ni «aproximarla».
+4. **Probar antes de tocar**: copiar `$T` entero a un scratchpad propio (`rsync -a`, ≈ 1 GB), guardar aparte su
+   `kvhm-canvas/formatos/` como referencia y correr `./rehacer-destinos.sh` en la copia. La copia **no es
+   hermética**: sigue leyendo el kit en OneDrive (solo lectura: alianzas, PNG de PromPerú, banderas) y los
+   `node_modules` de Greenhouse por ruta absoluta; no escribe en ninguno. Criterio de aprobado en §17.1.
+   Recién entonces trabajar en `$K`.
+5. **Correr en el orden de §1** y mirar la hoja de contacto de cada lote (§15). Al cerrar, el flujo de
+   entrega de siempre: GIF → `sync-canvas` → `new-pages` → publicar → copiar a `OUT` → `organizar.cjs` →
+   `rsync -a` sin `--checksum` a «ENTREGABLES BLACK» (§13–§14). Nunca leer el destino en OneDrive.
+6. **Volver a listar el kit** (crece; Daniela mueve fotos entre carpetas sin avisar) y revisar que los textos
+   que buscan `variantes`, `rutas`, `market.cjs` y `patches.cjs` sigan existiendo; los scripts avisan con `NO`.
+7. **Rehacer `parts/bbox.json`** si cambian las partes, antes de `banners.cjs` y `hph/market.cjs`.
+8. No escribir en las carpetas del kit; gasto de IA solo con autorización explícita y la clave que indique el
+   operador (`OPENAI_API_KEY_PROFILE=personal`, §4.6).
+
+Qué va en git y qué no: `$T/.gitignore` deja pasar solo el código (`*.cjs`, `*.sh`, `*.py`, `*.json`, `*.csv`,
+`*.md`, unos 54 archivos y 384 KB). El kit corregido, las fotos, las fuentes con licencia (Metric de SKY, Source
+Sans) y el proyecto del canvas quedan en este disco: el código se recupera de git en cualquier máquina, los
+insumos no. Rutas que siguen siendo absolutas a propósito: `node_modules` de Greenhouse (playwright, sharp),
+OneDrive (`logofix`, `banderas`, `variantes`, `rutas`, `story-video`) y la entrega en `split.py` y `data/inv.sh`.
+
+### 17.1 Prueba en frío (2026-11-06)
+
+Hecha por un agente sin contexto previo, con solo esta skill y una copia del taller. Resultado: **reconstruye las
+piezas byte a byte**. Cifras para comparar la próxima vez:
+
+| Medida | Valor esperado |
+| --- | --- |
+| `doctor.sh` | «LISTO», salida 0 |
+| Duración de `./rehacer-destinos.sh` | ≈ 1 min 40 s, salida 0 |
+| Última línea | `rehechas: 21` (las 15 rutas foco, `DOM_REGIONES`, `ENCUENTRA`, AR Santiago, AR Lima, BR Santiago y BR Perú) |
+| `formatos/` | 78 PNG; reescribe 42 (popup + story de las 21); **los 78 byte-idénticos a la referencia** |
+| `src2/` y `parts/` | idénticos al taller |
+
+**Criterio:** `formatos/` byte a byte (`cmp`), contando los 42 reescritos; los otros 36 son KV del kit que este
+script no recompone, así que su igualdad no prueba nada. **Tolerancia conocida:** `png/` (KV fijos, alimenta la
+entrega `kv/`) **no es determinista** en las piezas con flecha corrida: `HM_AR_KV_SANTIAGO.png` difirió en 391 px
+(0,027 %, máx. 47 niveles por canal, zona de flecha y badge) y `HM_BR_KV_PERU.png` en 7 px (máx. 6), con `src2/` y
+`parts/` idénticos. Es variación del rasterizado de Chromium: aceptable mientras sea así de chica y esté en esa zona;
+si crece o sale de ahí, mirar la pieza al 100 %.
+
+**Cómo leer `brecha.cjs`:** imprime por pieza `{"brecha": N, "corrida": M}`. Bajo el umbral de 40 px no corre nada
+(`corrida: 0`), así que un 34 o un 33 sin corrida está bien; un valor negativo (Cajamarca −53) también sale sin
+corrida. Al 2026-11-06 corren AR Lima y AR Santiago (16), BR Perú (52) y BR Santiago (44).
+
+**Crédito:** la marca de agua sale solo en las piezas con `cred` en `fotos-destino.json`; Cusco y AR Santiago no
+la llevan, a propósito.
+
+**Conteos viejos:** los «13 rutas», «37 KV» y «26 archivos en rutas-peru» de §4.3, §6 y §14 son del 2026-11-04.
+Desde la tercera ronda son 15 rutas foco; la cifra vigente es la de esta tabla.
 
 ## 18. Pendientes de confirmar (no son defectos del pipeline)
 

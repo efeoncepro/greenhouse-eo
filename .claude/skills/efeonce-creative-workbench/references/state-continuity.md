@@ -1,6 +1,6 @@
 # Corte de continuidad: 2026-09-30
 
-## SKY en Claude Design — corte 2026-11-04
+## SKY en Claude Design — corte 2026-11-04 (actualizado al 2026-11-06)
 
 Trabajo hecho fuera del harness, en el canvas de Claude Design: bocetos y adaptaciones para
 revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cómo operarlo en
@@ -12,7 +12,7 @@ fotografía de evento en
 | Artifact (privado del operador) | Estado al cierre |
 | --- | --- |
 | Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
-| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 40 (cierre de la cuarta ronda, 2026-11-05); diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | Versión 51 (cierre de la séptima ronda, 2026-11-05; la 40 fue la cuarta); diez páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo |
 
 Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
 (~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
@@ -22,8 +22,9 @@ genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos (con la lista de
 (pedidos de Daniela por Teams): logo BLACK corregido en todas las fuentes (fecha 25 nov–2 dic, línea flexible, menos
 resplandor) y todo rehecho desde `src2/`; 12 mensajes de la grilla por mercado con KV, popup, GIF y story video (12 MP4
 de 15,7 s); 13 rutas foco de Perú con popup y story; Chile «KV listo» (TikTok 3, DAT 2, PMAX 4) desde los editables. Entregables locales no versionados en
-`ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; sus
-scripts traen rutas del scratchpad de la sesión y hay que adaptarlas. El kit en OneDrive no se
+`ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; el
+taller completo vive desde el 2026-11-06 en `ai-generations/2026-11-04_sky-black-gif/taller/` y se retoma con
+`doctor.sh` (ver más abajo). El kit en OneDrive no se
 modificó; el 2026-11-05 la entrega (sin `scripts/`) se copió a la carpeta nueva
 `Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/`: 321 archivos (626 MB) verificados
 byte a byte. Mapeo en [sky-design-canvas.md](sky-design-canvas.md#entregables-y-scripts-locales).
@@ -58,8 +59,9 @@ de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya 
 destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin
 `--checksum`.
 Continuidad: las rondas siguientes se llevan en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del
-canvas». La copia vigente de los scripts está en `ai-generations/2026-11-04_sky-black-gif/scripts/`, con rutas del
-scratchpad viejo que hay que adaptar ([sky-black-pipeline.md](sky-black-pipeline.md) §17).
+canvas». Desde el 2026-11-06 el taller completo (scripts, kit corregido `src2/`, fotos, fuentes y proyecto del canvas) vive
+en `ai-generations/2026-11-04_sky-black-gif/taller/`, sin rutas al scratchpad viejo; se retoma con `bash
+taller/kvhm-canvas/doctor.sh` ([sky-black-pipeline.md](sky-black-pipeline.md) §0 y §17). `scripts/` quedó superada.
 Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
 la regla de la flecha también vale para los popups de los KV del kit.
 
