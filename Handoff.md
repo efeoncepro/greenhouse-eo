@@ -410,5 +410,5 @@ ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service ex
 EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
 TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
 determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. **Pendiente:** aplicar las migraciones
-`20261106230331669` y `20261106230745107` a la base compartida (requiere autorización), señal de reliability, `pnpm test`
-completo y `pnpm build`. Typecheck global con 2 errores ajenos (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).
+`20261106230331669` y `20261106230745107` a la base compartida (requiere autorización), señal de reliability y `pnpm build`
+(`pnpm test` completo verde: 21 842 tests). Typecheck global con 2 errores ajenos (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).

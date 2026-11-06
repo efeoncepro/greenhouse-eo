@@ -288,7 +288,8 @@ Plan y auditoría: [TASK-2096-plan.md](../plans/TASK-2096-plan.md). Cuatro slice
   Desvío del plan: el consumidor es Services, que tiene `space_id` propio; Insights espera TASK-1960.
 
 Pendiente para cerrar: aplicar las dos migraciones a la base compartida (autorización explícita), señal de reliability,
-revocación durante un write (primer write por Space), y los gates de cierre `pnpm test` completo y `pnpm build`.
+revocación durante un write (primer write por Space) y `pnpm build` (no corrido: requiere autorización por memoria del equipo).
+`pnpm test` completo en `ae0881e4be`: 2150 archivos, 21 842 tests, 0 fallas.
 Manual de uso: no aplica todavía; nadie puede otorgar Spaces sin el command de TASK-2099 (dueño: EPIC-057).
 
 ## Delta 2026-11-06 — Revisión contra código
