@@ -554,6 +554,14 @@ y abajo-derecha: los tramos con gradiente blanco→verde y brillo blanco propio)
 - **Errores de sharp que costaron una vuelta:** `blur` sobre un buffer de 1 canal devuelve 3 (rayas): `extractChannel(0)`;
   `extract` corre antes que `composite` en la misma cadena; `create` no admite 1 canal; en 8 bits los σ grandes sobre un
   trazo de 2 px posterizan.
+- **Entrega a Daniela (2026-11-06):** carpeta nueva en OneDrive `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026 - NEON LOGO
+  (PROPUESTA 2026-11-06)/` (59 archivos, 105 MB; copia idéntica en `OUT/neon-logo/`): `LEEME.txt`; `01 LOGO NEON PNG 4000px`
+  (ES/PT/EN × actual + 3 opciones, transparente y `_SOBRE-NEGRO`, **mismo encuadre** en las cuatro, para superponer);
+  `02 PIEZAS DE PRUEBA/{TACNA,IQUITOS}` (`BS_NEON_{KV|POPUP|STORY|LOGO-SOBRE-FOTO}_{TCQ|IQT}_<opción>.png`);
+  `03 ANIMACION CHISPA` (2 MP4). El logo grande sale de `logo-neon.cjs` sobre `OUT/logo-black/SKY_LOGO_BLACK_<L>_4000px.png`:
+  mide el marco por idioma (escala ≈ 6,25 px por unidad del SVG), aplica la misma receta con σ × escala y compone por capas
+  (halo debajo → logo → núcleo de acentos encima), con 300 px de relleno para que el halo no se corte.
+
 - **Pendiente:** que Dianesty (SKY) elija la opción. Aplicarla a las ~150 piezas es otra fase y solo a pedido; la receta
   elegida se documenta aquí y en la skill antes de tocar `logofix`/`compose`.
 
