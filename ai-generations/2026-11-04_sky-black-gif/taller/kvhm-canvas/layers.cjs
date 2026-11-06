@@ -18,7 +18,7 @@ const REG = {
 };
 // Variantes 2026-11-04: la lista bajo el logo también entra animada desde abajo.
 REG['HM_CL_KV_ENCUENTRA.svg'] = REG['HM_CL_KV_INTER_CLUSTER.svg'];
-for (const n of ['HM_AR_KV_BANDERAS', 'HM_PE_KV_INTER_BANDERAS', 'HM_BR_KV_BANDERAS', 'HM_US_KV_BANDERAS', 'HM_PE_KV_ENCUENTRA', 'HM_PE_KV_DOM_REGIONES'])
+for (const n of ['HM_AR_KV_BANDERAS', 'HM_PE_KV_INTER_BANDERAS', 'HM_BR_KV_BANDERAS', 'HM_US_KV_BANDERAS', 'HM_UY_KV_BANDERAS', 'HM_PE_KV_ENCUENTRA', 'HM_PE_KV_DOM_REGIONES'])
   REG[n + '.svg'] = { ...BADGE, ...PRECIO, lista: [40, 320, 720, 890], ...DESTINO };
 (async () => {
   const b = await chromium.launch();

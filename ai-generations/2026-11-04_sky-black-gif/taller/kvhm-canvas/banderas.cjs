@@ -12,7 +12,10 @@ const KVS = {
   HM_PE_KV_INTER_BANDERAS: { base: 'HM_PE_KV_INTER.svg', lista: [['PUJ', 'Punta Cana'], ['CL', 'Santiago y conexión', 'con 15 destinos'], ['AR', 'Buenos Aires'], ['BR', 'Río de Janeiro', 'y São Paulo'], ['US', 'Miami']] },
   HM_BR_KV_BANDERAS: { base: 'HM_BR_KV.svg', lista: [['CL', 'Santiago e conexões', 'para 15 destinos'], ['PE', 'Lima e conexões', 'para 16 destinos'], ['AR', 'Argentina'], ['US', 'Miami'], ['UY', 'Uruguai']] },
   HM_US_KV_BANDERAS: { base: 'HM_US_KV.svg', lista: [['CL', 'Santiago and connect', 'to 15 destinations'], ['PE', 'Lima and connect', 'to 16 destinations']] },
-  HM_UY_KV_BANDERAS: { base: 'HM_UY_KV.svg', fila: ['PUJ', 'CL', 'BR', 'US'] }
+  // Onceava ronda (Dianesty, Frame V3: «sumar los nombres de los destinos: Punta Cana, Chile y sus cnx, Salvador; les
+  // confirmo si va Miami»): la fila de banderas bajo «Internacional» pasa a la lista con nombres bajo el logo, como en
+  // los demás mercados; Chile con el mismo texto que el resto («Santiago y conexión con 15 destinos», Daniela). Miami queda hasta que Dianesty confirme. La píldora de origen vuelve (variantes.cjs la llena).
+  HM_UY_KV_BANDERAS: { base: 'HM_UY_KV.svg', lista: [['PUJ', 'Punta Cana'], ['CL', 'Santiago y conexión', 'con 15 destinos'], ['BR', 'Salvador'], ['US', 'Miami']], sombraTexto: true }
 };
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
@@ -41,7 +44,8 @@ const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   }
   const flag = (k, cx, cy, r = 33.5) => `<image x="${cx - r}" y="${cy - r}" width="${2 * r}" height="${2 * r}" clip-path="circle(50%)" preserveAspectRatio="xMidYMid slice" xlink:href="data:image/png;base64,${png[k]}"/>`
     + `<circle cx="${cx}" cy="${cy}" r="${r - 1}" fill="none" stroke="#fff" stroke-width="2"/>`;
-  for (const [name, cfg] of Object.entries(KVS)) {
+  const solo = process.argv.slice(2); // sin argumentos: los cinco KV
+  for (const [name, cfg] of Object.entries(KVS).filter(([n]) => !solo.length || solo.includes(n))) {
     let svg = fs.readFileSync(S2 + cfg.base, 'utf8');
     let add = '';
     if (cfg.lista) {
@@ -53,7 +57,11 @@ const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
           ? `<text x="166.5" y="${cy - 3}" fill="#fefefe" font-family="Metric-Medium, Metric" font-weight="500" font-size="33">${esc(l1)}<tspan x="166.5" dy="31.35">${esc(l2)}</tspan></text>`
           : `<text x="166.5" y="${cy + 11}" fill="#fefefe" font-family="Metric-Medium, Metric" font-weight="500" font-size="33">${esc(l1)}</text>`;
       });
-      add = `<g id="lista-banderas">${add}</g>`;
+      // sombraTexto (Uruguay, onceava ronda): sombra fina pegada a las letras, no un velo detrás de la lista (Dianesty pidió
+      // quitar el difuminado negro en USA). Hace legible «Salvador» sobre la nube clara del popup.
+      add = cfg.sombraTexto !== false // todas las listas de banderas (onceava ronda: «Buenos Aires» se perdía sobre el puente blanco de Perú)
+        ? `<filter id="lf-sombra-texto" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2.6" flood-color="#000" flood-opacity=".8"/></filter><g id="lista-banderas">${add.replace(/<text /g, '<text filter="url(#lf-sombra-texto)" ')}</g>`
+        : `<g id="lista-banderas">${add}</g>`;
     }
     fs.writeFileSync(K + '/_bd.html', `<!doctype html><meta charset="utf-8">${svg.replace(/^<\?xml[^>]*>/, '').replace('<svg ', '<svg width="1080" height="1350" ')}`);
     const p = await b.newPage({ viewport: { width: 1080, height: 1350 } });

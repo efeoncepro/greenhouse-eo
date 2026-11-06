@@ -22,7 +22,7 @@ const REG = {
 // Variantes 2026-11-04: lista de banderas o de regiones bajo el logo y logo de alianza arriba a la derecha.
 const ALIANZA = { alianza: [740, 0, 1080, 330] };
 REG['HM_CL_KV_ENCUENTRA.svg'] = REG['HM_CL_KV_INTER_CLUSTER.svg'];
-for (const n of ['HM_AR_KV_BANDERAS', 'HM_PE_KV_INTER_BANDERAS', 'HM_BR_KV_BANDERAS', 'HM_US_KV_BANDERAS', 'HM_PE_KV_ENCUENTRA', 'HM_PE_KV_DOM_REGIONES'])
+for (const n of ['HM_AR_KV_BANDERAS', 'HM_PE_KV_INTER_BANDERAS', 'HM_BR_KV_BANDERAS', 'HM_US_KV_BANDERAS', 'HM_UY_KV_BANDERAS', 'HM_PE_KV_ENCUENTRA', 'HM_PE_KV_DOM_REGIONES'])
   REG[n + '.svg'] = { ...BADGE, ...PRECIO, lista: [40, 320, 720, 890], ...DESTINO, ...LOGO, ...PIE };
 for (const n of ['HM_BR_KV_SANTIAGO', 'HM_BR_KV_PERU']) REG[n + '.svg'] = { ...BADGE, ...PRECIO, ...DESTINO, ...LOGO, ...ALIANZA, ...PIE };
 // Rutas foco Perú: PromPerú y ubicación de la foto van en la capa de alianza.

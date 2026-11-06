@@ -364,14 +364,8 @@
       0.72,
       0.45
     ],
-    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Santiago o Lima según el brandlift, con espacio a la izquierda para logo y textos. Banco 01_CHILE/SCL «Imagen de Codex 23 sept 2026, 05_52_07 p.m.» (Plaza de Armas).",
-    "sombra": true,
-    "veloLista": [
-      69,
-      344,
-      444,
-      509
-    ]
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Santiago o Lima según el brandlift, con espacio a la izquierda para logo y textos. Banco 01_CHILE/SCL «Imagen de Codex 23 sept 2026, 05_52_07 p.m.» (Plaza de Armas). Onceava ronda (Dianesty, Frame V3): sin velo detrás de la lista («los textos de santiago y lima tienen un difuminado negro, favor eliminar»).",
+    "sombra": true
   },
   "HM_PE_KV_INTER_BANDERAS": {
     "src": "PE_BUENOS_AIRES.png",

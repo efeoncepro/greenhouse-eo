@@ -96,7 +96,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         } else comp.push(await place(P(n, 'logo'), 1, 0, 0, 0, 0));
         const lb = await bbox(P(n, 'lista')), bot = 664;
         const sl = Math.min(1, (bot - top) / lb.h);
-        if (DEST[n] && DEST[n].veloLista) {
+        if (DEST[n] && DEST[n].veloLista && process.env.VELO_LISTA === '1') {
           const ly = Math.round(top + ((bot - top) - lb.h * sl) / 2);
           comp.push({ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${veloListaSvg([lb.x, ly, lb.x + lb.w * sl, ly + lb.h * sl])}</svg>`), left: 0, top: 0 });
         }
@@ -132,7 +132,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         if (has(n, 'ubicacion')) comp.push(await place(P(n, 'ubicacion'), 1, 0, 0, 0, 0));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'popup') : await foto(1.45, 1782, -154 * 1.45, W, H); // mujer al 80 % del KV, cabeza en y≈260
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'popup'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.popup && DEST[n].f.popup.piso) || [560, 1080, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
+      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'popup'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.popup && DEST[n].f.popup.piso) || [560, 1080, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra && process.env.SOMBRA === '1' ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
       const cp = credito(n, W, H, 34); if (cp) comp.push({ input: cp, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__popup.png');
     }
@@ -191,7 +191,7 @@ const P = (n, l) => PARTS + n + '__' + l + '.png';
         else comp.push(await place(P(n, 'alianza'), 1.1, ab.x + ab.w, ab.y, 1080 - 48, 500));
       }
       const bg = DEST[n] ? await cubrir(n, W, H, 'story') : await foto(2.04, 2198, 0, W, H); // la fuente cubre 1920 de alto a 2,04 (113 % del KV)
-      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'story'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.story && DEST[n].f.story.piso) || [1000, 1720, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
+      if (DEST[n]) comp.unshift({ input: await velo(n, bg, W, H, 'story'), left: 0, top: 0 }, { input: piso(W, H, ...((DEST[n].f && DEST[n].f.story && DEST[n].f.story.piso) || [1000, 1720, 0.62]), '#000'), left: 0, top: 0 }, ...(DEST[n].sombra && process.env.SOMBRA === '1' ? [{ input: sombra(W, H), left: 0, top: 0 }] : []));
       // Marca de agua pegada arriba también en la story (Daniela, 2026-11-05), como en KV y popup.
       const cs = credito(n, W, H, 40, 18); if (cs) comp.push({ input: cs, left: 0, top: 0 });
       await sharp(bg).composite(comp).png().toFile(OUT + n + '__story.png');

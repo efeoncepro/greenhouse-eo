@@ -677,6 +677,33 @@ son 20 piezas: 10 POP-up y 10 GIF, que ella revisa como `BS_GIF_*_AUDIO.mp4`.
   todas las piezas con foto: único caso más, popup de AR Lima (`f.popup = { t: [0.58, 0.6], z: 1.15 }`, cabezas bajo
   la fecha). Popup de Lima entregado en OneDrive; la story de PE no (las exporta Daniela).
 
+### 4.13 Onceava ronda (2026-11-06, Dianesty en Frame «V3» y Teams)
+
+Comentarios leídos en Frame (V3, https://f.io/noHToa-i, 20 activos) y en el chat «Sky - Efeonce / Performance | Shared».
+- **Color del logo en los MP4** («en todos los gif cambia el color del logo»): ffmpeg pasaba de RGB a YUV con BT.601 y
+  sin etiquetar, y Frame, QuickTime y los navegadores leen BT.709. El verde caía de 221 a 189 (medido decodificando en
+  BT.709). `render-gif.sh` y `render-all.sh` codifican ahora con `$V709` (`scale=out_color_matrix=bt709`, `setparams` y
+  etiquetas bt709): vuelve a 217 ≈ KV. `reencode-709.sh <KV…>` re-codifica desde `fr-<kv>/` sin re-renderizar.
+- **Difuminado superior** («que sea lo mismo para todos y no tan oscuro»): pruebas en tres piezas, cuatro variantes
+  (`pruebas-velo.sh`; canvas aparte https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC, `pruebas-velo-canvas.cjs`; OneDrive
+  `10_Noviembre/BLACK SKY 2026 - DIFUMINADO (PRUEBAS 2026-11-06)/`). Daniela: A y B se ven iguales y la de sólo detrás
+  del logo «está mala»; Dianesty aprobó la B «en todas». Default de `destinos.cjs`: `VELO_A=.45`, `VELO_FORMA=suave`,
+  `VELO_FIN_K=.85`. Sin sombra lateral ni velo de lista (`SOMBRA=1` y `VELO_LISTA=1` los devuelven): «ojo cuando sumen
+  otro degradé en las letras, se nota mucho con las transiciones».
+- **Píldora lila** («centrar textos de caluga lila», USA): `variantes.cjs` ajusta la píldora para que ícono y texto
+  tengan el mismo aire a cada lado (26,7 px, el que el kit deja a la izquierda); acepta un origen ya puesto. Aplicado a
+  USA, AR Lima, AR Santiago y Uruguay.
+- **USA**: sin velo tras la lista («los textos de santiago y lima tienen un difuminado negro»). Pendiente de Dianesty:
+  si suma Buenos Aires.
+- **Uruguay** («sumar los nombres de los destinos»): la fila de banderas pasa a lista bajo el logo (`banderas.cjs`, que
+  ahora acepta piezas como argumento): Punta Cana · Santiago y conexión con 15 destinos (texto de las demás piezas, pedido
+  de Daniela) · Salvador · Miami (pendiente de confirmar). La píldora vuelve, con «DESDE MONTEVIDEO» (supuesto).
+- **Sombra de letra en las listas de banderas** (no un velo): `feDropShadow` dy 2, desvío 2,6, opacidad .8 en todas las
+  listas de `banderas.cjs`; sin ella «Buenos Aires» se perdía sobre el puente blanco del popup de Perú.
+- Aplicado con `ronda11.sh` (lote + rutas foco de Perú) más Uruguay y las listas. Entregado en OneDrive: popups y
+  `BS_GIF_*_AUDIO.mp4` de las 10 carpetas, y popup y story de las 15 rutas de Perú. Canvas principal versión 68 (otra
+  sesión publicó la 66 y 67: se reemplazaron sólo imágenes y tableros `g-gif`, sin tocar `canvas.json`).
+
 ### 4.13 Rutas foco de Chile y Perú internacional (2026-11-06): sólo popup y story
 
 Pedido de Daniela (Teams, 1:1 con Julio, 2:00–4:01 p. m.; listas en Notion): «las rutas foco que te pasé, sólo en Chile y

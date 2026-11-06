@@ -88,13 +88,27 @@ const VELO = {
 // velo diagonal adaptativo. Es su gradiente tal cual: negro puro, 69 % de opacidad en el borde superior y caída
 // lineal (dos paradas) hasta 0 en el borde inferior, estirado al alto completo de cada formato. El kit trae
 // además Fade_img_abajo (oscuro abajo) y Fade_img (oscuro a la izquierda). `a` queda medido sólo como registro.
-const FADE = 0.69;
-const stops = () => `<stop offset="0" stop-color="#000" stop-opacity="${FADE}"/><stop offset="1" stop-color="#000" stop-opacity="0"/>`;
+// Pruebas del velo (2026-11-06, Dianesty vía Daniela: «si vamos a considerar algún difuminado en la parte superior, que
+// sea lo mismo para todos y no tan oscuro»). Por variables de entorno, sin tocar el default de la entrega:
+// VELO_A (opacidad arriba), VELO_FORMA (lineal | suave | logo), VELO_FIN_K (multiplica FADE_FIN). Ver pruebas-velo.sh.
+// Onceava ronda (2026-11-06, Dianesty y Daniela en Teams): aprobada la prueba B en todas las piezas: 45 % arriba con
+// caída suave que termina al 85 % del largo anterior, y sin la sombra lateral (SOMBRA=1 la devuelve). Dianesty: «ojo
+// cuando sumen otro degradé en las letras, se nota mucho sobre todo con las transiciones».
+const FADE = +(process.env.VELO_A || 0.45), FORMA = process.env.VELO_FORMA || 'suave', FIN_K = +(process.env.VELO_FIN_K || 0.85);
+const stops = () => FORMA === 'suave'
+  // Curva con salida suave (ease-out): cae rápido bajo el logo y se apaga sin borde visible.
+  ? [[0, 1], [0.3, 0.62], [0.6, 0.24], [0.85, 0.06], [1, 0]].map(([o, k]) => `<stop offset="${o}" stop-color="#000" stop-opacity="${(FADE * k).toFixed(3)}"/>`).join('')
+  : `<stop offset="0" stop-color="#000" stop-opacity="${FADE}"/><stop offset="1" stop-color="#000" stop-opacity="0"/>`;
 // El largo se corta poco después del logo (2026-11-05, Julio: a todo el alto tapaba caras y monumentos): el logo
 // ocupa hasta y≈0,24 (KV), 0,30 (popup) y 0,31 (story); el fade termina en FADE_FIN[fmt] y deja limpio el sujeto.
 const FADE_FIN = { kv: 0.42, popup: 0.5, story: 0.46 };
 function veloSvg(W, H, fmt = 'kv') {
-  return `<linearGradient id="lf-cielo-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Math.round(H * FADE_FIN[fmt])}">${stops()}</linearGradient>`;
+  if (FORMA === 'logo') {
+    // Sólo detrás del logo: elipse radial que desborda la caja del logo; el resto de la foto queda intacto.
+    const [x0, y0, x1, y1] = VELO[fmt].box, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = (x1 - x0) / 2 + 160, ry = (y1 - y0) / 2 + 130;
+    return `<radialGradient id="lf-cielo-g" gradientUnits="userSpaceOnUse" cx="${cx}" cy="${cy}" r="${rx}" gradientTransform="translate(${cx} ${cy}) scale(1 ${(ry / rx).toFixed(4)}) translate(${-cx} ${-cy})"><stop offset="0" stop-color="#000" stop-opacity="${FADE}"/><stop offset=".55" stop-color="#000" stop-opacity="${(FADE * 0.55).toFixed(3)}"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>`;
+  }
+  return `<linearGradient id="lf-cielo-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${Math.round(H * FADE_FIN[fmt] * FIN_K)}">${stops()}</linearGradient>`;
 }
 async function velo(n, foto, W, H, fmt) {
   const { a } = await veloAlfa(foto, VELO[fmt].box);
@@ -189,7 +203,7 @@ if (require.main === module) (async () => {
       const old = document.getElementById('lf-credito'); if (old) old.remove();
       if (cred) svg.insertAdjacentHTML('beforeend', `<text id="lf-credito" data-capa="base" x="40" y="34" font-family="Metric-Regular, Metric" font-size="12" letter-spacing=".3" fill="#fff" fill-opacity=".75">${cred.replace(/&/g, '&amp;')}</text>`);
       return { estado, ocultas };
-    }, [foto, !!d.sombra, d.cred || '', veloDef, d.capa || null, d.veloLista ? veloListaSvg(d.veloLista) : null]);
+    }, [foto, !!d.sombra && process.env.SOMBRA === '1', d.cred || '', veloDef, d.capa || null, d.veloLista && process.env.VELO_LISTA === '1' ? veloListaSvg(d.veloLista) : null]);
     r.velo = va;
     if (r.error) throw new Error(n + ': ' + r.error);
     // «Vuela por el Perú» (fila del CSV): legal, origen, PromPerú y ubicación como en las rutas.
