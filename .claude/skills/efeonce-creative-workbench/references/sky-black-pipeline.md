@@ -710,6 +710,9 @@ que el logo no esté encima de las cabezas, que haya full espacio arriba».
   vez como asset (id nuevo), actualizar `rf-blobs.json` y volver a correr `rf-page.cjs`.
 - **Entrega:** `BLACK SKY 2026/HM CL/RUTAS FOCO/<DESTINO>/BS_POPUP_<IATA>.png` y `BS_STORY_<IATA>.png` (11 rutas) y lo
   mismo en `HM PE/RUTAS FOCO/` (5 rutas, junto a las 15 DOM); copia local en `OUT/rutas-foco/`. 64 copias, `cmp` ok.
+  **En revisión** (Julio, 2026-11-06): `rf-entregar.cjs … --revision` copia además las 32 a `BLACK SKY 2026 - PARA REVISION/`
+  con la misma estructura y su `LEEME.txt` lista las rutas y lo que falta confirmar. Es el criterio de `split.py`: la
+  entrega directa queda y la carpeta de estado la acompaña. Al aprobarse, cada pieza se mueve a `- APROBADO`.
 - **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`

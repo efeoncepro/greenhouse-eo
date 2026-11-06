@@ -11,6 +11,7 @@
   `rutas-foco.cjs/.sh`, `rf-page.cjs`, `rf-entregar.cjs`. Detalle: skill §4.13.
 - Canvas versión 66, página «KV Black · Rutas foco Chile y Perú inter» (imágenes como assets: el canvas está en 509/511
   archivos). OneDrive `BLACK SKY 2026/HM CL|HM PE/RUTAS FOCO/<DESTINO>/` (32 archivos).
+- En revisión: las 32 también en `BLACK SKY 2026 - PARA REVISION/` (misma estructura, LEEME actualizado).
 - Pendiente: precios en 000, origen de Chile («DESDE SANTIAGO», inferido) y fechas del pie.
 
 ## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF
