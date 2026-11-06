@@ -9,23 +9,23 @@
   "line": "revenue-hubspot",
   "theme": "dark",
   "voice": {
-    "eyebrow": "Zero Trust con Entra ID",
-    "question": "Cada acceso al CRM pasa por",
+    "eyebrow": "Inicio de sesión único",
+    "question": "Un solo inicio de sesión, con",
     "answer": [
       "Entra",
       "ID"
     ]
   },
-  "body": "SSO obligatorio, MFA y **mínimo privilegio**: cada permiso se concede, se registra y se revoca.",
+  "body": "Su cuenta de Microsoft para todo: **MFA**, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.",
   "note": "Ejemplo ilustrativo · los permisos se definen con su equipo de TI",
   "sources": [
     "Outlook",
     "Teams",
     "App móvil",
     "Navegador",
-    "API"
+    "Escritorio"
   ],
-  "profileTitle": "Un usuario, 5 accesos",
+  "profileTitle": "Una cuenta, 5 accesos",
   "channels": [
     {
       "channel": "Contactos",
@@ -62,9 +62,9 @@
       "channel": "Negocios"
     },
     {
-      "icon": "data",
-      "title": "Wazuh",
-      "detail": "Todo queda registrado",
+      "icon": "revenue",
+      "title": "Registro",
+      "detail": "Cada acceso, en Wazuh",
       "channel": "Negocios"
     }
   ],

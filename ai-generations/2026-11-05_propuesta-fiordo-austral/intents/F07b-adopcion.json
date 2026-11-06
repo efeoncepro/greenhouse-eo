@@ -1,0 +1,38 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-plan",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Adopción",
+    "question": "La adopción se mide",
+    "answer": [
+      "Cada semana"
+    ]
+  },
+  "body": "Desde la puesta en marcha: un **piloto** con vendedores clave, luego las cuatro regiones y el uso medido.",
+  "horizon": 90,
+  "currentStop": 1,
+  "stops": [
+    {
+      "range": "Días 1–30",
+      "title": "Piloto",
+      "desc": "Vendedores clave de una región usan el CRM con sus clientes reales y lo ajustamos."
+    },
+    {
+      "range": "Días 31–60",
+      "title": "Toda la red",
+      "desc": "Se suman las cuatro regiones, con un referente por equipo y tutoriales por rol."
+    },
+    {
+      "range": "Días 61–90",
+      "title": "Hábito",
+      "desc": "El uso de cada vendedor se mide cada semana y la gerencia revisa en el CRM."
+    }
+  ]
+}

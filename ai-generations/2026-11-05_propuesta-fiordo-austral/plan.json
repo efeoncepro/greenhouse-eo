@@ -20,17 +20,13 @@
       "purpose": "04 · por qué HubSpot"
     },
     {
+      "recipeId": "content-bullets",
+      "purpose": "05 · su proceso"
+    },
+    {
       "recipeId": "proposal-cinematic-revops",
       "purpose": "05 · su ficha técnica",
       "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS2d-datos-en-orden.png"
-    },
-    {
-      "recipeId": "decision-platform-coexistence",
-      "purpose": "06 · integraciones"
-    },
-    {
-      "recipeId": "method-migration-reconcile",
-      "purpose": "07 · migración"
     },
     {
       "recipeId": "method-staircase",
@@ -44,6 +40,35 @@
       "recipeId": "breather",
       "purpose": "08c · app móvil",
       "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png"
+    },
+    {
+      "recipeId": "decision-platform-coexistence",
+      "purpose": "06 · integraciones"
+    },
+    {
+      "recipeId": "method-migration-reconcile",
+      "purpose": "07 · migración"
+    },
+    {
+      "recipeId": "decision-plan",
+      "purpose": "12 · adopción"
+    },
+    {
+      "recipeId": "content-day-live-library",
+      "purpose": "14 · capacitación"
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "12 · cronograma"
+    },
+    {
+      "recipeId": "content-day-release-cycle",
+      "purpose": "13 · cambios controlados"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "purpose": "17 · equipo",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
     },
     {
       "recipeId": "decision-difference",
@@ -67,10 +92,6 @@
       "purpose": "14 · continuidad e incidentes"
     },
     {
-      "recipeId": "content-measure-formulas",
-      "purpose": "14b · controles técnicos"
-    },
-    {
       "recipeId": "content-markets",
       "purpose": "10 · residencia de datos",
       "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png"
@@ -81,18 +102,6 @@
       "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS4-te-llevas-todo.png"
     },
     {
-      "recipeId": "method-waves",
-      "purpose": "12 · cronograma"
-    },
-    {
-      "recipeId": "content-day-release-cycle",
-      "purpose": "13 · cambios controlados"
-    },
-    {
-      "recipeId": "content-day-live-library",
-      "purpose": "14 · capacitación"
-    },
-    {
       "recipeId": "decision-why-us",
       "purpose": "15 · soporte y SLA"
     },
@@ -101,9 +110,16 @@
       "purpose": "16 · operación"
     },
     {
-      "recipeId": "section-cine-team",
-      "purpose": "17 · equipo",
-      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
+      "recipeId": "decision-chart",
+      "purpose": "26 · licencias"
+    },
+    {
+      "recipeId": "content-pricing-live",
+      "purpose": "19 · inversión"
+    },
+    {
+      "recipeId": "content-measure-formulas",
+      "purpose": "28 · retorno"
     },
     {
       "recipeId": "decision-next-steps",

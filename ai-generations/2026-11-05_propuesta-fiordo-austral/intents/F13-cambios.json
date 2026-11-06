@@ -10,13 +10,13 @@
   "line": "revenue-hubspot",
   "voice": {
     "eyebrow": "Cambios controlados",
-    "question": "A producción llega",
+    "question": "Todo cambio, antes de producción, pasa por",
     "answer": [
-      "Sólo lo",
-      "aprobado"
+      "Prueba y",
+      "control"
     ]
   },
-  "body": "Nada llega a producción sin su **aprobación**: se prueba en una cuenta de pruebas, se valida y se explica en un video.",
+  "body": "Se prueba en una cuenta de pruebas con datos de ejemplo, su equipo lo **valida** y recién entonces se publica.",
   "release": {
     "kicker": "Cambio 03 · Sales Hub",
     "title": "Alerta de cliente sin contacto",
@@ -32,22 +32,22 @@
     {
       "tool": "teams",
       "kicker": "Microsoft Teams",
-      "label": "Nos hablamos"
+      "label": "Video del cambio"
     },
     {
       "tool": "microsoft-365",
-      "kicker": "SharePoint",
-      "label": "Documentos del proyecto"
-    },
-    {
-      "tool": "loom",
-      "kicker": "Loom",
-      "label": "Se lo mostramos"
+      "kicker": "Microsoft 365",
+      "label": "Acta en SharePoint"
     },
     {
       "tool": "hs-icon:sales",
       "kicker": "HubSpot",
-      "label": "Pruebas controladas"
+      "label": "Cuenta de pruebas"
+    },
+    {
+      "tool": "microsoft-365",
+      "kicker": "Microsoft 365",
+      "label": "Aviso por Outlook"
     }
   ]
 }

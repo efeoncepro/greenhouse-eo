@@ -63,7 +63,7 @@ add('F02-entendimos', 'section-cine-purpose', d, '02 · lo que entendimos')
 
 # 03 · Qué cubre el CRM
 d = base(HS, 'P05-servicios.json')
-d['voice'] = {'eyebrow': 'Nuestra propuesta · Sales Hub Professional', 'question': 'Las seis necesidades de las bases,', 'answer': ['cubiertas']}
+d['voice'] = {'eyebrow': 'Nuestra propuesta · Sales Hub Professional', 'question': 'Proponemos un CRM hecho para', 'answer': ['exportar']}
 d['lanes'] = [
     {'icon': 'sales', 'title': 'Clientes y contactos', 'products': 'Smart CRM', 'description': 'Historial completo, segmentado por país, región, mercado, tipo y estado.'},
     {'icon': 'sales', 'title': 'Pipeline de exportación', 'products': 'Sales Hub', 'description': 'Etapas de negociación, muestras, aprobación interna y seguimiento.'},
@@ -88,6 +88,22 @@ d['verdicts'] = [
 ]
 d['selectedVerdict'] = 1
 add('F04-por-que-hubspot', 'decision-provider-fit', d, '04 · por qué HubSpot')
+
+# 04c · Su proceso (06/11, Julio: «cómo vamos a hacer que el CRM se ajuste o se adapte a sus procesos»). Etapas
+# propuestas sobre lo que describen las bases (muestras, especificación, aprobación interna); se validan en F0.
+d = base(EX, 'deck-content-bullets-intent.json')
+d['voice'] = {'eyebrow': 'Su proceso comercial', 'question': 'El CRM se configura sobre', 'answer': ['su proceso']}
+d['items'] = [
+    {'title': 'Pipeline de exportación', 'desc': 'Muestra, especificación, aprobación técnica, contrato y embarque; se validan en F0.'},
+    {'title': 'Ficha técnica por cliente', 'desc': 'Proteína, FFA, humedad y certificados en cada cliente y en cada oportunidad.'},
+    {'title': 'Visto bueno de la gerencia', 'desc': 'Las condiciones fuera de rango piden el visto bueno antes de llegar al cliente.'},
+    {'title': 'Una vista por región', 'desc': 'Asia, Europa, Norteamérica y Sudamérica, cada una con su vendedor y su distribuidor.'},
+]
+# Selección en 03: con el punto 01 la etiqueta tapaba el «04».
+d['selected'] = 3
+d['selection'] = {'target': 'object', 'label': 'Gerencia', 'participantKind': 'department'}
+d['progress'] = {'sections': 5, 'current': 1}
+add('F04c-proceso', 'content-bullets', d, '05 · su proceso')
 
 # 04b · Partners: retirada el 05/11 (Julio: «no tiene sentido como está planteada»). La receta content-partners exige
 # el muro de nueve partners de Efeonce, que en una propuesta HubSpot distrae; la credencial va en la insignia Gold.
@@ -137,6 +153,19 @@ d['stages'] = [
 ]
 d['reconciliation'] = '3.134 = 3.134 · cuadra'
 add('F07-migracion', 'method-migration-reconcile', d, '07 · migración')
+
+# 07b · Adopción (06/11, Julio: «cómo lo vamos a ayudar a facilitar la adopción»): 90 días desde la puesta en marcha.
+d = base(EX, 'deck-decision-plan-intent.json')
+d['voice'] = {'eyebrow': 'Adopción', 'question': 'La adopción se mide', 'answer': ['cada semana']}
+d['body'] = 'Desde la puesta en marcha: un **piloto** con vendedores clave, luego las cuatro regiones y el uso medido.'
+d['horizon'] = 90
+d['currentStop'] = 1
+d['stops'] = [
+    {'range': 'Días 1–30', 'title': 'Piloto', 'desc': 'Vendedores clave de una región usan el CRM con sus clientes reales y lo ajustamos.'},
+    {'range': 'Días 31–60', 'title': 'Toda la red', 'desc': 'Se suman las cuatro regiones, con un referente por equipo y tutoriales por rol.'},
+    {'range': 'Días 61–90', 'title': 'Hábito', 'desc': 'El uso de cada vendedor se mide cada semana y la gerencia revisa en el CRM.'},
+]
+add('F07b-adopcion', 'decision-plan', d, '12 · adopción')
 
 # 08 · Automatizaciones
 d = base(HS, 'B22-automatizacion.json')
@@ -217,11 +246,14 @@ add('F09-seguridad', 'decision-difference', d, '09 · seguridad')
 # su registro. (La escalera plana no entra: es variante de la de 08; `section-lens` no admite foto cine.)
 d = base(EX, 'deck-method-identity-consent-intent.json')
 d['use'] = 'proposal'
-d['voice'] = {'eyebrow': 'Zero Trust con Entra ID', 'question': 'Cada acceso al CRM pasa por', 'answer': ['Entra', 'ID']}
-d['body'] = 'SSO obligatorio, MFA y **mínimo privilegio**: cada permiso se concede, se registra y se revoca.'
+# 06/11, Julio: «¿qué quieres mostrar? ¿todo conectado por el single sign-on?». Sí: un solo inicio de sesión de Microsoft
+# para entrar al CRM desde cualquier lugar. render-patch.ts cambia «Fuente» y «Perfil unificado» y pone el ícono oficial de
+# MFA de Microsoft Entra (paquete de íconos de arquitectura de Azure V25).
+d['voice'] = {'eyebrow': 'Inicio de sesión único', 'question': 'Un solo inicio de sesión, con', 'answer': ['Entra', 'ID']}
+d['body'] = 'Su cuenta de Microsoft para todo: **MFA**, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.'
 d['note'] = 'Ejemplo ilustrativo · los permisos se definen con su equipo de TI'
-d['sources'] = ['Outlook', 'Teams', 'App móvil', 'Navegador', 'API']
-d['profileTitle'] = 'Un usuario, 5 accesos'
+d['sources'] = ['Outlook', 'Teams', 'App móvil', 'Navegador', 'Escritorio']
+d['profileTitle'] = 'Una cuenta, 5 accesos'
 d['channels'] = [
     {'channel': 'Contactos', 'purpose': 'Leer', 'permitted': True},
     {'channel': 'Negocios', 'purpose': 'Editar', 'permitted': True},
@@ -231,7 +263,7 @@ d['channels'] = [
 d['activations'] = [
     {'icon': 'sales', 'title': 'Vendedor', 'detail': 'Sus clientes ✓', 'channel': 'Contactos'},
     {'icon': 'sales', 'title': 'Etapa', 'detail': 'Con aprobación ✓', 'channel': 'Negocios'},
-    {'icon': 'data', 'title': 'Wazuh', 'detail': 'Todo queda registrado', 'channel': 'Negocios'},
+    {'icon': 'revenue', 'title': 'Registro', 'detail': 'Cada acceso, en Wazuh', 'channel': 'Negocios'},
 ]
 d['selection'] = {'target': 'object', 'label': 'TI', 'participantKind': 'department'}
 add('F09b-zero-trust', 'method-identity-consent', d, '11 · zero trust')
@@ -295,6 +327,9 @@ d['metrics'] = [
     {'glyph': 'reloj', 'name': 'Sesión única', 'formula': 'Control de sesión de Entra ID e inactividad corta', 'source': 'Prueba técnica', 'owner': 'TI y Efeonce'},
     {'glyph': 'contrato', 'name': 'Licencias Microsoft', 'formula': 'Licencia premium de Entra ID para el Acceso Condicional', 'source': 'Inventario de TI', 'owner': 'Fiordo Austral'},
 ]
+# 06/11: fuera del deck (Julio: «no se trata de responder las bases»); el detalle por control vive en la matriz (anexo)
+# y la receta pasa a la lámina de retorno.
+RETIRADAS = {'F09f-controles'}
 add('F09f-controles', 'content-measure-formulas', d, '14b · controles técnicos')
 
 # 10 · Residencia
@@ -328,18 +363,20 @@ add('F12-cronograma', 'method-waves', d, '12 · cronograma')
 
 # 13 · Cambios controlados
 d = base(HS, 'P12-dia-a-dia.json')
-d['voice'] = {'eyebrow': 'Cambios controlados', 'question': 'A producción llega', 'answer': ['sólo lo', 'aprobado']}
-d['body'] = 'Nada llega a producción sin su **aprobación**: se prueba en una cuenta de pruebas, se valida y se explica en un video.'
+# 06/11, Julio: «sólo aprobado ¿de qué?… no entiendo por qué tienes Loom». La voz dice qué pasa con cada cambio y Loom sale
+# (render-patch.ts: pasos sin «Sandbox» ni tuteo y el video en Teams).
+d['voice'] = {'eyebrow': 'Cambios controlados', 'question': 'Todo cambio, antes de producción, pasa por', 'answer': ['prueba y', 'control']}
+d['body'] = 'Se prueba en una cuenta de pruebas con datos de ejemplo, su equipo lo **valida** y recién entonces se publica.'
 d['release']['kicker'] = 'Cambio 03 · Sales Hub'
 d['release']['title'] = 'Alerta de cliente sin contacto'
 d['release']['icon'] = 'sales'
 d['release']['videoCaption'] = 'Qué cambia para ventas, en 3 minutos'
 d['release']['approveCta'] = 'Aprobar cambio'
 d['tools'] = [
-    {'tool': 'teams', 'kicker': 'Microsoft Teams', 'label': 'Nos hablamos'},
-    {'tool': 'microsoft-365', 'kicker': 'SharePoint', 'label': 'Documentos del proyecto'},
-    {'tool': 'loom', 'kicker': 'Loom', 'label': 'Se lo mostramos'},
-    {'tool': 'hs-icon:sales', 'kicker': 'HubSpot', 'label': 'Pruebas controladas'},
+    {'tool': 'teams', 'kicker': 'Microsoft Teams', 'label': 'Video del cambio'},
+    {'tool': 'microsoft-365', 'kicker': 'Microsoft 365', 'label': 'Acta en SharePoint'},
+    {'tool': 'hs-icon:sales', 'kicker': 'HubSpot', 'label': 'Cuenta de pruebas'},
+    {'tool': 'microsoft-365', 'kicker': 'Microsoft 365', 'label': 'Aviso por Outlook'},
 ]
 add('F13-cambios', 'content-day-release-cycle', d, '13 · cambios controlados')
 
@@ -412,6 +449,32 @@ add('F17-equipo', 'section-cine-team', d, '17 · equipo')
 # 18 · Costo total: retirada el 06/11. Licencias HubSpot, onboarding US$ 0 y servicios ya están en 19; las licencias
 # Microsoft que falten pasan al cuerpo de 19.
 
+# 18b · Licencias (06/11, Julio: «no estamos proponiendo las licencias, cómo adaptarlas en el modelo económico de
+# HubSpot»). Tres licencias por rol, a precio de lista del portal (05/11): Ventas US$ 100, Principal US$ 50 (la
+# «licencia principal adicional» de Pro), Sólo lectura US$ 0. La oferta económica cotiza 10 de Ventas como techo; el
+# reparto se cierra en F0. Montos con render-pricing-real.ts.
+# Con la inversión en el deck, content-pricing-stage choca con content-pricing-live (variantes): el ahorro por rol va en
+# decision-chart, en papel (growth). Reparto de ejemplo 6 + 2 + 2: US$ 700 contra US$ 1.000 al mes.
+d = base(EX, 'deck-decision-chart-intent.json')
+d['line'] = 'growth'
+d['theme'] = 'light'
+d['voice'] = {'eyebrow': 'Licencias por rol', 'question': 'Una licencia según', 'answer': ['cada rol']}
+d['progress'] = {'sections': 5, 'current': 5}
+d['body'] = 'Ventas para quien vende, Principal para quien registra y sin costo para quien sólo revisa.'
+d['bars'] = [{'label': '10 de Ventas', 'value': 100}, {'label': 'Por rol', 'value': 70}]
+d['annotation'] = '−30 %'
+d['chartNote'] = 'Ejemplo: 6 de Ventas, 2 Principal y 2 de sólo lectura, al mes.'
+src = 'precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento'
+d['figures'] = [
+    {'value': 'US$100', 'label': 'Ventas, al mes', 'source': src},
+    {'value': 'US$50', 'label': 'Principal, al mes', 'source': src},
+    {'value': 'US$0', 'label': 'Sólo lectura', 'source': src},
+    {'value': '3.000', 'label': 'créditos al mes', 'source': src},
+]
+d['selected'] = 2
+d['selection'] = {'target': 'object', 'label': 'Finanzas', 'participantKind': 'department'}
+add('F18b-licencias', 'decision-chart', d, '26 · licencias')
+
 # 19 · Inversión (content-pricing live; montos reales con render-pricing-real.ts, como Assetplan)
 d = base(AP, 'A078-inversion-cotizacion.json')
 d['voice'] = {'eyebrow': 'Inversión', 'question': '¿Cuánto invertimos?', 'answer': ['US$ 9.900']}
@@ -433,6 +496,22 @@ d['chips'] = [
     {'kicker': 'Opción Enterprise', 'text': '+US$ 6.000 al año\nen licencias'},
 ]
 add('F19-inversion', 'content-pricing-live', d, '19 · inversión')
+
+# 19b · Retorno (06/11, Julio: «precio, retorno de inversión»). Sin cifras de promesa: cada métrica con fórmula, fuente y
+# dueño, y la línea base del descubrimiento.
+d = base(EX, 'deck-content-measure-formulas-intent.json')
+d['use'] = 'proposal'
+d['voice'] = {'eyebrow': 'Retorno', 'question': '¿Cómo sabremos que rinde?', 'answer': ['Lo', 'medimos']}
+d['body'] = 'Cada métrica con su fórmula, su fuente y un **dueño**; la línea base sale del descubrimiento.'
+d['note'] = 'Sin cifras de promesa: la línea base se mide en el descubrimiento'
+d['metrics'] = [
+    {'glyph': 'medicion', 'name': 'Adopción', 'formula': 'Vendedores activos cada semana ÷ licencias de ventas', 'source': 'HubSpot', 'owner': 'Gerencia Comercial'},
+    {'glyph': 'reloj', 'name': 'Reportes a mano', 'formula': 'Horas al mes armando reportes en Excel', 'source': 'Inventario del descubrimiento', 'owner': 'Gerencia Comercial'},
+    {'glyph': 'checklist', 'name': 'Sin contacto', 'formula': 'Clientes activos sin actividad en el período ÷ total', 'source': 'HubSpot', 'owner': 'Cada vendedor'},
+    {'glyph': 'base-de-datos', 'name': 'Fichas completas', 'formula': 'Fichas técnicas completas ÷ clientes activos', 'source': 'HubSpot', 'owner': 'Administración del CRM'},
+    {'glyph': 'integracion', 'name': 'Pipeline al día', 'formula': 'Oportunidades con próximo paso y fecha ÷ abiertas', 'source': 'HubSpot', 'owner': 'Gerencia Comercial'},
+]
+add('F19b-retorno', 'content-measure-formulas', d, '28 · retorno')
 
 # 20 · Próximos pasos
 d = base(AP, 'A08-pasos.json')
@@ -456,7 +535,17 @@ add('F21-contraportada', 'close-proposal-horizon', d, '21 · contraportada')
 
 # 06/11: las bases (§11) piden la oferta técnica y la económica por separado. La inversión se compone, pero queda fuera
 # del plan técnico: va con la oferta económica y en la presentación de adjudicación.
-ECONOMICA = {'F19-inversion'}
+# 06/11 (tarde), Julio: «lo que calma a un comité de compra es el precio, el retorno, la adopción, la migración y que el
+# CRM se adapte a sus procesos… no se trata de responder las bases». La inversión vuelve al deck; al subir a Wherex
+# las láminas 26 a 28 van en el archivo de la oferta económica (§11).
+ECONOMICA = set() | RETIRADAS
+ORDEN = ['F01-portada', 'F02-entendimos', 'F03-cubre', 'F04-por-que-hubspot', 'F04c-proceso', 'F05-ficha',
+         'F08-automatizaciones', 'F08b-reportes', 'F08c-movil', 'F06-integraciones', 'F07-migracion', 'F07b-adopcion',
+         'F14-capacitacion', 'F12-cronograma', 'F13-cambios', 'F17-equipo', 'F09-seguridad', 'F09b-zero-trust',
+         'F09c-matriz', 'F09d-disponibilidad', 'F09e-continuidad', 'F10-residencia', 'F11-salida', 'F15-soporte',
+         'F16-operacion', 'F18b-licencias', 'F19-inversion', 'F19b-retorno', 'F20-pasos', 'F21-contraportada', 'F09f-controles']
+assert sorted(ORDEN) == sorted(k for k, *_ in slides), set(ORDEN) ^ {k for k, *_ in slides}
+slides.sort(key=lambda t: ORDEN.index(t[0]))
 plan = {'document': 'proposal', 'line': 'revenue-hubspot', 'slides': []}
 # 06/11, comentario de Julio en el canvas: «cuando esto comienza en minúscula no se ve bien». El destacado (la esfera)
 # arranca siempre con mayúscula, aunque continúe la frase del anillo.

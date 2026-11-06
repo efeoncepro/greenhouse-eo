@@ -8,9 +8,9 @@
   "recipe": "content-service-lanes",
   "voice": {
     "eyebrow": "Nuestra propuesta · Sales Hub Professional",
-    "question": "Las seis necesidades de las bases,",
+    "question": "Proponemos un CRM hecho para",
     "answer": [
-      "Cubiertas"
+      "Exportar"
     ]
   },
   "lanes": [

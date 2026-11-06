@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-measure-formulas",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Retorno",
+    "question": "¿Cómo sabremos que rinde?",
+    "answer": [
+      "Lo",
+      "medimos"
+    ]
+  },
+  "body": "Cada métrica con su fórmula, su fuente y un **dueño**; la línea base sale del descubrimiento.",
+  "note": "Sin cifras de promesa: la línea base se mide en el descubrimiento",
+  "metrics": [
+    {
+      "glyph": "medicion",
+      "name": "Adopción",
+      "formula": "Vendedores activos cada semana ÷ licencias de ventas",
+      "source": "HubSpot",
+      "owner": "Gerencia Comercial"
+    },
+    {
+      "glyph": "reloj",
+      "name": "Reportes a mano",
+      "formula": "Horas al mes armando reportes en Excel",
+      "source": "Inventario del descubrimiento",
+      "owner": "Gerencia Comercial"
+    },
+    {
+      "glyph": "checklist",
+      "name": "Sin contacto",
+      "formula": "Clientes activos sin actividad en el período ÷ total",
+      "source": "HubSpot",
+      "owner": "Cada vendedor"
+    },
+    {
+      "glyph": "base-de-datos",
+      "name": "Fichas completas",
+      "formula": "Fichas técnicas completas ÷ clientes activos",
+      "source": "HubSpot",
+      "owner": "Administración del CRM"
+    },
+    {
+      "glyph": "integracion",
+      "name": "Pipeline al día",
+      "formula": "Oportunidades con próximo paso y fecha ÷ abiertas",
+      "source": "HubSpot",
+      "owner": "Gerencia Comercial"
+    }
+  ]
+}

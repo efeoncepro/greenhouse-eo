@@ -197,6 +197,14 @@ por el comprador se cumple al preparar la presentación formal. Contrato de hand
 14. **Cierra con revisión visual completa.** Después de componer, inspecciona todos los frames
     exportados de cada deck y verifica recortes, legibilidad, jerarquía, condiciones fiscales, assets
     y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
+15. **La propuesta se estructura por lo que calma al comité, no por el índice de las bases** (Julio,
+    06/11/2026, Fiordo Austral: «esto no se trata de responder las bases… las bases sirven de línea base»).
+    En un CRM eso es: el precio, el retorno, cómo se facilita la adopción, cómo se facilita la migración y
+    cómo el CRM se ajusta a sus procesos. Las bases se usan como checklist de cobertura, y su detalle
+    (requisito por requisito) va en los anexos y la matriz. Cada lámina propone algo: «proponemos», «su
+    proceso», «se mide», nunca «cubierto» o «cumple». Las licencias se proponen por rol dentro del modelo del
+    fabricante (en HubSpot: Ventas, Principal y Sólo lectura sin costo), y el retorno se muestra con
+    métricas con fórmula, fuente y dueño, sin cifras de promesa.
 
 ### Oferta económica documental rápida para licitación
 

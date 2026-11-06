@@ -1,0 +1,8 @@
+{
+  "replace": [
+    { "from": "Fuente", "to": "Entra desde", "count": 5 },
+    { "from": "Perfil unificado", "to": "Microsoft Entra ID", "count": 1 },
+    { "from": "asset-ref:file:hubspot-icon-data", "to": "asset-ref:file:microsoft-entra-mfa", "count": 1 }
+  ],
+  "assets": { "file:microsoft-entra-mfa": "../assets/microsoft-entra-mfa.svg" }
+}

@@ -1,0 +1,63 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-chart",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Licencias por rol",
+    "question": "Una licencia según",
+    "answer": [
+      "Cada rol"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 5
+  },
+  "body": "Ventas para quien vende, Principal para quien registra y sin costo para quien sólo revisa.",
+  "bars": [
+    {
+      "label": "10 de Ventas",
+      "value": 100
+    },
+    {
+      "label": "Por rol",
+      "value": 70
+    }
+  ],
+  "annotation": "−30 %",
+  "chartNote": "Ejemplo: 6 de Ventas, 2 Principal y 2 de sólo lectura, al mes.",
+  "figures": [
+    {
+      "value": "US$100",
+      "label": "Ventas, al mes",
+      "source": "precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento"
+    },
+    {
+      "value": "US$50",
+      "label": "Principal, al mes",
+      "source": "precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento"
+    },
+    {
+      "value": "US$0",
+      "label": "Sólo lectura",
+      "source": "precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento"
+    },
+    {
+      "value": "3.000",
+      "label": "créditos al mes",
+      "source": "precio de lista de HubSpot, portal Efeonce, 05/11/2026; el reparto se cierra en el descubrimiento"
+    }
+  ],
+  "selected": 2,
+  "selection": {
+    "target": "object",
+    "label": "Finanzas",
+    "participantKind": "department"
+  }
+}
