@@ -713,6 +713,9 @@ que el logo no esté encima de las cabezas, que haya full espacio arriba».
   **En revisión** (Julio, 2026-11-06): `rf-entregar.cjs … --revision` copia además las 32 a `BLACK SKY 2026 - PARA REVISION/`
   con la misma estructura y su `LEEME.txt` lista las rutas y lo que falta confirmar. Es el criterio de `split.py`: la
   entrega directa queda y la carpeta de estado la acompaña. Al aprobarse, cada pieza se mueve a `- APROBADO`.
+  **Notion:** las 32 subtareas de pieza en «Listo para revisión» con «Fecha de envío a revisión» 2026-11-06. Son 22 de
+  «Rutas foco (KV LISTO)» (`DOM|INTER · <Destino> (IATA) — POPUP|STORY`) y 10 de «Rutas foco INTER» de BLACK SKY PE 26
+  (`Post` = popup y `Story` bajo cada ciudad). Las tareas agrupadoras (madre y ciudades) no se tocaron.
 - **Pendiente:** precios y descuentos en 000 / 00 % (no están en Notion); el origen de Chile; las fechas del pie.
 
 ## 5. KV fijo: `render.cjs` + `patches.cjs`
