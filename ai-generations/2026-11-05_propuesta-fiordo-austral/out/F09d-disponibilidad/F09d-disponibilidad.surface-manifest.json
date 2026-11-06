@@ -241,10 +241,10 @@
     "selection": [],
     "icons": [],
     "photo": {
-      "register": null,
+      "register": "documental",
       "subject": "person",
-      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png",
-      "alt": "Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA14e-guardia-disponibilidad.png",
+      "alt": "En la mesa de soporte de Efeonce, un especialista revisa en el monitor el historial de disponibilidad del CRM",
       "native": null,
       "focus": null,
       "emblem": "compose-from-axis-brand-assets"

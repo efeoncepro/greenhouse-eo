@@ -28,9 +28,9 @@
           "columnWidth": "--gl-column-width=976.84px"
         },
         "photo": {
-          "src": "asset-ref:plate:HS5b-licencias-justas",
-          "lensSrc": "asset-ref:plate:HS5b-licencias-justas",
-          "alt": "Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul"
+          "src": "asset-ref:plate:FA14e-guardia-disponibilidad",
+          "lensSrc": "asset-ref:plate:FA14e-guardia-disponibilidad",
+          "alt": "En la mesa de soporte de Efeonce, un especialista revisa en el monitor el historial de disponibilidad del CRM"
         },
         "orbit": {
           "src": "asset-ref:layer:measure-999-revenue-hubspot"

@@ -293,7 +293,11 @@ d['figures'] = [
     {'value': '99,95 %', 'label': 'meta mensual de HubSpot', 'source': 'Términos de servicio de HubSpot'},
     {'value': '≤ 1 h', 'label': 'respuesta Efeonce en S1', 'source': 'SLA de esta propuesta'},
 ]
-d['photo'] = {'subject': 'person', 'plateRef': 'ai-generations/2026-10-06_deck-hubspot/fotos/plates/HS5b-licencias-justas.png', 'alt': 'Una especialista de Efeonce enciende una a una las casillas de una grilla de luz azul'}
+# 06/11, Julio: «la imagen está forzada… ni siquiera está en el lente, su cara se corta; el lente tiene que tener un
+# propósito». HS5b venía de la lámina de licencias del deck HubSpot. La receta pide el oficio detrás de la cifra, dentro
+# del círculo: FA14 es la guardia de soporte revisando el historial de disponibilidad (FA14e = FA14 con el lienzo ampliado y centrado hacia
+# arriba con foto:expandir para que el lente encierre la cabeza completa y la pantalla del historial, y una edición que borró la costura).
+d['photo'] = {'register': 'documental', 'subject': 'person', 'plateRef': 'ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA14e-guardia-disponibilidad.png', 'alt': 'En la mesa de soporte de Efeonce, un especialista revisa en el monitor el historial de disponibilidad del CRM'}
 add('F09d-disponibilidad', 'content-measure', d, '13 · disponibilidad')
 
 # 09e · Continuidad e incidentes
