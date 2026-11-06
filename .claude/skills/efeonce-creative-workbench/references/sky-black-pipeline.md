@@ -497,7 +497,7 @@ segunda revisión; desde la octava ronda (2026-11-06, §4.9) las 30 piezas está
   piezas y «- PARA REVISION» sólo con `BS_STORY_PCL.png` + LEEME. Canvas versión 53 (sólo cambió esa imagen).
 - **Cierre (2026-11-06):** Daniela aprobó también la story corregida de Pucallpa (vía Julio). `split.py` quedó con las
   30 piezas en `A`: «APROBADO» tiene las 30 y «PARA REVISION» sólo un LEEME que lo dice. Las rutas foco no tienen
-  pendientes de diseño; faltan las cifras de SKY (§19).
+  pendientes de diseño; faltan las cifras de SKY (§19) Brief y corte del harness del Workbench al día en `main` (PR #37, `0ee2bfa`).
 - Workbench: contrato de fotos re-admitido y **mergeado en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`; conciliado: árbol
   idéntico, gates y pruebas en verde, story byte a byte igual); la
   story que arma el Workbench coincide con la del taller (media 0,13/255). El admisor fallaba al re-admitir (archivos en

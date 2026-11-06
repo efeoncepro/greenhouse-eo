@@ -11,8 +11,8 @@ sube ~130 px; queda ~30 px bajo el logo). `split.py` mueve piezas entre carpetas
 contrato de fotos + admisor idempotente **mergeados en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`;
 conciliado: árbol idéntico, gates y pruebas en verde, story byte a byte igual). Pendiente: visto bueno de Daniela a la
 story de Pucallpa. **Cerrado el mismo día:** Daniela la aprobó (vía Julio); `split.py` con las 30 en `A`, «APROBADO» 30 y
-«PARA REVISION» sólo LEEME. Docs y skills sin pendientes de diseño; brief del Workbench en rama
-`claude/sky-black-2026-aprobadas` (`1998397`), sin push. Sólo faltan las cifras de SKY.
+«PARA REVISION» sólo LEEME. Docs y skills sin pendientes de diseño; brief del Workbench mergeado en
+`main` (PR efeoncepro/creative-workbench#37, squash `0ee2bfa`; árbol idéntico a la rama, CI en verde). Sólo faltan las cifras de SKY.
 
 ## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con sus cifras
 
