@@ -19,7 +19,7 @@ subir): [producción de imágenes de noviembre](LOTE_NOVIEMBRE_2026_PRODUCCION_I
 También el 05-11 quedó lista la proyección a 24 meses y el aporte del blog a la venta pedidos en el kickoff (informe,
 planilla de búsquedas valorizadas y correo, sin enviar): [proyección](caso-auditoria-2026-10/PROYECCION_2026-11.md).
 El 06-11 quedó propuesto el lote de diciembre (25 reescrituras y 15 nuevos, con país del lector, ruta activa y
-calendario), sin cargar en el Content Hub ni aprobar: [lote de diciembre](LOTE_DICIEMBRE_2026_PLAN.md).
+calendario), cargado el mismo día en el Content Hub como «Idea», sin aprobación de SKY: [lote de diciembre](LOTE_DICIEMBRE_2026_PLAN.md).
 
 ## Resultado y alcance
 
