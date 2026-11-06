@@ -66,6 +66,9 @@ function sombra(W, H) {
 // 2026-11-05: «el gradiente marrón de abajo lo dejaría en negro»).
 function piso(W, H, y0, y1, a, c = '#2a1608') {
   if (SUTIL && c === '#2a1608' && DEST[actual]) a = 0; // PISO_SUTIL: sin el degradado marrón en las piezas con foto de destino
+  // Doceava ronda (Daniela: «cambiarlo a negro y hacerlo más sutil, 10 o 15 %»): en las piezas con la foto del kit el
+  // marrón pasa a negro al 15 % (el pie del kit va sobre la foto oscura de la mujer, así que basta lo sutil).
+  else if (SUTIL && c === '#2a1608') { c = '#000'; a = Math.min(a, 0.15); }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" x2="0" y1="${y0 / H}" y2="${y1 / H}"><stop offset="0" stop-color="${c}" stop-opacity="0"/><stop offset="1" stop-color="${c}" stop-opacity="${a}"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`;
   return Buffer.from(svg);
 }

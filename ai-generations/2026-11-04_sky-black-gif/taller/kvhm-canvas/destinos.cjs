@@ -129,6 +129,21 @@ function veloListaSvg(caja, id = 'lf-velo-lista') {
 }
 module.exports = { cubrir, credito, velo, veloAlfa, veloListaSvg, DEST };
 
+// Doceava ronda (Daniela, Teams 2026-11-06 18:03, «tres caminos»): con VELO_AUTO=1 el velo superior del KV va sólo si el
+// fondo del logo no es legible a la primera, y con PISO_SUTIL=1 el degradado inferior es negro al 15 % y sólo si el pie
+// es claro (mismos umbrales que compose.cjs para popup y story).
+async function ruidosoKV(img, [x0, y0, x1, y1]) {
+  const w = x1 - x0, g = await sharp(img).extract({ left: x0, top: y0, width: w, height: y1 - y0 }).greyscale().raw().toBuffer();
+  const v = [...g].sort((a, b) => a - b), m = v.reduce((a, b) => a + b, 0) / v.length;
+  const sd = Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length);
+  let e = 0; for (let i = 1; i < g.length; i++) if (i % w) e += Math.abs(g[i] - g[i - 1]); e /= g.length;
+  return v[Math.floor(v.length * 0.8)] > 185 || sd > 25 || e > 1.5;
+}
+async function luzKV(img, [x0, y0, x1, y1]) {
+  const px = await sharp(img).extract({ left: x0, top: y0, width: x1 - x0, height: y1 - y0 }).removeAlpha().raw().toBuffer();
+  const v = []; for (let i = 0; i < px.length; i += 3) v.push(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]);
+  v.sort((a, b) => a - b); return v[Math.floor(v.length * 0.75)];
+}
 if (require.main === module) (async () => {
   const { chromium } = require('/Users/jreye/Documents/greenhouse-eo/node_modules/playwright');
   const { PAGE, CSV, PP, FONTS, ORIGEN } = require(K + '/rutas.cjs');
@@ -206,6 +221,19 @@ if (require.main === module) (async () => {
     }, [foto, !!d.sombra && process.env.SOMBRA === '1', d.cred || '', veloDef, d.capa || null, d.veloLista && process.env.VELO_LISTA === '1' ? veloListaSvg(d.veloLista) : null]);
     r.velo = va;
     if (r.error) throw new Error(n + ': ' + r.error);
+    if (process.env.VELO_AUTO === '1' || process.env.PISO_SUTIL === '1') {
+      const velOn = process.env.VELO_AUTO !== '1' || await ruidosoKV(fotoBuf, [60, 40, 700, 330]);
+      const pisoOn = process.env.PISO_SUTIL !== '1' ? 'kit' : (await luzKV(fotoBuf, [0, 1130, 1080, 1350])) > 120;
+      r.fondos = await p.evaluate(([velOn, pisoOn]) => {
+        const c = document.getElementById('lf-cielo'); if (c) { if (velOn) c.removeAttribute('display'); else c.setAttribute('display', 'none'); }
+        const pr = document.getElementById('lf-piso'), pg = document.getElementById('lf-piso-g');
+        if (pr && pisoOn !== 'kit') {
+          if (!pisoOn) pr.setAttribute('display', 'none');
+          else { pr.removeAttribute('display'); pr.setAttribute('y', '1010'); pr.setAttribute('height', '340'); if (pg) pg.lastElementChild.setAttribute('stop-opacity', '.15'); }
+        }
+        return { velo: !!velOn, piso: pisoOn };
+      }, [velOn, pisoOn]);
+    }
     // «Vuela por el Perú» (fila del CSV): legal, origen, PromPerú y ubicación como en las rutas.
     if (d.promperu && !svg.includes('id="ruta"')) {
       const row = CSV.find((x) => x.d === 'Vuela por el Perú');

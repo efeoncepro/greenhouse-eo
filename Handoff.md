@@ -36,6 +36,7 @@
 - Canvas versión 65: caras libres del logo (story PE internacional y popup AR Lima, este también en OneDrive).
 - **Aprobado por Daniela (2026-11-06): todas las piezas del lote GIF + POPUP.** Grupo cerrado.
 - Onceava ronda (Dianesty, Frame V3 + Teams): difuminado B aprobado en todas (default de destinos.cjs), MP4 en BT.709 (color del logo), píldora centrada, Uruguay con lista con nombres. OneDrive + canvas v68. Pendientes de Dianesty: Buenos Aires en USA, Miami en Uruguay. Supuesto: «DESDE MONTEVIDEO». Skill §4.13.
+- Doceava ronda (Teams, Dianesty y Daniela): sin sombras de texto, píldora con avión adaptativa (35 px, pildora.cjs), velo y piso sólo donde hacen falta (VELO_AUTO/PISO_SUTIL también en el KV), fotos adaptadas donde no alcanzaba (adaptar-foto.cjs). OneDrive + canvas v72. Skill §4.14.
 
 ## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
 

@@ -704,6 +704,28 @@ Comentarios leídos en Frame (V3, https://f.io/noHToa-i, 20 activos) y en el cha
   `BS_GIF_*_AUDIO.mp4` de las 10 carpetas, y popup y story de las 15 rutas de Perú. Canvas principal versión 68 (otra
   sesión publicó la 66 y 67: se reemplazaron sólo imágenes y tableros `g-gif`, sin tocar `canvas.json`).
 
+### 4.14 Doceava ronda (2026-11-06, noche: Dianesty y Daniela en Teams)
+
+- **Sin sombras de texto** (Dianesty: «le quitamos las sombras»): `banderas.cjs` ya no aplica `lf-sombra-texto`
+  (sólo con `sombraTexto: true`) y la ubicación de las rutas de Perú (`rutas.cjs`) ya no lleva contorno oscuro.
+- **Píldora rosada de origen con avión, adaptativa** (Daniela, regla transversal para todo «badge con avión»):
+  `pildora.cjs` (`PILDORA`), usado por `variantes.cjs` (todas las entradas, también con el marcador «[ORIGEN]») y por
+  `rutas.cjs`. El avión no se mueve y la píldora termina 35 px tras la última letra. Escribe el trazado en
+  coordenadas locales: con coordenadas de pantalla, una píldora dentro de un grupo trasladado se corría 8 px por pasada.
+  Chile nacional pasa a `variantes.cjs` en el lugar con «DESDE SANTIAGO»; se quitó esa línea de `patches.cjs`. La misma
+  regla está en `rutas-foco.cjs`, de la sesión de rutas foco.
+- **Degradados sólo donde hacen falta** («tres caminos»): `VELO_AUTO=1` y `PISO_SUTIL=1`, que la sesión de rutas foco
+  agregó a `compose.cjs`. Ahora también los lee `destinos.cjs` para el KV: `lf-cielo` sólo si el fondo del logo es
+  ruidoso, y `lf-piso` negro al 15 % desde y=1010 sólo si el pie es claro (antes, negro de 0 a 80 % desde y=760). En
+  `compose.cjs`, el marrón de las piezas con foto del kit pasa a negro al 15 %. `ronda12.sh` corre todo con ambos flags.
+- **Adaptar la foto donde no alcanza** (tercer camino): `adaptar-foto.cjs <pieza> [umbral] [factor] [lista|destino]`
+  comprime las luces en la zona de los textos, con borde difuso, y escribe `fotos-destino/<foto>-adapt.png`.
+  `fotos-destino.json` guarda `srcOriginal`. No hay que filtrar por color: un corte para proteger la piel dejó manchas
+  posterizadas en el puente. Se usó con 105 y .35 en Perú internacional y Uruguay (lista), y en Tumbes, Trujillo, Tacna,
+  Cusco, Chiclayo, PE Encuentra y Vuela por el Perú (destino). Criterio: p75 de la luz tras el destino > 160.
+- Entregado: lote (popup + MP4 con audio, BT.709) y rutas de Perú (popup + story) en OneDrive BLACK SKY 2026. Canvas
+  principal versión 72: sólo imágenes y tableros `g-gif`; `canvas.json` es de la sesión de rutas foco.
+
 ### 4.13 Rutas foco de Chile y Perú internacional (2026-11-06): sólo popup y story
 
 Pedido de Daniela (Teams, 1:1 con Julio, 2:00–4:01 p. m.; listas en Notion): «las rutas foco que te pasé, sólo en Chile y

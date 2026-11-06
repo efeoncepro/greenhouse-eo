@@ -56,7 +56,7 @@
     ]
   },
   "HM_PE_RUTA_CUSCO": {
-    "src": "CUSCO.png",
+    "src": "CUSCO-adapt.png",
     "s": [
       0.5,
       0.56
@@ -85,7 +85,9 @@
           0.56
         ]
       }
-    }
+    },
+    "srcOriginal": "CUSCO.png",
+    "nota": " Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba."
   },
   "HM_PE_RUTA_IQUITOS": {
     "src": "IQUITOS.png",
@@ -190,7 +192,7 @@
     }
   },
   "HM_PE_RUTA_TACNA": {
-    "src": "TACNA.png",
+    "src": "TACNA-adapt.png",
     "s": [
       0.32,
       0.6
@@ -204,7 +206,9 @@
           0.5
         ]
       }
-    }
+    },
+    "srcOriginal": "TACNA.png",
+    "nota": " Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba."
   },
   "HM_PE_RUTA_TARAPOTO": {
     "src": "TARAPOTO.png",
@@ -227,7 +231,7 @@
     }
   },
   "HM_PE_RUTA_TRUJILLO": {
-    "src": "TRUJILLO.png",
+    "src": "TRUJILLO-adapt.png",
     "s": [
       0.5,
       0.5
@@ -240,15 +244,19 @@
           0.625
         ]
       }
-    }
+    },
+    "srcOriginal": "TRUJILLO.png",
+    "nota": " Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba."
   },
   "HM_PE_RUTA_TUMBES": {
-    "src": "TUMBES.png",
+    "src": "TUMBES-adapt.png",
     "s": [
       0.5,
       0.5
     ],
-    "cred": "© PROMPERÚ"
+    "cred": "© PROMPERÚ",
+    "srcOriginal": "TUMBES.png",
+    "nota": " Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba."
   },
   "HM_AR_KV_SANTIAGO": {
     "src": "US_SANTIAGO.jpg",
@@ -318,7 +326,7 @@
     }
   },
   "HM_PE_RUTA_CHICLAYO": {
-    "src": "CHICLAYO.png",
+    "src": "CHICLAYO-adapt.png",
     "s": [
       0.72,
       0.63
@@ -348,15 +356,18 @@
         "z": 1.05,
         "lift": 0.15
       }
-    }
+    },
+    "srcOriginal": "CHICLAYO.png",
+    "nota": " Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba."
   },
   "HM_UY_KV_BANDERAS": {
-    "src": "UY_SANTIAGO.jpg",
+    "src": "UY_SANTIAGO-adapt.png",
     "s": [
       0.6,
       0.5
     ],
-    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto de Santiago según el brandlift, con espacio para el logo. Banco «IA Marca/SANTIAGO.jpg»."
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto de Santiago según el brandlift, con espacio para el logo. Banco «IA Marca/SANTIAGO.jpg». Doceava ronda: foto adaptada (adaptar-foto.cjs: luces comprimidas en la zona de la lista) en vez de sombra de texto, tercer camino de Daniela.",
+    "srcOriginal": "UY_SANTIAGO.jpg"
   },
   "HM_US_KV_BANDERAS": {
     "src": "US_PLAZA.png",
@@ -368,12 +379,12 @@
     "sombra": true
   },
   "HM_PE_KV_INTER_BANDERAS": {
-    "src": "PE_BUENOS_AIRES.png",
+    "src": "PE_BUENOS_AIRES-adapt.png",
     "s": [
       0.65,
       0.5
     ],
-    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Buenos Aires mientras tanto, según el brandlift, con espacio a la izquierda. Banco 03_ARGENTINA/BUE «Imagen de ChatGPT 29 sept 2026, 16_43_50» (Puerto Madero, Puente de la Mujer).",
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): Buenos Aires mientras tanto, según el brandlift, con espacio a la izquierda. Banco 03_ARGENTINA/BUE «Imagen de ChatGPT 29 sept 2026, 16_43_50» (Puerto Madero, Puente de la Mujer). Doceava ronda: foto adaptada (adaptar-foto.cjs: luces comprimidas en la zona de la lista) en vez de sombra de texto, tercer camino de Daniela.",
     "sombra": true,
     "f": {
       "story": {
@@ -382,16 +393,18 @@
           0.5
         ]
       }
-    }
+    },
+    "srcOriginal": "PE_BUENOS_AIRES.png"
   },
   "HM_PE_KV_ENCUENTRA": {
-    "src": "PE_FAMILIA.png",
+    "src": "PE_FAMILIA-adapt.png",
     "s": [
       0.74,
       0.55
     ],
-    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto vivencial de una familia haciendo turismo en Perú, con espacio a la izquierda. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio: familia en Sacsayhuamán, Cusco. Prompt y descarte v1 en ai-generations/2026-11-04_sky-black-gif/foto-familia-peru/.",
-    "sombra": true
+    "nota": "Novena ronda (Daniela, Frame 2026-11-06): foto vivencial de una familia haciendo turismo en Perú, con espacio a la izquierda. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio: familia en Sacsayhuamán, Cusco. Prompt y descarte v1 en ai-generations/2026-11-04_sky-black-gif/foto-familia-peru/. Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba.",
+    "sombra": true,
+    "srcOriginal": "PE_FAMILIA.png"
   },
   "HM_CL_KV_INTER_CLUSTER": {
     "src": "CL_PUNTA_CANA.png",
@@ -412,13 +425,14 @@
     "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): familia en el interior de Chile (Calama), según el brandlift; la misma en GIF y POP-up. Generada con el maestro SKY Personas (compose.py del Workbench) y GPT Image 2.5 Sunburst high 1024×1536, clave personal, aprobada por Julio (la del banco, 16:9, dejaba la lista sobre la familia). Prompt en ai-generations/2026-11-04_sky-black-gif/foto-familia-calama/."
   },
   "HM_PE_KV_DOM_REGIONES": {
-    "src": "PE_MACHU_PICCHU.jpg",
+    "src": "PE_MACHU_PICCHU-adapt.png",
     "s": [
       0.8,
       0.5
     ],
     "sombra": true,
-    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): foto de Cusco con espacio para textos y logo; la misma en GIF y POP-up. Banco 02_PERU/CUZ «sky-chica-vivencial-machu-picchu-4k-3840x2160» (reducida a 2400 px). Sin PromPerú ni ubicación (siguen fuera desde la novena ronda)."
+    "nota": "Décima ronda (Daniela, Frame V2 2026-11-06): foto de Cusco con espacio para textos y logo; la misma en GIF y POP-up. Banco 02_PERU/CUZ «sky-chica-vivencial-machu-picchu-4k-3840x2160» (reducida a 2400 px). Sin PromPerú ni ubicación (siguen fuera desde la novena ronda). Doceava ronda: foto adaptada en la zona del destino (adaptar-foto.cjs) porque el piso sutil no alcanzaba.",
+    "srcOriginal": "PE_MACHU_PICCHU.jpg"
   },
   "HM_CL_DOM_RUTA_CONCEPCION": {
     "src": "RF_CCP.jpg",

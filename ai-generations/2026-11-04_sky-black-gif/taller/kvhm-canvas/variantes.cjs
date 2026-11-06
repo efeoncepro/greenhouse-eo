@@ -18,6 +18,7 @@ const PERU = {
   SELVA: [['Iquitos', 'IQUITOS.png'], ['Pto Maldonado', 'PTO_MALDONADO.png'], ['Pucallpa', 'PUCALLPA.png'], ['Tarapoto', 'TARAPOTO.png']]
 };
 const sharp = require('/Users/jreye/Documents/greenhouse-eo/node_modules/sharp');
+const { PILDORA } = require(K + '/pildora.cjs');
 const V = {
   // Novena ronda (Daniela, Frame): el genérico de Perú internacional dice «Vuela internacional» por ahora, no
   // «Vuela a Calama» (texto de relleno del kit). Va primero: HM_PE_KV_ENCUENTRA nace de este archivo.
@@ -30,6 +31,8 @@ const V = {
   // Décima ronda (Daniela, Frame V2): origen Miami en «Fly International» (popup y GIF). Edición en el lugar del KV de
   // banderas (banderas.cjs): idempotente, la segunda pasada no encuentra «FROM [ORIGEN]» y no toca nada.
   HM_US_KV_BANDERAS: { base: 'HM_US_KV_BANDERAS.svg', t: [], origen: 'FROM MIAMI' },
+  // Chile nacional: el origen Santiago pasa de patches.cjs a la píldora adaptativa (edición en el lugar, idempotente).
+  HM_CL_KV_DOM_CLUSTER: { base: 'HM_CL_KV_DOM_CLUSTER.svg', t: [], origen: 'DESDE SANTIAGO' },
   // Onceava ronda: Uruguay deja la fila de banderas por la lista con nombres; vuelve la píldora, con su origen.
   HM_UY_KV_BANDERAS: { base: 'HM_UY_KV_BANDERAS.svg', t: [], origen: 'DESDE MONTEVIDEO' },
   HM_BR_KV_SANTIAGO: { base: 'HM_BR_KV.svg', t: [['Internacional', 'Santiago']], alianza: 'chileTravel' },
@@ -65,24 +68,9 @@ const V = {
       if (ts.length) { ts[0].textContent = a; for (let i = 1; i < ts.length; i++) ts[i].remove(); } else el.textContent = a;
       return de + ' → ' + a;
     }), cfg.t);
-    if (cfg.origen) res.push(await p.evaluate((txt) => {
-      // Acepta el marcador del kit o un origen ya puesto (re-corridas sobre KV editados en el lugar, como el de USA).
-      const el = [...document.querySelectorAll('text')].find((e) => /^(DESDE|FROM) (\[ORIGEN\]|[A-ZÁÉÍÓÚÑ ]+)$/.test(e.textContent.replace(/\s+/g, ' ').trim()) && Math.abs(e.getBoundingClientRect().y - 1118) < 30);
-      if (!el) return 'origen: NO';
-      el.textContent = txt; el.setAttribute('font-size', '25');
-      const pill = [...document.querySelectorAll('path')].find((e) => /^M61\.83,1132\.41c0-17\.67,14\.33-32,32-32h[\d.]+/.test(e.getAttribute('d') || ''));
-      if (!pill) return 'origen: sin píldora';
-      // Onceava ronda (Dianesty, Frame V3: «centrar textos de caluga lila»): ícono + texto centrados en la píldora, con el
-      // mismo aire a cada lado. El aire es el que el kit deja a la izquierda del ícono; la píldora se ajusta a esa medida.
-      const R = (e) => e.getBoundingClientRect(), pb = R(pill), tb = R(el); // el lienzo se carga a 1080×1350: px de pantalla = px del KV
-      const icono = [...document.querySelectorAll('path, g')].filter((e) => e !== pill && !e.contains(el) && !e.contains(pill)).map(R)
-        .filter((b) => b.width > 8 && b.width < 60 && b.x > pb.x && b.x + b.width < tb.x && b.y > pb.y - 2 && b.y + b.height < pb.y + pb.height + 2)
-        .sort((a, b) => a.x - b.x)[0];
-      if (!icono) return 'origen: sin ícono';
-      const aire = icono.x - pb.x, h = tb.x + tb.width + aire - pb.x - 64;
-      pill.setAttribute('d', pill.getAttribute('d').replace(/h[\d.]+c17\.67/, 'h' + h.toFixed(2) + 'c17.67'));
-      return 'origen → ' + txt + ' (aire ' + aire.toFixed(1) + ' px a cada lado)';
-    }, cfg.origen));
+    // Píldora de origen con avión (Daniela, Teams 2026-11-06 17:57): reemplaza el centrado de la onceava ronda. El avión
+    // queda fijo y la píldora termina 35 px tras la última letra, también con el marcador «DESDE [ORIGEN]» (pildora.cjs).
+    res.push(await p.evaluate(PILDORA, { txt: cfg.origen || null }));
     let add = '';
     if (cfg.alianza) {
       // Logo de la alianza arriba a la derecha, sobre el cielo y lejos del avión y del rostro.

@@ -39,7 +39,9 @@ const PAGE = {
     }
     return n;
   },
-  // Píldora de origen: reemplaza «DESDE [ORIGEN]» y la recentra en el mismo espacio.
+  // Píldora de origen: reemplaza «DESDE [ORIGEN]» y la recentra en el mismo espacio (doceava ronda: la píldora la ajusta
+  // pildora.cjs después, con el avión fijo y 35 px tras la última letra). Sin contorno oscuro en la ubicación: Dianesty
+  // pidió quitar las sombras de los textos.
   origen: (txt) => {
     const el = [...document.querySelectorAll('text')].find((e) => e.textContent.replace(/\s+/g, ' ').trim() === 'DESDE [ORIGEN]');
     if (!el) return 'sin origen';
@@ -55,7 +57,7 @@ const PAGE = {
     const ppW = 1928, ppH = 724, h = 68, w = ppW * h / ppH, x = 1080 - 48 - w, y = 56;
     const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
     const add = `<g id="ruta" data-capa="alianza"><image x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${h}" href="data:image/png;base64,${pp}"/>`
-      + `<g id="ruta-ubic" data-capa="ubicacion"><text id="ubicacion" x="${1080 - 48}" y="${y + h + 34}" text-anchor="end" fill="#fff" font-family="Metric-Bold, Metric" font-weight="700" font-size="18" letter-spacing=".5" style="paint-order:stroke" stroke="rgba(0,0,0,.25)" stroke-width="3">${esc(ubic)}</text></g></g>`;
+      + `<g id="ruta-ubic" data-capa="ubicacion"><text id="ubicacion" x="${1080 - 48}" y="${y + h + 34}" text-anchor="end" fill="#fff" font-family="Metric-Bold, Metric" font-weight="700" font-size="18" letter-spacing=".5">${esc(ubic)}</text></g></g>`;
     document.querySelector('svg').insertAdjacentHTML('beforeend', add);
     const t = document.getElementById('ubicacion'), bb = t.getBBox(), cx = bb.x - 12, cy = bb.y + bb.height / 2;
     t.insertAdjacentHTML('beforebegin', `<path d="M${cx},${cy + 9} C${cx - 7},${cy + 1} ${cx - 7},${cy - 2} ${cx - 7},${cy - 3} a7,7 0 1 1 14,0 c0,1 0,4 -7,12z" fill="#26de00"/><circle cx="${cx}" cy="${cy - 3}" r="2.6" fill="#1f3550"/>`);
@@ -86,7 +88,7 @@ if (require.main === module) (async () => {
       return el.getBBox().width;
     }, r.d);
     const nLegal = await p.evaluate(PAGE.legal, r.legal);
-    const wOrigen = await p.evaluate(PAGE.origen, ORIGEN);
+    const wOrigen = await p.evaluate(require(K + '/pildora.cjs').PILDORA, { txt: ORIGEN });
     await p.evaluate(PAGE.alianza, [pp, ubic]);
     const out = await p.evaluate(() => { const s = document.querySelector('svg'); s.removeAttribute('width'); s.removeAttribute('height'); return new XMLSerializer().serializeToString(s); });
     await p.close();

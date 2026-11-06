@@ -15,7 +15,7 @@ const KVS = {
   // Onceava ronda (Dianesty, Frame V3: «sumar los nombres de los destinos: Punta Cana, Chile y sus cnx, Salvador; les
   // confirmo si va Miami»): la fila de banderas bajo «Internacional» pasa a la lista con nombres bajo el logo, como en
   // los demás mercados; Chile con el mismo texto que el resto («Santiago y conexión con 15 destinos», Daniela). Miami queda hasta que Dianesty confirme. La píldora de origen vuelve (variantes.cjs la llena).
-  HM_UY_KV_BANDERAS: { base: 'HM_UY_KV.svg', lista: [['PUJ', 'Punta Cana'], ['CL', 'Santiago y conexión', 'con 15 destinos'], ['BR', 'Salvador'], ['US', 'Miami']], sombraTexto: true }
+  HM_UY_KV_BANDERAS: { base: 'HM_UY_KV.svg', lista: [['PUJ', 'Punta Cana'], ['CL', 'Santiago y conexión', 'con 15 destinos'], ['BR', 'Salvador'], ['US', 'Miami']] }
 };
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
@@ -59,7 +59,7 @@ const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
       });
       // sombraTexto (Uruguay, onceava ronda): sombra fina pegada a las letras, no un velo detrás de la lista (Dianesty pidió
       // quitar el difuminado negro en USA). Hace legible «Salvador» sobre la nube clara del popup.
-      add = cfg.sombraTexto !== false // todas las listas de banderas (onceava ronda: «Buenos Aires» se perdía sobre el puente blanco de Perú)
+      add = cfg.sombraTexto === true // doceava ronda (Dianesty: «le quitamos las sombras» de los textos): apagada en todas
         ? `<filter id="lf-sombra-texto" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2.6" flood-color="#000" flood-opacity=".8"/></filter><g id="lista-banderas">${add.replace(/<text /g, '<text filter="url(#lf-sombra-texto)" ')}</g>`
         : `<g id="lista-banderas">${add}</g>`;
     }

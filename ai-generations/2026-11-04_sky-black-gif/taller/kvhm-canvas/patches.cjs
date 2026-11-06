@@ -26,9 +26,8 @@ P['HM_CL_KV_ENCUENTRA.svg'] = P['HM_CL_KV_INTER_CLUSTER.svg'];
 // precio entre «DESDE» y «Por tramo…»). Se aplica al KV, de modo que popup, story y GIF quedan iguales.
 P['HM_CL_KV_DOM_CLUSTER.svg'] = [
   ['translate(86.87 1048.72)', 'translate(86.87 1070.72)'],
-  ['<text transform="translate(541.23 1082.79)"', '<text transform="translate(541.23 1095.79)"'],
-  // Décima ronda (Daniela, Frame V2): origen Santiago. «SANTIAGO» mide casi lo mismo que «[ORIGEN]» y cabe en la píldora.
-  ['<tspan x="0" y="0">DESDE [ORIGEN] </tspan>', '<tspan x="0" y="0">DESDE SANTIAGO</tspan>']
+  ['<text transform="translate(541.23 1082.79)"', '<text transform="translate(541.23 1095.79)"']
+  // El origen Santiago (décima ronda) vive desde la doceava ronda en variantes.cjs, con la píldora adaptativa.
 ];
 // Costura de la flecha morada (novena ronda, 2026-11-06, Daniela: «una pequeña línea en la flecha morada en la
 // parte de la cola»): la flecha son tres formas que se tocan en x=537,61 y x=918,96, y el antialias deja una línea.
