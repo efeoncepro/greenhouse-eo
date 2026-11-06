@@ -39,10 +39,14 @@ def add(key, recipe_id, intent, purpose):
 # 01 · Portada (dawn, sin pregunta: render-portada.ts de Fiordo + portada-dawn.css)
 d = base(FA, 'F01-portada.json')
 d['voice'] = {'eyebrow': 'Propuesta técnica · LIC-MKT-2026-001', 'question': 'Propuesta', 'answer': ['Marketing', 'digital 2027']}
-d['body'] = 'Preparada para **KSB Chile S.A.** · Noviembre 2026'
+d['body'] = 'Para **KSB Chile S.A.** · Noviembre 2026'
 d['selection'] = {'target': 'client-logo', 'label': 'Efeonce', 'participantKind': 'role'}
 d['clientLogo'] = {'path': 'ai-generations/2026-11-06_propuesta-ksb/assets/ksb-logo-blanco-1200.png', 'alt': 'KSB'}
-add('K01-portada', 'cover-proposal-dawn', d, '01 · portada')
+# 06/11, comentario de Julio en el canvas: «por la cantidad de texto acá sirve más la otra portada»: `orbit` (la órbita
+# gigante sostiene el logo a la derecha; columna a la izquierda), sin pregunta con portada-orbit-decision.css de Fiordo.
+d['layout'] = 'orbit'
+d['column'] = {'topPx': 220}
+add('K01-portada', 'cover-proposal-orbit', d, '01 · portada')
 
 # 02 · Resumen ejecutivo
 d = base(FA, 'F09-seguridad.json')
@@ -225,20 +229,26 @@ d['progress'] = {'sections': SECTIONS, 'current': 5}
 d['voice'] = {'question': 'La inversión, por mes y por', 'answer': ['Servicio']}
 add('K18-seccion-economica', 'section-classic', d, '18 · sección · económica')
 
-# 19 · Económica (montos [MONTO] hasta GO; detalle en anexo A4)
-d = base(EX, 'deck-content-pricing-intent.json')
-d['voice'] = {'eyebrow': 'Económica', 'question': 'Tarifa fija, aparte de', 'answer': ['Los medios']}
-d['body'] = 'Tarifa fija de agencia y una inversión en medios que se gestiona sin margen, en las cuentas de KSB.'
-d['legal'] = 'Valores netos, IVA no incluido. Montos por confirmar en la oferta económica.'
-d['period'] = 'al mes · neto + IVA'
-d['recommended'] = 2
-d['recommendedLabel'] = 'Recomendado'
-d['plans'] = [
-    {'name': 'Esencial', 'tagline': 'Para empezar a medir', 'features': ['SEM de intención alta', 'LinkedIn por cuentas', 'Landings y formularios', 'Tablero mensual']},
-    {'name': 'Integral', 'tagline': 'Los cuatro canales', 'features': ['Todo lo de Esencial', 'Social pagado y redes', 'Contenidos por segmento', 'Medición hasta el cierre', 'Tablero semanal']},
-    {'name': 'Con la red', 'tagline': 'Para sumar la red', 'features': ['Todo lo de Integral', 'Programa para distribuidores', 'Campaña Expomin 2027', 'Revisión trimestral con la gerencia']},
+# 19 · Económica: dos niveles (Julio 06/11: Mínimo y Esencial). La receta nunca imprime montos: van en el anexo A4.
+d = base(EX, 'deck-content-pricing-live-intent.json')
+d['voice'] = {'eyebrow': 'Económica', 'question': 'Dos niveles; medios', 'answer': ['Aparte']}
+d['body'] = 'Esencial cubre las tres líneas; Mínimo, sólo la primera. Los medios se pagan **al costo**, sin comisión.'
+d['quote'] = {
+    'kicker': 'Oferta económica · 12 meses',
+    'title': 'Para KSB Chile',
+    'lines': [
+        {'name': 'Pauta y leads', 'desc': 'SEM, LinkedIn y Meta, landings y MQL a C4C', 'period': '/ mes'},
+        {'name': 'Contenidos y redes', 'desc': 'LinkedIn, Instagram, Facebook y YouTube', 'period': '/ mes'},
+        {'name': 'Medios', 'desc': 'En las cuentas de KSB, al costo', 'period': '/ mes'},
+    ],
+    'totalLabel': 'Total mensual',
+    'tax': 'neto + IVA',
+    'cta': 'Ver anexo económico',
+}
+d['chips'] = [
+    {'kicker': 'Cómo se cobra', 'text': 'Tarifa fija mensual,\nsin comisión sobre medios'},
+    {'kicker': 'Sin sorpresas', 'text': 'Valores netos,\nIVA no incluido'},
 ]
-d['selection'] = {'target': 'object', 'label': 'Finanzas', 'participantKind': 'department'}
 add('K19-economica', 'content-pricing', d, '19 · económica')
 
 # 20 · Próximos pasos

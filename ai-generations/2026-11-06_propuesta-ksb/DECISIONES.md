@@ -19,3 +19,9 @@
   sesión Brochure; revisados a ojo aquí. p34, p20 y p62 no tienen tuteo: van tal cual. El brochure 360° no se tocó.
 - **Pendiente:** logo oficial de KSB para `cover-proposal-orbit`; contenido de las láminas; GO/NO-GO martes 10/11.
 - **2026-11-06 · Composición.** 18 láminas compuestas con `brand:compose` (portada `dawn` con el método de Fiordo) y montadas en el canvas con los 5 insertos. `content-service-lanes` retirada (íconos de producto HubSpot/Salesforce). Pendientes: equipo (16) y certificaciones (21). Detalle en [LEEME.md](LEEME.md).
+- **2026-11-06 · Julio: niveles económicos — «Mínimo y Esencial».** Se presentan dos niveles cotizados con el
+  Cotizador V3 (`pricing/LEEME.md`): Mínimo (sólo pauta y leads, ≈ 62 UF/mes de honorarios) y Esencial (los 7 roles
+  con la frecuencia mínima de las bases, ≈ 193 UF/mes); medios aparte, al costo. Montos en revisión, sin aprobar.
+  **Riesgo:** el Mínimo no cubre contenidos, redes ni el equipo de 7 que exigen las bases. La lámina 19 pasa a
+  `content-pricing` `live` (tres líneas: pauta y leads, contenidos y redes, medios); la receta nunca imprime montos,
+  que van en el anexo económico A4.
