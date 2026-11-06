@@ -1,0 +1,375 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-11-06",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "ksb-ese-creative",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 12,
+    "lines": [
+      {
+        "lineId": "contenido",
+        "profile": "ECG-010",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: línea editorial técnica y calendario",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "social",
+        "profile": "ECG-006",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.25"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: LinkedIn, Instagram y Facebook 2 publicaciones/semana cada una",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "diseno",
+        "profile": "ECG-003",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.25"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: piezas sociales y de pauta (~24/mes)",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "copy",
+        "profile": "ECG-011",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.10"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: textos de publicaciones y anuncios",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "video",
+        "profile": "ECG-018",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.12"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: 1 video/mes para YouTube",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "contenido",
+      "assigneeIds": [
+        "planned-contenido-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "social",
+      "assigneeIds": [
+        "planned-social-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "diseno",
+      "assigneeIds": [
+        "planned-diseno-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "copy",
+      "assigneeIds": [
+        "planned-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "video",
+      "assigneeIds": [
+        "planned-video-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "5",
+      "serviceShare": "0.174",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "5",
+        "allocatedUnits": "0.87"
+      },
+      "reason": "5 asientos, uno por persona; KSB carga 0.87 de 5, la dedicación declarada.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "5",
+      "serviceShare": "0.174",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "5",
+        "allocatedUnits": "0.87"
+      },
+      "reason": "5 asientos, uno por persona; KSB carga 0.87 de 5, la dedicación declarada.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "metricool",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "plan-share-conservative",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Un plan para programar y medir LinkedIn, Instagram, Facebook y YouTube; supuesto conservador: KSB carga el plan completo. Precio histórico: el vigente no tiene monto.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "frame-io",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "0.12",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.12"
+      },
+      "reason": "Revisión de video; KSB carga 0.12 de 1, la dedicación del editor. Precio histórico: el vigente no tiene monto.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.123333333333333333",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "3",
+        "allocatedUnits": "0.37"
+      },
+      "reason": "Diseño y video usan licencias del paquete de tres; KSB carga 0.37 de 3, su dedicación declarada.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "seatCapacity": 3
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "adobe-express",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.083333333333333333",
+      "driver": {
+        "unit": "assigned-user-seat",
+        "totalUnits": "3",
+        "allocatedUnits": "0.25"
+      },
+      "reason": "Redes diseña piezas simples con una licencia de Express del paquete de tres; KSB carga 0.25 de 3.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "seatCapacity": 3
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [
+    "fx:CLP:USD"
+  ]
+}

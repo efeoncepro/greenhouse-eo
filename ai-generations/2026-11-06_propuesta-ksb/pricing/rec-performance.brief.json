@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-06",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "ksb-rec-performance",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "CLP",
+  "periods": 12,
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  },
+  "lines": [
+    {
+      "lineId": "cuenta",
+      "profile": "ECG-016",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.30"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: contraparte única, plan anual, comité mensual y validaciones",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "estrategia",
+      "profile": "ECG-022",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.15"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: estrategia por segmento (minería, agua, riego, distribuidores) y rampa de KPIs",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "paid",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.30"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: Google Search/Demand Gen, LinkedIn y Meta; optimización y presupuesto",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "trafficker",
+      "profile": "ECG-009",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.25"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: montaje, segmentación, lead ads y conversiones",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "leadgen",
+      "profile": "ECG-021",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.25"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: landings, formularios, calificación MQL, traspaso a SAP C4C",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "analitica",
+      "profile": "ECG-031",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.20"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: GA4/GTM, conversiones offline, tablero semanal y reporte mensual",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ]
+}

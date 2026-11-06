@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-06",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "ksb-ese-creative",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "CLP",
+  "periods": 12,
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  },
+  "lines": [
+    {
+      "lineId": "contenido",
+      "profile": "ECG-010",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.15"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: línea editorial técnica y calendario",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "social",
+      "profile": "ECG-006",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.25"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: LinkedIn, Instagram y Facebook 2 publicaciones/semana cada una",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "diseno",
+      "profile": "ECG-003",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.25"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: piezas sociales y de pauta (~24/mes)",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "copy",
+      "profile": "ECG-011",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.10"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: textos de publicaciones y anuncios",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "video",
+      "profile": "ECG-018",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.12"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: 1 video/mes para YouTube",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ]
+}
