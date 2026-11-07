@@ -2,6 +2,22 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-07 — Release `ff6fd900ce` (PR #268): develop completo en producción
+
+- Manifest `ff6fd900cecb-72e0ad96-ab2c-497c-b067-e12073a15402` `released` (08:33:13Z), orquestador `42354847224`, un
+  solo run; break-glass con razón sobre `pgmigrations` (TASK-1833 y TASK-2096 ya aplicadas) + marker
+  `auth_access + cloud_release` en el squash. Smoke de `main` producido, dos gates aprobados, Azure `no_infra_diff`.
+- Workers: cuatro en el target; `ops-worker` y el Job `artifact-worker` change-gated en `71a238c089` con diff de árbol
+  completo sólo docs + `playwright.config.ts`. Watchdog `ok` 6/6, health 200. Canary: `/api/platform/app/spaces` y
+  `/spaces/{id}/services` responden el envelope del lane app (`401 missing_session`); una ruta inexistente da 404.
+  Sin canary autenticado (exige sesión first-party real).
+- Fixes del release: auditor de flags ve `env.FLAG` inyectado (`scripts/ci/lib/flag-reference-scanner.mjs`, 180→204
+  flags, 0 env vars muertas falsas); Playwright `captureGitInfo.diff=false` (el diff de un PR grande reventaba el smoke).
+- Flags: los ocho `INSIGHTS_*` ya estaban ON en Vercel Production y workers. `BRAND_RENDER_ENABLED` queda OFF en
+  Production a propósito: su gate exige canary de staging de los seis catálogos y aprobación propia (TASK-1921).
+- TASK-2096 sigue `in-progress`: falta «revocación durante un write» (TASK-2097/2099) y la migración de consumidores
+  de `spaceId` de sesión (TASK-2100).
+
 ## 2026-11-07 — Hook de implementación Codex V1
 
 Admisión y colaboración alineadas con el [contrato V1](docs/operations/CODEX_EXECUTION_PROMPT_V1.md).
@@ -344,14 +360,3 @@ por el operador (cuenta personal, 200 USD) con `secretAccessor` para `greenhouse
 `clave personal`, ≈ USD 0,006. Regla: generación creativa de agentes con el perfil explícito; producto/runtime/`pnpm dev`
 con la clave de empresa; nunca default en `.env.local` ni en Vercel/workers. Manual
 [alternar-clave-openai.md](docs/manual-de-uso/ai-tooling/alternar-clave-openai.md). Typecheck, lint y 58 pruebas verdes.
-
-## 2026-11-01 — Marca de Efeonce ID aprobada y canonizada en AXIS
-
-«La órbita vive en la D»: asta, tramo recto de 110 y media órbita, esfera Growth a la 1:30 ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
-Generador `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas aprobado); 12 SVG
-`efeonce-id-*` en `axis-brand-assets` 0.4.31 (publicado en el release `v0.4.31`: AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages; 59/59 pruebas del paquete y la del Lab verdes).
-Regla del operador: en el login de Auth sólo favicon y formulario; el panel lateral es del carrusel de novedades.
-Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizadas y espejadas. **Favicon de Auth
-cambiado en `develop`** (teja de Efeonce ID vía `scripts/auth-server/efeonce-id-favicon.ts`; 743 pruebas de
-`src/lib/auth-server` verdes, verificado en el arnés): llega a producción sólo con un release gobernado. Pendiente: fijar
-`axis-brand-assets` ≥ 0.4.31 en Greenhouse (TASK-2014), lockup del formulario y botón «Continuar con Efeonce ID».

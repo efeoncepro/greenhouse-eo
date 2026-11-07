@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `2026-11-06: migraciones aplicadas a la base compartida y verificadas; código en develop sin release a producción. Laboratorio 244/244, pnpm test y pnpm build verdes; resolver = Space de sesión en 7/7 usuarios cliente reales`
+- Status real: `2026-11-07: en producción con el release ff6fd900ce (manifest ff6fd900cecb-72e0ad96, released); migraciones aplicadas y verificadas; lane app /spaces responde en producción. Abierto: revocación durante un write (TASK-2097/2099) y consumidores de spaceId de sesión (TASK-2100)`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`
