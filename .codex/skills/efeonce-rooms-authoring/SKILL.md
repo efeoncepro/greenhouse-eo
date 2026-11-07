@@ -28,27 +28,43 @@ no debe envejecer con él.
 1. **Gate del eval.** Con un cliente real, corre `node scripts/skills/rooms-authoring-eval-freshness.mjs` desde
    greenhouse-eo. Si falla, no armes la sala de ese cliente: el oficio vigente no tiene un recibo PASS. Con datos
    sintéticos en local puedes trabajar igual.
-2. **Canal.** Hoy operas con la CLI `pnpm rooms` (desde el repo `efeonce-rooms`) o el MCP stdio local, ambos con
-   `--session-file` de la persona en cuyo nombre actúas. Declárate como agente: `--agent <cliente>` en la CLI
-   (o `ROOMS_AGENT_CLIENT`); el MCP stdio toma el nombre del handshake. Nunca uses otra identidad que la de esa
-   persona ni copies su cookie a otro lugar.
+2. **Canal.** Operas con la CLI `pnpm rooms` (desde el repo `efeonce-rooms`) o el MCP stdio local, siempre con la
+   autoridad de la persona interna en cuyo nombre actúas. Hay dos formas de llevar esa autoridad:
+   - **Login de la CLI (camino normal en producción).** La persona corre una vez `pnpm rooms login` (Efeonce ID,
+     MFA y consentimiento de las clases de Rooms). Desde ahí tú usas los comandos **sin** `--session-file`: la CLI
+     toma el login guardado y lo renueva sola. Antes de trabajar, `pnpm rooms whoami` te dice qué clases tienes
+     (`read`, `author`, `release`, `access`); un `403` significa que te falta la clase de esa operación: díselo a la
+     persona (vuelve a entrar y la consiente) en vez de buscar otro canal. `read.client` (textos e invitados del
+     cliente) no está disponible para la CLI. Un `401` es que su acceso a ese espacio venció o la credencial se
+     revocó: se lo dices y esperas. `--organization` elige el espacio en cada comando.
+   - **`--session-file`** con la sesión de la persona (archivo privado `0600`). Sigue soportado y es lo habitual
+     en un Rooms local; si lo pasas, la CLI usa ese archivo y no el login guardado.
+
+   Declárate como agente: `--agent <cliente>` en la CLI (o `ROOMS_AGENT_CLIENT`); el MCP stdio toma el nombre del
+   handshake y reutiliza el login si omites `--session-file`. Nunca uses otra identidad que la de esa persona,
+   nunca imprimas ni copies su credencial (`~/.config/efeonce-rooms/credentials.json`) o su cookie, y nunca cierres
+   su sesión (`pnpm rooms logout`) sin que te lo pida.
 3. **Insumos que necesitas a la vista:** `organizationId`, la persona en cuyo nombre actúas y el deal o brief que
    te entregó una persona. Sin deal ni brief no hay sala: pídelo.
 
 Forma de cada llamada (CLI; el MCP usa los mismos `operation` y `payload`):
 
 ```bash
+# Con login guardado no hace falta --session-file; en local agrega --session-file S
 # Lectores
-pnpm rooms authoring  --organization ORG --room ROOM --session-file S --agent claude-code
-pnpm rooms validate   --organization ORG --room ROOM --session-file S --agent claude-code
-pnpm rooms invitation-management --organization ORG --room ROOM --session-file S --agent claude-code
+pnpm rooms authoring  --organization ORG --room ROOM --agent claude-code
+pnpm rooms validate   --organization ORG --room ROOM --agent claude-code
+pnpm rooms invitation-management --organization ORG --room ROOM --agent claude-code
 # Comandos: --input es el payload, sin envoltorio
 pnpm rooms execute --organization ORG --operation content.upsertBlock --input bloque.json \
-  --idempotency-key ROOM:upsert:escena-equipo:v1 --session-file S --agent claude-code
+  --idempotency-key ROOM:upsert:escena-equipo:v1 --agent claude-code
 ```
 
 Clave de idempotencia: `<roomId>:<operación>:<intención>:v<n>`. Ante un timeout repite **la misma** clave. Ante
-`409`, vuelve a leer `rooms authoring` y rehace con la revisión nueva; no sobrescribas cambios ajenos.
+`409`, vuelve a leer `rooms authoring` y rehace con la revisión nueva **y una clave nueva** (sube el `v<n>`): la clave
+vieja quedó atada al payload anterior. No sobrescribas cambios ajenos. La revisión también avanza sola cuando el
+worker termina los derivados de una imagen: después de subir o vincular piezas, lee la revisión fresca antes de la
+siguiente escritura, y también antes de cada `uploads.complete` cuando subes varias piezas seguidas.
 
 ## El recorrido: del deal a la sala publicada
 
@@ -81,6 +97,10 @@ comandos acotados.
   "profiles": ["seo-aeo"], "blocks": [], "evidence": [], "relations": [], "assetRefs": [] } }
 ```
 
+- `validate-import` solo valida contra una sala que ya existe: no sirve para revisar el manifiesto antes de
+  `rooms.create`. Crea y lee la cobertura con `rooms authoring`.
+- Crea la sala con `assetRefs: []` aunque ya conozcas las piezas y vincúlalas después con `content.attachAsset`:
+  una referencia con versión puesta en `rooms.create` hace que el `attachAsset` posterior responda `conflict`.
 - `dataOrigin` es procedencia declarada: `real` si los datos son del cliente; `synthetic` solo para demos y
   fixtures (la sala muestra la insignia). Nunca lo derives del correo, el logo o el formato.
 - `provenance.sourceType: fixture` no puede declarar `real`. Una sala real usa `user-authored` y en `reference`
@@ -130,7 +150,8 @@ Reglas de oficio por escena:
 
 - **`showcase` y `cycle` solo con una pieza aprobada.** Sin pieza no hay escena: no la reemplaces por un mockup
   ni por una imagen generada que nadie aprobó. Pide la pieza (paso 6) y arma el resto.
-- **`showcase`:** `where` dice el lugar real («Story de Instagram, viernes 19:00»); las notas de la lente explican
+- **`showcase`:** `where` dice el lugar real («Story de Instagram, viernes 19:00»), con lo que el deal o el brief
+  declaran: si no dicen el horario, no lo pongas; las notas de la lente explican
   una decisión de construcción, no elogian la pieza.
 - **`cycle`:** `terms` son los del contrato o la propuesta (por ejemplo «Respuesta en 24 h hábiles», «Dos rondas
   incluidas»). Si no están declarados, la escena espera.
@@ -167,7 +188,10 @@ Reglas de oficio por escena:
   principal y `adaptations[{assetRefId, label}]` para sus formatos).
 - Los bytes entran por **`media.importFromSource`** cuando exista (TASK-2090: fuentes en lista blanca, sin URLs
   en tu contexto). Mientras no exista, **pídele la subida a una persona** (interfaz o `pnpm rooms upload-bytes`
-  hecho por ella). Cuando el archivo esté `ready`, lo vinculas con `content.attachAsset`.
+  hecho por ella). Cuando el archivo esté `ready`, lo vinculas con `content.attachAsset`. El lector `media` de la
+  sala devuelve una **lista** de archivos (no un objeto por id): búscalo por su id en la lista y espera `ready`
+  antes de vincular. Después de vincular, revisa las etiquetas de `adaptations` del bloque (el formato principal
+  puede quedar con una etiqueta genérica) y corrígelas con `content.upsertBlock` si no dicen el formato real.
 - **Nunca** pongas una URL, una ruta interna ni un enlace firmado en el manifiesto, en un `caption` o en una nota.
   Nunca generes una pieza para «completar» una escena de un cliente real.
 
@@ -194,7 +218,8 @@ Reglas de oficio por escena:
 
 `editions.publish` con `expectedRevision` = la `revision` de la última lectura de cobertura limpia, **sin
 ninguna escritura entre esa lectura y la publicación**. El recibo trae `editionId` y la cobertura con que se
-publicó: guárdalos para el aviso y para revertir.
+publicó: guárdalos para el aviso y para revertir. El lector `room` no repite el `editionId` después de publicar;
+el recibo es la fuente.
 
 ### 9. Invitar solo a correos del deal
 
@@ -204,15 +229,33 @@ publicó: guárdalos para el aviso y para revertir.
 - `invitations.create` por persona, sobre la sala ya publicada:
 
 ```json
-{ "roomId": "sala-andina-2027", "expectedRevision": 15, "invitationId": "inv-carla-mendez",
+{ "roomId": "sala-andina-2027", "expectedRevision": 15, "invitationId": "inv-sala-andina-2027-carla-mendez",
   "recipientEmail": "carla.mendez@andina.example", "recipientName": "Carla Méndez", "recipientRole": "Gerenta de marketing",
   "capabilities": ["rooms.read"], "expiresAt": "2026-11-01T18:00:00Z" }
 ```
 
+- `invitationId` es único en **todo** Rooms, no solo en la sala: inclúyele el `roomId`
+  (`inv-<roomId>-<persona>`). Un id que ya existe en otra sala no responde `conflict` sino `unavailable` (503), y
+  parece una falla del entorno. Si una invitación responde `unavailable`, revisa primero el id; si no es eso, no
+  busques otro canal: díselo a la persona y deja la sala publicada sin invitados.
 - `capabilities` siempre incluye `rooms.read`. Suma `evidence.read` o `questions.create` solo a quien el deal
-  identifica como champion o evaluador; nadie recibe más de lo que necesita.
-- El enlace vive como máximo 24 horas; si vence, `invitations.reissue`, no una invitación nueva.
-- Confirma con `pnpm rooms invitation-management` que los destinatarios son exactamente los que querías.
+  identifica como champion o evaluador; nadie recibe más de lo que necesita, y solo puedes delegar una capacidad que
+  la persona en cuyo nombre actúas tiene (si no la tiene, la invitación va sin ella y lo dices en el aviso).
+- `expiresAt` es obligatorio. El enlace sigue la vida de una propuesta B2B: lo habitual es **30 días** y el tope es
+  **90**. Además nunca puede ir más allá del vencimiento del acceso interno de la persona en cuyo nombre invitas: si
+  lo pasa, la invitación responde `forbidden`. Acórtalo y dilo en el aviso; no le pidas a nadie que amplíe su acceso
+  para eso. Con `--session-file`, `invitation-management` te da el tope exacto en `issuance.maxExpiresAt`; con el
+  login de la CLI no hay forma de leerlo, así que acorta con margen. Si el tope deja un enlace que dura horas, dile a
+  la persona que renueve su acceso y reemita con `invitations.reissue`.
+- El enlace solo no basta para entrar: el invitado recibe un código en su correo. Si el enlace vence, usa
+  `invitations.reissue`, no una invitación nueva.
+- Después de publicar ya no hay borrador y `rooms authoring` responde `not_found`: la revisión vigente para invitar
+  la lees con `pnpm rooms room`.
+- Confirma que los destinatarios son exactamente los que querías. Con `--session-file`, usa
+  `pnpm rooms invitation-management`, que muestra los correos. Con el login de la CLI ese lector (y `invitations`)
+  pide `read.client`, que la CLI no tiene, y responde `not_found`; `pnpm rooms agents-activity` lista cada
+  `invitations.create` tuyo con su `invitationId` y su reversa, pero **no el correo**. Ahí la confirmación es cruzar
+  cada `invitationId` del recibo con el payload que enviaste, y cada correo de ese payload con el deal.
 
 ### 10. Avisar a la persona
 

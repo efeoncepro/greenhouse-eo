@@ -11,11 +11,12 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 11 workflows (9 deploy workflows + orchestrator + watchdog)', () => {
-  it('contains exactly the 11 production release workflows', () => {
+describe('workflow-allowlist — canonical 12 workflows', () => {
+  it('contains exactly the 12 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
         'Artifact Worker Deploy',
+        'Auth Key Maintenance Job Deploy',
         'Auth Server Deploy',
         'Azure Teams Bot Deploy',
         'Azure Teams Deploy',
@@ -36,7 +37,7 @@ describe('workflow-allowlist — canonical 11 workflows (9 deploy workflows + or
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(11)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(12)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -112,10 +113,37 @@ describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
       expect(orchestratedNames, `${name} está mapeado a Cloud Run pero el orquestador no lo despliega`).toContain(name)
     }
 
-    // Azure es la única familia orquestada sin recurso Cloud Run (no participa en revision drift).
-    const orchestratedCloudRun = orchestratedNames.filter((name) => name && !name.startsWith('Azure '))
+    // El Job Auth aún no existe: su call es opt-in, sin mapping hasta provisioning.
+    const pendingAuthJob = findWorkflow('Auth Key Maintenance Job Deploy')
+    const maintenanceCall = orchestrator.jobs['deploy-auth-key-maintenance'] as { if?: string } | undefined
+
+    expect(pendingAuthJob?.cloudRunService).toBeUndefined()
+    expect(maintenanceCall?.if).toContain("AUTH_KEY_MAINTENANCE_PROVISIONED == 'true'")
+
+    const orchestratedCloudRun = orchestratedNames.filter((name) =>
+      name && !name.startsWith('Azure ') && name !== 'Auth Key Maintenance Job Deploy'
+    )
 
     expect([...orchestratedCloudRun].sort()).toEqual([...mappedNames].sort())
+  })
+
+  it('Auth production deploy is orchestrator-owned with no push trigger', () => {
+    const repoRoot = join(import.meta.dirname, '..', '..', '..')
+    const workflowsDir = join(repoRoot, '.github', 'workflows')
+
+    const auth = parse(readFileSync(join(workflowsDir, 'auth-server-deploy.yml'), 'utf8')) as {
+      on?: Record<string, unknown>
+    }
+
+    const release = parse(readFileSync(join(workflowsDir, 'production-release.yml'), 'utf8')) as {
+      jobs: Record<string, { needs?: string[]; uses?: string }>
+    }
+
+    expect(auth.on).not.toHaveProperty('push')
+    expect(auth.on).toHaveProperty('workflow_call')
+    expect(auth.on).toHaveProperty('workflow_dispatch')
+    expect(release.jobs['deploy-auth-server']?.uses).toBe('./.github/workflows/auth-server-deploy.yml')
+    expect(release.jobs['deploy-auth-server']?.needs).toContain('approval-gate')
   })
 
   // TASK-1378 — El scanner está en el allowlist (lo necesita para ci_green y

@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "468eb84ce75b",
+  "key": "468eb84ce75b312175863a58f41fd89c2be6dd9e54405a3c6eb39bd2bcf3905b",
+  "status": "completed",
+  "createdAt": "2026-11-05T10:22:20.032Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/catacaos/img1-maestro.png",
+    "imageSha256": "2e8fabd9c6f562af6736b5547908177b7d99c47460e43977c04e347f8ce66c9a",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/retoque/catacaos-arco-mask.png",
+    "maskSha256": "07b2de7973705a7653a74c9813456a2b0c70645bd5a420a902550739e1e08fa8",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same wrought-iron village entrance arch, its top band filled with simple repeating decorative ironwork scrolls and the same small finials, with absolutely no letters, no words and no signage; same sunlight, same blue sky behind, same perspective",
+    "providerPrompt": "the same wrought-iron village entrance arch, its top band filled with simple repeating decorative ironwork scrolls and the same small finials, with absolutely no letters, no words and no signage; same sunlight, same blue sky behind, same perspective"
+  },
+  "mask": {
+    "touchedFraction": 0.01927071277006173,
+    "editable": 124135,
+    "soft": 35704,
+    "protected": 8134561
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1216,
+      "top": 0,
+      "width": 1423,
+      "height": 815
+    },
+    "target": {
+      "width": 1424,
+      "height": 816
+    },
+    "aspectError": 0.0005238850210242727,
+    "reason": "la zona con contexto ocupa 13.9 % de la imagen: se genera recortada a 1424x816"
+  },
+  "estimate": {
+    "usd": 0.0319,
+    "basis": "1 × salida 1424x816 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 59.519,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 7.45,
+        "bestError": 7.45,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 8134561,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 124135,
+        "maxDelta": 248,
+        "meanDelta": 68.703,
+        "worst": {
+          "x": 2093,
+          "y": 424
+        }
+      },
+      "seam": {
+        "pixels": 35704,
+        "maxDelta": 217,
+        "meanDelta": 27.587,
+        "worst": {
+          "x": 1896,
+          "y": 247
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 8134561,
+        "maxDelta": 247,
+        "meanDelta": 2.023,
+        "worst": {
+          "x": 2027,
+          "y": 721
+        }
+      },
+      "outputUsd": 0.0319,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1235,
+        "input_tokens_details": {
+          "image_tokens": 1170,
+          "text_tokens": 65
+        },
+        "output_tokens": 1063,
+        "output_tokens_details": {
+          "image_tokens": 1063,
+          "text_tokens": 0
+        },
+        "total_tokens": 2298
+      },
+      "meta": {
+        "size": "1424x816",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -2649,3 +2649,8 @@ derechos/evidencia legal, (c) UI/Playwright y asset. Cada subagente recibe una r
 árbol de otro agente y devuelve IDs/evidencia o un bloqueo verificable. El agente principal conserva el ownership
 de mutaciones, migraciones, promoción, decisión de no repromover y cierre; antes de ejecutar una mutación reconcilia
 los hallazgos para evitar dos sagas sobre la misma identidad.
+
+
+### Hibernated front door — approved 2026-11-01
+
+The retained-IP suspension is governed by `docs/architecture/creative-studio/GLOBE_HIBERNATED_FRONT_DOOR_DECISION_V1.md` and the deep-hibernation runbook. Hibernation removes only the two global HTTP/HTTPS forwarding rules; static IP, DNS, certificate, backends, data, SQL, secrets and images remain. `draining` recreates both rules automatically. The usual zero-delete plan gate has only this narrow explicitly authorized exception: exactly those two listeners, no other changes. Never release the IP or disable SQL public IP by inference. Forecast CLP22–23k/month is not realized savings. No HTTP probe or SQL wake during monitoring.

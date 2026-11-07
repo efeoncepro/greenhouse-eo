@@ -1,9 +1,9 @@
 # Radiografía AEO — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 2.1
+> **Versión:** 2.2
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-10-09 por Claude (segunda muestra publicada, contrato 0.2.0)
+> **Última actualización:** 2026-11-05 por Claude (§4: casos de Shutterstock del lote Blog SKY, tope de consultas, licencia en lote y URLs firmadas). Antes: 2026-10-09 (segunda muestra publicada, contrato 0.2.0)
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 > **Repo del runtime:** `efeonce-think` (**NO** `greenhouse-eo`)
@@ -224,6 +224,17 @@ src/assets/muestras/<cliente>-<slug>/
 **Fuente: Shutterstock** (credenciales en Secret Manager; ver `TASK-1411`). Wikimedia sirve de respaldo pero sus fotos son de aficionado — **y sus miniaturas se ven pixeladas** (bájate el **original**, no el thumb).
 
 🔴 **Verifica cada foto contra su `description`, NUNCA contra sus keywords.** Nos pasó: `789778528` se buscó como «Carretera Austral» y **era la Ruta 40 de ARGENTINA** — con `carretera` **y** `chile` entre sus keywords. De 13 candidatos "obvios", **9 eran de otra región o de otro país** (Torres del Paine, Argentina, Atacama). Y **`is_editorial` debe ser `false`**: una editorial no se puede usar comercialmente.
+
+**Se repitió con otro cliente del mismo servicio (2026-11-05, referencias del lote del Blog SKY).** Para lugares de
+Perú la búsqueda de Shutterstock rinde poco: muchas frases largas devuelven 0 resultados y otras traen otro país. Solo la
+`description` lo delató: «Costa del Este» trajo un sendero de la costa de Norfolk, el aguaje un mercado de Marrakech,
+el castillo de Lamas «Oropesa landmarks, Spain» y el manglar Langkawi (Malasia). Tres reglas operativas de ese día:
+
+- **Tope de consultas:** la API cortó con `429` y `RateLimit-Limit: 100`; `RateLimit-Reset` marcaba la hora en punto.
+  Para no quemar el cupo, se elige mirando hojas de contacto de candidatas y se licencia al final.
+- **Licencia en lote:** un solo `POST /v2/images/licenses?subscription_id=…&size=huge` con todos los `image_id`.
+- **Las URLs de descarga que devuelve la licencia son firmadas:** se usan para bajar el archivo y no se guardan. En el
+  registro de procedencia van solo `image_id`, `license_id`, la descripción y el uso.
 
 ### 5. Construir y verificar
 

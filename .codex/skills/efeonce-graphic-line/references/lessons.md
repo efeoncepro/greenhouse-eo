@@ -19,6 +19,42 @@
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
 
+## 2026-11-02 — Pantallas de producto: inventar figuras de órbita «con significado» rompe el canon
+
+**Síntoma:** el operador revisó en el canvas el rediseño de las pantallas de Efeonce ID (step-up, consentimiento,
+segundo factor, enlaces por correo, sesión) y dijo «en muchos no estás usando la órbita como es».
+**Causa:** para que cada panel «dijera algo», el agente dibujó variantes que no existen en el canon:
+- esfera suelta sobre el anillo, sin arco;
+- seis puntos (uno por dígito) y tres puntos de colores (uno por permiso): varias esferas por pieza;
+- una cuenta regresiva que vacía el anillo: un loader;
+- anillo cortado, anillo apagado y anillo completo con check;
+- el isotipo de Rooms dentro de la órbita: un logo fuera de un cierre de marca;
+- íconos dibujados a mano, tanto en la órbita como en los botones.
+
+Ninguna regla automática lo detectó; se vio a ojo.
+**Regla:** en un panel de producto, la órbita hace uno de dos trabajos canónicos y nada más:
+1. **Rodear un ícono de área del catálogo AXIS** (`resolveIcon`, en reposo, voz Trazo), con anillo fino, acento corto
+   arriba a la izquierda con la esfera en la punta y halo. Es la geometría de `canonicalOrbit` de Rooms.
+2. **Rodear una palabra** con la «órbita en reposo» aprobada en Rooms. Ahí el anillo va desnudo y la esfera es el punto
+   de la palabra.
+
+El movimiento es el de entrada (anillo, arco, esfera, halo) y después queda quieto: nunca un loop que finja progreso.
+Sin ícono del catálogo que calce, se usa una palabra o la pieza va sin órbita; el glifo no se dibuja. La UI funcional
+(botones, chips, campos) va sin íconos decorativos dibujados a mano, y lectura y escritura se distinguen con el texto,
+nunca con teal o ámbar. En móvil, sin panel, la esfera vuelve a ser el punto del titular, en el acento oscuro de la
+línea. Antes de publicar, recorre §3.13 («elegir una forma es elegir un trabajo») y la tabla de errores §10 pieza por
+pieza.
+
+## 2026-11-01 — Una escala redondeada a dos decimales recorta el logo dentro del lockup
+
+**Síntoma:** en el canvas de Efeonce ID, el operador preguntó si el lockup «se ve recortado a propósito»: el borde
+derecho de la D quedaba cortado en positivo, negativo y blanco. Ninguna prueba lo detectó; se vio a ojo.
+**Causa:** el generador escalaba la marca dentro del lockup con `scale(${f(s)})`, y `f()` redondea a dos decimales:
+0,0292 pasó a 0,03, la marca creció casi un 3 % y se salió del `viewBox`. El mismo redondeo movía la teja de app un 0,6 %.
+**Regla:** las coordenadas se redondean a dos decimales; **una escala nunca** (va con seis, o con un `<svg>` anidado y su
+propio `viewBox`, como hacen los generadores de la familia). Al terminar un lockup, comprueba que la última columna con
+tinta coincida con el borde del archivo y mira la curva: un borde recto donde debería haber curva es recorte.
+
 ## 2026-09-26
 
 - **Las recetas se alejaron del canvas en silencio.** Síntoma: lente con disco gigante, foco sin anillo, firma con el
@@ -964,3 +1000,37 @@ Carpeta: `ai-generations/2026-10-20_propuesta-assetplan/` (`LEEME.md`). Recetas:
   `matrix3d`), no como un rectángulo suelto.
 - **Plantas de venta dibujadas como cajas etiquetadas.** Síntoma: rechazo del operador. Regla: una planta se dibuja
   como plano arquitectónico: muros con grosor, puertas con giro, ventanas, mobiliario, cotas, escala y norte.
+
+## 2026-11-05 — Propuesta Fiordo Austral en /design: láminas a mano rechazadas e insignia negra
+
+- **Síntoma 1:** se dibujaron las láminas en el canvas de /design a mano, montando los componentes del design system (`Voice`, `Orbit`, `Icon`). Julio las rechazó: «las estás poniendo todas mal» y «así no hacemos las portadas».
+  - **Regla:** un deck de marca propia nunca se arma a mano en el canvas. Primero se elige del catálogo de recetas, después se valida el plan (`pnpm brand:deck-plan -- --plan`) y se compone cada lámina con `pnpm brand:compose`. Recién entonces los PNG compuestos van al canvas como imágenes a sangre.
+  - Precedentes que hay que replicar: `ai-generations/2026-10-20_propuesta-assetplan/` y `ai-generations/2026-10-06_deck-hubspot/`, con sus `build-intents.py` y `build-canvas.py`.
+  - Los componentes del design system son para piezas sueltas, no para láminas con receta.
+- **Síntoma 2:** la insignia HubSpot Solutions Partner salió negra en el canvas.
+  - **Causa:** el canvas de Design le quita el `<style>` a los SVG subidos, y los colores de esa insignia están en clases de estilo.
+  - **Regla:** la insignia, y cualquier SVG oficial que coloree con clases, se sube como PNG derivado del SVG con sharp, sin tocar el arte. El README de la insignia lo permite.
+  - Sobre fondo oscuro se usa `badge-light-spp-hubspot` (placa crema).
+
+## 2026-11-05 · Propuesta Fiordo Austral: el par pregunta-respuesta en todas las láminas
+
+- **Síntoma:** Julio rechazó el deck completo: «la dinámica de preguntas y respuestas de todo el deck se siente muy absurda y forzada». Las 25 láminas llevaban un par y casi todas las respuestas eran comodines («Lo rutinario», «Se recupera», «A tiempo», «Expertos», «Ninguno»).
+  - **Causa:** todas las recetas del compositor exigen `voice.question`, y el agente leyó el campo obligatorio como una pregunta obligatoria. La regla ya estaba escrita (criteria §4, «Cuándo sí y cuándo no», y el delta 2026-10-25 de La órbita) y no se aplicó.
+  - **Regla:** el slot `question` también admite una línea que abre el tema sin ser pregunta: el tema, el contexto o un dato. El destacado la completa como una frase en dos tiempos («Cada acceso al CRM pasa por / **Entra ID**», «Si se van, se llevan / **Sus datos**»). Así cumple la receta sin tocar código.
+  - Una propuesta deja entre dos y cuatro pares reales, en los momentos de decisión: la edición, los datos y el precio. La portada va sin voz (método `orbit-decision` a mano hasta TASK-2014).
+  - El destacado arranca **siempre con mayúscula**, aunque continúe la frase del anillo (corregido el 2026-11-06: Julio, en el canvas, «cuando esto comienza en minúscula no se ve bien»; eran 17 láminas). El armador del deck (`build-intents.py`) la aplica al escribir los intents. El límite de largo de cada slot lo da el compositor (`item_too_long`).
+
+## 2026-11-06 · Propuesta Fiordo Austral: el deck respondía a las bases en vez de proponer
+
+- **Síntoma:** Julio: «la forma en que estructuraste el deck es muy "respondemos a todas las bases"… no estamos proponiendo cómo hacer la implementación ni las licencias». Además, cuatro rótulos fijos de las plantillas decían otra cosa que la lámina: «Fuente» y «Perfil unificado» en el inicio de sesión con Entra ID, Loom en los cambios controlados y «Sólo lo aprobado» sin decir de qué.
+  - **Causa:** el guion se armó siguiendo el índice de las bases (§3 a §11) y se fue completando por cobertura. Las recetas se usaron por forma (se ven bien) aunque sus rótulos fijos hablaran de otro servicio.
+  - **Regla:** el orden lo pone lo que calma al comité (precio, retorno, adopción, migración y ajuste a sus procesos); las bases son la checklist y los anexos llevan el detalle. Antes de usar una receta prestada, leer sus rótulos fijos en el render: si dicen otra cosa, se corrigen en el plan (`render-patch.ts` de la carpeta Fiordo Austral, sin tocar el catálogo) o se elige otra receta.
+  - Una pantalla de producto se compone en vidrio sobre la foto aprobada (`render-movil-ui.mjs`), con datos de muestra rotulados, fuentes del font pack embebidas (Chromium no carga `file://` desde `setContent`) y el acento leído del token.
+  - El ícono oficial de un producto de terceros sale de su paquete oficial (Microsoft Entra: paquete de íconos de arquitectura de Azure, V25). Se usa sin recortar ni deformar y con su nombre al lado. Ese paquete no trae el ícono genérico de «Entra ID», así que se usó el de MFA, con el rótulo «Microsoft Entra ID».
+
+## 2026-11-06 · Fiordo Austral: foto prestada dentro del lente
+
+- **Síntoma:** Julio, sobre la lámina de disponibilidad (`content-measure`): «la imagen está forzada… ni siquiera está en el lente, su cara se corta… el lente tiene que tener un propósito».
+  - **Causa:** se reusó un plate de otra lámina (HS5b, «licencias» del deck HubSpot) porque «quedaba bien». Ese plate no estaba encuadrado para el círculo ni mostraba el oficio detrás de la cifra, y nadie miró el recorte. La receta lo dice: «la foto del oficio que produjo la cifra, con el sujeto contenido en el círculo».
+  - **Regla:** la foto de un lente se hace para ese lente. La escena declara el círculo (centro ≈ 74 % del ancho y 54 % del alto, diámetro ≈ 72 % del alto, como `P1-deck-lente-edicion`) y muestra lo que mide la cifra: en disponibilidad, la guardia de soporte frente al historial de estado. Antes de publicar se mira la lámina compuesta: cabeza completa dentro del círculo y el objeto de la cifra también adentro.
+  - Si el modelo deja al sujeto alto, `pnpm foto:expandir … --lienzo WxH --ancla centro` lo baja sin regenerarlo. Si queda el recuadro del original, se edita el resultado pidiendo sólo borrar la costura (`ai:image --image`), no se rehace con `--reponer no`: así el modelo rehízo la escena y sacó la pantalla del lente.

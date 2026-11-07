@@ -1,0 +1,130 @@
+{
+  "id": "tarapoto",
+  "notion_url": "https://app.notion.com/p/bd2c39aece51412d878527d2d0d6d40e",
+  "titulo": "Tarapoto en 3 días: cómo repartir tu viaje entre la ciudad, Lamas y Sauce",
+  "slug": "/que-visitar-en-tarapoto/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "tarapoto-calle-mototaxis-cordillera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero caminando por una calle de Tarapoto con mototaxis y los cerros verdes de la Cordillera Escalera al fondo",
+      "que_muestra": "una calle de Tarapoto en ligera pendiente, con dos o tres mototaxis en movimiento y fachadas bajas de colores; al fondo de la calle, la línea de cerros verdes de la Cordillera Escalera ocupa el tercio superior. Un viajero con mochila chica camina por la vereda hacia el fondo. Debe leerse como ciudad amazónica de llegada, no como selva virgen ni como postal de plaza.",
+      "hora_clima": "media mañana del día de llegada; aire húmedo, cielo con nubes blancas y claros, sin lluvia; luz natural abundante con sombras abiertas y altas luces del cielo conservadas",
+      "personas": "el viajero a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; conductores de mototaxi lejanos y pequeños, sin rostro identificable; nadie mira al lente",
+      "primer_plano": "hojas de una palmera o de un árbol de la vereda muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al viajero ni la cordillera",
+      "ancla_pov": "una línea de cerros verdes que asoma al fondo de cada calle",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin placas de mototaxi legibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin lluvia (la escena es de llegada con claros)",
+        "sin selva virgen ni lianas en plena calle"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una calle de Tarapoto con vista a la Cordillera Escalera en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero, al menos un mototaxi y la línea de cerros tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «El lugar es la catarata de Ahuashiyacu…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "viajera entrando a la poza · escala media · luz de tarde filtrada por el follaje",
+      "registro": "E",
+      "archivo": "ahuashiyacu-poza-viajera-tarapoto.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajera metiéndose a la poza al pie de la catarata de Ahuashiyacu, cerca de Tarapoto",
+      "que_muestra": "la caída de agua de Ahuashiyacu al fondo, nítida, cayendo sobre roca oscura rodeada de vegetación; en la poza, una viajera entra al agua hasta las rodillas con los brazos un poco abiertos por el frío, mirando hacia la caída. Se tiene que leer el contraste entre el agua blanca de la catarata y el verde que la rodea.",
+      "hora_clima": "tarde del día de llegada, antes de que baje la luz; cielo nublado claro o con sol filtrado por el follaje; luz natural luminosa, sombras abiertas, sin quemar el agua blanca de la catarata",
+      "personas": "fotografía un acompañante parado en la orilla, a la altura del agua; la viajera está de espaldas o de tres cuartos, mira la catarata y no al lente; si hay otros bañistas, lejanos, pequeños y en acciones espontáneas; ningún rostro identificable en primer plano; traje de baño o ropa de baño sencilla sin logos",
+      "primer_plano": "piedras mojadas de la orilla y una hoja grande muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar a la viajera ni la caída",
+      "ancla_pov": "Al pie hay una poza donde el agua fría te corta la respiración por un segundo",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos ni carteles legibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin saltos ni clavados desde la roca (el texto no los promueve)",
+        "sin barandas ni infraestructura inventada",
+        "sin arcoíris añadido"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la catarata de Ahuashiyacu y su poza en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vale la pena, con una condición: darle el día completo…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la cubierta de la balsa · escala amplia · luz de primera hora",
+      "registro": "E",
+      "archivo": "rio-huallaga-balsa-camino-sauce.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde la balsa que cruza el río Huallaga camino a la Laguna Azul de Sauce, con una camioneta a bordo y la otra orilla verde",
+      "que_muestra": "la vista desde la cubierta de una balsa plana que cruza el río Huallaga: en primer término, parte de una camioneta embarcada; adelante, el agua ancha color café y la otra orilla con vegetación verde y cerros bajos. La escala del río frente a la camioneta es el contenido: tiene que demostrar por qué la laguna pide un día entero.",
+      "hora_clima": "primeras horas de la mañana; cielo claro o con neblina que se levanta del río; luz natural luminosa y suave, sombras abiertas, sin quemar el cielo",
+      "personas": "fotografía el viajero parado en la cubierta, a la altura de los ojos; un acompañante apoyado en la baranda mira la otra orilla, de espaldas o de perfil; el operador de la balsa no aparece o queda lejano y sin rostro identificable; nadie mira al lente",
+      "primer_plano": "la baranda metálica o una cuerda de la balsa muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el río ni la orilla",
+      "ancla_pov": "durante el cruce solo hay agua color café a los costados, olor a río y la otra orilla verde acercándose despacio",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en la balsa",
+        "sin placas de vehículo legibles",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin agua azul ni turquesa (el Huallaga no es la laguna)",
+        "sin lluvia ni río crecido"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del cruce del Huallaga en la ruta Tarapoto–Sauce en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tarapoto",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Cataratas, lagunas y un castillo",
+    "archivo": "banner-ruta-lima-tarapoto.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tarapoto: cataratas, lagunas y un castillo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Tarapoto (TPP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TPP",
+      "ciudad": "Tarapoto"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Tarapoto"
+  },
+  "descartes": [
+    "Torres del castillo de Lamas entre techos — es la portada natural de la guía de Lamas",
+    "Bote sobre la Laguna Azul — es de la guía de la laguna",
+    "Juane abierto sobre la hoja de bijao — buena tipo E, pero no demuestra el ritmo del viaje",
+    "Mirador de Lamas con el valle — riesgo de mostrar a la comunidad sin consentimiento y repite la escala amplia de la portada",
+    "Centro Urku — animales en rescate: riesgo de verosimilitud y de lectura de bienestar animal, y visita sin confirmar"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-27",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "armor-90d-diagnostic-only",
+  "offerMarketCountry": "EC",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "paid-media-diagnostic",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "56"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-discovery-scope-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}

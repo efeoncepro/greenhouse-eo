@@ -169,6 +169,12 @@ export const CONTENT_METRIC_RULES: ReadonlyArray<{ module: InsightModule; prefix
   { module: 'seo', prefix: 'driver.', question: 'drivers' },
   { module: 'seo', prefix: 'opportunity.', question: 'recommendations' },
   { module: 'seo', prefix: 'site.', question: 'outcome' },
+  // Visitas desde redes sociales sin pago (GA4 Organic Social + Organic Video), por red: «qué pasó» con el contenido
+  // fuera de la búsqueda. Nunca se lee como búsqueda social ni como efecto del SEO.
+  { module: 'seo', prefix: 'social_source.', question: 'outcome' },
+  // Valor publicitario equivalente estimado de los clics (gsc_clicks_country_cpc_v1) y los clics que lo sostienen.
+  { module: 'seo', prefix: 'organic_value_usd', question: 'outcome' },
+  { module: 'seo', prefix: 'organic_value.', question: 'outcome' },
   // TASK-2033 — la propiedad completa cuando el informe mide un alcance de contenido. Es parte de «qué pasó» (el
   // contenido medido frente al sitio), pero llega como hecho de REFERENCIA: contexto de la cifra, nunca un resultado
   // propio. Sólo se emite junto a los clics del alcance, así que no puede responder la pregunta por sí solo.

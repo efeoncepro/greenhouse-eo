@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1547d7f8d5b9d19c80fc744cb082304fd2f068b23bed41d964d898d8c5887104",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR2b-portada-equipo-isotipo",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+      "sha256": "78451db42e24497c7e9fdf720e9b6b44849ab0546bae2888fbdde005e7f6c76d"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

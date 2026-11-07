@@ -1,0 +1,33 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "voice",
+  "voice": {
+    "eyebrow": "Propuesta comercial · Octubre 2026",
+    "question": "¿Piloto de Performance?",
+    "answer": [
+      "Piloto de",
+      "Performance"
+    ]
+  },
+  "body": "Preparada para **ARMOR EPPS** · Indecaucho · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "clientLogo": {
+    "path": "ai-generations/2026-10-28_propuesta-armor/assets/armor-logo.png",
+    "alt": "ARMOR Personal Protective Equipment"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

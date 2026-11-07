@@ -19,7 +19,25 @@ import type {
   TotpEnrollmentRecord
 } from '../types'
 
+export type RevokePersonAuthStateInput = {
+  environmentId: string
+  subject: string
+  subjectHash: string
+  now: Date
+  reason: string
+  actorRef: string | null
+  correlationId: string | null
+}
+
+export type RevokePersonAuthStateCounts = {
+  sessionsRevoked: number
+  passkeysRevoked: number
+  totpRevoked: boolean
+}
+
 export interface PersonAuthStorePort {
+  /** Revoca sesiones y factores junto con el intento auditado, todo o nada. */
+  revokeAuthStateWithAudit(input: RevokePersonAuthStateInput): Promise<RevokePersonAuthStateCounts>
   // ─── Sesiones ─────────────────────────────────────────────────────────────
   insertSession(record: PersonSessionRecord): Promise<void>
   /**

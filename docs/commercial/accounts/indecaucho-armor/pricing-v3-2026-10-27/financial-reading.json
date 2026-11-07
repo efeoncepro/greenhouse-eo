@@ -1,0 +1,18 @@
+{
+  "sourceCalculationId": "composition-60497573430227b3117bb43b",
+  "sourceReplayDigest": "60497573430227b3117bb43b1b22304dbf79783021d149104c2d22619e962abd",
+  "state": "requires_review",
+  "currency": "USD",
+  "fee": "22450.00",
+  "feeByPeriod": [
+    "11350.00",
+    "5550.00",
+    "5550.00"
+  ],
+  "cost": "9140.54",
+  "margin": "0.59284899777282850779510022271714922048997772828507795100222717149220489977728285",
+  "reserve": "829.01",
+  "mediaCeiling": "18000",
+  "combinedPlanningEnvelope": "40450.00",
+  "costBasis": "current V3 catalogue v14; see frozen artifact, demand and assessment"
+}

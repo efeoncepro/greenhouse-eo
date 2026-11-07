@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Sin amarras",
+    "question": "Si se van, se llevan",
+    "answer": [
+      "Sus datos"
+    ]
+  },
+  "body": "Sus datos son suyos: entran a HubSpot con **orden** y salen igual de completos.",
+  "pillars": [
+    {
+      "label": "Exportables",
+      "text": "registros y propiedades cuando lo necesiten."
+    },
+    {
+      "label": "API estable",
+      "text": "versiones que HubSpot sostiene 18 meses."
+    },
+    {
+      "label": "Recuperables",
+      "text": "hasta 90 días para restaurar lo borrado."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA23-sus-datos.png",
+    "alt": "Nexa entrega un estuche de vidrio con el archivo completo, mientras detrás queda abierto y vacío el cajón de donde salió"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

@@ -1,0 +1,68 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-difference",
+  "voice": {
+    "eyebrow": "Resumen ejecutivo",
+    "question": "De la pauta a la cotización, con un",
+    "answer": [
+      "Sistema"
+    ]
+  },
+  "body": "KSB ya invierte en Google, Meta y LinkedIn. Proponemos conectar cada canal con una **cotización medible** en su CRM.",
+  "alternative": {
+    "kicker": "Pauta por canal",
+    "title": "Cada canal se mide solo"
+  },
+  "efeonce": {
+    "kicker": "Pauta con sistema",
+    "title": "Se mide la cotización"
+  },
+  "versus": "vs",
+  "rows": [
+    {
+      "alternative": "Anuncios que llevan a páginas generales",
+      "efeonce": "Landings por línea, fuera de ksb.com"
+    },
+    {
+      "alternative": "Leads en formularios sueltos",
+      "efeonce": "Formularios calificados conectados al CRM"
+    },
+    {
+      "alternative": "Cada canal reporta su propia métrica",
+      "efeonce": "Un tablero: del clic a la cotización"
+    },
+    {
+      "alternative": "Contenido de catálogo global",
+      "efeonce": "Contenido técnico para el comprador chileno"
+    },
+    {
+      "alternative": "Metas sin línea base",
+      "efeonce": "Línea base en el mes 1 y rampa acordada"
+    }
+  ],
+  "ownTeam": {
+    "kicker": "¿Y su equipo comercial?",
+    "title": "Es parte del sistema",
+    "pillars": [
+      {
+        "title": "Definición",
+        "description": "MQL y SQL acordados"
+      },
+      {
+        "title": "Gestión",
+        "description": "Tiempo de respuesta al lead"
+      },
+      {
+        "title": "Cierre",
+        "description": "Resultado registrado en el CRM"
+      }
+    ]
+  },
+  "line": "growth",
+  "use": "proposal"
+}

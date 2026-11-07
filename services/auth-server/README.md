@@ -1,9 +1,9 @@
 # Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** README del deployable (TASK-1828 + TASK-1829, EPIC-044)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-04 por Claude (sesión `/implement-task 1828`)
-> **Última actualización:** 2026-09-08 por Codex (TASK-1844, multiorganización interna desplegada y certificada para cohorte exacta)
+> **Última actualización:** 2026-10-29 por Codex (contrato local del guard de despliegue; release aún retenido)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · contrato OAuth [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md)
 
 Authorization server propio de Efeonce. Cloud Run Service en `us-east4`, publicado como **segundo host del
@@ -78,23 +78,32 @@ Registry en `greenhouse_auth.signing_keys` (+ audit append-only `signing_key_eve
 `active → retiring → retired`. Exactamente una `active` (índice parcial único). El JWKS publica
 `active` + `retiring`.
 
-Rotación (operador, con ADC propia — el runtime no puede crear versiones KMS):
+Rotación (operador, con ADC propia — el runtime del issuer no puede crear versiones KMS):
 
 ```bash
-pnpm auth-server:rotate-key            # crea versión KMS nueva, la registra y la activa; la anterior → retiring
+pnpm auth-server:rotate-key            # command durable: baseline verificada, 90 días y ningún retiring
 pnpm auth-server:rotate-key --status   # lista llaves y estados
 pnpm auth-server:rotate-key --retire <kid>          # retira una `retiring` (exige ≥ 1 h de solapamiento)
 pnpm auth-server:rotate-key --retire <kid> --force  # sólo incidente; queda en el evento
 ```
 
-Después de retirar: deshabilitar la versión KMS vieja (`gcloud kms keys versions disable`) para volver a una
-sola versión facturable.
+El command nuevo y el Job aislado están sólo en el candidato local de TASK-1833;
+no representan el servicio desplegado. La creación persiste intención antes
+del RPC KMS, detiene un resultado incierto y exige conciliación supervisada.
+El Job nace OFF/dry-run ON y aún no tiene Scheduler. Ver
+[README del Job](../auth-key-maintenance/README.md) y
+[runbook](../../docs/operations/runbooks/auth-server-key-rotation.md) antes de
+cualquier ensayo. Retiro y deshabilitación siguen manuales; una versión
+KMS deshabilitada **continúa siendo facturable** mientras exista. No destruir
+ninguna versión por inferencia de costo.
 
 ## Scripts (`scripts/auth-server/`)
 
 | Comando                                        | Script                           | Qué hace                                                                                                                                                                                                                                                                                                             | Requiere                                                     |
 | ---------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `pnpm auth-server:rotate-key`                  | `rotate-signing-key.ts`          | Rota/registra/retira versiones de la llave KMS (`--status`, `--register <version>`, `--retire <kid> [--force]`)                                                                                                                                                                                                      | `.env.local` + proxy PG + `AUTH_SERVER_KMS_KEY` + ADC propia |
+| `pnpm auth-server:rotate-key`                  | `rotate-signing-key.ts`          | Command durable con baseline/90 días para crear; `--status`, `--register <version>` para recuperación y `--retire <kid> [--force]` supervisado | `.env.local` + proxy PG + `AUTH_SERVER_KMS_KEY` + ADC propia |
+| `pnpm auth-server:attest-rotation-baseline`   | `attest-key-rotation-baseline.ts` | Atestigua una baseline una vez retirada la llave anterior y verificados KMS/JWKS/evidencia | Perfil ops, KMS y evidencia de auditoría |
+| `pnpm auth-server:reconcile-key-rotation`     | `reconcile-key-rotation.ts`      | Vincula una versión exacta tras create incierto o verifica publicación reparada; nunca elige la más nueva | Perfil ops, KMS y evidencia de auditoría |
 | `pnpm auth-server:register-client`             | `register-oauth-client.ts`       | Registra un cliente OAuth **confidencial** (`--name`, `--redirect`, `--auth-method`, `--scopes`, `--client-id`); secreto mostrado una sola vez                                                                                                                                                                       | `.env.local` + proxy PG                                      |
 | `pnpm auth-server:oauth-store:smoke`           | `oauth-store-smoke.ts`           | Smoke del store OAuth contra PostgreSQL real (single-use, rotación/reuso, revoke de familia, consent idempotente, trigger append-only)                                                                                                                                                                               | `.env.local` + proxy PG                                      |
 | `pnpm auth-server:register-issuer-environment` | `register-issuer-environment.ts` | Registra/actualiza la fila `efeonce-auth` de `greenhouse_core.external_identity_environments` por el command canónico de TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox; nunca SQL). `--status draft\|active`, `--environment-id`. Registrada en `draft` el 2026-09-04; `issuerClass` inmutable | `.env.local` + proxy PG (perfil ops, `127.0.0.1:15432`)      |
@@ -105,13 +114,9 @@ sola versión facturable.
 
 ## Deploy
 
-La vía normal es el [release control plane](../../docs/operations/runbooks/production-release.md): candidato aprobado, preflight y `production-release.yml` con su SHA exacto. El workflow transporta las variables durables de gates/cohorte. No ejecutar el script directamente con sólo `ENV=staging` o `ENV=production`: sus defaults pueden apagar v2 y vaciar la cohorte en el servicio compartido. Una invocación directa exige autorización break-glass y preservar explícitamente todos los gates/cohorte del snapshot verificado; luego reconciliar configuración durable y servida.
+La vía normal es el [release control plane](../../docs/operations/runbooks/production-release.md): candidato aprobado, preflight y `production-release.yml` con su SHA exacto. El workflow transporta las variables durables de gates/cohorte. Una invocación directa de `deploy.sh` exige autorización break-glass y preservar explícitamente todos los gates/cohorte del snapshot verificado; luego reconciliar configuración durable y servida. Los defaults del script pueden apagar v2 y vaciar la cohorte.
 
-Un solo servicio Cloud Run (`auth-server`) compartido por staging y production, como `ops-worker`; `ENV`
-selecciona el mínimo de instancias (production 1, staging 0). Workflow: `.github/workflows/auth-server-deploy.yml`
-(Slice 2; staging en push a `develop`, producción sólo por `production-release.yml` job `deploy-auth-server`, deploy
-change-gated por rutas). Primer release de producción: `9100bbd2765d` (2026-09-04). El host `auth.efeonce.org` se
-enruta desde `efeonce-mcp/infra/terraform/front_door.tf` (`enable_auth_host`).
+En este árbol, `auth-server` es un **único servicio Cloud Run productivo** en `auth.efeonce.org`; no existe un servicio Auth staging. `deploy.sh` exige `ENV=production`, SHA completo idéntico al checkout y publicado en `origin/main`. El workflow Auth preparado elimina el push desde `develop` y acepta sólo `workflow_call` del release o dispatch auditado desde `main` con Environment `production`. Las PR del guard aún no están promovidas: antes de operar hay que leer el workflow y la revisión efectivamente servidos, no inferirlos de este README. Primer release de producción: `9100bbd2765d` (2026-09-04). El host se enruta desde `efeonce-mcp/infra/terraform/front_door.tf` (`enable_auth_host`).
 
 ## Gates
 

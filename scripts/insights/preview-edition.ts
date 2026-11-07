@@ -20,7 +20,7 @@
  *   GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
  *   pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
  *     --edition=insed-... --org=org-... [--output=report_pdf|deck_pdf|both] [--editorial-v2] [--plan-only] [--ai-authoring]
- *     [--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD] [--cover=light|dark]
+ *     [--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD] [--cover=light|dark] [--modules=seo,aeo] [--title="…"]
  *
  * TASK-1888 — `--editorial-v2` recorre el contrato editorial v2 como lo haría la generación con
  * `INSIGHTS_EDITORIAL_V2_ENABLED=true`: evidencia v2 (FTR y metas ICO), portada resuelta con la preferencia y los
@@ -55,6 +55,7 @@ import { getInsightEditionById } from '@/lib/efeonce-insights/stores/edition-sto
 import { getInsightReportById } from '@/lib/efeonce-insights/stores/report-store'
 import { readOrganizationLogoForRender } from '@/lib/storage/greenhouse-assets'
 import { resolveInsightWindows } from '@/lib/efeonce-insights/window'
+import { missingCompanionModules } from '@/lib/efeonce-insights/contracts/request'
 
 const arg = (name: string): string | undefined => {
   const hit = process.argv.find(a => a.startsWith(`--${name}=`))
@@ -95,15 +96,38 @@ const main = async () => {
 
   if (!edition) throw new Error(`No existe la edición ${editionId} en ${organizationId}`)
 
-  const report = await getInsightReportById(undefined, organizationId, edition.reportId)
+  const storedReport = await getInsightReportById(undefined, organizationId, edition.reportId)
 
-  if (!report) throw new Error(`No existe el reporte de la edición ${editionId}`)
+  if (!storedReport) throw new Error(`No existe el reporte de la edición ${editionId}`)
+
+  // `--title="…"`: título de la vista previa cuando el encargo cambia de alcance (p. ej. `--modules=seo` sobre un
+  // reporte titulado para SEO + AEO). Sólo rotula el PDF local; el reporte guardado no cambia.
+  const titleOverride = arg('title')
+  const report = titleOverride ? { ...storedReport, title: titleOverride } : storedReport
 
   // `--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD`: otra ventana con el mismo encargo (p. ej. el mes que todavía no
   // tiene edición), para revisar el documento antes de generarla. Misma zona horaria y comparación del encargo.
   const start = arg('start')
   const endExclusive = arg('end-exclusive')
-  const request = start && endExclusive ? { ...edition.request, period: { ...edition.request.period, start, endExclusive } } : edition.request
+  const windowed = start && endExclusive ? { ...edition.request, period: { ...edition.request.period, start, endExclusive } } : edition.request
+  // `--modules=seo,aeo[,ico]`: un subconjunto de los módulos del encargo. Nunca agrega un módulo que la edición no pidió
+  // ni deja `seo` sin `aeo` (estándar del informe, 2026-11-06).
+  const modulesArg = arg('modules')
+  const modules = modulesArg ? modulesArg.split(',').map(m => m.trim()).filter(Boolean) : null
+
+  if (modules && modules.some(m => !windowed.modules.includes(m as (typeof windowed.modules)[number]))) {
+    throw new Error(`--modules=${modulesArg} debe ser un subconjunto de [${windowed.modules.join(', ')}]`)
+  }
+
+  // Estándar del informe: con `seo` siempre va `aeo` (mismo contrato que la creación y las recurrencias). Octubre 2026
+  // de Berel salió sin AEO justamente por un `--modules=seo` en esta vista previa.
+  const missingModules = missingCompanionModules((modules ?? windowed.modules) as typeof windowed.modules)
+
+  if (missingModules.length > 0) {
+    throw new Error(`--modules=${modulesArg ?? windowed.modules.join(',')} debe incluir ${missingModules.join(', ')}: la visibilidad orgánica siempre va con la de motores de respuesta`)
+  }
+
+  const request = modules ? { ...windowed, modules: modules as typeof windowed.modules } : windowed
   const windows = resolveInsightWindows(request.period, request.comparison)
   // El documento rotula el período con el encargo de la edición: con otra ventana, la portada y los encabezados dicen ésa.
   const previewEdition = { ...edition, request }
@@ -136,6 +160,9 @@ const main = async () => {
   const violations = validateEditorialPlan(plan, content)
 
   console.log(`${report.reportCode} · ${content.facts.length} hechos · ${content.rejections.length} rechazos · ${violations.length} violaciones`)
+
+  // Cada rechazo con su motivo: un capítulo que sale corto casi siempre es una fuente que falló, y sin esto no se ve cuál.
+  for (const rejection of content.rejections) console.log(`  · ${rejection.module}/${rejection.metricId ?? '—'}: ${rejection.reason} — ${rejection.detail}`)
 
   // Un plan que el validador rechaza no se compone: producción tampoco lo haría.
   if (violations.length > 0) {

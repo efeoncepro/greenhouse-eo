@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "5d58347cb21c",
+  "key": "5d58347cb21c635b70d6092d8afbb99f5c86ce115c8b0683fe42e305ba484f60",
+  "status": "failed",
+  "createdAt": "2026-11-05T16:15:09.609Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/expand/expand-inputs/9938973d31ae-canvas.png",
+    "imageSha256": "82c55a4d009c83e4966b77245a804e6b4355b0d5eaae8990006a0e4fbed0eb12",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/expand/expand-inputs/9938973d31ae-mask.png",
+    "maskSha256": "b9ffabad59e08c8c5fcd7a352dd252eb2af3cc64005e43673b07c89240c657b4",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1800,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "The same flat matte deep blue painted wall continues straight upward past the top edge of the image, a tall uninterrupted wall with the same soft plaster texture and the same warm afternoon side light from the left. The window frame at the far left and the white side wall at the far right also continue straight upward. No ceiling, no lamps, no objects, no text.",
+    "providerPrompt": "The same flat matte deep blue painted wall continues straight upward past the top edge of the image, a tall uninterrupted wall with the same soft plaster texture and the same warm afternoon side light from the left. The window frame at the far left and the white side wall at the far right also continue straight upward. No ceiling, no lamps, no objects, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.20777777777777778,
+    "editable": 686080,
+    "soft": 79872,
+    "protected": 2920448
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 2048,
+      "height": 1800
+    },
+    "target": {
+      "width": 1536,
+      "height": 1344
+    },
+    "aspectError": 0.00444444444444439,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "error": "fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing"
+}

@@ -414,3 +414,13 @@ conserva consentimiento por persona/operación, resultado terminal de enriquecim
 por canal. El readback posterior a automatización detectó sustitución de Primary; su corrección UI no
 certifica membresía de segmentos ni calificación. Aplicación del contrato vigente, sin nueva autonomía,
 schema, API o scheduler; no constituye un ADR adicional ni habilita comunicaciones futuras.
+
+## Evidencia del adapter — 04/11/2026
+
+El [workflow de señal LinkedIn a contacto contextual](../../.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md)
+se conserva en las skills espejo Codex/Claude, con [funcionamiento](../documentation/comercial/prospeccion-b2b.md)
+y [manual](../manual-de-uso/comercial/operar-prospeccion-b2b.md). La
+[aplicación Paula/Cristian](../commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md)
+verifica dos InMail y un email, CRM y evidencias por canal dentro del mandato explícito. Sin correo
+laboral admisible, el canal LinkedIn permite solicitarlo y conservar CRM/email/material personalizado
+pendientes. Es una aplicación del método aceptado, sin nuevo schema, API, runtime ni scheduler.

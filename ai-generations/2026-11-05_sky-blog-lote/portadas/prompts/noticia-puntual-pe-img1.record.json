@@ -1,0 +1,22 @@
+{
+ "registro": "D",
+ "tipo": "B",
+ "portada": true,
+ "primerPlano": "the backrest of a waiting-area seat",
+ "sinPrimerPlano": null,
+ "borde": "lower-right corner",
+ "id": "noticia-puntual-pe",
+ "input": {
+  "id": "noticia-puntual-pe",
+  "registro": "D",
+  "tipo": "B",
+  "portada": true,
+  "lugar": "wide, quiet departure lounge of a generic airport (must not imitate the Jorge Chávez terminal architecture)",
+  "escena": "a traveler stands by the large window with a backpack on his shoulder and a boarding pass in his hand, looking outside; beyond the glass a pearl-grey sky and fine drizzle droplets on the window. It reads as calm waiting before an early flight, not as a delay",
+  "hora": "pre-dawn early morning",
+  "clima": "Lima garúa drizzle, even diffuse light, luminous exposure without inventing sun",
+  "primerPlano": "the backrest of a waiting-area seat",
+  "borde": "lower-right corner",
+  "prohibir": "sun or blue sky, readable boarding pass text, flight display screens or clocks with readable time, aircraft through the window, airline uniforms"
+ }
+}

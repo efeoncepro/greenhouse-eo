@@ -32,6 +32,7 @@ import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { hasActiveContractorEngagementForProfile } from '@/lib/contractor-engagements/active-engagement-flag'
+import { resolveSessionPrincipalRevocation, SessionAccessRevokedError } from '@/lib/auth/session-access-revoked'
 import { hasWorkforceContractingDocumentForProfile } from '@/lib/workforce/contracting/active-document-flag'
 import { resolveSupervisorAccessSummaryFromMinimalContext } from '@/lib/reporting-hierarchy/access'
 import { getUserLocalePreferenceSnapshot } from '@/lib/i18n/locale-preferences'
@@ -99,6 +100,7 @@ const applyTenantAccessClaimsToToken = (token: JWT, tenant: TenantAccessClaims) 
   token.googleEmail = tenant.googleEmail
 
   token.spaceId = tenant.spaceId ?? undefined
+  token.spaceSelectionRequired = tenant.spaceSelectionRequired === true
   token.organizationId = tenant.organizationId ?? undefined
   token.organizationName = tenant.organizationName ?? undefined
 
@@ -395,6 +397,7 @@ const createAuthOptions = (): NextAuthOptions => {
 
             // Account 360
             spaceId: tenant.spaceId ?? undefined,
+            spaceSelectionRequired: tenant.spaceSelectionRequired === true,
             organizationId: tenant.organizationId ?? undefined,
             organizationName: tenant.organizationName ?? undefined,
 
@@ -657,6 +660,7 @@ const createAuthOptions = (): NextAuthOptions => {
 
         // Account 360
         token.spaceId = user.spaceId
+        token.spaceSelectionRequired = user.spaceSelectionRequired === true
         token.organizationId = user.organizationId
         token.organizationName = user.organizationName
 
@@ -714,6 +718,7 @@ const createAuthOptions = (): NextAuthOptions => {
 
           // Account 360
           token.spaceId = tenant.spaceId ?? undefined
+          token.spaceSelectionRequired = tenant.spaceSelectionRequired === true
           token.organizationId = tenant.organizationId ?? undefined
           token.organizationName = tenant.organizationName ?? undefined
 
@@ -774,6 +779,7 @@ const createAuthOptions = (): NextAuthOptions => {
 
           // Account 360
           token.spaceId = tenant.spaceId ?? undefined
+          token.spaceSelectionRequired = tenant.spaceSelectionRequired === true
           token.organizationId = tenant.organizationId ?? undefined
           token.organizationName = tenant.organizationName ?? undefined
 
@@ -794,12 +800,15 @@ const createAuthOptions = (): NextAuthOptions => {
 
       if (shouldRefreshAccessClaims) {
         const tenant = await getTenantAccessRecordByUserId(token.userId as string)
+        const revocation = resolveSessionPrincipalRevocation(tenant)
 
-        if (tenant?.active && tenant.status === 'active') {
-          applyTenantAccessClaimsToToken(token, tenant)
-        } else {
-          token.accessClaimsRefreshedAt = Date.now()
+        // TASK-2096 (H2): a disabled or missing principal must not keep its previous claims.
+        // Throwing makes NextAuth drop the cookie; a lookup failure also throws (fail-closed).
+        if (revocation || !tenant) {
+          throw new SessionAccessRevokedError(revocation ?? 'tenant_not_found')
         }
+
+        applyTenantAccessClaimsToToken(token, tenant)
       }
 
       token.portalHomePath = resolvePortalHomePath({
@@ -853,6 +862,20 @@ const createAuthOptions = (): NextAuthOptions => {
 
       return token
       } catch (error) {
+        if (error instanceof SessionAccessRevokedError) {
+          // Expected revocation, not a callback defect: audit it without a Sentry exception.
+          await recordAuthAttempt({
+            provider: token.provider === 'azure-ad' ? 'azure-ad' : token.provider === 'google' ? 'google' : 'credentials',
+            stage: 'jwt_callback',
+            outcome: 'rejected',
+            reasonCode: error.reason,
+            userIdResolved: typeof token.userId === 'string' ? token.userId : null,
+            reasonDetail: 'access_claims_refresh'
+          })
+
+          throw error
+        }
+
         // TASK-742 Capa 3 — JWT callback errors are the primary cause of opaque
         // `error=Callback` redirects. Capture with full context so the failing
         // stage is observable and the operator can fix the upstream cause.
@@ -926,6 +949,7 @@ const createAuthOptions = (): NextAuthOptions => {
 
         // Account 360
         session.user.spaceId = typeof token.spaceId === 'string' ? token.spaceId : undefined
+        session.user.spaceSelectionRequired = token.spaceSelectionRequired === true
         session.user.organizationId = typeof token.organizationId === 'string' ? token.organizationId : undefined
         session.user.organizationName = typeof token.organizationName === 'string' ? token.organizationName : undefined
 

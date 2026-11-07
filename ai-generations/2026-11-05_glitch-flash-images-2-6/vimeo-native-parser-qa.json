@@ -1,0 +1,33 @@
+{
+  "verifiedOn": "2026-11-05",
+  "scope": "EO_Editorial_Styles::responsive_vimeo candidate evaluated under an isolated class name against the live WordPress HTML parser",
+  "status": "pass",
+  "checks": 39,
+  "stdout": "eo-editorial-vimeo: 39 checks passed (real WP_HTML_Tag_Processor)",
+  "candidate": "/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/efeonce-editorial-blocks/includes/editorial/class-eo-editorial-styles.php",
+  "candidateSha256": "ce3318605f86c259cd056a056b6342596c2f9354b43e6859794c3d17b124f21f",
+  "previousLiveSha256": "950f61c31f426712d78d9426e791d02d13b5310ef9e4e4ad4f44b41ba47ab2b0",
+  "test": "/Users/jreye/Documents/efeonce-public-site-runtime/tests/eo-editorial-vimeo.test.php",
+  "testSha256": "1577ea8c2d87811a667333cae52a26e4fd75ae4de0b8d21e015b1e095fb7c292",
+  "parser": "WP_HTML_Tag_Processor",
+  "parserFile": "/www/efeoncegroup_752/public/wp-includes/html-api/class-wp-html-tag-processor.php",
+  "installed": false,
+  "filtersRegistered": false,
+  "theContentRendered": false,
+  "pluginDeployed": false,
+  "exitCode": 0,
+  "coverage": [
+    "Intrinsic ratios 640/360, 640/160, 960/240 and positive decimal dimensions",
+    "Idempotent repeated processing",
+    "Intrinsic width/height, title, permissions and caption preserved",
+    "Existing styles preserved except width, height and aspect-ratio; handles semicolons inside quoted strings and functions",
+    "Other providers and foreign iframe sources remain unchanged",
+    "Rejects deceptive domains, userinfo, ports, non-HTTPS and invalid player paths",
+    "Malformed, missing, boolean, zero, negative and nonpixel dimensions remain unchanged"
+  ],
+  "additionalChecks": {
+    "phpLint": "pass",
+    "localEditorialHarness": "36 checks passed; optional local WP parser checks skipped because WP_CORE_DIR was absent",
+    "gitDiffCheck": "pass"
+  }
+}

@@ -19,6 +19,33 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
       commit ni a un prompt.**
 - [ ] **Imágenes cargadas** en la carpeta de OneDrive del mes (p. ej. "Artículos de agosto"). La
       imagen de portada es la que **dice "portada" en el nombre del archivo**.
+      ⚠️ *Nota 2026-11-04:* desde que los nombres salen de la Spec, la portada es el archivo **N1** declarado en su
+      ficha (p. ej. `colores-mexicanos-con-blanco-hero.webp`), aunque no diga "portada". Para banners de blog manda
+      el nombre de la Spec (→ [`05`](05_BANNERS_IMAGENES.md), § Nombres de archivo en la entrega).
+
+### La carpeta de entrega en OneDrive (verificado 2026-11-04)
+
+Es la carpeta de la que el paso de imágenes toma los archivos:
+
+```
+Berel - Efeonce - Squad Berel › Workspace Oficial › 04_Entregables ›
+  <NN>. Articulos <Mes>/
+    Artículo N## - <Título>/
+      <banners del blog, en la raíz de la carpeta del artículo>
+      Social media/
+        <post, story y pinterest en PNG + reel en MP4>
+```
+
+- Meses existentes al 2026-11-04: `01. Articulos Junio` … `06. Articulos Noviembre`; `07. Articulos Diciembre` se
+  creó ese día. El número del mes es correlativo de la carpeta, no el número del mes del calendario.
+- **Artículo sin número editorial asignado** → carpeta `Artículo (sin número) - <Título>` hasta que el módulo 16 le
+  asigne N##; entonces se renombra (→ [`16`](16_NUMERACION_EDITORIAL.md), § Artículos sin número asignado).
+- Nombres de archivo: banners con el nombre exacto de su ficha N1–N4; sociales `<slug>_SM_POST.png`,
+  `_SM_STORIE.png`, `_SM_PINTEREST.png` y `_SM_REEL.mp4` (o `N##_SM_…` si ya tiene número)
+  → [`05`](05_BANNERS_IMAGENES.md). El material de marca de Berel no lo exporta Efeonce.
+- 🔴 **Entregar no es aprobar ni publicar.** Los archivos en OneDrive son el handoff. Siguen pendientes la revisión de
+  diseño (Daniela, Andrés o Melkin) y la decisión de distribución de Berel, y **nada se programa hasta que la URL del
+  artículo pase QA live**. Al entregar, anotar la ruta de la carpeta en las notas internas del artículo.
 
 ## A · Subir un artículo NUEVO
 
@@ -95,6 +122,7 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
 - [ ] Metatag de título en formato `NoTitle | Pinturas Berel`
 - [ ] Meta descripción copiada de Notion (y en `Resumen`)
 - [ ] Alias de URL manual (checkbox automático desmarcado)
+- [ ] Imágenes tomadas de la carpeta del artículo en `04_Entregables`, con el nombre de su ficha (portada = N1)
 
 ## Correcciones posteriores a una publicación
 

@@ -4,9 +4,9 @@
 >
 > Estado: Aplicable a pilotos manuales versionados. No describe una pantalla de producto ni autoriza publicación automática.
 
-> **Ruta vigente para Gemini Omni 1.1 Cloud (2026-09-24):** usar `pnpm ai:omni` y el
-> [manual del CLI](gemini-omni-1-1-cli.md) para texto, imagen, primer/último cuadro, referencias, edición y
-> extensión. Los ejemplos del piloto de 2026-07-18 y sus respuestas `promptFeedback`/`candidates` pertenecen
+> **Ruta vigente para Gemini Omni Cloud (2026-11-05: 1.2 Flash por defecto, 1.1 con `--model 1.1`):** usar `pnpm ai:omni` y el
+> [manual del CLI](gemini-omni-1-1-cli.md) para texto, imagen, primer/último cuadro, referencias, edición,
+> extensión y upscale (sólo 1.2). Los ejemplos del piloto de 2026-07-18 y sus respuestas `promptFeedback`/`candidates` pertenecen
 > a la integración anterior; el CLI 1.1 usa Cloud Interactions, `global`, MP4 fuente para editar y GET por ID.
 
 ## Para qué sirve
@@ -60,7 +60,7 @@ el segundo prueba familia de campaña, format wall, mezcla y release creativo si
 3. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
 4. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
 5. Elegir la mano mediante el gate `el master ya contiene la toma/física` vs `falta una toma, ángulo o continuidad física`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
-6. Si se usará Omni 1.1 Cloud, ejecutar el [preflight GCP del CLI](gemini-omni-1-1-cli.md#3-preflight-gcp), incluidos gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
+6. Si se usará Omni Cloud (1.2 por defecto), ejecutar el [preflight GCP del CLI](gemini-omni-1-1-cli.md#4-preflight-gcp), incluidos gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
 7. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
 
 ### Preflight enterprise del provider

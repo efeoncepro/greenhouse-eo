@@ -1,0 +1,129 @@
+{
+  "id": "selva-maleta",
+  "notion_url": "https://app.notion.com/p/dd20168becf64e21b9d117e149cd371d",
+  "titulo": "Qué llevar a la selva peruana: una maleta pensada para el calor, la humedad y las excursiones",
+  "slug": "/que-llevar-a-la-selva-peruana/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala media · luz de tarde con lluvia fina · orienta",
+      "registro": "D",
+      "archivo": "selva-sendero-lluvia-viajera-capa.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera con capa de lluvia y mochila caminando por un sendero de la selva peruana bajo una lluvia fina",
+      "que_muestra": "un sendero de tierra húmeda entre vegetación densa de selva, con hojas grandes brillando de agua; una viajera con capa de lluvia liviana, pantalón largo y mochila pequeña camina hacia el fondo; gotas visibles en el aire. Tiene que leerse como selva peruana con lluvia de paso, no como tormenta ni como selva de película.",
+      "hora_clima": "media tarde, con lluvia fina que llega sin aviso (la del relato); cielo cubierto claro; luz natural abundante y suave, sombras abiertas, sin oscurecer la escena para dramatizarla",
+      "personas": "la viajera a media distancia, de espaldas, caminando, sin pose ni mirada al lente; ningún rostro identificable",
+      "primer_plano": "una hoja grande con gotas muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar a la viajera ni el sendero",
+      "ancla_pov": "la lluvia que llega sin avisar",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas legibles en la ropa, la capa o la mochila",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin tormenta eléctrica ni barro extremo",
+        "sin animales a la vista",
+        "sin lianas de película"
+      ],
+      "fidelidad": "escena genérica de sendero de selva, sin lugar identificable → requiere foto real REF-01 de un sendero de selva de San Martín o Loreto como referencia de vegetación en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la capa y el sendero tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina la noche antes del vuelo, con la maleta abierta sobre la cama…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "maleta abierta · escala cercana · luz cálida de habitación de noche",
+      "registro": "E",
+      "archivo": "maleta-selva-ropa-manga-larga.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Maleta abierta sobre una cama con ropa de manga larga, capa de lluvia, repelente y bolsas secas para un viaje a la selva",
+      "que_muestra": "vista cenital o de tres cuartos de una maleta mediana abierta sobre una cama: una camisa y un pantalón de manga larga de colores claros doblados, una capa de lluvia liviana, un traje de baño, sandalias, un frasco de repelente sin marca, protector solar sin marca y dos bolsas secas de colores; las manos del viajero acomodan la camisa. La selección de cosas es el contenido: tiene que verse qué entra y que no sobra nada.",
+      "hora_clima": "noche antes del vuelo, en casa; luz cálida de lámpara combinada con luz neutra suficiente para leer los colores, sin sombras duras",
+      "personas": "solo las manos del viajero acomodando la ropa; fotografía el propio viajero desde arriba; ningún rostro",
+      "primer_plano": "el borde de la tapa de la maleta muy cerca del lente y muy fuera de foco, por el borde superior, sin tapar el contenido",
+      "ancla_pov": "Imagina la noche antes del vuelo, con la maleta abierta sobre la cama",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas legibles en frascos, ropa o maleta",
+        "sin etiquetas de aerolínea",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin stock",
+        "sin cuchillos, machetes ni equipo de supervivencia",
+        "sin medicamentos con marca a la vista",
+        "sin exceso de objetos"
+      ],
+      "fidelidad": "escena de objetos sin lugar identificable → no requiere REF de lugar; sí revisar que ningún producto tenga marca reconocible antes de aprobar"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina el bote de regreso de una excursión, con la lluvia golpeando el techo…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "dentro de un bote · escala cercana · luz de tarde con lluvia",
+      "registro": "E",
+      "archivo": "celular-bolsa-seca-bote-lluvia.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mano sosteniendo un celular dentro de una bolsa seca transparente en un bote bajo la lluvia en la selva",
+      "que_muestra": "en primer término, la mano del viajero sostiene un celular dentro de una bolsa seca transparente con gotas por fuera; detrás, fuera de foco, el borde de un bote techado, la lluvia cayendo sobre el río y la orilla verde. El celular seco en medio de la lluvia es el contenido: demuestra para qué sirve la bolsa.",
+      "hora_clima": "tarde, con lluvia de selva (la del relato); luz natural suave bajo el techo del bote, sin oscurecer la escena; gotas nítidas en la bolsa",
+      "personas": "fotografía el propio viajero desde su punto de vista; solo su mano en cuadro; si aparece un acompañante al fondo, de espaldas y desenfocado; ningún rostro identificable",
+      "primer_plano": "la bolsa seca es el sujeto nítido; muy cerca del lente y muy fuera de foco, el borde del bote por el borde inferior, sin tapar la mano",
+      "ancla_pov": "lo ves seguro dentro de su bolsa transparente, sin una gota adentro",
+      "no": [
+        "sin texto ni logos",
+        "sin marca reconocible del celular ni pantalla con contenido legible",
+        "sin marcas en la bolsa",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin tormenta eléctrica",
+        "sin agua dentro del bote"
+      ],
+      "fidelidad": "escena genérica de bote en río de selva → requiere foto real REF-01 de un bote techado en un río de la selva peruana como referencia en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tarapoto",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Cataratas, lluvia tibia y mototaxis",
+    "archivo": "banner-ruta-lima-tarapoto-maleta.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tarapoto: cataratas, lluvia tibia y mototaxis",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Tarapoto (TPP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TPP",
+      "ciudad": "Tarapoto"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Tarapoto"
+  },
+  "descartes": [
+    "Botas de caucho alineadas en la entrada de un lodge — repite el universo de la guía de lodges",
+    "Viajero aplicándose repelente al atardecer — riesgo de leerse como consejo de salud y de mostrar marca",
+    "Ropa mojada colgada en una cabaña — poco atractiva y sin argumento propio",
+    "Lentes empañados en primer plano — efecto difícil de generar sin artefactos",
+    "Catarata con ropa de baño — es de la guía de Tarapoto"
+  ]
+}

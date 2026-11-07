@@ -1,10 +1,10 @@
 # TASK-2064 — Efeonce ID: login V4 con Rooms como primer consumidor
 
-## Corte 2026-10-29 — fuente aceptada preservada; release retenido
+## Corte 2026-11-01 — V4 con carrusel en producción; falta el login humano a Rooms
 
-La pantalla V4 que ya sirve Auth en el SHA productivo leído conserva first-party/OTP OFF. El candidato Auth apilado mantiene byte a byte renderer, copy, assets y generadores de la rama visual aceptada; se verificó localmente a 1440/390 con tres novedades públicas acotadas. La UI nueva del producto Rooms de Claude Design aún no se había entregado al último intercambio; pertenece a EPIC-052 y no cambia la aceptación de esta pantalla del issuer. El canary interno del 26-10 ejercitó identidad/OTP una vez y cerró con flags OFF. Faltan CI del HEAD Auth publicado y readback visual después de un release autorizado. [Evidencia](../../audits/rooms/2026-10-28-auth-release-readiness.md).
+Login V4 con el carrusel de novedades publicadas llegó a producción con el release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (`released`, run `41284120477`, squash PR #262). Auth sirve `auth-server-00170-qlx` al 100 % con `GIT_SHA` `935583f88` y first-party/OTP ON. El feed se lee de `https://greenhouse.efeoncepro.com/api/public/login-announcements` con `createCachedLoginAnnouncementsLoader` (`src/lib/auth-server/persons/login-announcements.ts`; 600 ms de timeout, tope de 16 KB, hasta 3 novedades y caché de 30 s en el proceso), conectado en `routes.ts` y `services/auth-server/server.ts`. Si el feed falla, queda la fotografía oficial. Readback del 2026-11-01: `/login` en 200 con el carrusel visible; la entrada desde Rooms muestra «Entra a Rooms» con el carrusel. El arnés `pnpm auth-server:dev-ui` sirve `/login/public-feed-preview` con el feed real. Falta un login humano completo Efeonce ID → Rooms sobre la 00170: por eso sigue `in-progress`.
 
-> Estado actual26Oct: ver `Status real` y «Conciliación vigente» abajo. El delta25Oct se conserva como historia del corte y sus pendientes no describen el estado actual.
+> Estado actual: ver `Status real` y «Conciliación vigente — 2026-11-01» abajo. El delta 25-oct se conserva como historia del corte; sus pendientes no describen el estado actual.
 
 ## Delta 2026-10-25 — estado al corte de Codex
 
@@ -28,7 +28,7 @@ La pantalla V4 que ya sirve Auth en el SHA productivo leído conserva first-part
 - Motion: `docs/ui/motion/TASK-2064-efeonce-id-login-v4-rooms-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `V4 neutral/Rooms servido en la última revisión Auth leída, con first-party/OTP OFF. Candidato integrado local conserva el renderer aceptado; QA 1440/390 y tres novedades públicas actuales revisadas 2026-10-28. GVC previo 42 frames, 116 tests y 55 rangos de contraste. Feed nuevo sólo local: faltan CI remoto, release/readback visual del candidato y login real Rooms. TASK-2064 sigue in-progress.`
+- Status real: `V4 con carrusel de novedades publicadas en producción desde el release 935583f88db0 (auth-server-00170-qlx al 100 %, first-party/OTP ON, feed público de Greenhouse con caché de 30 s y fallback a la foto oficial). /login y la entrada desde Rooms verificados en 200 con el carrusel el 2026-11-01. Falta un login humano completo Efeonce ID → Rooms sobre la 00170; errores de Sentry del release sin revisar. Sigue in-progress.`
 - Rank: `TBD`
 - Domain: `identity|ui`
 - Blocked by: `none`
@@ -36,11 +36,9 @@ La pantalla V4 que ya sirve Auth en el SHA productivo leído conserva first-part
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Conciliación vigente — 2026-10-26
+## Conciliación vigente — 2026-11-01
 
-Canary de identidad y correo ya completado: [canary real cerrado](../../audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). [Auth retenido en PR](../../audits/rooms/2026-10-26-auth-deploy-control.md). No ampliar esa prueba a assurance completo, login Greenhouse, clientes o nueva activación. CI general y Vercel de ambos HEAD PR263/264 PASS según el [readback documental26Oct](../../audits/rooms/2026-10-26-docs-skills-state-readback.json); ambas PR siguen abiertas y retenidas. Los criterios aún abiertos abajo mantienen su razón y alcance.
-
-El estado consolidado vigente y el siguiente bloque están en [contrato para Claude Design](../../documentation/rooms/backend-api-for-claude-design.md). Producción conserva los flags humanos OFF; conectar el diseño no autoriza activarlos ni repetir el correo único. Auth permanece en PR por decisión expresa del operador.
+La retención humana sobre Efeonce ID se levantó y el release `935583f88db0` llevó a `main` la pantalla V4 con el carrusel. PR #263/#264 se cerraron como superadas. Producción: `auth-server-00170-qlx`, flags first-party/OTP ON (fuente durable: variables de repo GitHub), tráfico a la última revisión; rollback = tráfico a `auth-server-00169-4pq`. El canary del 26-10 sigue cerrado y no se repite. Los criterios abiertos abajo conservan su razón. Estado del programa: [ledger de la skill `efeonce-auth`](../../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
 ## Summary
 
@@ -101,7 +99,7 @@ El issuer tiene shell Nocturno editorial mientras Greenhouse ya tiene V4 aprobad
 
 ### Gap
 
-- Resuelto local: issuer presenta V4/contexto y WOFF2 renovados. Falta verificar release e integración real; novedades quedan en fallback oficial.
+- Resuelto local: issuer presenta V4/contexto y WOFF2 renovados. Delta 2026-11-01: release servido y novedades integradas desde el feed público; falta el login humano a Rooms.
 
 ## Modular Placement Contract
 
@@ -293,7 +291,8 @@ Sesión Rooms posee consumer; root coordina integración y release. No nuevos cl
 - [x] Consentimiento y páginas existentes conservan regresiones verdes; suite UI y harness con/sin JS.
 - [x] Evidencia visual/scorecard y estado rollout registrados en dossier; no desplegado.
 - [x] Release y autenticación real Efeonce ID→Rooms verificados; dependen del rollout TASK-1834/2065. Evidencia: Auth00168 y canary Microsoft/MFA Rooms26Oct; flags OFF al finalizar. No cierra feed de novedades ni assurance.
-- [ ] Fuente pública bounded de novedades definida e integrada; hoy fallback oficial y fixtures sólo para QA.
+- [x] Fuente pública bounded de novedades definida e integrada. Evidencia: `createCachedLoginAnnouncementsLoader` contra el reader público de Greenhouse (timeout 600 ms, 16 KB, 3 novedades, caché 30 s, fallback a la foto oficial), 213 tests de `persons` PASS, y readback del 2026-11-01 sobre `auth-server-00170-qlx`: `/login` en 200 con el carrusel del feed publicado.
+- [ ] Login humano completo Efeonce ID → Rooms sobre la versión servida en `auth-server-00170-qlx` (carrusel). Sin verificar: el readback del 2026-11-01 cubrió la pantalla y la entrada «Entra a Rooms», no una sesión humana de punta a punta. El criterio anterior se apoya en el canary del 26-10, con otra revisión.
 
 ## Verification
 

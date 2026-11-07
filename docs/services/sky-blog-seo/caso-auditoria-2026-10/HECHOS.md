@@ -20,6 +20,9 @@ en docs, skills, informes o correos de este caso sale de aquí. Evidencia reprod
 
 ## Search Console (`https://blog.skyairline.com/`)
 
+- Al 01-11-2026 se creía que era la única propiedad con acceso. **Delta 05-11-2026:** el token de la conexión de SKY
+  también ve `https://www.skyairline.com/` (`siteFullUser`, `sites.list`). Ver «Hechos del 05-11» al final.
+
 - Clics/día por página: ene–feb 2026 2.354 → ago–sep 984 (−58 %). Por propiedad: 2.174 → 912.
 - Pérdida ene–feb → ago–sep por tipo (clics/día): equipaje y políticas −771, destinos internacionales −220, Chile
   −186, consejos −82, empleo/corporativo −79, Perú −32.
@@ -67,8 +70,12 @@ en docs, skills, informes o correos de este caso sale de aquí. Evidencia reprod
 
 - Hoy US$ 6.000–16.000/mes (Semrush CL+PE · GSC × CPC extrapolado); antes de migrar US$ 28.000–45.000/mes.
 - 71 % del valor medido es de marca (equipaje, check-in, SKY Plus). Cobertura sin extrapolar: 13,3 %.
+- Delta 05-11-2026: con la propiedad `www` el rango previo real da ≈US$ 43–61 mil/mes y la marca pesaba 49–52 %
+  antes de migrar. Ver «Hechos del 05-11» al final; las cifras de arriba se conservan como lo enviado el 23-10.
 
 ## Escenarios (estimación de Efeonce, no compromiso)
+
+Tabla del 23-10. El 05-11 «sin intervenir» pasó a la caída medida de oct-2026 (−43 %): ver «Hechos del 05-11».
 
 | | Nov 2026 | Dic 2026 | Ene 2027 |
 | --- | --- | --- | --- |
@@ -80,3 +87,71 @@ en docs, skills, informes o correos de este caso sale de aquí. Evidencia reprod
 ## Gasto de datos
 
 DataForSEO: 6 tareas SERP (≈US$ 0,012). Semrush por API dentro del plan.
+
+## Hechos del 05-11-2026 (proyección a 24 meses)
+
+Corte: GA4 al 04-11-2026, GSC final hasta oct-2026, Semrush oct-2026. Estas cifras actualizan las anteriores sin
+reescribirlas; el uso en el informe está en [PROYECCION_2026-11.md](PROYECCION_2026-11.md). Datos crudos (no
+versionados): `outputs/sky-blog-proyeccion-2026-11/{modelo,ga4,valor,informe}/`.
+
+### Tráfico (GA4, orgánico del blog, ambos hosts deduplicados)
+
+| Momento | Sesiones |
+| --- | --- |
+| Oct-2026 cerrado | 24.351 (vs 42.585 en oct-2025: −43 %) |
+| Nov-2026, días 1–4 | 2.546 (vs 5.824: −56 %) |
+
+- La serie GA4 del blog empieza en jul-2023. El −35,6 % de oct 1–21 queda reemplazado por el mes cerrado.
+
+### Conversión (GA4, evento clave `purchase`)
+
+- `vpv_bv` también es evento clave e infla la tasa genérica: no se usa.
+- Personas que vieron el blog y compraron ese mismo mes: ≈2.350/mes en ene–sep 2025 y ≈1.000/mes en ene–oct 2026
+  (774 en oct-2026). Su tasa de compra: 2,1–2,7 % en 2026 y 1,4–2,4 % antes de migrar.
+- Sesiones que entran por el blog y compran en esa sesión: 0,25 %, contra 2,7 % del sitio (oct-2026).
+- `purchase` no trae monto: todas las métricas de ingresos están en 0 en la propiedad. No hay ingresos por blog.
+- Pasar del blog a skyairline.com no abre otra sesión; los dominios cruzados no son un problema.
+- Es coincidencia en el mes, no atribución, y es un piso (no cubre cambio de dispositivo ni cookies rechazadas).
+
+### Search Console
+
+- La propiedad `https://www.skyairline.com/` es legible con el token de la conexión (`siteFullUser`). Se exportó el
+  05-11 filtrada a `/blog/`: primer día conservado 24-06-2025; ene–may 2025 ya no existe en GSC.
+  Archivos: `outputs/sky-blog-proyeccion-2026-11/valor/historia-www-blog-*.csv`.
+- Con filtro de página, la dimensión país sólo devuelve clics con consulta visible (oct-2026: 7.433 de 24.965). El
+  reparto por país del blog sale del total de la propiedad sin filtro; en `www`/blog el reparto es sólo de los
+  clics con consulta visible. La columna `country_basis` del CSV indica la base.
+
+### Valor publicitario equivalente (`gsc_clicks_country_cpc_v1`, Chile + Perú)
+
+| | Ago–oct 2026 (blog) | Jul–sep 2025 (`www`/blog) | Cambio |
+| --- | --- | --- | --- |
+| Medido, US$/mes | 2.107 | 7.406 | −72 % |
+| Sin marca medido, US$/mes | ≈700 | ≈3.700 | −81 % |
+| Peso de marca | 66–70 % | 49–52 % | — |
+| Cobertura de valoración | 12–15 % | 13,8–14,3 % | — |
+| Extrapolado (no canónico), US$/mes | ≈15.600 | ≈52.400 (ago-25: 52.993) | — |
+
+- Con datos reales, el rango previo a la migración da ≈US$ 43–61 mil/mes, contra los 28–45 mil publicados el 23-10.
+  El informe de la proyección mantiene 28–45 mil por consistencia, así que el repago queda conservador.
+- Por tema (valor medido, jul–sep 2025 → ago–oct 2026): equipaje −58 %, destinos Chile −82 %, internacionales
+  −83 %, destinos Perú −92 %, mascotas −33 %.
+- Los valores de 2025 son revaloración a CPC de hoy, no precios de esa época.
+
+### Semrush (traffic cost, ambos hosts, CL + PE)
+
+- Pico US$ 30–40 mil/mes entre may-2024 y may-2025 (máximo ene-2025: 40.283).
+- Ya bajaba antes de migrar: ago-2025 28.529, sep-2025 25.448. Después: oct-2025 12.406, sep-2026 6.089,
+  oct-2026 4.868.
+
+### Escenario «sin intervenir»
+
+- Usa la caída interanual medida de oct-2026 (−43 %) en vez del −35 % fijo: enero de 2027 sin intervenir pasa a
+  38.850 (antes 44.161). Base y estructural no cambian.
+
+### Gasto de datos
+
+- DataForSEO: 29 tareas `keyword_overview`, 19.239 keywords, US$ 1,525 real (estimado 2,66). Persistidas el 05-11
+  con el writer canónico en `greenhouse_growth.seo_keyword_market_data`: 19.239 filas, 4.987 con CPC, verificadas
+  por lectura. Recibos en `outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/` (~300 MB, no versionar).
+- Semrush: 4 llamadas dentro del plan.

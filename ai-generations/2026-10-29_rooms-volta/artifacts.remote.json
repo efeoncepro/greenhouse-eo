@@ -1,0 +1,71 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:51:04.404Z",
+  "run": "ai-generations/2026-10-29_rooms-volta",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-29_rooms-volta",
+  "totalBytes": 21608203,
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "dooh-3x1.png",
+      "sizeBytes": 3785090,
+      "sha256": "2d6b6c86cb883105644f14ffe1541075a2467715e3ceb1f5e79c4106004ceff1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/dooh-3x1.png"
+    },
+    {
+      "path": "feed-4x5.png",
+      "sizeBytes": 3060183,
+      "sha256": "dfbee582ef9331bcffed2134f1b2db781160a86b0edb0c904360918b3a0d6706",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/feed-4x5.png"
+    },
+    {
+      "path": "kv-16x9.png",
+      "sizeBytes": 4317488,
+      "sha256": "07988cba774af6f22b0af0a5cc3a7b7af39ccafcc2f31c225012ed26faab3917",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/kv-16x9.png"
+    },
+    {
+      "path": "story-9x16-b.png",
+      "sizeBytes": 3447610,
+      "sha256": "d4431632fdd0c07bdf302005faf4383df2c6b100fdbf61e10d2d5cee829c5156",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/story-9x16-b.png"
+    },
+    {
+      "path": "story-9x16.png",
+      "sizeBytes": 3785877,
+      "sha256": "2870799a5b3e7b8e22daf7a4a14c1e54d8ce9672f3115474528ca8e50a325c57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/story-9x16.png"
+    },
+    {
+      "path": "web/dooh-3x1.jpg",
+      "sizeBytes": 436041,
+      "sha256": "68a872d6925a771ea62aff42e39bc11e497833c565e118341a05221765a6d2a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/web/dooh-3x1.jpg"
+    },
+    {
+      "path": "web/feed-4x5.jpg",
+      "sizeBytes": 704773,
+      "sha256": "f4d123d3d2a686c0944a47d8bb223552921d9a2a45403e62a53f74fae1e746d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/web/feed-4x5.jpg"
+    },
+    {
+      "path": "web/kv-16x9.jpg",
+      "sizeBytes": 628016,
+      "sha256": "cb5bc92ee7c89c193ade7bb5f79799ed06362ecc38f541c87dcd2d5dffa50a5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/web/kv-16x9.jpg"
+    },
+    {
+      "path": "web/story-9x16-b.jpg",
+      "sizeBytes": 680631,
+      "sha256": "0888389f18dba1d6de3666ccf9a5939d5e06473c0e4b866cf16dd8b667066388",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/web/story-9x16-b.jpg"
+    },
+    {
+      "path": "web/story-9x16.jpg",
+      "sizeBytes": 762494,
+      "sha256": "1b8384fb5c923ff111452116a3f99914faee2dee1d680124c678a4408484fd6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_rooms-volta/web/story-9x16.jpg"
+    }
+  ]
+}

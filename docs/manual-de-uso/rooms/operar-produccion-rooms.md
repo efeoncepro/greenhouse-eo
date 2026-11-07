@@ -1,16 +1,16 @@
 # Rooms — Operar producción
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-10-31 por Claude
-> **Ultima actualizacion:** 2026-10-31 por Claude
+> **Ultima actualizacion:** 2026-11-02 por Claude (carril CLI de agentes)
 > **Documentacion tecnica:** [Dossier de Rooms](../../architecture/rooms/README.md) · [ADR acceso interno durable](../../architecture/rooms/EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md) · [Recibo de activación](../../audits/rooms/2026-10-31-production-activation.md) · [Recibo de acceso durable](../../audits/rooms/2026-10-31-durable-access-production.md)
 
 ## Para qué sirve
 
-Operar Rooms en producción tal como quedó el 2026-10-31: confirmar qué deploy está sirviendo, dejar el dominio
-público apuntando al deploy correcto, saber dónde vive cada interruptor, deshacer la activación si hace falta y
-resolver a una persona que no puede entrar.
+Operar Rooms en producción tal como quedó el 2026-11-02: confirmar qué deploy está sirviendo, dejar el dominio
+público apuntando al deploy correcto, saber dónde vive cada interruptor, aplicar una migración con su respaldo,
+deshacer la activación si hace falta y resolver a una persona que no puede entrar.
 
 Rooms está encendido para el equipo de Efeonce. Todavía no hay clientes reales: el primero necesita una autorización
 nueva.
@@ -38,13 +38,21 @@ Compara el id del deploy y su commit con el último deploy de producción:
 vercel ls efeonce-rooms --prod --scope efeonce-7670142f
 ```
 
-Al 2026-10-31 el dominio sirve `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG` = `main@a2d72c0`.
+Al 2026-11-02 el dominio sirve el deploy `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` (PR #23, `3434ea8`), con el carril CLI
+de agentes encendido. Antes: `efeonce-rooms-15djjyfz2` (redeploy con el carril encendido sobre PR #22 `main@9a4340a`).
 
 Comprobación sin sesión:
 
-- `/rooms` y `/auth/error` responden 200;
+- `/rooms` y `/rooms/:id/actividad` responden **307** a `/login?returnTo=…` (con `Cache-Control: private, no-store`);
+  un 200 con «Cargando la sala…» es la regresión de
+  [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md);
+- `/auth/error` responde 200;
 - `/api/auth/session` responde 401;
 - `/login?returnTo=/rooms` redirige 302 a `auth.efeonce.org/oauth/authorize`.
+
+```bash
+curl -sI https://efeonce-rooms.vercel.app/rooms | grep -iE '^(HTTP|location|cache-control)'
+```
 
 ### 2. Reasignar el alias manual después de cada deploy
 
@@ -64,8 +72,9 @@ Después repite el paso 1 y confirma que el id cambió. Para probar como visitan
 |---|---|---|
 | Vercel, proyecto `efeonce-rooms`, entorno Production | `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`, `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED`, `ROOMS_MEDIA_DISPATCH_ENABLED` | `true` |
 | Vercel, mismo entorno | `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` (permiso sólo de desarrollo) | `false`; no se toca |
-| Efeonce ID, Cloud Run `auth-server` | `AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` y los dos secretos de invitación montados | Revisión `auth-server-00169-4pq` con el 100 % del tráfico |
-| Variables de repo de GitHub (`efeoncepro/greenhouse-eo`) | Las mismas dos variables de Efeonce ID, que lee `auth-server-deploy.yml` | `true`; el próximo deploy gobernado conserva el estado |
+| Vercel, mismo entorno | `ROOMS_AGENT_LANE_ENABLED` (carril CLI de agentes) y sus cuatro variables `ROOMS_AGENT_*` | `true` desde el 2026-11-02 (paso 3b) |
+| Efeonce ID, Cloud Run `auth-server` | `AUTH_SERVER_FIRST_PARTY_ENABLED`, `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED`, los dos secretos de invitación montados y `AUTH_SERVER_ROOMS_AUDIENCE` | Al 2026-11-02, revisión `auth-server-00172-zcn` (hotfix PR #267) con el 100 % del tráfico |
+| Variables de repo de GitHub (`efeoncepro/greenhouse-eo`) | Las mismas variables de Efeonce ID, que lee `auth-server-deploy.yml` | Flags en `true` y la audiencia Rooms; el próximo deploy gobernado conserva el estado |
 | Greenhouse PostgreSQL | `greenhouse_notifications.email_type_config`, tipo `auth_server_rooms_invitation_otp` (correo con el código) | `enabled=true` |
 
 Lecturas:
@@ -81,6 +90,46 @@ gh variable list --repo efeoncepro/greenhouse-eo
 y bórralo al terminar.
 
 Un flag de Vercel nuevo o cambiado sólo aplica después de un redeploy. Ese redeploy vuelve a exigir el paso 2.
+
+### 3b. Carril CLI de agentes (`ROOMS_AGENT_LANE_ENABLED`)
+
+El carril deja que un agente opere Rooms por CLI con el login de una persona interna
+([manual](operar-rooms-con-agentes-por-cli.md)). Necesita los dos lados encendidos:
+
+| Lado | Variable | Valor en producción |
+|---|---|---|
+| Rooms (Vercel Production) | `ROOMS_AGENT_LANE_ENABLED` | `true` |
+| Rooms | `ROOMS_AGENT_AUDIENCE` | `https://efeonce-rooms.vercel.app/api/v1` |
+| Rooms | `ROOMS_AGENT_CLI_CLIENT_IDS` | `efeonce-rooms-cli` (los `azp` aceptados) |
+| Rooms | `ROOMS_AGENT_INTROSPECTION_CLIENT_ID` | `efeonce-rooms-resource` |
+| Rooms | `ROOMS_AGENT_INTROSPECTION_CLIENT_SECRET_SECRET_REF` | Secret Manager `rooms-production-agent-introspection-client-secret:1` (sólo en local va el secreto crudo) |
+| Efeonce ID | `AUTH_SERVER_ROOMS_AUDIENCE` | La misma audiencia; vacía = Efeonce ID no emite tokens para Rooms |
+
+**Prender** (con autorización del operador):
+
+1. Confirma que Efeonce ID sirve la audiencia y tiene los dos clientes
+   ([manual del autorizador](../identity/operar-autorizador-efeonce.md)).
+2. `vercel env add` de las variables de Rooms en Production (`--scope efeonce-7670142f`).
+3. Redeploy de producción y **reasigna el alias manual** (paso 2): sin eso el dominio sigue en un deploy con el carril
+   apagado.
+
+**Readback** (sin sesión ni tokens reales):
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://efeonce-rooms.vercel.app/.well-known/oauth-protected-resource
+# 200 (con audiencia, emisor y cliente) = encendido · 404 = apagado
+curl -s -o /dev/null -w '%{http_code}\n' -H 'Authorization: Bearer falso' \
+  https://efeonce-rooms.vercel.app/api/v1/rooms
+# 401 = el verificador rechaza un bearer falso (falla cerrado)
+```
+
+**Apagar**, del corte más acotado al más amplio; cualquiera surte efecto en menos de 30 s:
+
+1. `ROOMS_AGENT_LANE_ENABLED=false` en Vercel, redeploy y alias. La metadata vuelve a 404.
+2. Suspender el cliente `efeonce-rooms-cli` en Efeonce ID: corta todas las CLIs de todas las personas.
+3. Vaciar `AUTH_SERVER_ROOMS_AUDIENCE` (variable de repo GitHub + deploy gobernado de Efeonce ID).
+
+Ninguno de los tres corta el acceso de las personas por navegador.
 
 ### 4. Deshacer la activación (rollback, unos 2 minutos)
 
@@ -119,9 +168,38 @@ Hazlo sólo con autorización del operador y anota cada lectura en un recibo fec
 3. Reasigna el alias al deploy nuevo (paso 2) y confirma con el paso 1.
 
 Para volver atrás el **código** sin tocar flags: revierte el merge y redeploy, o reasigna el alias al deploy
-anterior (`dpl_GiGEoYaPSsUf8V7uZZyTbxtfZM8A`). La migración 19 es aditiva: el código anterior funciona con ella.
+anterior (búscalo con `vercel ls efeonce-rooms --prod --scope efeonce-7670142f`). Antes, confirma que las migraciones
+aplicadas después de ese deploy son aditivas (expand); las del 2026-10-31 y la del nombre del espacio
+(`1793267`) lo son, así que el código anterior funciona con ellas.
 
-### 5. Una persona del equipo no puede entrar (`identity_unbound`)
+### 5. Aplicar una migración a `rooms_production`
+
+`rooms_production` vive en la instancia compartida `greenhouse-pg-dev`: un PITR de la instancia también
+retrocedería Greenhouse. Por eso cada migración se ensaya en un clon y se aplica con un respaldo lógico previo del
+esquema `rooms`. Orden, cada paso con autorización explícita del operador:
+
+1. **Gate de migraciones revisadas, en el mismo PR.** La migración nueva entra en `REVIEWED_MIGRATIONS`
+   (`scripts/design-integration/config.ts`). `pnpm test` lo exige (`tests/integration-env.test.ts`): sin eso,
+   `pnpm integration:up` falla en el preflight con «Review exact migration inventory before integration bootstrap» y
+   el deploy queda retenido ([ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
+2. **En local**, `pnpm db:migrate up` (sin `up`, `pnpm db:migrate` sólo muestra el estado) y `pnpm verify`.
+3. **Ensayo en un clon:** `pnpm db:rehearse-production`. Debe terminar en PASS.
+4. **Corrida en seco** contra producción: `pnpm db:migrate-production`. Lista aplicadas, pendientes y tablas.
+5. **Aplicar** con el número exacto de pendientes que viste:
+
+   ```bash
+   ROOMS_EXPECT_PENDING=1 pnpm db:migrate-production --apply
+   ```
+
+   Antes del `up`, el script guarda un `pg_dump` del esquema `rooms` y del registro de migraciones en
+   `./.local/production-backups/` (permisos `700`). Después relee: todas las migraciones aplicadas, hashes de las
+   ediciones publicadas intactos y conteos de filas existentes sin cambios. Si cualquier lectura falla, se detiene.
+6. **Merge, deploy y alias** (paso 2), y lectura del dominio (paso 1).
+7. **Borra el respaldo** cuando el deploy quedó verificado: contiene datos de producción.
+
+Nunca corras `down` contra producción. Si hay que volver atrás, se restaura desde ese respaldo.
+
+### 6. Una persona del equipo no puede entrar (`identity_unbound`)
 
 1. La persona entró con Efeonce ID, pero no tiene acceso en Rooms. Rooms le muestra la página «Casi.» con un
    **código de solicitud** de 8 caracteres (`XXXX-XXXX`), válido por 7 días.
@@ -140,8 +218,11 @@ existieran los comandos `members.*`.
 | El dominio público sirve un deploy viejo | Falta reasignar el alias (paso 2). |
 | `identity_unbound` o la página «Casi.» | La persona existe en Efeonce ID pero no tiene acceso vigente en Rooms. |
 | `/api/auth/session` responde 401 sin sesión | Correcto. |
+| `/rooms` sin sesión responde 307 a `/login` | Correcto: el proxy envía a Efeonce ID antes de pintar la página. |
+| `integration:up` falla con «Review exact migration inventory…» | Una migración no está en `REVIEWED_MIGRATIONS` (paso 5.1). |
 | El chequeo de drift de Efeonce ID marca `RESEND_API_KEY_SECRET_REF` | Esperado hasta el primer deploy gobernado: la revisión viva lo declara sin versión y el workflow pide `:1`. |
 | `pnpm access:production health` sin señales | La organización tiene al menos un administrador con cobertura vigente. |
+| `/.well-known/oauth-protected-resource` responde 404 | El carril CLI de agentes está apagado, o el alias apunta a un deploy anterior al encendido (paso 3b). |
 
 ## Qué no hacer
 
@@ -153,7 +234,7 @@ existieran los comandos `members.*`.
 - No invitar a un cliente real: falta una autorización nueva, la revisión de seguridad TASK-1833 y medir la sala en
   vivo.
 - No dejar en disco archivos de `vercel env pull` ni respaldos lógicos con datos de producción.
-- No hacer merge de los PR #263/#264 de Efeonce ID como parte de esta operación: siguen retenidos.
+- No reabrir ni hacer merge de los PR #263/#264 de Efeonce ID: se cerraron sin merge el 2026-11-01, superados por el release; cualquier cambio de Efeonce ID va por su propio release.
 
 ## Problemas comunes
 
@@ -164,6 +245,8 @@ existieran los comandos `members.*`.
 | El login redirige pero Efeonce ID no muestra la pantalla propia | La revisión con tráfico no tiene first-party encendido | Paso 3: revisa el tráfico de `auth-server`. |
 | El código por correo no llega | Tipo de correo apagado o flag OTP apagado | Revisa `email_type_config` y la revisión de `auth-server`. |
 | No puedes probar en el alias del equipo | Tiene SSO de Vercel | Usa `efeonce-rooms.vercel.app`. |
+| `pnpm db:migrate up` falla en local por una migración desconocida | Tu PG local corrió una rama sin merge (caso `1793266`, rama `claude/rooms-media-import`) | Trae ese archivo temporalmente o usa una base desechable; no borres filas de `rooms_migrations` a mano. |
+| El encabezado dice «Espacio de trabajo» | La organización no tiene nombre o la base no respondió | [Nombrar el espacio de trabajo](nombrar-espacio-de-trabajo.md). |
 
 ## Referencias técnicas
 
@@ -173,5 +256,9 @@ existieran los comandos `members.*`.
 - [Migraciones aplicadas](../../audits/rooms/2026-10-31-production-migrations-applied.md) y
   [ensayo](../../audits/rooms/2026-10-31-production-migration-rehearsal.md)
 - [Administrar el acceso interno](administrar-acceso-interno.md)
+- [Operar Rooms con agentes por CLI](operar-rooms-con-agentes-por-cli.md) · [ADR, enmienda D1-bis](../../architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
+- [Nombrar el espacio de trabajo](nombrar-espacio-de-trabajo.md)
+- [ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md) y
+  [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)
 - [Invitación por correo y código](../identity/operar-invitacion-rooms-email-otp.md)
 - [Quién ve qué en Rooms](../../documentation/rooms/quien-ve-que-en-rooms.md)

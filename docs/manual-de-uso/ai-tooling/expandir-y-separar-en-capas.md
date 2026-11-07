@@ -1,9 +1,9 @@
 # Expandir, separar en capas, borrar, mover, incorporar, cambiar fondo y rehacer detalle
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.4
 > **Creado:** 2026-10-03 por Claude (TASK-1973)
-> **Ultima actualizacion:** 2026-10-03 por Claude — (1.2) seccion «Para agentes» (arbol de decision con los ganadores medidos, lineas de comando, codigos de salida, regla del tope de costo y checklist al 100 %); resultados medidos por tecnica con costo; expandir: Flux Fill vs GPT Image con la banca inventada en 9:16; Layerize cobra la base como una capa (USD 0,03375 c/u); seleccion de capa: el nombre gana sobre la descripcion; `foto:expandir` → TASK-1925. Antes (1.1) canario real: clean plate con las demas capas, sombra proyectada, `place`
+> **Ultima actualizacion:** 2026-11-05 por Claude — (1.4) en «Expandir», el rodeo sin saldo en fal: alejar la camara con Flare y usar el candidato crudo, con su costo de fidelidad (lote Blog SKY). Antes (1.3) en «Antes de empezar», cargar el gasto de las tecnicas con OpenAI al credito personal con `OPENAI_API_KEY_PROFILE=personal`. Antes (1.2) seccion «Para agentes» (arbol de decision con los ganadores medidos, lineas de comando, codigos de salida, regla del tope de costo y checklist al 100 %); resultados medidos por tecnica con costo; expandir: Flux Fill vs GPT Image con la banca inventada en 9:16; Layerize cobra la base como una capa (USD 0,03375 c/u); seleccion de capa: el nombre gana sobre la descripcion; `foto:expandir` → TASK-1925. Antes (1.1) canario real: clean plate con las demas capas, sombra proyectada, `place`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:layers`, `pnpm ai:mask --from-layer`, `pnpm ai:inpaint expand|erase|move|place|background`, `pnpm ai:inpaint image --zone-resolution`
 > **Documentacion relacionada:** [editar una zona de una imagen](editar-una-zona-de-una-imagen.md), [editar una zona de un video](editar-una-zona-de-un-video.md), [guia de seleccion de modelos](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md), [generador visual](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
@@ -35,6 +35,12 @@ cambio fuera de lo que se debia tocar, sale con codigo 2.
   clean plate si hay capas, si no Sunburst; **expandir** → Flux Fill, nunca GPT Image; **agregar o cambiar** en una
   zona → Flare para el dia a dia y Sunburst (el mas potente, edita sin mascara y recibe la zona como guia) para la pieza
   final. Los defaults de cada comando ya siguen esa regla.
+- Quien paga: cuando la tecnica usa un modelo OpenAI (Flare o Sunburst, por ejemplo borrar sin capas o agregar en
+  una zona), anteponer `OPENAI_API_KEY_PROFILE=personal` al comando (`OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint
+  erase …`) carga el gasto al credito de la cuenta personal mientras quede; sin la variable paga la clave de la
+  empresa. No aplica a Fal (Flux Fill, Seedream) ni a `pnpm ai:layers`. Nunca la dejes en `.env.local`; si OpenAI
+  responde 429 / `insufficient_quota`, el credito se acabo: quita la variable. Ver
+  [alternar la clave de OpenAI](alternar-clave-openai.md).
 
 ## Separar en capas: `pnpm ai:layers`
 
@@ -152,6 +158,16 @@ pnpm ai:inpaint expand --image escena-1x1.png --canvas 2048x1072 --scale 0.8 --a
 - Flux genera el area nueva a menor resolucion en lienzos grandes (9:16 de 1536×2730 → 1088×1904) y la escala; la
   escena original conserva la suya. Puede **inventar elementos** en el area nueva (en el 9:16 agrego una banca): si
   molesta, describe en el prompt que hay alrededor y repite.
+- **Sin saldo en fal: alejar la camara con Flare y quedarse con el candidato crudo** (lote Blog SKY, 2026-11-05).
+  `expand` no corrio porque fal respondia «User is locked. Exhausted balance» (revisa antes con `pnpm ai:fal --balance`,
+  gratis). Para subir al sujeto de 11 portadas se armo a mano el lienzo 3840×2160 (la escena reducida y subida sobre una
+  guia difuminada de la misma foto) con una mascara que protegia al sujeto, y se corrio `pnpm ai:inpaint image` con
+  `gpt-image-2.5-flare` en `high`. El recompuesto `candidate-1.png` dejo uniones visibles en 7 de 11 (Flare reencuadra,
+  como en el canario de abajo) y una pasada de fundido sobre las uniones las empeoro. El crudo `candidate-1-raw.png`
+  (2560×1440, la imagen entera redibujada) salio coherente y se amplio con lanczos a 3840×2160. El precio: el crudo no
+  conserva los pixeles originales (en una portada desaparecio la persona), asi que pierde la garantia de delta 0 y
+  obliga a revisar al 100 % lugar, personas y detalles. Es un rodeo, no el nuevo default: con saldo, `expand` con Flux
+  Fill. Scripts del caso: `creative-workbench/projects/sky/blog-lote-2026-11/tools/imagenes/zoomout.mjs` y `runzoom2.sh`.
 - `pnpm foto:expandir` sigue existiendo para el flujo de marca de CMP-004 (Sunburst, redibuja: es otro contrato) y no
   se delego a este nucleo; su migracion quedo en TASK-1925.
 - Pendiente: comparar con FLUX Outpainting y FLUX Erase de Black Forest Labs (API propia, no esta en fal); requiere

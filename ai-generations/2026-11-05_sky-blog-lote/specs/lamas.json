@@ -1,0 +1,129 @@
+{
+  "id": "lamas",
+  "notion_url": "https://app.notion.com/p/40239c2fefe7814d9391d902a6a3a3c6",
+  "titulo": "Lamas: el pueblo con castillo y barrio nativo cerca de Tarapoto",
+  "slug": "/lamas-tarapoto/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "lamas-calle-torres-castillo.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera subiendo una calle en pendiente de Lamas, en San Martín, con las torres de piedra del castillo entre los techos y cerros verdes al fondo",
+      "que_muestra": "una calle de Lamas en pendiente marcada, con casas bajas y techos de teja; entre los techos asoman las torres de piedra del castillo y, detrás, cerros cubiertos de selva. Una viajera sube por la calle hacia el fondo. Tiene que leerse como pueblo de ladera con un castillo inesperado, no como castillo europeo aislado.",
+      "hora_clima": "media mañana; aire húmedo, cielo con nubes blancas y claros, sin lluvia; luz natural abundante con sombras abiertas y altas luces del cielo conservadas",
+      "personas": "la viajera a media distancia, de espaldas, subiendo, sin pose ni mirada al lente; si aparecen vecinos, lejanos y pequeños, en acciones espontáneas y sin rostro identificable; ninguna persona con vestimenta tradicional en primer plano",
+      "primer_plano": "el borde de un muro de tapial o una planta de la vereda muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar a la viajera ni las torres",
+      "ancla_pov": "Unas torres de piedra que asoman entre los techos de teja",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin almenas ni torres inventadas que no tenga el castillo real",
+        "sin niebla de cuento ni filtros de fantasía",
+        "sin retratos de personas de la comunidad"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del castillo de Lamas visto desde una calle del pueblo en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, las torres y la pendiente de la calle tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Lo ves antes de entenderlo: torres y muros de piedra…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "asomado a una ventana del castillo · escala media · luz de media mañana desde afuera",
+      "registro": "E",
+      "archivo": "castillo-lamas-ventana-valle.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero asomado a una ventana de piedra del castillo de Lamas, con el valle verde de San Martín abajo",
+      "que_muestra": "el interior en penumbra de un piso alto del castillo, con muros de piedra; un viajero apoya las manos en el alféizar de una ventana y mira hacia afuera, donde se ve el valle verde, techos del pueblo y cerros con selva. El contraste entre el interior de piedra fresco y el verde luminoso de afuera es el contenido.",
+      "hora_clima": "media mañana; afuera, cielo con nubes y claros, sin lluvia; adentro, luz natural que entra por la ventana con sombras abiertas, sin quemar el exterior ni dejar el interior negro",
+      "personas": "fotografía un acompañante desde dentro del mismo piso, a unos metros, a la altura de los ojos; el viajero está de espaldas o de perfil, mira el valle; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "el canto de un muro o de un marco de piedra muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar al viajero ni la ventana",
+      "ancla_pov": "en cada nivel una ventana te devuelve el valle un poco más abajo que en la anterior",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni rótulos legibles",
+        "sin obras de arte ni frescos inventados con figuras reconocibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin armaduras, antorchas ni decorado de fantasía que el castillo no tenga"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del interior del castillo de Lamas (una ventana de un piso alto) en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina el momento: la artesana te pasa la vasija…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "con el taller de fondo · escala cercana · luz natural de patio",
+      "registro": "E",
+      "archivo": "barrio-wayku-ceramica-manos.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos sosteniendo una vasija de cerámica recién comprada en un taller del barrio Wayku, en Lamas",
+      "que_muestra": "en primer término, las manos del viajero sostienen y giran una vasija de cerámica artesanal con decoración pintada; al fondo, fuera de foco, un patio de taller con muro de tapial, otras piezas secándose y herramientas de trabajo. La pieza en manos del visitante, comprada en el lugar, es el contenido: demuestra la visita como intercambio, no como safari fotográfico.",
+      "hora_clima": "media mañana o mediodía; luz natural abundante de patio en sombra abierta, sin sol duro sobre la pieza",
+      "personas": "fotografía el propio viajero desde su punto de vista, mirando la pieza; solo sus manos en cuadro; la artesana o el artesano no aparecen, o como mucho una silueta lejana muy desenfocada, sin rostro ni vestimenta identificable",
+      "primer_plano": "la propia vasija es el sujeto nítido; muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, el canto de una mesa de trabajo, sin tapar la pieza",
+      "ancla_pov": "la giras en las manos para ver el dibujo y sientes que pesa menos de lo que parecía",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de talleres reales",
+        "sin rostros ni retratos de personas de la comunidad",
+        "sin vestimenta tradicional en primer plano",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin diseños de cerámica inventados que no correspondan a la tradición lamista",
+        "sin escenografía exótica"
+      ],
+      "fidelidad": "objeto y lugar identificables → requiere foto real REF-01 de cerámica del barrio Wayku y de un taller de la comunidad, usada con autorización, en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tarapoto",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Piedra, arcilla y valle verde",
+    "archivo": "banner-ruta-lima-tarapoto-lamas.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tarapoto: piedra, arcilla y valle verde",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Tarapoto (TPP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TPP",
+      "ciudad": "Tarapoto"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Tarapoto"
+  },
+  "descartes": [
+    "Panorámica desde el mirador con el valle — escala amplia que repite la portada y puede mostrar el barrio sin consentimiento",
+    "Artesana trabajando la arcilla en su patio — retrato de una persona real de la comunidad: exige autorización expresa",
+    "Fachada del castillo en plano frontal — postal intercambiable",
+    "Taza de café y chocolate en el café del castillo — tipo E sin argumento propio",
+    "Plaza de Lamas — sin rasgo distintivo verificado"
+  ]
+}

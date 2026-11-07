@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:55:18.968Z",
+  "run": "ai-generations/2026-11-02_motogas-linea-grafica",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_motogas-linea-grafica",
+  "totalBytes": 530491,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "referencias/manual-motogas-lamina-1.png",
+      "sizeBytes": 141340,
+      "sha256": "3d7e6b37fb54589b95c760b1d8c02315d8ede66d739de0f3931c851a5e4b5a45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-linea-grafica/referencias/manual-motogas-lamina-1.png"
+    },
+    {
+      "path": "referencias/manual-motogas-lamina-2.png",
+      "sizeBytes": 220342,
+      "sha256": "97cbbafd335948218e6903efa267b2220249d9e17abd684d7d7ffbabb111881f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-linea-grafica/referencias/manual-motogas-lamina-2.png"
+    },
+    {
+      "path": "referencias/manual-motogas-lamina-3.png",
+      "sizeBytes": 80192,
+      "sha256": "3f8afb30c28c14c9a3fc2469f1ba98f308eb73d565959b8d024b92ea14b82440",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-linea-grafica/referencias/manual-motogas-lamina-3.png"
+    },
+    {
+      "path": "referencias/manual-motogas-lamina-4.png",
+      "sizeBytes": 88617,
+      "sha256": "a0342fb02fad57588fcf716640ba9cb3fa485e524cfe833b56a8bbd703b421e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-linea-grafica/referencias/manual-motogas-lamina-4.png"
+    }
+  ]
+}

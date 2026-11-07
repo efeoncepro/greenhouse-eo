@@ -1,0 +1,7 @@
+plato-stracciatella.png 1024x1536
+plato-pasta-langostinos.png 1024x1536
+experiencia-brindis.png 1024x1536
+experiencia-mesa-compartida.png 1024x1024
+plato-tiramisu.png 1024x1536
+detras-sesion.png 1536x1024
+reel-portada.png 1024x1536

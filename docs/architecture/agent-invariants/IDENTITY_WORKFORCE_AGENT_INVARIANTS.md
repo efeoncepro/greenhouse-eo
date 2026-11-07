@@ -734,7 +734,13 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
   es fail-closed por diseño, no un bug.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
   `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
-  `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
+  `pages/efeonce-isotipo.generated.ts` ni `pages/orbit-assets.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`;
+  drift en `brand-assets.test.ts` y `orbit-shell.test.ts`).
+- **Pantallas del emisor con La órbita (2026-11-02, local en `develop`, sin release).** Toda pantalla salvo el login V4
+  se compone con `pages/orbit-shell.ts` (contrato en `docs/architecture/ui-platform/PATTERNS.md` § Runtime sin React):
+  una sola esfera por pantalla, sin logo dentro de la órbita, sin `style=` (CSP `default-src 'none'`, estilos por
+  hash). La marca de la aplicación en el consentimiento sale de un origen CIMD verificado o de un `client_id`
+  first-party **exacto** (`FIRST_PARTY_CLIENT_MARKS`), **NUNCA** del `client_name` ni de un id de DCR parecido.
 
 **Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
 `retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,
@@ -910,3 +916,39 @@ Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) 
 - Publicar UI, activar flags, completar SSO y emitir/usar/revocar un token son evidencias distintas. Leer
   runtime y medir deny con token vigente; preservar expiración/cohorte original al restaurar un canary.
   Runbook: [rollout interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+## Autoridad por cuenta operativa (Space) y revocación de sesión (TASK-2096, desde 2026-11-06)
+
+Contrato del modelo B aceptado en
+[`GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md`](../GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md):
+un client comercial, varios Spaces, contexto Space/Service explícito por request.
+
+- **Sesión determinista.** `greenhouse_serving.session_360` es una fila por usuario
+  (`migrations/20261106230331669_task-2096-session-360-deterministic-space.sql`). `space_id` sólo existe si el client
+  tiene exactamente un Space activo; con más, queda `NULL` y `space_selection_required = true`
+  (`session.user.spaceSelectionRequired`, `TenantContext.spaceSelectionRequired`, `/me`). **NUNCA** ordenar por
+  `updated_at` ni tomar `LIMIT 1` sin unicidad para elegir un Space o un principal: las cuatro lecturas de
+  `identity-store.ts` piden dos filas y lanzan `IdentitySessionAmbiguousError` si llega más de una.
+- **Revocación en el refresh.** Si el principal ya no existe o no está `active`/`status='active'`, el callback
+  `jwt` lanza `SessionAccessRevokedError` (`src/lib/auth/session-access-revoked.ts`): NextAuth borra la cookie y la
+  sesión queda nula. **NUNCA** vaciar los claims en su lugar: el callback `session` asigna un rol primario por
+  defecto cuando faltan roles. El magic link y el firmador interno revisan el mismo predicado antes de emitir.
+- **Autoridad por Space.** `resolveSpaceContext` / `listAuthorizedSpaces` / `revalidateSpaceContext`
+  (`src/lib/tenant/space-authority/`) leen el principal de `client_users` en cada llamada y devuelven
+  `authorized | selection_required | denied`. Reglas: con algún grant activo de la persona en la Organization, sólo
+  cuentan los grants; sin grants, un client con un único Space activo conserva el comportamiento actual; con varios
+  Spaces y sin grant no hay acceso ni departamento por defecto. Los ids del request sólo restringen.
+- **Grants.** `greenhouse_core.space_access_grants` se escribe sólo con `grantSpaceAccess` / `revokeSpaceAccess`
+  (transacción + evento `identity.space_access.granted|revoked`). Versionados, nunca borrados (runtime sin
+  `DELETE`); un contexto elegido con una versión anterior queda `context_stale`. Un grant sólo alcanza a personas del
+  client del Space. **NUNCA** derivar un grant de `person_memberships` (son descriptivas).
+- **Primer consumidor.** App lane `GET /api/platform/app/spaces`, `/spaces/{spaceId}/services` y
+  `/spaces/{spaceId}/services/{serviceId}`: Space ajeno o Service fuera del Space → 404; varios Spaces sin elegir
+  → 409 `space_selection_required`. Insights espera su vínculo informe→Space (TASK-1960) antes de filtrar por Space.
+- **Señal.** `identity.operational_space.ungranted_user` (data_quality, steady 0; `not_configured` sin la tabla):
+  personas activas de un cliente con varios Spaces sin ningún grant vigente. **NUNCA** abrir una segunda cuenta
+  operativa con esta señal fuera de 0.
+- **Sin perfil de identidad.** Un usuario sin `identity_profile_id` no puede recibir grants, pero conserva la regla de un
+  solo Space (medido 2026-11-06: 2 de 7 usuarios cliente activos). **NUNCA** denegarlo por falta de perfil.
+- **Rollout.** Las dos migraciones están aplicadas a la base compartida desde el 2026-11-06 (verificadas). La vista se aplicó antes del código
+  (salida idéntica para los 116 usuarios, misma huella md5; el código anterior ignora las columnas agregadas).

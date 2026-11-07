@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "a7b18713f84a",
+  "key": "a7b18713f84a37d69fe4e53acab12d27c92fb97741c08cf7a2f8f7111f39f3ae",
+  "status": "completed",
+  "createdAt": "2026-11-05T09:47:43.244Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2-base.png",
+    "imageSha256": "b31bb9b5fbdb3f3f38ee9e1664a72b1732bfd487b094800e76719e01161456f1",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2-mask.png",
+    "maskSha256": "fbd579ae24df188346bc951668ea81b531cd4cb5722bddce858d13af793b9974",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same terminal floor continuing toward the camera in soft shade, mid-tone, with the backrest of a waiting seat very out of focus at the lower-right corner; beyond the glass only grey drizzle sky, no aircraft. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas.",
+    "providerPrompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same terminal floor continuing toward the camera in soft shade, mid-tone, with the backrest of a waiting seat very out of focus at the lower-right corner; beyond the glass only grey drizzle sky, no aircraft. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas."
+  },
+  "mask": {
+    "touchedFraction": 0.8574283854166667,
+    "editable": 6874742,
+    "soft": 237112,
+    "protected": 1182546
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 51.798,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 8.55,
+        "bestError": 8.55,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1182546,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6874742,
+        "maxDelta": 236,
+        "meanDelta": 53.389,
+        "worst": {
+          "x": 568,
+          "y": 845
+        }
+      },
+      "seam": {
+        "pixels": 237112,
+        "maxDelta": 143,
+        "meanDelta": 5.667,
+        "worst": {
+          "x": 1258,
+          "y": 151
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1182546,
+        "maxDelta": 223,
+        "meanDelta": 14.19,
+        "worst": {
+          "x": 1797,
+          "y": 658
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1696,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 188
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3539
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/candelaria-a.png (edit) …
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/punta-cana-a.png (edit) …
+  ✓ 10578KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2698 (img 1536 · txt 1162) · out 13342 · total 16040
+done
+punta-cana-a exit=0
+  ✓ 13193KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2830 (img 1452 · txt 1378) · out 13342 · total 16172
+done
+candelaria-a exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/punta-cana-b.png (edit) …
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/candelaria-b.png (edit) …
+  ✓ 11262KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2698 (img 1536 · txt 1162) · out 13342 · total 16040
+done
+punta-cana-b exit=0
+  ✓ 13247KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2830 (img 1452 · txt 1378) · out 13342 · total 16172
+done
+candelaria-b exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/candelaria-img2-fix-maestro.png (edit) …
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/carnaval-cajamarca-img3-fix-maestro.png (edit) …
+  ✓ 11126KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2654 (img 1457 · txt 1197) · out 13342 · total 15996
+done
+carnaval3 exit=0
+  ✓ 13424KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2707 (img 1479 · txt 1228) · out 13342 · total 16049
+done
+candelaria2 exit=0
+done

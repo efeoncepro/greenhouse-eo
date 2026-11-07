@@ -1,0 +1,83 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:25:20.858Z",
+  "run": "ai-generations/2026-10-20_agenda-nexa-retrato",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-20_agenda-nexa-retrato",
+  "totalBytes": 21223445,
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "inpaint/7a4ac6309d2c/mask-preview.png",
+      "sizeBytes": 2547362,
+      "sha256": "48b34fd1dcef8f8796ee4ae15b7fa75f2dc025806d87078e017e4d1685ff941b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/7a4ac6309d2c/mask-preview.png"
+    },
+    {
+      "path": "inpaint/7a4ac6309d2c/provider-input.png",
+      "sizeBytes": 2720606,
+      "sha256": "5b8ab6cfa839dc3ff21f5d59514563257a8cb5c3acc4ff473a073e7711fd1afb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/7a4ac6309d2c/provider-input.png"
+    },
+    {
+      "path": "inpaint/7a4ac6309d2c/provider-mask.png",
+      "sizeBytes": 5369,
+      "sha256": "fa621907d79195b0b8735240ce00b63f1a555184e64cdba915138fc214aec0aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/7a4ac6309d2c/provider-mask.png"
+    },
+    {
+      "path": "inpaint/7a4ac6309d2c/provider-sketch.png",
+      "sizeBytes": 2707749,
+      "sha256": "4a9fbd7da44e10ef8bdfb0f81ae986a43953bc7e30b39a9a7c3a19c01a9a0a98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/7a4ac6309d2c/provider-sketch.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/candidate-1-diff.png",
+      "sizeBytes": 52087,
+      "sha256": "c8fb09897d2e0b55673150f5b263c3ed454fdd163fdb87e4d2053c0c6910664f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/candidate-1-diff.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/candidate-1-raw.png",
+      "sizeBytes": 2466245,
+      "sha256": "53f786ce3394c61aa2bdab9ef52145b8b3b53c0e438b05c794707155f4bb20f1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/candidate-1-raw.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/candidate-1.png",
+      "sizeBytes": 2678751,
+      "sha256": "c78457bc4d3f62a19086f480c1c3712034b4fa136037f5c4a0db9db4eb60e3be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/candidate-1.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/mask-preview.png",
+      "sizeBytes": 2547362,
+      "sha256": "48b34fd1dcef8f8796ee4ae15b7fa75f2dc025806d87078e017e4d1685ff941b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/mask-preview.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/provider-input.png",
+      "sizeBytes": 2720606,
+      "sha256": "5b8ab6cfa839dc3ff21f5d59514563257a8cb5c3acc4ff473a073e7711fd1afb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/provider-input.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/provider-mask.png",
+      "sizeBytes": 5369,
+      "sha256": "fa621907d79195b0b8735240ce00b63f1a555184e64cdba915138fc214aec0aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/provider-mask.png"
+    },
+    {
+      "path": "inpaint/80d9daf8b20d/provider-sketch.png",
+      "sizeBytes": 2707749,
+      "sha256": "4a9fbd7da44e10ef8bdfb0f81ae986a43953bc7e30b39a9a7c3a19c01a9a0a98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/inpaint/80d9daf8b20d/provider-sketch.png"
+    },
+    {
+      "path": "nexa-retrato-agenda-720.jpg",
+      "sizeBytes": 64190,
+      "sha256": "ef472f95128c0c14155ad3aa86bb71bb2de251147178b47ebb76d59232d7f8d9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-20_agenda-nexa-retrato/nexa-retrato-agenda-720.jpg"
+    }
+  ]
+}

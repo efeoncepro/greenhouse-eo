@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "mode": "measure-only",
+    "audio": "ai-generations/2026-11-05_propuesta-mambrino/reel/reel-mambrino-del-fuego.mp4",
+    "video": "ai-generations/2026-11-05_propuesta-mambrino/reel/reel-mambrino-del-fuego.mp4",
+    "files": [
+      {
+        "path": "ai-generations/2026-11-05_propuesta-mambrino/reel/reel-mambrino-del-fuego.mp4"
+      }
+    ],
+    "latencyMs": 951
+  },
+  "mapa": {
+    "durationSec": 15,
+    "onsets": [
+      0.03,
+      0.78,
+      1.04,
+      1.78,
+      2.53,
+      4.02,
+      5.28,
+      5.53,
+      5.78,
+      6.53,
+      8.02,
+      8.78,
+      9.28,
+      9.53,
+      10.03,
+      10.53,
+      12.02,
+      13.29,
+      14.04
+    ],
+    "silences": [
+      {
+        "t": 14.81,
+        "tFin": 15.01
+      }
+    ],
+    "cuts": [
+      1.966667,
+      4.933333,
+      7.9,
+      10.866667,
+      12.833333
+    ],
+    "visualEvents": [
+      0.366667,
+      1.2,
+      1.966667,
+      2.933333,
+      3.766667,
+      4.933333,
+      7.533333,
+      7.7,
+      7.9,
+      9.533333,
+      10.5,
+      10.666667,
+      10.866667,
+      11.5,
+      11.666667,
+      12,
+      12.166667,
+      12.5,
+      12.666667,
+      12.833333
+    ],
+    "frozen": [
+      {
+        "t": 2.033333,
+        "tFin": 2.066667
+      },
+      {
+        "t": 6.666667,
+        "tFin": 6.7
+      }
+    ],
+    "sync": {
+      "pairs": 4,
+      "medianMs": 30,
+      "worstMs": 120,
+      "inSync": true
+    }
+  }
+}

@@ -850,7 +850,8 @@ export const buildStatSlides = (
           ...(view.lowerIsBetter ? { lowerIsBetter: view.lowerIsBetter } : {})
         })),
         // La nota del tablero es una afirmación del plan (con sus hechos): se imprime su texto.
-        ...(stat.note ? { note: { text: stat.note.text } } : {}),
+        // Con hechos, sólo en la página que contiene la cifra que explica (una nota del valor estimado no va junto a los clics).
+        ...(stat.note && (stat.note.factIds.length === 0 || stat.note.factIds.some(id => factIds.includes(id))) ? { note: { text: stat.note.text } } : {}),
         ...(board.title.length > 0 ? { titleChannels: board.title.map(platform => ({ channelId: platform })) } : {})
       }
     }

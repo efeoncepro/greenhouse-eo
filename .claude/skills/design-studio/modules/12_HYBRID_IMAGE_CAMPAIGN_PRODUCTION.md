@@ -1,7 +1,7 @@
 # 12 · Hybrid Campaign Production — still, motion, digital y offline
 
 > **Cárgalo cuando** una campaña use más de un modelo, especialmente Seedream 5 Lite/Pro + GPT Image 2 +
-> Gemini Omni 1.1 Flash, o cuando el pedido sea producir muchas piezas digitales, motion, print u OOH sin perder
+> Gemini Omni Flash (1.2 por defecto), o cuando el pedido sea producir muchas piezas digitales, motion, print u OOH sin perder
 > identidad y estándar visual. Capacidades y precios: **as-of 2026-07-18; reverificar**. Contrato canónico:
 > `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`.
 
@@ -48,7 +48,7 @@ print proof ◀── approved anchor ──┼──▶ 4:5 / 9:16 / 16:9 / 3:1
 | Organize | GPT Image 2 | Estructura, safe zones y disciplina compositiva |
 | Extend | GPT Image 2 | Recomponer ratios desde el mismo anchor |
 | Repair | Pro semántico o GPT + máscara | Art direction regional o cirugía protegida |
-| Animate | Gemini Omni 1.1 Flash vía `pnpm ai:omni` (Cloud directo) | Convertir un clean plate en video corto; editar un MP4 con instrucción. La cadena conversacional stateful no está verificada |
+| Animate | Gemini Omni 1.2 Flash vía `pnpm ai:omni` (Cloud directo; 1.1 con `--model 1.1`) | Convertir un clean plate en video corto; editar un MP4 con instrucción. La cadena conversacional stateful no está verificada |
 | Compose | Diseño determinístico | Tipo, marca, CTA, precio, legal y locale |
 | Prepress | Humano + vendor spec | ICC, bleed, trim, sustrato y lectura OOH |
 | Release | Humano + QA | Validar destino, provenance, peso, motion y sistema |
@@ -68,12 +68,14 @@ Cuando el problema central sea control compositivo y acabado de un set estático
 no hereda automáticamente AXIS/Efeonce, pero conserva brief, rights y provenance. Una pieza de cliente usa sólo
 su brand book. Logo, CTA, legal, captions y end card se añaden determinísticamente después de la generación.
 
-## Gemini Omni 1.1 Flash: relevo still → motion
+## Gemini Omni Flash: relevo still → motion
 
 - Es video, no otro generador de stills. Se consume **directo en Google Cloud/Vertex**, nunca mediante Fal.
-  CLI local: `pnpm ai:omni`; modelo Cloud `gemini-omni-1.1-flash-preview`, `global`. El modelo anterior
+  CLI local: `pnpm ai:omni`; modelo Cloud por defecto `gemini-omni-1.2-flash` (GA desde 2026-11-05, `global`;
+  clips de hasta 15 s, upscale de borrador 360p/720p a 1080p/4K, ≈ USD 0,07/s a 720p; sin clip 1.2 generado aún).
+  Con `--model 1.1`, `gemini-omni-1.1-flash-preview`, cuya evidencia sigue abajo. El modelo anterior
   `gemini-omni-flash-preview` conserva su evidencia histórica y no comparte límites ni canary.
-- Los seis modos `text|image|frames|reference|edit|extend` completaron corridas técnicas a 360p, 16:9 y 3 s
+- En 1.1, los seis modos `text|image|frames|reference|edit|extend` completaron corridas técnicas a 360p, 16:9 y 3 s
   el 2026-09-24; `extend` entregó 6 s acumulados. Se observaron MP4 H.264/AAC. No se han probado 720p,
   1080p, 4K, 9:16, preservación fina, cadena stateful, C2PA ni factura. Manual:
   `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
@@ -127,7 +129,7 @@ No miniaturizar el feed ad para print u OOH. El canal cambia jerarquía, densida
 
 ## Router motion: Omni, Seedance 2.0 o post
 
-- **Gemini Omni 1.1:** primera mano cuando un clean plate puede reinterpretarse en una microescena o hace
+- **Gemini Omni (1.2 por defecto):** primera mano cuando un clean plate puede reinterpretarse en una microescena o hace
   falta editar un MP4 mediante instrucción. La cadena conversacional stateful no está verificada en la CLI.
   Su audio nativo es scratch hasta pasar escucha y mezcla.
 - **Seedance 2.0 image/reference-to-video:** fallback para **una toma nueva**, un ángulo/acción inexistente o

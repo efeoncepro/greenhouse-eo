@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "team",
+  "voice": {
+    "eyebrow": "Quién lo implementa",
+    "question": "Implementa un equipo certificado en",
+    "answer": [
+      "HubSpot"
+    ]
+  },
+  "body": "Un **equipo asignado**: consultor líder, implementador, especialistas en integraciones, seguridad y datos, y gestión de proyecto.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png",
+    "alt": "Nexa al frente del equipo de Efeonce con sus uniformes y cinco agentes mini robots, todos mirando a cámara"
+  }
+}

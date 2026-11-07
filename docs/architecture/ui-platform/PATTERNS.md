@@ -525,6 +525,29 @@ una pantalla fuera del portal usa este patrón, no un segundo sistema visual.
   declaradas terminales con su razón. `page-contract.test.ts` lo afirma pantalla por pantalla, junto
   con la CSP de cada una y la anti-enumeración.
 
+### Shell con La órbita (2026-11-02 · local en `develop`, sin release)
+
+Todas las pantallas del emisor **salvo el login V4** se componen con `src/lib/auth-server/oauth/pages/orbit-shell.ts`
+(vía `layout()` en `render.ts`): formulario en papel con el lockup «Efeonce | ID» y, desde 64rem, panel oscuro con la
+órbita canónica. Producción sigue con el shell de TASK-1835 hasta un release gobernado.
+
+- **El panel hace uno de dos trabajos:** `renderOrbitPanel({ kind: 'icon', glyph })` rodea un ícono del catálogo AXIS
+  en reposo (`resolveIcon`, glifos `seguridad | correo | integracion | reloj`) con anillo + arco de acento + esfera en
+  la punta; `{ kind: 'word', lines }` es la órbita en reposo (anillo desnudo) y la esfera es el punto de la palabra.
+  **Una sola esfera por pantalla.** **NUNCA** medida, loader, puntos repetidos, anillo roto/atenuado, logo dentro de
+  la órbita ni íconos dibujados a mano. Geometría desde `efeonceGraphicLine.orbit` (`orbit-geometry.ts`).
+- **Titular** `orbitHeading({ lead, key })`: Bricolage con contraste de pesos (≈340/740). Con panel el punto final es
+  tipeado; sin panel (móvil) el punto es la esfera en `accentOnLight`. Teal nunca en texto ni fondos.
+- **Assets generados:** lockups positivo/negativo de Efeonce ID, isotipo de Rooms (copias exactas de
+  `axis-brand-assets` 0.4.32 en `public/branding/SVG/`) e íconos → `orbit-assets.generated.ts` por
+  `scripts/auth-server/generate-orbit-assets.ts` (`pnpm auth-server:brand-assets:generate`), con drift test en
+  `orbit-shell.test.ts`. Fuentes Poppins 400/500/600 + Bricolage variable en `fonts.generated.ts`. Estilos `os-*` en
+  `scripts/auth-server/orbit-shell-styles.ts`, anexados a `styles.generated.ts` bajo el hash CSP. **NUNCA** `style=`.
+- **Marca de la aplicación en el consentimiento:** first-party sólo por `client_id` exacto (`FIRST_PARTY_CLIENT_MARKS`
+  en `client-marks.ts`, hoy `efeonce-rooms-cli`); un id de DCR nunca la hereda.
+- **Controlador de step-up:** seis casillas sobre el input real `name="code"`, serializado con nonce; sin JS queda el
+  campo de texto (modo respaldo) y el formulario funciona.
+
 ### Evidencia viva
 
 `src/lib/auth-server/oauth/pages/**` · `src/lib/auth-server/persons/pages.ts` ·

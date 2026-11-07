@@ -1,0 +1,125 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:49:38.029Z",
+  "run": "ai-generations/2026-10-26_marketing-contenidos-leads",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-26_marketing-contenidos-leads",
+  "totalBytes": 27149643,
+  "fileCount": 19,
+  "files": [
+    {
+      "path": "final/candidatos/descartes/portada-1-recorte-movil.png",
+      "sizeBytes": 1814955,
+      "sha256": "9bfae7194cbd5a95c2ea6e646350910d1a32160a883bb07065898540812a90dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-1-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-1.png",
+      "sizeBytes": 2794696,
+      "sha256": "3a7a7eead9b69c09fbb9a58a291832704a141940152875b1f127cf81f51cadf1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-1.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-2-recorte-movil.png",
+      "sizeBytes": 1823630,
+      "sha256": "41b21d54666b3b50a83d24c8e53cf8a4bb415a511a120d628b85d6f7624f1fce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-2-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-2.png",
+      "sizeBytes": 2784482,
+      "sha256": "6e3a52a102f7ae92fff4f9b9c9b4f44e8045acf4f16d13eae7586699303caf09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-2.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-3-recorte-movil.png",
+      "sizeBytes": 1813798,
+      "sha256": "d82330ba5d7d702289cb0d6be0eacebf8e7e3a99d90deafb239f3350f1c3a695",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-3-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-3.png",
+      "sizeBytes": 2793071,
+      "sha256": "f1698a1d950df45749c38ef4a3746c8b5725bba7f2f5dc5785f7d665f62b04e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/descartes/portada-3.png"
+    },
+    {
+      "path": "final/candidatos/portada-4-recorte-movil.png",
+      "sizeBytes": 1829275,
+      "sha256": "7e05f53901fb3486b045f049ec8ef3e8818a4e5a7b647eb8ebc8414775f264f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/portada-4-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/portada-4.png",
+      "sizeBytes": 2790176,
+      "sha256": "b6f247ba5f5d70fe750478009f0ce64469942fc911cff3cecacebe127971f1f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/portada-4.png"
+    },
+    {
+      "path": "final/candidatos/revision-textos.png",
+      "sizeBytes": 1037847,
+      "sha256": "6b2bbc3c983271093ff6d6c4a0baba6d2b2e81cdaaedf30b9653310a06de97e4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/candidatos/revision-textos.png"
+    },
+    {
+      "path": "final/marketing-de-contenidos-leads-2026-card.webp",
+      "sizeBytes": 51358,
+      "sha256": "f9d7bc753cc73eba149d97f0b2bc8898b640621d60a253cc2752acacb0daaa4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/marketing-de-contenidos-leads-2026-card.webp"
+    },
+    {
+      "path": "final/marketing-de-contenidos-leads-2026-hero.webp",
+      "sizeBytes": 49210,
+      "sha256": "ebae420199deb05b3256ec03d735d63b35567cce1de8f603fddad6db34105e1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/marketing-de-contenidos-leads-2026-hero.webp"
+    },
+    {
+      "path": "final/marketing-de-contenidos-leads-2026-recorte-movil.png",
+      "sizeBytes": 1829275,
+      "sha256": "7e05f53901fb3486b045f049ec8ef3e8818a4e5a7b647eb8ebc8414775f264f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/marketing-de-contenidos-leads-2026-recorte-movil.png"
+    },
+    {
+      "path": "final/marketing-de-contenidos-leads-2026.jpg",
+      "sizeBytes": 175338,
+      "sha256": "92aff1171df83fe72dc1223f377944bd9d3dcc1b6e17b531a202c304dbc5dbd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/marketing-de-contenidos-leads-2026.jpg"
+    },
+    {
+      "path": "final/revision-superficies.png",
+      "sizeBytes": 737117,
+      "sha256": "223d238282ce0aeae97017089392d1b5a886e4f73c18935a43c15175a0e66288",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/final/revision-superficies.png"
+    },
+    {
+      "path": "infografia/review/contenido-una-idea-cada-formato-desktop-dark.png",
+      "sizeBytes": 236568,
+      "sha256": "8d4c159fcbc6b509e04983b1df1f88ab846d6582f653cd24727a1f3454d1d957",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/infografia/review/contenido-una-idea-cada-formato-desktop-dark.png"
+    },
+    {
+      "path": "infografia/review/contenido-una-idea-cada-formato-desktop-light.png",
+      "sizeBytes": 235077,
+      "sha256": "246b2a1cd6a8fce9696ad42f6cd5d2766fc512ebc017032836e9ffcd49634421",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/infografia/review/contenido-una-idea-cada-formato-desktop-light.png"
+    },
+    {
+      "path": "infografia/review/contenido-una-idea-cada-formato-mobile-dark.png",
+      "sizeBytes": 239235,
+      "sha256": "ddbca9fc263774d02528939ccce106fcdacf91c00c5bb96a70c353d9fea1c5fe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/infografia/review/contenido-una-idea-cada-formato-mobile-dark.png"
+    },
+    {
+      "path": "infografia/review/contenido-una-idea-cada-formato-mobile-light.png",
+      "sizeBytes": 238657,
+      "sha256": "2143784b07f7fcdaeaebb4976a4f0f83cde368387137a2d053426d8da7ee99a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/infografia/review/contenido-una-idea-cada-formato-mobile-light.png"
+    },
+    {
+      "path": "plates/MCB-CML1-169.png",
+      "sizeBytes": 3875878,
+      "sha256": "c682ae79bbc93d47911a4846540495f5058bf655b93ed31807549f7580294699",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_marketing-contenidos-leads/plates/MCB-CML1-169.png"
+    }
+  ]
+}

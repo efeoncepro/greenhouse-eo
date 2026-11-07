@@ -1,0 +1,44 @@
+--- published
++++ with-embeds
+@@ -50,15 +50,11 @@
+ <p>En su <a href="https://openai.com/index/introducing-images-2-6/"><strong>anuncio oficial</strong></a>, OpenAI declara que Images 2.6 genera imágenes <strong>un 50 % más rápido</strong> y que Flare puede entregar resultados <strong>desde seis segundos cuando la calidad está en low</strong>. Es una afirmación del proveedor bajo esas condiciones. No equivale a un tiempo garantizado para cualquier escena ni permite calcular cuánto tardará una campaña completa.</p>
+ <!-- /wp:paragraph -->
+ 
+-<!-- wp:buttons -->
+-<div class="wp-block-buttons"><!-- wp:button {"className":"is-style-outline"} -->
+-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="https://player.vimeo.com/video/1243362697?h=7809127775">Ver comparación oficial (8×)</a></div>
+-<!-- /wp:button --></div>
+-<!-- /wp:buttons -->
+-
+-<!-- wp:paragraph -->
+-<p>Comparación de latencia con anuncio de viajes. Reproducida a 8×: no interpretar como velocidad en tiempo real. <a href="https://openai.com/index/introducing-images-2-6/">Fuente: OpenAI.</a></p>
+-<!-- /wp:paragraph -->
++<!-- wp:embed {"url":"https://player.vimeo.com/video/1243362697?h=7809127775","type":"video","providerNameSlug":"vimeo","responsive":true} -->
++<figure class="wp-block-embed is-type-video is-provider-vimeo wp-block-embed-vimeo"><div class="wp-block-embed__wrapper">
++https://player.vimeo.com/video/1243362697?h=7809127775
++</div><figcaption class="wp-element-caption">Comparación de latencia con anuncio de viajes. Reproducida a 8×: no interpretar como velocidad en tiempo real. <a href="https://openai.com/index/introducing-images-2-6/">Fuente: OpenAI.</a></figcaption></figure>
++<!-- /wp:embed -->
+ 
+ <!-- wp:paragraph -->
+ <p>La comparación oficial de velocidad está reproducida a <strong>8×</strong>, según la descripción del anuncio. Sirve para observar la secuencia comparada; no para cronometrar una generación como si estuviéramos viendo tiempo real.</p>
+@@ -214,15 +210,11 @@
+ <p>Las animaciones breves son una de las novedades más visibles. El anuncio muestra ejemplos de OpenArt y Town: personajes, reacciones y pequeñas escenas que exploran movimiento. Son demostraciones del lanzamiento, seleccionadas por el proveedor y sus colaboradores; no evaluaciones independientes de una campaña.</p>
+ <!-- /wp:paragraph -->
+ 
+-<!-- wp:buttons -->
+-<div class="wp-block-buttons"><!-- wp:button {"className":"is-style-outline"} -->
+-<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="https://player.vimeo.com/video/1242918503?h=5974be9997">Ver video oficial de Images 2.6</a></div>
+-<!-- /wp:button --></div>
+-<!-- /wp:buttons -->
+-
+-<!-- wp:paragraph -->
+-<p>Montaje oficial de escenas animadas generadas con Images 2.6. <a href="https://openai.com/index/introducing-images-2-6/">Fuente: OpenAI.</a></p>
+-<!-- /wp:paragraph -->
++<!-- wp:embed {"url":"https://player.vimeo.com/video/1242918503?h=5974be9997","type":"video","providerNameSlug":"vimeo","responsive":true} -->
++<figure class="wp-block-embed is-type-video is-provider-vimeo wp-block-embed-vimeo"><div class="wp-block-embed__wrapper">
++https://player.vimeo.com/video/1242918503?h=5974be9997
++</div><figcaption class="wp-element-caption">Montaje oficial de escenas animadas generadas con Images 2.6. <a href="https://openai.com/index/introducing-images-2-6/">Fuente: OpenAI.</a></figcaption></figure>
++<!-- /wp:embed -->
+ 
+ <!-- wp:paragraph -->
+ <p>La documentación oficial añade este ejemplo de un personaje con una linterna. Sirve para mirar un loop con una tarea concreta: seguir el gesto, observar qué partes del personaje permanecen y revisar la transición entre el final y el principio.</p>

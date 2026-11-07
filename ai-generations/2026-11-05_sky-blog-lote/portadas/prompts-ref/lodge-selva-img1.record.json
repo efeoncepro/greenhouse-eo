@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "the bow of the boat",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "lodge-selva",
+ "input": {
+  "id": "lodge-selva",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "a rustic lodge on the bank of an Amazon river near Iquitos, Peru (not a real identifiable lodge)",
+  "escena": "seen from the water, a simple wooden dock enters the river; behind it, among tall trees, two or three raised cabins with palm-thatch roofs; a woman traveler with a backpack steps from the boat onto the dock. It must read as arriving at a rustic lodge in the middle of the forest, not a resort or city hotel",
+  "hora": "mid-afternoon",
+  "clima": "humid cloudy sky without rain, abundant natural light filtered by the trees, open shadows, sky highlights retained",
+  "primerPlano": "the bow of the boat",
+  "borde": "bottom edge",
+  "refLugar": "Peruvian Amazon riverbank vegetation, water colour and traditional wooden riverside architecture",
+  "prohibir": "swimming pools or resort infrastructure, posed wildlife, a real identifiable lodge, readable signs",
+  "extra": "COMPOSITION, MEASURED: the cabins among the trees and the woman stepping onto the dock (small, between 22% and 48% of the frame height, centred between 40% and 60% of the width) sit in the upper half. The lower half is the calm dark river water and the out-of-focus bow of the boat. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

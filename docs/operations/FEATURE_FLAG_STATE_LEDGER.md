@@ -19,8 +19,8 @@ Esta tabla supera a la del 26-10 para los flags que lista.
 | `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` | Vercel Rooms Production | `false` | Permiso de desarrollo; nunca en producción |
 | `AUTH_SERVER_FIRST_PARTY_ENABLED` | auth-server `00169-4pq` (100 %) | `true` | Durable: variable de repo GitHub `true` (input de `auth-server-deploy.yml`) |
 | `AUTH_SERVER_INVITATION_EMAIL_OTP_ENABLED` | auth-server `00169-4pq` | `true`, con HMAC y token de autoridad montados | Durable: variable de repo GitHub `true`; refs `:1` ya declaradas |
-| `AUTH_SERVER_ROOMS_AUDIENCE` (valor, no booleano) | auth-server — código en `develop` (TASK-2095), sin release | vacía = audiencia Rooms apagada | Durable: variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE` (input de `auth-server-deploy.yml`, leída por `deploy.sh`); el drift la compara (`rooms-config-drift.py`). Fijarla exige release a `main` y autorización del operador |
-| `ROOMS_AGENT_LANE_ENABLED` | Vercel Rooms Production — TASK-2087 | `false` (default de código) | Sin él Rooms rechaza todo bearer; la cookie sigue igual |
+| `AUTH_SERVER_ROOMS_AUDIENCE` (valor, no booleano) | auth-server `00172-zcn` (100 %, `GIT_SHA=69b0ba9`, hotfix PR #267) | `https://efeonce-rooms.vercel.app/api/v1` (readback 2026-11-02) | Durable: variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE` (input de `auth-server-deploy.yml`, leída por `deploy.sh`); el drift la compara (`rooms-config-drift.py`). Fijarla exige release a `main` y autorización del operador |
+| `ROOMS_AGENT_LANE_ENABLED` | Vercel Rooms Production — deploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`, segundo redeploy de `main@9a4340a`; el primero fue `mgod4xbea`) con alias | `true` desde 2026-11-02 (env add del operador); con `ROOMS_AGENT_AUDIENCE` y `ROOMS_AGENT_INTROSPECTION_CLIENT_SECRET_SECRET_REF`. Readback: metadata RFC 9728 200 con la audiencia, bearer falso 401. Rollback: `false` + redeploy + alias |
 | email type `auth_server_rooms_invitation_otp` | Greenhouse PG `email_type_config` | `enabled=true` | Kill-switch por tipo |
 | `ROOMS_MEDIA_IMPORT_ENABLED` | `efeonce-rooms` rama local `claude/rooms-media-import` (TASK-2090), sin desplegar | `false` (default de código; ausente en Vercel) | Requiere además `ROOMS_MEDIA_ENABLED`; sin flag `media.importFromSource` responde `unavailable`. Prender exige buckets aprobados, IAM de lectura y migración aplicada |
 
@@ -30,6 +30,18 @@ Rollback de Efeonce ID: las dos variables de GitHub en `false` + tráfico a `aut
 `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`. Acceso del operador: restaurado por SQL
 autorizado y luego adoptado por el bootstrap de TASK-2082 como administrador hasta 2027-11-01
 ([recibo](../audits/rooms/2026-10-31-durable-access-production.md)); falta su primer login real con la versión nueva.
+
+## Auth — Job de rotación de llaves (TASK-1833), integrado en develop 2026-11-01
+
+Código del Job aislado en `develop` desde el 2026-11-01; **no existe en cloud** (sin SA, login PG, secreto, Job ni
+Scheduler). El orquestador sólo lo despliega si la variable GitHub `AUTH_KEY_MAINTENANCE_PROVISIONED=true`, y el deploy
+declara `ENABLED=false`/`DRY_RUN=true`. La migración `20261029092236733_task-1833-auth-key-maintenance.sql` no está aplicada.
+
+| Flag | Runtime | Valor | Límite |
+| --- | --- | --- | --- |
+| `AUTH_KEY_MAINTENANCE_ENABLED` | Futuro Cloud Run Job `auth-key-maintenance` | `false` | Job inexistente en cloud. OFF retorna antes de leer PostgreSQL o KMS. |
+| `AUTH_KEY_MAINTENANCE_DRY_RUN` | Futuro Cloud Run Job `auth-key-maintenance` | `true` | Con enabled ON, dry-run lee metadata y no reclama lease ni crea versión. |
+| `AUTH_KEY_MAINTENANCE_PROVISIONED` | Variable GitHub del release control plane | ausente = no desplegar | Prenderla exige SA, login PG, secreto e IAM revisados y la migración aplicada. |
 
 ## Rooms / Auth — estado releído26Oct2026
 
@@ -852,6 +864,19 @@ elegibilidad y policy publicada por fuente/versión; EC se decide por separado. 
 **Client lifecycle / Onboarding:** `CLIENT_LIFECYCLE_ONBOARDING_ENABLED` (+`NEXT_PUBLIC`) · `CLIENT_LIFECYCLE_HUBSPOT_DEAL_TRIGGER_ENABLED` · `CLIENT_BIRTH_CANONICAL_WRITE_ENABLED` · `ONBOARDING_ITEM_EVIDENCE_AUTOCOMPLETE_ENABLED` · `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED` (TASK-991…1017).
 
 **UI / Design tokens:** `HOME_V2_ENABLED` (TASK-696/780) · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED` (default ON; emergency revert to legacy azure; 2026-07-18). `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED` is retired and no longer read by runtime.
+
+**Leídos desde un env inyectado — registrados 2026-11-07** (`pnpm flags:audit` no los veía: se leen como
+`env.FLAG` sobre un parámetro `env: EnvSource = process.env`, ni como `process.env.FLAG` ni como literal; el
+escáner vive ahora en `scripts/ci/lib/flag-reference-scanner.mjs` con prueba de comportamiento, y por la misma
+causa los ocho flags de Insights salían como «env var muerta» estando ON en Production):
+`GREENHOUSE_MCP_TOKEN_EXCHANGE_ENABLED` — Vercel únicamente (`src/lib/sister-platforms/mcp-token-exchange.ts`,
+ruta `/api/integrations/v1/sister-platforms/oauth/token`); **Production `true`** (leído con `vercel env pull`
+2026-11-07), staging presente · `RELIABILITY_SYNTHETIC_ENABLED` — Vercel (cron
+`/api/cron/reliability-synthetic`); **kill switch con default ON cuando la var falta**, sin setear en ningún
+environment (estado diseñado) · `RELIABILITY_AI_OBSERVER_ENABLED` — ops-worker únicamente (TASK-638); default
+`true` en `services/ops-worker/deploy.sh`, **`true` en la revisión activa `ops-worker-00794-wd8`** (2026-11-07) ·
+`CLOUD_COST_AI_COPILOT_ENABLED` — ops-worker únicamente (`src/lib/cloud/finops-ai/runner.ts`); opt-in, default
+`false` en `deploy.sh` y **`false` en `ops-worker-00794-wd8`** (estado diseñado, sin pendiente).
 
 **Kortex bridge / sister platform:** `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` · `KORTEX_COMMAND_ADAPTER_ENABLED` · `KORTEX_COMMAND_ADMIN_ENABLED` · `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED` · `KORTEX_GITHUB_COMMANDS_ENABLED` · `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED`.
 

@@ -1,0 +1,48 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "recipe": "method-staircase",
+  "use": "proposal",
+  "line": "brand",
+  "theme": "dark",
+  "body": "El mismo ritmo de tu equipo en Lima: apruebas antes de producir y antes de publicar.",
+  "voice": {
+    "eyebrow": "05 · Cómo trabajamos",
+    "question": "¿Cómo es cada mes?",
+    "answer": [
+      "En orden"
+    ]
+  },
+  "levels": [
+    {
+      "name": "Grilla",
+      "descriptor": "con referencias"
+    },
+    {
+      "name": "Sesión",
+      "descriptor": "en tu tienda"
+    },
+    {
+      "name": "Revisión",
+      "descriptor": "sobre la pieza"
+    },
+    {
+      "name": "Publicación",
+      "descriptor": "y comunidad"
+    },
+    {
+      "name": "Reporte",
+      "descriptor": "y reunión mensual"
+    }
+  ],
+  "note": "Cada paso queda en Notion con responsable, fecha y estado.",
+  "selection": {
+    "target": "level",
+    "level": 3,
+    "label": "Tú",
+    "participantKind": "role"
+  }
+}

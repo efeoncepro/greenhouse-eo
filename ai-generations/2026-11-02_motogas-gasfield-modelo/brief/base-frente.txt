@@ -1,0 +1,5 @@
+Expression: friendly, confident open smile.
+
+POSE AND CAMERA: standing upright and relaxed, both arms hanging loosely slightly away from the body, hands open and relaxed, feet slightly apart, weight even. FRONT VIEW at eye level, the camera straight in front of the face: the face, both eyes and the whole front of the body are fully visible and symmetrical, the guard hoop on top is seen almost edge-on as a thin ellipse with all four posts visible.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully visible with generous margin, centered.

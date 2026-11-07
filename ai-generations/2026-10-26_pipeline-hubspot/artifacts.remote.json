@@ -1,0 +1,149 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:49:52.303Z",
+  "run": "ai-generations/2026-10-26_pipeline-hubspot",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-26_pipeline-hubspot",
+  "totalBytes": 30154356,
+  "fileCount": 23,
+  "files": [
+    {
+      "path": "final/candidatos/descartes/portada-1-recorte-movil.png",
+      "sizeBytes": 2018970,
+      "sha256": "efdbfede8629cbbff6c27b0f84692e58b3d699902bc3ee0c0c68c4c0884a5fb7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-1-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-1.png",
+      "sizeBytes": 2991868,
+      "sha256": "81451878ec14e3fe55bed6b76568383f880c2a09309653af84c7d000ca136371",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-1.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-2-recorte-movil.png",
+      "sizeBytes": 2027242,
+      "sha256": "de7c31ab5101e3cff21e77d6acab5cf1a5f3ddf9862e00540d945bbf151af059",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-2-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-2.jpg",
+      "sizeBytes": 188426,
+      "sha256": "3463773f94e58e50ef37ef0ada9700e55703e5e7518f59aa00aa97978d222453",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-2.jpg"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-2.png",
+      "sizeBytes": 2997964,
+      "sha256": "470df51c8d55076c9d765c6d7536fff14c9ccc1fc7f4243602d94fc997cdf864",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-2.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-3-recorte-movil.png",
+      "sizeBytes": 2018080,
+      "sha256": "4b8e41c66aaa3d159d4b00f0d70291789d465444ebff02b488cd1de36a41a6c5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-3-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/descartes/portada-3.png",
+      "sizeBytes": 2992151,
+      "sha256": "7d979cbdc2d37437587e68ec3c966c6d0d1f1f19796e1892e4a73603ef0b4669",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/descartes/portada-3.png"
+    },
+    {
+      "path": "final/candidatos/portada-4-recorte-movil.png",
+      "sizeBytes": 2031534,
+      "sha256": "5cbfedc31ba2fa8c82dd4f87685e3c54123b446e25f190c4c8775e70b1c413ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/portada-4-recorte-movil.png"
+    },
+    {
+      "path": "final/candidatos/portada-4.jpg",
+      "sizeBytes": 186960,
+      "sha256": "a34b7e7cbbeed99d45d9d55adee4f6ed9c9bc565598f54f676d7125667496614",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/portada-4.jpg"
+    },
+    {
+      "path": "final/candidatos/portada-4.png",
+      "sizeBytes": 2998918,
+      "sha256": "3dd7da0a93db01c7fb4de9c21b22bf3c530491878209b0ab621f193e6e8f3b60",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/portada-4.png"
+    },
+    {
+      "path": "final/candidatos/revision-textos.png",
+      "sizeBytes": 2234626,
+      "sha256": "8be1b630c0c84767bc4ede1004d5568200025ea0093b62a29400dc9ba481aee9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/candidatos/revision-textos.png"
+    },
+    {
+      "path": "final/pipeline-de-ventas-hubspot-2026-card.webp",
+      "sizeBytes": 58896,
+      "sha256": "25a3c91d158d8dd5a92d4c33774f259d858136952d59a83cbb944aa83457ef6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/pipeline-de-ventas-hubspot-2026-card.webp"
+    },
+    {
+      "path": "final/pipeline-de-ventas-hubspot-2026-hero.webp",
+      "sizeBytes": 46792,
+      "sha256": "b4d7f5c87caf6507183f95306ecbb54eb20a10dd1563d35802b06f90ef0657bd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/pipeline-de-ventas-hubspot-2026-hero.webp"
+    },
+    {
+      "path": "final/pipeline-de-ventas-hubspot-2026-recorte-movil.png",
+      "sizeBytes": 2031534,
+      "sha256": "5cbfedc31ba2fa8c82dd4f87685e3c54123b446e25f190c4c8775e70b1c413ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/pipeline-de-ventas-hubspot-2026-recorte-movil.png"
+    },
+    {
+      "path": "final/pipeline-de-ventas-hubspot-2026.jpg",
+      "sizeBytes": 186960,
+      "sha256": "a34b7e7cbbeed99d45d9d55adee4f6ed9c9bc565598f54f676d7125667496614",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/pipeline-de-ventas-hubspot-2026.jpg"
+    },
+    {
+      "path": "final/revision-superficies.png",
+      "sizeBytes": 667935,
+      "sha256": "ef2279e5e26b8519118fef5be972f1a7ae0bc39d6945908c82eb9860f979aef0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/final/revision-superficies.png"
+    },
+    {
+      "path": "plates/MCB-PIPE1-169.png",
+      "sizeBytes": 4101630,
+      "sha256": "8dc6205380cef45d49654b401cf116bddf38b7161b9b9bfe04174cae1fac8c2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/plates/MCB-PIPE1-169.png"
+    },
+    {
+      "path": "webp/prospecting-agent-advanced-settings.webp",
+      "sizeBytes": 66310,
+      "sha256": "bfd9c5ba3282ae81e5e27816f4d64f39e89fc756b1b7fb17f6c31084b831de7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/prospecting-agent-advanced-settings.webp"
+    },
+    {
+      "path": "webp/prospecting-agent-contact-sourcing.webp",
+      "sizeBytes": 54762,
+      "sha256": "74f68580aa2935d30a9932a00075c31d759bdffc3652674c6f84dd815397d4b5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/prospecting-agent-contact-sourcing.webp"
+    },
+    {
+      "path": "webp/prospecting-agent-plays.webp",
+      "sizeBytes": 64094,
+      "sha256": "dda91f9f62ba85311b190a104f26ed348938ab13d8787928f4d775900074471d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/prospecting-agent-plays.webp"
+    },
+    {
+      "path": "webp/prospecting-agent-review-before-sending.webp",
+      "sizeBytes": 58618,
+      "sha256": "bb24a9d36af7ab71f05714d1f9b93825d96bfdbb215e222466c549d761caad0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/prospecting-agent-review-before-sending.webp"
+    },
+    {
+      "path": "webp/smart-deal-progression-board-notification.webp",
+      "sizeBytes": 81140,
+      "sha256": "9fbe305e0e09eafe87b456ee6f7bf323f819f6dcad539a1271083b21993552a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/smart-deal-progression-board-notification.webp"
+    },
+    {
+      "path": "webp/smart-deal-progression-update-crm.webp",
+      "sizeBytes": 48946,
+      "sha256": "3dbffe9ab0a8be67f9279835b51ddbe9dd24ae4637a5ae5d199ff6faa21b3d9e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-26_pipeline-hubspot/webp/smart-deal-progression-update-crm.webp"
+    }
+  ]
+}

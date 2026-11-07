@@ -1,0 +1,251 @@
+{
+  "schemaVersion": "intermedica-pricing-editorial-summary/1",
+  "preparedOn": "2026-10-28",
+  "currency": "USD",
+  "binding": false,
+  "reviewStatus": "requires_review",
+  "taxTreatment": "not_resolved",
+  "quotes": {
+    "a-performance-v2": {
+      "artifact": "a-performance-v2.artifact.json",
+      "replayDigest": "fe27bd7858d3e81761e015c34d312a3b4937043a817e1d62a9fdd130467c1660",
+      "replayExitCode": 3,
+      "net": "8640.00",
+      "cost": "4024.62",
+      "averageMonthlyNet": "2880.00",
+      "periods": 3,
+      "marginRateRoundedDown": "0.534187",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "3984.00",
+      "confirmedCost": "40.62",
+      "estimatedShareOfCost": "0.989907",
+      "contingencyReserve": null,
+      "lineFte": [
+        {
+          "lineId": "media",
+          "fte": "0.3",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "data",
+          "fte": "0.05",
+          "talentCountry": "CL"
+        }
+      ]
+    },
+    "a-creative": {
+      "artifact": "a-creative.artifact.json",
+      "replayDigest": "ca4490ae0dab347d4468b559789f8eb6a7d8de757d142bd2627114531f6b6f4e",
+      "replayExitCode": 3,
+      "net": "1350.00",
+      "cost": "750.36",
+      "averageMonthlyNet": "450.00",
+      "periods": 3,
+      "marginRateRoundedDown": "0.444177",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "710.40",
+      "confirmedCost": "39.96",
+      "estimatedShareOfCost": "0.946746",
+      "contingencyReserve": null,
+      "lineFte": [
+        {
+          "lineId": "design",
+          "fte": "0.08",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "copy",
+          "fte": "0.04",
+          "talentCountry": "CL"
+        }
+      ]
+    },
+    "a-preparation-v2": {
+      "artifact": "a-preparation-v2.artifact.json",
+      "replayDigest": "250c7eb0772186b59b9b0f832725e4581b23ee3e9fbf6b808e46df0ebf3a3b77",
+      "replayExitCode": 3,
+      "net": "1780.00",
+      "cost": "749.15",
+      "averageMonthlyNet": "1780.00",
+      "periods": 1,
+      "marginRateRoundedDown": "0.579129",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "739.48",
+      "confirmedCost": "9.67",
+      "estimatedShareOfCost": "0.987092",
+      "contingencyReserve": {
+        "rate": "0.12",
+        "base": "human",
+        "amount": "63.48",
+        "baseAmount": "529.00",
+        "shareOfNet": "0.035663",
+        "waived": false,
+        "recordId": "contingency:performance-commerce-distribution:on_demand",
+        "revision": 1,
+        "scope": {
+          "offerId": "performance-commerce-distribution",
+          "engagementForm": "on_demand"
+        },
+        "sourceStatus": "estimated"
+      },
+      "lineFte": [
+        {
+          "lineId": "measure",
+          "fte": "0.12",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "web",
+          "fte": "0.06",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "media",
+          "fte": "0.07",
+          "talentCountry": "CL"
+        }
+      ]
+    },
+    "b-performance-v2": {
+      "artifact": "b-performance-v2.artifact.json",
+      "replayDigest": "b1dc6ae108b05c4314ba56244c80a14470fd5adb11ceb2fe5651856488aaaec6",
+      "replayExitCode": 3,
+      "net": "19140.00",
+      "cost": "8987.10",
+      "averageMonthlyNet": "6380.00",
+      "periods": 3,
+      "marginRateRoundedDown": "0.530454",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "8871.00",
+      "confirmedCost": "116.10",
+      "estimatedShareOfCost": "0.987081",
+      "contingencyReserve": null,
+      "lineFte": [
+        {
+          "lineId": "media",
+          "fte": "0.6",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "buyer",
+          "fte": "0.25",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "data",
+          "fte": "0.15",
+          "talentCountry": "CL"
+        }
+      ]
+    },
+    "b-creative": {
+      "artifact": "b-creative.artifact.json",
+      "replayDigest": "c411cde3b742113b0a1cd259504d8c9a99c20504f8cccbeff94fde50cb3808dc",
+      "replayExitCode": 3,
+      "net": "2160.00",
+      "cost": "1206.72",
+      "averageMonthlyNet": "720.00",
+      "periods": 3,
+      "marginRateRoundedDown": "0.441333",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "1126.80",
+      "confirmedCost": "79.92",
+      "estimatedShareOfCost": "0.933771",
+      "contingencyReserve": null,
+      "lineFte": [
+        {
+          "lineId": "design",
+          "fte": "0.16",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "copy",
+          "fte": "0.08",
+          "talentCountry": "CL"
+        }
+      ]
+    },
+    "b-preparation-v2": {
+      "artifact": "b-preparation-v2.artifact.json",
+      "replayDigest": "c9b04b6404322a67a7bb0ed54c2b0498dc9ddb2a3d87fb25956d75aea138be0e",
+      "replayExitCode": 3,
+      "net": "2660.00",
+      "cost": "1125.68",
+      "averageMonthlyNet": "2660.00",
+      "periods": 1,
+      "marginRateRoundedDown": "0.576812",
+      "belowPolicyFloor": false,
+      "flaggedLinePeriods": 0,
+      "estimatedCost": "1110.20",
+      "confirmedCost": "15.48",
+      "estimatedShareOfCost": "0.986248",
+      "contingencyReserve": {
+        "rate": "0.12",
+        "base": "human",
+        "amount": "103.20",
+        "baseAmount": "860.00",
+        "shareOfNet": "0.038797",
+        "waived": false,
+        "recordId": "contingency:performance-commerce-distribution:on_demand",
+        "revision": 1,
+        "scope": {
+          "offerId": "performance-commerce-distribution",
+          "engagementForm": "on_demand"
+        },
+        "sourceStatus": "estimated"
+      },
+      "lineFte": [
+        {
+          "lineId": "measure",
+          "fte": "0.2",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "web",
+          "fte": "0.08",
+          "talentCountry": "CL"
+        },
+        {
+          "lineId": "media",
+          "fte": "0.12",
+          "talentCountry": "CL"
+        }
+      ]
+    }
+  },
+  "scenarios": {
+    "a": {
+      "performanceMonthly": "2880.00",
+      "creativeMonthly": "450.00",
+      "servicesMonthlyWithCreative": "3330.00",
+      "preparationOnce": "1780.00",
+      "baseThreeMonthsPlusPreparation": "10420.00",
+      "servicesThreeMonthsWithCreativePlusPreparation": "11770.00",
+      "optionalClientDirectMediaMonthlyCeiling": "1500.00",
+      "optionalClientDirectMediaThreeMonthsCeiling": "4500.00",
+      "planningOutlayWithCreativeAndFullMediaCeilingBeforeTax": "16270.00",
+      "modeledServiceCostWithCreativeOverHorizon": "5524.13",
+      "modeledAggregateMarginWithCreative": "0.5306601529311809685641461342",
+      "firstServiceBlockWithCreativePlusPreparation": "5110.00"
+    },
+    "b": {
+      "performanceMonthly": "6380.00",
+      "creativeMonthly": "720.00",
+      "servicesMonthlyWithCreative": "7100.00",
+      "preparationOnce": "2660.00",
+      "baseThreeMonthsPlusPreparation": "21800.00",
+      "servicesThreeMonthsWithCreativePlusPreparation": "23960.00",
+      "optionalClientDirectMediaMonthlyCeiling": "3000.00",
+      "optionalClientDirectMediaThreeMonthsCeiling": "9000.00",
+      "planningOutlayWithCreativeAndFullMediaCeilingBeforeTax": "32960.00",
+      "modeledServiceCostWithCreativeOverHorizon": "11319.50",
+      "modeledAggregateMarginWithCreative": "0.5275667779632721202003338898",
+      "firstServiceBlockWithCreativePlusPreparation": "9760.00"
+    }
+  }
+}

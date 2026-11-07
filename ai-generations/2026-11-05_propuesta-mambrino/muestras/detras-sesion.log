@@ -1,0 +1,8 @@
+  $ costo estimado ≈ USD 0.041 (1 × 1372 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/detras-sesion.png …
+[secrets] Secret Manager lookup failed for OPENAI_API_KEY; falling back without exposing the secret value. {
+  secretRef: 'projects/efeonce-group/secrets/greenhouse-openai-api-key-personal/versions/latest',
+  error: '4 DEADLINE_EXCEEDED: Deadline exceeded after 60.003s,name resolution: 0.007s,time to current attempt start: 0.001s,Waiting for LB pick'
+}
+  ✗ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/detras-sesion.png FAILED: La clave OpenAI del perfil "personal" no está disponible: revisa que exista el secreto greenhouse-openai-api-key-personal y tu acceso a él. No se usó la clave canónica.
+done

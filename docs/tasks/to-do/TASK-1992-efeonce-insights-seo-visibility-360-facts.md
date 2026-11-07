@@ -367,6 +367,8 @@ Nombres finales de hechos y de reglas se fijan en Discovery; el criterio es la r
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: todo fact nuevo seleccionado para Blog hereda scope host+ruta y receipt de TASK-2033/1960; rechaza evidencia del dominio completo o de otra ventana. Módulos opcionales y política competidores no bloquean el núcleo GA4/GSC/AEO.
+
 - [ ] Slice 6: selector/binding compatible de organización/target/run/fecha/versión implementado; run ajeno rechazado, request hash distingue corridas y una edición sellada no cambia a latest.
 - [ ] Slice 6: contrato compartido de salud/hallazgos/alcance/URLs y referencias client-safe desde reader dueño; absence/stale/partial/no verificado conservan semántica, sin SQL/snapshot paralelo ni costos/tier/cupo/IDs internos.
 - [ ] Backend audit desbloquea TASK-1672 sin exigir los demás slices ni la tarjeta de canal; tarjeta y detalle consumen el mismo binding y método, con pruebas de no duplicar hechos/edición.
@@ -412,3 +414,11 @@ Nombres finales de hechos y de reglas se fijan en Discovery; el criterio es la r
 ## Delta 2026-10-12 — alcance de contenido (TASK-2033)
 
 - `TASK-2033` agregó el alcance de contenido por organización (`src/lib/growth/seo/content-scope/`). El adapter SEO ya lo resuelve y lo sella en cada fuente. Todo hecho nuevo de esta task que salga por URL o por página (`url_visibility.*`, `site_health.*`, movimiento de keywords por página) debe recibir el alcance o declararse fuera de él con un límite; con alcance vigente el ETV del dominio no se emite, y `paid_etv`, `backlinks.*` y los hechos de dominio completo necesitan la misma decisión.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Dependencia por módulo seleccionado, no cierre total; sigue en EPIC-045 con sus bloqueos actuales.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

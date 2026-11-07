@@ -1,5 +1,14 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-11-01 — negativos (a)/(b) conciliados en develop
+
+Los tests (a) y (b) se verificaron el 28-10 en `efeonce-mcp` rama local `codex/auth-gateway-assurance@9fb877b`
+(`pnpm exec tsx --test test/auth-assurance-1831.test.ts`, 3 PASS): un token externo con el scope de escritura no lista
+ni despacha `track_seo_keywords`, y un rol Entra con ese string sin scope delegado recibe 403 sin dispatch; la señal
+registra sólo herramienta, motivo y clase de issuer. Esa conciliación se había hecho en una rama de Codex de
+greenhouse-eo y no llegó a `develop`; se porta aquí. La rama de `efeonce-mcp` no está en `origin`: son pruebas locales,
+no repetición productiva.
+
 ## Delta 2026-09-07 — Efeonce ID SSO no es autorización MCP
 
 El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` confirma que una sesión
@@ -435,8 +444,8 @@ Reglas obligatorias:
 - [x] `AuthContext` expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes`, `roles`, `expiresAt`, `grantsVersion` sin fallback `azp ?? sub` ni fusión de `roles`. Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
 - [x] Un token con issuer no configurado se rechaza sin ningún fetch de JWKS (test). Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
 - [x] Todas las tools registradas declaran `allowedIssuers` y `authorityClass`; el arranque falla si falta. Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
-- [ ] Test (a): token externo con scope string internal-only → deny en dispatch con señal redactada.
-- [ ] Test (b): `roles` con string de escritura y sin scope delegado → deny, también en el issuer Entra.
+- [x] Test (a): token externo con scope string internal-only → deny en dispatch con señal redactada. `test/auth-assurance-1831.test.ts` en `efeonce-mcp` rama local `codex/auth-gateway-assurance@9fb877b`: callback y HTTP MCP, 3 PASS locales el 28-10; la rama no está en `origin`.
+- [x] Test (b): `roles` con string de escritura y sin scope delegado → deny, también en el issuer Entra. Mismo retest local: HTTP 403, cero dispatch y señal acotada; no es repetición productiva Entra.
 - [x] Test (c): grant revocado con token vigente → deny por `grants_version` en ≤60 s. Canary interno TASK-1836: retiro selectivo del grant ≤11 s, restituido con vencimiento original; ver runbook.
 - [ ] El canary interno `globe.producer.fleet.list` con Entra no cambia de comportamiento.
 - [ ] Persona externa resuelta sólo por `(issuer, subject)` vía registry; ninguna búsqueda por `client_id` ni email.

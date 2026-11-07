@@ -53,6 +53,10 @@ describe('email delivery layer', () => {
     mockWithGreenhousePostgresTransaction.mockImplementation(async callback => callback({ query: vi.fn() }))
 
     mockRunGreenhousePostgresQuery.mockImplementation((sql: string) => {
+      if (sql.includes('email_type_config')) {
+        return Promise.resolve([{ enabled: true, paused_reason: null }])
+      }
+
       if (sql.includes('RETURNING delivery_id')) {
         return Promise.resolve([{ delivery_id: 'delivery-123' }])
       }
@@ -86,6 +90,32 @@ describe('email delivery layer', () => {
     expect(persisted).toContain('ea52cc41-0a92-43c1-9be8-111111111111')
     expect(persisted).toContain('token_sensitive')
   })
+
+  it.each(['missing', 'read_error'] as const)(
+    'does not dispatch a Rooms invitation OTP when its delivery gate is %s',
+    async failure => {
+      mockRunGreenhousePostgresQuery.mockImplementation((sql: string) => {
+        if (sql.includes('email_type_config')) {
+          return failure === 'missing'
+            ? Promise.resolve([])
+            : Promise.reject(new Error('synthetic config read failure'))
+        }
+
+        return Promise.resolve([])
+      })
+
+      const result = await sendEmail({
+        emailType: 'auth_server_rooms_invitation_otp', domain: 'identity',
+        recipients: [{ email: 'synthetic@example.test' }],
+        context: { invitationUrl: 'https://rooms.example.test/invite#synthetic', roomLabel: 'Synthetic',
+          code: '918273', expiresInMinutes: 10 },
+        persistence: { mode: 'token_sensitive', safeContext: { locale: 'es' } }
+      })
+
+      expect(result.status).toBe('skipped')
+      expect(mockGetResendClient).not.toHaveBeenCalled()
+    }
+  )
 
   it.each([
     { emailType: 'auth_server_magic_link' as const,

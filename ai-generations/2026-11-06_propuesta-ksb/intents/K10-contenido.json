@@ -1,0 +1,47 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-service",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Ejes 3 y 4 · Demanda y contenido",
+    "question": "Contenido técnico para quien",
+    "answer": [
+      "Especifica"
+    ]
+  },
+  "body": "Contenido de costo total de propiedad, casos chilenos y servicio, distribuido donde decide cada segmento.",
+  "steps": [
+    {
+      "kicker": "Gancho propio",
+      "name": "Mida su bomba",
+      "desc": "Sonolyzer y KSB Guard, también con equipos de otras marcas."
+    },
+    {
+      "kicker": "Por segmento",
+      "name": "Series técnicas",
+      "desc": "Desalación, relaves, riego y edificación, en LinkedIn y YouTube."
+    },
+    {
+      "kicker": "Hito 2027",
+      "name": "Expomin",
+      "desc": "Del 20 al 24 de abril: captura de leads y seguimiento."
+    }
+  ],
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+    "alt": "Un diseñador de Efeonce con el hoodie navy mueve una prueba de diagramación al tope de una grilla de pruebas impresas en el estudio de noche"
+  },
+  "selection": {
+    "target": "object",
+    "label": "KSB",
+    "participantKind": "department"
+  }
+}

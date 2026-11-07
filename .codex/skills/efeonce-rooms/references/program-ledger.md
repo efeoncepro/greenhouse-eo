@@ -5,40 +5,179 @@
 > Las entradas fechadas previas son snapshots: sus pendientes quedan superados por la entrada vigente,
 > sin reescribir la evidencia histórica ni repetir el canary cerrado.
 
-## Estado vigente (2026-10-31, cierre del día)
+## Estado vigente (2026-11-02)
 
-- Producción (`vivo`): `efeonce-rooms.vercel.app` sirve `main@a2d72c0` = `dpl_5FNV9MSLdqWxuBGyim5Yoiz2UkPG`
-  (PR #5, TASK-2082 + TASK-2083), sobre PR #4 `6f99a6f` (UI aprobada + «Vive el servicio»). `/rooms` 200,
-  `/auth/error` 200 y `/api/auth/session` sin sesión 401. Alias **manual**: tras cada deploy,
+- **2026-11-02 — skill de oficio actualizada al carril CLI, eval PASS (`local`):** `efeonce-rooms-authoring` ahora enseña
+  el login de la CLI como canal normal (`whoami`, clases, `403`/`401`), `assetRefs: []` al crear, clave nueva ante
+  `409`, el lector `media` como lista, vencimiento real de invitaciones (30 días, tope 90, acotado por el acceso de
+  quien invita), `invitationId` con el `roomId` (es único en todo Rooms; un choque responde `unavailable`) y cómo
+  confirmar destinatarios sin `read.client`. Cuatro rondas del eval por el login local (`integration:up`); recibo
+  `evals/runs/2026-11-02.json`, PASS, hash `sha256:9ff2aff5…`. [Auditoría](../../../../docs/audits/rooms/2026-11-02-authoring-eval-cli-lane-run.md).
+
+- **2026-11-02 — botón «Continuar con Efeonce ID» definido, no adoptado (`doc` + `local`):** el [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md#el-botón-continuar-con-efeonce-id-aprobado-2026-11-02)
+  fija el botón canónico para relying parties: «Continuar con» + `efeonce-id-button-lockup-*` (`axis-brand-assets` 0.4.32), diez
+  estados, sin primitive todavía en `axis-ui-primitives`. `local`: `main@3434ea8` (PR #23, páginas `/cli/conectado` y `/cli/error`)
+  ya fija `axis-brand-assets` 0.4.32 y muestra el lockup de familia `efeonce-id-lockup-negative`: no es el botón. La pantalla de
+  sesión cerrada sigue con un `Button` genérico «Volver a entrar». Adoptarlo: cuando exista la primitive, sólo donde Rooms ya ofrece entrar; la entrada a rutas
+  protegidas sigue directa (D2/D9).
+- **2026-11-02 — páginas de fin de `pnpm rooms login` en producción (`vivo`):** efeonce-rooms PR #23, merge `3434ea8`, deploy
+  `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` con alias (diseño: sesión «Diseño UI Rooms efeonce», a pedido del operador). El loopback espera a
+  que la credencial quede guardada y responde 303 a `/cli/conectado` («Listo») o `/cli/error?motivo=state|issuer|denied|failed`
+  («Casi»); ni el código ni tokens viajan en esa URL. Antes decía «Listo» antes del canje: corregido. Páginas públicas con
+  `OrbitWordStage`, fila «Acceso con» + `efeonce-id-lockup-negative` (`axis-brand-assets` 0.4.32 por `sync-brand`) y la nota con el
+  comando. Notas del escenario de vuelta a 13 px (también `/salir` y 404). Suite 420 pass, 24 skipped, 0 fail;
+  `tests/agent-cli-login.test.ts` afirma el 303. Readback: `/cli/conectado`, `/cli/error` y el lockup en 200. **Verificado por el
+  operador (2026-11-02):** `logout` (`revoked: true`) y `login` contra producción terminan en `/cli/conectado` («Listo», «Tu agente
+  ya tiene acceso») y el agente lee el espacio con el refresh nuevo.
+- **2026-11-02 — aceptación del carril CLI en producción (`vivo`):** el operador corrió `pnpm rooms login` una vez (Efeonce ID + MFA;
+  `subject` opaco, principal `rooms-pilot-julio-20261025`, espacio «Efeonce» `org-2df565fb-…`). Sin pedirle nada más, el agente creó
+  `demo-volta` («Campaña «Llega antes»», `synthetic`/`fixture`), subió las 5 imágenes (`kv-16x9`, `feed-4x5`, `story-9x16`,
+  `story-9x16-b`, `dooh-3x1`), las adjuntó por referencia, dejó la cobertura en cero (revisión 21), revisó «Ver como» comprador
+  (6 capítulos, sin marcadores, URLs, nombres de archivo ni pruebas) y publicó la edición `87dd99b7-6cc9-4a5c-a0a4-7edab30ea1da`
+  (revisión 22). Sin invitaciones. Actividad: 17 acciones, todas `cli/claude-code`, aviso y reversa (`rooms.archive`) disponibles.
+  Introspección real con el secreto de Secret Manager verificada por la primera lectura. **Sin verificar:** la sala vista en el
+  navegador con sesión humana en `/rooms`.
+  - La página de éxito del callback era HTML sin estilo (el operador: «está pantalla está horrible»); resuelto en PR #23 (arriba).
+- **2026-11-02 — carril ENCENDIDO (`vivo`):** `ROOMS_AGENT_LANE_ENABLED=true` (env add del operador), `ROOMS_AGENT_AUDIENCE` y la ref del
+  secreto `rooms-production-agent-introspection-client-secret:1`; redeploy `efeonce-rooms-15djjyfz2` (`dpl_ErLrg34sku4YdWBwnExTcGcpZETR`; antes `mgod4xbea`)
+  con alias. Metadata 200 con audiencia/emisor/cliente; `/rooms` 307, `/auth/error` 200, sesión 401, bearer falso 401. Efeonce ID ya
+  sirve la audiencia (`auth-server-00172-zcn`). Falta el primer `pnpm rooms login` del operador y la sala Volta.
+- **Carril CLI de agentes (TASK-2087 + TASK-2095, enmienda D1-bis): PR #22 en producción, APAGADO** (snapshot de 2026-11-01; encendido y aceptado el 2026-11-02, entradas de arriba). Merge `main@9a4340a`
+  (autorizado por el operador: «Solo hasta Rooms»), deploy `efeonce-rooms-r39y0yi7g` (`dpl_HKTWk2WpdX5hKZLC2TDrPLXQE39q`) con
+  alias reasignado. `vivo` sin sesión: `/rooms` 307 a login, `/auth/error` 200, `/api/auth/session` 401,
+  `/.well-known/oauth-protected-resource` 404 (carril OFF) y un bearer falso 401. `ROOMS_AGENT_LANE_ENABLED` sigue ausente en
+  Vercel; Efeonce ID aún sin la audiencia Rooms (TASK-2095 sin release). Rama `claude/rooms-agent-cli-bearer`
+  (worktree `/Users/jreye/Documents/rooms-agent-cli`). Verificador del bearer de Efeonce ID
+  (`src/server/agents/bearer.ts`: JWKS + introspección ≤ 30 s con el cliente `efeonce-rooms-resource`, `azp` de la lista,
+  sin `act`, clases por ruta y por operación, `sub` → binding interno con la misma autoridad que la cookie vía
+  `internalPrincipalFor`), detrás de `ROOMS_AGENT_LANE_ENABLED` (nace OFF). Con cookie presente el bearer se ignora (contrato
+  previo). Metadata RFC 9728 en `/.well-known/oauth-protected-resource` (404 con el carril apagado). `pnpm rooms
+  login|logout|whoami` (`scripts/lib/rooms-cli-auth.ts`: PKCE por loopback, `~/.config/efeonce-rooms/credentials.json` 0600,
+  refresh con candado de archivo) y MCP stdio sin `--session-file`. `local`: ensayo completo en `pnpm integration:up` con el
+  emisor de prueba extendido (`scripts/design-integration/agent-issuer.ts`): login, sala Volta creada, 5 imágenes subidas
+  (`synthetic`/`fixture`) y adjuntas, cobertura limpia, «Ver como» comprador limpio, publicada y atribuida a `claude-code`
+  por `cli` con aviso y reversa; rechazos de `live`, `read.client`, bearer falso y otra organización.
+  - Lección: el manifiesto Volta traía `assetRefs` con versiones de marcador (`av-…`); `content.attachAsset` da `conflict`
+    si la referencia ya tiene otra versión. Crear sin `assetRefs` y dejar que cada adjunto agregue la suya.
+  - Lección: el procesamiento de imágenes avanza la revisión del borrador en segundo plano; cada comando lee la revisión
+    vigente y ante `409` relee y rehace con una clave nueva.
+  - Lección: un worktree bajo `/private/tmp` rompe `integration:up` (socket de PG > 103 bytes y resolución de módulos de
+    Next); usar una ruta corta junto al repo.
+  - El entorno de integración del checkout principal se detuvo para este ensayo; se levanta de nuevo con `pnpm integration:up`.
+
+- **PR #17 + #18 (`main@5533dcd`), en producción desde 2026-11-01:** causa de
+  [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md) encontrada: cada conexión
+  nueva del conector de Cloud SQL usa el certificado temporal guardado sin revisar si venció, y su refresco (temporizador)
+  no corre con la función de Vercel congelada. Fix: un checkout fallido descarta el pool y reintenta **una sola vez**
+  (ninguna consulta ni COMMIT se reintenta) y el pool se recicla a los 40 min. Flujo completo revisado logueado y sin
+  loguear: la raíz es la portada (con sesión, el proxy manda a `/rooms`; sin sesión NO, porque «Volver a Rooms» de
+  Efeonce ID apunta a la raíz y formaba un círculo con `/login`), `/auth` → `/rooms`, 404/error sin banda de demo,
+  `AccessState` según quien mira (miembro, sesión vencida, invitado, anónimo), páginas de sala en el espacio
+  seleccionado, invitado válido gana a cookie interna vencida, `/login` con sesión abierta va directo, `returnTo` con las
+  rutas reales y por defecto `/rooms`, el selector de espacio conserva el enlace, cerrar sesión termina en `/salir`.
+  Deploy `efeonce-rooms-g2rwd5xbq`, alias reasignado.
+- **PR #19 (`main@b985998`), en producción desde 2026-11-01:** `/salir` con la dirección A aprobada en canvas
+  (https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2, «La órbita en reposo»): `SignedOutStage` reutiliza `DepthLayers`,
+  `Orbit` (`measure={{value:0,total:1}}`, anillo desnudo + halo canónico) y los estilos de access-issue; «Hasta pronto»
+  con la esfera como punto; copy en `INVITATION_COPY.access.signedOut`. Deploy `efeonce-rooms-iskmdcidc`, alias
+  reasignado.
+- **PR #20 (`main@693eb6a`), en producción desde 2026-11-01:** `OrbitWordStage` (anillo desnudo de `Orbit` + halo canónico,
+  palabra con la esfera como punto, titular, acciones y nota bajo línea) es la pieza única de la familia: `/salir`, la
+  portada («Entra», Efeonce ID, sala de ejemplo, nota para invitados) y el 404 general («Aquí no», ir a Rooms, nota de
+  abrir el enlace del correo completo), aprobados en canvas. Copy en `INVITATION_COPY.access.{entry,notFound,signedOut}`.
+  Deploy `efeonce-rooms-f511d5vjm`, alias reasignado.
+- **PR #21 (`main@cfa8c62`), en producción desde 2026-11-01:** el error inesperado (`error.tsx`) entra a la familia:
+  «De nuevo», Reintentar / Ir a Rooms y la referencia = `digest` de Next (el mismo id del registro del servidor; sin
+  digest no hay nota). Verificado en local con una ruta que lanzaba a propósito (no commiteada); el React #441 en consola
+  es la forma de producción del error de servidor provocado, no del cambio. Deploy `efeonce-rooms-9hcm8slr3`.
+  Nota: un URL inexistente bajo `/demo` también cae en el 404 general (Next usa el not-found raíz para rutas sin
+  match); `app/demo/not-found.tsx` sólo cubre `notFound()` dentro de la demo. **Regla:** la raíz sin sesión nunca redirige a
+  `/rooms`; un destino protegido tras cerrar sesión vuelve a entrar solo con la sesión de Efeonce ID abierta.
+- **PR #16 (`main@1989576`), en producción desde 2026-11-01:** el callback reinicia el login una vez ante
+  `login_required` o transacción de Rooms vencida (5 min); cookie `__Host-rooms_login_retry` de 2 min contra el bucle.
+  Deploy `efeonce-rooms-m6kqevsxq`, alias reasignado. Con el hotfix de Efeonce ID
+  (PR #266, `auth-server-00171-xdd`) completa el arreglo de
+  [ISSUE-190](../../../../docs/issues/resolved/ISSUE-190-rooms-login-expired-continuation-raw-json.md), resuelto el 2026-11-01.
+- **PR #13 a #15 (`main@4d0e6df`), en producción desde 2026-11-01:** la palabra de «el acceso se detuvo» se ajusta al
+  anillo según su largo (antes «Espera.», «Aún no.» y «Otra vez.» se salían) y la esquina superior quedó sin el rótulo
+  «Acceso a Rooms». PR #15 (`main@4d0e6df`): la línea «¿Sigues sin poder entrar?…» pasó de pie suelto a cerrar el
+  bloque de referencia, junto a las acciones. Deploy vigente `efeonce-rooms-dv0ii23nb`, alias reasignado. Además, registro saneado `rooms.db.init_failed`
+  y `rooms.db.connect_failed` para el login intermitente de [ISSUE-189](../../../../docs/issues/open/ISSUE-189-rooms-login-unavailable-on-cold-start.md)
+  (abierto, causa sin confirmar). Lección: una palabra de tamaño fijo dentro de una forma fija revienta con la palabra
+  más larga del copy; el tamaño debe derivarse del largo.
+- **PR #12 (`main@30845e7`), en producción desde 2026-11-01 (`vivo`):** invitación de propuesta B2B 30 días por defecto /
+  90 tope (antes 24 h), sesión del invitado 8 h (antes 15 min, tope 1 h), formulario en días. Migración `1793268000000`
+  (CHECK de `rooms.invitation_sessions` a 12 h) aplicada en `rooms_production` ANTES del merge, con respaldo
+  `.local/production-backups/rooms-production-20261101T112716Z.dump` y readback (26 migraciones, hashes y conteos intactos).
+  Deploy `efeonce-rooms-lu0np7peo` (`dpl_GxH7cWJ2doCYXYsYSvWonUwbD6t2`) con alias reasignado; smoke `/rooms` 307, `/login`
+  302, `/auth/error` 200, `/api/auth/session` 401. Sin verificar: una invitación real de punta a punta en producción. El
+  respaldo se borra tras esa verificación. Lección: un tope de vida en el código puede tener un CHECK gemelo en la base;
+  ampliar uno sin el otro rompe el login del invitado.
+
+- Producción (`vivo`): desde 2026-11-02 `efeonce-rooms.vercel.app` sirve `dpl_2CTf9RddsGRSkE3y6XxU5hhZcVzt` (PR #23, `main@3434ea8`), sobre PR #22 `main@9a4340a` (carril CLI) y PR #16–#21. Antes sirvió el deploy `efeonce-rooms-lu0np7peo` (PR #12, vigencias de invitación), sobre el `efeonce-rooms-12zux9578` (PR #11, `8aef9db`:
+  inventario de migraciones revisadas). Debajo, en orden: PR #10 `main@449a0cd` (nombre del espacio, `f59d1df`),
+  PR #9 `main@97588d3` (307 sin sesión, `1021e75`), PR #8 `main@21b10a9` (casa agentes primero, TASK-2085), PR #7
+  `main@d7d6f6b` (TASK-2084 expand) y PR #5/#4. Alias **manual**: tras cada deploy,
   `vercel alias set <deploy> efeonce-rooms.vercel.app --scope efeonce-7670142f`.
-- `rooms_production`: migraciones 9–18 `vivo` (14:16 UTC, con ensayo en clon y respaldo lógico, ya borrado); la 19
-  `doc` (sesión de acceso).
-- Flags Production (`vivo`, valores releídos): `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`,
+- Sin sesión (`vivo`): `/rooms` y `/rooms/:id/actividad` responden **307** a `/login?returnTo=…` desde el proxy; `/login`
+  302 a `auth.efeonce.org/oauth/authorize`; `/auth/error` 200; `/api/auth/session` 401. La entrada desde Rooms
+  muestra el login V4 de Efeonce ID con «Entra a Rooms» y carrusel de novedades (release de Greenhouse
+  `935583f88db0`; detalle en la skill `efeonce-auth`).
+- `rooms_production` (`vivo`): 25 migraciones hasta `1793267000000_rooms-organization-profile`, 52 tablas. La
+  `1793266` pertenece a la rama sin merge `claude/rooms-media-import` y **no** está en producción.
+- Espacio de trabajo (`vivo`): `org-2df565fb-…` se llama «Efeonce» (`organization.rename`, recibo atribuido al agente
+  `claude-code` por CLI). Sin ver todavía con una sesión humana real.
+- Flags Production (`vivo`, valores releídos 2026-10-31): `ROOMS_FIRST_PARTY_AUTH_ENABLED`, `ROOMS_INVITATIONS_ENABLED`,
   `ROOMS_MEDIA_ENABLED`, `ROOMS_LIVE_ENABLED`, `ROOMS_MEDIA_DISPATCH_ENABLED` = `true`;
-  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`.
-- Efeonce ID (`vivo`): `auth-server-00169-4pq` con first-party y OTP ON; fuente durable en variables de repo GitHub.
-  Detalle y rollback en el ledger de `efeonce-auth`.
-- Acceso del operador: restaurado con SQL autorizado hasta 2027-10-31 (`vivo`) y adoptado por el bootstrap de
-  TASK-2082 como administrador hasta 2027-11-01 (`doc`). Todo acceso vence en máximo un año y se renueva.
-- Decisiones: ADR de escenas, de acceso interno durable y del carril de agentes, los tres **Accepted**. El carril de
-  agentes no tiene código.
+  `ROOMS_AUTH_ALLOW_LOCAL_DEVELOPMENT` = `false`. `ROOMS_AGENT_LANE_ENABLED` = `true` desde 2026-11-02 (entrada de arriba).
+- Efeonce ID (`vivo`): first-party y OTP ON, y la audiencia Rooms con los clientes `efeonce-rooms-cli` / `efeonce-rooms-resource`
+  (`auth-server-00172-zcn`, hotfix PR #267); fuente durable en variables de repo GitHub. Detalle y rollback en el
+  ledger de `efeonce-auth`.
+- Acceso del dueño: administrador con renovación automática (`vivo` 2026-10-31). Todo acceso vence en máximo un año.
+- Login humano con MFA: **aceptación reportada por el operador** (`doc`, 2026-11-01), transmitida por la sesión Auth:
+  «Ya yo lo probé y funciona bien con MFA». Sin logs ni prueba instrumentada añadidos; no certifica el encabezado,
+  la casa nueva ni la renovación automática. [Registro](../../../../docs/audits/rooms/2026-11-01-operator-mfa-acceptance.md).
+- Decisiones: ADR de escenas, de acceso interno durable y del carril de agentes, los tres **Accepted**. Del carril,
+  están en producción la atribución, avisos, reversas y cuotas de TASK-2084 (expand), la casa de TASK-2085 y, desde el
+  2026-11-02, el bearer por CLI (enmienda D1-bis, aceptado). El gateway delegado no existe todavía.
+- Issues resueltos del corte: [ISSUE-187](../../../../docs/issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)
+  (inventario de migraciones revisadas) e [ISSUE-188](../../../../docs/issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)
+  (entrada sin sesión por RSC).
 - Recibos: [activación](../../../../docs/audits/rooms/2026-10-31-production-activation.md) ·
   [migraciones aplicadas](../../../../docs/audits/rooms/2026-10-31-production-migrations-applied.md) ·
   [ensayo](../../../../docs/audits/rooms/2026-10-31-production-migration-rehearsal.md) ·
-  [acceso durable](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md).
+  [acceso durable](../../../../docs/audits/rooms/2026-10-31-durable-access-production.md) ·
+  [atribución de agentes](../../../../docs/audits/rooms/2026-10-31-agent-lane-attribution-production.md).
 - Lo que sigue, en orden:
-  1. Primer login real del operador con la versión nueva.
-  2. Carril de agentes: tasks según el orden del ADR; primero en Rooms: actor, aviso, «Actividad de agentes» con
-     reversa, cuotas y guard de clasificación.
-  3. Task nueva de EPIC-044: delegación interactiva para la audiencia de Rooms (canje RFC 8693, `act`, D10).
-     TASK-1917 no la cubre. Bloqueada por la retención de Efeonce ID.
-  4. Verificador del bearer en Rooms (`ROOMS_AGENT_LANE_ENABLED`) y provider `rooms` en `efeonce-mcp`.
-  5. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
-  6. Skill de oficio + eval antes del primer cliente real.
-  7. Rediseño agentes-primero del canvas de administración
-     ([canvas](https://claude.ai/artifact/DX8VgavaqqZmHYXRbKVjeL), fila «El lado de Efeonce — administrar salas»).
-  8. Antes de clientes reales: medir la sala en vivo (prendida y sin medir), cerrar TASK-1833 y revisar gobierno de
-     datos IA para `read.client`. Ningún cliente real sin una autorización nueva.
+  1. TASK-2084/2085: el recorrido real de acción, aviso y reversa de agente quedó hecho con la sala Volta (2026-11-02);
+     falta verla con sesión humana en `/rooms` y, después, slice 6 (contract).
+  2. TASK-2085: QA de la casa nueva y encabezado «Efeonce», captura GVC (`pnpm fe:capture rooms-agent-activity`) con
+     scorecard y campos que faltan en el reader. El login con MFA ya tiene aceptación reportada.
+  3. Medir la sala Live en Vercel (streams y pool), encendida y todavía sin medición.
+  4. Gateway: canje RFC 8693 de Efeonce ID para la audiencia Rooms (`act`, D10), TASK-2086 (`to-do`); la audiencia ya
+     existe (TASK-2095). TASK-1917 no la cubre.
+  5. Provider `rooms` en `efeonce-mcp` (TASK-2088), que reutiliza el verificador del bearer ya vivo. Cierre formal de
+     TASK-2087 y TASK-2095.
+  6. Fuentes (Radiografía AEO y CRM vía readers de Greenhouse) y medios gobernados.
+  7. Antes de clientes reales: cerrar TASK-1833 y revisar gobierno de datos IA para `read.client`, además de la
+     medición Live. Ningún cliente real sin una autorización nueva.
+
+## 2026-11-01 — Inventario de migraciones revisadas al día (PR #11) EN PRODUCCIÓN
+
+- Síntoma: `pnpm integration:up` fallaba en el preflight («Review exact migration inventory before integration
+  bootstrap») desde TASK-2084, porque `REVIEWED_MIGRATIONS` de `scripts/design-integration/config.ts` se había quedado
+  en `1793261`. Retuvo el deploy del corte. Issue: ISSUE-187.
+- [PR #11](https://github.com/efeoncepro/efeonce-rooms/pull/11) (`8aef9db`): agrega `1793262`–`1793265` y `1793267`;
+  `tests/integration-env.test.ts` exige que la lista sea **exactamente** `migrations/*.sql`, así que una migración
+  nueva sin revisar falla en `pnpm test` (parte de `pnpm verify`), no semanas después. `vivo`: deploy `efeonce-rooms-12zux9578` y alias
+  reasignado.
+- `local`: la PG local (`rooms_migrations`) ya tenía aplicada `1793266` de la rama `claude/rooms-media-import`;
+  `pnpm db:migrate up` falló hasta copiar temporalmente ese archivo al checkout. `pnpm db:migrate` sin argumento sólo
+  hace `status` (dry run); la acción que aplica es `up`.
+- Lecciones:
+  - cada migración nueva entra a `REVIEWED_MIGRATIONS` en el mismo PR; el test lo exige;
+  - una PG local que corrió una rama sin merge queda «adelantada»: o se trae el archivo temporalmente o se usa una
+    base desechable; nunca se borra la fila de `rooms_migrations` a mano.
 
 ## 2026-11-01 — Nombre del espacio de trabajo EN PRODUCCIÓN
 
@@ -48,7 +187,8 @@
   - [PR #10](https://github.com/efeoncepro/efeonce-rooms/pull/10) en `main@449a0cd`, deploy `efeonce-rooms-r00l7k48n` + `vercel alias set`;
   - `org-2df565fb-…` nombrada «Efeonce» con `pnpm access:production rename-organization … --agent claude-code --apply` (recibo atribuido al agente por CLI, como el principal `rooms-pilot-julio-20261025`); relectura `current: "Efeonce"`.
 - Contrato: `organization.rename` (members.manage, clase `author`); `profile.get.organizationName`; encabezado de `/rooms` y actividad de sala + selector de espacio con fallback genérico. Sin ver con sesión real.
-- Deuda vista: `REVIEWED_MIGRATIONS` de la integración local no incluye 1793262–1793267 (`integration:up` fallaría en preflight). La rama `claude/rooms-media-import` trae 1793266, ya aplicada en la PG local.
+- Deuda vista: `REVIEWED_MIGRATIONS` de la integración local no incluye 1793262–1793267 (`integration:up` fallaría en preflight). La rama `claude/rooms-media-import` trae 1793266, ya aplicada en la PG local. Resuelta por el PR #11 (entrada de arriba).
+- Tooling: `pnpm access:rename-organization --organization ORG --principal ID --name "…" --agent CLIENT_ID [--apply]` (local) o `pnpm access:production rename-organization …` (producción por Cloud SQL proxy); en seco imprime el nombre actual y el nuevo. Manual: [nombrar el espacio](../../../../docs/manual-de-uso/rooms/nombrar-espacio-de-trabajo.md).
 
 ## 2026-11-01 — Casa agentes primero (TASK-2085) y redirección a Efeonce ID EN PRODUCCIÓN
 
@@ -791,5 +931,5 @@ Fuente consolidada: [auditoría de estado](../../../../docs/audits/rooms/2026-10
 ### Lecciones
 
 - «Tests verdes» puede no cubrir lo nuevo: el glob de `pnpm test` dejaba fuera `tests/media-*` (y luego `tests/live-*`). Al sumar un archivo de test, confirmar que el script lo recoge: la cuenta de tests debe subir.
-- La integración local valida un inventario exacto de migraciones (`REVIEWED_MIGRATIONS`): cada migración nueva se agrega ahí tras revisarla, o `integration:up` falla en preflight sin decir por qué.
+- La integración local valida un inventario exacto de migraciones (`REVIEWED_MIGRATIONS`): cada migración nueva se agrega ahí tras revisarla, o `integration:up` falla en preflight sin decir por qué. Desde el PR #11 (2026-11-01) `tests/integration-env.test.ts` exige que la lista sea exactamente `migrations/*.sql`.
 - Un cierre «local» (DB local) no acredita el runtime cloud: decir siempre contra qué base se probó.

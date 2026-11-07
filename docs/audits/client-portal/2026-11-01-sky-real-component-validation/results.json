@@ -1,0 +1,421 @@
+{
+  "task": "TASK-2094",
+  "scope": "synthetic local characterization and candidate contract; not bridge acceptance or production certification",
+  "discoveryCommit": "c618bc662",
+  "startedAtEpochMs": 1793574789002,
+  "passed": 89,
+  "failed": 0,
+  "total": 89,
+  "suites": [
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/aeo-insights.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT GAP: root and Blog collapse into one own_domain row; failed observations do not inflate it",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT LIMIT: provider-declared Blog domain preserves unresolved redirect URL, without proving destination",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior existing protection: failed-only observations produce no evaluable citations, not a measured Blog zero",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO citation reducers: current behavior CURRENT LIMIT: dedupe is exact raw URL; tracking variants remain separate citations",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: asks the owner reader for a run finished inside the resolved UTC window",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: rejects native report readiness insufficient_data",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: rejects native report readiness review_required",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: a reader response outside the requested civil window is rejected",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: missing native AEO plus successful empty GA4 emits ai_sessions=0 and passes current validation",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: GA4 AI-referral query has neither Blog landing rules nor host selection",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads CURRENT GAP: only comparison-window facts satisfy current module presence even with allowPartial=false",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing protection: no current or comparison facts is rejected with allowPartial=false",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — real AEO adapter with stubbed upstream reads existing generic policy: allowPartial=true permits an empty module; this is not Blog completeness",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — candidate source gate versus the characterized current gaps requires native AEO even when real adapter has populated the AEO chapter with GA4 referrals",
+          "status": "passed"
+        },
+        {
+          "name": "TASK-2094 — candidate source gate versus the characterized current gaps rejects comparison-only native receipt as current evidence, preserving two other valid current sources",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/bridge-postgres.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "isolation of this harness (not product authorization) OS denies IP sockets, including localhost; only owned UNIX PG is used",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes actual session_360 default and module loading, rather than a modeled selector",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes metadata changing the implicit default only for shared-client B",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes revoking memberships not revoking the bridge-derived session",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime preserves the existing Finance owner despite newer SEO metadata",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes incomplete Finance context choosing the most recent bridge",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime rejects a genuinely conflicting profile/client and leaves the profile unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime real commercial instantiation guard rejects another client, without adding a financial profile",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes Account360 aggregating both Spaces while excluding the control organization",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime contrasts explicit Notion Space selection with cardinality hidden by client LIMIT 1",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime characterizes a canonical service replay preserving its ID but overwriting ownership",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime exercises the real cron adapter contract mismatch after a valid inbound upsert",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime verifies the real PG transaction helper rolls back a partial replay on error",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge A-prime real snapshot store and migration triggers preserve sealed evidence through metadata changes and attempted rewrites",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes actual session_360 default and module loading, rather than a modeled selector",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes metadata changing the implicit default only for shared-client B",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes revoking memberships not revoking the bridge-derived session",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B preserves the existing Finance owner despite newer SEO metadata",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes incomplete Finance context choosing the most recent bridge",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B rejects a genuinely conflicting profile/client and leaves the profile unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B real commercial instantiation guard rejects another client, without adding a financial profile",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes Account360 aggregating both Spaces while excluding the control organization",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B contrasts explicit Notion Space selection with cardinality hidden by client LIMIT 1",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B characterizes a canonical service replay preserving its ID but overwriting ownership",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B exercises the real cron adapter contract mismatch after a valid inbound upsert",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B verifies the real PG transaction helper rolls back a partial replay on error",
+          "status": "passed"
+        },
+        {
+          "name": "current real components with bridge B real snapshot store and migration triggers preserve sealed evidence through metadata changes and attempted rewrites",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "scripts/experiments/sky-measurement-bridge/measurement-contract.local-spec.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "candidate contract — three independent current producers accepts a complete candidate with explicit top-row GSC controls, without demanding impossible query completeness",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing ga4",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing gsc",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers does not substitute another producer for missing native_aeo",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers GA4 referrals do not satisfy the native AEO requirement",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers comparison facts cannot fill the current window",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers fails closed on duplicate candidate receipts instead of choosing latest",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong spaceId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong serviceId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong organizationId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects wrong bindingId despite shared host",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers rejects stale binding and scope versions",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers missing/deleted scope never falls back to site total",
+          "status": "passed"
+        },
+        {
+          "name": "candidate contract — three independent current producers missing/deleted scope never falls back to site total",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations accepts observed zero only with complete verified evidence in all three sources",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps unknown evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps partial evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations keeps unavailable evidence in preview",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations does not promote an unverified empty API response to observed zero",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations refuses partial extraction even with rows on every day",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks controls and policy rather than asserting top-rows are the full population",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations cannot relabel blog activity as entry sessions or infer the entry hostname",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks source calendar close separately from report close",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations recent query cannot certify lagging ga4 data",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations recent query cannot certify lagging gsc data",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects provisional finality even after calendar closes",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects unknown finality even after calendar closes",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects future data-through and an attestation later than the query",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations checks declared UTC against civil timezone, including a DST-changing comparison month",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations characterizes the canonical midnight-gap result and fails closed rather than inventing a new resolver",
+          "status": "passed"
+        },
+        {
+          "name": "quality, calendars and populations rejects a shifted producer window and source calendar",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com.evil.invalid/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://sub.blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com@evil.invalid/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://www.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://blog.skyairline.com:444/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: //blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: javascript:alert(1)",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel rejects URL outside the exact-host contract: https://user:pass@blog.skyairline.com/a",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel allows root, query and normalized host case without broadening paths",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel unknown redirect destinations cannot silently disappear from native coverage",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel native run must fall inside the half-open current window with a fully accounted panel",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel incompatible comparison panel blocks comparison but not a valid current-only candidate",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel does not certify a comparison when ga4 availability is provisional or late",
+          "status": "passed"
+        },
+        {
+          "name": "exact host and native panel does not certify a comparison when gsc availability is provisional or late",
+          "status": "passed"
+        },
+        {
+          "name": "integration with existing Berel/GA4 pure primitives characterizes host-blind v1 and verifies candidate adds host without changing legacy behavior",
+          "status": "passed"
+        },
+        {
+          "name": "integration with existing Berel/GA4 pure primitives retains the real GA4 path-boundary/query filter while demonstrating it cannot express a host",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "migrations/20260915100154428_task-1845-insights-foundation.sql": "83c2ace72858748cf07fe75509d0b61d86243b5507eb7b072ae60d259503cf44",
+    "scripts/experiments/sky-measurement-bridge/aeo-insights-evidence.md": "517bf35b8996aaeb4ad552d4089f32eb752a4e9da4242b6fd86c477d32b4dc48",
+    "scripts/experiments/sky-measurement-bridge/aeo-insights.local-spec.ts": "a327acd43005b8cf559bc56c90dc49a5e9d7de38efaea11eb83541c1a0bbb6bd",
+    "scripts/experiments/sky-measurement-bridge/baseline.sql": "8171836eb1fcb60db4458264c47bc096731b8464ac564f96a6a0ec85a715d302",
+    "scripts/experiments/sky-measurement-bridge/bridge-postgres.local-spec.ts": "76ba57e645a1040b253eae900630cd3a6e749414ca92057a4cc06d5cb0c5fd86",
+    "scripts/experiments/sky-measurement-bridge/empty.ts": "1f991208cf76e361c607fc7d884a19733cfe6f4efe76117343c7101728c9c266",
+    "scripts/experiments/sky-measurement-bridge/measurement-contract.local-spec.ts": "03063cefe08c637ba3711e3f801c6258293ea5a15b15ed0e4caedf494a52e848",
+    "scripts/experiments/sky-measurement-bridge/measurement-contract.ts": "f6f0b528bfbb063fb7cc159f8beaa661b1e71dd88ed3eda8df7e3527d7861e6a",
+    "scripts/experiments/sky-measurement-bridge/run-local.mjs": "b66bc3c47dd0d0a2736f815d32e68c64f6b4389c2c6a6a9dc94436cf1218302f",
+    "scripts/experiments/sky-measurement-bridge/setup.ts": "d8dcaa9fccd2f7a0c0dd3a951283363461c0ee0a693fb8d848430b570f1c5846",
+    "scripts/experiments/sky-measurement-bridge/vitest.config.ts": "d5ad61c36a1f043990d6d3fa83b3623162ab11fc8db1444199318b782e88aa91",
+    "scripts/setup-postgres-identity-v2.sql": "b72b9dd55e25f634dd67672eb4c85bfce2c27c7da1ceed98abd498e829d65d7a",
+    "src/lib/account-360/resolve-scope.ts": "a6980ba3dfda5d6310058204e9a96fc7245fd5a2788fa0a4cc898ce5863b9d5d",
+    "src/lib/commercial/party/commands/instantiate-client-for-party.ts": "75ec7f74d6c3381ef5ef7bb762b0fb83b6ef0bb4471415219a7a2bce1144bc7f",
+    "src/lib/efeonce-insights/adapters/aeo-adapter.ts": "e847978e4c35036683c0f0837d1a6fa76b78ebd6932512234ad453a31871170f",
+    "src/lib/efeonce-insights/adapters/contract.ts": "1790fb9bc470d5d3a96c259bb05eb5cc6f19c62eda3d00453315a42902f55507",
+    "src/lib/efeonce-insights/commands/generation.ts": "a66308b967d2a6ad4d51e613cdb2ca27e5ca9332a67fcc9875d016e66cb824fe",
+    "src/lib/efeonce-insights/contracts/evidence.ts": "6760a908bc821b43da8babb004a6cdab72a0eace21066281a6ab1607875e8493",
+    "src/lib/efeonce-insights/contracts/plan.ts": "c6c565ffa740bd565404a8eef21f2302da4f669d75b590a489fd54f87b111779",
+    "src/lib/efeonce-insights/stores/records.ts": "b9a33b222899257dc9cf10e9d8e12638269458bb40a93325cdf31fc6b45abcba",
+    "src/lib/efeonce-insights/stores/snapshot-store.ts": "a3588ab27e639b97e51d1eaf91b70a749d86f85c97c9cf1d684e1d7561bd312c",
+    "src/lib/efeonce-insights/window.ts": "cc722a3f441a84b083888e27faf9d969b59e8613bb54e655061d7377274d396b",
+    "src/lib/finance/canonical.ts": "5b90b1c8bdfbde89ab23be2bdbe91b5dce3bd585d141517a05332519b7fe57c1",
+    "src/lib/growth/ai-visibility/contracts.ts": "04a120b652c13e5511b83042df9640e1c8a637630bfc364c9bd361c6e27adb83",
+    "src/lib/growth/ai-visibility/observation.ts": "a5fefdba26a77dbcfa29bf2bb42bf34b5ef5ca11d8bbf0e081b601ba0d1757f8",
+    "src/lib/growth/ai-visibility/report/citation-breakdown.ts": "b5d2926d9e4b1cb85d391855a51a89fdc0caa424a994e96537d9cf764ef859b8",
+    "src/lib/growth/analytics-ga4/reader.ts": "40ce5024a0d29e022ef88566a8e98fa893449913de2b5bb8c4b367e75dd7cea7",
+    "src/lib/growth/seo/content-scope/contracts.ts": "cbef0ceb34754f2e57bea1487a504ad2a21acff74ee399901a2dd8de3b9cf7d8",
+    "src/lib/postgres/client.ts": "9a5e74bda7340202b7b1e49524f57fa020aac321137d53f2b5e95fb9859d9f75",
+    "src/lib/services/service-lifecycle-mapper.ts": "abbf988a43dd5905892f2fcf94020fc96a3a4183ec28620ab7c8b2f4f52005ad",
+    "src/lib/services/service-sync.ts": "61c752dad3b6d49a59c8897b54c172b20bee491d2f1fa97acc1728c50d2c3992",
+    "src/lib/services/upsert-service-from-hubspot.ts": "0e8ddb260d8c92c20330790321551ca44c6a0915ac81ec39b3268990600b8108",
+    "src/lib/space-notion/space-notion-store.ts": "8e09f53b9f798efb7468f6d5f3603349dfcfbb8b497ed5cd04ae57ec3675ac3b",
+    "src/lib/tenant/identity-store.ts": "a1fb84fa7e5511cff25a830b15426329feb74781a2802c67669682640ea84b56"
+  }
+}

@@ -1,9 +1,9 @@
 # Revisar y diagnosticar las pantallas de Efeonce ID
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.3
 > **Creado:** 2026-09-06 por Claude (TASK-1835)
-> **Última actualización:** 2026-10-26 (estado Auth/Rooms, canary cerrado y retención de PR)
+> **Última actualización:** 2026-11-02 por Claude (pantallas con La órbita: cómo revisarlas, regenerar sus assets, gates y qué no hacer; favicon y marca de Efeonce ID)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1835)
 > **Administracion en portal:** ninguna. Estas pantallas viven en `auth.efeonce.org` (servicio Cloud Run `auth-server`), no en el portal, y se revisan con un harness local y dos verificadores de linea de comandos.
 > **Documentacion relacionada:** [Pantallas de Efeonce ID](../../documentation/identity/pantallas-efeonce-id.md) (funcional), [Operar el autorizador de Efeonce](operar-autorizador-efeonce.md) (el servicio, sus llaves y flags), [Operar la autenticacion de clientes externos](operar-autenticacion-clientes-externos.md) (invitar, revocar, canary), [PATTERNS.md § Runtime sin React](../../architecture/ui-platform/PATTERNS.md)
@@ -21,14 +21,65 @@ responde, o cuando necesitas revisar un estado que en produccion no se puede pro
 **Este manual no cubre** invitar personas, revocar accesos, rotar llaves ni prender flags: eso esta en
 los dos manuales relacionados de arriba.
 
-## Corte de interfaz — 2026-10-26
+## Corte de interfaz — 2026-11-02: pantallas con La órbita (local, sin release)
 
-Login V4 ya está servido en `/login`; `/login/rooms` toma el contexto sólo del registro/transacción
-confiable. El canary acotado validó el recorrido real con Microsoft/MFA, pero Auth first-party/OTP quedó
-OFF y el ensayo cerrado. Eso no acredita aceptación visual de una nueva dirección ni el feed de novedades del issuer.
-Puede continuar nueva UI en harness/entorno aislado; su publicación y activación necesitan decisiones
-separadas. PR #263/#264 siguen abiertas y retenidas; no desplegar para revisar una pantalla.
-[Estado operativo](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+**Estado:** está en `develop` (commit `d14b786d3`), sin push ni release. `auth.efeonce.org` sigue sirviendo el diseño
+anterior. `auth-server` es el mismo servicio del login de todos los clientes MCP, así que este cambio llega a producción
+**sólo por un release gobernado desde `main`** (control plane), y ese release todavía no está autorizado.
+
+**Qué cambió.** Todas las pantallas de Efeonce ID **salvo el login V4** usan ahora el shell con la órbita aprobado por el
+operador en el canvas: consentimiento (también multiorganización y aplicación no verificada), «Primero, entra a tu
+cuenta», «Confirma que eres tú» (step-up requerido), errores del protocolo, error del acceso corporativo, segundo factor y
+su activación, enlace por correo (enviado, confirmar, no válido), invitación (confirmar y aceptada), acceso retirado,
+demasiados intentos, y sesión iniciada o cerrada. El login V4 con el carrusel no cambia.
+
+| Pieza | Cómo se ve |
+| --- | --- |
+| **Formulario** | Papel claro con el lockup «Efeonce \| ID» arriba (en modo oscuro del navegador, la versión negativa). Pantallas cortas centradas; las de listas largas, alineadas a la izquierda. |
+| **Titular** | Bricolage con contraste de pesos: una primera parte liviana y la parte clave pesada («Revisa **tu correo**»). |
+| **Panel con la órbita** | Sólo en escritorio (desde 64rem de ancho). La órbita rodea un ícono del catálogo AXIS en reposo (seguridad, correo, integración o reloj) o una palabra («Listo», «Hasta pronto», «De nuevo»). Una sola esfera por pantalla. |
+| **Punto final del titular** | Con panel es un punto tipeado (la esfera ya está en la órbita). Sin panel, en móvil, el punto **es** la esfera, en el acento oscuro de la marca. |
+| **Segundo factor** | El código se escribe en seis casillas. «Usar un código de respaldo» cambia al campo de texto y vuelve con «Usar el código de la aplicación». Si el controlador no carga, queda el campo de texto y el formulario sigue funcionando. En la activación siempre se piden las seis casillas. |
+| **Activación del segundo factor** | Tres pasos: escanear el código, guardar los códigos de respaldo y confirmar con un código. |
+| **Ficha de la aplicación** | La CLI de Rooms (`client_id` exacto `efeonce-rooms-cli`) muestra el isotipo de Rooms. Un id parecido registrado por registro dinámico, no: queda con la inicial y el aviso «No verificada». |
+
+### Cómo verlas en el arnés
+
+```bash
+pnpm auth-server:dev-ui
+```
+
+Abre `http://127.0.0.1:19036/...` (por nombre `localhost` el arnés responde `421`, a propósito). Rutas útiles para este
+corte: `/consent`, `/consent/multi-org-v2`, `/error/missing`, `/error/step-up-required`, `/error/invalid-client`,
+`/step-up`, `/step-up/enroll`, `/magic-link/sent`, `/magic-link/confirm`, `/magic-link/expired`, `/invitation/confirm`,
+`/invitation/accepted`, `/access/revoked`, `/error/rate-limited`, `/session/started`, `/session/closed` e
+`/internal-error`. Revísalas en claro, en oscuro y a 390 px (sin panel).
+
+Los ejemplos de consentimiento del arnés usan aplicaciones ficticias sin origen comprobable, así que siempre muestran
+«No verificada». La marca de Rooms en la ficha no aparece ahí; la cubre `orbit-shell.test.ts`.
+
+### Gates de este corte
+
+```bash
+pnpm vitest run src/lib/auth-server
+pnpm typecheck
+pnpm auth-server:verify-contrast   # con el arnés levantado; 1440 y 390 px
+```
+
+Con eso pasó el commit (784/784 pruebas, 0 textos bajo WCAG). **No** se verificó todavía: `pnpm build`, la captura
+visual contra producción, ni un consentimiento o step-up real contra el host. Esos van con el release.
+
+## Corte de interfaz — 2026-11-01
+
+- **Qué hay en producción:** login V4 con el carrusel de novedades, servido en `https://auth.efeonce.org/login` desde la
+  revisión `auth-server-00170-qlx` (release del 2026-11-01).
+- **Contexto Rooms:** `/login/rooms` toma el contexto sólo del registro o la transacción confiable. Quien llega desde Rooms
+  ve «Entra a Rooms» con el mismo carrusel.
+- **De dónde salen las novedades:** del feed público de Greenhouse. Se publican con el
+  [manual de novedades](administrar-novedades-del-login.md); Auth no tiene administración propia.
+- **Si el feed falla o no hay novedades:** queda la fotografía oficial y el acceso sigue funcionando.
+- **Cómo revisar un cambio de pantalla:** en el arnés, nunca desplegando. Llevarlo a producción exige un release gobernado
+  desde `main`.
 
 El inventario original TASK-1835 que sigue documenta estados y fallback del issuer; su marco visual de
 septiembre no debe leerse como especificación de fidelidad del V4 ni aprobación de una futura UI.
@@ -71,6 +122,7 @@ Cada direccion dibuja una pantalla real con datos ficticios:
 | --- | --- |
 | `/login` | Inicio de sesion con los tres caminos (Microsoft, passkey, correo). |
 | `/login/rooms` | Contexto Rooms derivado de datos confiables del harness; no activa el acceso del producto. |
+| `/login/public-feed-preview` | Inicio de sesión con el carrusel alimentado por el feed **real** de producción de Greenhouse (sólo lectura). Si el feed no responde, muestra la fotografía oficial, igual que producción. |
 | `/login/external` | El mismo, sin el acceso corporativo: lo que ve alguien de fuera de Efeonce. |
 | `/login/invalid-email` | Inicio de sesion con el error de correo mal escrito. |
 | `/consent` | Consentimiento con una organizacion y dos permisos (uno de lectura, uno de escritura). |
@@ -120,15 +172,79 @@ JavaScript, y con la ceremonia rechazada. Verifica ademas que el boton vaya ante
 y que no haya desplazamiento horizontal en 390px. Imprime `ok` o `FAIL` por comprobacion y un
 recuento al final.
 
+### 5. Regenerar el favicon y los assets de marca
+
+El favicon (`/favicon.svg`) es la teja de Efeonce ID: fondo oscuro de Efeonce (`#001a33`, radio del 22 %) con el isotipo
+chico en negativo al 71,3 % del lado. Nadie lo dibuja: se compone desde el archivo oficial.
+
+1. **De dónde sale.** `public/branding/SVG/efeonce-id-isotype-small-negative.svg`, copia byte a byte del archivo de
+   `@efeoncepro/axis-brand-assets` 0.4.31. Si AXIS publica una versión nueva de ese isotipo, reemplaza la copia con el
+   archivo del paquete, nunca editándola.
+2. **Cómo se compone.** `scripts/auth-server/efeonce-id-favicon.ts` arma la teja; exige que los colores del SVG sean
+   atributos (sin `<style>` ni `class`), porque la política de seguridad del emisor bloquearía un estilo interno.
+3. **Regenera** (no necesita base de datos ni proxy):
+
+   ```bash
+   pnpm auth-server:brand-assets:generate
+   ```
+
+   Reescribe `src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts`; el favicon queda en la constante
+   `EFEONCE_ID_FAVICON_SVG`.
+4. **Verifica:**
+
+   ```bash
+   pnpm vitest run src/lib/auth-server/oauth/pages/brand-assets.test.ts
+   ```
+
+   La guarda compara la constante contra el generador, que `/favicon.svg` sirva exactamente eso y que haya una sola
+   esfera. Con el arnés levantado, abre `http://127.0.0.1:19036/favicon.svg` y mírala chica (16 px) en una pestaña
+   clara y en una oscura.
+5. **Para llegar a `auth.efeonce.org`** hace falta un release gobernado: el favicon de Efeonce ID está en `develop`
+   (commit `04aaba55e`) y producción sigue con el isotipo de Efeonce en azul hasta ese release.
+
+### 6. Regenerar los assets de la órbita
+
+Las pantallas con la órbita usan tres archivos de marca y cuatro íconos. Nadie los dibuja ni los copia a mano dentro del
+código.
+
+1. **De dónde salen.** Los lockups `public/branding/SVG/efeonce-id-lockup-positive.svg` y
+   `efeonce-id-lockup-negative.svg`, y el isotipo `rooms-isotype-positive.svg`, son copias exactas de
+   `@efeoncepro/axis-brand-assets` 0.4.32 (Greenhouse fija 0.4.25, que todavía no los trae; mismo criterio que el
+   favicon). Los íconos (seguridad, correo, integración, reloj) salen del catálogo de AXIS con `resolveIcon`, en reposo.
+2. **Regenera:**
+
+   ```bash
+   pnpm auth-server:brand-assets:generate
+   ```
+
+   Reescribe `src/lib/auth-server/oauth/pages/orbit-assets.generated.ts` (con `scripts/auth-server/generate-orbit-assets.ts`).
+   El generador falla si un SVG trae `<style>` o `class`, porque la política de seguridad del emisor lo bloquearía.
+3. **Verifica:**
+
+   ```bash
+   pnpm vitest run src/lib/auth-server/oauth/pages/orbit-shell.test.ts
+   ```
+
+   La guarda compara el archivo generado contra el generador (drift), que haya una sola esfera por pantalla y que la
+   marca de Rooms salga sólo con el id exacto.
+4. **Fuentes.** Bricolage (variable) y Poppins 400/500/600 se embeben en `fonts.generated.ts` desde
+   `scripts/auth-server/generate-font-assets.ts`; tampoco se editan a mano.
+
 ## Que significan los estados y las señales
 
 | Lo que ves | Que significa |
 | --- | --- |
+| Carrusel con pestañas en `/login` | Hay novedades publicadas y vigentes en el feed de Greenhouse (máximo tres). |
+| Sólo la fotografía, sin pestañas | No hay novedades vigentes o el feed no respondió en 600 ms. El acceso no se ve afectado. |
 | `421` en el harness | Entraste por un host que no es `127.0.0.1:19036`. No es una falla del servicio. |
 | `405` en el harness | Intentaste un metodo que no es `GET` sobre una ruta de solo lectura. |
 | `contraste OK en todas las pantallas` | Ningun texto quedo bajo 4.5:1 (o 3:1 si es texto grande) en ninguna de las dos anchuras. |
 | `🔴 1.53:1 (piso 4.5) /consent …` | Un texto concreto no se lee. La linea dice la pantalla, el tamaño, el texto y los dos colores. |
 | Boton de passkey ausente en `/login` | Correcto si el navegador no admite passkeys. Si tu navegador si las admite y el boton no aparece, el controlador quedo bloqueado: revisa la consola. |
+| Pantallas sin la órbita en `auth.efeonce.org` | Normal mientras no haya release: el shell con la órbita está en `develop`. En el arnés ya se ve. |
+| Sin panel oscuro y el punto del titular es una esfera | Estás en una pantalla angosta (menos de 64rem). Es el diseño: en móvil no hay panel. |
+| El código del segundo factor aparece como un solo campo de texto | O elegiste «Usar un código de respaldo», o el controlador no cargó. En ambos casos el formulario funciona. |
+| Favicon azul de Efeonce en `auth.efeonce.org` | Normal mientras no haya release: el favicon de Efeonce ID está en `develop`. En el arnés ya se ve la teja oscura. |
 | Un control pintado que no responde | Casi siempre el permiso del script de esa pagina. El navegador lo bloquea **sin decir nada visible**; el mensaje sale en la consola. |
 
 ## Que no hacer
@@ -138,13 +254,27 @@ recuento al final.
   generador.
 - **No reuses un estilo de texto entre el lienzo oscuro y la tarjeta clara.** Es exactamente lo que
   dejo un texto casi invisible en el consentimiento.
-- **No escribas texto visible dentro del HTML.** Todo el copy vive en los dos archivos de copy; texto
+- **No escribas texto visible dentro del HTML.** Todo el copy vive en los archivos de copy (`auth-server.ts`, `auth-server-orbit.ts`, `auth-server-step-up.ts`); texto
   suelto en la plantilla crea un segundo juego de palabras para la misma pantalla, y alguien terminara
   editando el que no se ve.
 - **No leas un cero del verificador generico de accesibilidad como evidencia de contraste** en estas
   pantallas. Usa `pnpm auth-server:verify-contrast`.
 - **No armes a mano la respuesta de una pagina con controlador.** Hay una forma canonica de servirla
   que declara el permiso del script; construirla aparte deja el control muerto y la pagina se ve bien.
+- **No pongas el isotipo grande de Efeonce ID en el panel lateral del inicio de sesión.** Ese panel es del carrusel de
+  novedades. La marca va sólo en el favicon y dentro del formulario: el lockup del encabezado (ya en las pantallas con la
+  órbita, en `develop`; el login V4 todavía no lo lleva) y el botón «Continuar con Efeonce ID» de las aplicaciones
+  (pendiente).
+- **No dibujes ni edites a mano los SVG de Efeonce ID** (ni la copia de `public/branding`, ni el `*.generated.ts`). Salen
+  de `@efeoncepro/axis-brand-assets` y del generador. Vale para `orbit-assets.generated.ts`, `fonts.generated.ts` y
+  `styles.generated.ts`: se regeneran con su comando.
+- **No uses atributos `style=`** en las plantillas. La política de seguridad del emisor sólo admite estilos por hash;
+  todo va con clases (`os-*`) y atributos SVG.
+- **No inventes figuras de órbita.** El panel hace uno de dos trabajos: rodear un ícono del catálogo AXIS en reposo o
+  rodear una palabra. Nada de medidas, cargadores, puntos repetidos, anillos rotos o atenuados ni íconos dibujados a mano.
+- **No pongas una segunda esfera.** Una sola por pantalla: la de la órbita, o la del punto de la palabra.
+- **No metas un logo dentro de la órbita.** El lockup va arriba del formulario; la órbita rodea un ícono o una palabra.
+- **No uses el teal en texto ni en fondos.** El punto-esfera en móvil usa el acento oscuro de la marca.
 - **No dejes una pantalla nueva sin salida.** Cada pantalla ofrece una accion, salvo las declaradas
   terminales con su razon.
 - **No uses el harness como evidencia de produccion.** Sus datos son ficticios y no autentica a nadie.
@@ -161,12 +291,19 @@ recuento al final.
 | Un boton no hace nada en el navegador | El script de esa pagina esta bloqueado por la politica de seguridad de contenido | Mira la consola del navegador; el bloqueo es silencioso en la pantalla. |
 | Una persona reporta que su enlace «ya no sirve» | Los enlaces duran 15 minutos y funcionan una sola vez; tambien los queman algunos escaneres de correo | La pantalla ofrece «Pedir un enlace nuevo». Si se repite, revisa la entrega de correo en el manual de clientes externos. |
 | Una persona pide autorizar una escritura y queda en la verificacion adicional | Es el comportamiento esperado: los permisos de escritura exigen segundo factor | Si no tiene ninguno configurado, la misma pantalla le ofrece activarlo. |
+| `orbit-shell.test.ts` falla por drift | Alguien editó `orbit-assets.generated.ts` a mano o cambió una copia de `public/branding/SVG` | Corre `pnpm auth-server:brand-assets:generate` y revisa que las copias sigan idénticas a AXIS 0.4.32. |
+| El generador falla con «trae <style> o class» | La copia del SVG no es la de AXIS o la editaron | Reemplázala con el archivo exacto del paquete. |
+| La ficha de Rooms sale con la inicial y «No verificada» | El `client_id` no es exactamente `efeonce-rooms-cli` (por ejemplo, uno de registro dinámico) | Es correcto: la marca first-party sólo sale por id exacto. |
 | Una persona pregunta como crear su passkey | No existe la pantalla todavia | Explicale que entra por enlace de correo. Lo cierra `TASK-1842`. |
+| Una novedad recién publicada no aparece en `auth.efeonce.org/login` | Caché: hasta 5 minutos en el feed de Greenhouse más 30 segundos en el autorizador | Espera unos minutos y recarga. Si sigue sin verse, revisa el feed público según el [manual de novedades](administrar-novedades-del-login.md). |
 
 ## Referencias tecnicas
 
 - Patron del runtime sin React: [`docs/architecture/ui-platform/PATTERNS.md`](../../architecture/ui-platform/PATTERNS.md) § «Runtime sin React — shell Efeonce ID».
+- Lector del feed de novedades: [`src/lib/auth-server/persons/login-announcements.ts`](../../../src/lib/auth-server/persons/login-announcements.ts) (TASK-2064).
+- Shell con la órbita: [`orbit-shell.ts`](../../../src/lib/auth-server/oauth/pages/orbit-shell.ts), [`orbit-geometry.ts`](../../../src/lib/auth-server/oauth/pages/orbit-geometry.ts), estilos en [`scripts/auth-server/orbit-shell-styles.ts`](../../../scripts/auth-server/orbit-shell-styles.ts), assets en [`scripts/auth-server/generate-orbit-assets.ts`](../../../scripts/auth-server/generate-orbit-assets.ts), marca de la ficha en [`client-marks.ts`](../../../src/lib/auth-server/oauth/pages/client-marks.ts) y guarda en [`orbit-shell.test.ts`](../../../src/lib/auth-server/oauth/pages/orbit-shell.test.ts).
 - Plantillas: [`src/lib/auth-server/persons/pages.ts`](../../../src/lib/auth-server/persons/pages.ts), [`src/lib/auth-server/persons/step-up-page.ts`](../../../src/lib/auth-server/persons/step-up-page.ts), [`src/lib/auth-server/oauth/pages/render.ts`](../../../src/lib/auth-server/oauth/pages/render.ts).
-- Texto visible: [`src/lib/copy/auth-server.ts`](../../../src/lib/copy/auth-server.ts) y [`src/lib/copy/auth-server-step-up.ts`](../../../src/lib/copy/auth-server-step-up.ts).
+- Texto visible: [`src/lib/copy/auth-server.ts`](../../../src/lib/copy/auth-server.ts), [`src/lib/copy/auth-server-orbit.ts`](../../../src/lib/copy/auth-server-orbit.ts) (titulares y textos del rediseño) y [`src/lib/copy/auth-server-step-up.ts`](../../../src/lib/copy/auth-server-step-up.ts).
 - Harness y verificadores: [`scripts/auth-server/dev-ui-server.ts`](../../../scripts/auth-server/dev-ui-server.ts), [`scripts/auth-server/verify-contrast.mjs`](../../../scripts/auth-server/verify-contrast.mjs), [`scripts/auth-server/verify-passkey-lane.mjs`](../../../scripts/auth-server/verify-passkey-lane.mjs).
+- Marca de Efeonce ID: [ADR](../../architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md); favicon en [`scripts/auth-server/efeonce-id-favicon.ts`](../../../scripts/auth-server/efeonce-id-favicon.ts) y guarda en [`brand-assets.test.ts`](../../../src/lib/auth-server/oauth/pages/brand-assets.test.ts).
 - Revision visual: [`docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md`](../../ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md).

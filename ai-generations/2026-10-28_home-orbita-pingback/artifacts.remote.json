@@ -1,0 +1,77 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:50:24.889Z",
+  "run": "ai-generations/2026-10-28_home-orbita-pingback",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-28_home-orbita-pingback",
+  "totalBytes": 12992026,
+  "fileCount": 11,
+  "files": [
+    {
+      "path": "plates/emblemas-al-100.jpg",
+      "sizeBytes": 948700,
+      "sha256": "6d221348484e18f2df08efc58a395873ff3b2da5130960327007b8c921ef8b78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/emblemas-al-100.jpg"
+    },
+    {
+      "path": "plates/HERO-antonio-cut.png",
+      "sizeBytes": 569193,
+      "sha256": "a34ff3bfda0013724a07ee9be5dc3572b82811b8c3fcd97081cf2bfdea190a1f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-antonio-cut.png"
+    },
+    {
+      "path": "plates/HERO-antonio.png",
+      "sizeBytes": 1714115,
+      "sha256": "c65722a63939a91783c185cb8f27079d1bdcfc180870e131b6cf8c1cd5812a7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-antonio.png"
+    },
+    {
+      "path": "plates/HERO-hum-cut.png",
+      "sizeBytes": 565572,
+      "sha256": "298c5893f31ed3dd55daa09401f09117354d00155df0b32f66f126014fd45018",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-hum-cut.png"
+    },
+    {
+      "path": "plates/HERO-hum.png",
+      "sizeBytes": 1677646,
+      "sha256": "9007f8fa85b727ac4d9b8836c1ce0b50e0c7ff6ccc755597d034778cad111db2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-hum.png"
+    },
+    {
+      "path": "plates/HERO-isabella-cut.png",
+      "sizeBytes": 642368,
+      "sha256": "cbd2b063e18aa95e51a1af8254726082341b5767471c64bb42fc8a9f98e457b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-isabella-cut.png"
+    },
+    {
+      "path": "plates/HERO-isabella.png",
+      "sizeBytes": 1785037,
+      "sha256": "2cad6b2aef6d0f327528db621401dca17765d5f83b2284656ac4a9b150b46583",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-isabella.png"
+    },
+    {
+      "path": "plates/HERO-karo-cut.png",
+      "sizeBytes": 722803,
+      "sha256": "feb6d09c53c41ad1daed3e428600e8948478358fe3a6c1acb3f7314305df0200",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-karo-cut.png"
+    },
+    {
+      "path": "plates/HERO-karo.png",
+      "sizeBytes": 1970573,
+      "sha256": "557dc120e7e7506042c34789d4e9a01c1444b13875ef758b9f8e6d2a89d4e98e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-karo.png"
+    },
+    {
+      "path": "plates/HERO-sophia-cut.png",
+      "sizeBytes": 622385,
+      "sha256": "a3844861e356b765074cd011ab77b5dae8fff32f876ba085f342680b5712bcf6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-sophia-cut.png"
+    },
+    {
+      "path": "plates/HERO-sophia.png",
+      "sizeBytes": 1773634,
+      "sha256": "4a0125341f5b830822091821d7c1106667c13937d7ef6e7372fbbc0f3787dc09",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-28_home-orbita-pingback/plates/HERO-sophia.png"
+    }
+  ]
+}

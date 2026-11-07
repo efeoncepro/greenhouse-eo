@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "2061ecba3436",
+  "key": "2061ecba3436f25213cc8d4a3a4e93cd27a0be58d78192598397abb253573cd0",
+  "status": "completed",
+  "createdAt": "2026-11-05T11:36:50.239Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/yanahuara-img2-paso1.png",
+    "imageSha256": "a3c8a3881865da5e10a3821ed7981b9228ac575b21e565dc538c680919e92156",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/yanahuara-img2-mask2.png",
+    "maskSha256": "565fe80e800a94a016c06cae73356994083884d25fc955bd0505d034747818ee",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same carved white sillar stone arch and wall, the whole arch band plain and smooth with only natural volcanic stone texture and block joints, completely blank stone surface; same sunlight and shadows, same sky inside the opening",
+    "providerPrompt": "the same carved white sillar stone arch and wall, the whole arch band plain and smooth with only natural volcanic stone texture and block joints, completely blank stone surface; same sunlight and shadows, same sky inside the opening"
+  },
+  "mask": {
+    "touchedFraction": 0.10324785397376543,
+    "editable": 750100,
+    "soft": 106279,
+    "protected": 7438021
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 89 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 23.639,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.34,
+        "bestError": 5.34,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7438021,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 750100,
+        "maxDelta": 167,
+        "meanDelta": 25.412,
+        "worst": {
+          "x": 2347,
+          "y": 610
+        }
+      },
+      "seam": {
+        "pixels": 106279,
+        "maxDelta": 123,
+        "meanDelta": 11.125,
+        "worst": {
+          "x": 2474,
+          "y": 355
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7438021,
+        "maxDelta": 234,
+        "meanDelta": 15.15,
+        "worst": {
+          "x": 1943,
+          "y": 1049
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1567,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 59
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3410
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

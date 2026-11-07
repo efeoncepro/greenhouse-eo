@@ -15,6 +15,9 @@ usar yo, ahora, en este espacio de trabajo?"**
 Son preguntas diferentes. Un modelo puede estar integrado y probado y aun así no estar habilitado
 para tu workspace. La flota es el dato que responde la segunda.
 
+> **Nota 2026-11-05:** Google publicó **Gemini Omni 1.2 Flash** (`gemini-omni-1.2-flash`, GA). Vale la misma regla:
+> el anuncio no lo agrega a la flota de Globe. Hoy sólo lo usa la CLI local `pnpm ai:omni`.
+
 ## Gemini Omni 1.1 no aparece por el solo hecho de haberse anunciado
 
 Google lanzó **Gemini Omni 1.1 Flash** el 2026-08-27, pero el anuncio no modifica automáticamente la

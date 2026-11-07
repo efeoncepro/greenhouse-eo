@@ -1,5 +1,11 @@
 # Cotizador V3: flujo completo para Codex y Claude
 
+**Catálogo27/10/2026:** [Performance y Ecuador en v14](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md).
+Cuarta oferta `performance-commerce-distribution`, `managed_service`, objetivo55%/piso45% estimados;
+mercadoEC neutro1,00 estimado y reserva On-Demand12% humana. Consultar `--current`; no equivale a precio aprobado
+o catálogo sincronizado a la base de la plataforma. El [caso ARMOR](../../commercial/accounts/indecaucho-armor/COSTEO-V3-2026-10-27.md)
+demuestra preparación y operación en un mismo programa finito, sin duplicar funciones, plataforma o asientos al inicio.
+
 TASK-2022, 2026-10-09. Prototipo local ejecutable. Entrada:
 [data y casos](../../../data/pricing/v3-operating/README.md),
 [ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
@@ -2910,6 +2916,50 @@ No hay una comisión sobre lo que el cliente paga directo: si se pacta una, hoy 
 - No marcar `confirmed` una `evidence` sin cotización del proveedor, ni estirar su vigencia para que la corrida pase.
 - No escribir el proveedor ni su monto en `label`: el `label` llega al cliente.
 - No nombrar el tipo de cambio de un costo en `fxRecordIds`.
+
+### Licencias HubSpot
+
+**Qué es.** La licencia de HubSpot que compra el cliente es software del vendor. Tiene precio de lista de HubSpot,
+no costo ni margen de Efeonce. En una oferta va **separada de la implementación**. El precio sale del pricebook de
+TASK-1405 (`src/lib/growth/hubspot-pricing/`), sembrado con la
+[lectura del portal Efeonce del 05/11/2026](../../services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md).
+No se usa el `tool` ETG-005 ni la policy de herramientas: esas cubren el HubSpot propio de Efeonce, otro objeto económico.
+
+**Consultar la lista vigente.**
+
+```bash
+pnpm --silent pricing:v3 hubspot list [--hub <id>] [--json]
+```
+
+**Estimar la licencia de un caso y obtener el fragmento para la demanda.**
+
+```bash
+pnpm --silent pricing:v3 hubspot estimate --hub <id> --tier <starter|pro|enterprise> --seats <n> \
+  [--months 12] [--settlement client_direct|reinvoiced] [--waive-onboarding] [--json]
+```
+
+Devuelve dos cosas:
+- **El estimado:** mensual, total del plazo y onboarding, cada dato con su marca de evidencia y su as-of.
+- **Un fragmento `thirdPartyCosts[]`** con `category: "licences"`, listo para pegar en el `brief`.
+
+**Liquidación.** El valor por defecto es `client_direct`: HubSpot le factura al cliente, así que la licencia queda
+como nota y no suma al total, al neto ni a la caja de Efeonce. Usar `reinvoiced` sólo cuando Efeonce revende la
+licencia. En ese caso entra a costo, con margen 0, según la política `third-party:licences`, y exige `evidence`.
+
+**Onboarding.** Es un costo único y va en el primer periodo. `--waive-onboarding` lo deja en cero cuando la
+implementación la hace Efeonce como partner certificado; se confirma por escrito con HubSpot antes de prometerlo.
+
+**Ejemplo.** Fiordo Austral, 10 licencias de Sales Hub:
+- **Pro:** US$ 1.000 al mes (US$ 100 por licencia).
+- **Enterprise:** US$ 1.500 al mes (US$ 150 por licencia).
+
+En los dos casos se presenta como bloque de licencias aparte de la implementación y la capacitación de Efeonce.
+
+**Qué no hacer.**
+- No meter la licencia dentro del precio de la implementación ni aplicarle margen.
+- No cotizar un precio que el pricebook marca como no publicado (por ejemplo, el onboarding del bundle Customer
+  Platform): se dice que HubSpot no lo publica.
+- No sumar créditos entre Hubs: manda el tier más alto.
 
 ## Reserva de contingencia
 

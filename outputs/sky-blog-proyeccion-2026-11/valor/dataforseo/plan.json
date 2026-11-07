@@ -1,0 +1,246 @@
+{
+  "sets": [
+    "blog-2026-08",
+    "blog-2026-09",
+    "blog-2026-10",
+    "www-blog-2025-07",
+    "www-blog-2025-08",
+    "www-blog-2025-09"
+  ],
+  "ceilingUsd": 3,
+  "estimatedCostUsd": 2.65668,
+  "batches": [
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-0-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-0-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-1-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-1-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-2-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-2-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-3-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-3-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-4-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-4-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-5-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-5-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-6-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-6-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-7-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-7-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-8-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-8-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-9-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-9-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-10-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-10-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-11-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-11-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-12-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-12-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-13-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-13-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-14-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-14-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-15-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-15-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-16-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-16-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-17-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-17-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "chl",
+      "locationCode": "2152",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-18-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/chl-18-receipt.json",
+      "keywords": 220,
+      "estimatedCostUsd": 0.0384
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-0-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-0-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-1-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-1-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-2-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-2-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-3-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-3-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-4-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-4-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-5-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-5-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-6-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-6-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-7-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-7-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-8-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-8-receipt.json",
+      "keywords": 700,
+      "estimatedCostUsd": 0.096
+    },
+    {
+      "country": "per",
+      "locationCode": "2604",
+      "file": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-9-payload.json",
+      "receipt": "outputs/sky-blog-proyeccion-2026-11/valor/dataforseo/per-9-receipt.json",
+      "keywords": 119,
+      "estimatedCostUsd": 0.02628
+    }
+  ]
+}

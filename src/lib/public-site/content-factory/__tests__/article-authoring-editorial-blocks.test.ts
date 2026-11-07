@@ -174,6 +174,43 @@ describe('authorGutenbergDraft — embed caption, table stripes, buttons', () =>
     }
   )
 
+  it.each([
+    'https://player.vimeo.com/video/1243362697?h=7809127775',
+    'https://player.vimeo.com/video/1242918503?h=5974be9997',
+    'https://vimeo.com/1242918503/5974be9997'
+  ])('embeds Vimeo %s with its source hash and intrinsic dimensions', url => {
+    const draft = authorGutenbergDraft(
+      specWith([
+        { kind: 'embed', provider: 'vimeo', url, caption: [{ text: 'Fuente: OpenAI', href: 'https://openai.com/' }] },
+        RELATED_PARAGRAPH
+      ])
+    )
+
+    const content = gutenberg(draft).postContent
+
+    expect(content).toContain('"providerNameSlug":"vimeo","responsive":true')
+    expect(content).toContain(`<div class="wp-block-embed__wrapper">\n${url}\n</div><figcaption`)
+    expect(content).toContain('<a href="https://openai.com/">Fuente: OpenAI</a>')
+    expect(content).not.toContain('wp-embed-aspect-16-9')
+    expect(content).not.toContain('wp-has-aspect-ratio')
+    expect(validateGeneratedGutenbergDraft(draft).status).toBe('pass')
+  })
+
+  it.each([
+    'http://vimeo.com/123',
+    'https://vimeo.com.attacker.test/123',
+    'https://attacker.test/video/123',
+    'https://user@vimeo.com/123',
+    'https://vimeo.com:8080/123',
+    'https://vimeo.com/channels/staffpicks',
+    'https://player.vimeo.com/not-a-video/123',
+    'https://www.youtube.com/watch?v=123'
+  ])('rejects non-video or mismatched Vimeo URL %s', url => {
+    expect(() => authorGutenbergDraft(specWith([{ kind: 'embed', provider: 'vimeo', url }]))).toThrow(
+      'content_factory_article_embed_url_invalid'
+    )
+  })
+
   it('renders the core stripes table style on the comment and the figure', () => {
     const draft = authorGutenbergDraft(
       specWith([

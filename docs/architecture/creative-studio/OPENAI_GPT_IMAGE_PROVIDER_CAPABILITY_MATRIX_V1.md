@@ -2,7 +2,16 @@
 
 > **Tipo:** investigación de proveedor y contrato de integración
 > **Estado:** Accepted como evidencia de proveedor; no autoriza rollout
-> **Validado:** 2026-09-08 (familia 2.5, ciclo de vida, precios, tamaños, streaming, provenance).
+> **Versión:** 1.2 — 2026-11-05 (tarde): Greenhouse transporta la familia 2.6 en `pnpm ai:image` y
+> `pnpm ai:inpaint`; consumo de `xhigh`/`max`, GIF en edits, `markup` y máscara medidos.
+> **Versión anterior:** 1.1 — 2026-11-05: familia GPT Image 2.6 (Sunburst y Flare) y deprecaciones vigentes.
+> **Validado:** 2026-11-05 (familia 2.6: identidad, endpoints, parámetros nuevos, consumo medido, system card,
+> deprecaciones) con canario propio en `ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json` y
+> `cli/`). El contrato [contrato] de 2.6 se leyó del árbol de trabajo del 2026-11-05 en
+> `src/lib/ai/openai-image.ts`, `scripts/ai/generate-image.ts` y `scripts/ai/inpaint/adapters/openai.ts`.
+> Etiquetas de esta revalidación: [oficial] doc/blog OpenAI · [verificado 2026-11-05] corrida real nuestra ·
+> [tercero] · [inferido] · [sin dato] · [contrato] lo que hace hoy nuestro código.
+> **Validado antes:** 2026-09-08 (familia 2.5, ciclo de vida, precios, tamaños, streaming, provenance).
 > El contrato transportado por el helper, la máscara del CLI y las líneas base de consumo medido — generar y
 > editar — se validaron el 2026-09-16.
 > Las secciones de transparencia GPT Image 2 y el mapeo Globe conservan su validación del 2026-08-21.
@@ -34,6 +43,28 @@ falsamente la existencia de `input_fidelity`.
 
 ## Resultado ejecutivo
 
+- **Delta 2026-11-05 — llegó la familia 2.6; producción sigue en 2.5.** OpenAI publicó el 2026-11-04
+  `gpt-image-2.6-sunburst` ("Image generation and editing for detailed visual work") y `gpt-image-2.6-flare`
+  ("Image generation and editing for fast iteration") [oficial]. Sin id plano `gpt-image-2.6`, sin tier mini y
+  **sin snapshot fechado**: el snapshot es el propio id, con `shutdown_date: null` [oficial] [verificado
+  2026-11-05: `GET /v1/models/<id>` = 200]. Lo nuevo de verdad: `complexity`, **SVG nativo**, **GIF animado** y
+  `markup` (este último también en 2.5). Ver §Novedades de 2.6.
+- 🔴 **2.6 cobra la misma tarifa por token que 2.5 pero gasta muchos más tokens de salida en `low` y `medium`**
+  [verificado 2026-11-05]: a 1024², `low` 824 tokens (2.5: 196, **4,2×**) y `medium` 1.449 (2.5: 439, **3,3×**);
+  en `high`, `xhigh` y `max` empata (1.758 vs 1.756; 3.122 y 7.024 en ambas familias). **Sólo `low` y `medium`
+  cuestan más.** La fórmula de grilla de 2.5 no reproduce 2.6 sin un factor. Ver §Precios.
+- **Desde el 2026-11-05 (tarde) Greenhouse transporta 2.6** [contrato]: `gpt-image-2.6-sunburst` y
+  `gpt-image-2.6-flare` están en `OpenAIImageModel` y en `OPENAI_IMAGE_MODEL_CAPABILITIES`; `pnpm ai:image` acepta
+  `--model gpt-image-2.6-*` con `--complexity`, `--format svg|gif`, `--markup` y `--estimate`, y `pnpm ai:inpaint`
+  acepta 2.6. **El default del CLI es `gpt-image-2.5-flare` desde el 2026-11-05 (`gpt-image-2` sigue con `--model`); el del runtime sigue siendo `gpt-image-2`.** Globe sigue sin ruta de 2.6. Ver
+  §Mapeo contra Greenhouse y Globe.
+- **Endpoints de 2.6:** sólo `v1/images/generations` y `v1/images/edits` según la ficha, que marca Batch,
+  Responses y Chat Completions como "not supported" [oficial]. 🔴 Contradicción medida: el tool `image_generation`
+  de Responses con `tool.model: "gpt-image-2.6-flare"` **respondió 200 y generó** [verificado 2026-11-05]. No
+  tratarlo como garantizado.
+- **Deprecaciones vigentes (no causadas por 2.6):** `gpt-image-1` apagado el **2026-10-23**; `gpt-image-1.5`,
+  `gpt-image-1-mini` y `chatgpt-image-latest` se apagan el 2026-12-01; **el reemplazo recomendado hoy es 2.5**
+  [oficial]. `gpt-image-2` sigue sin fecha de retiro.
 - **Delta 2026-09-08 — la familia 2.5 es la frontera.** OpenAI publicó `gpt-image-2.5-sunburst` y
   `gpt-image-2.5-flare` (snapshots `…-2026-09-08`) para Image API y para el tool `image_generation` de
   Responses API. Traen los niveles de calidad nuevos `xhigh` y `max` y **usan las mismas tarifas por token
@@ -41,6 +72,10 @@ falsamente la existencia de `input_fidelity`.
 - **`gpt-image-2` NO está deprecado** y sigue siendo el reemplazo recomendado en toda la tabla de
   deprecations. Conserva **Batch**, que 2.5 no soporta, y es el único de la familia con tabla oficial de
   costo por imagen y con rate limits publicados. No retirarlo por la llegada de 2.5.
+  🔴 *Contradicción con la revalidación del 2026-11-05:* la tabla de deprecations hoy nombra a **2.5** como
+  reemplazo recomendado, no a `gpt-image-2` [oficial]. Sobre Batch, ver §Superficies API (estado de 2.5 sin
+  resolver). La afirmación de que 2.5 no es estimable ni tiene rate limits publicados contradice lo que registró
+  `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` el 2026-09-16; ver §Contradicciones.
 - **No existe forma documentada de estimar el costo por imagen de 2.5.** OpenAI lo declara explícito: tarifas
   iguales no implican costo por imagen igual. La única fuente es `usage` en la respuesta real. Ver §Precios.
 - La única diferencia de contrato entre Flare y Sunburst es el valor de `model`. Mismo precio, mismos quality
@@ -63,17 +98,23 @@ falsamente la existencia de `input_fidelity`.
 
 ## Familia y ciclo de vida
 
-Deprecations verificadas el 2026-09-08 contra `https://developers.openai.com/api/docs/deprecations`.
+Deprecations revalidadas el **2026-11-05** contra `https://developers.openai.com/api/docs/deprecations` (la
+validación anterior fue el 2026-09-08).
 
 | Identidad API | Snapshot/semántica | Estado oficial al corte | Retiro anunciado | Uso nuevo |
 |---|---|---|---|---|
-| `gpt-image-2.5-sunburst` | alias + `gpt-image-2.5-sunburst-2026-09-08` | activo; "our most capable model for image generation and editing" | no anunciado | Sí |
-| `gpt-image-2.5-flare` | alias + `gpt-image-2.5-flare-2026-09-08` | activo; "our fastest model for high-quality, everyday image generation" | no anunciado | Sí |
-| `gpt-image-2` | alias + `gpt-image-2-2026-04-21` | activo; recomendado en toda la tabla de deprecations; único con Batch | no anunciado | Sí |
-| `gpt-image-1.5` | `gpt-image-1.5-2025-12-16` | deprecated | 2026-12-01 | No |
-| `gpt-image-1` | sin snapshot fechado distinto en la ficha | deprecated | **2026-10-23** | No |
-| `gpt-image-1-mini` | alias del modelo económico de la generación 1 | deprecated | 2026-12-01 | No |
-| `chatgpt-image-latest` | alias del modelo anteriormente usado por ChatGPT | deprecated; no recomendado para API | 2026-12-01 | No |
+| `gpt-image-2.6-sunburst` | **sin snapshot fechado**: el snapshot es el id; `shutdown_date: null` [oficial] [verificado 2026-11-05] | activo desde 2026-11-04; "Image generation and editing for detailed visual work" | no anunciado | Sí, por elección explícita: Greenhouse lo transporta desde 2026-11-05 [contrato]; no es default |
+| `gpt-image-2.6-flare` | **sin snapshot fechado**: el snapshot es el id; `shutdown_date: null` [oficial] [verificado 2026-11-05] | activo desde 2026-11-04; "Image generation and editing for fast iteration" | no anunciado | Sí, por elección explícita: Greenhouse lo transporta desde 2026-11-05 [contrato]; no es default |
+| `gpt-image-2.5-sunburst` | alias + `gpt-image-2.5-sunburst-2026-09-08` | activo; "our most capable model for image generation and editing" (texto del 2026-09-08); **default de `/v1/images/edits`** [oficial 2026-11-05] | no anunciado | Sí |
+| `gpt-image-2.5-flare` | alias + `gpt-image-2.5-flare-2026-09-08` | activo; "our fastest model for high-quality, everyday image generation" (texto del 2026-09-08) | no anunciado | Sí |
+| `gpt-image-2` | alias + `gpt-image-2-2026-04-21` | activo; sin fecha de retiro. Al 2026-09-08 era el reemplazo recomendado de toda la tabla; al 2026-11-05 lo es **2.5** [oficial] | no anunciado | Sí |
+| `gpt-image-1.5` | `gpt-image-1.5-2025-12-16` | deprecated; reemplazo recomendado 2.5 | 2026-12-01 | No |
+| `gpt-image-1` | sin snapshot fechado distinto en la ficha | **apagado el 2026-10-23** | ya ocurrió | No; el helper lo corta antes de la red (`assertOpenAIImageModelAvailable`) [contrato] |
+| `gpt-image-1-mini` | alias del modelo económico de la generación 1 | deprecated; reemplazo recomendado 2.5 | 2026-12-01 | No |
+| `chatgpt-image-latest` | alias del modelo anteriormente usado por ChatGPT | deprecated; no recomendado para API; reemplazo recomendado 2.5 | 2026-12-01 | No |
+
+Las deprecaciones vigentes **no las causó 2.6**: estaban anunciadas antes del 2026-11-04 [oficial]. 2.6 no trae
+tier mini [oficial], y la tabla recomienda 2.5 como reemplazo de todos los modelos deprecados, no 2.6.
 
 Los modelos DALL·E no pertenecen a la familia GPT Image. Sus snapshots fueron retirados del API el
 2026-05-12; no son una alternativa vigente para una integración nueva.
@@ -81,7 +122,7 @@ Los modelos DALL·E no pertenecen a la familia GPT Image. Sus snapshots fueron r
 > **Trampa documental vigente:** el schema de `/v1/images/generations` todavía declara `dall-e-2` como
 > **default de `model`**, pese a que ese modelo se apagó el 2026-05-12. **NUNCA omitir `model` en un request.**
 
-### Cómo elegir entre 2.5 y GPT Image 2
+### Cómo elegir entre 2.6, 2.5 y GPT Image 2
 
 | Situación | Modelo | Razón documentada |
 |---|---|---|
@@ -89,16 +130,43 @@ Los modelos DALL·E no pertenecen a la familia GPT Image. Sus snapshots fueron r
 | Generación cotidiana de alta calidad | `gpt-image-2.5-flare` | OpenAI lo posiciona como el más rápido de la familia |
 | Requiere Batch API | `gpt-image-2` | 2.5 marca `v1/batch → Not supported` y no tiene fila batch en pricing |
 | Requiere presupuesto por imagen estimable antes de gastar | `gpt-image-2` | Es el único con calculadora oficial; 2.5 sólo se mide con `usage` real |
-| Requiere rate limits conocidos para dimensionar | `gpt-image-2` | 2.5 no publica tabla de rate limits |
+| Requiere rate limits conocidos para dimensionar | `gpt-image-2` | 2.5 no publica tabla de rate limits (ver §Contradicciones: el generador registró lo contrario el 2026-09-16) |
+| Requiere SVG nativo o GIF animado del proveedor | `gpt-image-2.6-flare` | Sólo 2.6 acepta `output_format: "svg" \| "gif"` [oficial]. Greenhouse lo transporta: `pnpm ai:image --format svg\|gif` [contrato] |
+| Explorar barato en `low`/`medium` | 2.5 | 2.6 gasta 4,2× (`low`) y 3,3× (`medium`) más tokens de salida con la misma tarifa [verificado 2026-11-05] |
+| Pieza final raster en `high`/`xhigh`/`max` | 2.5 Sunburst o 2.6 Sunburst | Mismo consumo de tokens [verificado 2026-11-05]; la calidad relativa en nuestras piezas no está medida [sin dato] |
+| Edición guiada por marcas (`markup` o trazos sobre la foto) | 2.5 o 2.6 | Ambos verificados el 2026-11-05; `markup` no suma tokens de imagen de entrada |
+| Editar una zona con máscara | Flare (2.5 o 2.6) | Sunburst 2.5 y 2.6 con la máscara del pipeline devuelven un panel negro [verificado: 3 de 3 en 2.5, 1 de 1 en 2.6] |
+
+La tabla operativa completa «¿2.5 o 2.6?», con los comandos verificados, vive en
+`GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §GPT Image 2.6 y en `pnpm ai:image --help`.
 
 ## Superficies API
 
-| Superficie | Selección | Generación | Edición/referencias | Máscara | Streaming | Identidad exacta | 2.5 |
-|---|---|---:|---:|---:|---:|---:|---:|
-| `POST /v1/images/generations` | GPT Image directo | Sí | No | No | Sí, `partial_images: 0..3` | Sí | Sí |
-| `POST /v1/images/edits` | GPT Image directo | No | Sí, hasta 16 imágenes | Sí | Sí, `partial_images: 0..3` | Sí | Sí |
-| Responses API + `image_generation` | modelo principal GPT-5+; el tool admite `model` explícito | Sí | Sí, multi-turn | Sí, `input_image_mask` | Sí | Sí dentro del tool | Sí |
-| Batch API | endpoint Images embebido | Sí | Sí | Sí, según endpoint | resultado diferido, no SSE | Sí en el body del request | **No** |
+| Superficie | Selección | Generación | Edición/referencias | Máscara | Streaming | Identidad exacta | 2.5 | 2.6 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `POST /v1/images/generations` | GPT Image directo | Sí | No | No | Sí, `partial_images: 0..3` | Sí | Sí | Sí [oficial] [verificado 2026-11-05] |
+| `POST /v1/images/edits` | GPT Image directo | No | Sí, hasta 16 imágenes | Sí | Sí, `partial_images: 0..3` | Sí | Sí | Sí [oficial] [verificado 2026-11-05: Flare multipart] |
+| Responses API + `image_generation` | modelo principal GPT-5+; el tool admite `model` explícito | Sí | Sí, multi-turn | Sí, `input_image_mask` | Sí | Sí dentro del tool | Sí | 🔴 ficha: "not supported" [oficial]; **200 con `tool.model: "gpt-image-2.6-flare"`** [verificado 2026-11-05] |
+| Chat Completions | — | — | — | — | — | — | — | "not supported" [oficial] |
+| Batch API | endpoint Images embebido | Sí | Sí | Sí, según endpoint | resultado diferido, no SSE | Sí en el body del request | **No** (🔴 ver nota) | **No**: no está en la tabla de Batch; sin descuento Batch [oficial] |
+
+**2.6 en Responses — contradicción medida, no garantía.** La ficha de 2.6 marca Responses como "not supported" y
+el guide del tool `image_generation` todavía lista sólo 2.5, 2, 1.5 y 1-mini [oficial]. Aun así, una llamada con
+mainline `gpt-5.5` y `tool.model: "gpt-image-2.6-flare"` respondió 200, generó (action `generate`) y devolvió
+`revised_prompt` [verificado 2026-11-05]. Lectura adoptada: funciona hoy, pero no está documentado y puede dejar de
+funcionar sin aviso. No construir un contrato sobre esto.
+
+🔴 **Batch de 2.5 — sin resolver.** Esta matriz registra desde el 2026-09-08 que 2.5 no soporta Batch, y el
+generador repite ese estado. En la revalidación del 2026-11-05 un informe reportó a 2.5 dentro de la tabla de
+Batch [oficial según ese informe], mientras la guía sigue afirmando "Batch sólo gpt-image-2". No se leyó la tabla
+de Batch directamente en esta pasada: **leerla antes de usar Batch con 2.5.** Para 2.6 no hay ambigüedad: no está.
+
+**Otros proveedores con 2.6 al 2026-11-05:** Azure OpenAI / Foundry **no** tiene 2.6 (sólo 2.5) [oficial
+Microsoft]. fal.ai lo expone como `openai/gpt-image-2.6/{flare,sunburst}/{text-to-image,edit}` con "Reasoning
+Effort" [tercero]. OpenRouter como `openai/gpt-image-2.6-sunburst|flare`, sin SVG, GIF ni markup [tercero].
+Higgsfield tiene una página "GPT Image 2.6" en créditos [tercero]. Replicate, Adobe y Figma: [sin dato]. En
+ChatGPT y Codex el producto se llama «ChatGPT Images 2.6», disponible en todos los planes [tercero citando a
+OpenAI].
 
 La columna **Máscara** describe la superficie del proveedor, no lo que Greenhouse transporta. `/v1/images/edits`
 acepta máscara desde siempre; lo que cambió el **2026-09-16** es que el CLI `pnpm ai:image` la expone con
@@ -116,7 +184,10 @@ top-level de `/v1/responses`; sí es `model` dentro del tool `image_generation`.
 **Requisito de acceso:** la guía advierte que puede exigirse completar la **API Organization Verification**
 desde la consola de desarrollador antes de usar modelos GPT Image.
 
-## Contrato de salida — familia 2.5 y GPT Image 2
+## Contrato de salida — familias 2.6, 2.5 y GPT Image 2
+
+Lo que sigue se documentó para 2.5 y GPT Image 2. Para 2.6, cada punto lleva su etiqueta: lo heredado está
+[oficial] salvo donde se indica, y lo nuevo vive en §Novedades de 2.6.
 
 ### Fondo y transparencia
 
@@ -125,6 +196,9 @@ desde la consola de desarrollador antes de usar modelos GPT Image.
 - En **2.5 el soporte es pleno**: la referencia declara verbatim que `gpt-image-2.5-sunburst` y
   `gpt-image-2.5-flare`, incluidos sus snapshots `2026-09-08`, soportan `opaque` y `transparent`.
 - En **`gpt-image-2` la capacidad sigue en preview** para el alias y `gpt-image-2-2026-04-21`.
+- En **2.6** `background: transparent | opaque | auto` con PNG/WebP está documentado [oficial] y se verificó con
+  Sunburst 2.6: PNG con alfa 0..254 a 2048×1152 [verificado 2026-11-05]. Con `output_format: "svg"` la respuesta
+  reportó `background: transparent` [verificado 2026-11-05].
 - `output_format` debe ser `png` o `webp`; `jpeg` es inválido porque no preserva alfa.
 - No debe confundirse un checkerboard renderizado con transparencia real.
 - Se debe validar que el archivo tenga canal alfa **y al menos un píxel no opaco**.
@@ -137,14 +211,18 @@ como `background: "transparent" | "opaque"`; debe conservarse en provenance/read
 
 `quality`: `low | medium | high | xhigh | max | auto`. Default documentado: **`auto`**.
 
-- `xhigh` y `max` **existen sólo en la familia 2.5**. Los modelos anteriores llegan hasta `high`.
+- `xhigh` y `max` **existen sólo en las familias 2.5 y 2.6** [oficial]. Los modelos anteriores llegan hasta
+  `high`.
+- En 2.6 `quality` se combina con un control nuevo, `complexity`, que no es lo mismo: ver §Novedades de 2.6.
 - OpenAI **no documenta qué significa cada nivel** ni su consumo de tokens. La única guía cualitativa es usar
   `low` para drafts y comparar niveles altos para encontrar el balance detalle/latencia/costo.
 - El enum del endpoint también acepta `standard` y `hd`, que son valores heredados de DALL·E, no de GPT Image.
 
 ### Formato, compresión y tamaño
 
-- Formatos: PNG por defecto, JPEG y WebP. `jpeg` es más rápido que `png`.
+- Formatos: PNG por defecto, JPEG y WebP. `jpeg` es más rápido que `png`. **2.6 agrega `gif` y `svg`** [oficial],
+  cada uno con restricciones propias (§Novedades de 2.6). El GIF también salió por `edits` [verificado
+  2026-11-05], aunque la guía lo declara sólo para `generations`.
 - `output_compression: 0..100`, default **100**; aplica sólo a JPEG y WebP; no debe enviarse con PNG.
 - Tamaños recomendados: `1024x1024`, `1536x1024`, `1024x1536`. Default `auto`.
 - Tamaños custom `WIDTHxHEIGHT` con **todas** estas reglas simultáneas:
@@ -153,6 +231,10 @@ como `background: "transparent" | "opaque"`; debe conservarse en provenance/read
   - **ningún borde excede 3840 px** (la referencia fija el máximo soportado en `3840x2160`);
   - total de píxeles entre **655.360 y 8.294.400**.
 - Resoluciones **superiores a `2560x1440` son experimentales** según la guía vigente.
+- Las reglas de tamaño custom están documentadas para 2.5; para 2.6 se verificaron Sunburst 2.6 a `2048x1152` y a
+  `1536x1024` (200 ambos) [verificado 2026-11-05]. En GIF el `size` es el de cada cuadro y el área mínima **no**
+  aplica al cuadro: `640x640` (409.600 px, bajo 655.360) respondió 200 [verificado 2026-11-05]. El resto de la
+  grilla en 2.6: [sin dato].
 - `prompt` admite hasta **32.000 caracteres** en modelos GPT image.
 
 > Delta respecto a la validación del 2026-08-21: el borde experimental que la doc declara hoy es `2560x1440`,
@@ -176,6 +258,19 @@ como `background: "transparent" | "opaque"`; debe conservarse en provenance/read
     de la frase verbatim *"The details below apply to earlier models, **not Sunburst or Flare**"*.
   - **NUNCA enviar `input_fidelity` con un modelo 2.5.** La preservación de identidad en 2.5 se pide **por
     prompt** (lista de invariantes repetida en cada turno), no por parámetro.
+  - **Para 2.6: [sin dato].** No se encontró mención ni se probó. Mientras no se mida, no enviarlo. El helper ya
+    lo impide: 2.6 declara `inputFidelity: false` [contrato].
+- Edits en 2.6: hasta 16 imágenes (URL, base64 o `file_id`) y `mask` con alfa que guía, no matte exacto
+  [oficial]. Medido con Flare 2.6 `low` 1024², `complexity: "low"`, multipart: 200, 1.024 tokens de imagen de
+  entrada + 30 de texto, **962 de salida** — más que generar (824) — en ~11 s [verificado 2026-11-05].
+- 🔴 **Máscara en 2.6** [verificado 2026-11-05, 1 de 1 cada caso]:
+  - **Sunburst 2.6 con la máscara del pipeline `ai:inpaint`** (RGB negro bajo el alfa) → **panel negro**, el mismo
+    defecto que en 2.5 (allí 3 de 3). Lo detectó el propio pipeline (veredicto REVISAR).
+  - Sunburst 2.6 con una máscara que conserva el RGB de la foto bajo el alfa, en llamada directa → sin panel.
+  - **Flare 2.6 por el pipeline → PASS, sin panel.**
+  - Regla vigente: **Sunburst (2.5 y 2.6) edita sin máscara; Flare edita con máscara.**
+- Ambos modelos 2.6 **redibujan la imagen entera**: deriva media de 12–17/255 fuera de la zona editada
+  [verificado 2026-11-05]. Recomponer sobre la original sigue siendo obligatorio.
 - Un output aceptado exige revisar deriva fuera de la región, identidad, texto/logos y geometría protegida.
 - **Los formatos aceptados como imagen de entrada del endpoint de edits NO están documentados.** La tabla
   PNG/JPEG/WEBP/GIF de "Image input requirements" pertenece a la guía de visión de Responses/Chat y **no debe
@@ -208,7 +303,11 @@ como `background: "transparent" | "opaque"`; debe conservarse en provenance/read
 - **Siempre base64.** `url` está marcado como no soportado para modelos GPT image, y `response_format` tampoco
   existe en el schema de `/edits`.
 - `revised_prompt` en el objeto `Image` es `dall-e-3` only. En Responses API sí llega a nivel de
-  `image_generation_call`.
+  `image_generation_call`. En 2.6 tampoco llega por Images API; sí llegó por Responses [verificado 2026-11-05].
+- **2.6 agrega `svg_usage`** cuando `output_format: "svg"`: el consumo del modelo autor del vector, aparte del
+  `usage` del raster de referencia [oficial] [verificado 2026-11-05]. El helper lo devuelve como `svgUsage` y el
+  CLI lo imprime [contrato]. Ver §Novedades de 2.6.
+- `safety_identifier` (≤ 128 caracteres) reemplaza a `user` [oficial].
 - ⚠️ El schema describe `usage` como "For `gpt-image-1` only" — string obsoleto: la guía de 2.5 instruye
   explícitamente usar `usage` para medir consumo. **Parsear `usage` de forma defensiva** (presente pero opcional).
 
@@ -223,6 +322,109 @@ Eventos SSE: `image_generation.partial_image` / `image_generation.completed` par
 `response.image_generation_call.partial_image` y ahí la guía declara el rango como `1..3`, no `0..3`.
 
 Esta función necesita contrato de eventos, lifecycle y costo; no debe activarse por un cambio de UI aislado.
+
+### Novedades de 2.6 — `complexity`, SVG, GIF y `markup`
+
+Esta sección describe la superficie del **proveedor**. Desde el 2026-11-05 (tarde) Greenhouse transporta
+`complexity`, SVG, GIF y `markup` en el helper, en `pnpm ai:image` y (`complexity`) en `pnpm ai:inpaint`
+[contrato]; ver §Mapeo contra Greenhouse y Globe.
+
+**`complexity: low | medium | high`** (default `high` si se omite) [oficial]. Es un "planning effort" separado
+de `quality` y sin cargo propio; el system card lo llama "configurable reasoning effort". Según OpenAI, el nivel
+bajo sirve para ediciones acotadas y el alto para texto denso o layout, a costa de más latencia y con riesgo de
+que *"introduce unwanted changes"*.
+
+- Medido con Flare `low` 1024², `complexity: "low"` contra omitido: **mismos 824 tokens de salida y misma
+  latencia (~8 s)** [verificado 2026-11-05]. Con Sunburst `low` 1536×1024, `complexity: "medium"` dio 664 tokens,
+  igual a la predicción sin él [verificado 2026-11-05]. **No abarata.** Su efecto en calidad: [sin dato].
+
+**SVG nativo — `output_format: "svg"`** [oficial]:
+
+- Sólo en `generations` y con `n: 1`. No acepta stream, imágenes parciales, `output_compression` ni
+  `prompt_rewriter`. No existe en `edits`.
+- El resultado es estático: sin scripts, sin recursos externos, sin rasters incrustados. OpenAI primero renderiza
+  un raster de referencia, cuyo detalle controla `quality`.
+- 🔴 **Exige `svg.model`.** Sin él responde 400 `missing_required_parameter` (*"SVG generation requires
+  'svg.model'."*) [verificado 2026-11-05]. Con `svg: { model: "gpt-5.5", reasoning: { effort: "low" } }` → 200,
+  SVG limpio de 589 bytes (4 `<path>`, `<title>`, `<desc>`, `viewBox` 1024) y `background` reportado
+  `transparent` [verificado 2026-11-05].
+- `svg.reasoning.effort`: `none | minimal | low | medium | high | xhigh | max` [oficial].
+- **Se cobra dos veces:** el `usage` del raster de referencia (824 tokens a USD 30/1M en `low` 1024²) más
+  `svg_usage`, el consumo del modelo autor a la tarifa de ese modelo (con gpt-5.5: 1.559 de entrada, 204 de
+  salida, 0 de razonamiento) [oficial] [verificado 2026-11-05].
+
+**GIF animado — `output_format: "gif"`** (`generations` según la guía [oficial]; también `edits` [verificado]):
+
+- `frame_count` default 9; 🔴 el rango se contradice: la guía dice 2–64 y la referencia 2–16.
+- `frame_duration_ms` default 200, mínimo 20, múltiplo de 10; la guía da un máximo de 2000.
+- `size` es el tamaño **de cada cuadro**. Sin stream, parciales, máscara ni `output_compression`. No hay
+  parámetro de loop: se describe en el prompt.
+- La referencia dice que requiere acceso a un preview. **Nuestra organización sí lo tiene:** Flare `low`
+  816×816, 2 cuadros → 200; GIF 816×816 de 2 páginas, delay 200 ms, loop 0 (infinito), 987 tokens de salida
+  [verificado 2026-11-05].
+- 🔴 **Los cuadros se componen en una hoja interna con límite de borde y de presupuesto de píxeles**
+  [verificado 2026-11-05]:
+
+  | Cuadros × tamaño | Resultado | Tokens de salida |
+  |---|---|---:|
+  | 2 × 1024² | 400 *"No supported sheet fits 2 GIF frames at size '1024x1024'. Invalid size '4096x2048'…"* | — |
+  | 4 × 1024² | 400 (hoja 4096x2048) | — |
+  | 9 × 1024² | 400 *"sheet 3072x3072 exceeds pixel budget"* | — |
+  | 2 × 816² | 200 | 987 |
+  | 6 × 640² (vía CLI) | 200 | 710 |
+  | 9 × 640² | 200 | 1.529 |
+
+  Lectura práctica: **640² admite hasta 9 cuadros**; 1024² no cabe ni con 2. El límite exacto por número de
+  cuadros: [sin dato] fuera de estos puntos.
+- 🔴 **GIF también funciona en `edits`:** 2 cuadros a 816² sobre una foto → 200 [verificado 2026-11-05]. Contradice
+  la guía, que lo declara "not supported on edits". Tratarlo como no garantizado.
+
+**`markup`** — nuevo para 2.5 **y** 2.6, sólo en `edits` [oficial]:
+
+- PNG transparente con anotaciones, del mismo tamaño que la primera imagen y **sin aplanar** con ella; las demás
+  imágenes del request quedan como referencia.
+- ≤ 16.777.216 px y ≤ 50 MB. No se combina con `mask` ni con `prompt_rewriter`. Sin cargo extra.
+- **Funciona en 2.5 Flare y en 2.6 Flare y Sunburst** [verificado 2026-11-05]: con un óvalo más texto y con un
+  boceto a mano alzada, el modelo siguió las marcas y **no dibujó las anotaciones**. La capa `markup` **no suma
+  tokens de imagen de entrada**: sólo se cobra la imagen base. Resuelve la contradicción entre la referencia
+  (*"Supports GPT Image 2.5"*) y el changelog (2.5 y 2.6) a favor del changelog.
+- **Rayar la imagen sin `markup` también funciona** [verificado 2026-11-05, 1 de 1 cada caso, `low`]: tachar en
+  rojo una libreta pintada sobre la foto y pedir *"remove the objects scribbled over in red"* la borró (Flare 2.6 y
+  Flare 2.5); un boceto rojo de lámpara pintado sobre la foto se convirtió en una lámpara real (Sunburst 2.6).
+
+**`prompt_rewriter`** aparece sólo en las notas de exclusión de SVG, GIF y `markup`, sin definición [sin dato].
+
+**Parámetros heredados de 2.5 que 2.6 documenta igual** [oficial]: `prompt` ≤ 32.000 caracteres; `n` 1–10;
+`output_compression` 0–100 (JPEG/WebP); `moderation: auto | low`; `partial_images` 0–3 con `stream` (cada parcial
+suma 100 tokens de salida); `safety_identifier` ≤ 128 en lugar de `user`.
+
+## Qué afirma OpenAI sobre 2.6
+
+- **System card** ([`chatgpt-images-2-6`](https://deploymentsafety.openai.com/chatgpt-images-2-6)): mejora en
+  *"editing consistency, detail preservation, and responses to sketches and image annotations"* [oficial].
+- **Guía de prompting oficial** ([`image-prompting`](https://developers.openai.com/api/docs/guides/image-prompting))
+  [oficial]: Sunburst es la *"base model for workflows that need more detail or precise edits"*. Recomienda escribir
+  por secciones rotuladas (escena, sujeto, detalles, restricciones); poner el texto entre comillas con su posición
+  y tipografía, deletrear las marcas y pedir "no extra text", usando `medium`/`high` para texto chico; revisar
+  etiquetas y relaciones factuales en infografías; pedir el fotorrealismo explícito; para personajes, una
+  referencia reutilizable más los rasgos repetidos y *"Do not redesign the character"*; numerar cada imagen de
+  entrada con su rol; editar con "change only X" más la lista de lo que se conserva, un cambio por turno.
+- **Fallas que la propia guía declara** [oficial]: las ediciones repetidas cambian detalles; el prompt no
+  garantiza el píxel exacto (componer sobre la original); *"A drawn checkerboard is not transparency"*; números
+  inventados en charts; *"A higher setting doesn't guarantee a better result"*.
+- **Latencia:** OpenAI dice *"50% faster than before"* y Flare `low` *"as little as six seconds"* [tercero / oficial
+  en el foro de la comunidad]. 🔴 En nuestra única corrida, **Sunburst 2.6 `medium` fue más lento que 2.5**: 24,4 s
+  contra 15,7 s con el mismo prompt [verificado 2026-11-05]. Ver §Precios para las latencias medidas.
+- **Sólo en ChatGPT, sin API:** imágenes de referencia guardadas (uno mismo, mascotas, personajes) y edición de
+  GIF por cuadro [tercero]. Web grounding: [sin dato].
+- **Rankings externos (preliminares, no son la verdad):** Arena el 2026-11-04, configuración Medium — texto a
+  imagen Sunburst 2.6 #2 con 1409 y Flare 2.6 #4 con 1384; edición de imagen única Sunburst 1476 y Flare 1462;
+  multi-imagen Flare 1439 [tercero]. Design Arena pone a Sunburst 2.6 #1 [tercero]. Artificial Analysis no tenía
+  fila de 2.6 al 2026-11-05 [tercero]. El 2026-09-07 Arena tenía a 2.5 Sunburst #1 con 1421 (texto a imagen) y 1520
+  (edición): con estos números preliminares 2.6 no lo supera [inferido; comparar con cautela].
+- **Problemas de los primeros días** [tercero]: SDK y docs con retraso (openai-python 3.46.0, del 2026-11-05,
+  agrega `complexity`, GIF y SVG; 3.42.0, del 2026-10-31, agrega `markup`); una regresión reportada en Responses +
+  `gpt-image-2` con *"Complexity 'low' is not supported"*; proxies que descartan `complexity`.
 
 ## Qué afirma OpenAI sobre 2.5 — y qué NO afirma
 
@@ -268,6 +470,9 @@ Vigentes en la guía de API al 2026-09-08 — **no fueron retiradas por 2.5**:
 El help center agrega que en la edición por selección *"**highlights are not always precise, and edits may
 extend beyond the area you selected**"*.
 
+Al 2026-11-05 no se revalidó si esta tabla sigue en la guía; la guía de prompting de 2.6 declara sus propias
+fallas (§Qué afirma OpenAI sobre 2.6) y ninguna de ellas cierra estas cuatro.
+
 **Consecuencia para Greenhouse:** ninguna de las cuatro limitaciones se cerró. Un entregable con texto pequeño,
 un sistema de personaje recurrente o un layout con jerarquía fija **sigue exigiendo QA humano por pieza**; 2.5
 no convierte eso en un paso automatizable.
@@ -305,9 +510,26 @@ posible suspensión de cuentas).
 
 **Marcas y trademarks:** OpenAI **no publica política específica** para 2.5. Lo único que existe es práctica de
 prompting (constraints tipo "no trademarks / no logos / non-infringing logo"). El default de Greenhouse
-(`greenhouse-ai-image-generator`: nunca reproducir un trademark) **no se relaja** por la llegada de 2.5.
+(`greenhouse-ai-image-generator`: nunca reproducir un trademark) **no se relaja** por la llegada de 2.5 ni de 2.6
+(para 2.6 tampoco se encontró política específica de marcas [sin dato]).
 
-## Precios oficiales al 2026-09-08
+### System card de 2.6
+
+Fuente: `https://deploymentsafety.openai.com/chatgpt-images-2-6` [oficial]. Evaluación sobre **3.077 prompts
+adversariales**.
+
+| Métrica | Sunburst | Flare | Significancia |
+|---|---:|---:|---|
+| Unsafe-not-blocked ↓ | 1,92 % → **1,72 %** | 1,49 % → **2,14 %** | Flare: no significativo; Sunburst: [sin dato] |
+| Safe generation ↑ | [sin dato] | 78,36 % → **75,04 %** | Flare: **significativo** (empeora) |
+
+🔴 **Leer con cuidado.** El valor de la izquierda es la referencia que usa el system card de 2.6, y **no coincide**
+con los números del system card de 2.5 (Sunburst 1,09 % / Flare 1,41 % de *unsafe presented*, Flare 79,4 % de
+*safe generation*). O es otro set, otra corrida o una métrica nombrada distinto [inferido]: **no comparar tablas
+entre system cards**. Lo único que el documento sostiene con significancia es que **Flare 2.6 genera menos
+respuestas seguras que su referencia**. No usar esta tabla como argumento comercial de que 2.6 es más seguro.
+
+## Precios oficiales al 2026-09-08 y al 2026-11-05
 
 Los valores son USD y evidencia temporal, no precios de cliente ni Studio Credits.
 
@@ -315,14 +537,76 @@ Los valores son USD y evidencia temporal, no precios de cliente ni Studio Credit
 
 | Modelo | Image in | Image cached | Image out | Text in | Text cached | Batch |
 |---|---:|---:|---:|---:|---:|---|
-| `gpt-image-2.5-sunburst` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** |
-| `gpt-image-2.5-flare` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** |
+| `gpt-image-2.6-sunburst` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** |
+| `gpt-image-2.6-flare` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** |
+| `gpt-image-2.5-sunburst` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** (🔴 ver §Superficies API) |
+| `gpt-image-2.5-flare` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | **no** (🔴 ver §Superficies API) |
 | `gpt-image-2` | $8.00 | $2.00 | $30.00 | $5.00 | $1.25 | sí (mitad) |
 | `gpt-image-1.5` | $8.00 | $2.00 | $32.00 | $5.00 | $1.25 | sí |
 | `gpt-image-1` | $10.00 | $2.50 | $40.00 | $5.00 | $1.25 | sí |
 | `gpt-image-1-mini` | $2.50 | $0.25 | $8.00 | $2.00 | $0.20 | sí |
 
-El texto de salida no se factura: estos modelos emiten imágenes, no texto.
+El texto de salida no se factura: estos modelos emiten imágenes, no texto. Las tarifas de 2.6 son idénticas a
+las de 2.5 y `gpt-image-2` [oficial 2026-11-05]; **lo que cambia es cuántos tokens gasta** (ver §GPT Image 2.6:
+misma tarifa, muchos más tokens). La excepción es el SVG de 2.6, que suma el consumo de un segundo modelo
+(`svg_usage`) a la tarifa de ese modelo.
+
+### 🔴 GPT Image 2.6: misma tarifa, muchos más tokens en `low` y `medium` — evidencia fechada, NO contrato
+
+`usage` real del **2026-11-05**, clave personal, 1024×1024 salvo donde se indica. Evidencia completa:
+`ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json` y `cli/`).
+
+| 1024×1024 | 2.5 (tokens de salida) | 2.6 (tokens medidos) | Ratio | USD de salida 2.6 |
+|---|---:|---:|---:|---:|
+| `low` | 196 (fórmula; medido 2026-09-16) | 824 (Flare, 2 corridas) | 4,2× | 0,0247 |
+| `medium` | 439 (Sunburst 2.5, medido 2026-11-05) | 1.449 (Flare y Sunburst) | 3,3× | 0,0435 |
+| `high` | 1.756 (fórmula y medido) | 1.758 (Flare) | 1,0× | 0,0527 |
+| `xhigh` | 3.122 (fórmula) | 3.122 (Flare) | 1,0× | 0,0937 |
+| `max` | 7.024 (fórmula y medido) | 7.024 (Flare) | 1,0× | 0,2107 |
+
+**Sólo `low` y `medium` cuestan más en 2.6.** En `high`, `xhigh` y `max` gasta lo mismo que 2.5 [verificado
+2026-11-05]. *Corrección:* la versión 1.1 de esta matriz anotaba 3.124 como tokens de 2.5 en `xhigh`; la fórmula
+oficial da 3.122 (`ceil(64 × 64 × 3.048.576 / 4.000.000)`), que es también lo medido en 2.6.
+
+Otros puntos medidos [verificado 2026-11-05]:
+
+- **2048×1152 `low`, Sunburst 2.6:** 660 tokens (2.5 por fórmula: 157 → 4,2×).
+- **1536×1024 `low`, Sunburst 2.6:** 664 tokens, exactamente lo que predijo el factor 4,2 sobre 2.5.
+- **Flare y Sunburst 2.6 gastan lo mismo** para el mismo `quality` (`medium`: 1.449 ambos), igual que en 2.5.
+- **`complexity: "low"` no cambia el gasto:** 824 tokens con y sin él (Flare `low`).
+- **Editar en 2.6 cuesta más salida que generar:** Flare `low` 1024², 1.024 tokens de imagen de entrada + 30 de
+  texto y **962 de salida**, contra 824 al generar.
+- **GIF:** Flare `low` 816×816, 2 cuadros → 987 tokens de salida; 640², 6 cuadros (vía CLI) → 710; 640², 9 cuadros
+  → 1.529. **La hoja de cuadros no sigue la fórmula de grilla:** no hay estimación de GIF.
+- **`markup`:** la capa de anotaciones no suma tokens de imagen de entrada; sólo se paga la imagen base.
+- **SVG:** el raster de referencia (824 tokens en `low` 1024²) más `svg_usage` del modelo autor (gpt-5.5: 1.559
+  de entrada, 204 de salida, 0 de razonamiento) a la tarifa de gpt-5.5.
+
+**Hipótesis, no fórmula** [inferido, con 7 puntos]: tokens 2.6 = ceil(tokens 2.5 × k), con k = 4,2 en `low`, 3,3 en
+`medium` y 1,0 en `high`, `xhigh` y `max`. Un usuario del foro estimó los mismos 4,2× y 3,3× [tercero]. **La fórmula
+de grilla de 2.5 NO reproduce 2.6 sin ese factor.** El factor se sostiene en tres tamaños de `low` (1024², 1536×1024
+y 2048×1152); `medium` se midió sólo a 1024².
+
+**Consecuencias:**
+
+1. **Explorar con 2.6 en `low` o `medium` cuesta 4,2× / 3,3× más que con 2.5**; en `high`, `xhigh` y `max` cuesta lo
+   mismo. El borrador barato sigue siendo 2.5.
+2. 🔴 **Ningún estimador que reutilice la grilla de 2.5 sin factor sirve para 2.6: lo subestima.** El estimador del
+   helper ya lo resuelve [contrato]: `estimateOpenAIImageOutputTokens` calcula 2.6 como la grilla de 2.5 por
+   `GPT_IMAGE_2_6_TOKEN_FACTOR` (`low` 4,2 · `medium` 3,3 · `high`/`xhigh`/`max` 1), devuelve `null` para GIF y, en
+   SVG, estima sólo el raster de referencia. `pnpm ai:image --estimate` imprime el costo y sale sin llamar a la API,
+   y avisa cuando 2.6 en `low`/`medium` cuesta N× su gemelo 2.5. `pnpm ai:inpaint` estima con el mismo factor.
+3. **El factor es una hipótesis medida, no una tarifa.** Comparar cada estimación con el `usage` real que imprime
+   el CLI y revalidar el factor si se desvía.
+
+**Latencias medidas (una corrida cada una)** [verificado 2026-11-05]: Flare `low` ~8 s · Flare `medium` 8,7 s ·
+Flare `high` 12 s · Sunburst 2.6 `medium` 24,4 s (2.5 Sunburst `medium`, mismo prompt: 15,7 s) · Sunburst 2.6
+`low` 2048×1152 15,3 s · edit Flare `low` 11 s · Flare `xhigh` 18 s · Flare `max` 32 s. OpenAI dice
+*"50% faster than before"* [tercero / oficial en el foro]; en nuestra única corrida Sunburst 2.6 `medium` fue
+**más lento** que 2.5.
+
+🔴 **Esta tabla es evidencia fechada, no una tarifa estable ni un contrato.** Una corrida por punto, una sola
+organización, primer día del modelo. Volver a medir antes de presupuestar.
 
 ### 🔴 El costo por imagen de 2.5 NO es estimable desde la documentación
 
@@ -340,6 +624,12 @@ Y de la guía:
 gasto que hoy derive el costo de una imagen desde una tabla `quality × size` **es inválido para 2.5**. La única
 vía documentada es leer `usage` de la respuesta real y persistirlo. Cualquier cifra de costo por imagen de 2.5
 publicada en prensa o blogs de terceros **no es verificable contra doc oficial** y no debe entrar a un contrato.
+
+> 🔴 **Contradicción entre documentos, sin resolver en esta pasada (2026-11-05).** Esta sección es del
+> 2026-09-08. El 2026-09-16, `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §GPT Image 2.5 registró lo contrario: que
+> la guía oficial publica una calculadora que cubre 2.5 y que su fórmula de grilla reproduce exactamente las 7
+> mediciones del repo (196 / 1.756 / 7.024). Las cifras de 2.5 de la tabla de 2.6 de arriba usan esa fórmula. No
+> se releyó la calculadora hoy. Lo que sí está medido: **esa fórmula no reproduce 2.6**.
 
 ### Línea base de consumo medido — evidencia fechada, NO contrato
 
@@ -412,7 +702,7 @@ tamaño, y el consumo puede cambiar sin aviso del lado de OpenAI. **Volver a med
 Evidencia completa y reproducible: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (§"Qué cuesta
 EDITAR frente a generar" del README y bloque `editBaseline` de `manifest.json`).
 
-### Costo por imagen — modelos con calculadora oficial (NO aplica a 2.5)
+### Costo por imagen — modelos con calculadora oficial (NO aplica a 2.5 ni a 2.6)
 
 | Modelo | Quality | 1024×1024 | 1024×1536 | 1536×1024 |
 |---|---|---:|---:|---:|
@@ -434,7 +724,8 @@ elevar el input por la alta fidelidad automática. **No extrapolar linealmente p
 resolución no cuadrada mayor puede producir menos output tokens que otra menor con la misma calidad.
 
 La tabla de tokens por imagen (272/1056/4160 para 1024² en low/medium/high) cubre **sólo modelos anteriores a
-`gpt-image-2`**. No hay equivalente publicado para GPT Image 2 ni para 2.5.
+`gpt-image-2`**. No hay equivalente publicado para GPT Image 2 ni para 2.5 (al 2026-09-08; ver la contradicción
+anotada arriba) ni para 2.6 [sin dato].
 
 ## Rate limits
 
@@ -443,10 +734,16 @@ La tabla de tokens por imagen (272/1056/4160 para 1024² en low/medium/high) cub
 | `gpt-image-2` | Sí — Tier 1: 100.000 TPM / 5 IPM · T2: 250.000 / 20 · T3: 800.000 / 50 · T4: 3.000.000 / 150 · T5: 8.000.000 / 250 |
 | `gpt-image-2.5-flare` | **No publicada** |
 | `gpt-image-2.5-sunburst` | **No publicada** |
+| `gpt-image-2.6-flare` | [sin dato] |
+| `gpt-image-2.6-sunburst` | [sin dato] |
 
 `IPM` = images per minute. Las fichas de 2.5 terminan en "Snapshots" y no incluyen sección de rate limits.
 **Asumir los números de `gpt-image-2` para 2.5 sería inferencia, no documentación.** El límite real se lee en la
-sección de límites de la cuenta.
+sección de límites de la cuenta. Lo mismo vale para 2.6: no asumir los de 2.5 ni los de `gpt-image-2`.
+
+> 🔴 **Contradicción entre documentos:** el 2026-09-16 `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` registró que
+> las fichas de 2.5 **sí publican** rate limits, iguales a `gpt-image-2`. Esta tabla conserva el estado del
+> 2026-09-08 y no se revalidó para 2.5 en esta pasada.
 
 ## Seguridad, datos y provenance
 
@@ -462,8 +759,8 @@ sección de límites de la cuenta.
 - OpenAI indica que los datos API no se usan para entrenamiento salvo opt-in explícito.
 - Por defecto, `/v1/images/generations` y `/v1/images/edits` pueden conservar abuse-monitoring logs hasta 30 días,
   no mantienen application state y son elegibles para ZDR con aprobación y limitaciones.
-- ZDR estaba declarado compatible para `gpt-image-2`, 1.5, 1 y 1-mini al 2026-08-21. **Para la familia 2.5 no se
-  revalidó la elegibilidad ZDR**; leerla antes de comprometerla con un cliente. Los inputs de imagen se escanean
+- ZDR estaba declarado compatible para `gpt-image-2`, 1.5, 1 y 1-mini al 2026-08-21. **Para las familias 2.5 y 2.6
+  no se revalidó la elegibilidad ZDR** [sin dato]; leerla antes de comprometerla con un cliente. Los inputs de imagen se escanean
   para CSAM; un posible positivo puede retenerse para revisión manual incluso bajo ZDR/MAM/Eyes Off.
 - Image storage/data residency regional requiere leer la tabla vigente y, en varias regiones, aprobación enhanced
   ZDR/MAM. No asumir residencia desde la ubicación de Globe.
@@ -502,6 +799,10 @@ por modalidad: **imágenes = C2PA + SynthID**, audio = sólo SynthID, texto = to
 - Existe además una **marca de agua visible** opcional, pedida por prompt (*"Include a visible OpenAI watermark
   in the image"*), distinta de las señales embebidas.
 
+**La familia 2.6 también emite ambas señales:** su system card declara **C2PA + SynthID** en ChatGPT, Codex y la
+API [oficial]. No se corrió el Content Provenance API sobre un output de 2.6 [sin dato]; tampoco se sabe si un
+SVG o un GIF de 2.6 conservan las señales [sin dato]. Las salvedades de arriba aplican igual.
+
 La verificación de provenance complementa, pero no reemplaza, el lineage interno.
 
 ## Mapeo contra Greenhouse y Globe
@@ -509,7 +810,7 @@ La verificación de provenance complementa, pero no reemplaza, el lineage intern
 | Capa | Estado observado | Consecuencia |
 |---|---|---|
 | OpenAI | familia 2.5 activa con transparencia plena y `xhigh`/`max` | provider-supported desde 2026-09-08 |
-| Greenhouse helper | **transporta la familia 2.5**, con contrato decidido por capacidad declarada | ver §El contrato transportado abajo |
+| Greenhouse helper | **transporta las familias 2.5 y 2.6**, con contrato decidido por capacidad declarada | 2.6 desde el 2026-11-05 (tarde); ver §Familia 2.6 en Greenhouse y §El contrato transportado abajo |
 | Greenhouse helper | conserva el modelo exacto y rechaza JPEG transparente antes de red | implementado local; aceptar el asset sigue exigiendo QA alfa |
 | Greenhouse CLI | valida `--model` y `--quality` contra el allowlist antes de cualquier I/O | canary local facturable aprobado 2026-08-21: `gpt-image-2`, PNG 1024×1024, `quality=low`, `background=transparent`, canal alfa y 470.164 píxeles totalmente transparentes; no demuestra el runtime Globe |
 | Greenhouse CLI | **expone máscara: `--mask <path>` (inpainting)** desde 2026-09-16 | conecta el soporte de máscara que `editOpenAIImage()` ya tenía y el CLI no ofrecía; `--mask` sin `--image` **aborta antes de cualquier I/O** — sin esa guarda el request habría salido como generación desde cero, ignorando la máscara en silencio |
@@ -522,28 +823,64 @@ La verificación de provenance complementa, pero no reemplaza, el lineage intern
 | Globe result driver | decodifica bytes y exige alfa + píxel no opaco | implementado local; canary/runtime pendiente |
 | Globe ruta `ref/still/openai-v2` | generación prompt-only con `auto` / `opaque` / `transparent`; edit deferred | implementado local; promoción/canary pendientes |
 | Globe familia 2.5 | **sin ruta, sin binding, sin readiness** | Globe está `hibernated` desde 2026-09-02; no hay promoción posible hoy |
+| Globe familia 2.6 | **sin ruta, sin binding, sin readiness** | ninguna ruta de Globe declara 2.6; mismo estado de hibernación |
+
+### Familia 2.6 en Greenhouse — transportada por el CLI y `ai:inpaint` (2026-11-05, tarde) [contrato]
+
+Leído del árbol de trabajo del 2026-11-05 en `src/lib/ai/openai-image.ts`, `scripts/ai/generate-image.ts` y
+`scripts/ai/inpaint/adapters/openai.ts`. Reemplaza el inventario de la mañana, que la daba por no transportada.
+
+| Pieza | Estado | Consecuencia |
+|---|---|---|
+| Union `OpenAIImageModel` | incluye `gpt-image-2.6-sunburst`, `gpt-image-2.6-flare` y el snapshot `gpt-image-2-2026-04-21`; conserva `gpt-image-1`, 1.5 y 1-mini | `pnpm ai:image --model gpt-image-2.6-*` pasa la validación del allowlist |
+| `OPENAI_IMAGE_MODEL_CAPABILITIES` | además de `extendedSizeGrid`, `premiumQualityTiers` e `inputFidelity`, declara `complexity`, `svgOutput`, `gifOutput` (los tres sólo 2.6), `markup` (2.5 y 2.6), `tokenFamily` y `shutdownDate` | el `Record` obliga a declarar cada capacidad de todo modelo nuevo |
+| Ciclo de vida | `assertOpenAIImageModelAvailable` corta antes de la red un modelo apagado: `gpt-image-1` desde el 2026-10-23; 1.5 y 1-mini desde el 2026-12-01 | un modelo deprecado falla con mensaje, no con un 4xx pagado |
+| Validación de opciones | **una sola función**, `assertOpenAIImageOptionsSupported`, que usan el helper, el CLI y `ai:inpaint` | `complexity` sólo 2.6; SVG sólo al generar, exige `svg.model`; GIF sin `mask` ni `markup`; `markup` sólo al editar, nunca con `mask`; `output_compression` sólo JPEG/WebP; JPEG transparente rechazado |
+| Estimación de costo | grilla de 2.5 × `GPT_IMAGE_2_6_TOKEN_FACTOR` (`low` 4,2 · `medium` 3,3 · resto 1); GIF → `null`; SVG estima el raster de referencia | el modelo autor del SVG se cobra aparte y el CLI lo avisa |
+| `generateOpenAIImage` / `editOpenAIImage` | aceptan `complexity`, `outputCompression`, `moderation`, `svg {model, reasoningEffort}`, `gif {frameCount, frameDurationMs}` y `markup` (sólo edits; valida PNG con alfa, mismo tamaño que la base y ≤ 16.777.216 px); devuelven `svgUsage` | todas las novedades de 2.6 son alcanzables desde el helper |
+| `runOpenAIImageTool` (Responses) | acepta `imageModel` (`tool.model`) | 2.6 por Responses no está garantizado (§Superficies API) y **no tiene flag de CLI** |
+| `pnpm ai:image` | flags nuevos: `--model gpt-image-2.6-flare\|gpt-image-2.6-sunburst`, `--complexity low\|medium\|high` (sólo 2.6), `--format png\|jpeg\|webp\|gif\|svg` (o la extensión `.gif`/`.svg` de `--out`), `--svg-model` (default `gpt-5.5`), `--svg-effort` (default `low`), `--frames` (2–64; avisa sobre 16), `--frame-ms` (20–2000), `--markup <png>` (exige `--image`; no con `--mask`), `--compression 0-100`, `--moderation auto\|low` y `--estimate` | en SVG y GIF `--background` sólo viaja si se pasa explícito; imprime `svg_usage`; `--help` trae la tabla «¿2.5 o 2.6?» |
+| Default del helper, del CLI y del runtime | `gpt-image-2` | **sin cambio**: 2.6 se usa sólo eligiéndolo |
+| `pnpm ai:inpaint`, adaptador `openai` | acepta 2.6; default `gpt-image-2.5-flare` `medium` sin cambio; `isSunburst` = `/^gpt-image-2\.(5\|6)-sunburst/`; a los modelos con `complexity` les envía `complexity: low`; estima con el factor 2.6 | Sunburst 2.5 **y** 2.6 editan sin máscara; Flare 2.6 viaja con máscara |
+| No expuesto | Batch API (2.6 no lo tiene en OpenAI), `partial_images`/`stream` (el helper rechaza `partialImages > 0` sin parser SSE), flag de CLI para Responses, `n > 1` (`--count N` son N pedidos separados y se pagan N veces) y `safety_identifier` | sin cambio |
+| `scripts/foto/*.mjs` y `scripts/ai/inpaint/erase.ts` | siguen fijando `gpt-image-2.5-sunburst` | sin cambio de modelo posible sin editar código |
+| `pnpm models:inventory` / `pnpm models:freshness` | no cuentan los ids de OpenAI [inventario de la mañana, no revalidado] | la llegada de 2.6 no aparece en esos reportes |
+
+**Decisión vigente** [decisión propuesta, con evidencia]: 2.6 es ejecutable desde `pnpm ai:image` y
+`pnpm ai:inpaint`, pero **no es default**. Explorar e iterar en `low`/`medium` sigue en 2.5 Flare (2.6 cuesta
+4,2×/3,3× más); la pieza final en `high`/`xhigh`/`max` puede hacerse con 2.5 o 2.6 Sunburst al mismo costo,
+comparando en la toma; SVG y GIF exigen 2.6 Flare. La identidad de personas (fotografía de marca) sigue con 2.5
+Sunburst hasta un canario de identidad con 2.6 [sin dato]. La tabla completa vive en
+`GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` §GPT Image 2.6.
 
 ### El contrato transportado de la familia 2.5
 
 Verificado leyendo `src/lib/ai/openai-image.ts`. Los cuatro identificadores viven en el tipo `OpenAIImageModel`
 y en el allowlist: `gpt-image-2.5-flare`, `gpt-image-2.5-flare-2026-09-08`, `gpt-image-2.5-sunburst` y
-`gpt-image-2.5-sunburst-2026-09-08`.
+`gpt-image-2.5-sunburst-2026-09-08`. La familia 2.6 se sumó el 2026-11-05 con el mismo mecanismo (§Familia 2.6
+en Greenhouse).
 
 **El contrato se decide por capacidad declarada, no por literales de modelo.**
-`OPENAI_IMAGE_MODEL_CAPABILITIES` es un `Record<OpenAIImageModel, …>` con tres capacidades por modelo
-—`extendedSizeGrid`, `premiumQualityTiers`, `inputFidelity`— y ser un `Record` es la defensa: el compilador
+`OPENAI_IMAGE_MODEL_CAPABILITIES` es un `Record<OpenAIImageModel, …>` con las capacidades por modelo (las tres
+originales —`extendedSizeGrid`, `premiumQualityTiers`, `inputFidelity`— más las del 2026-11-05) y ser un
+`Record` es la defensa: el compilador
 obliga a declarar las capacidades de todo modelo nuevo, así que agregar uno **no puede volver a degradar en
 silencio** por olvidar un literal en una rama. Esa era exactamente la forma de la falla anterior.
 
-| Capacidad | Qué gobierna | Familia 2.5 | `gpt-image-2` | 1.5 / 1 / 1-mini |
-|---|---|---|---|---|
-| `extendedSizeGrid` | grilla moderna (`2048x1152`, `2048x2048`, …) en vez de la legacy de tres tamaños | sí | sí | no |
-| `premiumQualityTiers` | escalones `xhigh` y `max` | sí | no | no |
-| `inputFidelity` | envío de `input_fidelity` en `/v1/images/edits` | **no** | no | sí |
+| Capacidad | Qué gobierna | Familia 2.6 | Familia 2.5 | `gpt-image-2` | 1.5 / 1 / 1-mini |
+|---|---|---|---|---|---|
+| `extendedSizeGrid` | grilla moderna (`2048x1152`, `2048x2048`, …) en vez de la legacy de tres tamaños | sí | sí | sí | no |
+| `premiumQualityTiers` | escalones `xhigh` y `max` | sí | sí | no | no |
+| `inputFidelity` | envío de `input_fidelity` en `/v1/images/edits` | **no** | **no** | no | sí |
+| `complexity` | envío de `complexity` | sí | no | no | no |
+| `svgOutput` / `gifOutput` | `output_format: "svg"` / `"gif"` | sí | no | no | no |
+| `markup` | capa de anotaciones en `/v1/images/edits` | sí | sí | no | no |
+| `tokenFamily` | grilla de estimación de tokens | `gpt-image-2.6` (2.5 × factor) | `gpt-image-2.5` | `gpt-image-2` | `null` |
+| `shutdownDate` | corte antes de la red | `null` | `null` | `null` | 2026-12-01 (`gpt-image-1`: 2026-10-23) |
 
 Consecuencias verificadas en el código:
 
-- **`quality` acepta `auto | low | medium | high | xhigh | max`.** `xhigh` y `max` existen sólo en 2.5;
+- **`quality` acepta `auto | low | medium | high | xhigh | max`.** `xhigh` y `max` existen sólo en 2.5 y 2.6;
   pedirlos a un modelo anterior **lanza antes de la red** (`assertOpenAIImageQualitySupported`), en vez de
   gastar un request que el proveedor rechaza.
 - **`input_fidelity` ya no viaja con modelos 2.5.** `editOpenAIImage()` lo envía sólo cuando el modelo declara
@@ -600,15 +937,66 @@ canary propio sobre fondo claro/oscuro y no hereda evidencia del PNG histórico 
    migración entre ambos estados.
 9. No se revalidó la elegibilidad ZDR de la familia 2.5.
 10. OpenAI no publicó guía de prompting específica de 2.5: la vigente en el cookbook está fechada 2026-04-21 y
-    escrita para `gpt-image-2`.
+    escrita para `gpt-image-2`. *Delta 2026-11-05:* existe una guía de prompting oficial en
+    `api/docs/guides/image-prompting` con contenido de 2.6 (§Qué afirma OpenAI sobre 2.6).
+
+**Agregadas el 2026-11-05 (familia 2.6):**
+
+11. La ficha de 2.6 marca Responses "not supported" y el guide del tool lista sólo 2.5/2/1.5/1-mini, pero
+    `tool.model: "gpt-image-2.6-flare"` respondió 200 y generó [verificado 2026-11-05].
+12. `frame_count` del GIF: la guía dice 2–64 y la referencia 2–16.
+13. `markup`: la referencia dice "Supports GPT Image 2.5"; el changelog dice 2.5 y 2.6. **Resuelta a favor del
+    changelog:** funcionó en Flare 2.6 y Sunburst 2.6 [verificado 2026-11-05].
+14. GIF: la referencia dice que requiere acceso a un preview; nuestra organización generó sin pedir nada, tanto en
+    `generations` como en `edits` [verificado 2026-11-05]. Queda abierto si es acceso general o de nuestra cuenta.
+15. Batch de 2.5: esta matriz y el generador dicen «no»; un informe de esta revalidación lo ubica en la tabla de
+    Batch; la guía dice "Batch sólo gpt-image-2". Sin leer la tabla directamente.
+16. **Entre documentos del repo:** esta matriz dice que el costo de 2.5 no es estimable, que no tiene rate limits
+    publicados y que no hay tabla de tokens para 2.5; `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` registró el
+    2026-09-16 que la calculadora oficial cubre 2.5 (fórmula que reproduce las 7 mediciones) y que los rate limits
+    de 2.5 están publicados e iguales a `gpt-image-2`. No se revalidó en esta pasada.
+17. La tabla de deprecations del 2026-09-08 recomendaba `gpt-image-2` como reemplazo; la del 2026-11-05
+    recomienda 2.5.
+18. Los valores de referencia del system card de 2.6 (Sunburst 1,92 %, Flare 1,49 %, Flare 78,36 %) no
+    coinciden con los del system card de 2.5 (1,09 %, 1,41 %, 79,4 %).
+19. OpenAI dice que 2.6 es *"50% faster than before"*; en nuestra única corrida Sunburst 2.6 `medium` tardó
+    24,4 s contra 15,7 s de 2.5 con el mismo prompt.
+20. La guía declara el GIF "not supported on edits", pero 2 cuadros a 816² sobre una foto respondieron 200
+    [verificado 2026-11-05].
+21. **Entre versiones de esta matriz:** la 1.1 anotaba 3.124 tokens de 2.5 en `xhigh` a 1024²; la fórmula oficial
+    da 3.122 y es lo medido en 2.6. Corregido en §Precios.
+
+**Preguntas abiertas de 2.6 (sin medir):**
+
+- Si el factor ceil(2.5 × k) se sostiene en `medium`, `high`, `xhigh` y `max` fuera de 1024² (en `low` se sostuvo
+  en tres tamaños).
+- Tamaño máximo de cuadro de GIF según el número de cuadros fuera de los seis puntos medidos (§Novedades de 2.6).
+- Si `input_fidelity` existe o se ignora en 2.6 (el helper no lo envía).
+- Por qué Sunburst 2.6 devuelve un panel negro con la máscara del pipeline (RGB negro bajo el alfa) y no con una
+  máscara que conserva el RGB de la foto: 1 de 1 cada caso; no alcanza para cambiar el pipeline.
+- Preservación de identidad de personas con 2.6 frente a 2.5 Sunburst.
+- Calidad relativa de 2.5 y 2.6 Sunburst en piezas finales `high`/`xhigh`/`max`, que cuestan lo mismo.
+- Efecto de `complexity` en la calidad (en costo y latencia no cambió nada en `low`).
+- Rate limits y elegibilidad ZDR de 2.6; si SVG y GIF conservan C2PA/SynthID.
+- Definición de `prompt_rewriter`.
 
 Cuando fuentes oficiales discrepan, se conserva la contradicción y se valida el endpoint concreto con un probe
 controlado antes de cambiar el contrato.
 
 ## Fuentes oficiales
 
-Familia 2.5, ciclo de vida, precios, tamaños, streaming y provenance consultadas el **2026-09-08**; el resto
-conserva la consulta del 2026-08-21. Agregar `.md` a cualquiera de estas URLs devuelve el Markdown crudo.
+Familia 2.6, deprecaciones y precios consultados el **2026-11-05** (canarios de `xhigh`/`max`, GIF, `markup` y
+máscara de la tarde del mismo día); familia 2.5, tamaños, streaming y provenance
+el **2026-09-08**; el resto conserva la consulta del 2026-08-21. Agregar `.md` a cualquiera de estas URLs devuelve
+el Markdown crudo.
+
+- Fichas de `gpt-image-2.6-sunburst` y `gpt-image-2.6-flare` bajo `developers.openai.com/api/docs/models/` (ruta
+  por el mismo patrón que las fichas de abajo) y `GET /v1/models/<id>` = 200 [verificado 2026-11-05]
+- [Image prompting guide](https://developers.openai.com/api/docs/guides/image-prompting) — guía oficial con 2.6
+- [ChatGPT Images 2.6 System Card](https://deploymentsafety.openai.com/chatgpt-images-2-6)
+- Changelog del 2026-11-04: *"Released GPT-Image-2.6 Sunburst and GPT-Image-2.6 Flare for image generation and
+  editing."* (enlace abajo)
+- Evidencia propia: `ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json` y `cli/`)
 
 - [Image generation guide](https://developers.openai.com/api/docs/guides/image-generation)
 - [Images API reference](https://developers.openai.com/api/reference/resources/images)

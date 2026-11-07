@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-service",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Eje 2 · Medición",
+    "question": "Cada lead se mide hasta",
+    "answer": [
+      "El cierre"
+    ]
+  },
+  "body": "Definimos con su área comercial qué es un MQL y qué es un SQL, y conectamos campañas, formularios y CRM.",
+  "steps": [
+    {
+      "kicker": "Mes 1",
+      "name": "Definición",
+      "desc": "MQL, SQL y etapas, acordados con ventas."
+    },
+    {
+      "kicker": "Mes 1",
+      "name": "Conexión",
+      "desc": "Formularios, CRM y Google Analytics enlazados."
+    },
+    {
+      "kicker": "Desde el mes 2",
+      "name": "Conversiones offline",
+      "desc": "Las cotizaciones vuelven a Google y LinkedIn."
+    },
+    {
+      "kicker": "Cada semana",
+      "name": "Tablero",
+      "desc": "ROAS, costo por lead y MQL al día."
+    }
+  ],
+  "note": "HubSpot, Marketo u otro CRM: se confirma con su equipo.",
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+    "alt": "Una estratega de growth con el polo navy de Efeonce, de pie tras una mesa de nogal en el estudio de noche, justo después de salir en vivo una campaña"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Comercial",
+    "participantKind": "department"
+  }
+}

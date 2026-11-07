@@ -224,7 +224,8 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   «Comparación de color», «Banco de fotos»). **PDF** (16:9): OneDrive
   `Alineación/4. Comercial/Brochures/2026/HubSpot/Efeonce-Brochure-Servicios-HubSpot.pdf`, armado con
   `node ai-generations/2026-10-06_deck-hubspot/exp/brochure-pdf.mjs <brochure-files.json> <salida.pdf>` desde las
-  láminas del canvas verificadas por sha256 (portada con la insignia Gold; **sin** el sprocket 3D, de uso interno).
+  láminas del canvas verificadas por sha256 (portada con la insignia Gold; se armó **sin** el sprocket 3D, que entonces era de uso interno). Desde el 2026-10-14
+  el sprocket está autorizado fuera de Efeonce (aprobación escrita de HubSpot declarada por el operador el 2026-10-14; ratificado el 2026-11-05 en la propuesta Fiordo Austral); siempre desde el kit, sin modificar ni generar el logo.
   Pipeline: `ai-generations/2026-10-06_deck-hubspot/` (`build-intents.py`, `nuevas.py`, `ti.py`, `build-canvas.py`,
   `fotos/LEEME.md` con banco y descartes). Pendientes antes de usarlo con prospectos y el uso comercial: skill
   `hubspot-solutions-partner`. **Lecciones de oficio medidas en esta corrida:**
@@ -1041,6 +1042,17 @@ Cuando quien recibe el deck lo lleva a su gerencia sin nosotros (caso ARMOR EPPS
 
 Cuando el cliente ya trabaja con nosotros y el deck propone cambiar cómo se opera la cuenta (roles, flujo, herramientas, entregas) — caso «Sky × Efeonce — Cómo trabajamos», 18 láminas, línea Growth, iterado con el operador y la Creative Operations Lead; aún no presentado: diagnóstico con tres miradas, «Quién hace qué» en vez de «Quiénes somos», comparativas hoy → propuesta por rol, casos especiales, exactitud de cada rol buscada en todo el deck, banderas en círculo y exportación del canvas a PDF con Playwright: [references/propuesta-operativa-cliente-activo.md](references/propuesta-operativa-cliente-activo.md).
 
+### Kickoff de cuenta con el cliente recién ganado (2026-11-01)
+
+Caso fuente: kickoff SKY SEO Blog, canvas Design de 34 láminas + 4 de anexo para 60 min
+(`ai-generations/2026-10-31_kickoff-seo-sky/canvas/project/`; artifact
+https://claude.ai/artifact/JQ3k1siSTNxgUiqu1NsaHE). Un kickoff **no es un deck de venta**: equipo que atiende la cuenta
+con `content-team`, sin prueba de venta, y el orden pedido → diagnóstico → meta y medición → plan → cómo trabajamos →
+decisiones ([deck-archetypes.md §7](deck-archetypes.md)). Impacto visual, logos de quien actúa y cursor
+([visual-system.md](visual-system.md) §«Impacto en láminas de cliente»), pérdidas en rojo por rol
+([data-storytelling.md](data-storytelling.md) §Color) e integridad del crédito, los accesos y el copy del cliente
+([evidence-integrity.md](evidence-integrity.md) §5).
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -1294,7 +1306,7 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 ├─ QUÉ decir y en qué orden: storyline, Minto/SCQ,
 │  Assertion-Evidence, el arco, el ask ................. narrative-architecture.md
 ├─ QUÉ TIPO de deck es: comité · pitch · exec/board ·
-│  QBR · readout · webinar. Leído vs presentado ........ deck-archetypes.md
+│  QBR · readout · webinar · kickoff. Leído o en sala .. deck-archetypes.md
 ├─ CÓMO se ve: el molde, tipografía, color, íconos,
 │  fotos, densidad, y qué está quemado en 2026 ......... visual-system.md
 ├─ CÓMO se produce: catálogo cerrado, selector,

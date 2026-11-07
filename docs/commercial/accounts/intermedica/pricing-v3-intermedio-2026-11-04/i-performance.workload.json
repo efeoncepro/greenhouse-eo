@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-i-performance-2026-11-04-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-11-04",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "lead-direction",
+      "label": "Direccion, relacion con cliente y comite mensual 60 min con preparacion",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:lead-direction",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "lead-strategy",
+      "label": "Estrategia por 2 lineas de negocio y mix de hasta 3 canales",
+      "hoursPerMonth": "6",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:lead-strategy",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "lead-hypotheses",
+      "label": "3 hipotesis/mes: diseno, brief de test y decision (3 x 3 h)",
+      "hoursPerMonth": "9",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:lead-hypotheses",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "lead-reading",
+      "label": "Lectura quincenal (2 x 2,5 h) + reporte mensual con recomendacion (5 h)",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:lead-reading",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "lead-optimization",
+      "label": "Supervision de pacing y decisiones de optimizacion",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:lead-optimization",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "buyer-checks",
+      "label": "8 chequeos programados/mes (8 x 2 h)",
+      "hoursPerMonth": "16",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:buyer-checks",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "buyer-campaigns",
+      "label": "Configuracion y mantenimiento de hasta 6 campanas activas (6 x 2,5 h)",
+      "hoursPerMonth": "15",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:buyer-campaigns",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "buyer-variants",
+      "label": "Montaje de variantes para 3 hipotesis (3 x 2 h)",
+      "hoursPerMonth": "6.5",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-performance:buyer-variants",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "lead",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "lead-direction",
+          "share": "1"
+        },
+        {
+          "workId": "lead-strategy",
+          "share": "1"
+        },
+        {
+          "workId": "lead-hypotheses",
+          "share": "1"
+        },
+        {
+          "workId": "lead-reading",
+          "share": "1"
+        },
+        {
+          "workId": "lead-optimization",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "buyer",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "buyer-checks",
+          "share": "1"
+        },
+        {
+          "workId": "buyer-campaigns",
+          "share": "1"
+        },
+        {
+          "workId": "buyer-variants",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "6915d4716f57",
+  "key": "6915d4716f57439ec6212062d58beedb142f1a0f469d9065e2a47257a8a3b838",
+  "status": "completed",
+  "createdAt": "2026-11-05T21:19:13.638Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/projects/sky/blog-lote-2026-11/salidas/santiago-ano-nuevo/img3-maestro.png",
+    "imageSha256": "3a8a3aa072f1877bee2286148df7a4174b711fefc11cd612d7cdebbccc047e74",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/stgo3-sky-mask.png",
+    "maskSha256": "fa3f1bea60809080f8bdd5914c9cbedabb91357ef1cbe638a9a08243fc5413c1",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Deep late-night city sky well after midnight: an almost black, very dark sky with no blue twilight gradient, no glow on the horizon and no hint of sunrise; only a faint warm haze very close to the street lamps. The tree crowns and the building edges continue naturally into the dark sky. Smooth, clean, natural photographic night sky with fine grain, no stripes, no stars painted, no moon.",
+    "providerPrompt": "Deep late-night city sky well after midnight: an almost black, very dark sky with no blue twilight gradient, no glow on the horizon and no hint of sunrise; only a faint warm haze very close to the street lamps. The tree crowns and the building edges continue naturally into the dark sky. Smooth, clean, natural photographic night sky with fine grain, no stripes, no stars painted, no moon."
+  },
+  "mask": {
+    "touchedFraction": 0.15599175347222222,
+    "editable": 1125675,
+    "soft": 168183,
+    "protected": 7000542
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 61 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 33.479,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 5.91,
+        "bestError": 5.91,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7000542,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1125675,
+        "maxDelta": 255,
+        "meanDelta": 36.522,
+        "worst": {
+          "x": 370,
+          "y": 210
+        }
+      },
+      "seam": {
+        "pixels": 168183,
+        "maxDelta": 225,
+        "meanDelta": 13.109,
+        "worst": {
+          "x": 1615,
+          "y": 900
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7000542,
+        "maxDelta": 255,
+        "meanDelta": 14.154,
+        "worst": {
+          "x": 2103,
+          "y": 887
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1605,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 97
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3448
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

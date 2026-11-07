@@ -11,15 +11,20 @@ sin un segundo almacén de llaves ni llave privada exportable.
   versión KMS e identidad del operador; son metadata, nunca material privado.
 - Confirmar exactamente una active, KMS ENABLED y permiso de firma del runtime. Preparar rollback y canary
   que firma/verifica sin imprimir el token. Revisar consumers y sus cachés JWKS.
+- La identidad que ejecuta `--register` o la rotación manual necesita permiso KMS `useToSign` sobre
+  la versión candidata para el preflight local; una falla de ese permiso detiene la activación.
 - La configuración pública `AUTH_SERVER_KMS_KEY` procede de `services/auth-server/deploy.sh`; credenciales
   PG/ADC por loaders canónicos: la CLI carga `loadGreenhouseToolEnv` y perfil `ops`. `--status` sólo necesita la conexión PG y no debe crear un cliente KMS.
 - No usar `--force` en rotación rutinaria ni asumir que estar ENABLED significa que no quedan tokens vigentes.
 
-## Secuencia manual existente
+## Secuencia manual supervisada
 
 1. `pnpm auth-server:rotate-key -- --status`: conservar el kid anterior y las fechas.
-2. Con identidad autorizada y configuración completa, `pnpm auth-server:rotate-key`: crea una versión KMS,
-   registra/activa la nueva y pasa la anterior a retiring. Guardar metadata y eventos de transición.
+2. El command nuevo sin argumentos crea una versión sólo con baseline verificada, 90 días cumplidos,
+   ningún `retiring` y ledger disponible. Persiste la intención antes de llamar a KMS; si se pierde
+   la respuesta, detiene la operación para reconciliación, sin otro create. Para recuperación manual
+   de una versión **ya inventariada**, `--register <version>` comprueba firma/verificación y la
+   activa; no usarlo como modo de omitir el ledger de una rotación rutinaria. Guardar metadata y eventos.
 3. Verificar que JWKS publica ambas, que el registry tiene una sola active y que una firma nueva se verifica
    con la nueva llave; demostrar también que un token sintético vigente previo conserva verificación.
 4. Esperar al menos `SIGNING_KEY_MIN_OVERLAP_MS` (una hora) **desde retiring_at** y el TTL máximo vigente más
@@ -28,16 +33,24 @@ sin un segundo almacén de llaves ni llave privada exportable.
    evento append-only y comprobar que JWKS deja de publicar el kid tras vencer las cachés.
 6. Deshabilitar sólo la versión KMS retirada y verificada, identificada desde el registry. No destruirla.
    Confirmar que emisión, JWKS y consumers siguen funcionando y documentar tiempos efectivos.
+   Deshabilitar impide volver a firmar con esa versión, pero sigue contando como versión activa para
+   [facturación de Cloud KMS](https://cloud.google.com/kms/pricing); no usar este paso como control de costo.
 
-## Automatización pendiente
+## Job aislado aceptado, rollout pendiente (2026-10-29)
 
-`ops-auth-key-rotate` no se encontró en el readback25Oct. El contrato previsto es SchedulerOIDC → ops-worker
-con flagOFF y jobPAUSED iniciales, antigüedad >80d, exclusión mutua e idempotencia durable de ventana,
-creación/registro/verificación y retirada separada tras solapamiento. No montar privilegios de administración
-KMS en el issuer público. Reintentos después de fallo deben recuperar la misma operación/version sin crear
-versiones indefinidas ni activar una llave cuya firma no se verificó. Esta descripción **no es implementación**.
+`ops-auth-key-rotate` no se encontró en el readback del 25-10. El texto histórico de TASK-1833 proponía
+Scheduler OIDC → `ops-worker`; la [decisión aceptada](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md#architecture-decision-2026-10-28--mantenimiento-aislado-de-llaves-task-1833)
+lo reemplaza por un Job dedicado con Scheduler OAuth → Jobs API, flag OFF, dry-run ON y Scheduler PAUSED de inicio.
+No montar privilegios de administración KMS en `ops-worker`, el portal o el issuer público por inferencia
+de este runbook. Hay candidato local de Job y migración, sin aplicar en cloud ni ejecutar. El
+[README del Job](../../../services/auth-key-maintenance/README.md) enumera los grants, baseline y readbacks.
+El comando sin argumentos de `pnpm auth-server:rotate-key` usa el ledger del candidato local y exige
+baseline verificada + 90 días; `--register` sigue siendo recuperación manual supervisada de una versión
+KMS existente. Un `create_uncertain` bloquea nuevas creaciones hasta reconciliación auditada.
 
-El scheduler se activa sólo después del ensayo y rotación manual verificados. La señal
+El primer ensayo debe comprobar emisión del **issuer**, no sólo firma con la SA del Job; tras activar
+una candidata, retirar/disable permanecen manuales. Un scheduler se activaría sólo después del ensayo
+y recuperación verificados. La señal
 `auth.keys.rotation_overdue` ayuda a detectar atraso pero no demuestra que se rotó.
 
 ## Fallos y recuperación

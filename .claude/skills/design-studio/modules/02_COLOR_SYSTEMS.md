@@ -140,6 +140,11 @@ cambian por región).
       del fondo bajo cada glifo (no el promedio).
 - [ ] Verificado sobre **la zona real** del texto, no sobre un swatch plano.
 - [ ] Si el fondo varía bajo el texto, hay scrim/gradiente/caja/blur — no solo text-shadow.
+- [ ] El oscurecido es el mínimo que hace falta, en este orden: (1) si la foto se lee a la primera, sin scrim;
+      (2) si no, un gradiente sutil sólo en la zona del texto; (3) si no alcanza, **adaptar la foto** (reencuadrar,
+      quitar elementos, bajar las luces del cielo) en vez de oscurecer más; (4) si aún no, otra foto. Sin sombra de
+      texto ni degradé pegado a las letras: en piezas animadas «se nota mucho con las transiciones» (caso SKY BLACK,
+      Daniela y Dianesty, 2026-11-06).
 - [ ] Legible también en el peor caso (imagen comprimida, thumbnail, dark mode del cliente).
 - [ ] El acento de color no compite con el color del texto por el foco.
 - [ ] Craft fino de tipo (peso/tracking) delegado a `typography-design`; acá resuelto lo visual.

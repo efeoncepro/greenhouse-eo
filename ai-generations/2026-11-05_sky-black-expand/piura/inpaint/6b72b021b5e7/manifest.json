@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "6b72b021b5e7",
+  "key": "6b72b021b5e704cabaa3064ebf78d5d78c517d26c07266b5684eaee5ec35c8e6",
+  "status": "failed",
+  "createdAt": "2026-11-05T21:24:06.343Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/piura/expand-inputs/742e9c342a24-canvas.png",
+    "imageSha256": "fabb499810eed0f2a31fef03ec376b2e062e772d262cb47a019867315c5c1f55",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/piura/expand-inputs/742e9c342a24-mask.png",
+    "maskSha256": "33226b0a5db490b966567bc4f6bbd4dbf2714f7ca7a1784f4dd1e1287d47e2a8",
+    "maskConvention": "white-editable",
+    "width": 800,
+    "height": 1422,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "Continue the same clear deep blue tropical sky upward above the palm trees of Mancora beach; complete the tops of the palm fronds naturally. No new objects, no birds, no clouds, no text.",
+    "providerPrompt": "Continue the same clear deep blue tropical sky upward above the palm trees of Mancora beach; complete the tops of the palm fronds naturally. No new objects, no birds, no clouds, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.3108298171589311,
+    "editable": 274400,
+    "soft": 79200,
+    "protected": 784000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 800,
+      "height": 1422
+    },
+    "target": {
+      "width": 800,
+      "height": 1424
+    },
+    "aspectError": 0.0014064697609000264,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.1,
+    "basis": "1 × 1 imagen(es) × 2 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "error": "fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing"
+}

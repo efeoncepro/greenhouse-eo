@@ -1,0 +1,23 @@
+{
+ "registro": "D",
+ "tipo": "B",
+ "portada": true,
+ "primerPlano": "the handle of a carry-on suitcase",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "noticia-gol-cl-v2",
+ "input": {
+  "id": "noticia-gol-cl-v2",
+  "registro": "D",
+  "tipo": "B",
+  "portada": true,
+  "lugar": "wide corridor of a generic modern airport terminal in Brazil (must not imitate Guarulhos, Galeão or Florianópolis)",
+  "escena": "a woman traveler with a backpack and a light jacket in her hand walks away toward the far end of a wide corridor with tall windows, heading to her next gate; outside the glass, green vegetation and a warm afternoon sky. It reads as a calm connection in Brazil, not a rush between flights",
+  "hora": "mid-afternoon",
+  "clima": "high clouds, warm abundant light, window highlights retained",
+  "primerPlano": "the handle of a carry-on suitcase",
+  "borde": "lower-left corner",
+  "prohibir": "aircraft or apron with aircraft visible through the windows, flight display screens, readable signage, GOL or SKY corporate colours, airline uniforms",
+  "extra": "COMPOSITION, MEASURED: the woman is farther away and small: her whole figure, head to feet, spans from 20% to 48% of the frame height, centred between 45% and 55% of the width. The lower half is the calm polished floor reflecting the windows, kept mid-tone and not bright; no bright reflections below the middle of the frame. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

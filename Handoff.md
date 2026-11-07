@@ -1,257 +1,362 @@
 # Handoff
 
-**31/10 — Prospección focal:** [Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
-Mayra: NDR de correo inferido, sin reintento. Dayanna: Apollo Verified/2 créditos, Contact/Primary y email SENT
-comprobados; LinkedIn previo. Pendientes Commercial: respuesta/brief, secundaria vacía y verificación de
-segmentos Mambrino. Skills espejo y canon actualizados; sin nueva comunicación o secuencia en este cierre.
+[Historial de sesiones](Handoff.archive.md).
 
-## 2026-10-30 — Mattis GRD-1555: oferta enviada en Wherex
+## 2026-11-06 — SKY BLACK 2026: rutas foco de Chile y Perú internacional (popup + story)
 
-[Expediente](docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md): enviada 30/10 17:11 por
-Julio (OK explícito), COP 120.000.000 netos de IVA; excepción de margen ≈ 17 % decidida por Julio, bajo el piso de 45 %.
-Pendientes: certificado de residencia fiscal SII (retención máx. 10 %, convenio Chile–Colombia art. 12), declaración de
-conflicto de intereses adjuntada en el reenvío de las 17:38 (sin comisión Wherex), claims SSilva/Berel/«+85» y permiso de logos (TASK-1937). Lecciones en skills
-espejo: Wherex (`wherex-radar-chrome-playwright.md`) y «La órbita» (`lessons.md`). HubSpot: deal 66672959873 en
-«Presentación de soluciones», COP 120.000.000, nota 120053981805. Sin push.
+- 16 rutas (Notion «Rutas foco (KV LISTO)» y BLACK SKY PE 26): CL DOM Concepción, Calama, Antofagasta; CL INTER Cusco,
+  Lima, Punta Cana, São Paulo, Mendoza, Río de Janeiro, Bariloche, Florianópolis; PE INTER Santiago, Buenos Aires,
+  Punta Cana, Río de Janeiro, São Paulo. Copy por tipo de ruta según Daniela (Teams); sin GIF (Daniela: sólo popup y story).
+- Fotos del banco, sin generar; cinco cambiadas para que el logo no quede sobre cabezas. Scripts propios
+  `rutas-foco.cjs/.sh`, `rf-page.cjs`, `rf-entregar.cjs`. Detalle: skill §4.13.
+- Canvas versión 66, página «KV Black · Rutas foco Chile y Perú inter» (imágenes como assets: el canvas está en 509/511
+  archivos). OneDrive `BLACK SKY 2026/HM CL|HM PE/RUTAS FOCO/<DESTINO>/` (32 archivos).
+- En revisión: las 32 también en `BLACK SKY 2026 - PARA REVISION/` (misma estructura, LEEME actualizado).
+- Notion: las 32 subtareas de pieza en «Listo para revisión», con fecha de envío 2026-11-06.
+- Difuminado B aprobado por Dianesty aplicado a las 16 rutas: reentregadas en OneDrive (ambas carpetas) y canvas versión 67.
+- Ajustes de Daniela (Teams) y Frame: degradé arriba y piso negro al 15 % sólo cuando hacen falta (flags opcionales `PISO_SUTIL`/`VELO_AUTO`
+  de `compose.cjs`, apagados por defecto), píldora de origen adaptable, fotos nuevas de Lima, Santiago y Buenos Aires.
+  Reentregadas en ambas carpetas y canvas versión 70. Legal débil en el popup de Cusco y el story de Concepción.
+- Pendiente: precios en 000, origen de Chile («DESDE SANTIAGO», inferido) y fechas del pie.
 
-## 2026-10-29 — Sales Navigator: búsquedas en cuatro mercados hispanos
+## 2026-11-06 — SKY BLACK 2026: décima ronda (logo BLACK nuevo + Frame «V2»), sólo POP-up y GIF
 
-[Inventario](docs/commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md): **24 búsquedas de cuentas/20 de personas**,
-Chile/México/Colombia/Perú; nombres/IDs verificados tras recarga. Persistencia completa, cobertura parcial:
-[diagnóstico Perú](docs/commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) CRM 58→81→106→868 y Growth 789.
-Sede/geografía cambian población; vocabulario ampliado cambia varios términos. No sumar ni calificar conteos.
-Las 100 observaciones de tarjetas previas no validaron compradores excluidos. Skill B2B espejo, política y
-capas documentales separan persistencia/muestra/cobertura, controles conocidos y contrastes por filtro.
-P89 offline preparada, sin evaluación conductual. Variantes temporales sin guardar; las 44 nativas intactas.
-Cupos documentados 50+50, sin prueba de borrado/recuperación ni recepción futura de avisos semanales.
-Listas 54/57 y servicios/Personas 12/5 sin cambio. Sin mensajes, solicitudes, InMail, CRM o scheduler externo.
-Próximo: auditar cobertura de las 20 consultas de personas antes de proponer reemplazos; mantener criterio
-comprador y prioridad agencias/proveedores. Commit local, sin push; cambios concurrentes preservados.
+- Logo nuevo de Daniela (`Despliegue Base/KV X HM/LOGO BLACK/`): mismo dibujo que el de `logofix` con el resplandor
+  original del kit. Se aplica con `patches.cjs → logoNuevo` en render/parts/layers. Su `ESP` trae la fecha en
+  portugués: se conservó la fecha viva por idioma.
+- Ajustes del Frame V2: orígenes (Miami, Buenos Aires, Santiago), gradiente suave tras las banderas de USA, popup de
+  AR Santiago reencuadrado, fotos de Punta Cana (Chile inter), Calama (familia generada, Julio aprobó ≈ USD 0,04) y
+  Machu Picchu («Vuela por el Perú»). `destinos.cjs` reemplaza ahora la foto en los clústeres raster (`capa`).
+- Entregado en OneDrive `BLACK SKY 2026`: 30 archivos (POP-up, GIF y GIF_AUDIO de las 10 carpetas). Story y story video
+  no se rehicieron (los exporta Daniela). Canvas actualizado (versión 61: 20 imágenes, 12 tableros, 10 videos). Detalle: skill §4.12.
+- Daniela: «no uses GIF, sólo MP4». Se retiraron los 10 `.gif` del lote (a la papelera, recuperables); queda el
+  `BS_GIF_*_AUDIO.mp4`. `organizar.cjs` ya no entrega `.gif`.
+- Canvas versión 62: los 14 tableros de animación de la Grilla pasan al MP4 con audio, con controles, y se titulan «MP4».
+- Canvas versión 63: sin story video en la Grilla (Julio: se iterará después).
+- Canvas versión 65: caras libres del logo (story PE internacional y popup AR Lima, este también en OneDrive).
+- **Aprobado por Daniela (2026-11-06): todas las piezas del lote GIF + POPUP.** Grupo cerrado.
+- Onceava ronda (Dianesty, Frame V3 + Teams): difuminado B aprobado en todas (default de destinos.cjs), MP4 en BT.709 (color del logo), píldora centrada, Uruguay con lista con nombres. OneDrive + canvas v68. Pendientes de Dianesty: Buenos Aires en USA, Miami en Uruguay. Supuesto: «DESDE MONTEVIDEO». Skill §4.13.
+- Doceava ronda (Teams, Dianesty y Daniela): sin sombras de texto, píldora con avión adaptativa (35 px, pildora.cjs), velo y piso sólo donde hacen falta (VELO_AUTO/PISO_SUTIL también en el KV), fotos adaptadas donde no alcanzaba (adaptar-foto.cjs). OneDrive + canvas v74. Skill §4.14.
 
-## 2026-10-27 — SKY: ADR y puente operativo probado localmente
+## 2026-11-06 — SKY BLACK 2026: novena ronda de POP-up y GIF (Daniela en Frame) entregada en OneDrive
 
-[TASK-2073](docs/tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md) cerrada sólo por sandbox:
-97 tests/68 checks A′/B PASS, red/FS restringidos. [Evaluación](docs/audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md).
-[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md): una Organization,
-Spaces separados y A′ recomendado, owner Finance común normalizado **antes** de candidatos. U01/U02/U02F antes de
-provisioning; no producción, fuentes, servicios o historia Diseño tocados, ni push/deploy. Types global baseline
-agotó heap; lint global 0 errores/26 warnings existentes. Aceptación ADR y foundations reales pendientes.
+- Se leyeron los comentarios de Daniela en las 10 carpetas Frame `BLACK SKY 2026/GIF+POPUP` (21 activos) desde el
+  Chrome de Julio, con sus dos referencias adjuntas, y el chat de Teams. Se aplicaron todos los cambios en el taller
+  (`ronda9.sh`) y se entregaron en `SKY Campañas/2026/10_Noviembre/BLACK SKY 2026/` (`organizar.cjs`): 55 archivos con
+  POPUP, STORY, GIF, GIF_AUDIO (nuevo, el GIF no lleva sonido) y STORYVIDEO en 11 carpetas.
+- Cambios: separador de puntualidad y «00%» en el clúster de Chile; costura de la flecha morada (ahora general en
+  render/parts/layers); «Chile» y precio centrados; «Vuela internacional» en Perú; «Vuela por el Perú» rediseñado
+  (COSTA/SIERRA/SELVA con miniaturas, mujer del kit; story sin lista); logos más chicos en los popups de Perú; UY con
+  título más grande; origen «Buenos Aires» en AR Santiago; fotos del banco para UY, USA, AR Santiago y PE internacional.
+  La familia de «Encuentra destinos» Perú se generó con el maestro SKY (Julio aprobó, ≈ USD 0,08).
+- Detalle y recetas: skill `efeonce-creative-workbench` → `sky-black-pipeline.md` §4.11.
+- Canvas de Claude Design actualizado (versión 59, 62 archivos y 24 videos). Pendiente: revisión de Daniela/SKY; contrato de fotos del Workbench
+  (`black-photos.json`) desfasado, se re-admite en un PR aparte.
 
-## 2026-10-26 — Blog: refresh de Pipeline y de marketing de contenidos publicados
+## 2026-11-06 — SKY BLACK 2026: Daniela aprobó las 30 rutas foco (Pucallpa story, la última)
 
-Pipeline (246045 → `/hubspot/pipeline-de-ventas/` con 301) y marketing de contenidos (244883, misma URL, 22:44 UTC)
-publicados con portada, hero, tarjeta e infografía «Una idea, cada formato» (adjuntos 252169/252170, sólo claras).
-Copias privadas 252161/252171 en la papelera; indexación de ambos pedida por la sesión de Analytics con OK directo de
-Julio. Registro, QA y rollback en [Pipeline §11](docs/public-site/HUBSPOT_PIPELINE_REFRESH_DRAFT_V1.md) y
-[marketing de contenidos §9–§10](docs/public-site/CONTENT_MARKETING_LEADS_REFRESH_DRAFT_V1.md). Receta de refresh y
-trampas de QA (host.js del Growth CTA, engine.js del gráfico, categoría principal de la copia) en la skill del sitio
-público §17. Pendiente: mapa de átomos de marketing de contenidos; tanda 2: GA4 formularios y Excel→HubSpot (246072).
+Teams 10:28 + Frame «V2»: todo aprobado; la story de Pucallpa no tenía su corrección («subir un poco más la torre, sin
+que choque con el logo», aviso de Frame 2026-11-05 17:05). Corregida con `lift` 0.07 en `fotos-destino.json` (la torre
+sube ~130 px; queda ~30 px bajo el logo). `split.py` mueve piezas entre carpetas: «APROBADO» 29, «PARA REVISION» sólo
+`BS_STORY_PCL.png` + LEEME. «BLACK SKY 2026» (1 archivo) y «ENTREGABLES BLACK» al día; canvas versión 53. Workbench:
+contrato de fotos + admisor idempotente **mergeados en `main`** (PR efeoncepro/creative-workbench#36, squash `8ed1c00`;
+conciliado: árbol idéntico, gates y pruebas en verde, story byte a byte igual). Pendiente: visto bueno de Daniela a la
+story de Pucallpa. **Cerrado el mismo día:** Daniela la aprobó (vía Julio); `split.py` con las 30 en `A`, «APROBADO» 30 y
+«PARA REVISION» sólo LEEME. Docs y skills sin pendientes de diseño; brief del Workbench mergeado en
+`main` (PR efeoncepro/creative-workbench#37, squash `0ee2bfa`; árbol idéntico a la rama, CI en verde). Sólo faltan las cifras de SKY.
 
-## 2026-10-26 — Rooms: entorno local y conectores listos
+## 2026-11-06 — SKY BLACK 2026: el Creative Workbench construye las piezas aprobadas con sus cifras
 
-29Oct: [conciliación completa docs/skills](docs/audits/rooms/2026-10-29-docs-skills-full-reconciliation.md)
-con3subagentes: arquitectura/manuales/Rooms/Auth/MCP, tasks y routers. Fuente3c7 intacta;
-AGENTS runtime actualizado en de38af5. Recovery8 PG16/18 ya ejecutado ahora tiene recibos versionados.
-Sin repetir pruebas, correo o servicios; UI/externos/rollout y retención Auth se conservan.
+Pedido de Julio: las piezas aprobadas por Daniela sólo esperan precio; el Workbench tiene que poder construirlas.
+**Workbench** (worktree `/Users/jreye/Documents/creative-workbench-sky-black`, rama `claude/sky-black-2026`, commit
+`ca44bd0` → **mergeado en `main` por PR efeoncepro/creative-workbench#35, squash `a47fea2`**, conciliado: árbol idéntico,
+gates y pruebas en verde, pieza byte a byte igual): familia declarada `brands/sky-airline/campaigns/black-2026/` que recompone KV, popup y
+story de las 39 piezas desde sus capas aprobadas (sha256, fuera de Git en `clients/sky/.resources-local/black-2026/`)
+y dibuja con Metric las cifras del job (importes, descuento, campos del legal vivo AR/UY/CL y el legal completo de
+PE/BR/US, que en el kit viene trazado; transcripción verificada en el contrato). Paridad con marcadores: 117 PNG,
+media ≤ 0,50/255. 39 jobs con `null` en `projects/sky/black-sky-2026/jobs/` hasta que SKY dé precios y fechas.
+**Greenhouse:** `taller/kvhm-canvas/exportar-workbench.cjs` (exporta capas sin cifras + fichas), skill
+`sky-black-pipeline.md` §19 + router + `state-continuity` (espejo `.codex`) y manual SKY 1.10 (paso 7i).
+**Pendiente:** cifras de SKY; fase 2 (GIF/MP4, story en video, PMAX, HPH);
+«DESDE BUENOS AIRES» desborda la píldora de AR Lima (el QA lo avisa).
 
-29Oct: [backend local listo para conectar](docs/audits/rooms/2026-10-29-backend-local-completion.md),
-Código Rooms3c7bcb5 sin push:337tests0skip, lint/types/build, Chrome18+23 y restore PG16/18
-(13migraciones/43tablas,23archivos/14pins) PASS. Colaboración/presentación, V4 mixto y MCPstdio;
-[contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y manual listos.
-Cierre local2070/2074–2078; UI2071/2072, Linux/cloud, conectores reales y rollout separados.
-Entorno detenido; Auth retenido en PR, sin producción/correo.
+## 2026-11-06 — Blog SKY: fichas del Content Hub plegadas en secciones y ronda de revisión de imágenes resuelta
 
-[Dos RP/adapters locales, retest](docs/audits/rooms/2026-10-28-two-rp-auth-ca97eecd1.md): Rooms8750750 + fuentes Authca97eecd1,35checks/Chrome/PGPASS. Checkout avanzó sólo docs a0ab888728; issuerQA, no server.ts completo. RP2 mismo consumer; sin rollout/HTTPS/MFA. Bases retiradas.
+**Content Hub:** Julio: «dejaste la chorrera de texto». Se plegaron 44 fichas del lote de noviembre y de las pruebas de
+octubre. Cada una tiene el callout 🧭 «Cómo leer esta página», el índice y cinco toggles h1: Brief, Research, Artículo
+(con la ficha SEO y el JSON-LD en sus propios toggles), Fuentes y hallazgos, y Producción y cambios. En las de octubre,
+la versión anterior quedó en un toggle 🗄️ y sus subpáginas V1, V2 y V3 siguen intactas.
 
-[Aislamiento RP focal](docs/audits/rooms/2026-10-28-cross-rp-persistence-focal.md):3PASS/0skip, servicios/persistencia con PG efímero; Rooms e0edf1e intacto, DB retirada. Dos aplicaciones RP/browser integral sigue pendiente.
+- El cambio sólo insertó etiquetas con `update_content`; no cambió texto ni propiedades.
+- Se leyeron de vuelta 7 fichas: balance 0 y sin etiquetas literales.
+- Cinco ya venían ordenadas y no se tocaron: Punta Sal, Tipos de equipaje, Zorritos y Año Nuevo en Santiago, con
+  toggles, y Cena chilena, con pestañas.
+- Tampoco se tocaron las fichas Idea de diciembre (sólo brief) ni los temas rechazados.
+- Norma en `sky-blog-seo-editorial/references/lote-editorial.md` §6; generador y verificador en
+  `outputs/sky-blog-content-hub-estructura/`.
 
-B10 reader real: [Auth8d027f747→Rooms e0edf1e](docs/audits/rooms/2026-10-28-b10-rooms-mcp-authority.md),16checks+8gruposPASS y SQLv7; datos/proyección sintéticos, sin revocación browser binding ni dispatch/MFA. Bases efímeras retiradas, sin publicar.
+**Imágenes de noviembre:** la ronda de Frame.io (35 comentarios de Melkin y Andrés) y del chat de Teams quedó resuelta.
 
-B10 ampliado: [MCP PostgreSQL y dos bases efímeras](docs/audits/rooms/2026-10-28-b10-rooms-mcp-postgres.md),16checks+8gruposPASS y SQL read-only; Rooms intacto e0edf1e. Límites grants/contexto/dispatch/MFA separados; procesos retirados.
+- CTA de escritorio centrado bajo la ruta (Workbench `d5281de`).
+- Retoques con máscaras que cubren objetos enteros; el cielo de N14 IMG 3 se cambió con una edición de la imagen
+  completa; N23 IMG 2 es nueva.
+- OneDrive en `V1/` (la entrega de las 09:11) y `V2/` (lo vigente) en 45 carpetas; 72 archivos difieren y el índice
+  tiene la columna «Versión».
+- Docs: skill `sky-blog-graphic-line` (lecciones, revisión, flujo, banners), sistema visual del Workbench §8.8 y
+  README de la pieza (`70c2adc`), expediente y manual de imágenes.
+- **La respuesta a Diseño en Teams está redactada y sin enviar**, a la espera del permiso de Julio.
+- Sin push en ninguno de los dos repos.
 
-B10 local28Oct: Rooms→MCP en el mismo navegador, consentimiento explícito/tokenread/write-stepup,16checksMCP+8gruposRoomsPASS;
-[recibo y límites](docs/audits/rooms/2026-10-28-b10-rooms-mcp-explicit-consent.md). Roomse0edf1e, Auth1136ac273; procesos cerrados, sin publicar.
+## 2026-11-06 — SKY BLACK 2026: taller rescatado a carpeta durable y prueba en frío
 
-B18 local28Oct: invitado OTP sin sesión interna/SSO;51checks,lint/typesPASS;
-[prueba](docs/audits/rooms/2026-10-28-b18-guest-without-internal-sso.md). Commit Rooms3b1b7b2, procesos detenidos; sin push/flags/deploy. Nueva UI pendiente de Claude Design.
+El taller del kit (scripts, kit corregido `src2/`, fotos de destino, fuentes y copia del canvas) vivía en el
+scratchpad temporal de otra sesión (`/private/tmp/…/556be26d…`), que se borra al reiniciar. Quedó en
+`ai-generations/2026-11-04_sky-black-gif/taller/` (≈ 1 GB en disco; en git sólo el código: 54 archivos, 384 KB, con
+`taller/.gitignore`; kit, fotos y fuentes con licencia quedan fuera). Rutas fijas al scratchpad reemplazadas por rutas
+relativas; nuevo `doctor.sh` (chequeo de arranque, solo lectura). **Prueba en frío:** un agente sin contexto, con solo la
+skill, copió el taller y corrió `rehacer-destinos.sh`: «LISTO», 21 piezas rehechas en ≈ 1 min 40 s y `formatos/` 78/78
+byte-idénticos (42 reescritos). `png/` varía unos píxeles en las piezas con flecha corrida (tolerancia documentada).
+Skill `efeonce-creative-workbench` (`sky-black-pipeline.md` §0, §4.5, §17 y §17.1; `state-continuity`;
+`sky-design-canvas`; espejo `.codex`) y manual SKY 1.9. `OUT/scripts/` quedó superada. Sin push.
 
-Rama runtime `codex/rooms-design-integration@2cddc98a`, sólo commit local. Next3216, PG55433 propio,
-issuer fixture19338 y datos/permisos sintéticos; SDKbrowser same-origin para DTO/commands/media/sesión.
-250testsPASS,lint/types/build y18checksAPIenChrome (imagen→publicación→guest,conflicto/replay/denegaciones);
-Playwright53PASS/3skip. [Manual](docs/manual-de-uso/rooms/integrar-claude-design-local.md),
-[evidencia](docs/audits/rooms/2026-10-26-local-design-integration.json).
-Queda conectar/aceptar UI Claude Design, entorno cloud si se decide y activación separada. AuthPR263/264
-OPEN sinmerge; producción no cambiada, sincorreo/push/deploy. Caché Next local puede regenerar archivos
-de tipos: revisar sólo sus cambios generados antes de commitear. Runtime limpio al checkpoint; entorno activo.
+## 2026-11-06 — Insights: búsqueda siempre con motores de respuesta (estándar) y Berel octubre rehecho
 
-## 2026-10-26 — Rooms/Auth: continuidad documental y conexión Claude Design
+**Decisión del operador:** todo informe con `seo` lleva `aeo`, lo más completo posible. `missingCompanionModules`
+(`contracts/request.ts`) lo impone en `validate-request.ts` (creación, revisión, recurrencias) y en
+`preview-edition.ts`; el alcance de contenido recorta sólo el capítulo SEO. Además: la vista previa imprime cada rechazo
+con su motivo, y lo esencial ya no dice «de 1.648 a 1.082 de 1.121» (`arrivalText`). Código local, sin push ni release.
+**Berel octubre rehecho con AEO** (análisis del 3-oct: 5 motores, Share of Model 41,7 %, Share of Voice 44,6 % frente a
+Comex/Sherwin-Williams/Behr, citas 26,8 %, sentimiento, visitas desde IA 1.121): A4 32 págs. y deck 25, reemplazados en
+OneDrive `Berel/Informes/` y en `~/Desktop/Berel - Informe octubre 2026/`. **El borrador de correo quedó desactualizado:**
+no menciona AEO; hay que sumarle los hallazgos de motores de respuesta antes de enviar (sigue sin enviarse).
+**Pendiente:** Claude (33,3 %) no entra a la figura de mención por motor porque no tiene período anterior; sale en
+texto y tabla (requiere cambiar `chart_spec_v1`).
 
-Estado y pendientes reconciliados en [dossier Rooms](docs/architecture/rooms/README.md),
-[contrato Claude Design](docs/documentation/rooms/backend-api-for-claude-design.md) y skills Rooms/Auth
-espejadas. Main Rooms e4b2e890 publicado: GCS/DB8/26tablas, worker automático y canary único comprobados;
-flags humanos OFF. Falta entorno aislado/datos/permisos, conexión UI same-origin, recorrido nuevo y
-activación general separada; restore8 no se infiere del ensayo histórico7. Claude Design conserva UI.
-Auth **permanece en PR263/264 por decisión humana**, sin merge main/develop ni deploy; revisión00168-vzb
-con emisor/login base activos, first-party/OTP OFF. CI263/264 y Vercel PASS en seguimiento posterior; ambas siguen abiertas.
-[Readback](docs/audits/rooms/2026-10-26-docs-skills-state-readback.json),
-[auditoría documental](docs/audits/rooms/2026-10-26-docs-skills-continuity.md).
+## 2026-11-06 — SKY: EPIC transversal formalizado
 
-## 2026-10-26 — Mass Chile: tres personas y cierre por canal
+[EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md) coordina TASK-2094
+(baseline 204 pruebas del 01-11) y siete nuevas TASK-2096–2102, todas to-do: autoridad/contexto, routing,
+Finance, alta hija local, readers/cache, historia y operación durable. Insights/portal mantienen sus dueñas
+2033/1960/1848/1849/1992 y1852–1857; GSC1655 conserva productor. No se reparentan ni duplican.
+[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), B recomendado;
+aceptación/apertura pendientes. Próximo ejecutable: TASK-2096 local, previa toma/plan de implementación.
+Grafo por hitos: foundation1852 consumible; gate SKY SEO1852 espera QA2094. Preparación2102 antes del canary,
+observación después; sin ciclo de cierre total. [QA documental](docs/audits/client-portal/2026-11-06-operational-accounts-epic/README.md).
+Registro y commit sólo documentales; no nueva corrida de tests runtime, no cambios en producción ni historia Diseño.
+Revisión contra código el mismo día ([hallazgos](docs/audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)):
+B se mantiene. Laboratorio usaba `session_360` del script de setup; la vigente elige Space sin orden. Cookie de usuario
+inactivo conserva claims sin límite; un P&L cerrado se reescribe. Tasks 2096–2102 con impact/archivos/criterios
+corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin código ni producción. Disco local al 98%.
+ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service explícito). ADR, `DECISIONS_INDEX`,
+EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
+TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
+determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. Señal `identity.operational_space.ungranted_user`; `pnpm test`
+y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Migraciones aplicadas** a la base
+compartida el 2026-11-06 (las dos de TASK-2096 y la de TASK-1833, con el rol `greenhouse_auth_key_maintenance` creado por migrator);
+verificadas. **Pendiente:** release del código a producción.
 
-[Expediente](docs/commercial/prospecting-agent/runs/2026-10-26-mass-chile.md): Yuri por email personal
-(excepción expresa) y DM; corporativo inferido rebotó, no reintentar. Guillermo/Judith: alta con Primary
-Company/campos/segmento182 y dos correos personalizados, firma gráfica, CCO y dos brochures originales
-por links nativos; Enviados y EMAIL SENT independientes. Cinco créditos históricos, sin nuevo gasto.
-[Auditoría](docs/audits/commercial/2026-10-26-mass-chile-docs-skills.md); dos skills espejo y dueños
-documentales actualizados. Corte17:04Chile, sin entrega/lectura confirmadas ni cadencia futura autorizada.
+## 2026-11-05 — Insights Berel octubre «sólo blog»: clics completos (ISSUE-191), valor estimado y redes
 
-## 2026-10-26 — ARMOR / Indecaucho: discovery y caso en construcción
+**Código (develop, sin push ni release):** `f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`. El capítulo SEO de
+Insights toma totales, serie, contexto del sitio y movimientos de páginas del control de Search Console sin la
+dimensión consulta (`readSeoSearchControlForWindow`, adapter `seo_report_adapter_v2`); la cascada suma «Consultas que
+Google no muestra»; si el control falla, límite, nunca la tabla. Nuevo `organic_value_usd` (`readOrganicTrafficValueForWindow`,
+sólo CPC capturados, sin CPC = límite) y `site.social_sessions`/`social_source.*` de GA4. CLI de valor orgánico con
+`--markets --brand --content-scope` y `sc-domain:`. Vista previa con `--modules` y `--title`; fix de etiquetas gemelas.
+Necesita `GROWTH_SEARCH_CONSOLE_ENABLED` + OAuth de Search Console en el runtime que genera la edición.
+**Berel:** blog octubre 4.094 clics (antes se habrían impreso 1.065); el informe de septiembre entregado el 2026-10-12
+imprimió 799 de 3.540. Compra CPC MX única autorizada (508 consultas, task DataForSEO
+`11041847-1987-0607-0000-0e19efc03a45`, USD 0,04836). PDF A4 (18 págs.) y deck (14) desde la **vista previa local**, no
+por el flujo de producción, en OneDrive `Alineación/1. Clientes (Interno)/Berel/Informes/`.
+**Correo a Berel: redactado, NO enviado** (Para María Fernanda Vega, Anel Garza y Marcela Espinoza; CC Valentina Hoyos y
+Daniela Ferreira; CCO HubSpot; debía salir el lunes 2026-11-02, pide disculpas y explica visitas desde redes y la
+medición completa de clics). **Los PDF muestran el valor publicitario de ~US$ 85 (A4 págs. 6 y 14, y el deck) que el
+correo omite por decisión del operador:** confirmar con él antes de adjuntar.
+**Pendiente:** push + release; tablero SEO y demás readers de `seo_gsc_daily` siguen sumando el subconjunto
+(ISSUE-191 open); corrección de URLs migradas en movimientos (hoy regla manual); captura de CPC de consultas nuevas por
+mes es manual. Docs: funcional Insights 1.26, valor orgánico 1.1 (funcional y manual), manual Insights 1.23.
 
-[Expediente único](docs/commercial/accounts/indecaucho-armor/README.md): Katia respondió y pide propuesta
-para ARMOR; terna posterior sin selección. Invitación27/10 14:30–15:00Chile y confirmación26/10 14:28
-con firma/CCO verificadas; cadena HubSpot de cuatro contiene la confirmación, no cuatro envíos nuevos.
-Tres subagentes ampliaron marca/canal/digital y método. Guía de reunión y caso v0 listos, economía
-pendiente de discovery. Skills/mirrors y fixtures v16 actualizados; [cierre](docs/audits/commercial/2026-10-26-armor-discovery-case-docs-skills.md).
-Lectura posterior **HubSpot/Notion** autorizada y programada una vez27/10 16h en este hilo; app ID
-`armor-leer-discovery-y-completar-caso`. Configurada/releída, aún sin ejecución/transcripción. Global
-PAUSED conservado; no nuevos contactos, Deal/Lead, etapas, secuencias, precio o envío.
-Registro final pedido después: NOTE119606905700 y TASK119625704196, Julio/TODO/NOT_STARTED,
-27/10 16hChile; cuerpos, fecha/owner y ambas asociaciones releídos. La revisión sólo actualizará esa TASK.
-[Señal y seguimiento previos](docs/commercial/follow-up-agent/runs/2026-10-26-indecaucho-documento-seguimiento.md)
-se conservan; respuesta posterior no prueba causalidad.
+## 2026-11-05 — GPT Image 2.6 (Sunburst/Flare) en la CLI, junto a 2.5
 
-## 2026-10-26 — Blog: pilar Loop Marketing publicado y barrido de docs y skills
+**Código (develop, sin push):** `src/lib/ai/openai-image.ts` (modelos 2.6 + `gpt-image-2-2026-04-21`; tabla de capacidades
+con `complexity`/`svgOutput`/`gifOutput`/`markup`/`tokenFamily`/`shutdownDate`; `assertOpenAIImageOptionsSupported`;
+estimación 2.6 = tokens 2.5 × factor medido; `svgUsage`; `imageModel` en el tool de Responses), `scripts/ai/generate-image.ts`
+(flags `--complexity --format gif|svg --svg-model --svg-effort --frames --frame-ms --markup --compression --moderation
+--estimate`; ayuda con la tabla «¿2.5 o 2.6?»), adaptador de `ai:inpaint` (acepta 2.6, Sunburst 2.5 y 2.6 sin máscara,
+`complexity: low`). Default de `ai:image` → `gpt-image-2.5-flare` (operador, 2026-11-05; `gpt-image-2` con `--model`);
+el runtime sigue `gpt-image-2`. Tests focales 200/200, typecheck y lint limpios.
+**Evidencia:** `ai-generations/2026-11-05_gpt-image-2-6-canary/` (`results.json`, `cli/`, `cli/rayado/`), clave personal,
+~USD 1 en total. Medido: tokens 2.6 a 1024² low 824 · medium 1.449 · high 1.758 · xhigh 3.122 · max 7.024; SVG exige
+`svg.model`; GIF también en edits, hoja ≤ 3840 y 8,3 MP (9×640² sí, 9×1024² no); markup en 2.5 y 2.6 sin tokens de
+entrada extra; rayado sobre la foto funciona; Sunburst 2.6 + máscara del pipeline = panel negro; Flare 2.6 PASS; el tool
+de Responses aceptó `tool.model` 2.6 aunque la ficha oficial dice que no.
+**Docs:** guía de modelos §2/§4/§5.1/§7/§8/§9/§12, matriz del proveedor OpenAI, arquitectura del generador, skills de
+imagen/diseño/ads/social, manual nuevo `generar-y-editar-imagenes-con-gpt-image.md`, funcional y manual de inpaint.
+**Pendiente:** canario de identidad de personas con 2.6 antes de usarlo en fotografía de marca; comparar 2.5 vs 2.6 en
+una pieza final real; Batch de 2.5 sin confirmar; `models:inventory`/`freshness` no cuentan los ids de OpenAI; el commit
+`48f6dd6de` y este trabajo siguen sin push.
 
-- **Pilar publicado:** «Qué es Loop Marketing» (248398) en `/loop-marketing/que-es-loop-marketing/`.
-  - 248483 quedó en borrador, con un 301 de Yoast hacia el pilar.
-  - Portada 252148, `hero` 252149 y tarjeta 252150.
-  - Lleva lo verificado de UNBOUND 2026.
-  - Sin la sección de transparencia, por decisión de Julio.
-- **Detalle y rollback:** [borrador del pilar](docs/public-site/LOOP_MARKETING_REFRESH_DRAFT_V1.md) §4 y sus deltas.
-- **Content Factory:** el embed de YouTube lleva la URL en su propia línea.
-- **Reglas nuevas:**
-  - voz de Julio §4.5 y §4.6;
-  - no exponer la caída de un contenido propio (`AGENTIC_BLOGPOST_AUTHORING` §8);
-  - fusión de posts (skill del sitio §16);
-  - Loop 2026 en `hubspot-solutions-partner`.
-- **Casebook cine:** fallas 59–64 de portadas sin persona y dos recetas nuevas en `cine-recetas.json`.
-- **Pendiente:**
-  - indexación en Search Console del pilar y de `/aeo/seo-y-aeo/` (la hace una persona);
-  - 248513, sin decidir;
-  - grabación de UNBOUND (sesión del 17-sep);
-  - [brief Taste Profile/4 Rs](docs/public-site/LOOP_TASTE_PROFILE_4RS_ARTICLE_BRIEF_V1.md), por validar demanda.
-- **Coordinación:** las sesiones del blog autorizaron purgar la caché después de republicar contenido sin
-  consultarles, salvo cuando haya despliegues de plugins.
+**Glitch Flash publicado:** [artículo y cierre](docs/public-site/glitch-flash-images-2-6/README.md), post 252401,
+autor Julio, cuatro pruebas crudas de Nexa, cinco Drops. Corrección del operador: dos Vimeo incrustados con
+captions; autoría `youtube | vimeo` y filtro responsive de la clase editorial en el runtime canónico, desplegado
+con hash/backup. Reproducción y ratios 16:9/4:1 comprobados a 1440/390, sin desborde. 90 tests de autoría y
+39 checks del parser WordPress PASS. Código local sin commit/push; backups y hashes de rollback en el cierre.
 
-## Antecedentes25–26Oct — Rooms/Auth antes de la conciliación documental
+## 2026-11-04 — SKY en Claude Design: CyberSky Perú y kit BLACK
 
-### 2026-10-26 — Rooms: backend Codex y diseño Claude Design
+**Artifacts privados:** DS [«SKY Airline — Performance»](https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei) (desde las
+126 adaptaciones del pack SKY 0.1.0; Metric Regular/Semibold/Bold/Black, **sin Medium**) y canvas
+[«SKY CyberSky Perú — Adaptaciones»](https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee) (v21; DS instalado por copia).
+Páginas: Internacionales + Nacionales (66 piezas CyberSky, 22 destinos × popup/post/story), Plantillas, KV Black · HM
+(12 KV fijos), KV Black · Animación GIF (12 videos en bucle + 6 referencias + previa con audio), KV Black · Popup y
+Story (24 estáticos). **Local, sin versionar:** PDF de 66 páginas en `~/Downloads/`; `ai-generations/2026-11-04_sky-black-gif/`
+(12 GIF, 12 MP4, 12 MP4 con audio, `estaticos/`, `scripts/`) y `ai-generations/2026-11-04_sky-cybersky-peru/` (21 selfies
+GPT Image, ~USD 5,3 con clave personal autorizada). **Sin confirmar por el operador:** «S/» vs «$/», miles con coma, origen
+Lima, tramo del legal y elementos sólo de Cusco. **A corregir en la fuente (OneDrive no se tocó):** bandera CL que es AR,
+`SKY-13.svg` es Brasil, derechos de medalla y foto con marcas de IA, flecha en 3 piezas, clúster internacional
+desalineado y con franja, textos DCTO/«tramo»/«Stock» inconsistentes, legales trazados, sin logos de alianza ni URL.
+[Manual](docs/manual-de-uso/creative/adaptar-kv-sky-en-claude-design.md) · [funcional](docs/documentation/creative/adaptaciones-sky-en-claude-design.md).
+**Segunda ronda (pedidos de Daniela por Teams, 2026-11-04):** logo BLACK corregido en todas las fuentes (fecha
+«25 de noviembre al 2 de diciembre» en ES/PT/EN, línea del marco flexible, menos resplandor) con `logofix.cjs` → `src2/`
+y todo rehecho en cascada (KV, partes, popup/story, GIF, PMAX, HPH). Nuevas páginas del canvas: «Grilla por mercado»
+(12 mensajes CL/PE/AR/UY/BR/US con KV, popup, GIF, story y story video de 5 slides con audio), «Rutas foco Perú»
+(13 rutas, popup + story, PromPerú y ubicación placeholder) y «Chile KV listo» (TikTok ×3, DAT ×2, PMAX ×4 desde los
+editables). HPH por mercado con la lista de banderas del mercado. **Por confirmar:** BR «Voe para Peru» (alianza o KV),
+«Vuela por Perú» sin fotos, «Encuentra destinos» CL hecho con el clúster internacional, frases INTER del brandlift y
+traducciones, tapa vertical ES recortada de la horizontal (falta en el kit).
+**Entrega en OneDrive (2026-11-05):** los 321 entregables (sin `scripts/`) quedaron en una carpeta nueva,
+`Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/` (GIF Y VIDEO KV, KV ESTATICOS, POPUP Y STORY, RUTAS FOCO
+PERU, CHILE KV LISTO, STORY VIDEO 5 SLIDES, PMAX, HPH; 626 MB), verificados byte a byte con `diff -rq`/`cmp`. El kit
+no se tocó; la subida a la nube depende de la sincronización de OneDrive.
+**Documentación completa (2026-11-05):** catálogo técnico de formatos y taxonomía (`sky-format-catalog.md`), pipeline
+script por script (`sky-black-pipeline.md`), catálogo funcional (`docs/documentation/creative/catalogo-formatos-sky.md`)
+y manual v1.4. Se encontraron 6 PMAX 1080 de DOM-RUTA/INTER-RUTA con la fecha vieja del logo: se recopiaron desde su
+popup, KV y story en local y en OneDrive (`cmp` idéntico). Scripts, `bbox.json`, manifiesto e inventarios quedaron
+persistidos en `ai-generations/2026-11-04_sky-black-gif/scripts/` (el scratchpad es temporal).
+**Tercera ronda (2026-11-05, Teams):** las 15 rutas foco del CSV de Daniela llevan su foto aprobada, legal, ubicación
+y crédito; «Vuela por el Perú» y AR Santiago/Lima llevan foto del destino (`destinos.cjs`, `fotos-destino.json`). Todo
+quedó ordenado en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en GIF + POPUP, `organizar.cjs`); canvas en versión 38: foto
+completa con degradado superior del 20 % a 0 (sombra y cielo prolongado rechazados), créditos arriba a la izquierda y story
+con PromPerú entre precio y pie. **Pendiente:**
+fotos de Chiclayo y Talara; ubicación del CSV ≠ foto en Pucallpa y Trujillo; «DESDE LIMA» deducido; CL «Encuentra destinos».
+**Cuarta ronda (2026-11-05, 11 comentarios del canvas, versión 40):** velo diagonal del logo con intensidad medida por
+foto (reemplaza al degradado plano 20 %), regla destino ↔ flecha de precio a 40 px (`brecha.cjs` en el SVG y
+`compose.cjs` en popup/story; también corre los popups de los KV del kit), Chile Travel pegado a la esquina, AR
+Santiago con foto de verano, story de Tacna reencuadrada, stories con PromPerú centrado y marca de agua y ubicación
+pegadas arriba, aro de banderas de 2 px (KV, GIF, story en video y HPH por mercado). Actualizado en canvas,
+`BLACK SKY 2026` y ENTREGABLES. **Por confirmar:** que la regla de la flecha valga también para los popups del kit.
+**Quinta ronda (2026-11-05, Teams y Frame.io, canvas versión 44):** gradiente de referencia de Daniela
+(`GRAFICOS/Gradiente para imagenes`, negro 69 % → 0) en lugar del velo diagonal. A todo el alto tapaba caras (rechazado por
+Julio) y quedó acotado bajo el logo (`FADE_FIN` 0,42/0,50/0,46), con comparación A/B enviada. Talara (ballena) y Chiclayo
+(Muelle de Pimentel) con foto de `BANCO DE VIDEOS/02_PERU/PROMPERU/` y ubicación del CSV; Iquitos, Talara y Chiclayo
+reencuadrados con `lift`; stories en video de AR Lima, AR Santiago y «Vuela por el Perú» con el destino en intro y
+brandlift. `BLACK SKY 2026` (46 archivos) y ENTREGABLES actualizados. **Por confirmar:** largo del gradiente; foto de
+Chiclayo (Daniela sólo comentó Talara). Los comentarios de Frame.io no se pueden responder desde aquí.
+**Sexta ronda (2026-11-05, Frame.io `https://f.io/VZlcCQta`, canvas versión 47):** 30 comentarios de Daniela sobre las
+rutas (versión de la cuarta ronda). Aplicados: Ayacucho sin personas (reencuadre), Trujillo popup con más cielo, crédito de
+PromPerú a 18 px en la story, y stories de Piura, Arequipa, Juliaca y Pucallpa expandidas hacia arriba con GPT Image 2.6
+Flare (fal sin saldo en sus dos cuentas; ≈ USD 0,15, aprobado por Julio). `BLACK SKY 2026` (30 archivos) y ENTREGABLES al día.
+**Por confirmar:** story de Tarapoto («APROBADA» con estado de ajuste) y story de Tumbes (sin comentario).
+**Séptima ronda (2026-11-05, segunda revisión en Frame y Teams, canvas versión 51):** Talara = Playa Las Pocitas y Piura =
+Playa Vichayito (foto y ubicación de su carpeta; `ubic` en `fotos-destino.json` manda sobre el CSV), story de Tarapoto
+expandida (≈ USD 0,04), piso más alto en el popup de Cusco y degradado inferior negro en las piezas con foto de destino (GIF
+y story video de AR Lima, AR Santiago y «Vuela por el Perú» rehechos). Carpetas `BLACK SKY 2026 - APROBADO` (19) y
+`- PARA REVISION` (11 + LEEME) en `10_Noviembre/`. **Pendiente:** visto bueno de Ayacucho, Chiclayo y story de Pucallpa.
 
-Auth separado: corrección preparada en PR263 (main,5e1fc2554) y264 (develop,aabd6d78d), **retenidas en PR
-por instrucción expresa del operador**, sin merge ni deploy.22Python+14contratosVitest/gates/hook normal
-PASS;CI general de HEAD nuevos pendiente, tras corregir fixture/espejo que fallaron en primera pasada.
-No release262 ni flags/correo/workflows ajenos. Revisar filtros de deploy por src/lib antes de264.
-[Auditoría y límites](docs/audits/rooms/2026-10-26-auth-deploy-control.md).
+## 2026-11-04 — Fix del BreadcrumbList en efeoncepro.com, pushes y CLAUDE.md bajo presupuesto
 
-Disparo automático posterior ya verificado: Rooms main `e4b2e890` (PR3), endpoint de máquina con OIDC
-y Scheduler cada minuto. Vacío200 sin contenedor; demanda sintética en la misma sala archivada202→Job
-`4r9nz` SUCCESS, cola vacía/ack liberado y publicaciones intactas. Ocho migraciones/26tablas, worker
-por digest `d49995de…`,234testsPASS. Flag dispatch ON; flags humanos web OFF; cero correos y ningún
-cambio UI. [Prueba](docs/audits/rooms/2026-10-26-automatic-media-dispatch.json). Claude Design conserva frontend.
+**SEO (en producción):** GSC avisó «Falta el campo "item" (en "itemListElement")» (3 correos idénticos; que vengan
+de varias propiedades de GSC es inferencia). Causa: Yoast emite en la portada un BreadcrumbList de un solo ListItem
+sin `item`. Fix: mu-plugin `wp-content/mu-plugins/efeonce-breadcrumb-single-item.php` (repo
+`efeoncepro/efeonce-public-site-runtime`, commit `64d8c59`), instalado en Kinsta con
+`scripts/public-website/install-breadcrumb-single-item-mu-plugin.php` (commit `fa3f57dbf`). Verificado en vivo;
+re-barrido de 113 URLs del sitemap con 0 problemas. Detalle técnico, funcional y manual en `docs/public-site/`.
+**Pushes:** runtime `main` `29bf792..64d8c59` (39 commits pendientes, incluido el fix); `develop`
+`985f84d3c..fa3f57dbf` (61 pendientes) y luego `fa3f57dbf..0992618ea`. **CLAUDE.md:** las filas nuevas del router
+(Motogas, Berel, Blog SKY) lo dejaron en 35.321 tokens y falló «CLAUDE.md governance»; `0992618ea` compactó filas cuyo
+detalle ya vive en su doc o skill: 34.652 tokens, 0 huérfanos, check en `success`
+([lección](docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md)). Lecciones del carril de push desde la shell del
+agente: delta 2026-11-04 de [local-first](docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md).
+**Pendiente:** el operador marca «Validar corrección» en GSC. CLAUDE.md queda con ~350 tokens de margen: la próxima
+fila del router es un puntero corto o exige compactar antes.
 
-Canary real de Auth y una imagen completado; flags OFF: Microsoft/MFA, una sala sintética y PNG físico de 3 MB por GCS→Job→dos WebP; preview de 304 KB con SHA/ETag/SQL coincidentes. Un correo recibido: código correcto200/incorrecto400/replay404, lectura privada200 y revocación401/404. Invitación revocada y sala archivada. Final Rooms main a87852e OFF y Auth00168-vzb OFF, misma imagen; Resend producción v1 y Sentry production corregidos. [Prueba y límites](docs/audits/rooms/2026-10-26-auth-rooms-real-image-canary.md). Bootstrap b2f90fa local sólo habilita edición/reapertura de esa sala. Al terminar ese canary quedaban consumidor Claude Design, disparo del Job y workflow Auth staging pendientes (deltas posteriores arriba). Sin full suite repetida ni release de Greenhouse.
+## 2026-11-04 — Prospección contextual: envíos verificados y workflow guardado
 
-Bloque de infraestructura cerrado: bucket GCS privado con IAM/CORS y SA, 7 migraciones/25 tablas cloud, rol worker con límite 2 y secreto v1; Job CPU 1/RAM 1Gi, timeout 240s y cero reintentos, con una ejecución de cola vacía SUCCESS. Variables GCS preparadas para próximo deploy; app OFF, sin Auth/correos/UI/scheduler ni otro deploy. [DB](docs/audits/rooms/2026-10-26-media-database-infra.json), [storage](docs/audits/rooms/2026-10-26-media-storage-infra.json), [worker](docs/audits/rooms/2026-10-26-media-worker-deployment.json). Canary OIDC y de imagen real, consumidor y disparo del Job quedan para el siguiente bloque. Lint del script y typecheck global PASS; no se repitieron las 225 pruebas anteriores.
+[Paula / Cristian](docs/commercial/prospecting-agent/runs/2026-11-04-paula-cristian-contextual.md): **2 InMail y 1 email enviados**;
+conversaciones LinkedIn, Enviados de Outlook y EMAIL `120319391872` `SENT` verificados por separado.
+Cristian: Contact `260252351138`, Company `60546887588` y Primary confirmados; landing, brochure original,
+firma gráfica y CCO preservados. Paula: sólo LinkedIn, se pidió correo laboral; **CRM, brochure personalizado
+y email pendientes de respuesta**, sin usar su correo personal. Owner: Julio / Commercial. Esperar respuestas;
+no duplicar altas, enriquecimiento ni envíos, ni programar seguimientos. Envío no acredita entrega/lectura.
+[Workflow Codex](.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md) y
+[espejo Claude](.claude/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md), accesibles desde
+sus skills y el manual. Invocación: «Aplica el workflow de prospección contextual a estas personas».
 
-Actualización posterior autorizada: backend fusionado en `efeonce-rooms/main@a87852e` vía [PR2](https://github.com/efeoncepro/efeonce-rooms/pull/2), sin los doce paths visuales2071.225tests+lint/types/build,53 browserPASS+3skip,CI Docker/previewPASS; flagsOFF sin cambios. [Recibo de despliegue](docs/audits/rooms/2026-10-26-production-backend-release.json). Recursos/migraciones/worker cloud y canary pendientes; no correo ni deploy Auth/Greenhouse.
+## 2026-11-02 — Carril CLI de agentes para Rooms en producción y aceptado (TASK-2095 + TASK-2087)
 
-Asignación humana vigente: Codex backend; Claude Design interfaz. TASK-2072, runtime rama `task/2072-cloud-media-backend`, commitd056708 y [PR1](https://github.com/efeoncepro/efeonce-rooms/pull/1) draft contra el scaffold rescatado.225/225testsPASS0skip,lint/types/build,PG16/18restore2tenants/6rooms y CI DockerLinux/decoderPASS. GCS/directPUT/generaciones y workerComputeperfilpropio preparados; ningún JSX/layout/motion nuevo. Main20f9fe9 conservado. Bucket/IAM/CORS,rol/SA/secretworker,migracióncloud/canary siguen pendientes;CLI+ADC renovados por runner canónico y verificados vigentes; readback confirma bucket/SA/secret worker aún ausentes, lectura Job no concluyente. [Contrato frontend](docs/documentation/rooms/backend-api-for-claude-design.md), [recovery](docs/audits/rooms/2026-10-26-media-backend-recovery.md). No cerrar2072 por código/fakesSDK ni activarflags por conectar diseño.
+Enmienda **D1-bis** al [ADR del carril](docs/architecture/rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01)
+(«CLI primero, gateway después»): un agente opera Rooms en producción con el login de una persona interna, sin MFA por
+acción. **En producción:** Efeonce ID con la audiencia `https://efeonce-rooms.vercel.app/api/v1` y los clientes
+`efeonce-rooms-cli`/`efeonce-rooms-resource` (hotfix PR #267, release `69b0ba90832c`, `auth-server-00172-zcn` al 100 %,
+2026-11-01); Rooms con el verificador del bearer y `pnpm rooms login|logout|whoami` (PR #22 `9a4340a`, carril encendido por
+el operador en `efeonce-rooms-15djjyfz2`, PR #23 `3434ea8` con `/cli/conectado` y `/cli/error`). **Aceptación:** tras un único
+`pnpm rooms login`, el agente creó y publicó la sala `demo-volta` en «Efeonce» (edición `87dd99b7`, 17 acciones
+`cli/claude-code`, sin invitaciones); `logout` y un segundo login verificados por el operador. Interruptores:
+`ROOMS_AGENT_LANE_ENABLED=false`, suspender `efeonce-rooms-cli` o vaciar `AUTH_SERVER_ROOMS_AUDIENCE`
+([manual](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md)). **Pendiente:** copy del consentimiento
+`75b40772d` (sólo `develop`, sale con el próximo release completo); cierre formal de 2095/2087 (siguen in-progress, ver sus
+criterios abiertos); la sala vista con sesión humana en `/rooms`; `read.client` tras la revisión de gobierno de datos IA;
+gateway TASK-2086 (sólo el canje) → TASK-2088. Rama: Greenhouse `develop` (docs y `src/lib/auth-server`), Rooms `main`.
+Siguiente ID libre: TASK-2096.
 
+## 2026-11-02 — Pantallas de Efeonce ID con La órbita (develop, sin release) y fin del login de la CLI de Rooms (vivo)
 
+**Efeonce ID** (commit `d14b786d3`, local, sin push): todas las pantallas salvo el login V4 usan el shell
+`src/lib/auth-server/oauth/pages/orbit-shell.ts` (canvas aprobado por el operador). Órbita canónica alrededor de un ícono
+AXIS en reposo o de una palabra, una esfera por pantalla, titulares Bricolage, código de seis casillas con modo respaldo,
+marca de `efeonce-rooms-cli` por id exacto. Assets por `pnpm auth-server:brand-assets:generate` (drift en
+`orbit-shell.test.ts`). Gates: 784 pruebas de `src/lib/auth-server`, typecheck y contraste verdes. **Pendiente:** `pnpm build`,
+flujo real contra el host y el release gobernado a `main` (mismo servicio que el login MCP; requiere autorización).
+**Rooms** (PR #23, merge `3434ea8`, en producción y verificado por el operador): el callback loopback de `pnpm rooms login`
+responde 303 a `/cli/conectado` («Listo») o `/cli/error` («Casi», motivo cerrado), sin code ni tokens en la URL.
+Manuales y doc técnica: [pantallas Efeonce ID](docs/manual-de-uso/identity/operar-pantallas-efeonce-id.md) ·
+[CLI de Rooms](docs/manual-de-uso/rooms/operar-rooms-con-agentes-por-cli.md).
 
-Claude auditó con tres subagentes de solo lectura: [registro de estado](docs/audits/rooms/2026-10-25-rooms-auth-status-after-codex-stop.md). Auth `auth-server-00166-p77` (`754a2a28`) vivo con first-party y OTP **OFF**, Login V4 servido; PR #262 draft con CI pendiente; promoción a main, flags y único canary a `jreyes@efeoncepro.com` pendientes; ningún correo enviado. Rooms `20f9fe9` en Vercel con `ROOMS_*` OFF, DB `rooms_production` 5 migraciones. WIP medios TASK-2070/2071 **sin commitear en `efeonce-rooms`** y con `typecheck` rojo (TS2322): llevar a rama, nunca a `main` (cada push es producción). Skills vivas nuevas `efeonce-rooms` y `efeonce-auth` (espejo Claude↔Codex) con ledger del programa. Segunda auditoría (§6): EPIC-044 tiene 27 unidades, sin repo propio, sin logins nativos desde 26/9 porque faltan los conectores de Codex y Claude (TASK-1904/2000; MCP construido y probado), `develop` despliega el emisor productivo. TASK-1829 cerrada (administrativa). 1828/1830/1832 NO listas (llave v1, passkeys 2 navegadores, muestra steady). PR #262 CI verde sin promover. Medios de Rooms rescatados en rama local `efeonce-rooms` `task/2070-2071-private-media` (`c0facfd`, `2626921`, `7ca5fd3`: limpieza, worker `--loop`, hijo sin `tsx`, DO en migración; verify 207/207), `main` sigue en `20f9fe9`. Demo de Rooms **no aceptada** por Julio (busca algo más inmersivo): Rooms en pausa hasta revisar la dirección con maqueta. Login V4 vivo en `auth.efeonce.org/login`; entrar a Rooms con él sigue OFF. Siguiente (con créditos Codex desde 1/11): release #262 + canary único, conectores Codex/Claude, separar deploy de Auth, higiene de seguridad.
+## 2026-11-02 — Botón «Continuar con Efeonce ID» canonizado
 
-## 2026-10-25 — Auth: Rooms primero y login V4
+«Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (Efeonce | ID con «ID» en la tinta del texto) en
+`axis-brand-assets` 0.4.32 (publicado en el release `v0.4.32`, AXIS `0d45749`, 2026-11-02, readback en GitHub Packages; 59/59 pruebas del paquete y 179/179 del Lab). Anatomía,
+tamaños y los diez estados en el README del paquete y en el [ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md).
+Pendiente: primitive en `axis-ui-primitives` y adopción en Rooms, Studio y Greenhouse.
 
-1834/2064/2067 y consumer Rooms verificados localmente; Greenhouse diferido2063. Goal de producción controlada autorizado con único correo a jreyes@efeoncepro.com; migraciones1834/2067+registroRP+secretosv1 aplicados y verificados, aún sin deploy/envío real.1833 en ejecución: Julio sustituyó pentest contratado por evaluación propia; openredirect magiclink corregido y146testsPASS separados, señales5nuevas/PGaislado, workflow flags+secretrefs y senderOTP trackingOFF. Revisión ofensiva CIMD bloqueada automáticamente; patchdefensivo+magiclink192PASS/tscPASS, no pentest completo. [Rollout](docs/audits/identity/2026-10-25-auth-rooms-controlled-rollout.md), [evaluación](docs/audits/auth-server/2026-10-25-independent-protocol-review.md), [preflight](docs/audits/identity/TASK-2067-production-preflight-2026-10-25.md), [base local](docs/audits/identity/2026-10-25-auth-rooms-first-local.md). Peer «Mira el epic de rooms» posee2068UI/WAF/cloud; coordinación continua, sin activar antes de readiness común. Harness OIDC+OTP19336 activo sólo para QA UI3210 del peer; cleanup al terminar. Release en preparación: contención duradera correos Growth OFF, lint gráfico mecánico corregido; fullsuite detectó mirror de rutas Auth incompleto, corregido con2paths y13retestPASS;21598testsPASS/383skip. Lint heredado21whitespace corregido conASTidéntico; lintglobal0errors; tsc del toolingRooms falló y fue corregido d4a1d16e0, nueva pasada globalPASS. PR262 remoto; CI/build/smoke pendientes. Recibos completos pasan a .auth0600 por repo público; resúmenes mínimos, historia previa no borrada.
+## 2026-11-01 — Perfil de clave OpenAI `personal` para generación creativa
 
-## 2026-10-25 — Rooms: autoría V2 verificada y acceso coordinado
+Resolver único `src/lib/ai/openai-api-key.ts` para `openai.ts` y `openai-image.ts` (commit `60a53958b`, sin push):
+`OPENAI_API_KEY_PROFILE=<perfil>` / `pnpm ai:image --openai-key <perfil>` → secreto `greenhouse-openai-api-key-<perfil>`;
+falla cerrado, nunca cae a la canónica; resultados con `keyProfile`. Secreto `greenhouse-openai-api-key-personal` creado
+por el operador (cuenta personal, 200 USD) con `secretAccessor` para `greenhouse-portal`; prueba real `low` 1024² →
+`clave personal`, ≈ USD 0,006. Regla: generación creativa de agentes con el perfil explícito; producto/runtime/`pnpm dev`
+con la clave de empresa; nunca default en `.env.local` ni en Vercel/workers. Manual
+[alternar-clave-openai.md](docs/manual-de-uso/ai-tooling/alternar-clave-openai.md). Typecheck, lint y 58 pruebas verdes.
 
-Runtime e72ad65 incorpora autoría V2;66testsPASS0skip, lint/types/build y migración down/up/restore mixto V1/V2 PASS. TASK-2062 cierre local; demo pública sigue bd4b802. TASK-2065 consumerOIDC interno en implementación con peerAuth1834/2064. TASK-2066 prepara invitaciones: UN correo Resend trae enlace tokenizado+código, cliente pega código EN Rooms; issuer2067 verifica/envía y Rooms conserva sesión guest limitada. No SSO global por OTP, no emails reales enviados, sin DB cloud. GoalEPIC-052 abierto. Índices README/registry compartidos coordinados con peerAuth, no mezclar su WIP. [Auditoría](docs/audits/rooms/2026-10-25-versioned-content-authoring.md).
+## 2026-11-01 — Marca de Efeonce ID aprobada y canonizada en AXIS
 
-[Historial](Handoff.archive.md).
+«La órbita vive en la D»: asta, tramo recto de 110 y media órbita, esfera Growth a la 1:30 ([ADR](docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)).
+Generador `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas aprobado); 12 SVG
+`efeonce-id-*` en `axis-brand-assets` 0.4.31 (publicado en el release `v0.4.31`: AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages; 59/59 pruebas del paquete y la del Lab verdes).
+Regla del operador: en el login de Auth sólo favicon y formulario; el panel lateral es del carrusel de novedades.
+Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizadas y espejadas. **Favicon de Auth
+cambiado en `develop`** (teja de Efeonce ID vía `scripts/auth-server/efeonce-id-favicon.ts`; 743 pruebas de
+`src/lib/auth-server` verdes, verificado en el arnés): llega a producción sólo con un release gobernado. Pendiente: fijar
+`axis-brand-assets` ≥ 0.4.31 en Greenhouse (TASK-2014), lockup del formulario y botón «Continuar con Efeonce ID».
 
-## 2026-10-25 — Rooms: persistencia, motion y primer release
+## 2026-11-01 — Cloud Build: paquete de subida 986 → 131 MB
 
-Goal explícito de continuar EPIC-052; GitHub privado y publicación Vercel autorizados. TASK-2058/2060 complete: can y ciclo durable PostgreSQL local con concurrencia, auditoría/outbox y recuperación probada. TASK-2059 incorpora View Transitions y botones/badges AXIS; aceptación visual humana pendiente. TASK-2061 publica [demo sintética](https://efeonce-rooms.vercel.app/demo) en Vercel, commit `bd4b802`, deployment `dpl_8vJ75Cbn1q75JNe7FEa7LkUccigc`; [dossier vivo](docs/architecture/rooms/README.md), [manual](docs/manual-de-uso/rooms/operar-primera-experiencia-local.md). Runtime `../efeonce-rooms` main, repo privado `efeoncepro/efeonce-rooms`; docs en develop. Efeonce ID aún depende de TASK-1834: issuer vivo sólo anuncia scopes MCP; API real 401, sin DB cloud ni clientes reales. EPIC-052 continúa abierto.
-
-## 2026-10-25 — UTP Perú: presentación enviada; LinkedIn pendiente
-[Caso y readback](docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md): Company UTP y Contact Gustavo
-Alfaro con Primary y segmentos comprobados; Apollo waterfall autorizado, correo Verified, 2 créditos.
-Enviados y EMAIL `SENT` asociados: dos brochures originales, clientes, firma gráfica y CCO; sin Lead/Deal ni
-nueva secuencia. LinkedIn **no enviado**, faltan créditos de InMail y la invitación previa sigue pendiente;
-texto preparado en nota CRM. Esperar admisión/documentación de Compras; no repetir el correo ni comprar plan.
-
-## 2026-10-25 — Aprendizaje comercial reutilizable y propuesta de pauta
-Prospección, Commercial y Copywriting Codex/Claude cargan el criterio de conversaciones útiles para nuevas
-aperturas, seguimientos e inbound comercial; espejos verificados. [Implementación y cola nativa](docs/commercial/analyses/2026-10-prospeccion/IMPLEMENTACION-Y-PAUTA.md).
-[Aplicación nativa verificada](docs/commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md): guía9.705, nueve correos/nueve plantillas ajustados, cinco pausas en cuatro cuentas; cola13→8 el29Oct. QA borrador nuevo pendiente por créditos; sin envío inmediato.
-Pauta propuesta: US$600/mes, Chile, Search/HubSpot, sujeta a demanda/costo y ruta de conversión; sin gasto aprobado.
-
-## 2026-10-25 — Ficha de autor del blog, byline y schema de autor (TASK-2057) cerrada
-El single muestra «Por Julio Reyes» enlazado al archivo y, al final, la ficha de La órbita (retrato `portrait`, cargo,
-bio corta, temas, «Ver sus 44 artículos», LinkedIn e Instagram) en lugar de la caja de Ohio con redes del demo.
-`efeonce-editorial-blocks` 0.5.5 (runtime d3156f6, lector `EO_Author_Profile`; hovers sin el relleno de Ohio y aire bajo la ficha tras tu revisión) y `page_headline.php` por el paquete del
-tema (runtime 1d7a7bd); perfil de Julio cargado (avatar 252085, cargo «Managing & GTM Director», bios sin «Fundador»)
-e indexable de Yoast reconstruido. Verificado en vivo: Person con cargo, foto, `sameAs` y `worksFor` por `@id`;
-Playwright 5 anchos sin desborde, axe 0. Trampas: `.single-post aside {display:none}` inline (la ficha es `section`),
-el indexable de Yoast guarda el `og:image` viejo y Ohio repinta todo enlace al hover (cada enlace de la ficha lleva
-`-unlink -undash`; prueba de 34 chequeos). 0.5.6 (ficha más contenida: retrato 160, ancho 800) en producción y verificada en vivo. **Pendiente:** enlace YouTube global de Ohio → `colabrio`; slug de autor; `/wp-json/wp/v2/users`. Turno de content-model devuelto a la sesión del Archivo, que implementa la cabecera de `/author/` con el mismo lector. TASK-2057 cerrada por el operador el 2026-10-25. Ajustes posteriores en vivo: 0.5.8 (ficha alineada con el texto en teléfono, centrada en escritorio, 56/40 px de aire) y 0.5.9 (redes junto al retrato en teléfono). Sin push.
-
-## 2026-10-24 — Portada del blog: «Explora por tema» v2 (TASK-2051) en producción
-La órbita de `/blog/` dejó de mostrar «¿De qué escribimos más?» y es la puerta a las categorías: «Elige por dónde
-empezar.», seis temas (HubSpot, Inbound, Marketing digital, Loop Marketing, AEO, Diseño) como enlaces a
-`/category/<slug>/`; el centro muestra descripción, tres lecturas y «Ver todo»; en móvil, lista por lecturas
-(runtime `f2210d7`, efeonce-editorial-blocks 0.4.8; Greenhouse `55c0b7d8e`; canvas versión 95). Descripción de Diseño
-cargada. Verificado en vivo: enlaces en el HTML del servidor, hover, 1440/390, desborde 0, axe 0. Además, las tarjetas
-de foto del riel tienen imagen y foco propios (`card`), aplicados a 249387, 251397 y al recurso 252050. Sin push.
-
-## 2026-10-24 — Portada del blog: imagen y punto focal propios de la tarjeta de foto (TASK-2051)
-Pedido de la sesión «Análisis de Analytics y Search Console» con aprobación del operador: la tarjeta de foto recortaba
-al centro y cortaba el texto incrustado de las portadas de Manzanitas. En vivo: metas `_eo_card_image` /
-`_eo_card_focus` (panel y comando `card`, plan salvo `--apply`, falla si cambia la destacada), `efeonce-editorial-blocks`
-0.4.5, runtime 6578773, Greenhouse e60f5045c; `verify --browser` 0 px en 8 anchos, riel sin cambios. Foco medido:
-`84% 30%` sirve en los tres tableros para una cara a ≈71 %. `card 244765 --focus "84% 30%"` corrió sólo como plan.
-**Pendiente:** aplicarlo cuando 244765, 245605 o 245154 entren al riel (QA: la sesión de Analytics). Sin push.
-
-## 2026-10-24 — Portada del blog: tarjetas v2 de «Para leer con calma» (TASK-2051) en producción
-Desde 21:12 UTC el riel usa las tarjetas aprobadas (canvas versión 93): foto a sangre, logo del cliente ANAM, pregunta
-del diagnóstico, guía firmada por Efeonce Think, insignias con regla y dato real, autor, fecha y hover líquido
-(runtime `e9124fa` + `7bfbd40` + `9fec02d`, `efeonce-editorial-blocks` 0.4.4; Greenhouse `aa96207ac`). Gates en
-vivo: desborde 0 px en 8 anchos, un H1, axe 0 en los tres tableros; local: equivalencia, paridad 27 casos, píxeles 25/25.
-Datos: `client 251432 anam --apply` (ledger). Webinar (próximo evento) y podcast (formato nuevo) tienen soporte sin
-contenido. **Pendiente:** lectores para «Últimos cupos»/«Lista de espera» (reservas Growth Forms) y «Más leído»/
-«Tendencia» (GA4), por el filtro `eo_home_rail_signals`. Sin push en ningún repo.
-
-## 2026-10-24 — Archivo del blog: variante Glitch (TASK-2056) en producción
-`/category/glitch/` y `/glitch/` sirven la variante Glitch aprobada en el canvas (versión 79) desde ~19:50 UTC: wordmark,
-«EDICIÓN #17» y «FLASH», muletilla en Guttery, falla en bytes, placas por fila, filtro Ediciones/Flash/Notas y banner de
-suscripción con la píldora real blanca (runtime `9a19d46`, Greenhouse `db64920a2`). Verificado en vivo (200, un H1,
-canonical, index, desborde 0, axe 0 en 7 vistas, `/blog/` verify verde). **Pendiente:** el logo dentro de la píldora
-necesita el renderer de Growth Forms 1.3.0 en producción (commit en develop, sin push ni release). **Pedido del
-operador para después:** no le gusta la grilla «Para leer con calma» de la portada (tarjetas tipográficas sin foto
-alternadas con tarjetas con foto); es un cambio de diseño de TASK-2051 que se dibuja primero en el canvas.
-
-## 2026-10-24 — Archivo del blog v3 (TASK-2055): en producción, task cerrada
-
-**Búsqueda, temas, etiquetas y autores de efeoncepro.com sirven el «Archivo del blog» desde el 2026-10-24 ~18:20 UTC**
-(`eo_blog_archive_enabled = 1`): dirección D aprobada (canvas «Portada Blog Efeonce» v75), plantilla en `eo-blog-home`
-(`EOBH_Archive`, runtime `2c2cfbb`), datos por `EO_Archive_Adapter` (`efeonce-editorial-blocks`), seis descripciones de
-temas aprobadas y cargadas. Verificado en vivo: matriz HTTP/robots/canonical/schema, sin desborde ni palabras cortadas de
-320 a 1920, axe 0, `/blog/` verify verde, post con FAQ intacto. Rollback: `pnpm public-website:blog-home archive 0 --apply`.
-Contrato `docs/architecture/public-site/BLOG_ARCHIVE_RUNTIME_V1.md`; manual `operar-archivo-del-blog.md`.
-Lección: el `header-cap` de 108 px de Ohio sólo existe en archivos (el preview local con el shell de /blog/ no lo ve):
-correr siempre el gate en producción con `archive preview`. Pendientes fuera de alcance: `/wp-json/wp/v2/users` y
-`?author=N`, 404 del sitio, «lecturas» vs «publicaciones» en la órbita. Task cerrada: `pnpm test` (21 299 pruebas) y `pnpm build`
-verdes sobre `f908db7d5`. Residual: el runtime no se empujó a su remoto (origin/main ya estaba divergido). Propuesta
-abierta: variante Glitch de `/category/glitch/` (= `/glitch/`), espera decisión del operador y tablero en el canvas.
+`.gcloudignore` excluye `/ai-generations/`, `/outputs/`, `/generated/` y `/scripts/frontend/` (anclados a la raíz;
+sin anclar, `ai-generations/` también atrapaba `scripts/ai-generations/`). Verificado con
+`gcloud meta list-files-for-upload`: solo salen archivos de esas cuatro carpetas y siguen presentes todas las rutas
+que copian los 8 Dockerfiles de `services/`. No se borra nada del repo. Al empujar a develop, los filtros de ruta de
+`artifact-worker`, `commercial-cost-worker` y `auth-server` disparan un deploy a staging, que es la prueba real
+(empujado a develop; los 4 deploys de workers a staging salieron verdes). El operador compró el CUD de Cloud SQL
+`greenhouse-pg-dev-us-east4-3y` (3 años, us-east4, USD 0,03/h ≈ 21,60/mes, inicio 2026-11-01 16:00 PT) y canceló
+Looker Studio Pro (verificado). Proyección: ~CLP170k/mes desde diciembre.

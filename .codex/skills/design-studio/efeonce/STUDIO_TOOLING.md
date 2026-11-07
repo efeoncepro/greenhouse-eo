@@ -26,9 +26,13 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Nano Banana 2.1 por `pnpm ai:nano` (Google Cloud/Vertex global, operador local); acabado premium → Gemini 3 Pro Image (sin CLI propia); texto conceptual → Ideogram;
-  vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa,
-  máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
-  (los tres con `pnpm ai:image --model`);
+  vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa
+  o pieza final → GPT Image 2.5 Sunburst (una zona con máscara → `pnpm ai:inpaint`, Flare); generación cotidiana →
+  GPT Image 2.5 Flare; Batch → GPT Image 2 (los tres con `pnpm ai:image --model`); SVG nativo o GIF animado →
+  **GPT Image 2.6 Flare** (2026-11-04) con `pnpm ai:image --format svg|gif` (desde 2026-11-05); corrección dibujada →
+  `pnpm ai:image --markup` o trazos rojos sobre la foto (2.5 o 2.6); la identidad de personas sigue en 2.5 Sunburst
+  hasta un canario, y para una pieza de producción raster se comparan 2.5 y 2.6 Sunburst en la toma real (2.6 cuesta
+  más sólo en `low`/`medium`, ~4×/~3×; igual en `high`+; cifras en la guía §5.1);
   divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
   (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta; **Pro no es 4K
   en fal**: resolución nativa > 2K → Lite o GPT Image).
@@ -46,7 +50,7 @@
   borrar, mover) usa `pnpm ai:layers` + `pnpm ai:inpaint`: las capas son contenido regenerado y sólo sirven de
   máscara y clean plate; la base se cobra como una capa.
 - **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
-  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni 1.1 (`pnpm ai:omni`, Cloud directo, nunca Fal; seis modos probados sólo a 360p/16:9/3 s);
+  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni 1.2 (`pnpm ai:omni`, Cloud directo, nunca Fal; default GA desde 2026-11-05 con clips de hasta 15 s y upscale, sin clip 1.2 generado aún; 1.1 con `--model 1.1`, seis modos probados sólo a 360p/16:9/3 s);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
   `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (árbol por necesidad + costos por
   resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance sí es candidato con personas y
@@ -100,10 +104,12 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
   y guía de selección §10.1. El default del provider de producto `google-gemini-image` sigue siendo Nano Banana 2
   (`gemini-3.1-flash-image`), sin migración de runtime. Nano Banana Pro (`gemini-3-pro-image`) figuraba disponible en
   Vertex en la revisión 2026-09-16, sin superficie ni CLI propia; no se refrescó aquí. OpenAI sigue directo y
-  `pnpm ai:image` conserva `gpt-image-2` por defecto. Para cine, ficha y `foto:prompt` primero y gates después con
+  `pnpm ai:image` conserva `gpt-image-2` por defecto (2.6 corre desde 2026-11-05, pero se pide explícito con `--model`). Para cine, ficha y `foto:prompt` primero y gates después con
   cualquier motor; la prueba Nexa 2.1 quedó APROBABLE, no es un alta en el banco aprobado ([casebook](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CINE_CASEBOOK_V1.md#nexa-con-nano-banana-21-2026-10-06--prueba-portable)).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
-- **OpenAI → directo.**
+- **OpenAI → directo.** La producción creativa que corres con `pnpm ai:image` lleva `--openai-key personal`
+  (en `ai:inpaint` y `foto:*`, `OPENAI_API_KEY_PROFILE=personal` delante) mientras quede crédito; producto y runtime
+  pagan con la clave de la empresa. Al reportar, di qué clave pagó: [manual](../../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - **Post/composición exacta → runtime determinístico/humano.**
 
 Antes de elegir, cargar `../modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md` y leer el registry

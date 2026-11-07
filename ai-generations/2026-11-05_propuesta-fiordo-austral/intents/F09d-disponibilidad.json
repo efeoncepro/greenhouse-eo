@@ -1,0 +1,41 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "recipe": "content-measure",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Nivel de servicio",
+    "question": "Disponibilidad mensual exigida:",
+    "answer": [
+      "99,9 %"
+    ]
+  },
+  "body": "mensual como mínimo, según las bases. HubSpot publica una meta de 99,95 % y su historial en status.hubspot.com.",
+  "measure": {
+    "value": 0.999,
+    "source": "Bases Wherex 428823, sección 4"
+  },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA14e-guardia-disponibilidad.png",
+    "alt": "En la mesa de soporte de Efeonce, un especialista revisa en el monitor el historial de disponibilidad del CRM"
+  },
+  "figures": [
+    {
+      "value": "99,95 %",
+      "label": "meta mensual de HubSpot",
+      "source": "Términos de servicio de HubSpot"
+    },
+    {
+      "value": "≤ 1 h",
+      "label": "respuesta Efeonce en S1",
+      "source": "SLA de esta propuesta"
+    }
+  ],
+  "use": "proposal"
+}

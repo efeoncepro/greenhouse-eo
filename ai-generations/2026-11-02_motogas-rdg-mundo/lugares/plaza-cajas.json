@@ -1,0 +1,18 @@
+[
+  {
+    "k": "2d-rey-trono",
+    "left": 180,
+    "top": 710,
+    "w": 555,
+    "h": 559,
+    "flip": false
+  },
+  {
+    "k": "2d-paje",
+    "left": 900,
+    "top": 1255,
+    "w": 221,
+    "h": 330,
+    "flip": false
+  }
+]

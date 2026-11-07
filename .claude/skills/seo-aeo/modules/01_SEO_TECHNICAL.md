@@ -166,6 +166,30 @@ del renderer real.
 Para Home/landings carga `../references/home-landing-metadata-schema.md`: title/H1/social,
 propiedad del grafo, alcance local/global, escrituras CMS y límites de verificación.
 
+### `BreadcrumbList`: cuándo `item` es obligatorio (caso real 2026-11-04)
+
+Google exige `item` (la URL) en cada `ListItem` **salvo en el último de una ruta de dos o más niveles**, que es la
+página actual. Una lista de **un solo** elemento (típica de la portada: «Portada») es primero y último a la vez: sin
+`item`, Search Console lo marca como error crítico («Falta el campo "item" (en "itemListElement")»). Un elemento
+intermedio sin `item` también es inválido.
+
+| Forma de la lista | Sin `item` en… | Veredicto |
+| --- | --- | --- |
+| 2+ elementos | sólo el último | Válido; no tocar |
+| 1 elemento | ese único | Error crítico; completar con la URL de la página |
+| 2+ elementos | uno intermedio | Error; corregir la ruta en su dueño |
+
+- **Barre el sitemap entero antes de tocar schema.** El correo de GSC no dice qué URL ni cuántas fallan. Extrae sólo los
+  bloques `application/ld+json` del HTML crudo de cada URL y clasifica con la tabla; en efeoncepro.com el error estaba
+  en 1 de 113 URLs (la portada) y las otras 111 dejaban el último sin `item`, que es válido.
+- **Corrige acotado y en el dueño del grafo** (en WordPress, un filtro del plugin SEO): sólo el caso inválido; no
+  «completes por si acaso» el último elemento de las rutas largas.
+- Re-barre después: el contador de inválidos baja a 0 y el de válidos no cambia. Cierra con «Validar corrección» en cada
+  propiedad de GSC que avisó.
+
+Overlay Efeonce (mu-plugin, instalación, rollback y script de barrido):
+`../efeonce/EFEONCE_OVERLAY.md` §Landing comercial WordPress + Yoast.
+
 ### Cambio de parser 2026-08-21: un solo HTML unescape
 
 [Google Search Central anunció](https://www.linkedin.com/feed/update/urn:li:activity:7496492350907596801/)

@@ -1,0 +1,138 @@
+{
+  "id": "check-in",
+  "notion_url": "https://app.notion.com/p/40239c2fefe78139930cf41f74b720cc",
+  "titulo": "Check-in SKY: cuándo hacerlo y cómo obtener tu tarjeta de embarque",
+  "slug": "/que-es-el-check-in/",
+  "mercado": "CL/PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + POV del viajero",
+      "modificadores": "persona sola · escala cercana · luz de noche interior · orienta",
+      "registro": "D",
+      "archivo": "check-in-sky-noche-antes-telefono.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Mano sosteniendo un teléfono con una tarjeta de embarque digital junto a una mochila a medio armar, la noche antes de un vuelo",
+      "que_muestra": "desde los ojos del viajero, una mano sostiene el teléfono encendido sobre una cama o un sillón; en la pantalla se adivina una tarjeta de embarque con un código QR genérico (ilegible, sin marca ni nombre); al lado, una mochila abierta con ropa doblada y un cargador. Debe leerse como «la noche antes de viajar, revisando que todo esté listo», no como publicidad de una app.",
+      "hora_clima": "noche, interior de una casa (la noche antes del vuelo del gancho); luz cálida de lámpara, abundante y suave, con sombras abiertas; la pantalla no debe quemar ni dominar la exposición",
+      "personas": "solo la mano y parte del antebrazo del viajero, en ropa de casa; sin rostro; la mano sostiene el teléfono con naturalidad, sin pose de producto",
+      "primer_plano": "el borde de la mochila o de una prenda doblada muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el teléfono",
+      "ancla_pov": "el teléfono iluminando la cama a medio ordenar, el correo de la reserva abierto",
+      "no": [
+        "sin texto legible ni logos en la pantalla ni en la mochila",
+        "sin interfaz real de la app o del sitio de SKY",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin pasaportes con datos legibles",
+        "sin pantalla quemada en blanco"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01; la pantalla se resuelve como QR genérico sin marca, que valida Diseño antes de aprobar",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el teléfono con el QR y la mochila tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vas caminando hacia la puerta de embarque…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la fila de embarque · mano del viajero + otras personas integradas · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "tarjeta-embarque-qr-puerta-embarque.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Teléfono con el código QR de una tarjeta de embarque acercado al lector en la puerta de embarque de un aeropuerto",
+      "que_muestra": "desde los ojos del viajero en la fila, su mano extiende el teléfono con un código QR genérico hacia un lector de puerta de embarque; al fondo, fuera de foco, una persona del personal en ropa neutra (cuerpo parcial, sin rostro) y la manga o la sala de embarque sin aviones visibles. La acción es el contenido: mostrar la tarjeta desde el teléfono, sin papel.",
+      "hora_clima": "interior de terminal, luz natural abundante que entra por ventanales más la luz del recinto; sombras abiertas, sin reflejos que quemen la pantalla",
+      "personas": "fotografía el viajero desde la fila y mira el lector; delante, otro pasajero de espaldas ya cruzando la puerta; el personal, de cuerpo parcial y sin rostro, mira el lector; nadie mira al lente",
+      "primer_plano": "la correa de una mochila o el borde de la manga de la chaqueta del viajero muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar el teléfono ni el lector",
+      "ancla_pov": "basta con acercar la pantalla al lector",
+      "no": [
+        "sin texto ni logos",
+        "sin señalética de aeropuerto ni números de puerta legibles",
+        "sin interfaz real de la app SKY ni nombres en la pantalla",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin tarjeta de embarque de papel (el texto dice que no hace falta imprimirla)"
+      ],
+      "fidelidad": "escena genérica de aeropuerto (sin terminal identificable) → no requiere REF-01; si Diseño quiere ubicarla en un terminal concreto (Santiago o Lima), pedir foto real REF-01 antes de generar"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Llegas al aeropuerto con la maleta grande…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "B — Viajero integrado",
+      "modificadores": "en el counter · persona del personal integrada · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "check-in-counter-aeropuerto-maleta-balanza.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Pasajero dejando su maleta en la balanza de un counter de aeropuerto mientras una persona del personal revisa su documento",
+      "que_muestra": "un pasajero, de tres cuartos de espaldas, apoya su maleta en la balanza de un counter; al otro lado, las manos de una persona del personal en ropa neutra sostienen un documento de identidad cerrado o con datos ilegibles. Demuestra lo que el texto argumenta: el counter sigue disponible y sin costo para los casos que lo necesitan.",
+      "hora_clima": "interior de terminal, de día; luz abundante y pareja, sombras abiertas, colores naturales",
+      "personas": "fotografía un acompañante del viajero, de pie un paso atrás; el pasajero mira la balanza; el personal, de cuerpo parcial (manos y torso, sin rostro), mira el documento; nadie mira al lente",
+      "primer_plano": "el asa extendida de una segunda maleta muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la balanza ni el documento",
+      "ancla_pov": "la pones en la balanza y, mientras la cinta la pesa, alguien del personal revisa tu documento",
+      "no": [
+        "sin texto ni logos",
+        "sin señalética ni pantallas de counter legibles",
+        "sin colores ni uniformes SKY en el personal",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin documentos con datos legibles",
+        "sin cifras de peso legibles en la balanza (el peso permitido no se afirma en este artículo)"
+      ],
+      "fidelidad": "escena genérica de counter (sin aeropuerto identificable) → no requiere REF-01; el personal va en ropa neutra y cuerpo parcial para no generar uniformes"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "PMC",
+      "ciudad": "Puerto Montt"
+    },
+    "home_market": "CHL",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-puerto-montt",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Sur de Chile, check-in resuelto",
+    "cta": "Ver vuelos a Puerto Montt",
+    "archivo": "banner-ruta-santiago-puerto-montt.webp",
+    "alt": "Banner de SKY de la ruta Santiago–Puerto Montt: sur de Chile, check-in resuelto",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Santiago (SCL) → Puerto Montt (PMC) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“Sur de Chile, check-in resuelto” (5 palabras; la ruta Santiago–Puerto Montt es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: en vuelos nacionales el check-in lo hace SKY",
+      "CTA (lo escribe el compositor)": "Ver vuelos a Puerto Montt →",
+      "Enlace del banner": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-puerto-montt",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-santiago-puerto-montt.webp`",
+      "ALT": "“Banner de SKY de la ruta Santiago–Puerto Montt: sur de Chile, check-in resuelto”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+    }
+  },
+  "descartes": [
+    "kioscos de autoatención del aeropuerto de Santiago — exige fidelidad del terminal y REF-01, y solo aplica a un aeropuerto",
+    "completar los datos del documento en el teléfono — repite la portada y obliga a mostrar una interfaz",
+    "fila de control de seguridad — no es parte del check-in",
+    "pasajero con mascota en el counter — es un caso entre varios y tiene su propio artículo"
+  ]
+}

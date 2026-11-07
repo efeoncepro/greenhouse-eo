@@ -6,6 +6,10 @@
 > —incluido el Playbook de Producción— difiere de la Spec, **manda la Spec** y hay que corregir
 > el documento que divergió.
 
+> **Cómo se ve y cómo se produce** cada banner (identidad, recetas, grilla del marcador, fotografía por
+> estrato, color de catálogo, QA visual) vive en la skill [`berel-graphic-line`](../../berel-graphic-line/SKILL.md).
+> Este módulo decide qué pieza existe, cuándo y con qué ficha.
+
 ## Principio rector: ninguna imagen es decorativa ni intercambiable
 
 Cada imagen nace del contenido específico de **ese** artículo y se empareja con un elemento real
@@ -77,7 +81,7 @@ Diseño entrega **master + variantes**:
 | Pin de Pinterest | 2:3 · 1000 × 1500 |
 | Facebook | 4:5 · 1080 × 1350 (apto para carrusel) — ⚠️ era la de Instagram hasta la decisión del cliente del 2026-08-25; Instagram pasó a 9:16 |
 | Historia de Instagram | 9:16 · 1080 × 1920 |
-| Reel | 9:16 (video) |
+| Reel | 9:16 (video) · 1080 × 1920 · ver [módulo 06](06_DERIVADOS_SOCIALES.md) § Producción del reel |
 
 🔴 **Una sola pieza por artículo lleva 🔁.** Dos marcas anulan el propósito: el derivado social
 deja de tener un master único y diseño produce dos veces lo mismo con criterios distintos.
@@ -119,6 +123,20 @@ El cuerpo de la subtarea lleva **dos secciones**, cada una como encabezado 1 seg
 
 → Plantilla copiable: [`../templates/ficha-banner.md`](../templates/ficha-banner.md)
 
+### N1 y N4 llevan marcador de color y logo (corrección del operador, 2026-11-04)
+
+Las fotografías de portada (N1) y cierre (N4) **no** van «Sin texto»: llevan el **marcador de color** —nombre y
+código del color protagonista— y el **logo de Berel**. El operador lo corrigió el 2026-11-04 («necesitas el chip
+de color»). Redacción de los dos campos:
+
+- **→ Texto en la imagen:** «Sin titular. Solo el marcador de color con el nombre y el código de *[Color código]*,
+  sobre el muro principal.»
+- **→ Graficos adicionales en la imagen:** «Marcador de color y logo de Berel.»
+
+El nombre del color debe caber en el marcador: un nombre largo se cambia por otro color del artículo antes de
+producir, no se recorta (ver el caso N2 abajo). Cómo se compone el marcador lo decide
+[`berel-graphic-line`](../../berel-graphic-line/references/marker-grid.md).
+
 ### Productos nuevos o de awareness
 
 Cuando el brief identifique un producto reciente o con baja notoriedad, al menos una pieza debe incluir
@@ -126,6 +144,17 @@ el **render oficial del empaque**, sin recrearlo ni sustituirlo por un envase ge
 la fuente del asset, la versión confirmada y su ubicación; si falta el render oficial, la pieza queda
 `⚠️ Pendiente` y no se inventa. La escena puede contextualizar el producto, pero el empaque debe ser
 reconocible y coherente con la tabla/producto al que acompaña.
+
+**Producto en escena (desde el 2026-11-02).** La ficha decide **qué** producto aparece y **dónde se usa** (impermeabilizante
+en la azotea, sellador frente al muro dañado, galón en el espacio, laca junto a la madera, aerosol frente a la herrería);
+**cómo** se produce —escala por diámetro, presencia publicitaria, redibujo guiado y verificación de la etiqueta— lo decide
+[`berel-graphic-line`](../../berel-graphic-line/references/photography.md) §6 bis. Tres reglas que tocan a la ficha:
+- Un render cuya forma no corresponde a su contenido es una maqueta y no se usa: hoy los renders de las **Manchas de 1 L**
+  tienen forma de aerosol. Hasta que Berel entregue el empaque real, la pieza que las necesite queda `⚠️ Pendiente`.
+- Aerosoles, litros y ½ L solo se leen en una toma de detalle (cámara a la altura de la superficie); si la ficha pide uno
+  en una vista general de espacio, no se va a leer.
+- La pieza conserva su logo compuesto aunque la etiqueta del envase muestre el logo Berel (decisión del operador
+  2026-11-02).
 
 ## 🔴 ALT, archivo y posición son una sola fuente de verdad
 
@@ -142,6 +171,19 @@ Corolarios que el origen declara explícitamente:
 - ALT descriptivo y específico al contenido; **nunca la URL ni el nombre de archivo**.
 - La imagen principal (LCP) se sirve **sin** `loading="lazy"`; el resto, con lazy.
 
+### Nombres de archivo en la entrega (2026-11-04)
+
+- **Banners del blog:** se exportan con **exactamente** el `Archivo` declarado en su ficha N1–N4, que sigue la Spec:
+  minúsculas, guiones, `.webp`, menos de 200 KB. Ejemplo: `colores-mexicanos-con-blanco-hero.webp`.
+- ⚠️ **Conflicto con la guía del CMS:** el [módulo 08](08_PUBLICACION_CMS_DRUPAL.md) dice que la portada es el
+  archivo que lleva "portada" en el nombre. Para banners de blog **manda la Spec** (regla de precedencia de arriba): la
+  portada es el N1 con el nombre de su ficha, y no se le agrega "portada".
+- **Sociales:** `<slug>_SM_POST.png`, `<slug>_SM_STORIE.png`, `<slug>_SM_PINTEREST.png` y `<slug>_SM_REEL.mp4`
+  mientras el artículo no tenga N##; con número, `N##_SM_…`, como en los meses anteriores
+  (→ [`16`](16_NUMERACION_EDITORIAL.md), § Artículos sin número asignado).
+- **Material de marca de Berel** (p. ej. N2 y N3 de Umbral Vivo): Efeonce no lo exporta ni lo deja en la carpeta de
+  entrega.
+
 ### Contrato de congelamiento del arte
 
 Desde que diseño produce o entrega un asset, su ficha queda congelada: composición, texto sobre la imagen,
@@ -154,6 +196,33 @@ fotográficos ya estaban producidos y sus fichas quedaron **congeladas** en la V
 cambió. En el Color del Año, la portada y el cierre producidos dejaron de usarse porque Berel entrega el banner
 principal: sus tareas **se conservan como producidas** (no se cancelan ni se borran) y el cambio se explica en
 `🗒️ Notas internas de producción`.
+
+**Cuando el asset cambia, la ficha y el texto cambian con él, en la misma pasada (2026-11-04).** El congelamiento
+protege el arte de las ediciones de copy; el caso inverso también obliga. Si una imagen se regenera o se corrige
+después de escrita su ficha, actualizar en una sola edición la **ficha** (descripción, colores, ALT) **y el texto
+del artículo** que la nombra, para que imagen y texto digan lo mismo; después replicar la ficha en la tarea
+visual. *Casos del 2026-11-04:* la N4 se regeneró en un registro más alto y su descripción cambió; en la N2 el
+tercer color pasó de *Brillo de Jade 3-1605D* a *Milpa 3-1005D* porque el nombre largo no cabía en el marcador, y
+el cambio se llevó a la ficha, al ALT y al párrafo del artículo que listaba la combinación.
+
+### Reespecificar y reordenar las fichas de una reescritura (2026-11-05)
+
+*Caso Rayados N52:* el artículo pasó de aniversario a evergreen (módulo 03) y sus banners tenían tareas bloqueadas
+sin arte producido.
+
+- **Sin arte producido, la ficha se reespecifica** contra la V2: no rige el congelamiento, porque no hay asset que
+  proteger. Si diseño ya produjo, gobierna el contrato de congelamiento.
+- **Una infografía que la fuente no puede sostener se cambia por otra pieza.** La infografía de uniformes de 1945,
+  1952 y 1983 habría puesto el escudo actual en jerseys históricos, algo que el material oficial no respalda («la van
+  a objetar», operador). Se reemplazó por una foto de otro espacio.
+- **Las posiciones siguen al texto, no al orden heredado.** N1–N4 se reordenaron según la V2: N2 = foto de la paleta
+  con dos marcadores; N3 = puerta azul en la sección «Detalles en azul». Una N2 fotográfica usa esta ficha, no la
+  ficha `11`.
+- **La ficha describe lo que se produjo.** Si la pieza cambió de tipo o de escena, se actualizan en la misma pasada
+  `Tipo de gráfico`, la descripción, `Texto en la imagen` y el ALT (§ Cuando el asset cambia).
+- **Co-branding con el club:** el escudo solo desde el archivo oficial del club, compuesto y después terminado,
+  nunca generado; autógrafo genérico e ilegible; sin patrocinadores terceros en la escena. Los derechos de uso del
+  escudo quedan pendientes con Berel y se registran en `🗒️ Notas internas de producción`, nunca en el cuerpo.
 
 ## Material de marca Berel (desde 2026-09-19)
 
@@ -196,6 +265,10 @@ La posición N# sigue existiendo en el artículo, pero su ficha cambia:
 - [ ] Si el producto es nuevo/de awareness: render oficial del empaque incluido o bloqueo documentado
 - [ ] Ninguna nota de agente, auditoría, QA, pendiente editorial o instrucción CMS/Dev se confundió con las fichas N1–N4
 - [ ] Si ya existe arte, el saneamiento o corrección no modificó ningún campo de su ficha
+- [ ] N1 y N4 declaran el marcador de color (nombre + código) y el logo de Berel; ninguna dice «Sin texto»
+- [ ] Si un asset se regeneró o cambió de color, su ficha, su ALT y el texto del artículo se actualizaron juntos
+- [ ] Ninguna pieza afirma algo que la fuente no respalda (p. ej. escudo actual en uniformes históricos); escudos de terceros solo desde su archivo oficial, con derechos registrados en notas internas
+- [ ] Archivos exportados con el nombre exacto de su ficha (Spec); sociales con slug o `N##_SM_…`, nunca con un N## inventado
 - [ ] Material de marca de Berel con su ficha propia (Origen, Pieza, Formato, ALT, Archivo, Posición), sin composición inventada y con el mismo archivo en todas las páginas que lo usan
 - [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 

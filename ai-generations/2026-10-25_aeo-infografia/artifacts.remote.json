@@ -1,0 +1,23 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:49:11.530Z",
+  "run": "ai-generations/2026-10-25_aeo-infografia",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-25_aeo-infografia",
+  "totalBytes": 427281,
+  "fileCount": 2,
+  "files": [
+    {
+      "path": "review/aeo-motor-respuesta-desktop-light.png",
+      "sizeBytes": 190263,
+      "sha256": "432ea4dbf4374371f9ba685b33dd3e65a78e200ea25055fff659a8dbd82ad8ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_aeo-infografia/review/aeo-motor-respuesta-desktop-light.png"
+    },
+    {
+      "path": "review/aeo-motor-respuesta-mobile-light.png",
+      "sizeBytes": 237018,
+      "sha256": "f92683f289e6193674b64d0d4481952dbc13f84d37ba04afc2039e2346628e28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-25_aeo-infografia/review/aeo-motor-respuesta-mobile-light.png"
+    }
+  ]
+}

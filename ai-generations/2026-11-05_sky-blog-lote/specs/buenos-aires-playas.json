@@ -1,0 +1,132 @@
+{
+  "id": "buenos-aires-playas",
+  "notion_url": "https://app.notion.com/40239c2fefe78172a316f2f356cff147",
+  "titulo": "Playas cerca de Buenos Aires: cuáles elegir para una escapada de verano",
+  "slug": "/playas-mas-cercanas-desde-buenos-aires/",
+  "mercado": "AR",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + B — Viajero integrado",
+      "modificadores": "viajera sola en la costa del río · escala amplia · luz de tarde · orienta",
+      "registro": "D",
+      "archivo": "playas-cerca-de-buenos-aires-costanera-sur-rio.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera mirando el Río de la Plata desde la orilla de la Reserva Ecológica Costanera Sur, en Buenos Aires, al final de la tarde",
+      "que_muestra": "la orilla de la Reserva Ecológica Costanera Sur con el Río de la Plata color café que se extiende hasta el horizonte, sin otra costa a la vista; juncos y vegetación de ribera a los lados; una viajera de pie en la orilla, sin meterse al agua, mira el río. Debe leerse como costa de río, no como playa de mar.",
+      "hora_clima": "final de la tarde de verano, cielo despejado o con nubes altas; luz cálida abundante, sombras abiertas y altas luces del cielo conservadas",
+      "personas": "la viajera de espaldas o de perfil, quieta, sin pose ni mirada al lente; si aparecen otros visitantes, lejanos, caminando o en bicicleta por el sendero; nadie dentro del agua; ningún rostro identificable",
+      "primer_plano": "juncos o pastizal de ribera muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera ni el río",
+      "ancla_pov": "un río tan ancho que no deja ver la otra orilla, de color café, con olor a agua dulce y a junco",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin agua azul ni turquesa (el río es café)",
+        "sin bañistas en el agua",
+        "sin arena de playa caribeña",
+        "sin carteles legibles de la Reserva"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la costa de la Reserva Ecológica Costanera Sur en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; tienen que sobrevivir la viajera y la línea del río hasta el horizonte. Viajera en el tercio inferior; mitad superior con cielo para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «El camino entra entre pinos…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "caminando por una calle de arena entre pinos que se abre a la playa · otra persona integrada · escala media · luz de mañana · explica",
+      "registro": "E",
+      "archivo": "costa-del-este-pinar-camino-a-la-playa.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Calle de arena entre pinos que se abre a la playa en Costa del Este, en la costa atlántica de Buenos Aires",
+      "que_muestra": "una calle de arena bajo pinos altos, con luz que entra en franjas, y al fondo la abertura donde empieza la playa y se ve una línea de mar; un acompañante camina adelante con una bolsa de playa al hombro.",
+      "hora_clima": "mañana de verano, cielo despejado; luz abundante entre los árboles, sombras abiertas y altas luces conservadas en el fondo de la playa",
+      "personas": "fotografía el viajero que camina detrás, a la altura de los ojos; el acompañante va de espaldas, mirando hacia la playa; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "una rama de pino muy cerca del lente y muy fuera de foco, por un borde lateral, sin tapar la abertura hacia el mar",
+      "ancla_pov": "Las casas aparecen metidas en el bosque, y al final de cada calle se abre la arena",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin autos en el camino",
+        "sin carteles de calles ni de balnearios legibles",
+        "sin palmeras ni vegetación tropical"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una calle del pinar de Costa del Este en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Pinamar suma médanos, bosque y una ciudad con más movimiento…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + C — Acción espontánea",
+      "modificadores": "en la orilla, la primera ola · viajera integrada · escala media · luz de media tarde · cierra emoción",
+      "registro": "D",
+      "archivo": "pinamar-orilla-primera-ola-atlantico.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajera recibe la primera ola fría en la orilla de Pinamar, en la costa atlántica de Buenos Aires, con médanos al fondo",
+      "que_muestra": "la orilla de Pinamar con una ola que rompe en espuma alrededor de las piernas de una viajera, que encoge los hombros por el frío; al fondo, la playa ancha y los médanos con vegetación. El gesto del frío es el contenido: tiene que leerse que es el Atlántico, no un mar tibio.",
+      "hora_clima": "media tarde de verano, con viento; cielo despejado o con nubes altas; luz abundante, sombras abiertas y altas luces conservadas en la espuma",
+      "personas": "la viajera de espaldas o de perfil, con el agua a la altura de las rodillas, sin pose ni mirada al lente; bañistas lejanos y pequeños; ningún rostro identificable",
+      "primer_plano": "espuma de la ola muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera",
+      "ancla_pov": "el mar está frío y la primera ola te saca el aire, pero después ya no quieres salir",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin carpas ni sombrillas con marcas",
+        "sin agua turquesa ni color caribeño",
+        "sin vehículos en la arena"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Pinamar con médanos en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "ruta_texto": "Buenos Aires (AEP/EZE) → Santiago (SCL) · Home Market ARG · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "titular": "El Pacífico, a un vuelo",
+    "cta": "Ver vuelos a Santiago",
+    "url": "https://www.skyairline.com/flights/es-us/vuelos-a-santiago-de-chile-desde-buenos-aires",
+    "archivo": "banner-ruta-buenos-aires-santiago.webp",
+    "alt": "Banner de SKY: ruta de Buenos Aires a Santiago, con el Pacífico a un vuelo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin playas argentinas en la ruta dibujada (la ruta va a Santiago)",
+    "origen": {
+      "iata": "AEP/EZE",
+      "ciudad": "Buenos Aires"
+    },
+    "destino": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "home_market": "ARG",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "nota": "Decisión de ruta por confirmar con Valentina; alternativa: banner bloqueado (no hay ruta SKY a playas argentinas; EZE→PUJ solo con landing genérica)"
+  },
+  "descartes": [
+    "Buenos Aires Playa con juegos de agua — programa de temporada que puede cambiar; niños identificables",
+    "Las rocas de Mar del Sud — repite costa con IMG 3 y exige REF de un pueblo poco documentado",
+    "El picnic en Punta Lara — estado del baño sin confirmar",
+    "La terminal de Retiro — señalética y marcas"
+  ]
+}

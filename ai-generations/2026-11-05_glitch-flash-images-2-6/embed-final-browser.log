@@ -1,0 +1,33 @@
+### Result
+{"results":[{"status":200,"width":1440,"scrollWidth":1440,"iframes":2,"oldButtons":0,"bodyImages":11,"drops":5,"canonical":"https://efeoncepro.com/glitch/glitch-flash-images-2-6/","robots":"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1","cover":"https://efeoncepro.com/wp-content/uploads/2026/11/glitch-images-2-6-own-cover.png","videos":[{"id":"1243362697","w":1112,"h":625.5,"style":"aspect-ratio:640/360;width:100%;height:auto;","currentTime":1.0171,"paused":false,"readyState":4,"error":null,"videoWidth":1280,"videoHeight":720},{"id":"1242918503","w":1112,"h":278,"style":"aspect-ratio:640/160;width:100%;height:auto;","currentTime":1.0169,"paused":false,"readyState":4,"error":null,"videoWidth":1200,"videoHeight":300}]},{"status":200,"width":390,"scrollWidth":390,"iframes":2,"oldButtons":0,"bodyImages":11,"drops":5,"canonical":"https://efeoncepro.com/glitch/glitch-flash-images-2-6/","robots":"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1","cover":"https://efeoncepro.com/wp-content/uploads/2026/11/glitch-images-2-6-own-cover.png","videos":[{"id":"1243362697","w":358,"h":201.375,"style":"aspect-ratio:640/360;width:100%;height:auto;","currentTime":1.0254,"paused":false,"readyState":4,"error":null,"videoWidth":1280,"videoHeight":720},{"id":"1242918503","w":358,"h":89.5,"style":"aspect-ratio:640/160;width:100%;height:auto;","currentTime":1.0116,"paused":false,"readyState":4,"error":null,"videoWidth":1200,"videoHeight":300}]}],"pageErrors":[]}
+### Ran Playwright code
+```js
+await (async (page) => {
+ const results=[],errors=[];page.on('pageerror',e=>errors.push(e.message));
+ for(const width of [1440,390]){
+  await page.setViewportSize({width,height:900});
+  const response=await page.goto('https://efeoncepro.com/glitch/glitch-flash-images-2-6/',{waitUntil:'domcontentloaded'});
+  const metrics=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,iframes:document.querySelectorAll('.entry-content iframe[src*="player.vimeo.com"]').length,oldButtons:document.querySelectorAll('.entry-content .wp-block-button').length,bodyImages:document.querySelectorAll('.entry-content .wp-block-image').length,drops:document.querySelectorAll('aside.gh-glitch-drop').length,canonical:document.querySelector('link[rel=canonical]')?.href,robots:document.querySelector('meta[name=robots]')?.content,cover:document.querySelector('meta[property="og:image"]')?.content}));
+  const videos=[];
+  for(const id of ['1243362697','1242918503']){
+   const selector='.entry-content iframe[src*="'+id+'"]';const iframe=page.locator(selector);
+   await iframe.scrollIntoViewIfNeeded();
+   await page.frameLocator(selector).getByRole('button',{name:'Reproducir',exact:true}).first().click();
+   const frame=page.frames().find(f=>f.url().includes('player.vimeo.com/video/'+id));
+   await frame.waitForFunction(()=>{const v=document.querySelector('video');return v&&!v.paused&&v.currentTime>1&&v.readyState>=3},null,{timeout:15000});
+   const rect=await iframe.evaluate(f=>({w:f.getBoundingClientRect().width,h:f.getBoundingClientRect().height,style:f.getAttribute('style')}));
+   const state=await frame.locator('video').evaluate(v=>({currentTime:v.currentTime,paused:v.paused,readyState:v.readyState,error:v.error?.message||null,videoWidth:v.videoWidth,videoHeight:v.videoHeight}));
+   await iframe.locator('xpath=ancestor::figure[1]').screenshot({path:'output/playwright/glitch-images26-review/embedded-final-'+id+'-'+width+'.png'});
+   videos.push({id,...rect,...state});await frame.locator('video').evaluate(v=>v.pause());
+  }
+  results.push({status:response.status(),...metrics,videos});
+ }
+ return {results,pageErrors:errors};
+})(page);
+```
+### Events
+- New console entries: .playwright-cli/console-2026-11-05T13-56-24-252Z.log#L24-L56
+
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

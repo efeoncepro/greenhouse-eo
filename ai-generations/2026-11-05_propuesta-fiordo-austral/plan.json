@@ -1,0 +1,134 @@
+{
+  "document": "proposal",
+  "line": "revenue-hubspot",
+  "slides": [
+    {
+      "recipeId": "cover-proposal-dawn",
+      "purpose": "01 · portada"
+    },
+    {
+      "recipeId": "section-cine-purpose",
+      "purpose": "02 · lo que entendimos",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA02-cuatro-regiones.png"
+    },
+    {
+      "recipeId": "content-service-lanes",
+      "purpose": "03 · qué cubre el CRM"
+    },
+    {
+      "recipeId": "decision-provider-fit",
+      "purpose": "04 · por qué HubSpot"
+    },
+    {
+      "recipeId": "content-bullets",
+      "purpose": "05 · su proceso"
+    },
+    {
+      "recipeId": "proposal-cinematic-revops",
+      "purpose": "05 · su ficha técnica",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA06-ficha-del-cliente.png"
+    },
+    {
+      "recipeId": "method-staircase",
+      "purpose": "08 · automatizaciones"
+    },
+    {
+      "recipeId": "content-report-formats",
+      "purpose": "08b · reportes y dashboards"
+    },
+    {
+      "recipeId": "breather",
+      "purpose": "08c · app móvil",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png"
+    },
+    {
+      "recipeId": "decision-platform-coexistence",
+      "purpose": "06 · integraciones"
+    },
+    {
+      "recipeId": "method-migration-reconcile",
+      "purpose": "07 · migración"
+    },
+    {
+      "recipeId": "decision-plan",
+      "purpose": "12 · adopción"
+    },
+    {
+      "recipeId": "content-day-live-library",
+      "purpose": "14 · capacitación"
+    },
+    {
+      "recipeId": "method-waves",
+      "purpose": "12 · cronograma"
+    },
+    {
+      "recipeId": "content-day-release-cycle",
+      "purpose": "13 · cambios controlados"
+    },
+    {
+      "recipeId": "section-cine-team",
+      "purpose": "17 · equipo",
+      "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
+    },
+    {
+      "recipeId": "decision-difference",
+      "purpose": "09 · seguridad"
+    },
+    {
+      "recipeId": "method-identity-consent",
+      "purpose": "11 · zero trust"
+    },
+    {
+      "recipeId": "method-score-ring",
+      "purpose": "12 · matriz de cumplimiento"
+    },
+    {
+      "recipeId": "content-measure",
+      "purpose": "13 · disponibilidad",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA14e-guardia-disponibilidad.png"
+    },
+    {
+      "recipeId": "decision-risk",
+      "purpose": "14 · continuidad e incidentes"
+    },
+    {
+      "recipeId": "content-markets",
+      "purpose": "10 · residencia de datos",
+      "plateRef": "ai-generations/2026-10-06_deck-hubspot/fotos/plates/RG2b-mapa.png"
+    },
+    {
+      "recipeId": "section-cine-purpose",
+      "purpose": "11 · salida",
+      "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA23-sus-datos.png"
+    },
+    {
+      "recipeId": "decision-why-us",
+      "purpose": "15 · soporte y SLA"
+    },
+    {
+      "recipeId": "content-day-live-console",
+      "purpose": "16 · operación"
+    },
+    {
+      "recipeId": "decision-chart",
+      "purpose": "26 · licencias"
+    },
+    {
+      "recipeId": "content-pricing-live",
+      "purpose": "19 · inversión"
+    },
+    {
+      "recipeId": "content-measure-formulas",
+      "purpose": "28 · retorno"
+    },
+    {
+      "recipeId": "decision-next-steps",
+      "purpose": "20 · próximos pasos"
+    },
+    {
+      "recipeId": "close-proposal-horizon",
+      "purpose": "21 · contraportada",
+      "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png"
+    }
+  ]
+}

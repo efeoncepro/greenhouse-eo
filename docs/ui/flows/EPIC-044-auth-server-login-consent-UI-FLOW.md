@@ -9,6 +9,30 @@
 > **Contratos técnicos:** `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (§2, §5, §6) y
 > `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md` (§5.bis de este doc = su contrato implementado).
 
+## Delta 2026-11-02 — shell con La órbita (local en `develop`, sin release)
+
+Vigente en código desde el commit `d14b786d3` (aprobado por el operador en el canvas); **no desplegado**: producción
+sigue con el shell S0 de TASK-1835 hasta un release gobernado.
+
+- **S0 cambia de forma, no de contrato.** Todos los nodos salvo el login V4 se pintan con
+  `src/lib/auth-server/oauth/pages/orbit-shell.ts` a través de `layout()` en `render.ts`: formulario en papel con el
+  lockup «Efeonce | ID» + panel de escritorio (≥64rem) con la órbita canónica. Rutas, formularios, campos, estados del
+  motor, CSP y anti-enumeración de este flujo **no cambian**.
+- **Nodos que lo usan y su panel:** S1 consentimiento (también multiorganización y app no verificada) e
+  `login_required` → ícono `integracion`; S6 step-up requerido, S6 `/login/step-up`, S6b alta del segundo factor y S7
+  acceso retirado → `seguridad`; S3 (enlace enviado e invitación aceptada), S4 (confirmar y enlace no válido) y S7
+  confirmar invitación → `correo`; `rate_limited` → `reloj`; S8 sesión iniciada → palabra «Listo», sesión cerrada →
+  «Hasta pronto»; S9/S10 y el error del acceso corporativo → «De nuevo».
+- **S2 (login V4) no cambia:** conserva su cuerpo y el carrusel de novedades (`state: 'login'` en `layout()`).
+- **S6 (código):** seis casillas `[data-otp-cell]` sobre el input real `name="code"`; sin controlador queda el campo de
+  texto (modo respaldo) y el POST funciona; «Usar un código de respaldo» alterna; en S6b se fuerza el modo dígitos.
+  S6b se presenta en tres pasos (escanear, guardar códigos, confirmar) sin alterar la regla de mostrar el secreto UNA vez.
+- **S1 (ficha de la aplicación):** marca first-party sólo por `client_id` exacto (`efeonce-rooms-cli` → isotipo de
+  Rooms, `FIRST_PARTY_CLIENT_MARKS` en `client-marks.ts`); un id parecido de DCR sigue sin marca y con «No verificada».
+- **Una sola esfera por pantalla** y nunca un logo dentro de la órbita; sin panel (móvil) el punto del titular es la
+  esfera. Sin atributos `style=` (CSP `default-src 'none'`, estilos por hash).
+- Operación y gates: [manual de las pantallas](../../manual-de-uso/identity/operar-pantallas-efeonce-id.md).
+
 ## 1. Un motor, varias formas de render
 
 El único motor es el handler del emisor (`src/lib/auth-server/oauth/handler.ts` +

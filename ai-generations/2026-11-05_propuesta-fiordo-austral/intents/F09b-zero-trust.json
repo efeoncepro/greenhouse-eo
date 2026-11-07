@@ -1,0 +1,76 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-identity-consent",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Inicio de sesión único",
+    "question": "Un solo inicio de sesión, con",
+    "answer": [
+      "Entra",
+      "ID"
+    ]
+  },
+  "body": "Su cuenta de Microsoft para todo: **MFA**, Acceso Condicional y mínimo privilegio, y cada acceso queda registrado en Wazuh.",
+  "note": "Ejemplo ilustrativo · los permisos se definen con su equipo de TI",
+  "sources": [
+    "Outlook",
+    "Teams",
+    "App móvil",
+    "Navegador",
+    "Escritorio"
+  ],
+  "profileTitle": "Una cuenta, 5 accesos",
+  "channels": [
+    {
+      "channel": "Contactos",
+      "purpose": "Leer",
+      "permitted": true
+    },
+    {
+      "channel": "Negocios",
+      "purpose": "Editar",
+      "permitted": true
+    },
+    {
+      "channel": "Exportar",
+      "purpose": "Base completa",
+      "permitted": false
+    },
+    {
+      "channel": "Ajustes",
+      "purpose": "Administrar",
+      "permitted": false
+    }
+  ],
+  "activations": [
+    {
+      "icon": "sales",
+      "title": "Vendedor",
+      "detail": "Sus clientes ✓",
+      "channel": "Contactos"
+    },
+    {
+      "icon": "sales",
+      "title": "Etapa",
+      "detail": "Con aprobación ✓",
+      "channel": "Negocios"
+    },
+    {
+      "icon": "revenue",
+      "title": "Registro",
+      "detail": "Cada acceso, en Wazuh",
+      "channel": "Negocios"
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "TI",
+    "participantKind": "department"
+  }
+}

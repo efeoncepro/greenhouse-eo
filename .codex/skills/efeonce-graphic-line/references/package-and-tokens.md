@@ -1,5 +1,7 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
+> Delta Efeonce ID verificado contra: `packages/brand-assets/src/manifest.ts` de AXIS `main` en `0d45749` (`axis-brand-assets` 0.4.32; tags `v0.4.31` y `v0.4.32` publicados) — 2026-11-02. Sólo §6 (filas y párrafo de `efeonce-id-*`).
+
 > Delta familia H3 (Wave, Reach, Globe) verificado contra: `packages/brand-assets/src/manifest.ts` de AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09. Sólo §2.3 (nota) y §6 (filas de Wave/Reach/Globe).
 
 > Actualización de este corte verificada contra: axis-design-system@df2de61 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
@@ -789,6 +791,8 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `aeo-logo-*` · `aeo-isotype-*` · `aeo-lockup-*` (desde 0.4.2) | logo / isotype / lockup | | positive / negative / white | Efeonce \| AEO |
 | `aeo-assessment-logo-*` · `aeo-assessment-lockup-*` (desde 0.4.2) | logo / lockup | | positive / negative / white | Efeonce \| AEO Assessment (sin isotipo) |
 | `ai-visibility-report-logo-*` · `ai-visibility-report-lockup-*` (desde 0.4.2) | logo / lockup | | positive / negative / white | Efeonce \| AI Visibility Report (sin isotipo) |
+| `efeonce-id-logo-*` · `efeonce-id-lockup-*` · `efeonce-id-isotype-*` · `efeonce-id-isotype-small-*` (desde 0.4.31) | logo / lockup / isotype | | positive / negative / white | 0,7723 · 0,1537 · 1 · 1 (lockup Efeonce \| ID con «ID» en gris; isotipo chico sólo ≤ 32 px) |
+| `efeonce-id-button-lockup-positive` / `-negative` (desde 0.4.32) | lockup | light / dark | positive / negative | 0,1537 · «ID» en la tinta del texto; sólo dentro del botón «Continuar con Efeonce ID» |
 | `url-bubble-source` | url-bubble | any | source (gris `#848484`, fusionar con luminosidad) | 0,1968 |
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |
@@ -802,6 +806,8 @@ Generador
 publicados) + `pnpm seal`; sólo contornos, sin máscaras ni `clipPath`. En 0.4.28 las piezas nuevas quedaban fuera del
 catálogo del Lab (`AXIS_LOGO_EXCLUSIONS`); desde 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice del Lab está
 fragmentado y son públicas en «Logotipos», como Rooms y Creative Studio. Greenhouse fija 0.4.25 (adopción: TASK-2014). Criterio: [criteria.md](criteria.md) (H3).
+
+**Efeonce ID (0.4.31 y 0.4.32, AXIS `5a6a597` + `5540a2c` y `0d45749`, tags `v0.4.31` y `v0.4.32` publicados el 2026-11-02):** 14 SVG de la marca de la cuenta de Efeonce Auth: `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}` (0.4.31; viewBox del lockup 195,23 × 30, del logo 909 × 702, de los isotipos 1080 × 1080) y `efeonce-id-button-lockup-{positive,negative}` (0.4.32; mismo viewBox que el lockup, «ID» en la tinta del texto en vez del gris de la familia). Públicos en «Logotipos» del Lab. Se generan en Greenhouse con `scripts/brand/build-efeonce-id-logos.mjs` y se re-sellan con `pnpm seal`; nunca se editan a mano. Greenhouse fija 0.4.25 (adopción: TASK-2014); `auth-server` usa una copia byte a byte de `efeonce-id-isotype-small-negative` para el favicon. Qué pieza va dónde y el botón: [applications.md](applications.md) A20; ADR `docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md`.
 
 **Insights (0.4.0, tag `v0.4.0`):** marca `insights` en `AXIS_BRAND_ASSET_BRANDS`; `kind: 'lockup'` es nuevo y sólo lo usa
 `insights-lockup-*`. Se generan en Greenhouse con `scripts/brand/build-insights-logo.mjs` y se re-sellan con

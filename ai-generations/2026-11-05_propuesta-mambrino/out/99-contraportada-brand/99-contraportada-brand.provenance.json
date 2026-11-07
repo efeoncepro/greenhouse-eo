@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ffa38c71c88ed0c8a3523de3f34cf2e207c900ee775c13a9eabe5c25f979c090",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BRD3-contraportada",
+      "path": "ai-generations/2026-11-05_propuesta-mambrino/plates/BRD3-contraportada.png",
+      "sha256": "643c0868cb917633f840769b831fc48d3e59b75e51013843ecb677c97fe24897"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

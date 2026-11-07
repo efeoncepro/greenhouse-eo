@@ -1,0 +1,38 @@
+{
+  "id": "CT1",
+  "formato": "16:9",
+  "impacto": true,
+  "nota": "Hero web de Contacto (efeoncepro.com/contacto). Registro cine aprobado por el operador el 2026-10-30 para este hero; caso 1 (Nexa protagonista). Conserva la pose de la foto anterior sin la línea lima dibujada.",
+  "identidad": [
+    { "persona": "nexa", "expresion": "escucha-empatica" }
+  ],
+  "objetos": [
+    { "objeto": "hoodie-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark design studio at night): she sits at the far end of a long dark matte walnut table that runs toward the camera, on the RIGHT half of the frame, framed from the waist up, wearing the royal blue EFEONCE HOODIE, no lanyard, no smartwatch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at the height of her eyes, 85mm, she does not lean toward the lens. POSE: her RIGHT forearm, on the frame-left side of her body, rises from the table and her chin rests lightly on her loosely closed right hand; her right elbow rests on the table at about 56% of the frame width; her left forearm lies flat on the table; the embroidered mark on her left chest stays fully visible, nothing in front of it. She looks straight into the lens with a warm, attentive expression, the face of someone who is listening to you. Between the left edge of the frame and her elbow there is a wide band of empty darkness. A thin ring of glowing teal light hovers just above the table around her right elbow, no wider than her shoulders and entirely inside the right half of the frame, tilted up toward the camera so it reads as an open ellipse, never a flat line; it passes in front of her forearm and behind it. A short brighter teal arc of that ring carries ONE small cool-white sphere into the orbit, with the long-exposure light trail of a message that has just arrived, while she stays perfectly still and razor sharp. That glowing arc and its sphere are the only key light: the frame-left half of her face, her hand and the underside of her chin catch the teal glow and the frame-right half falls into deeper shadow; the glow only grazes the hoodie and never floods her chest. The haze above the ring catches its glow as a soft visible column of light rising toward her face. A crisp cool rim light from behind separates her hair and shoulders from the dark. A slim premium aluminium laptop stands open at the right edge of the table, seen from its thin side edge, its screen off and dark, no glow on her, no logo and no marks. The whole frame is cool and contemporary: teal light against deep navy darkness, nothing warm, amber or golden. Rich contrast, punchy saturated teal, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near end of the same long dark walnut table, soft out of focus and outside the reach of the ring of light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep darkness of the studio with only faint haze",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "nexa",
+  "llave": {
+    "fuente": "the short bright teal arc of the ring and its small cool-white sphere, hovering just above the table in front of her right elbow",
+    "lado": "below her face and to the left of it (frame left), slightly in front of her",
+    "distancia": "about 35 cm below and in front of her chin"
+  },
+  "fondo": "far behind her, only on the right half of the frame, a tall dark window with the cold lights of a night city melted into large round bokeh, dim and out of focus; no window and no bokeh in the left 45%",
+  "fenomeno": {
+    "que": "a thin tilted ring of teal light (#36C8BF) hovers just above the table around her right elbow; a short brighter teal arc carries ONE small cool-white sphere into the orbit, the long-exposure trail of a message that has just arrived",
+    "esServicio": "Contacto: le escribes a Efeonce, Nexa te escucha y tu mensaje ya entró en órbita hacia el equipo que lo resuelve"
+  }
+}

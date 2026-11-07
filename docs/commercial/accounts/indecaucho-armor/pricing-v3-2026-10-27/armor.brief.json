@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-27",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "indecaucho-armor-90d",
+  "offerMarketCountry": "EC",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+    {
+      "lineId": "ECG-008",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "67"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "99"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "ECG-009",
+      "profile": "ECG-009",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "20"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "44"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "ECG-019",
+      "profile": "ECG-019",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "24"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "24"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "ECG-011",
+      "profile": "ECG-011",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "10"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "dedicationByPeriod": [
+        {
+          "periodId": 1,
+          "dedication": {
+            "unit": "hours_per_month",
+            "value": "34"
+          }
+        }
+      ]
+    },
+    {
+      "lineId": "ECG-031",
+      "profile": "ECG-031",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "32"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "activePeriods": [
+        1
+      ]
+    },
+    {
+      "lineId": "ECG-012",
+      "profile": "ECG-012",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "24"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "activePeriods": [
+        1
+      ]
+    },
+    {
+      "lineId": "ECG-021",
+      "profile": "ECG-021",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "16"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "activePeriods": [
+        1
+      ]
+    },
+    {
+      "lineId": "ECG-016",
+      "profile": "ECG-016",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "hours_per_month",
+        "value": "8"
+      },
+      "dedicationEvidence": {
+        "reference": "estimate:armor-90d-scope-from-discovery-2026-10-27",
+        "effectiveFrom": "2026-10-27",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": [],
+      "activePeriods": [
+        1
+      ]
+    }
+  ],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}

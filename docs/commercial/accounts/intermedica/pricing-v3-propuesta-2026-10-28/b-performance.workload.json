@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-b-performance-2026-10-28-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-10-28",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "media-scope",
+      "label": "b-performance: bloque de trabajo media",
+      "hoursPerMonth": "75",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-performance:media",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "buyer-scope",
+      "label": "b-performance: bloque de trabajo buyer",
+      "hoursPerMonth": "37.5",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-performance:buyer",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "data-scope",
+      "label": "b-performance: bloque de trabajo data",
+      "hoursPerMonth": "22.5",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-performance:data",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "strategy-scope",
+      "label": "b-performance: bloque de trabajo strategy",
+      "hoursPerMonth": "15",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:b-performance:strategy",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "media",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "media-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "buyer",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "buyer-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "data",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "data-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "strategy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "strategy-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

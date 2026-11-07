@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "el hombro y el pelo de alguien que camina delante del lente,",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "santiago-ano-nuevo",
+ "input": {
+  "id": "santiago-ano-nuevo",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Alameda de Santiago de Chile con la Torre Entel",
+  "escena": "la Alameda cerrada al tránsito, con la calzada ocupada por gente que camina hacia el poniente; al fondo, nítida, la Torre Entel con su antena recortada contra el cielo que todavía guarda algo de luz. Se tiene que leer como víspera: gente llegando, no multitud ya instalada. Personas: grupos pequeños y familias caminando de espaldas o de perfil hacia la torre, en acciones espontáneas (conversan, llevan a un niño de la mano, miran el celular); nadie posa ni mira al lente; ningún rostro identificable en primer plano",
+  "hora": "anochecer de verano, cielo despejado azul profundo con resto de luz cálida en el horizonte (la llegada «con luz» del relato)",
+  "clima": "luz ambiente abundante de la ciudad, sombras abiertas, sin quemar las luces de la calle",
+  "primerPlano": "el hombro y el pelo de alguien que camina delante del lente,",
+  "borde": "lower-left corner",
+  "prohibir": "sin texto ni logos, sin el logo de Entel legible en la torre ni en pantallas, sin escenarios con marcas, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin fuegos artificiales todavía (es antes de medianoche), sin carabineros ni vallas en primer plano",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "Alameda de Santiago de Chile con la Torre Entel (its real forms, scale and spatial relationships)"
+ }
+}

@@ -1,5 +1,10 @@
 # Pricing V3 — operación local para agentes
 
+**Delta27/10/2026:** [v14 agrega Performance y Ecuador](PERFORMANCE_ECUADOR_2026-10-27.md), por pedido de Julio.
+Cuarta oferta `performance-commerce-distribution` (objetivo55%/piso45%, estimados), mercadoEC neutro1,00 estimado,
+reserva On-Demand12% del costo humano. Current vigente actualizado por CLI; policy v12/créditosv1 conservados.
+ARMOR recalculado en revisión, sin precio aprobado, importación a plataforma o envío.
+
 TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
 [Manual ejecutable](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
 [referencia funcional completa](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md).

@@ -19,10 +19,22 @@
 ## Extensión first-party — baseline25-oct y canary del 26 de octubre
 
 TASK-1834 añade un carril de identidad separado de MCP; contrato: [Rooms primero y login V4](EFEONCE_AUTH_ROOMS_FIRST_AND_LOGIN_V4_DECISION_V1.md). Registro server-owned, scope openid, ID token y handle opaco por RP; sin refresh ni userinfo en este corte. El canary conjunto Rooms del 26 de octubre acreditó el carril real para una identidad interna con Microsoft/MFA;
-volvió a OFF y quedó cerrado. No es rollout general ni autorización de un nuevo correo.
-Estado efectivo, retención PR #263/#264 y límites: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
+volvió a OFF y quedó cerrado. El carril first-party está ON en producción desde el 2026-10-31 y en `main` desde el release `935583f88db0` (2026-11-01); no es rollout general ni autorización de un nuevo correo ni de clientes reales.
+Estado efectivo y límites: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md). Las tablas y gv de este contrato MCP no se reutilizan para simular identidad.
 
 ## Delta 2026-11-01 — segunda audiencia: Rooms (TASK-2095)
+
+**En producción.** Hotfix acotado [PR #267](https://github.com/efeoncepro/greenhouse-eo/pull/267) (squash
+`69b0ba90832cad262a972aa82c050b8dd7d83a1c`), release `69b0ba90832c-5e4bdd3f-386a-4827-8e45-0b4b2ef5dd1d`
+(`released`, orquestador `41372622852` success) y revisión `auth-server-00172-zcn` al 100 %. Audiencia Rooms
+publicada: `https://efeonce-rooms.vercel.app/api/v1`, durable como variable de repo GitHub
+`AUTH_SERVER_ROOMS_AUDIENCE` (input de `auth-server-deploy.yml` y `services/auth-server/deploy.sh`;
+`scripts/auth-server/rooms-config-drift.py` la trata como opcional). Los dos clientes están registrados en
+producción; el secreto de introspección vive en Secret Manager como
+`rooms-production-agent-introspection-client-secret`. Rooms la consume desde el 2026-11-02 y el operador aceptó el
+carril ese día. Pendiente: la copy del consentimiento de las clases Rooms (`src/lib/copy/auth-server.ts`, commit
+`75b40772d`) está solo en `develop` y llega con el próximo release completo de Greenhouse. Pruebas:
+`src/lib/auth-server/oauth/rooms-audience.test.ts`.
 
 - **Audiencias:** gateway (`AUTH_SERVER_MCP_AUDIENCE`) y Rooms (`AUTH_SERVER_ROOMS_AUDIENCE`, vacía = apagada).
   Código en `src/lib/auth-server/oauth/resources.ts`.
@@ -32,12 +44,15 @@ Estado efectivo, retención PR #263/#264 y límites: [runbook](../operations/run
 - **Clases restringidas.** `efeonce.mcp.rooms.*` solo se conceden a un cliente que las liste en `allowed_scopes`;
   un `allowed_scopes` abierto (CIMD, DCR) nunca las recibe (`restricted_scope`). `author`, `release` y `access`
   exigen step-up al consentir.
+- **Audiencia apagada.** Con `AUTH_SERVER_ROOMS_AUDIENCE` vacía, pedir clases Rooms falla con
+  `rooms_audience_disabled`; el `resource` Rooms no se acepta.
 - **Solo personas internas.** Sin contexto de autorización interno, `authorize` responde `access_denied`
   (`rooms_requires_internal`) y `token` `invalid_grant`. En v2, un contexto puede llevar el scope base del gateway o
   solo clases Rooms (D10 de la autoridad interna: la autoridad sobre Rooms la decide Rooms).
 - **Vida:** access token Rooms de 300 s; refresh igual que el resto (rotación con reuso, 30 d / 90 d).
 - **Introspección por audiencia.** Un cliente confidencial con `metadata.introspection_audience` solo ve activos
-  los tokens de esa audiencia; la respuesta trae el `aud` real (access y refresh).
+  los tokens de esa audiencia; la respuesta trae el `aud` real (access y refresh). La revocación (RFC 7009) también
+  trabaja con el `aud` real.
 - **Clientes:** `efeonce-rooms-cli` (público, `none`, `http://127.0.0.1/callback` con puerto libre, code +
   refresh, clases Rooms sin `read.client`) y `efeonce-rooms-resource` (confidencial, sin `code` ni grants
   utilizables, solo introspección). Registro: `pnpm auth-server:register-rooms-agent-clients -- --secret-out <ruta>`
@@ -242,12 +257,18 @@ del mismo primitive: `POST /oauth/consent` (pantalla), `POST /api/admin/auth-ser
 
 ### 5.1 Contrato para la pantalla de consentimiento (task ui-ux)
 
-`GET /oauth/authorize` renderiza hoy una página mínima (server-side, sin JS, CSP estricta, isotipo
-Efeonce del SSOT `public/branding/SVG/isotipo-full-efeonce.svg` bundleado como constante generada,
-copy en `src/lib/copy/auth-server.ts`) con un `<form method="post" action="/oauth/consent">` y los
-campos `client_id`, `scope` (space-delimited), `return_to` (path+query del authorize original) y
-`decision` (`allow` | `deny`). La task ui-ux reemplaza la vista; el contrato de campos y rutas se
-mantiene. `deny` redirige al cliente con `error=access_denied&state&iss`.
+`GET /oauth/authorize` renderiza la pantalla de consentimiento server-side (sin JS, CSP estricta, copy en
+`src/lib/copy/auth-server.ts` y `src/lib/copy/auth-server-orbit.ts`) con un
+`<form method="post" action="/oauth/consent">` y los campos `client_id`, `scope` (space-delimited), `return_to`
+(path+query del authorize original) y `decision` (`allow` | `deny`). La vista puede cambiar; el contrato de campos y
+rutas se mantiene. `deny` redirige al cliente con `error=access_denied&state&iss`.
+
+- **Vista vigente.** En producción, el shell de TASK-1835 (isotipo Efeonce del SSOT bundleado como constante
+  generada). En `develop` (commit `d14b786d3`, **sin release**), el shell con La órbita (`pages/orbit-shell.ts`:
+  lockup «Efeonce | ID», panel con la órbita alrededor del ícono `integracion`, ficha de la aplicación con
+  `FIRST_PARTY_CLIENT_MARKS` por `client_id` exacto). Contrato visual en
+  `docs/architecture/ui-platform/PATTERNS.md` § Runtime sin React. El rediseño no altera campos, rutas ni la
+  revelación del destino.
 
 - **Host del `redirect_uri` visible (desde TASK-1837, 2026-09-06).** La pantalla revela a la persona el destino
   de la autorización: `renderConsentPage` exige `redirectHost` (lanza si falta) y muestra "Destino de la
@@ -308,7 +329,7 @@ ventana 24 h, steady 0): `auth.oauth.code_reuse_detected` (error), `auth.oauth.r
 | `AUTH_SERVER_ISSUER` | `https://auth.efeonce.org` | `issuer` publicado (origen https sin query/fragment) |
 | `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`; activo para el piloto; ver abajo) |
 | `AUTH_SERVER_MCP_AUDIENCE` | `https://mcp.efeonce.org/mcp` | `aud` de los access tokens y `resource` aceptado |
-| `AUTH_SERVER_ROOMS_AUDIENCE` | vacía (apagada) | TASK-2095: segunda audiencia (API de Rooms). Con valor, `resource` Rooms se acepta y las clases `efeonce.mcp.rooms.*` firman con ese `aud` y 300 s de vida |
+| `AUTH_SERVER_ROOMS_AUDIENCE` | vacía (apagada) | TASK-2095: segunda audiencia (API de Rooms). Con valor, `resource` Rooms se acepta y las clases `efeonce.mcp.rooms.*` firman con ese `aud` y 300 s de vida. En producción: `https://efeonce-rooms.vercel.app/api/v1` desde `auth-server-00172-zcn` (variable de repo GitHub, nunca `--update-env-vars`) |
 
 TTLs y límites: `AUTH_SERVER_OAUTH_DEFAULTS` (`config.ts`) — code 300 s, access 900 s, refresh 30 d /
 90 d, CIMD 24 h, rate limits arriba.

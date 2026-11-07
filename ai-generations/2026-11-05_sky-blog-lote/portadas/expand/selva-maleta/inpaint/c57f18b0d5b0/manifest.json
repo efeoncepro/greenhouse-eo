@@ -1,0 +1,60 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "c57f18b0d5b0",
+  "key": "c57f18b0d5b08a9f2b46fac7ba4ff872c29ef3b2939fcdf204454c775cd4d2ee",
+  "status": "failed",
+  "createdAt": "2026-11-05T09:42:34.400Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta/expand-inputs/582f6052718f-canvas.png",
+    "imageSha256": "cb5e92ac61fb1b6dd434cf82456d059f37edc6de99a1fbb553b72d0daf6dcf39",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta/expand-inputs/582f6052718f-mask.png",
+    "maskSha256": "2301d93b5c2b280ee9557e10d509a28cc16043e65cdb24e63f040bf388e14355",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "fal:flux-pro-fill",
+    "provider": "fal",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "fal-ai/flux-pro/v1/fill",
+    "quality": null,
+    "seed": null,
+    "count": 1,
+    "prompt": "continuation of the same damp earth jungle trail and dense wet vegetation toward the camera, in soft shade, mid-dark and calm, same light, same rain, no people, no objects",
+    "providerPrompt": "continuation of the same damp earth jungle trail and dense wet vegetation toward the camera, in soft shade, mid-dark and calm, same light, same rain, no people, no objects Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.6742068142361111,
+    "editable": 5111298,
+    "soft": 480843,
+    "protected": 2702259
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 1904,
+      "height": 1088
+    },
+    "aspectError": 0.015873015873015817,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.15,
+    "basis": "1 × 1 imagen(es) × 3 MP (redondeado arriba) × USD 0.05/MP"
+  },
+  "candidates": [],
+  "error": "fal upload initiate failed (HTTP 403, cuenta FAL_API_KEY_B): User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing"
+}

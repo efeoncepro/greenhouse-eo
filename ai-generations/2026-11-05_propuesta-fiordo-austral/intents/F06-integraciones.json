@@ -1,0 +1,69 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-platform-coexistence",
+  "voice": {
+    "eyebrow": "Integrado a Microsoft 365",
+    "question": "Outlook, Teams y SharePoint",
+    "answer": [
+      "Se",
+      "conectan"
+    ]
+  },
+  "body": "HubSpot se conecta con lo que Fiordo Austral ya usa, con **permisos mínimos** y registro de actividad.",
+  "note": "QAD: factibilidad incluida; la construcción es una fase opcional",
+  "platforms": [
+    {
+      "icon": "data",
+      "base": "Su operación",
+      "name": "Hoy",
+      "items": [
+        "Outlook y calendario",
+        "Teams y SharePoint",
+        "Planillas Excel",
+        "ERP QAD"
+      ]
+    },
+    {
+      "icon": "data",
+      "base": "HubSpot",
+      "name": "Smart CRM",
+      "items": [
+        "Correo y calendario conectados",
+        "Teams y carpeta por cliente",
+        "Importación con deduplicación",
+        "API con permisos mínimos"
+      ]
+    }
+  ],
+  "tableTitle": "Decisión por sistema",
+  "capabilities": [
+    {
+      "capability": "Correo y calendario de Outlook",
+      "verdict": "Integrar"
+    },
+    {
+      "capability": "Microsoft Entra ID: identidad",
+      "verdict": "Integrar"
+    },
+    {
+      "capability": "Teams y SharePoint u OneDrive",
+      "verdict": "Integrar"
+    },
+    {
+      "capability": "Planillas comerciales en Excel",
+      "verdict": "Migrar"
+    },
+    {
+      "capability": "ERP QAD: clientes y pedidos",
+      "verdict": "Integrar"
+    }
+  ],
+  "selectedCapability": 1,
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

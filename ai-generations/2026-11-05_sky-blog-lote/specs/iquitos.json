@@ -1,0 +1,130 @@
+{
+  "id": "iquitos",
+  "notion_url": "https://app.notion.com/p/2e3e2b2a1199480fa39e318b2d91c752",
+  "titulo": "Iquitos por primera vez: cómo combinar la ciudad con el Amazonas",
+  "slug": "/viaje-a-iquitos/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "iquitos-malecon-rio-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera apoyada en la baranda del malecón Tarapacá de Iquitos, mirando el río y la selva en la otra orilla",
+      "que_muestra": "el malecón Tarapacá de Iquitos con su baranda y el piso del paseo en primer término; una viajera apoyada en la baranda mira hacia el río, ancho y color café, y hacia la línea verde de selva de la otra orilla. Tiene que leerse como ciudad frente al río, con la selva a la vista pero lejos.",
+      "hora_clima": "media mañana; cielo húmedo con nubes blancas y claros, sin lluvia; luz natural abundante, sombras abiertas, altas luces del cielo y reflejos del río conservados",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; si aparecen paseantes, lejanos y pequeños, en acciones espontáneas; ningún rostro identificable",
+      "primer_plano": "el extremo de la baranda o la hoja de una palmera del malecón muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar a la viajera ni el río",
+      "ancla_pov": "la primera vista del río desde el malecón",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin agua azul ni turquesa",
+        "sin fauna exótica posada en el malecón",
+        "sin edificios inventados"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del malecón Tarapacá con vista al río en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la baranda y la línea del río tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Después, baja hacia Belén…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "en un puesto del mercado · escala cercana · luz de media mañana bajo toldo",
+      "registro": "E",
+      "archivo": "mercado-belen-aguaje-mano-iquitos.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mano sosteniendo frutos de aguaje en un puesto del mercado de Belén, en Iquitos",
+      "que_muestra": "en primer término, la mano del viajero sostiene dos o tres frutos de aguaje, de cáscara rojiza escamada; detrás, fuera de foco, un puesto del mercado con racimos de plátano, frutas amazónicas apiladas y toldos de colores. El fruto en la mano es el contenido: la ciudad se recorre probando.",
+      "hora_clima": "media mañana; luz natural abundante filtrada por los toldos, sombras abiertas, sin sol duro sobre la fruta",
+      "personas": "fotografía el propio viajero desde su punto de vista, mirando el fruto; solo su mano en cuadro; vendedores y compradores lejanos y muy desenfocados, sin rostro identificable",
+      "primer_plano": "el canto de una mesa del puesto o una hoja de plátano muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la mano ni el fruto",
+      "ancla_pov": "Es el lugar para probar con la mano lo que solo conocías de nombre",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni precios legibles",
+        "sin rostros identificables",
+        "sin animales silvestres a la venta ni carne de monte en cuadro",
+        "sin basura ni escenas que exotizan la pobreza del barrio",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "objeto y lugar identificables → requiere foto real REF-01 de frutos de aguaje y de un puesto del mercado de Belén en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es temprano en el embarcadero y la lancha ya está cargada…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la popa de una lancha · otra persona integrada · escala amplia · luz de primera hora",
+      "registro": "E",
+      "archivo": "iquitos-lancha-rio-salida-ciudad.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde una lancha que se aleja de Iquitos por el río, con la ciudad baja en la orilla y una acompañante mirando hacia adelante",
+      "que_muestra": "desde la parte de atrás de una lancha techada, la estela abre el agua color café; a un lado, la ciudad baja de Iquitos se aleja en la orilla, y al frente el río ancho con la línea de selva. Una acompañante sentada con chaleco salvavidas mira hacia adelante. La ciudad que se achica frente al río que se abre es el contenido: demuestra que la selva empieza donde termina la ciudad, y que hay que navegar para llegar.",
+      "hora_clima": "primeras horas de la mañana; cielo con nubes y algo de bruma sobre el agua, sin lluvia; luz natural luminosa y suave, sombras abiertas, sin quemar el cielo",
+      "personas": "fotografía el viajero sentado en la última banca, mirando hacia atrás y al costado; la acompañante está de espaldas o de perfil y mira hacia adelante; el conductor no aparece; nadie mira al lente; chalecos salvavidas sin logos",
+      "primer_plano": "el borde del techo de la lancha o una cuerda muy cerca del lente y muy fuera de foco, por el borde superior o inferior, sin tapar la ciudad ni el río",
+      "ancla_pov": "la ciudad se va achicando en la orilla y en pocos minutos solo queda el río",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en la lancha",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin delfines ni fauna en el agua (no se promete avistamiento)",
+        "sin agua azul",
+        "sin edificios altos inventados"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de Iquitos vista desde el río en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-iquitos",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Aguaje en Belén, noche selvática",
+    "archivo": "banner-ruta-lima-iquitos.webp",
+    "alt": "Banner de SKY de la ruta Lima–Iquitos: aguaje en Belén, noche en la selva",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Iquitos (IQT) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "IQT",
+      "ciudad": "Iquitos"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Iquitos"
+  },
+  "descartes": [
+    "Casas flotantes de Belén con canoas — riesgo de exotizar el barrio y de mostrar personas sin consentimiento",
+    "Noche en un lodge con mosquitero — es de la guía de lodges",
+    "Delfín asomando en el río — promete un avistamiento que el texto no garantiza",
+    "Plaza de Armas con la catedral — postal intercambiable",
+    "Mono en la Isla de los Monos — animal en rescate: riesgo de lectura de bienestar animal"
+  ]
+}

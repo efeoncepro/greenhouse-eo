@@ -1,0 +1,302 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "agenda",
+  "input": {
+    "artifactId": "agenda",
+    "slides": [
+      {
+        "slideId": "deck-decision-agenda",
+        "contentType": "deck.decision-agenda",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 140,
+            "questionPx": "--gl-ag-question-px=40px",
+            "questionLeading": "--gl-ag-question-leading=1.2",
+            "answerLeading": "--gl-ag-answer-leading=0.95",
+            "answerTracking": "--gl-ag-answer-tracking=-0.04em",
+            "answerInset": "--gl-ag-answer-inset=-6px",
+            "listLeft": "--gl-ag-list-left=820px",
+            "listTop": "--gl-ag-list-top=170px",
+            "listWidth": "--gl-ag-list-width=960px",
+            "rowGap": "--gl-ag-row-gap=40px",
+            "rule": "--gl-ag-rule=2px",
+            "padTop": "--gl-ag-pad-top=18px",
+            "padBottom": "--gl-ag-pad-bottom=22px",
+            "numberPx": "--gl-ag-number-px=80px",
+            "numberWght": "--gl-ag-number-wght=300",
+            "numberTracking": "--gl-ag-number-tracking=-0.04em",
+            "numberWidth": "--gl-ag-number-width=130px",
+            "topicPx": "--gl-ag-topic-px=46px",
+            "topicTracking": "--gl-ag-topic-tracking=-0.01em",
+            "topicChosenWght": "--gl-ag-topic-chosen-wght=600"
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-ag-progress-0-of-5-growth"
+          },
+          "voice": {
+            "question": "¿Qué veremos hoy?",
+            "answer": "temas",
+            "eyebrow": "Agenda",
+            "answerLead": "Cinco"
+          },
+          "topics": [
+            {
+              "role": "rest",
+              "number": "01",
+              "topic": "Diagnóstico"
+            },
+            {
+              "role": "lead",
+              "number": "02",
+              "topic": "La propuesta"
+            },
+            {
+              "role": "rest",
+              "number": "03",
+              "topic": "El equipo"
+            },
+            {
+              "role": "rest",
+              "number": "04",
+              "topic": "Cómo funciona"
+            },
+            {
+              "role": "rest",
+              "number": "05",
+              "topic": "Cómo empezamos"
+            }
+          ],
+          "selection": {
+            "label": "SKY",
+            "anchor": "bottom-start",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+            "padding": "standard",
+            "overlay": "none",
+            "item": 2
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-decision-agenda",
+      "contentType": "deck.decision-agenda",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 140,
+          "questionPx": "--gl-ag-question-px=40px",
+          "questionLeading": "--gl-ag-question-leading=1.2",
+          "answerLeading": "--gl-ag-answer-leading=0.95",
+          "answerTracking": "--gl-ag-answer-tracking=-0.04em",
+          "answerInset": "--gl-ag-answer-inset=-6px",
+          "listLeft": "--gl-ag-list-left=820px",
+          "listTop": "--gl-ag-list-top=170px",
+          "listWidth": "--gl-ag-list-width=960px",
+          "rowGap": "--gl-ag-row-gap=40px",
+          "rule": "--gl-ag-rule=2px",
+          "padTop": "--gl-ag-pad-top=18px",
+          "padBottom": "--gl-ag-pad-bottom=22px",
+          "numberPx": "--gl-ag-number-px=80px",
+          "numberWght": "--gl-ag-number-wght=300",
+          "numberTracking": "--gl-ag-number-tracking=-0.04em",
+          "numberWidth": "--gl-ag-number-width=130px",
+          "topicPx": "--gl-ag-topic-px=46px",
+          "topicTracking": "--gl-ag-topic-tracking=-0.01em",
+          "topicChosenWght": "--gl-ag-topic-chosen-wght=600"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-ag-progress-0-of-5-growth"
+        },
+        "voice": {
+          "question": "¿Qué veremos hoy?",
+          "answer": "temas",
+          "eyebrow": "Agenda",
+          "answerLead": "Cinco"
+        },
+        "topics": [
+          {
+            "role": "rest",
+            "number": "01",
+            "topic": "Diagnóstico"
+          },
+          {
+            "role": "lead",
+            "number": "02",
+            "topic": "La propuesta"
+          },
+          {
+            "role": "rest",
+            "number": "03",
+            "topic": "El equipo"
+          },
+          {
+            "role": "rest",
+            "number": "04",
+            "topic": "Cómo funciona"
+          },
+          {
+            "role": "rest",
+            "number": "05",
+            "topic": "Cómo empezamos"
+          }
+        ],
+        "selection": {
+          "label": "SKY",
+          "anchor": "bottom-start",
+          "participantKind": "department",
+          "scale": 1.1,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 2
+        }
+      },
+      "template": "DecisionAgenda",
+      "contractHash": "ce1a3399aa03edc97d4d5b43987231ac5cec84f48367dd4973c8341081a6b1c1",
+      "templateHash": "641fc60d8534c3f710b8628d6fdfda43a7f4ae353492bb0ff0ea5e0f81f5184e"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

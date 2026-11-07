@@ -1,5 +1,7 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
+> Delta Efeonce ID (2026-11-02): checks de la marca, el favicon y el botón «Continuar con Efeonce ID», incluida la trampa del lockup recortado por una escala redondeada; AXIS `main` en `0d45749` (paquete 0.4.32, tags `v0.4.31` y `v0.4.32` publicados). El botón no está implementado; el favicon está en código de `develop`, sin release.
+
 > Delta familia H3 (2026-10-09): checks de Wave, Reach y Globe junto a Efeonce; AXIS `main` en `7c96680` + `5346761` (paquete 0.4.28, tag `v0.4.28` publicado). Prueba de los isotipos chicos en favicon real aún sin ejecutar.
 
 > Delta Rooms verificado contra: decisión del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; checklist propuesto para el consumidor, sin QA runtime ejecutado.
@@ -555,3 +557,19 @@ Fuente: ADR [`EFEONCE_ROOMS_MARK_DECISION_V1.md`](../../../../docs/architecture/
 | [ ] | A 24 px o menos, Reach y Globe usan `*-isotype-small-*` | `assetId`; prueba en favicon real pendiente al 2026-10-09 |
 
 Fuente: ADR [`EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md`](../../../../docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md) y [ledger 2026-10-09](ledger.md#2026-10-09--wave-reach-y-globe-en-la-familia-h3-33-piezas).
+
+## Efeonce ID: marca, favicon y botón (2026-11-02)
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | La pieza es la que corresponde: `lockup` por defecto (encabezado del formulario, correos, documentos); `isotype` sólo como avatar o ícono de app, nunca junto al nombre; `isotype-small` sólo a 32 px o menos; `logo` como insumo; `button-lockup` sólo dentro del botón | `assetId` del manifest de `axis-brand-assets` (0.4.31 / 0.4.32) |
+| [ ] | En el `lockup`, «ID» va en el gris de la familia (`#6b6b6b` / `#6f89a2`); en el `button-lockup`, en la tinta del texto (blanco o navy). En ambos, sólo la esfera lleva el acento Growth y ningún texto va en el acento | `assetId` + revisión |
+| [ ] | La D conserva asta, tramo recto y media órbita, con la esfera a la 1:30; nada agregado dentro de la panza (sin surcos ni huella) | Revisión del SVG del paquete; nunca editar a mano: se regenera con `scripts/brand/build-efeonce-id-logos.mjs` |
+| [ ] | **El lockup no está recortado:** la curva de la D llega entera al borde derecho del archivo, en `positive`, `negative` y `white`. Trampa conocida: una escala de SVG redondeada a dos decimales (0,0292 → 0,03) agranda la marca casi un 3 % y la saca del `viewBox`; las escalas van con seis decimales o con un `<svg>` anidado con su propio `viewBox` | Revisión al 100 % y comprobación de que la última columna con tinta coincide con el borde; borde recto donde debería haber curva = recorte ([lessons.md](lessons.md), 2026-11-01) |
+| [ ] | Pantalla de entrada de Efeonce Auth: la marca sólo en el favicon y dentro del formulario (lockup del encabezado, botón); **nunca el isotipo grande en el panel lateral**, que es del carrusel de novedades | Captura de la pantalla real; revisión |
+| [ ] | Favicon: teja `#001a33`, radio 22 %, isotipo chico en negativo al 71,3 % del lado | `pnpm auth-server:brand-assets:generate` sin diferencias; revisión a 16 y 32 px |
+| [ ] | Botón: «Continuar con» + `button-lockup`; el monograma nunca antes del texto ni al final, nunca la órbita sola a la izquierda, nunca el isotipo en teja | Revisión |
+| [ ] | Botón: superficie según el fondo (sello `#001a33` sobre papel o blanco; blanco con borde sobre oscuro o foto); tamaño 52 / 56 / 40 (compacto, con nombre accesible «Continuar con Efeonce ID») / ancho completo / sólo símbolo (con nombre accesible) | Revisión contra el README de `axis-brand-assets` («The «Continuar con Efeonce ID» button») |
+| [ ] | Botón: los diez estados presentes y distinguibles (reposo, cursor, presionado, foco con teclado con anillo teal separado, foco + cursor, cargando con la órbita girando y «Conectando…», cargando quieto con movimiento reducido, conectado, error con aviso debajo, deshabilitado) | Revisión contra la lámina «Botón «Continuar con Efeonce ID» · todos los estados» del canvas; pendiente de implementar como primitive al 2026-11-02 |
+
+Fuente: ADR [`EFEONCE_ID_MARK_DECISION_V1.md`](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md), [applications.md A20](applications.md) y [ledger.md](ledger.md) (2026-11-01 y 2026-11-02).

@@ -2,6 +2,16 @@
 
 Diseño inicial: 2026-10-07. **Goal de construcción autorizado; estado ejecutado al2026-10-29 en el [dossier vivo](README.md).** El diseño restante sigue propuesto; no confundir topología futura con runtime desplegado. Dueño: Platform/Product. [ADR](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
 
+## Delta 2026-11-02 — autenticación de agentes por CLI
+
+Rooms tiene dos formas de autenticar a una persona interna en producción: la cookie de sesión (login en el navegador
+con Efeonce ID) y, desde el 2026-11-02, el bearer de Efeonce ID que obtiene `pnpm rooms login` (enmienda
+[D1-bis](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01), TASK-2087 y
+TASK-2095). El bearer fuerza el canal `cli`; si hay cookie, gana la cookie. Los canales siguen siendo
+`browser | cli | gateway | system`; `gateway` espera la forma delegada (TASK-2086, TASK-2088). En el diagrama de §1,
+la CLI y el MCP stdio local ya presentan identidad de Efeonce ID; el gateway MCP todavía no. Contrato:
+[§ Bearer de agentes](EFEONCE_ROOMS_API_AND_ACCESS_CONTRACT_V1.md#bearer-de-agentes-carril-cli-d1-bis).
+
 ## 0. Corte ejecutado y frontera pendiente — 2026-10-29
 
 El [candidato backend local](../../audits/rooms/2026-10-29-backend-local-completion.md)

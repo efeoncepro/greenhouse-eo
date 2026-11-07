@@ -172,10 +172,13 @@ Lo que hay que saber antes de abrirlo:
    en revisión, `2` falta un insumo, `1` rechazo, `0` operación técnica. Una simulación calculada no es costo
    validado, precio aprobado ni cotización emitida, y no cruza la frontera de la
    [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
-2. **Qué se cotiza sale del negocio, no de una preferencia.** Tres ofertas, cada una con su objetivo y su piso
-   (decisiones del CEO): `creative-managed-service` (45 % / 45 %), `seo-aeo-managed-service` (55 % / 45 %) y
-   `talent-assurance-staffing` (30–40 % por tier / 25 %). La **unidad comercial es un hecho del catálogo** (las dos
-   gestionadas se venden como `managed_service`, un fee; staffing como `role_capacity`, línea por línea) y una
+2. **Qué se cotiza sale del negocio, no de una preferencia.** Cuatro ofertas: `creative-managed-service`
+   (45 % / 45 %), `seo-aeo-managed-service` (55 % / 45 %) y `talent-assurance-staffing` (30–40 % por tier / 25 %)
+   conservan sus reglas decididas por el CEO. Desde el 27/10, `performance-commerce-distribution` incorpora
+   objetivo55 % / piso45 % **estimados**, bajo autorización de agregar la oferta; Ecuador tiene factor de mercado
+   neutro1,00 **estimado**, sin factor de talento EC inferido. [Alcance de v14](../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md).
+   La **unidad comercial es un hecho del catálogo**: las tres prácticas gestionadas se venden como
+   `managed_service`, un fee; staffing como `role_capacity`, línea por línea. Una
    demanda que la contradice no calcula. La forma (`engagementForm`) se declara siempre: `on_demand` para un
    trabajo con alcance, inicio, término y aceptación (+10 % y, en un servicio gestionado, la reserva de
    contingencia); `on_going` para un servicio mensual continuo. No existe una oferta para proyectos únicos: hoy van

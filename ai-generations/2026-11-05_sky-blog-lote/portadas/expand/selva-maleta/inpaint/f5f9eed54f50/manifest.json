@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "f5f9eed54f50",
+  "key": "f5f9eed54f50df410a66fe104568f6ce447e3ff2e7ca3463a87f28e2b79d4f16",
+  "status": "completed",
+  "createdAt": "2026-11-05T09:43:13.244Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta-base.png",
+    "imageSha256": "041a7708a98cd6cd1e79221c593802a18c18066949211bf75db8af539cafd9a1",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta-mask.png",
+    "maskSha256": "5b90c888a4f2247df2cbd9437434e7381fafb9003b3f018ad032b65b66301d10",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend the same photograph outward as if the camera stepped back: continue the damp earth jungle trail and the dense wet vegetation toward the camera and to both sides, with the same light, the same fine rain, the same colour and the same lens. The new lower area is calm and mid-dark, in soft shade, with large out-of-focus wet leaves very close to the lens at the bottom edge. No people, no objects, no text. Seamless with the existing photograph.",
+    "providerPrompt": "Extend the same photograph outward as if the camera stepped back: continue the damp earth jungle trail and the dense wet vegetation toward the camera and to both sides, with the same light, the same fine rain, the same colour and the same lens. The new lower area is calm and mid-dark, in soft shade, with large out-of-focus wet leaves very close to the lens at the bottom edge. No people, no objects, no text. Seamless with the existing photograph."
+  },
+  "mask": {
+    "touchedFraction": 0.668565658757716,
+    "editable": 5545351,
+    "soft": 0,
+    "protected": 2749049
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 50.075,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 13.75,
+        "bestError": 13.75,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 2749049,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 5545351,
+        "maxDelta": 255,
+        "meanDelta": 50.075,
+        "worst": {
+          "x": 757,
+          "y": 8
+        }
+      },
+      "seam": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "modelDriftInProtected": {
+        "pixels": 2749049,
+        "maxDelta": 254,
+        "meanDelta": 40.999,
+        "worst": {
+          "x": 2586,
+          "y": 3
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1620,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 112
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3463
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

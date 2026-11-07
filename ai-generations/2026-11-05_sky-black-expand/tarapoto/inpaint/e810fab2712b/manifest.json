@@ -1,0 +1,155 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "e810fab2712b",
+  "key": "e810fab2712b0423d44225960ef8b151bed50bdff891c80d6df8da7d2838530c",
+  "status": "completed",
+  "createdAt": "2026-11-05T22:11:33.155Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/tarapoto/expand-inputs/12d1ba12a046-canvas.png",
+    "imageSha256": "b414704c0ca1926b08719978b98fb29f550c1cc2d800ab97ae41ed00c4250706",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-black-expand/tarapoto/expand-inputs/12d1ba12a046-mask.png",
+    "maskSha256": "97b96e3aeeb85c1ab028abcf2049c725766b42942a13c6963d2fb08f02d89e7b",
+    "maskConvention": "white-editable",
+    "width": 1200,
+    "height": 2133,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "medium",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend the photo vertically: above, continue the same blue sky with white clouds over the medieval-style castle of Lamas and complete the tops of its towers and battlements naturally; below, continue the same green trees and foliage. Keep the existing photo exactly. No new buildings, no birds, no text.",
+    "providerPrompt": "Extend the photo vertically: above, continue the same blue sky with white clouds over the medieval-style castle of Lamas and complete the tops of its towers and battlements naturally; below, continue the same green trees and foliage. Keep the existing photo exactly. No new buildings, no birds, no text. Extend the scene naturally into the empty margins: continue the surfaces, light, perspective and grain of the photo. Do not add new subjects, text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.5874355368026254,
+    "editable": 1266000,
+    "soft": 237600,
+    "protected": 1056000
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1200,
+      "height": 2133
+    },
+    "target": {
+      "width": 1200,
+      "height": 2128
+    },
+    "aspectError": 0.0023441162681669867,
+    "reason": "recorte desactivado (--crop off)"
+  },
+  "estimate": {
+    "usd": 0.0379,
+    "basis": "1 × salida 1200x2128 medium (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 71.235,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 11.81,
+        "bestError": 11.81,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1056000,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1266000,
+        "maxDelta": 251,
+        "meanDelta": 81.871,
+        "worst": {
+          "x": 318,
+          "y": 2130
+        }
+      },
+      "seam": {
+        "pixels": 237600,
+        "maxDelta": 232,
+        "meanDelta": 14.563,
+        "worst": {
+          "x": 371,
+          "y": 1604
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1056000,
+        "maxDelta": 242,
+        "meanDelta": 33.86,
+        "worst": {
+          "x": 182,
+          "y": 998
+        }
+      },
+      "outputUsd": 0.0379,
+      "providerModel": "gpt-image-2.6-flare",
+      "usage": {
+        "input_tokens": 1617,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 109
+        },
+        "output_tokens": 1264,
+        "output_tokens_details": {
+          "image_tokens": 1264,
+          "text_tokens": 0
+        },
+        "total_tokens": 2881
+      },
+      "meta": {
+        "size": "1200x2128",
+        "quality": "medium",
+        "providerMask": true
+      }
+    }
+  ],
+  "expand": {
+    "source": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/556be26d-0508-40ae-90b2-998711ee8289/scratchpad/kvhm-canvas/expand/TARAPOTO_crop1200.png",
+    "sourceSha256": "509520d13120ee84a4fd97829355a46b594f03c0547ae44312e531bb421382bd",
+    "to": null,
+    "plan": {
+      "canvas": {
+        "width": 1200,
+        "height": 2133
+      },
+      "scene": {
+        "left": 0,
+        "top": 527,
+        "width": 1200,
+        "height": 1080
+      },
+      "scale": 1
+    },
+    "fill": "mirror",
+    "blend": 100
+  }
+}

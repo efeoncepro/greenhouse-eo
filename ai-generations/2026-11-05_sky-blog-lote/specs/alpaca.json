@@ -1,0 +1,130 @@
+{
+  "id": "alpaca",
+  "notion_url": "https://app.notion.com/p/c193e2c676504447b0b5901097d32b62",
+  "titulo": "Del hilo a la prenda: cómo acercarte al tejido de alpaca durante un viaje",
+  "slug": "/tejido-de-alpaca/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "F — Encuentro social + B Viajero integrado",
+      "modificadores": "viajera y tejedora · escala media · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "tejido-alpaca-chinchero-patio-tejedora-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera observando a una tejedora trabajar en un telar de cintura en un patio de Chinchero, en Cusco, con cerros andinos al fondo",
+      "que_muestra": "un patio de tierra y adobe en Chinchero con una tejedora sentada en el suelo trabajando un telar de cintura, madejas de colores a su lado y cerros andinos al fondo bajo un cielo limpio; la viajera, agachada a unos pasos, mira el telar con atención. Debe leerse como un espacio de trabajo real, sereno, no como escenario para turistas.",
+      "hora_clima": "media mañana, la hora de la visita en el relato; cielo despejado, sol de altura; luz abundante, sombras abiertas, altas luces del cielo conservadas",
+      "personas": "la viajera de perfil o de espaldas, mirando el telar y no la cámara; la tejedora de perfil o con el rostro fuera de cuadro o no identificable, concentrada en el tejido, sin posar; nadie mira al lente",
+      "primer_plano": "el borde de una madeja de fibra teñida muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar el telar",
+      "ancla_pov": "el golpe rítmico de un telar de cintura",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles del centro o de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostro identificable de la tejedora",
+        "sin trajes convertidos en disfraz",
+        "sin alpacas posando en el patio",
+        "sin diseños textiles copiados de una comunidad identificable"
+      ],
+      "fidelidad": "lugar y oficio identificables → requiere fotos reales REF-01 de un patio del Centro de Textiles de Chinchero y REF-02 de un telar de cintura con su tejido en la tarea antes de generar (si no, Bloqueado). Las personas son referencia de oficio, no retrato: se generan sin parecido con tejedoras reales",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el telar, las manos de la tejedora y la viajera tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina que te sientas en un banco bajo…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "manos del viajero con pushka y fibra · escala cercana · luz de mañana",
+      "registro": "E",
+      "archivo": "tejido-alpaca-pushka-hilado-manos-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos de un viajero intentando hilar fibra cruda de alpaca con una pushka, el huso de mano andino, en un taller textil de Cusco",
+      "que_muestra": "en primer término, las manos del viajero sosteniendo una pushka con un hilo irregular que sale de un copo de fibra cruda de alpaca, de color natural; al fondo, desenfocadas, las manos de una tejedora hilando con soltura y madejas de colores en una mesa o banco. El contraste entre el hilo torpe del viajero y el hilo parejo de la tejedora es el contenido.",
+      "hora_clima": "mañana, durante la visita del relato; interior o galería con luz natural abundante que entra de costado, sombras abiertas, sin flash",
+      "personas": "fotografía el propio viajero desde su posición; solo sus manos en primer plano y, al fondo, las manos y el torso de la tejedora, sin rostro; nadie mira al lente",
+      "primer_plano": "el copo de fibra cruda muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la pushka",
+      "ancla_pov": "Cuando lo intentas tú, el hilo se corta o se engruesa",
+      "no": [
+        "sin texto ni logos",
+        "sin etiquetas legibles ni rótulos del centro",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin stock",
+        "sin ruecas de pedal ni maquinaria industrial",
+        "sin fibra teñida en el copo crudo",
+        "sin rostro de la tejedora"
+      ],
+      "fidelidad": "objeto y oficio identificables → requiere foto real REF-01 de una pushka con fibra de alpaca en uso en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vas a ver primero las madejas colgadas…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "manos de la tejedora en el telar · escala cercana · luz de mediodía",
+      "registro": "E",
+      "archivo": "tejido-alpaca-telar-cintura-manos-pasada.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos de una tejedora apretando una pasada con una paleta de madera en un telar de cintura, con un tejido de colores a medio terminar",
+      "que_muestra": "en primer término, el tejido a medio hacer sobre el telar de cintura, con una franja de diseño geométrico de colores ya terminada y la urdimbre todavía cruda; las manos de la tejedora aprietan la pasada con la paleta de madera. La parte terminada junto a la parte pendiente es el contenido: demuestra cuánto trabajo hay en cada centímetro.",
+      "hora_clima": "mediodía, durante la demostración del relato; exterior a la sombra o galería con luz natural abundante, sombras abiertas, color fiel de los hilos",
+      "personas": "fotografía el viajero agachado junto al telar; solo las manos y antebrazos de la tejedora en cuadro, sin rostro; nadie mira al lente",
+      "primer_plano": "hilos sueltos de la urdimbre muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar las manos ni el diseño",
+      "ancla_pov": "con una paleta de madera, golpea cada pasada para apretar el tejido",
+      "no": [
+        "sin texto ni logos",
+        "sin etiquetas ni rótulos legibles",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin stock",
+        "sin telares de pedal ni industriales",
+        "sin copiar un diseño identificable de una comunidad concreta",
+        "sin rostro de la tejedora"
+      ],
+      "fidelidad": "oficio identificable → requiere foto real REF-01 de un telar de cintura en uso en la región de Cusco en la tarea antes de generar (si no, Bloqueado). La iconografía se genera genérica, sin reproducir diseños de una comunidad real"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "CUZ",
+      "ciudad": "Cusco"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-cusco",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Telares, colores y montaña en Cusco",
+    "cta": "Ver vuelos a Cusco",
+    "archivo": "banner-ruta-lima-cusco-tejido.webp",
+    "alt": "Banner de SKY de la ruta Lima–Cusco: telares, colores y montaña",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Cusco (CUZ) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Telares, colores y montaña en Cusco” (6 palabras; la ruta Lima → Cusco es el elemento principal y el titular va en segundo nivel)<br />**CTA (lo escribe el compositor):** Ver vuelos a Cusco →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-cusco<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-cusco-tejido.webp` · **ALT:** “Banner de SKY de la ruta Lima–Cusco: telares, colores y montaña”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin diseños textiles de una comunidad identificable"
+  },
+  "descartes": [
+    "alpacas en un pastizal — postal intercambiable; el artículo no trata del animal sino del oficio",
+    "olla de tinte natural hirviendo — los tintes del centro están pendientes de confirmar",
+    "tienda con prendas colgadas — se lee como guía de compras, que la ficha prohíbe",
+    "retrato de una tejedora — persona real identificable"
+  ]
+}

@@ -12,7 +12,8 @@ declarar hipótesis editorial y responsable de seguimiento: no inventar métrica
 
 Los cuatro formatos existentes son un catálogo, no un paquete obligatorio:
 Facebook 4:5; Instagram Story de 3–4 pantallas 9:16; Reel/TikTok/Short de
-5 escenas y 20–30 segundos; Pinterest Pin 2:3. Un artículo puede generar de cero a cuatro.
+5 escenas y 20–30 segundos (el corpus entregado es otro: transformación de 14 s; ver
+[módulo 06](06_DERIVADOS_SOCIALES.md) § Producción del reel); Pinterest Pin 2:3. Un artículo puede generar de cero a cuatro.
 Mantener las plantillas del módulo 06. No convertir una Story en carrusel ni añadir plataformas.
 
 Evaluar cada combinación artículo/canal con cinco preguntas, sin inventar un score medido:
@@ -47,6 +48,20 @@ La idoneidad editorial es una hipótesis, no rendimiento observado.
 Fecha de producción no equivale a fecha de publicación: se puede producir con anticipación.
 Una efeméride fuera del mes no se cancela automáticamente; confirmar el encargo y ventana con
 el responsable, sin mover fechas. Archivos y temas sensibles conservan revisión humana.
+
+**Cuando el cliente decide usar sus artes oficiales (2026-11-04, caso Umbral Vivo).** Si una reunión con Berel
+fija que lo social de un artículo se hace con sus artes oficiales (29-oct-2026), los cuatro canales quedan
+`Pendiente · Decisión del cliente` en la matriz y la propuesta que se haya pedido a Efeonce vive como alternativa en
+el toggle `📣 Derivados sociales · propuesta V1` del artículo (módulo 06). No se crean tareas ni subítems ni se
+cuenta en el cupo hasta que Berel confirme; y nada se programa hasta que la canónica planificada pase QA live.
+
+**Una reescritura evergreen reabre la matriz (2026-11-05, caso Rayados N52).** El 2026-09-03 los cuatro canales de
+N52 quedaron `No aplica` porque la pieza era de aniversario (`Archivo YYYY`). Cuando la reunión del 29 de octubre
+decidió reescribirla como evergreen (módulo 03), esa decisión dejó de valer y la matriz se evaluó de nuevo. Se produjo
+una propuesta V1 de los cuatro formatos (post de Facebook, 4 stories de Instagram, Pin y reel de 14 s; módulo 06),
+aprobada por Efeonce el 5 de noviembre de 2026 y pendiente de la revisión de Berel. El cambio se fecha en la matriz
+sin borrar la decisión anterior. Para el balance de diciembre, N52 ya no cuenta como «bloqueado»: se recuenta al
+cierre con el método de abajo.
 
 ## Capacidad y conteo
 

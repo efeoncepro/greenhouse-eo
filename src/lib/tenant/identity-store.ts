@@ -165,6 +165,9 @@ type Session360Row = Record<string, unknown> & {
   // Account 360 — resolved from session_360 via space bridge, primary membership, or operating entity fallback
   space_id: string | null
   space_public_id: string | null
+  // TASK-2096 — how many active Spaces the client has; > 1 means the Space must be chosen explicitly
+  active_space_count: number | null
+  space_selection_required: boolean | null
   organization_id: string | null
   organization_public_id: string | null
   organization_name: string | null
@@ -225,6 +228,7 @@ const sessionRowToAccessRow = async (row: Session360Row) => {
     // Account 360
     space_id: row.space_id ?? null,
     space_public_id: row.space_public_id ?? null,
+    space_selection_required: row.space_selection_required === true,
     organization_id: row.organization_id ?? null,
     organization_public_id: row.organization_public_id ?? null,
     organization_name: row.organization_name ?? null,
@@ -242,26 +246,48 @@ const sessionRowToAccessRow = async (row: Session360Row) => {
   }
 }
 
+/**
+ * TASK-2096 (H1) — a session lookup must resolve one principal or fail. `session_360` is one row
+ * per user since TASK-2096; two rows mean an identity integrity defect (or a view regression), and
+ * picking one by row order would hand out an arbitrary principal or Space.
+ */
+export class IdentitySessionAmbiguousError extends Error {
+  constructor(readonly lookup: 'user_id' | 'microsoft_oid' | 'google_sub' | 'email') {
+    super(`identity_session_ambiguous:${lookup}`)
+    this.name = 'IdentitySessionAmbiguousError'
+  }
+}
+
+const pickSingleSessionRow = (rows: Session360Row[], lookup: IdentitySessionAmbiguousError['lookup']) => {
+  if (rows.length > 1) throw new IdentitySessionAmbiguousError(lookup)
+
+  return rows[0] ?? null
+}
+
 export const getSessionFromPostgresByMicrosoftOid = async (oid: string) => {
   await assertIdentityPostgresReady()
 
   const rows = await runGreenhousePostgresQuery<Session360Row>(
-    `SELECT * FROM greenhouse_serving.session_360 WHERE microsoft_oid = $1 LIMIT 1`,
+    `SELECT * FROM greenhouse_serving.session_360 WHERE microsoft_oid = $1 LIMIT 2`,
     [oid]
   )
 
-  return rows[0] ? sessionRowToAccessRow(rows[0]) : null
+  const row = pickSingleSessionRow(rows, 'microsoft_oid')
+
+  return row ? sessionRowToAccessRow(row) : null
 }
 
 export const getSessionFromPostgresByGoogleSub = async (sub: string) => {
   await assertIdentityPostgresReady()
 
   const rows = await runGreenhousePostgresQuery<Session360Row>(
-    `SELECT * FROM greenhouse_serving.session_360 WHERE google_sub = $1 LIMIT 1`,
+    `SELECT * FROM greenhouse_serving.session_360 WHERE google_sub = $1 LIMIT 2`,
     [sub]
   )
 
-  return rows[0] ? sessionRowToAccessRow(rows[0]) : null
+  const row = pickSingleSessionRow(rows, 'google_sub')
+
+  return row ? sessionRowToAccessRow(row) : null
 }
 
 export const getSessionFromPostgresByEmail = async (email: string) => {
@@ -274,22 +300,26 @@ export const getSessionFromPostgresByEmail = async (email: string) => {
      WHERE LOWER(email) = $1
         OR LOWER(COALESCE(microsoft_email, '')) = $1
         OR LOWER(COALESCE(google_email, '')) = $1
-     LIMIT 1`,
+     LIMIT 2`,
     [normalized]
   )
 
-  return rows[0] ? sessionRowToAccessRow(rows[0]) : null
+  const row = pickSingleSessionRow(rows, 'email')
+
+  return row ? sessionRowToAccessRow(row) : null
 }
 
 export const getSessionFromPostgresByUserId = async (userId: string) => {
   await assertIdentityPostgresReady()
 
   const rows = await runGreenhousePostgresQuery<Session360Row>(
-    `SELECT * FROM greenhouse_serving.session_360 WHERE user_id = $1 LIMIT 1`,
+    `SELECT * FROM greenhouse_serving.session_360 WHERE user_id = $1 LIMIT 2`,
     [userId]
   )
 
-  return rows[0] ? sessionRowToAccessRow(rows[0]) : null
+  const row = pickSingleSessionRow(rows, 'user_id')
+
+  return row ? sessionRowToAccessRow(row) : null
 }
 
 export const getInternalUsersFromPostgres = async () => {

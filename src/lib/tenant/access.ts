@@ -60,6 +60,8 @@ interface TenantAccessRow {
   // Account 360 — nullable until M1 migration
   space_id?: string | null
   space_public_id?: string | null
+  // TASK-2096 — client has several active Spaces; none is chosen implicitly
+  space_selection_required?: boolean | null
   organization_id?: string | null
   organization_public_id?: string | null
   organization_name?: string | null
@@ -117,6 +119,8 @@ export interface TenantAccessRecord {
 
   // Account 360
   spaceId: string | null
+  /** TASK-2096 — true when the client has several active Spaces and `spaceId` is intentionally null. */
+  spaceSelectionRequired: boolean
   organizationId: string | null
   organizationName: string | null
 
@@ -228,6 +232,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
 
     // Account 360
     spaceId: row.space_id ?? null,
+    spaceSelectionRequired: row.space_selection_required === true,
     organizationId: row.organization_id ?? null,
     organizationName: row.organization_name ?? null,
 

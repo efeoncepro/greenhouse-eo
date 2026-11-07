@@ -1,0 +1,131 @@
+{
+  "id": "arequipa",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781ae9355cd8f0affa578",
+  "titulo": "Lugares turísticos de Arequipa: cómo organizar tres días con el Cañón del Colca",
+  "slug": "/lugares-turisticos-arequipa/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + B Viajero integrado",
+      "modificadores": "persona sola · escala amplia · luz de mediodía · orienta",
+      "registro": "D",
+      "archivo": "arequipa-plaza-armas-portales-misti-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando bajo los portales de sillar de la Plaza de Armas de Arequipa, con el volcán Misti al fondo",
+      "que_muestra": "los portales de arcos de sillar blanco de la Plaza de Armas de Arequipa vistos desde la sombra de una de sus galerías; afuera, la plaza con palmeras y, al fondo, el cono del Misti contra un cielo azul limpio. La viajera camina por el portal hacia la luz. Debe leerse como centro histórico de piedra volcánica blanca, no como una plaza colonial cualquiera.",
+      "hora_clima": "cerca del mediodía, con el sol alto sobre el sillar (el momento del gancho); cielo despejado; luz abundante, sombras abiertas dentro del portal, altas luces del sillar y del cielo conservadas",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, caminando sin pose ni mirada al lente; transeúntes lejanos en la plaza, en actividades espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "el canto de una columna de sillar del portal muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar a la viajera ni al volcán",
+      "ancla_pov": "Sillar blanco que encandila al mediodía, el Misti asomando al fondo de la plaza",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales de los portales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin nieve inventada en el Misti si la referencia no la tiene",
+        "sin cambiar la proporción ni la posición real del volcán respecto de la plaza"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de los portales de la Plaza de Armas de Arequipa con el Misti al fondo en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el arco del portal, la viajera y el Misti tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «A dos cuadras, el Monasterio de Santa Catalina es otro mundo…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "calle interior · otra persona integrada · escala media · luz de media tarde",
+      "registro": "E",
+      "archivo": "santa-catalina-calle-roja-azul-recorrido.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Calle interior del Monasterio de Santa Catalina, en Arequipa, con muros rojos y azul añil, recorrida a pie por una visitante",
+      "que_muestra": "una calle angosta y empedrada del monasterio, con muros pintados de rojo intenso a un lado y azul añil al fondo, macetas con geranios y una puerta de madera; una acompañante camina unos pasos adelante, mirando una de las puertas. El color de los muros es el contenido: tiene que leerse como Santa Catalina y no como un pueblo colonial genérico.",
+      "hora_clima": "media tarde de la primera jornada en el relato; cielo despejado; luz natural abundante que entra por la calle, sombras abiertas, color saturado sin quemar el cielo",
+      "personas": "fotografía el viajero que recorre la calle; la acompañante, de espaldas o de perfil, mira una puerta; ningún rostro identificable; nadie mira al lente; sin religiosas representadas",
+      "primer_plano": "una maceta con geranios o el borde de un muro rojo muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la calle",
+      "ancla_pov": "calles angostas pintadas de rojo y azul añil, patios con geranios, cocinas con olor a piedra fría",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles del museo",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin monjas ni hábitos",
+        "sin multitudes de turistas",
+        "sin colores distintos a los reales del monasterio"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una calle interior del Monasterio de Santa Catalina en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «El punto que vas a esperar todo el camino es la Cruz del Cóndor…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + B Viajero integrado",
+      "modificadores": "viajero en la baranda · escala muy amplia · luz de media mañana",
+      "registro": "E",
+      "archivo": "colca-cruz-del-condor-mirador-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero abrigado apoyado en la baranda del mirador Cruz del Cóndor, mirando la profundidad del Cañón del Colca",
+      "que_muestra": "el viajero, con casaca y gorro, apoyado en la baranda de piedra del mirador, mirando hacia el cañón; las paredes caen en capas hacia un río lejano y apenas visible, con montañas al otro lado. La escala es el contenido: la figura humana pequeña frente a la profundidad demuestra por qué el Colca pide un día entero.",
+      "hora_clima": "media mañana, la hora de llegada al mirador en el relato; cielo despejado y aire frío; luz natural abundante que entra al cañón, sombras abiertas en las paredes, altas luces del cielo conservadas",
+      "personas": "fotografía un acompañante desde unos pasos atrás; el viajero, de espaldas o de perfil, mira el cañón y no la cámara; otros visitantes, si aparecen, lejanos y de espaldas; ningún rostro identificable",
+      "primer_plano": "el borde de piedra de la baranda muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al viajero ni la caída del cañón",
+      "ancla_pov": "Te asomas y el vacío da vértigo: paredes que caen hasta un río que apenas se ve",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cóndores en primer plano ni bandadas (no se promete el avistamiento)",
+        "sin vegetación selvática",
+        "sin exagerar la profundidad ni inventar cascadas"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la vista desde el mirador Cruz del Cóndor en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "AQP",
+      "ciudad": "Arequipa"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Sillar blanco y un cañón profundo",
+    "cta": "Ver vuelos a Arequipa",
+    "archivo": "banner-ruta-lima-arequipa.webp",
+    "alt": "Banner de SKY de la ruta Lima–Arequipa: sillar blanco y un cañón profundo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Arequipa (AQP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Sillar blanco y un cañón profundo” (6 palabras; la ruta Lima → Arequipa es el elemento principal y el titular va en segundo nivel)<br />**CTA (lo escribe el compositor):** Ver vuelos a Arequipa →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-arequipa.webp` · **ALT:** “Banner de SKY de la ruta Lima–Arequipa: sillar blanco y un cañón profundo”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+  },
+  "descartes": [
+    "Juanita en su vitrina — restos humanos: no se representan con IA ni se usan como imagen editorial",
+    "terrazas del valle del Colca con pueblo de piedra — compite con la IMG 3 por el mismo día",
+    "Mirador de Yanahuara con el Misti entre arcos — pertenece al artículo de Yanahuara",
+    "Molino de Sabandía en la campiña — requiere REF real y repite la presencia del volcán",
+    "cóndor en vuelo sobre el cañón — promete un avistamiento que el texto no garantiza"
+  ]
+}

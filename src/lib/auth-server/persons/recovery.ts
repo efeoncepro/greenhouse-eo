@@ -46,56 +46,17 @@ export const revokePersonAuthState = async (
 ): Promise<RevokePersonAuthStateResult> => {
   const now = deps.now()
 
-  const sessionsRevoked = await deps.store.revokeSessionsForSubject({
+  const counts = await deps.store.revokeAuthStateWithAudit({
     environmentId: deps.environmentId,
     subject: input.subject,
-    now,
-    reason: input.reason
-  })
-
-  const credentials = await deps.store.listPasskeyCredentials({
-    environmentId: deps.environmentId,
-    subject: input.subject
-  })
-
-  let passkeysRevoked = 0
-
-  for (const credential of credentials) {
-    passkeysRevoked += await deps.store.revokePasskeyCredential({
-      credentialId: credential.credentialId,
-      now,
-      reason: input.reason
-    })
-  }
-
-  const totpRevoked =
-    (await deps.store.revokeTotpEnrollment({
-      environmentId: deps.environmentId,
-      subject: input.subject,
-      now,
-      reason: input.reason
-    })) > 0
-
-  await deps.store.recordAttempt({
-    method: 'recovery',
-    stage: 'revoke',
-    outcome: 'success',
-    reasonCode: input.reason,
-    environmentId: deps.environmentId,
     subjectHash: sha256Hex(input.subject),
-    ipHash: null,
-    userAgentHash: null,
-    correlationId: input.correlationId,
-    details: {
-      sessionsRevoked,
-      passkeysRevoked,
-      totpRevoked,
-      // Referencia del actor, no su identidad cruda: el ledger no acumula PII.
-      actorRef: input.actorRef
-    }
+    now,
+    reason: input.reason,
+    actorRef: input.actorRef,
+    correlationId: input.correlationId
   })
 
-  return { subject: input.subject, sessionsRevoked, passkeysRevoked, totpRevoked }
+  return { subject: input.subject, ...counts }
 }
 
 /** Revoca el estado de todos los subjects que una re-invitación dejó atrás. */

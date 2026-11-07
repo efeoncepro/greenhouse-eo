@@ -147,7 +147,7 @@ siguen siendo candidatos, sin aprobación de marca o publicación automática.
 
 **Entrega para humanos y agentes:** seguir `EFEONCE_CAMPAIGN_REGISTRY_V1.md` §Entrega de pauta compartida. Un manifiesto operativo genera catálogo visual y CSV; Finales organiza por campaña/tipo/ratio, con titulares legibles e IDs estables. Recetas y versiones en Recursos, nunca entregas separadas por agente.
 
-### Motor de IA: cómo elegir (as-of 2026-09-16)
+### Motor de IA: cómo elegir (as-of 2026-09-16; delta GPT Image 2.6 2026-11-05)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en
 `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
@@ -164,9 +164,16 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
   mascota), contraste medido bajo la caja del lockup **antes** de componer (una luz detrás del logo blanco dio 1,3:1) y
   lockup, eyebrow y fila de productos determinísticos. Criterio del lockup (filete, logos en blanco, un solo bloque
   focal, sin pregunta-respuesta): `efeonce-graphic-line` → `references/applications.md` §A16.
-- 🔴 `pnpm ai:image` sin `--model` genera con `gpt-image-2`: nombra siempre el modelo 2.5 que quieres.
-- Plate cotidiano → GPT Image 2.5 Flare; edición precisa, máscara o master final → 2.5 Sunburst
-  (`pnpm ai:image --model gpt-image-2.5-sunburst`); material/atmósfera → Seedream 5 Pro; divergencia barata →
+- 🔴 `pnpm ai:image` sin `--model` genera con `gpt-image-2`: nombra siempre el modelo 2.5 o 2.6 que quieres.
+- **GPT Image 2.6** (Sunburst/Flare, 2026-11-04) corre en `pnpm ai:image --model gpt-image-2.6-*` desde 2026-11-05.
+  Ruteo: explorar e iterar en `low`/`medium` sigue en 2.5 Flare (2.6 cuesta ~4×/~3× más ahí; igual en
+  `high`/`xhigh`/`max`, cifras en la guía §5.1); vector → `--format svg`; micro-loop → `--format gif`; corrección
+  dibujada → `--markup` o trazos rojos sobre la foto (2.5 o 2.6). 🔴 **Pieza de producción:** compara 2.5 y 2.6
+  Sunburst en la toma real antes de elegir, y la **identidad de personas sigue en 2.5 Sunburst** hasta un canario.
+  🔴 Sunburst 2.6 tampoco va con máscara (panel negro): la zona va por `pnpm ai:inpaint`, Flare. Comandos, oficio y
+  trampas: `greenhouse-ai-image-generator` §GPT Image 2.6.
+- Plate cotidiano → GPT Image 2.5 Flare; edición precisa o master final → 2.5 Sunburst
+  (`pnpm ai:image --model gpt-image-2.5-sunburst`; una zona con máscara va por `pnpm ai:inpaint`, Flare); material/atmósfera → Seedream 5 Pro; divergencia barata →
   Seedream 5 Lite (`pnpm ai:fal`).
 - Resolución nativa > 2K (OOH, print proof) → Seedream 5 Lite o GPT Image (hasta 3840×2160, experimental sobre
   2560×1440); Seedream 5 Pro en fal **no pasa de 2048²**.

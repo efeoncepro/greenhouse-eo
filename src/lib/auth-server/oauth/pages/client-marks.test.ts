@@ -12,7 +12,7 @@ describe('marca de la aplicación en el consentimiento', () => {
     const claude = renderClientMark({ clientId: 'https://claude.ai/.well-known/oauth-client', clientName: 'Claude' })
 
     expect(claude.verified).toBe(true)
-    expect(claude.html).toContain('id-client-mark-brand')
+    expect(claude.html).toContain('os-client-mark-brand')
     expect(claude.html).toContain('<svg')
   })
 

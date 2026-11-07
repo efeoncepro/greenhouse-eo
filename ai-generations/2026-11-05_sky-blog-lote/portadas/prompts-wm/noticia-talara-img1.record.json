@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "D",
+ "portada": true,
+ "primerPlano": "el borde de una columna o de una banca de la sala,",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "noticia-talara",
+ "input": {
+  "id": "noticia-talara",
+  "registro": "D",
+  "tipo": "D",
+  "portada": true,
+  "lugar": "aeropuerto de Talara, Piura, Perú",
+  "escena": "el interior de una sala de llegadas pequeña y luminosa; un viajero, de espaldas y a media distancia, camina hacia la salida con una mochila y una tabla de surf en su funda bajo el brazo; por los ventanales del fondo entra la luz de la tarde. Tiene que leerse como llegada a un aeropuerto regional de playa, no como gran terminal. Personas: el viajero de espaldas, caminando, sin pose ni mirada al lente; otros pasajeros pequeños y lejanos; personal, si aparece, con ropa neutra, de espaldas y sin uniformes reconocibles; ningún rostro identificable",
+  "hora": "final de la tarde, con luz natural cálida que entra por los ventanales",
+  "clima": "interior luminoso, sombras abiertas, ventanales sin quemar",
+  "primerPlano": "el borde de una columna o de una banca de la sala,",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin señalética ni pantallas legibles, sin logos de aerolíneas, sin aviones a la vista por los ventanales, sin cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin cintas de equipaje con marcas",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, body-height POV.",
+  "refLugar": "aeropuerto de Talara, Piura, Perú (its real forms, scale and spatial relationships)"
+ }
+}

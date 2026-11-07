@@ -1,7 +1,7 @@
 # Inpainting y edición local — playbook del agente
 
 > **as-of 2026-10-03** (TASK-1965 + TASK-1973); delta 2026-10-19 (guarda de marca y `expand` sin saldo, corrida
-> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`). Esto es el playbook operativo: intención → comando → modelo → flags →
+> `ai-generations/2026-10-19_google-partner-freeze/`); delta 2026-10-20 (§9, simular un anuncio exacto en foto real, caso Gana GRD-1541); delta 2026-10-20 (§5, borrar una línea de luz del fondo, retrato de Nexa para `/agenda/`); delta 2026-11-05 (§2, GPT Image 2.6 y `markup`; tarde: `--markup` y rayado verificados en `pnpm ai:image`, Sunburst 2.6 con máscara = panel negro, Flare 2.6 por el pipeline PASS; noche: lote Blog SKY, guarda de marca con «logos» en negativo y alejar la cámara con el crudo de Flare). Esto es el playbook operativo: intención → comando → modelo → flags →
 > qué mirar al 100 % → código de salida → costo medido. El contrato vive en otro lado y manda ante cualquier
 > diferencia:
 >
@@ -49,14 +49,20 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 - **Caché por hash** de la entrada (incluye la revisión del adaptador): repetir no vuelve a pagar; `--force` repite.
 - **Tope de costo:** `--max-usd` (default USD 1; env `AI_COST_CONFIRM_USD`); `--yes` lo supera.
 - **`--dry-run` es gratis:** máscara, recorte, payload y costo estimado, sin llamar al proveedor. Úsalo primero.
+- **Qué clave OpenAI paga:** `ai:inpaint` no tiene flag propio; para trabajo creativo antepón
+  `OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint …` (crédito personal, desde 2026-11-01). Sin la variable paga la
+  clave de la empresa; nunca la dejes en `.env.local`. Regla y manual:
+  [`alternar-clave-openai.md`](../../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - `--count <n>` (1–8) = N pedidos pagados, con `contact-sheet.png`.
 
 ## 2. Intención → comando → modelo
 
 | Intención | Comando | Modelo por defecto | Flags que importan |
 |---|---|---|---|
-| Editar o agregar algo **en una zona** | `ai:inpaint image --image --mask --prompt` | `openai` · **Flare** `medium` con máscara | `--adapter fal:flux-pro-fill` (alternativa con máscara) · `--model gpt-image-2.5-sunburst` para la pieza final |
+| Editar o agregar algo **en una zona** | `ai:inpaint image --image --mask --prompt` | `openai` · **Flare** `medium` con máscara | `--adapter fal:flux-pro-fill` (alternativa con máscara) · `--model gpt-image-2.5-sunburst` para la pieza final · `--model gpt-image-2.6-flare` opcional (PASS por el pipeline 2026-11-05) |
 | Guiar con un dibujo, como el Markup de ChatGPT | `image --sketch` (+ `--reference` para el objeto) | el de `image` | sin `--mask`, la máscara sale del trazo (`--sketch-margin`, 40) y **crece hasta el objeto** (`--grow-mask auto`); una `--mask` explícita nunca crece |
+| Guiar con anotaciones **nativas** de OpenAI (`markup`) | `pnpm ai:image --image base.png --markup marcas.png --prompt …` (no es `ai:inpaint`) | GPT Image 2.5 Flare, 2.6 Flare o 2.6 Sunburst [verificado 2026-11-05] | PNG **transparente del mismo tamaño que la base** con trazos rojos (óvalo + nota o boceto a mano alzada); la CLI valida alfa y tamaño; **no combina con `--mask`**. Prompt: *"Follow the red annotations: … Do not render the annotations. Keep everything else identical."* La capa no suma costo de entrada. 🔴 `ai:image` **no recompone ni verifica delta 0**: si el resto debe quedar idéntico, recompón o usa `--sketch` |
+| **Rayar** la foto (trazos rojos aplanados sobre la imagen) | `pnpm ai:image --image base-rayada.png --prompt …` (sin `--markup`) | GPT Image 2.5 o 2.6 [verificado 1 de 1 por caso, `low`] | Borrar: *"Remove the objects scribbled over in red … and the red scribbles. Keep everything else identical."* (Flare 2.6 y 2.5 borraron una libreta). Agregar: un boceto rojo de lámpara se volvió lámpara real (Sunburst 2.6). Mismo límite: sin recomposición ni verificación |
 | Rehacer un detalle (manos, textura) | `image --zone-resolution <px>` (512–4096) | el de `image` | **reinterpreta, no escala**: Flare redibujó la taza y le quitó el pie |
 | **Borrar** un objeto | `ai:inpaint erase` | con `--layers`: **clean plate** (USD 0) · con `--mask`: **Sunburst por instrucción** | `--layer` (repetible), `--grow` (16), `--shadow auto` (default con capas: suma la sombra proyectada), `--fill plate\|model` |
 | **Mover** o escalar un elemento | `ai:inpaint move --layers --layer --dx --dy [--scale]` | sin IA salvo el halo | `--scale` 0,2–3 · `--harmonize auto\|off` (sólo sombra de contacto y reflejo) · `--shadow off` |
@@ -71,7 +77,15 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
 - 🔴 **Sunburst NUNCA con máscara:** devuelve la zona como **panel negro plano** (3 de 3). El pipeline lo hace editar sin
   máscara (`--provider-mask auto`), le manda la zona en magenta como imagen 2 (`--guide auto`), corrige el color en un
   anillo de 14 px (`--color-match auto`) y recompone. Revisa el aviso de reencuadre.
-- **Flare es el default con máscara** para editar una zona; Sunburst es el más potente para la pieza final.
+  🔴 **Vale para Sunburst 2.5 Y 2.6** (delta 2026-11-05): Sunburst 2.6 con la máscara del pipeline (RGB negro bajo el
+  alfa) también devolvió **panel negro** (1 de 1, el pipeline lo detectó y salió `3` REVISAR). `ai:inpaint` ya acepta
+  2.6 [contrato 2026-11-05]: manda **Sunburst 2.6 sin máscara (como 2.5)** y **Flare 2.6 con máscara**, y a los modelos
+  con `complexity` les envía `complexity: low` (recomendación oficial para ediciones acotadas; no cambia el costo); la
+  estimación aplica el factor 2.6. Ambos 2.6 redibujan la imagen entera (deriva media fuera de la zona 12–17/255):
+  la recomposición sobre la original sigue siendo obligatoria, y la hace el pipeline.
+- **Flare es el default con máscara** para editar una zona (2.5 por defecto; **Flare 2.6 por el pipeline: PASS, sin
+  panel** [verificado 2026-11-05], opcional); Sunburst es el más potente para la pieza final. Rostros e identidad de
+  personas siguen en 2.5 Sunburst: 2.6 no tiene canario de identidad.
 - **Borrar = editor por instrucción, no relleno con máscara:** Flare con máscara dejó media taza; Flux Fill dibujó
   **otra** taza dos veces; Seedream 5 Pro Edit dejó un fantasma del asa que el detector **no** ve. Con capas, el clean
   plate es gratis y limpio.
@@ -91,7 +105,9 @@ media no es criterio; los modelos movieron la zona protegida hasta 179/255).
   describir la identidad y pasarla por `--reference`. `--allow-brand` es para ediciones de contexto, no para esto.
 - **La guarda también aborta si el prompt dice «logos» en negativo** («sin logos», «no logos»; caso anuncio
   Efeonce | Google, 2026-10-19): lee la palabra, no la intención. Si la edición toca el contexto y hay que nombrar
-  marcas, `--allow-brand`.
+  marcas, `--allow-brand`. Se repitió el 2026-11-05 (lote Blog SKY): «no lettering, no logos» frenó 11 expansiones
+  y un retoque de letrero, sin cobro. Para borrar letras falsas o un letrero, describir la superficie limpia en
+  positivo («plain smooth stone… completely blank stone surface») en vez de nombrar lo que no debe aparecer.
 - **Piel craquelada / «papel arrugado»** en una foto IA es artefacto de upscaler; se corrige con la misma ruta. Si la
   persona además no es la canónica, cambiar la cara por las anclas resuelve las dos cosas en una pasada.
 
@@ -104,6 +120,17 @@ Unificarlos es decisión de TASK-1925; no cambies uno por otro en una serie ya a
 Exhausted balance», el comando no corre (`pnpm ai:fal --balance` antes de planearlo). Con un fondo vacío, sin objetos
 que continuar, el formato se extendió de forma determinística (color por columna + grano), fuera de este pipeline y
 sin su verificación: caso del 9:16 del anuncio Efeonce | Google.
+
+**Alejar la cámara sin Flux Fill: el crudo de Flare, no el recompuesto (2026-11-05, lote Blog SKY).** Con fal sin
+saldo, para subir al sujeto de 11 portadas se armó el lienzo a mano (escena reducida y subida sobre 3840×2160 con una
+guía difuminada de la misma foto) y una máscara que protegía al sujeto, con `ai:inpaint image` + `gpt-image-2.5-flare`
+`high`. El recompuesto `candidate-1.png` dejó uniones en 7 de 11 (Flare reencuadra, lo mismo que midió el canario de
+`expand`) y una pasada de fundido las empeoró. El crudo `candidate-1-raw.png` (2560×1440) salió coherente y se amplió
+con lanczos a 3840×2160 [verificado a ojo, 11 de 11 sin uniones]. Costo: el crudo es la imagen entera redibujada, así
+que **no** tiene la garantía de delta 0 (en una portada desapareció la persona): revisar lugar, personas y detalle al
+100 % y dejarlo declarado como pendiente de validación humana. Es un rodeo; con saldo, `expand` con Flux Fill. Scripts:
+`creative-workbench/projects/sky/blog-lote-2026-11/tools/imagenes/zoomout.mjs` y `runzoom2.sh` (rutas del scratchpad
+de la sesión: ajustarlas antes de reusar).
 
 ## 3. Máscaras — `pnpm ai:mask`
 

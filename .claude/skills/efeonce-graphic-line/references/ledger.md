@@ -1,5 +1,46 @@
 # Registro de decisiones y versiones
 
+### 2026-11-02 — Pantallas de Efeonce ID con La órbita (aprobadas e implementadas en local)
+
+- **Decisión del operador:** La órbita es el sistema de todas las pantallas de Efeonce ID (como Rooms, 2026-10-07). El
+  login V4 sigue siendo la excepción documentada en §A12; el resto usa el shell aprobado en el canvas «Rooms — Cerraste
+  tu sesión» (tarjetas `Id*`).
+- **Cómo se usa la órbita:** rodea un ícono del catálogo AXIS (seguridad, correo, integración, reloj) con anillo, acento
+  y esfera, o una palabra con la «órbita en reposo». Nada de medidas, puntos repetidos, anillos cortados ni logos dentro.
+  Corrección del operador del mismo día en [lessons.md](lessons.md).
+- **Código:** `src/lib/auth-server/oauth/pages/orbit-shell.ts` + `scripts/auth-server/orbit-shell-styles.ts`; sin release.
+
+### 2026-11-02 — Botón «Continuar con Efeonce ID» (aprobado)
+
+- **Canónico:** «Continuar con» + `efeonce-id-button-lockup-{positive,negative}` (`axis-brand-assets` 0.4.32, publicado en `v0.4.32`, AXIS
+  `0d45749`): el lockup Efeonce | ID con «ID» en la tinta del texto, no en gris. Sello oscuro sobre papel, blanco sobre
+  oscuro; 52 px por defecto, grande 56, compacto 40, ancho completo y sólo símbolo; diez estados (cursor con halo teal,
+  cargando con la órbita, conectado con la vuelta completa, error con aviso debajo). ADR de la marca, sección del botón.
+- **Descartado:** monograma antes del texto («ID Continuar con Efeonce ID»), monograma al final (la esfera arriba se lee
+  como aviso), órbita sola a la izquierda (parece recargar), isotipo en teja («muy pesado»), lockup con «ID» en gris.
+- **Regla que deja:** un símbolo hecho de letras no va antes de un texto que las repite; si tiene que ir, va en su propio
+  lugar con forma de logo (la G de Google), o la marca entra como nombre después de «Continuar con».
+
+### 2026-11-01 — Marca de Efeonce ID: la órbita vive en la D (aprobada)
+
+Caso: logo de Efeonce ID, la cuenta de Efeonce Auth (canvas `https://claude.ai/code/artifact/4e613ff0-2a09-48c6-8e98-4adffc6da9bd`,
+exploración en `ai-generations/2026-11-01_efeonce-id-logo/`). ADR: `docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md`.
+
+- **Aprobada la ruta A pulida** («Bien, está aprobado»): la D es asta, **tramo recto de 110** y media órbita; esfera
+  Growth a la 1:30 con el corte concéntrico; anillo 64, esfera 88, aire 22. 12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`
+  en `@efeoncepro/axis-brand-assets` **0.4.31** (publicado en el release `v0.4.31`: AXIS `5a6a597` + `5540a2c`, 2026-11-02, readback en GitHub Packages), públicos en «Logotipos». Generador
+  `scripts/brand/build-efeonce-id-logos.mjs` (0 px de diferencia contra el canvas).
+- **El tramo recto resolvió la primera queja** («no me gusta mucho»): sin él la media órbita salía del asta, dejaba un
+  muñón entre asta y esfera y la panza parecía un alambre pegado a la barra. Anillos de 80 y 96 se probaron y se
+  descartaron: volvían a pesar.
+- **Descartadas:** la nave de Efeonce + «ID» («la nave no funciona, descártala»); la huella con surcos concéntricos en
+  la panza, en tres grados, con remates redondos y en trazo fino («muy pesada y no tan limpia para el logo e incluso para
+  nuestra línea gráfica»); la I dentro de una órbita (se lee ⓘ); la esfera como punto de la i (sin órbita, choca con
+  Insights).
+- **Pantalla de entrada de Efeonce Auth:** la marca va **sólo en el favicon y en ciertas aplicaciones del formulario**
+  (lockup en el encabezado, botón «Continuar con Efeonce ID»). **Nunca el isotipo grande en el panel lateral**: es del
+  carrusel de novedades, que se conserva. La adopción en `auth-server` no está hecha.
+
 ### 2026-10-28 — Home de efeoncepro.com en «La órbita» (canvas «Home Efeonce en órbita»): aprobada y publicada
 
 Caso: rediseño de la home del sitio con la línea gráfica y el motion de referencia de getpingback.com (canvas
@@ -1082,3 +1123,19 @@ Publicado «Explora», cuatro columnas, newsletter/empleo separados, partners gr
 legales discretos y controles flotantes ocultos sólo al ver footer. 531px desktop, QA6casos y axe
 sin violaciones. [Recibo](../../../../docs/audits/public-site/2026-10-14-footer-composition-v2.md).
 La variante anterior se conserva como historial; no se cambia la firma de correo ni tiers.
+
+## 2026-11-05 — Sprocket 3D de HubSpot autorizado fuera de Efeonce (norma 1.36)
+
+- **Decisión del operador:** Julio pidió la propuesta de Fiordo Austral «muy HubSpot» con sus activos oficiales y luego
+  ordenó «Sí, actualízala» para la norma.
+  - El sprocket 3D de HubSpot queda **autorizado fuera de Efeonce**, con la aprobación escrita de HubSpot que el
+    operador declaró el 2026-10-14 (caso Assetplan). Se ratifica en esta fecha.
+  - Siempre se usa desde el kit (`ai-generations/2026-10-06_deck-hubspot/png/sprocket-3d-flotando-800.png`), sin
+    modificar ni generar el logo.
+- **Dónde va:** sobre la plataforma de `content-service-lanes`, a 380 px en x 1410 / y 470.
+- **Qué se actualizó:** la norma de superficie (§4.6, deck HubSpot), el README de recetas y las skills `deck-studio` y
+  `hubspot-solutions-partner`.
+  - Antes decían «uso interno»; el catálogo de recetas y el manual ya lo daban por autorizado.
+  - El PDF del brochure de octubre se armó sin el sprocket y queda así.
+- **Insignia Gold naranja:** sobre fondo oscuro se puede usar la variante naranja cuando la pieza pide el acento de
+  HubSpot. Se sube como PNG, porque el canvas de Design le quita el `<style>` al SVG.

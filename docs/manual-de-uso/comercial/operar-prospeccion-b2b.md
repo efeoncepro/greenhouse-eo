@@ -1,5 +1,14 @@
 # Operar prospección B2B con agentes
 
+## Atajo: workflow de prospección contextual
+
+Con capturas, publicaciones o perfiles concretos: **«Aplica el workflow de prospección contextual a estas personas»**.
+El [recorrido guardado](../../../.codex/skills/efeonce-b2b-prospecting/references/linkedin-signal-to-outreach.md)
+investiga persona/empresa/necesidad, consigue correo verificable, registra Contact/Company en HubSpot y
+ejecuta InMail/mensaje y email contextual con landings y brochure original enlazado desde HubSpot,
+dentro del mandato y con lectura posterior por canal. Preserva firma gráfica/CCO, presupuesto acotado,
+dedupe y paradas; no instala un scheduler ni activa seguimientos por guardar el workflow.
+
 **Cobertura pendiente:** [diagnóstico Perú](../../commercial/sales-navigator/COBERTURA-PERU-Y-VALIDACION-DE-BUSQUEDAS-2026-10-29.md) separa persistencia, pertinencia y cobertura. Las 44 búsquedas siguen guardadas; las variantes CRM 58/81/106/868 no son censo ni compradores calificados. Revisar controles y exclusiones antes de recomendar sustituciones.
 
 **Sales Navigator multimer­cado:** [44 búsquedas guardadas](../../commercial/sales-navigator/BUSQUEDAS-GUARDADAS-MERCADOS-HISPANOS-2026-10-29.md)

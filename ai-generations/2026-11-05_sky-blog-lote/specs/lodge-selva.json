@@ -1,0 +1,129 @@
+{
+  "id": "lodge-selva",
+  "notion_url": "https://app.notion.com/p/034cd25e8dfd4423943b01a9bc41dfce",
+  "titulo": "Dormir en la selva por primera vez: qué revisar antes de reservar un lodge",
+  "slug": "/lodges-en-iquitos/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de media tarde · orienta",
+      "registro": "D",
+      "archivo": "lodge-selva-llegada-muelle.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera bajando de un bote a un muelle de madera frente a cabañas con techo de palma en la selva cerca de Iquitos",
+      "que_muestra": "desde el agua, un muelle de madera sencillo que entra al río; al fondo, entre árboles altos, dos o tres cabañas elevadas con techo de palma; una viajera con mochila pisa el muelle desde el bote. Debe leerse como llegada a un alojamiento rústico en medio del bosque, no como resort ni hotel de ciudad.",
+      "hora_clima": "media tarde, la hora de llegada del relato; cielo húmedo con nubes, sin lluvia; luz natural abundante filtrada por los árboles, sombras abiertas, altas luces del cielo conservadas",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, bajando del bote, sin pose ni mirada al lente; si aparece personal del lodge, lejano, con ropa neutra, cuerpo parcial y sin rostro identificable",
+      "primer_plano": "la punta del bote o una cuerda de amarre muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera ni las cabañas",
+      "ancla_pov": "una cabaña con mosquitero que te espera entre los árboles",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni nombres de lodges reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin piscinas ni infraestructura de resort",
+        "sin fauna posada para la foto",
+        "sin un lodge real identificable"
+      ],
+      "fidelidad": "escena genérica de lodge, sin establecimiento identificable → requiere foto real REF-01 de un muelle y cabañas de lodge de la zona de Iquitos como referencia de tipología (no de un lodge concreto) en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, el muelle y al menos una cabaña tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es todavía de noche cuando el guía golpea suave la puerta…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde una canoa · otra persona integrada · escala media · luz de amanecer",
+      "registro": "E",
+      "archivo": "canoa-cano-amanecer-selva.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde una canoa que avanza al amanecer por un caño de la selva amazónica, con un guía remando adelante",
+      "que_muestra": "desde el asiento del medio de una canoa de madera, el caño angosto cubierto de bruma suave, árboles altos y raíces a ambos lados, y adelante un guía de espaldas que rema; el agua quieta refleja la primera luz.",
+      "hora_clima": "amanecer, la primera salida del relato; bruma sobre el agua, sin lluvia; luz natural suave y luminosa, sombras abiertas, sin oscurecer la escena para dramatizarla",
+      "personas": "fotografía el viajero sentado en la canoa, a la altura del agua; el guía está de espaldas, con ropa neutra y sin logos, y mira hacia adelante; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "el borde de la canoa y la mano del viajero apoyada en él, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el caño ni al guía",
+      "ancla_pov": "el caño está cubierto de bruma y el único ruido es el remo entrando en el agua",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres de lodges",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin animales posados ni a la vista (no se promete avistamiento)",
+        "sin linternas encendidas ya de día",
+        "sin lianas de película ni selva de fantasía"
+      ],
+      "fidelidad": "escena genérica de caño amazónico → requiere foto real REF-01 de un caño de la zona de Iquitos al amanecer como referencia de vegetación y agua en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Llega la noche y la selva sube el volumen…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "interior de cabaña · escala cercana · luz de lámpara al anochecer",
+      "registro": "D",
+      "archivo": "lodge-cabana-mosquitero-noche.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Cama con mosquitero en una cabaña de madera de un lodge en la selva, con una lámpara encendida al anochecer",
+      "que_muestra": "el interior de una cabaña de madera con paredes de malla hacia el bosque; una cama con el mosquitero recogido, una lámpara de luz cálida sobre una mesa pequeña y, detrás de la malla, el bosque ya oscuro con el último azul del cielo. La sensación de refugio en medio del bosque es el contenido: demuestra cómo es de verdad la noche en un lodge.",
+      "hora_clima": "anochecer, justo después de que se va la luz del día; luz cálida de la lámpara combinada con el último azul del cielo, sin dejar la escena negra ni quemar la lámpara",
+      "personas": "sin personas: la cabaña vacía, como la encuentra el viajero al entrar; la mochila del viajero apoyada en una silla da la señal de POV",
+      "primer_plano": "el borde del mosquitero muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar la cama ni la lámpara",
+      "ancla_pov": "el mosquitero, recogido sobre el colchón, es lo último que bajas antes de dormir",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres de lodges",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin lujo de resort ni decoración de catálogo",
+        "sin insectos o animales dentro de la cabaña",
+        "sin aparatos electrónicos en primer plano"
+      ],
+      "fidelidad": "escena genérica de cabaña, sin establecimiento identificable → requiere foto real REF-01 de una cabaña de lodge de la zona como referencia de materiales en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-iquitos",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Canoa al amanecer, ranas de noche",
+    "archivo": "banner-ruta-lima-iquitos-lodge.webp",
+    "alt": "Banner de SKY de la ruta Lima–Iquitos: canoa al amanecer, ranas de noche",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Iquitos (IQT) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "IQT",
+      "ciudad": "Iquitos"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Iquitos"
+  },
+  "descartes": [
+    "Comedor de madera con el almuerzo servido — repite el momento E de otras guías y no muestra un criterio de decisión",
+    "Caminata nocturna con linternas frontales — exige oscuridad y riesgo de imagen poco legible",
+    "Guía señalando un ave en la copa de un árbol — promete un avistamiento",
+    "Visita a una comunidad — retrato de personas reales: exige autorización y pautas oficiales",
+    "Hamaca en la terraza del lodge — postal intercambiable"
+  ]
+}

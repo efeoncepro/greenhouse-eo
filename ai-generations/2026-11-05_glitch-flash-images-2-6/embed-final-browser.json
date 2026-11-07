@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "status": 200,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "iframes": 2,
+      "oldButtons": 0,
+      "bodyImages": 11,
+      "drops": 5,
+      "canonical": "https://efeoncepro.com/glitch/glitch-flash-images-2-6/",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "cover": "https://efeoncepro.com/wp-content/uploads/2026/11/glitch-images-2-6-own-cover.png",
+      "videos": [
+        {
+          "id": "1243362697",
+          "w": 1112,
+          "h": 625.5,
+          "style": "aspect-ratio:640/360;width:100%;height:auto;",
+          "currentTime": 1.0171,
+          "paused": false,
+          "readyState": 4,
+          "error": null,
+          "videoWidth": 1280,
+          "videoHeight": 720
+        },
+        {
+          "id": "1242918503",
+          "w": 1112,
+          "h": 278,
+          "style": "aspect-ratio:640/160;width:100%;height:auto;",
+          "currentTime": 1.0169,
+          "paused": false,
+          "readyState": 4,
+          "error": null,
+          "videoWidth": 1200,
+          "videoHeight": 300
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "width": 390,
+      "scrollWidth": 390,
+      "iframes": 2,
+      "oldButtons": 0,
+      "bodyImages": 11,
+      "drops": 5,
+      "canonical": "https://efeoncepro.com/glitch/glitch-flash-images-2-6/",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "cover": "https://efeoncepro.com/wp-content/uploads/2026/11/glitch-images-2-6-own-cover.png",
+      "videos": [
+        {
+          "id": "1243362697",
+          "w": 358,
+          "h": 201.375,
+          "style": "aspect-ratio:640/360;width:100%;height:auto;",
+          "currentTime": 1.0254,
+          "paused": false,
+          "readyState": 4,
+          "error": null,
+          "videoWidth": 1280,
+          "videoHeight": 720
+        },
+        {
+          "id": "1242918503",
+          "w": 358,
+          "h": 89.5,
+          "style": "aspect-ratio:640/160;width:100%;height:auto;",
+          "currentTime": 1.0116,
+          "paused": false,
+          "readyState": 4,
+          "error": null,
+          "videoWidth": 1200,
+          "videoHeight": 300
+        }
+      ]
+    }
+  ],
+  "pageErrors": []
+}

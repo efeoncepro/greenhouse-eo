@@ -70,7 +70,7 @@ const opsSubject = { ...internalSubject, userId: 'user-ops', roleCodes: ['efeonc
 const clientSubject = { userId: 'user-cli', tenantType: 'client' as const, roleCodes: ['client_manager'], primaryRoleCode: 'client_manager', routeGroups: ['client'], authorizedViews: [] }
 
 const request = (overrides: Record<string, unknown> = {}) => ({
-  modules: ['seo'],
+  modules: ['seo', 'aeo'],
   period: { start: '2026-08-01', endExclusive: '2026-09-01', timeZone: 'America/Santiago' },
   comparison: { kind: 'previous_period' },
   audience: 'client',
@@ -195,6 +195,19 @@ describe('TASK-1845 — createInsightEdition', () => {
     const partial = await createInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', request: request({ idempotencyKey: 'idem-key-0002', policy: { allowPartial: true } }), env: ENV_ON })
 
     expect(partial.generation?.outcome).toBe('ready_for_review')
+  })
+})
+
+describe('Estándar del informe (2026-11-06) — SEO siempre con AEO', () => {
+  it('un encargo con seo y sin aeo se rechaza con el módulo que falta; con los dos, pasa', async () => {
+    const { validateInsightRequest } = await import('./validate-request')
+    const context = { organizationId: 'org-a', allowedAudiences: ['client' as const], now: new Date('2026-09-15T12:00:00Z') }
+
+    expect(() => validateInsightRequest(request({ modules: ['seo'] }), context)).toThrow(/modules debe incluir aeo/)
+    expect(() => validateInsightRequest(request({ modules: ['seo', 'ico'] }), context)).toThrow(/modules debe incluir aeo/)
+    expect(validateInsightRequest(request({ modules: ['seo', 'aeo'] }), context).request.modules).toEqual(['seo', 'aeo'])
+    // Sin seo, la regla no exige nada: un informe sólo de entrega (ICO) sigue siendo válido.
+    expect(validateInsightRequest(request({ modules: ['ico'] }), context).request.modules).toEqual(['ico'])
   })
 })
 

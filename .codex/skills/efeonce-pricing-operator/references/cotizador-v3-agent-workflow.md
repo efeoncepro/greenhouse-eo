@@ -66,14 +66,17 @@ cotización tiene una forma, un plazo y un neto ([6.6](#66-opciones-incrementos-
 
 ### 2.2 Oferta y unidad comercial
 
-- Hay tres ofertas (`catalog search --current --kind offer --date <fecha>`), con el objetivo y el piso que les fijó
-  el CEO: `creative-managed-service` (objetivo 45 %, piso 45 %), `seo-aeo-managed-service` (objetivo 55 %, piso
-  45 %) y `talent-assurance-staffing` (objetivo 30 %, 35 % o 40 % según el tier del perfil; piso 25 %). Lee la regla
-  que le tocó a cada línea en `compose assess` → `margin.pricingPolicies[]`.
+- Hay cuatro ofertas (`catalog search --current --kind offer --date <fecha>`): `creative-managed-service`
+  (objetivo45 %, piso45 %), `seo-aeo-managed-service` (objetivo55 %, piso45 %) y `talent-assurance-staffing`
+  (objetivo30 %,35 % o40 % según tier, piso25 %) conservan sus reglas decididas por el CEO. Desde el27/10 se añade
+  `performance-commerce-distribution` con objetivo55 % y piso45 % **estimados** del pack de Performance,
+  bajo autorización de Julio de incorporar la oferta. Ecuador se añade como mercado con factor1,00 **estimado**;
+  no hay costo/factor de talento EC inferido. [Mantenimiento y autoridad de v14](../../../../data/pricing/v3-operating/PERFORMANCE_ECUADOR_2026-10-27.md).
+  Una regla estimada permite calcular en revisión, no valida un tarifario ni aprueba un precio de cliente.
 - Se elige **por práctica y por lo que se vende**, nunca por el margen que deja pasar: un programa SEO/AEO no se
   cotiza con la oferta creativa, y la oferta de staffing no se usa para un servicio gestionado.
-- **La unidad comercial es un hecho del catálogo**, no una elección de la demanda: `creative-managed-service` y
-  `seo-aeo-managed-service` se venden como `managed_service` (un fee; el cliente nunca ve equipo, horas ni roles) y
+- **La unidad comercial es un hecho del catálogo**, no una elección de la demanda: `creative-managed-service`,
+  `seo-aeo-managed-service` y `performance-commerce-distribution` se venden como `managed_service` (un fee; el cliente nunca ve equipo, horas ni roles) y
   `talent-assurance-staffing` como `role_capacity` (línea por línea). `compose scaffold` la escribe desde el
   catálogo. Una demanda que declara otra no calcula: `COMMERCIAL_UNIT_CONTRADICTS_OFFER` (exit 2). Si el catálogo
   no la declara para una oferta, el andamio deja `commercialUnit: null` y pregunta (`COMMERCIAL_UNIT_REQUIRED`): la

@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "60190203298",
+      "labels": [],
+      "labelsDisplay": "",
+      "associationTypes": [
+        {
+          "category": "HUBSPOT_DEFINED",
+          "typeId": 190,
+          "fromObjectTypeId": null,
+          "toObjectTypeId": null
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "next": null
+  }
+}

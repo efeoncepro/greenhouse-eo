@@ -1,0 +1,132 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "3a8a50aeb879",
+  "key": "3a8a50aeb87957447d522754a9322f2aeb75a1b5aa84e00f36c98799bfd9b411",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:49:54.914Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3/inpaint/18ac646bf184/candidate-1.png",
+    "imageSha256": "6220d2b18cef04c8888b0a23949d2cd5db5e600943a0c5cabfa1920545b0c469",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3b-mask.png",
+    "maskSha256": "b2470d57d3b8acd4b24d5a5208c9588b56d35b50d23b6ffeb1b46d91706079a0",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "On the check-in belt stands a very large 28-inch checked suitcase: a tall medium charcoal-grey hard-shell spinner (grey, not black) with vertical ribs and a matte finish, noticeably taller and slimmer than now: its top reaches the agent's lower chest, and it is clearly much bigger than a cabin bag. Its four wheels sit on the belt. The agent stands behind it and rests both hands on its top carry handle, with the paper bag tag hanging from the handle. Plain unbranded suitcase, plain clothes with no printed marks or lettering. Same airport light, same colours and focus as the rest of the photo.",
+    "providerPrompt": "On the check-in belt stands a very large 28-inch checked suitcase: a tall medium charcoal-grey hard-shell spinner (grey, not black) with vertical ribs and a matte finish, noticeably taller and slimmer than now: its top reaches the agent's lower chest, and it is clearly much bigger than a cabin bag. Its four wheels sit on the belt. The agent stands behind it and rests both hands on its top carry handle, with the paper bag tag hanging from the handle. Plain unbranded suitcase, plain clothes with no printed marks or lettering. Same airport light, same colours and focus as the rest of the photo."
+  },
+  "mask": {
+    "touchedFraction": 0.18500578703703704,
+    "editable": 0,
+    "soft": 1534512,
+    "protected": 6759888
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 65 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 33.091,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 4.45,
+        "bestError": 4.45,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 6759888,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 0,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "seam": {
+        "pixels": 1534512,
+        "maxDelta": 251,
+        "meanDelta": 33.091,
+        "worst": {
+          "x": 2491,
+          "y": 204
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 6759888,
+        "maxDelta": 209,
+        "meanDelta": 10.576,
+        "worst": {
+          "x": 1622,
+          "y": 1580
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1651,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 143
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3494
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

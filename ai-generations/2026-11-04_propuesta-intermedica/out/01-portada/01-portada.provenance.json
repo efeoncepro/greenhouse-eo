@@ -1,0 +1,21 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "68f3ca572da874b615622f64e1b0e4bf04b40733e2c3935de76830e5daec63d4",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:intermedica-blanco",
+      "path": "ai-generations/2026-11-04_propuesta-intermedica/logos/intermedica-blanco.png",
+      "sha256": "7cb4de0f6a42a28ff74a2e5effd4f0ab48a0f5e27cad3b640388f258a34f1828"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "cover-proposal-orbit-decision-by-hand-2026-10-28"
+}

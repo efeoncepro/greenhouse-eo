@@ -1,0 +1,84 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-diagnosis-verdict",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Diagnóstico · fuentes públicas",
+    "question": "Hoy el lead se pierde",
+    "answer": [
+      "Tras el",
+      "clic"
+    ]
+  },
+  "body": "La pauta está activa; lo que no se ve es qué pasa **después del clic**.",
+  "reportTitle": "Lectura externa de su marketing digital",
+  "reportSubtitle": "KSB Chile · revisión del 06/11/2026",
+  "sampleMark": "Fuentes públicas",
+  "modules": [
+    {
+      "kicker": "Pauta",
+      "title": "Google, Meta, LinkedIn"
+    },
+    {
+      "kicker": "Destino",
+      "title": "Sitio global"
+    },
+    {
+      "kicker": "Captura",
+      "title": "Formulario externo"
+    },
+    {
+      "kicker": "Medición",
+      "title": "Sin vista Chile"
+    },
+    {
+      "kicker": "Plan",
+      "title": "Cuatro ejes 2027"
+    }
+  ],
+  "operationNodes": [
+    "Google Ads",
+    "Meta",
+    "LinkedIn",
+    "ksb.com",
+    "Formulario",
+    "CRM"
+  ],
+  "operationFootnote": "Bibliotecas de anuncios, sitio y redes · 06/11/2026",
+  "verdictOptions": [
+    "Medible",
+    "Parcial",
+    "Sin medir"
+  ],
+  "selectedVerdict": 1,
+  "verdictCondition": "Condición: conectar formularios y CRM antes de escalar la inversión",
+  "risks": [
+    "Leads sin CRM",
+    "CPL sin base",
+    "Destino genérico"
+  ],
+  "recordText": "Cada hallazgo con su fuente: bibliotecas de anuncios, el sitio y sus redes, revisados el 06/11/2026.",
+  "waves": [
+    {
+      "name": "Q1",
+      "title": "Línea base y conversión",
+      "kicker": "Base"
+    },
+    {
+      "name": "Q2–Q3",
+      "title": "Escalado por segmento",
+      "kicker": "Crecimiento"
+    },
+    {
+      "name": "Q4",
+      "title": "Consolidación",
+      "kicker": "Resultado"
+    }
+  ]
+}

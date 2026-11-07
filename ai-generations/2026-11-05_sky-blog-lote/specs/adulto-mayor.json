@@ -1,0 +1,143 @@
+{
+  "id": "adulto-mayor",
+  "notion_url": "https://app.notion.com/p/37eba825849842708a84ed3afb4dd59c",
+  "titulo": "Viajar en avión con un adulto mayor: cómo acompañarlo en cada paso",
+  "slug": "/viajar-en-avion-con-adulto-mayor/",
+  "mercado": "CL/PE",
+  "version": "v2 · 05/11/2026 (IMG 1–3 ya producidas en v1.1; ojo: adjuntos de IMG 2 e IMG 3 intercambiados en la v1.1)",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1 · anterior: N10_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "F — Encuentro social",
+      "modificadores": "dúo (acompañante y mujer mayor, cuerpo parcial) · preparación en pausa · escala cercana · luz de mañana interior · orienta",
+      "registro": "E",
+      "archivo": "viajar-en-avion-con-adulto-mayor-preparacion.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Mujer mayor y su acompañante ordenando juntos un pastillero semanal y un documento en una funda transparente sobre la mesa del comedor, con un bastón apoyado en la silla",
+      "que_muestra": "mesa de comedor de madera; un pastillero semanal translúcido con compartimentos de colores, sin letras legibles; una funda transparente con un documento sin texto legible; unos lentes de lectura. Las manos de una mujer de unos 75 años, con anillos sencillos y piel con textura real, sostienen la funda; a su lado, las manos de una persona de unos 40 años cierran un compartimento del pastillero. Un bastón de madera apoyado en el respaldo de su silla.",
+      "hora_clima": "mañana, interior; luz natural abundante de ventana, sombras abiertas, altas luces de la ventana conservadas",
+      "personas": "fotografía un tercero desde el otro lado de la mesa, a la altura de los ojos de quien está sentado; la mujer mayor mira la funda que sostiene; el acompañante mira el pastillero; ninguno mira al lente; la mujer mayor de perfil y fuera de foco, o recortada desde los hombros; sin rostros reconocibles",
+      "primer_plano": "el borde de una taza muy cerca del lente y muy fuera de foco, por una esquina inferior, sin tapar las manos",
+      "ancla_pov": "un pastillero semanal con los días marcados, el documento de identidad de tu mamá dentro de una funda transparente",
+      "no": [
+        "sin texto ni logos",
+        "sin pastillas sueltas ni nombres de medicamentos",
+        "sin cajas de remedios con marca",
+        "sin documento con datos o fotos legibles",
+        "sin pasajes ni tarjetas de embarque",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin dedos de más, manos fundidas ni arrugas caricaturescas"
+      ],
+      "fidelidad": "interior genérico → no requiere REF-01 · continuidad: la misma mujer mayor, el mismo chaleco de lana gris y el mismo bastón de madera en las tres imágenes",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; las manos, el pastillero, la funda y el bastón tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2 · anterior: N10_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vas a caminar al lado de la silla…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "POV del acompañante, que camina un paso atrás y al costado · trío (mujer mayor en silla, persona del aeropuerto y acompañante, cuerpos parciales) · escala media · luz de día interior · explica",
+      "registro": "E",
+      "archivo": "adulto-mayor-silla-de-ruedas-aeropuerto.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mujer mayor en silla de ruedas empujada por una persona del aeropuerto por un pasillo de la terminal, con su acompañante caminando al lado y su bastón sobre las piernas",
+      "que_muestra": "pasillo amplio de terminal. La mujer de la IMG 1, con el mismo chaleco gris, va sentada en una silla de ruedas estándar de aeropuerto, de espaldas o de tres cuartos de espalda, con el bastón de madera cruzado sobre las piernas. Una persona del aeropuerto, con ropa lisa y neutra y recortada desde los hombros hacia abajo, empuja la silla. A su lado camina el acompañante, del que se ven el brazo y el costado, con un bolso de mano colgado del hombro y la mano apoyada en el respaldo. Pasajeros ambientales con maletas, fuera de foco.",
+      "hora_clima": "de día, interior de terminal; luz abundante por un ventanal lateral, sombras abiertas, altas luces conservadas",
+      "personas": "fotografía el acompañante, que mira hacia adelante, al pasillo; la mujer mayor mira el camino; la persona del aeropuerto mira hacia el control; nadie mira al lente; sin rostros reconocibles",
+      "primer_plano": "la correa del bolso del acompañante muy cerca del lente y muy fuera de foco, por un borde lateral, sin tapar la silla",
+      "ancla_pov": "Vas a caminar al lado de la silla, con su bolso colgado de tu hombro, mientras alguien del aeropuerto la empuja hacia el control de seguridad",
+      "no": [
+        "sin texto ni logos",
+        "sin uniformes, logos ni colores corporativos de SKY o de otras aerolíneas",
+        "sin credenciales legibles",
+        "sin señalética ni pantallas de vuelos",
+        "sin aviones ni cabinas",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin sillas con marca visible",
+        "sin escena dramática ni de hospital"
+      ],
+      "fidelidad": "terminal genérica, no identificable → no requiere REF-01 · misma mujer, ropa y bastón que la IMG 1"
+    },
+    {
+      "pieza": "N?_IMG-3 · anterior: N10_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Después del control llega la espera…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "POV del acompañante sentado al lado · dúo en detalle cercano · luz y temperatura · demuestra la calma de llegar con margen",
+      "registro": "E",
+      "archivo": "adulto-mayor-acompanante-sala-de-embarque.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mano de una mujer mayor sobre la de su acompañante en el apoyabrazos de una sala de embarque, con un bastón de madera apoyado entre los dos asientos y luz de ventanal",
+      "que_muestra": "vista desde el asiento del acompañante hacia el apoyabrazos compartido: la mano de la mujer de la IMG 1, con los mismos anillos sencillos y la manga del chaleco gris, sobre la mano del acompañante. El bastón de madera, entre los dos asientos. Al fondo, muy fuera de foco, un ventanal con luz cálida de día y pasajeros ambientales.",
+      "hora_clima": "de día, interior de sala de embarque; luz cálida y abundante del ventanal, sombras abiertas, altas luces conservadas",
+      "personas": "fotografía el acompañante desde su asiento y mira las manos; la mujer mayor mira hacia la puerta de embarque, fuera de cuadro; pasajeros del fondo fuera de foco; sin rostros reconocibles",
+      "primer_plano": "el borde del bolso de mano en el regazo del acompañante muy cerca del lente y muy fuera de foco, por una esquina inferior, sin tapar las manos",
+      "ancla_pov": "La sala tibia por el sol del ventanal, el bastón apoyado entre los dos asientos y su mano buscando la tuya cuando llaman a embarcar",
+      "no": [
+        "sin texto ni logos",
+        "sin aviones visibles por el ventanal",
+        "sin cabinas ni uniformes SKY ni de otras aerolíneas",
+        "sin pantallas, letreros ni números de puerta legibles",
+        "sin tarjetas de embarque con texto",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostros reconocibles",
+        "sin gesto de despedida triste ni escena de hospital"
+      ],
+      "fidelidad": "sala de embarque genérica → no requiere REF-01 · misma mujer, ropa, anillos y bastón que la IMG 1 y la IMG 2"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "ZAL",
+      "ciudad": "Valdivia"
+    },
+    "home_market": "CHL",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-valdivia",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "El sur, a su propio ritmo",
+    "cta": "Ver vuelos a Valdivia",
+    "archivo": "banner-ruta-santiago-valdivia.webp",
+    "alt": "Banner de SKY de la ruta Santiago–Valdivia: el sur, a su propio ritmo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Santiago (SCL) → Valdivia (ZAL) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“El sur, a su propio ritmo” (5 palabras; la ruta Santiago–Valdivia es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: la silla de ruedas en el aeropuerto no tiene costo e incluye acompañamiento en el embarque y el desembarque",
+      "CTA (lo escribe el compositor)": "Ver vuelos a Valdivia →",
+      "Enlace del banner": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-valdivia",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-santiago-valdivia.webp`",
+      "ALT": "“Banner de SKY de la ruta Santiago–Valdivia: el sur, a su propio ritmo”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin personas mayores retratadas como frágiles"
+    }
+  },
+  "descartes": [
+    "counter con la persona que entrega la silla — riesgo de uniformes y señalética",
+    "pantalla de compra con los asientos juntos — texto legible e interfaz de SKY generada",
+    "llegada a destino con un abrazo — rostros en primer plano y sin escena en el texto",
+    "vuelo al amanecer desde la ventana del taxi — repite la idea del horario y no muestra el dúo"
+  ]
+}

@@ -100,6 +100,11 @@ export const GH_INSIGHTS = {
    * TASK-2033 — alcance de contenido: el informe mide sólo la parte del sitio que Efeonce trabaja. Las poblaciones
    * son trazabilidad del snapshot (no se imprimen); la línea y la lectura sí llegan al documento.
    */
+  /** ISSUE-191 — total de Search Console sin la dimensión consulta (incluye las consultas que Google no muestra). */
+  seoControl: {
+    population: 'Clics e impresiones de Search Console de la propiedad conectada (total del período)'
+  },
+
   contentScope: {
     gscPopulation: 'Consultas de Search Console hacia el contenido medido',
     rankPopulation: 'Keywords monitoreadas que posicionan con el contenido medido',
@@ -125,10 +130,20 @@ export const GH_INSIGHTS = {
   ga4: {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
     aiPopulation: 'Sesiones del canal AI Assistant de la propiedad GA4 conectada',
-    tableTitle: { seo: 'Visitas desde buscadores', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
+    tableTitle: { seo: 'Visitas desde buscadores y redes', aeo: 'Visitas desde asistentes de IA' } as Readonly<Record<string, string>>,
     tableLead: 'Sesiones medidas por Google Analytics 4, según su agrupación de canales.',
     /** TASK-1974 — la porción que suma a los asistentes fuera de los 2 que más traen. */
-    otherAssistants: 'Otros asistentes'
+    otherAssistants: 'Otros asistentes',
+    /** Visitas desde redes sociales sin pago: la porción fuera de las 2 redes que más traen. */
+    otherNetworks: 'Otras redes',
+    /** Para derivar la población social desde la orgánica (misma propiedad y mismo alcance). */
+    organicChannelName: 'canal Organic Search',
+    socialChannelName: 'canales Organic Social y Organic Video'
+  },
+
+  /** Valor publicitario equivalente estimado (método `gsc_clicks_country_cpc_v1`). */
+  organicValue: {
+    population: 'Clics de consultas visibles de Search Console con CPC de Google Ads del mercado (DataForSEO)'
   },
 
   /** TASK-1962 — nombres de los tipos de fuente y tonos del Grader en el informe (nunca la clave cruda). */
@@ -202,6 +217,10 @@ export const GH_INSIGHTS = {
     'site.organic_engaged_sessions': 'Visitas orgánicas con interacción',
     'site.organic_unengaged_sessions': 'Visitas orgánicas sin interacción',
     ai_sessions: 'Visitas desde asistentes de IA',
+    'site.social_sessions': 'Visitas desde redes sociales',
+    organic_value: 'Valor estimado del tráfico orgánico',
+    organic_value_usd: 'Valor publicitario estimado',
+    'organic_value.valued_clicks': 'Clics valorados con CPC del mercado',
     'driver.query': 'Consultas que más cambiaron',
     'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
@@ -295,6 +314,8 @@ export const GH_INSIGHTS = {
     driversTableLead: 'Las consultas y páginas con mayor cambio de clics frente al período anterior. Dicen dónde cambió, no por qué.',
     driversEntityColumn: 'Consulta o página',
     driversRestLabel: 'Resto de consultas',
+    /** ISSUE-191 — paso de la cascada: el cambio de los clics cuya consulta Google no informa (total menos detalle). */
+    driversHiddenLabel: 'Consultas que Google no muestra',
     driversWaterfallTitle: 'Qué consultas explican el cambio de clics',
     /** TASK-1975 — lectura de la cascada: la cifra es el aporte de la consulta que más cambió (un hecho, no una resta). */
     waterfallCaption: (gained: boolean, label: string, period: string) => `clics ${gained ? 'más' : 'menos'} en «${label}» que en ${period}`,
@@ -347,7 +368,8 @@ export const GH_INSIGHTS = {
     } as Readonly<Partial<Record<InsightModule, string>>>,
     /** Nota del tablero cuando una cifra lo necesita para leerse bien (sin cifras propias). */
     notes: {
-      organic_etv: 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.'
+      organic_etv: 'El tráfico estimado se calcula con la posición y el volumen de búsqueda de cada keyword.',
+      organic_value_usd: 'Lo que costaría comprar en Google Ads los clics con precio conocido. No es ingreso ni ahorro.'
     } as Readonly<Record<string, string>>,
     estimated: 'Estimado',
     lowerIsBetter: 'Menor es mejor',
@@ -364,6 +386,9 @@ export const GH_INSIGHTS = {
       organic_etv: 'Tráfico estimado',
       'site.organic_sessions': 'Visitas orgánicas',
       'site.organic_engaged_sessions': 'Visitas con interacción',
+      'site.social_sessions': 'Visitas desde redes',
+      organic_value_usd: 'Valor estimado',
+      'organic_value.valued_clicks': 'Clics valorados',
       ai_sessions: 'Visitas desde IA',
       share_of_model: 'Share of Model',
       citation_share: 'Respuestas con cita',
@@ -398,6 +423,8 @@ export const GH_INSIGHTS = {
     // TASK-1962 — de qué asistente de IA llegan las visitas (GA4). Las cifras las pone el planner desde los hechos.
     aiTopSourceMost: 'trae la mayoría de las visitas desde asistentes de IA:',
     aiTopSource: 'es el asistente de IA que más visitas trae:',
+    socialTopSourceMost: 'trae la mayoría de las visitas desde redes sociales:',
+    socialTopSource: 'es la red social que más visitas trae:',
     of: 'de',
     aboveTarget: 'sobre la meta de',
     belowTarget: 'bajo la meta de',
@@ -495,6 +522,9 @@ export const GH_INSIGHTS = {
     citation_share: { subject: 'Las respuestas que citan tu sitio', plural: true },
     'sov.brand': { subject: 'El Share of Voice de tu marca', plural: false },
     clicks: { subject: 'Los clics orgánicos', plural: true },
+    organic_value_usd: { subject: 'El valor publicitario estimado', plural: false },
+    'organic_value.valued_clicks': { subject: 'Los clics valorados', plural: true },
+    'site.social_sessions': { subject: 'Las visitas desde redes sociales', plural: true },
     impressions: { subject: 'Las impresiones', plural: true },
     ctr: { subject: 'El CTR', plural: false },
     position: { subject: 'La posición media', plural: false },
@@ -516,14 +546,18 @@ export const GH_INSIGHTS = {
    */
   sources: {
     gsc_window_aggregate: 'Google Search Console',
+    // ISSUE-191 — total de Search Console pedido sin la dimensión consulta: incluye las consultas que Google no muestra.
+    gsc_search_control: 'Search Console (total)',
     seo_work_queue: 'cola de trabajo SEO priorizada',
-    gsc_window_movers: 'Google Search Console',
+    // ISSUE-191 — el detalle por consulta: sólo las consultas que Google muestra (el total es `gsc_search_control`).
+    gsc_window_movers: 'Search Console (consultas visibles)',
     dataforseo_serp_rank: 'posiciones en buscadores',
     dataforseo_etv: 'tráfico orgánico estimado',
     // Nombre de producto del diagnóstico (ADR de naming Efeonce AEO): la fuente se nombra como lo conoce el cliente.
     ai_visibility_grader: 'Efeonce AEO Assessment',
     ico_engine_monthly: 'métricas mensuales de entrega',
-    ga4_channel_sessions: 'Google Analytics 4'
+    ga4_channel_sessions: 'Google Analytics 4',
+    gsc_clicks_country_cpc: 'CPC de DataForSEO'
   } as Readonly<Record<string, string>>,
 
   /** Unidad legible de una figura (por `EvidenceUnit`). La unidad cruda (`count`) nunca llega al documento. */

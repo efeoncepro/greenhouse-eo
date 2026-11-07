@@ -1,0 +1,658 @@
+{
+  "verifiedAt": "2026-10-28",
+  "verification": "Graph folder listings with exact paths, no pending pagination; compare remote byte counts with local delivery",
+  "fileContentExtraction": "Connector returned null for Markdown text/raw request; no remote content hash claimed",
+  "items": [
+    {
+      "relativePath": "LEEME-EMPEZAR-AQUI.md",
+      "id": "017EGG3WGWKODLOOM7EVH2X4Q6TNYKY536",
+      "bytes": 2698
+    },
+    {
+      "relativePath": "MANIFIESTO-PAQUETE-INTERNO.json",
+      "id": "017EGG3WHPLGXARXSKVFCK3FDUKJ3IKGW5",
+      "bytes": 100077
+    },
+    {
+      "relativePath": "01. Solicitud y contexto/1-1000403861.jpg",
+      "id": "017EGG3WBH44IOELAJFZHZMV4V5LMVCRLM",
+      "bytes": 85713
+    },
+    {
+      "relativePath": "01. Solicitud y contexto/2-1000403859.jpg",
+      "id": "017EGG3WC3EGENDBLYVFCLWMTBQ7RKHAUA",
+      "bytes": 76858
+    },
+    {
+      "relativePath": "01. Solicitud y contexto/CRM-2026-10-28.md",
+      "id": "017EGG3WF76YLDEH4GCRBLZXJMHZITZRZG",
+      "bytes": 10520
+    },
+    {
+      "relativePath": "01. Solicitud y contexto/SOLICITUD-LINKEDIN-2026-10-28.md",
+      "id": "017EGG3WFKOSJNNSSROVA23JVEBZDFV6DY",
+      "bytes": 4859
+    },
+    {
+      "relativePath": "02. Investigación - INTERNO/AUDITORIA-DIGITAL-PUBLICA-2026-10-28.md",
+      "id": "017EGG3WH7TYTVQUSDGRHKGYZGGSAWRMQS",
+      "bytes": 26354
+    },
+    {
+      "relativePath": "02. Investigación - INTERNO/CASO-DE-NEGOCIO-PROFUNDIZADO-INTERNO.md",
+      "id": "017EGG3WEY4RKJOKPFF5FI34TBHXCICVID",
+      "bytes": 17673
+    },
+    {
+      "relativePath": "02. Investigación - INTERNO/HISTORIAL-LOCAL-2026-10-28.md",
+      "id": "017EGG3WAGTVHYAQDKPJDJLUFDTXRWUDQH",
+      "bytes": 6527
+    },
+    {
+      "relativePath": "02. Investigación - INTERNO/INVESTIGACION-NEGOCIO-COMPETENCIA-2026-10-28.md",
+      "id": "017EGG3WCHA25DDMWXMNCZZKD3Y433YDCX",
+      "bytes": 26878
+    },
+    {
+      "relativePath": "02. Investigación - INTERNO/INVESTIGACION-PUBLICA-2026-10-28.md",
+      "id": "017EGG3WGNWPAAMGWWP5F3RD5S2ZTC5ZZG",
+      "bytes": 13003
+    },
+    {
+      "relativePath": "03. Propuesta para Claude/INSTRUCCIONES-CLAUDE-DESIGN-INTERNO.md",
+      "id": "017EGG3WCFIJO3NG7J6FHKEPOCMBZ3UFOC",
+      "bytes": 8437
+    },
+    {
+      "relativePath": "03. Propuesta para Claude/PROPUESTA-INTERMEDICA-PARA-CLAUDE-DESIGN.md",
+      "id": "017EGG3WGBCVAOQR5SCNCJTDRKMVSX373C",
+      "bytes": 17909,
+      "url": "https://efeonce.sharepoint.com/sites/GrowthMarketing/Documentos%20compartidos/Alineaci%C3%B3n/4.%20Comercial/Licitaciones/Intermedica/1.%20Marketing%20digital%20y%20performance/03.%20Propuesta%20para%20Claude/PROPUESTA-INTERMEDICA-PARA-CLAUDE-DESIGN.md"
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/ECONOMIA-Y-ALCANCE-PROPUESTA-2026-10-28.md",
+      "id": "017EGG3WAJ43OPBIHB4FDKS5VRUEUV3IGU",
+      "bytes": 24384
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.artifact.json",
+      "id": "017EGG3WFVC266WBUFQFDYRI3BU6HBJ2C7",
+      "bytes": 1387169
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.assess.json",
+      "id": "017EGG3WA7E7BGT4HNSBBJ3GKVKEKMM2FZ",
+      "bytes": 7258
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.assess.run.json",
+      "id": "017EGG3WEHX3E3X2SB7JG2RJZHDMPIW7DS",
+      "bytes": 8279
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.brief.json",
+      "id": "017EGG3WD4AHTQAYDHZJDKMQFITYF2SS27",
+      "bytes": 1602
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.brief-input.json",
+      "id": "017EGG3WGQELXRFUL3AZBKHBUMUI5XHFOO",
+      "bytes": 1090
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.demand.json",
+      "id": "017EGG3WBIPLZ7KOBDKBGKNV3RKTZ2MOPV",
+      "bytes": 4353
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.quote.run.json",
+      "id": "017EGG3WGMU5ZBC33L3RCKOR4A4VQP2WIK",
+      "bytes": 13506
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.replay.json",
+      "id": "017EGG3WB56YTME7AUFBGIDCRKW5AHWKVU",
+      "bytes": 13064
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.scaffold.json",
+      "id": "017EGG3WBUE4KAKML2VRGLASBZKYYWZWCU",
+      "bytes": 2259
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.scaffold.run.json",
+      "id": "017EGG3WBKQWSEFQBSPVHKVKKVOURM23J6",
+      "bytes": 7302
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.workload.json",
+      "id": "017EGG3WFVFVQICJY7N5GIUXCPILYBYQM3",
+      "bytes": 1765
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-creative.workload.run.json",
+      "id": "017EGG3WEQAJ7BX3DDO5A3LN7KSADQYYHN",
+      "bytes": 4537
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.brief.json",
+      "id": "017EGG3WCJOBDHIA6EQNGJOAYGN3BEL75L",
+      "bytes": 2984
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.brief-input.json",
+      "id": "017EGG3WBWAC2ITFW6UJCZURTMURIK2JTC",
+      "bytes": 2207
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.demand.json",
+      "id": "017EGG3WARESA5M4VT4RD2QVI5JJ37FTL4",
+      "bytes": 5299
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.quote.run.json",
+      "id": "017EGG3WD3AH6JYG5N3BFIAWNLZKUVMTXL",
+      "bytes": 7468
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.scaffold.json",
+      "id": "017EGG3WHMTFIMQOVSDBGYO7FWWI3MNAJF",
+      "bytes": 3906
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.scaffold.run.json",
+      "id": "017EGG3WC5W7GEHMETO5BJRK6V76RWQGJA",
+      "bytes": 9167
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.workload.json",
+      "id": "017EGG3WC4QDQUZGN3ONBY4OB3DFCDE5LT",
+      "bytes": 2416
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance.workload.run.json",
+      "id": "017EGG3WCZ2GDSTF2ZLJC2WXH66ZALRLYI",
+      "bytes": 6814
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.artifact.json",
+      "id": "017EGG3WCVI7NVJ756QZCK77JVSKOE3RH6",
+      "bytes": 1384713
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.assess.json",
+      "id": "017EGG3WFIRH764TLVQJHJUCCCLRTPWOZE",
+      "bytes": 7663
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.assess.run.json",
+      "id": "017EGG3WFABHRXQIFMZ5ELSAJXTI62HLGD",
+      "bytes": 8732
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.brief.json",
+      "id": "017EGG3WHAP5B5DBUSGFAKY2OJQ4T3RZXV",
+      "bytes": 2385
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.brief-input.json",
+      "id": "017EGG3WHP6AO6I7H525DJNO2T3LXJUNAU",
+      "bytes": 1868
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.demand.json",
+      "id": "017EGG3WFID6FHPVW7TRE3CHPYJISJ4WMT",
+      "bytes": 4493
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.quote.run.json",
+      "id": "017EGG3WE7RCYYMATQ6VGY5YOYS3TGEBWB",
+      "bytes": 13425
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.replay.json",
+      "id": "017EGG3WERW4YCYC5W7JAIZXICU5C3BXV5",
+      "bytes": 13493
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.scaffold.json",
+      "id": "017EGG3WFFJBVHPZN2IRCK6BBP23F75SDT",
+      "bytes": 3096
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.scaffold.run.json",
+      "id": "017EGG3WASRACLJ7OMPBDKMTS7Q4HO7TIG",
+      "bytes": 7481
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.summary.json",
+      "id": "017EGG3WCRERAZ7YU4VZCLVLUPAI53BJAC",
+      "bytes": 11508
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.workload.json",
+      "id": "017EGG3WAYHNBXHIDPK5A3MEI4VQZDXEAP",
+      "bytes": 1806
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-performance-v2.workload.run.json",
+      "id": "017EGG3WBEY6332QFL3VBZYP46EBNHGTJB",
+      "bytes": 5496
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.brief.json",
+      "id": "017EGG3WD2G6OEGSVOSJE22G45B6XI5OP3",
+      "bytes": 2811
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.brief-input.json",
+      "id": "017EGG3WDF5SPRCPRGW5GINNNDO5JBR7GW",
+      "bytes": 1775
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.demand.json",
+      "id": "017EGG3WAINHOMPA5LCJAJ7OGTNNCMGR5D",
+      "bytes": 5205
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.quote.run.json",
+      "id": "017EGG3WAZPWEDPNM7GNHYRK2NJ63RISRU",
+      "bytes": 6556
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.scaffold.json",
+      "id": "017EGG3WFG7ET6AZKSQBGI2WCTW5RDM24Y",
+      "bytes": 3884
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.scaffold.run.json",
+      "id": "017EGG3WEP2HM3KHED4VAJBN7IXWCUEU7E",
+      "bytes": 9841
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.workload.json",
+      "id": "017EGG3WA3TQRBFKQT6RFJ4VVPPM5I5OQB",
+      "bytes": 3035
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation.workload.run.json",
+      "id": "017EGG3WAQK6LLLGSQTRC2B6RXFGMH53EZ",
+      "bytes": 7213
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.artifact.json",
+      "id": "017EGG3WCHJVH3C7IQ5JG3R2W7QMUW3EJH",
+      "bytes": 1309095
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.assess.json",
+      "id": "017EGG3WBA6WTIRP5BVJCIBGWWCAQ7ANP2",
+      "bytes": 7194
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.assess.run.json",
+      "id": "017EGG3WFUMWMPK4ICAJE3GZUGHDFYTX5P",
+      "bytes": 8221
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.brief.json",
+      "id": "017EGG3WCXUSQRVY4NYNBZHBRYXHTCAS3V",
+      "bytes": 2213
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.brief-input.json",
+      "id": "017EGG3WGMIHZVVA665JGIVXZMZ623DRLS",
+      "bytes": 1436
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.demand.json",
+      "id": "017EGG3WHMZJIWQB52INGZOI5WGKMR7ZXS",
+      "bytes": 4458
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.quote.run.json",
+      "id": "017EGG3WCGOGSRZTQGXVHJHJFCJBETASUC",
+      "bytes": 13986
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.replay.json",
+      "id": "017EGG3WC4DKI4KFNTWJBIP4UP35FLAYP6",
+      "bytes": 14004
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.scaffold.json",
+      "id": "017EGG3WEK5HQQXKKSVNCL7GJHGFBBS2JH",
+      "bytes": 3075
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.scaffold.run.json",
+      "id": "017EGG3WBIITYWMB7GSZFZBVK4JG7W7RQC",
+      "bytes": 8156
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.summary.json",
+      "id": "017EGG3WGLL4MBVOWPX5HKQBVYN6CSLB2K",
+      "bytes": 12019
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.workload.json",
+      "id": "017EGG3WEBAK5UBSFULJEJCLHE4VDQHDRK",
+      "bytes": 2428
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/a-preparation-v2.workload.run.json",
+      "id": "017EGG3WFR37SAH42MVNELBFCJBJKYPLD3",
+      "bytes": 5903
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.artifact.json",
+      "id": "017EGG3WBSAUWH2RLJ5ZGL5XDOQNHQUBS4",
+      "bytes": 1387222
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.assess.json",
+      "id": "017EGG3WCFGBP3LINVRJE22FDDVH7QUGCI",
+      "bytes": 7259
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.assess.run.json",
+      "id": "017EGG3WHCGZSLCT44YJB3WTTOIA35B2LO",
+      "bytes": 8280
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.brief.json",
+      "id": "017EGG3WA2MBRCOEKRARAKAIM2PSWSHSH7",
+      "bytes": 1602
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.brief-input.json",
+      "id": "017EGG3WCGZRPUB7DHBFG3AGNQ7N7K7YM7",
+      "bytes": 1090
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.demand.json",
+      "id": "017EGG3WETWYPH5OLBWNF23C4ZSMYFJYV4",
+      "bytes": 4353
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.quote.run.json",
+      "id": "017EGG3WE62TPP7MFQRRE3RPT3GXDCTLXJ",
+      "bytes": 13516
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.replay.json",
+      "id": "017EGG3WDEIBWCWFULLRA2DNVLDIBYGBBG",
+      "bytes": 13074
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.scaffold.json",
+      "id": "017EGG3WEQCIC6LNAGKRBIB4MJ7ZE65NQM",
+      "bytes": 2259
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.scaffold.run.json",
+      "id": "017EGG3WFZUBT33PKACVGIRZYVW42WRSOA",
+      "bytes": 7302
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.workload.json",
+      "id": "017EGG3WB7DQWTIYLKZVGJM3XFVVOL3FI5",
+      "bytes": 1766
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-creative.workload.run.json",
+      "id": "017EGG3WH5LQAEQO4ULRDKYUECEG2VL2YC",
+      "bytes": 4538
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.brief.json",
+      "id": "017EGG3WAWSDXNWO5N4JBIIS7QQMGYEONE",
+      "bytes": 3577
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.brief-input.json",
+      "id": "017EGG3WBZB6LVQPGHNBGZOSBM7L5CLREY",
+      "bytes": 2543
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.demand.json",
+      "id": "017EGG3WBSOSWIAUVNHJHIXNIDSU4ENZXL",
+      "bytes": 6065
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.quote.run.json",
+      "id": "017EGG3WDBYVZAENDWEJEJJJ3EL3BA6BEA",
+      "bytes": 8148
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.scaffold.json",
+      "id": "017EGG3WASP2S2ZOJ6LNFYFUENEFGKYREG",
+      "bytes": 4704
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.scaffold.run.json",
+      "id": "017EGG3WEY5R6SHRJDLJBJ6SWKSLR2BEVO",
+      "bytes": 10806
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.workload.json",
+      "id": "017EGG3WA5KMFMS53LEZELS3X2ZRTJTZYU",
+      "bytes": 3037
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance.workload.run.json",
+      "id": "017EGG3WB7D5FLFDFSSVG2KPIIDOJPQDVY",
+      "bytes": 8118
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.artifact.json",
+      "id": "017EGG3WAUJI4OTQ4D6REL2UQ653STSFWP",
+      "bytes": 1455128
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.assess.json",
+      "id": "017EGG3WGLRN26QGIYL5BIHT7IHUE4IHHB",
+      "bytes": 8034
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.assess.run.json",
+      "id": "017EGG3WGQUNZS4JOP4RFJCUUUMN7AWVR5",
+      "bytes": 9118
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.brief.json",
+      "id": "017EGG3WF64WNAIDBKTRHZS5ODXSMILSTA",
+      "bytes": 2980
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.brief-input.json",
+      "id": "017EGG3WDMC7RGJOCIJRBLJBT4VUHVKFXH",
+      "bytes": 2204
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.demand.json",
+      "id": "017EGG3WAHUQDRNFQXW5AJPYPS76GMZS6B",
+      "bytes": 5323
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.quote.run.json",
+      "id": "017EGG3WCIGVKKKJZECZBLFI3S34UIOTSJ",
+      "bytes": 15713
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.replay.json",
+      "id": "017EGG3WCMMXKYYF5UKZD3KEMHHFTP555Z",
+      "bytes": 15871
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.scaffold.json",
+      "id": "017EGG3WFPQ3JSNVD54RCYKEX7PPJMR36N",
+      "bytes": 3896
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.scaffold.run.json",
+      "id": "017EGG3WANCS4ORYSEIRHZCCINUDN4YUPC",
+      "bytes": 9122
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.summary.json",
+      "id": "017EGG3WGZTN2RRZ6HQZDLGR3RFRE5G2AC",
+      "bytes": 13598
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.workload.json",
+      "id": "017EGG3WGM5AGHRCGCQJH3DZGXIRDJIBPX",
+      "bytes": 2428
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-performance-v2.workload.run.json",
+      "id": "017EGG3WAI6I4QGGKD2ZEYPQU4FK6UY2PO",
+      "bytes": 6809
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.brief.json",
+      "id": "017EGG3WCT57KP27YX3RDJIQSRRPWIAA5M",
+      "bytes": 2810
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.brief-input.json",
+      "id": "017EGG3WA4464KDVU47BGKH7DUVJIIS5BH",
+      "bytes": 1775
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.demand.json",
+      "id": "017EGG3WDGSXRFEVBFFVBKR5RMI4A6QXMF",
+      "bytes": 5198
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.quote.run.json",
+      "id": "017EGG3WEQ7S4QNZ6Y4BDJYJWYKYU3SKL4",
+      "bytes": 6556
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.scaffold.json",
+      "id": "017EGG3WGS2HGQ2ELSHFEKMZBMZAILF4EK",
+      "bytes": 3883
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.scaffold.run.json",
+      "id": "017EGG3WGT4LNJBFCG4BEZKNNBOY3US3LK",
+      "bytes": 9840
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.workload.json",
+      "id": "017EGG3WGB7K44XM5MNZG2TXAFO6QRXWVZ",
+      "bytes": 3037
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation.workload.run.json",
+      "id": "017EGG3WBAHVVRMOPHAZEZUF3GU5P6PHLZ",
+      "bytes": 7203
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.artifact.json",
+      "id": "017EGG3WHTE5EBY2TTNJH37TZZGYEKDKZF",
+      "bytes": 1309285
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.assess.json",
+      "id": "017EGG3WFAST3AUTW2D5FY7MFLLVHLDSLW",
+      "bytes": 7196
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.assess.run.json",
+      "id": "017EGG3WFBLX45R25MKVH3ABLRYGSYMGUN",
+      "bytes": 8223
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.brief.json",
+      "id": "017EGG3WCBINYGDPGA5ZC3EDAYBDNZDFEA",
+      "bytes": 2212
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.brief-input.json",
+      "id": "017EGG3WDXBG2OXS3MS5DYO5TGWGK4I5BK",
+      "bytes": 1436
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.demand.json",
+      "id": "017EGG3WAGWM4NEBNV6ND2MPCN3O3XFYMU",
+      "bytes": 4457
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.quote.run.json",
+      "id": "017EGG3WDEZYDZBYJZ65H2H5QZ76V4KFKQ",
+      "bytes": 13998
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.replay.json",
+      "id": "017EGG3WF2TZT3FBBTXVAZGNB2ARDSYYAO",
+      "bytes": 14016
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.scaffold.json",
+      "id": "017EGG3WDVJTTVZOOCD5C36UKWRWW43D7A",
+      "bytes": 3074
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.scaffold.run.json",
+      "id": "017EGG3WBYJFYJWVDPQFC2JU3G35H6SHVC",
+      "bytes": 8155
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.summary.json",
+      "id": "017EGG3WF2BCWOLXTRHBBK4SCFOV3NVMGV",
+      "bytes": 12031
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.workload.json",
+      "id": "017EGG3WGRYRJ3HMRA6JGJMUASP5UMEKRV",
+      "bytes": 2429
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/b-preparation-v2.workload.run.json",
+      "id": "017EGG3WAIRZ4AS6XZX5AKL7HYQBV53V4L",
+      "bytes": 5892
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/build-scenarios.py",
+      "id": "017EGG3WAAQ4HBXMU5VFF3BLLU5RGO7NQP",
+      "bytes": 6191
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/complete-scenarios-v2.py",
+      "id": "017EGG3WDBZVDBCGWMBVCL6WLDZRAQRQFX",
+      "bytes": 3042
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/current.readback.json",
+      "id": "017EGG3WDT5YJ5GGOGIVBZCSCTELNYRUKF",
+      "bytes": 2032
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/EDITORIAL-PRICE-MASTER.json",
+      "id": "017EGG3WGNCUALKUBYQNCKX4KFETU4MFSS",
+      "bytes": 7599
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/profiles.readback.json",
+      "id": "017EGG3WGX6GHLDH3MBVE3OQCPFLM55ODQ",
+      "bytes": 26885
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/resources.readback.json",
+      "id": "017EGG3WGFP7NQHYZHKFHJAH3XL6JAH3VN",
+      "bytes": 102549
+    },
+    {
+      "relativePath": "04. Economía - INTERNO/pricing-v3-propuesta-2026-10-28/verify-and-summarize.py",
+      "id": "017EGG3WHMTXHOMF3LWNBIE4QYM3ZLLRQX",
+      "bytes": 3037
+    },
+    {
+      "relativePath": "05. Diseño y revisión/README.md",
+      "id": "017EGG3WH2KNUXMJLFVNA3B4GTGDIFUERX",
+      "bytes": 212
+    }
+  ]
+}

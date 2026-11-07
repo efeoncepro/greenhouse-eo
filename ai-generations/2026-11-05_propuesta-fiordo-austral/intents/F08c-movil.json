@@ -1,0 +1,27 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "breather",
+  "use": "proposal",
+  "recipe": "breather",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "question": "En planta o en feria,",
+    "answer": [
+      "En el móvil"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 1
+  },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png",
+    "alt": "En una feria internacional, una gerenta de exportaciones registra en el teléfono la visita que acaba de terminar, con la tarjeta del visitante en la otra mano"
+  }
+}

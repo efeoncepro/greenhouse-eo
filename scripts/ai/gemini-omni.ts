@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-/** Gemini Omni 1.1 Flash on Google Cloud. Local operator tooling; never a Globe runtime. */
+/** Gemini Omni Flash (1.2 GA by default, 1.1 Preview opt-in) on Google Cloud. Local operator tooling; never a Globe runtime. */
 import { spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { access, mkdir, open, readFile, rename, stat, writeFile } from 'node:fs/promises'
@@ -12,17 +12,22 @@ import {
   buildOmniRequest,
   estimateOmniVideoOutputUsd,
   omniInteractionUrl,
-  OMNI_CLOUD_MODEL,
+  OMNI_TASKS,
+  resolveOmniModel,
   summarizeOmniInteraction,
   validateOmniRequest,
   type OmniAspect,
   type OmniMedia,
+  type OmniModelSpec,
   type OmniResolution,
   type OmniTask
 } from '@/lib/ai/gemini-omni-cli'
 import { detectMediaFormat } from '@/lib/ai/fal-input-rules'
 
 type Args = {
+  model?: string
+  previous?: string
+  sourceResolution?: OmniResolution
   task?: OmniTask
   prompt?: string
   promptFile?: string
@@ -48,23 +53,29 @@ type Args = {
   help: boolean
 }
 
-const usage = `Gemini Omni 1.1 Flash · Google Cloud Interactions API
+const usage = `Gemini Omni Flash · Google Cloud Interactions API (por defecto 1.2 GA)
 
-Generar: pnpm ai:omni --task text|image|frames|reference|edit|extend --prompt "..." --gcs-output gs://bucket/prefix/ --yes
+Generar: pnpm ai:omni --task text|image|frames|reference|edit|extend|upscale --prompt "..." --gcs-output gs://bucket/prefix/ --yes
 Consultar: pnpm ai:omni --status <interaction-id> [--project efeonce-group]
 Esperar:   pnpm ai:omni --wait <interaction-id> [--out clip.mp4]
 
+Modelo:   --model 1.2 (gemini-omni-1.2-flash, GA, por defecto) | 1.1 (gemini-omni-1.1-flash-preview)
 Entradas: --image <gs://...|archivo> (repetible), --video <gs://...|archivo> (repetible)
           --first-frame y --last-frame para frames; orden explícito
           --staging-uri gs://bucket/prefix/ obligatorio para archivos locales
+Duración: 1.2 → text/image/reference 3..15 · frames y extend 3..10 · edit = duración del fuente
+          1.1 → 3..10 en todas las tareas
+Upscale:  sólo 1.2, sin --prompt · --task upscale --video clip.mp4 --source-resolution 360p|720p --resolution 720p|1080p|4k
+          (360p→720p|1080p, 720p→1080p|4k) · --duration = largo del fuente para estimar (por defecto 15)
+Turnos:   --previous <interaction-id> continúa sobre el clip del turno anterior (edit o upscale, sin --video)
 Opciones: --project, --prompt-file, --aspect 16:9|9:16, --resolution 360p|720p|1080p|4k,
-          --duration 3..10, --out clip.mp4, --state-file ruta.json, --estimate,
+          --duration N, --out clip.mp4, --state-file ruta.json, --estimate,
           --max-usd N (cota sobre SOLO el video output nominal), --yes
 
 Todas las operaciones son async. El submit se hace una sola vez; si se pierde su respuesta,
 no repitas el envío a ciegas. La salida queda en GCS; --out la descarga al completar.
 Los videos MP4 locales se inspeccionan con ffprobe antes de subirlos.
-El modelo Cloud es ${OMNI_CLOUD_MODEL} (Preview, región global, cuota fija).
+Región global. 1.2 es GA con PayGo estándar; 1.1 es Preview con cuota fija.
 `
 
 function parseArgs(argv: string[]): Args {
@@ -97,6 +108,15 @@ function parseArgs(argv: string[]): Args {
     switch (argv[index]) {
       case '--task':
         args.task = next() as OmniTask
+        break
+      case '--model':
+        args.model = next()
+        break
+      case '--previous':
+        args.previous = next()
+        break
+      case '--source-resolution':
+        args.sourceResolution = next() as OmniResolution
         break
       case '--prompt':
         args.prompt = next()
@@ -211,7 +231,11 @@ function validateMediaSource(value: string, kind: 'image' | 'video', stagingUri?
   else if (!stagingUri) throw new Error(`Archivo local ${kind}: añade --staging-uri gs://bucket/prefix/.`)
 }
 
-async function validateLocalMediaBytes(value: string, kind: 'image' | 'video'): Promise<void> {
+async function validateLocalMediaBytes(
+  value: string,
+  kind: 'image' | 'video',
+  maxVideoSeconds: number | null
+): Promise<void> {
   if (value.startsWith('gs://')) return
   const file = await open(resolve(value), 'r')
   const header = Buffer.alloc(32)
@@ -247,8 +271,12 @@ async function validateLocalMediaBytes(value: string, kind: 'image' | 'video'): 
 
     const seconds = Number(probe.stdout.trim())
 
-    if (probe.status !== 0 || !Number.isFinite(seconds) || seconds > 10 || seconds <= 0) {
-      throw new Error(`El video local ${basename(value)} debe durar más de 0 y hasta 10 segundos (ffprobe).`)
+    if (probe.status !== 0 || !Number.isFinite(seconds) || seconds <= 0) {
+      throw new Error(`ffprobe no pudo leer la duración de ${basename(value)}.`)
+    }
+
+    if (maxVideoSeconds !== null && seconds > maxVideoSeconds + 0.05) {
+      throw new Error(`El video local ${basename(value)} debe durar hasta ${maxVideoSeconds} segundos (ffprobe).`)
     }
   }
 }
@@ -337,11 +365,15 @@ async function saveState(path: string, record: Record<string, unknown>) {
 }
 
 function printStatus(summary: ReturnType<typeof summarizeOmniInteraction>, project: string) {
+  if (summary.unexpectedModel) {
+    console.warn(`Aviso: la respuesta declara un modelo fuera de Omni 1.1/1.2 (${summary.model}). Conserva el ID y revisa en Google Cloud.`)
+  }
+
   console.log(
     JSON.stringify(
       {
         project,
-        model: summary.model || OMNI_CLOUD_MODEL,
+        model: summary.model ?? 'no declarado',
         id: summary.id,
         status: summary.status,
         videos: summary.videos,
@@ -427,9 +459,11 @@ async function main() {
     return printStatus(await interactionRequest(project, 'GET', id), project)
   }
 
-  if (!args.task || !['text', 'image', 'frames', 'reference', 'edit', 'extend'].includes(args.task)) {
-    throw new Error('Elige --task text|image|frames|reference|edit|extend.')
+  if (!args.task || !OMNI_TASKS.includes(args.task)) {
+    throw new Error(`Elige --task ${OMNI_TASKS.join('|')}.`)
   }
+
+  const model: OmniModelSpec = resolveOmniModel(args.model)
 
   if (args.prompt && args.promptFile) throw new Error('Usa --prompt o --prompt-file, no ambos.')
 
@@ -443,7 +477,7 @@ async function main() {
 
   if (!args.gcsOutput) throw new Error('Falta --gcs-output gs://bucket/prefix/.')
 
-  if ((args.task === 'edit' || args.task === 'extend') && args.explicitAspect) {
+  if (['edit', 'extend', 'upscale'].includes(args.task) && args.explicitAspect) {
     throw new Error(`--aspect no aplica a ${args.task}; la salida conserva el aspecto del video fuente.`)
   }
 
@@ -455,8 +489,20 @@ async function main() {
 
   for (const image of args.images) validateMediaSource(image, 'image', args.stagingUri)
   for (const video of args.videos) validateMediaSource(video, 'video', args.stagingUri)
-  for (const image of args.images) await validateLocalMediaBytes(image, 'image')
-  for (const video of args.videos) await validateLocalMediaBytes(video, 'video')
+
+  // 1.2 extend accepts any input length (it uses the last 10s); everything else is bounded per model.
+  const maxVideoSeconds =
+    args.task === 'extend' && model.extendAcceptsAnyInputLength
+      ? null
+      : args.task === 'reference' && model.key === '1.2'
+        ? 3
+        : model.maxInputVideoSeconds
+
+  for (const image of args.images) await validateLocalMediaBytes(image, 'image', null)
+  for (const video of args.videos) await validateLocalMediaBytes(video, 'video', maxVideoSeconds)
+
+  // upscale prices on the source length (default: the 15s ceiling); edit prices on the model ceiling.
+  if (args.task === 'upscale' && !args.explicitDuration) args.duration = model.maxGenerationSeconds
   // Validate cardinality, shape and MIME before any GCS upload or billable submit.
   validateOmniRequest({
     task: args.task,
@@ -466,14 +512,30 @@ async function main() {
     gcsOutput: args.gcsOutput,
     aspect: args.aspect,
     resolution: args.resolution,
-    duration: args.duration
+    duration: args.duration,
+    model: model.key,
+    previousInteractionId: args.previous,
+    sourceResolution: args.sourceResolution
   })
-  const pricedDuration = args.task === 'edit' ? 10 : args.duration
-  const cost = estimateOmniVideoOutputUsd(args.resolution, pricedDuration)
-  const priceLabel = args.task === 'edit' ? 'cota de video output para hasta 10s' : 'video output nominal'
+  const pricedDuration = args.task === 'edit' ? model.maxGenerationSeconds : args.duration
+
+  const cost = estimateOmniVideoOutputUsd({
+    model: model.key,
+    task: args.task,
+    resolution: args.resolution,
+    duration: pricedDuration,
+    sourceResolution: args.sourceResolution
+  })
+
+  const priceLabel =
+    args.task === 'edit'
+      ? `cota de video output para hasta ${model.maxGenerationSeconds}s`
+      : args.task === 'upscale'
+        ? `video output de upscale ${args.sourceResolution}→${args.resolution} para ${pricedDuration}s`
+        : 'video output nominal'
 
   console.log(
-    `Omni 1.1 Cloud · ${args.task} · ${args.resolution} · ${priceLabel} ≈ USD ${cost.toFixed(3)} + input/texto/impuestos.`
+    `${model.label} (${model.id}) · ${args.task} · ${args.resolution} · ${priceLabel} ≈ USD ${cost.toFixed(3)} + input/texto/impuestos.`
   )
   if (args.estimate) return
   if (!args.yes) throw new Error('El submit consume cuota y dinero. Repite con --yes después de revisar la estimación.')
@@ -492,7 +554,10 @@ async function main() {
     gcsOutput: args.gcsOutput,
     aspect: args.aspect,
     resolution: args.resolution,
-    duration: args.duration
+    duration: args.duration,
+    model: model.key,
+    previousInteractionId: args.previous,
+    sourceResolution: args.sourceResolution
   })
 
   const summary = await interactionRequest(project, 'POST', undefined, body)
@@ -504,8 +569,9 @@ async function main() {
     provider: 'google-cloud',
     project,
     location: 'global',
-    model: OMNI_CLOUD_MODEL,
+    model: model.id,
     task: args.task,
+    ...(args.previous ? { previousInteractionId: args.previous } : {}),
     interactionId: summary.id,
     status: summary.status,
     gcsOutput: args.gcsOutput,

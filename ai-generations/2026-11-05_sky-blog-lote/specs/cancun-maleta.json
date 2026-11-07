@@ -1,0 +1,130 @@
+{
+  "id": "cancun-maleta",
+  "notion_url": "https://app.notion.com/454a8153dd3e48faa488a8341ba8e641",
+  "titulo": "Qué llevar a Cancún (y qué no): ropa, mar, documentos y aduana",
+  "slug": "/que-llevar-a-cancun/",
+  "mercado": "CL",
+  "version": "v3 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "personas ambientales caminando por la orilla · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "playa-cancun-media-manana-orilla.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Playa de arena blanca en Cancún a media mañana, con agua turquesa y personas caminando en sandalias por la orilla",
+      "que_muestra": "una playa de la Zona Hotelera de Cancún a media mañana, con sol alto, arena blanca y agua turquesa; personas caminando por la orilla en sandalias, en acciones espontáneas. Cámara a la altura de los ojos, desde la arena.",
+      "hora_clima": "media mañana (el sol que «ya pica en los hombros» del gancho), cielo despejado; luz abundante, sombras abiertas, altas luces de arena y espuma conservadas; color natural, sin saturación de postal",
+      "personas": "paseantes en acción espontánea, de espaldas o de perfil, sin pose ni mirada al lente; ningún rostro identificable en primer plano",
+      "primer_plano": "hojas de uva de playa muy cerca del lente y muy fuera de foco, en una esquina inferior, sin tapar la orilla nítida",
+      "ancla_pov": "Una sandalia que se hunde en arena blanca y tibia",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin letreros ni fachadas de hoteles legibles",
+        "sin sargazo",
+        "sin HDR ni vista de dron"
+      ],
+      "fidelidad": "lugar reconocible → requiere foto real REF-01 de una playa de la Zona Hotelera; la imagen ya está producida y adjunta en la versión del 14/10/2026 (`SKY_N4_B01`) pero sin REF-01 cargada: no se aprueba hasta resolverlo (ver hallazgo)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro, validadas por separado; tienen que sobrevivir la orilla, el agua turquesa y al menos una persona en sandalias. Mitad superior con cielo para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «En Cancún el día cambia de escenario más rápido que de clima…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "vista desde arriba, como quien arma la maleta · escala cercana · luz natural de día · demuestra",
+      "registro": "E",
+      "archivo": "maleta-cancun-calzado-agua-ropa-lino.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos guardando calzado para el agua en una maleta abierta junto a ropa de lino, traje de baño y una camisa liviana de manga larga",
+      "que_muestra": "una maleta abierta vista desde arriba; las manos del viajero guardan un calzado para el agua; alrededor, ropa de lino doblada, un traje de baño y una camisa liviana de manga larga. El criterio del artículo es el contenido: que se lea que la maleta se arma por momentos, no por cantidad.",
+      "hora_clima": "de día, en casa, antes del viaje; luz natural abundante que entra por una ventana, sombras abiertas",
+      "personas": "fotografía el viajero de pie frente a la maleta, mirando lo que guarda; solo sus manos en cuadro; nadie más",
+      "primer_plano": "el borde de un sombrero de paja muy cerca del lente y muy fuera de foco, en un costado, sin tapar la maleta",
+      "ancla_pov": "yo no armaría la maleta por tipo de prenda, sino por momento",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin etiquetas o logos de marcas en ropa, envases o maleta",
+        "sin pasaportes ni documentos",
+        "sin abrigo ni jeans",
+        "sin desorden caótico",
+        "sin rostros"
+      ],
+      "fidelidad": "sin lugar identificable → no requiere REF-01; la imagen ya está producida y adjunta en la versión del 14/10/2026 (`SKY_N4_B02`): revisarla contra este callout antes de aprobar"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Bajas los escalones de piedra húmeda de un cenote…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "bajando los escalones hacia el agua · persona sola al fondo · escala media · luz interior de cenote · demuestra",
+      "registro": "E",
+      "archivo": "escalones-cenote-agua-transparente.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Escalones de piedra húmeda que bajan a un cenote de agua quieta y transparente, con una persona nadando al fondo",
+      "que_muestra": "la vista desde los ojos de quien baja los escalones, mirando hacia el agua; piedra mojada, agua quieta y transparente donde se ve el fondo y luz que entra desde la abertura; al fondo, una persona nadando con chaleco. La piedra mojada es el argumento: tiene que verse por qué las sandalias de playa resbalan.",
+      "hora_clima": "de día, con luz que entra por la abertura del cenote; sombras abiertas sin perder detalle en la roca, altas luces de la abertura conservadas; color natural, sin cian exagerado",
+      "personas": "fotografía el viajero mientras baja, mirando el agua; la persona del fondo nada con chaleco, de espaldas o lejos, en acción espontánea; nadie posa; ningún rostro identificable",
+      "primer_plano": "raíces colgantes muy cerca del lente y muy fuera de foco, en el borde superior, sin tapar el agua nítida",
+      "ancla_pov": "Bajas los escalones de piedra húmeda de un cenote, con el agua tan quieta que ves el fondo",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin letreros, barandas ni infraestructura de un cenote real identificable",
+        "sin sandalias de playa presentadas como solución"
+      ],
+      "fidelidad": "cenote genérico, sin nombre → no requiere REF-01; la imagen ya está producida y adjunta en la versión del 14/10/2026 (`SKY_N4_B03`): revisarla contra este callout antes de aprobar"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado CHL: SCL → CUN figura 🔴 Archivada al 05/11/2026 (también LIM → CUN, EZE → CUN y GRU → CUN). Sin URL de ruta. No producir hasta que Paid / Ad Ops confirme una ruta activa; si vuelve SCL → CUN, se completa con su URL limpia",
+    "receta": "ruta.color",
+    "ruta_texto": "Santiago (SCL) → Cancún (CUN) · Home Market CHL · 🔴 Archivada en Precios y Rutas SKY, verificada el 05/11/2026",
+    "titular": "Tu maleta, lista para el Caribe",
+    "cta": "Ver vuelos a Cancún",
+    "url": null,
+    "archivo": "banner-ruta-santiago-cancun.webp",
+    "alt": "Banner de SKY: ruta de Santiago a Cancún, con la maleta lista para el Caribe",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin producir mientras la ruta siga 🔴 Archivada",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "CUN",
+      "ciudad": "Cancún"
+    },
+    "home_market": "CHL",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🔴 Archivada)"
+  },
+  "descartes": [
+    "La salida del aeropuerto con el calor de golpe — señalética y marcas del terminal",
+    "La mano leyendo la etiqueta del protector — etiqueta con marca legible",
+    "Joyas perdidas en el mar — escena negativa y poco verosímil"
+  ]
+}

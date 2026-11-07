@@ -1,0 +1,285 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-11-06",
+    "offerId": "performance-commerce-distribution",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "ksb-base-performance",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 12,
+    "lines": [
+      {
+        "lineId": "cuenta",
+        "profile": "ECG-016",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: contraparte y reporte mensual",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "paid",
+        "profile": "ECG-008",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.15"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: Google Search y LinkedIn, optimización",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "leadgen",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: una landing y formularios nativos, traspaso a C4C",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "analitica",
+        "profile": "ECG-031",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "dedicationEvidence": {
+          "reference": "KSB 2027, estimado: conversiones y reporte mensual",
+          "effectiveFrom": "2026-11-01",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "tax:cl-iva-19",
+      "source": {
+        "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    },
+    "thirdPartyCosts": [
+      {
+        "costId": "media-ksb",
+        "category": "media",
+        "label": "Medios digitales: Google Ads y LinkedIn Ads",
+        "supplier": "Google, LinkedIn y Meta",
+        "settlement": "client_direct",
+        "amount": "1650543",
+        "currency": "CLP",
+        "quantity": "1",
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "evidence": {
+          "reference": "KSB FAQ V2 06/11/2026: medios minimo recomendado 40 UF/mes, referencial; UF 41.263,57",
+          "effectiveFrom": "2026-11-06",
+          "effectiveUntil": "2027-12-31",
+          "status": "estimated"
+        }
+      }
+    ]
+  },
+  "work": [
+    {
+      "lineId": "cuenta",
+      "assigneeIds": [
+        "planned-cuenta-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "paid",
+      "assigneeIds": [
+        "planned-paid-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "leadgen",
+      "assigneeIds": [
+        "planned-leadgen-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "analitica",
+      "assigneeIds": [
+        "planned-analitica-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "4",
+      "serviceShare": "0.09",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "4",
+        "allocatedUnits": "0.36"
+      },
+      "reason": "4 asientos, uno por persona; KSB carga 0.36 de 4, la dedicación declarada.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "4",
+      "serviceShare": "0.09",
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "4",
+        "allocatedUnits": "0.36"
+      },
+      "reason": "4 asientos, uno por persona; KSB carga 0.36 de 4, la dedicación declarada.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "zapier",
+      "priceId": "historical",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "plan-share-conservative",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Un plan para automatizar el traspaso de leads a SAP C4C; supuesto conservador: KSB carga el plan completo. Precio histórico: el vigente no tiene monto.",
+      "evidence": {
+        "reference": "KSB 2027: plan, asientos y parte declarados por la práctica; sin factura ni registro de asientos verificado",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

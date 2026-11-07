@@ -327,3 +327,19 @@ Al registrar Creative Workbench, se trasladó aquí la introducción del router 
 contenido. CLAUDE.md mantiene un enlace a este bloque y carga skill/invariantes por dominio.
 
 > **`CLAUDE.md` es un ROUTER, no un spec-store.** Inline queda lo transversal. Los **invariantes operativos por dominio** (`NUNCA`/`SIEMPRE` específicos de un subsistema) viven **load-on-demand** en su spec/companion — esta tabla dice dónde. Al tocar un dominio: cargar su skill **y** su doc de invariantes. Cada dominio también tiene un pointer inline (con sus reglas más peligrosas) más abajo. **Auto-load nativo (Claude):** `.claude/rules/<dominio>.md` (frontmatter `paths:`) carga el pointer al companion automáticamente al tocar `src/lib/<dominio>/**` — no cuentan al budget (cargan solo al tocar el path). **Subagentes:** si un spawn falla por límite de contexto (el Explore built-in hereda ~170k de tool defs MCP), usar el subagente `explore-lite` (`.claude/agents/`, sin MCP). CLI de gobernanza: `pnpm claude-md {inventory\|budget\|audit\|check}` (`check` = budget `--strict` + rule-audit; gate de no-pérdida + anti-re-acreción @35k, workflow `claude-md-governance.yml`). Mapa completo del refactor: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
+
+### Delta 2026-11-04 — presupuesto rebasado al sumar filas al router
+
+Al sumar filas del router (Motogas, Berel, Blog SKY), `CLAUDE.md` quedó en 35.321 tokens (> 35.000) y el
+check «CLAUDE.md governance» falló en `develop`. El commit `0992618ea` compactó filas cuyo detalle ya
+vive en su doc o skill (fotografía de marca, Blog SKY, Berel, Motogas, Globe y el párrafo de generación
+con IA): 34.652 tokens, `node scripts/ci/claude-md.mjs check` con 0 huérfanos, y el check volvió a
+`success`. Margen al cierre: ~350 tokens.
+
+- **Una fila nueva del router es un puntero corto a su skill o doc**, no un resumen de sus reglas. El
+  detalle se escribe primero en el destino y la fila sólo lo enruta.
+- **Las líneas del baseline (`27ce06a11`) se auditan por alcanzabilidad exacta**: el rule-audit busca
+  cada línea original verbatim en el corpus. Compactar una línea del baseline que no existe tal cual en
+  otro doc deja un huérfano (pasó al intentar acortar el bullet de GVC: 1 huérfano, revertido). Antes de
+  compactar una línea del baseline, verificar que su texto exacto ya vive en su doc o skill de destino.
+- **Correr `pnpm claude-md check` antes de commitear cualquier cambio a `CLAUDE.md`**, no esperar al CI.

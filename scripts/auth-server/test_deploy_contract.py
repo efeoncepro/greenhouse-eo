@@ -60,8 +60,9 @@ class DeployContractTests(unittest.TestCase):
 
     def test_trigger_environment_and_lock_are_production_only(self):
         triggers = WORKFLOW.split('  workflow_dispatch:', 1)[0]
-        self.assertIn('      - main\n', triggers)
-        self.assertNotIn('develop', triggers)
+        self.assertNotIn('  push:', triggers)
+        self.assertIn('  workflow_call:', WORKFLOW)
+        self.assertIn('  workflow_dispatch:', WORKFLOW)
         self.assertIn('    environment: production\n', WORKFLOW)
         self.assertIn('  group: auth-server-production\n  cancel-in-progress: false', WORKFLOW)
         self.assertNotIn("|| 'staging'", WORKFLOW)
@@ -147,6 +148,24 @@ class DeployContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
 
+    def test_vendor_only_live_change_cannot_bypass_runtime_guard(self):
+        (self.repo / 'vendor').mkdir()
+        (self.repo / 'vendor/package.tgz').write_bytes(b'changed build input')
+        self.git('add', 'vendor/package.tgz')
+        self.git('commit', '-qm', 'unpromoted vendor input')
+        current = self.git('rev-parse', 'HEAD')
+        revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': current}]}]}}
+        result = self.run_step('Check deployed revision drift', EXPECTED_SHA=self.sha,
+                               TEST_REVISION=json.dumps(revision), GCP_PROJECT_ID='test', GCP_REGION='test')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('target would replace unpromoted or newer Auth runtime', result.stdout)
+
+    def test_ignore_files_are_runtime_comparison_inputs(self):
+        paths = workflow_run('Check deployed revision drift').split('WORKER_RUNTIME_PATHS=(', 1)[1].split(')', 1)[0]
+        for name in ('.dockerignore', '.gcloudignore'):
+            with self.subTest(name=name):
+                self.assertIn(name, paths.split())
+
     def test_split_traffic_or_missing_source_never_deploys(self):
         split = {'status': {'traffic': [{'revisionName': 'a', 'percent': 50}, {'revisionName': 'b', 'percent': 50}]}}
         for env in ({'TEST_SERVICE': json.dumps(split)}, {'TEST_REVISION': '{"spec":{"containers":[{"env":[]}]}}'}):
@@ -155,6 +174,40 @@ class DeployContractTests(unittest.TestCase):
                                        GCP_PROJECT_ID='test', GCP_REGION='test', **env)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn('ERROR:', result.stdout + result.stderr)
+
+    def test_post_deploy_readback_requires_expected_sha_on_active_revision(self):
+        revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': self.sha}]}]}}
+        params = {'DEPLOY_NEEDED': 'true', 'PREVIOUS_GIT_SHA': '0' * 40,
+                  'EXPECTED_SHA': self.sha, 'TEST_REVISION': json.dumps(revision),
+                  'GCP_PROJECT_ID': 'test', 'GCP_REGION': 'test'}
+        result = self.run_step('Verify active Auth revision', **params)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('100% traffic', result.stdout)
+        self.assertIn('active_revision=auth-server-test', (self.repo / 'output').read_text())
+        self.assertIn('served_sha=' + self.sha, (self.repo / 'output').read_text())
+        bad_revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': 'f' * 40}]}]}}
+        result = self.run_step('Verify active Auth revision', **(params | {'TEST_REVISION': json.dumps(bad_revision)}))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('active Auth revision', result.stdout)
+
+    def test_post_skip_readback_requires_unchanged_active_revision(self):
+        revision = {'spec': {'containers': [{'env': [{'name': 'GIT_SHA', 'value': self.sha}]}]}}
+        params = {'DEPLOY_NEEDED': 'false', 'PREVIOUS_GIT_SHA': self.sha,
+                  'EXPECTED_SHA': 'f' * 40, 'TEST_REVISION': json.dumps(revision),
+                  'GCP_PROJECT_ID': 'test', 'GCP_REGION': 'test'}
+        result = self.run_step('Verify active Auth revision', **params)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        split = {'status': {'traffic': [{'revisionName': 'a', 'percent': 50},
+                                       {'revisionName': 'b', 'percent': 50}]}}
+        result = self.run_step('Verify active Auth revision', **(params | {'TEST_SERVICE': json.dumps(split)}))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('exactly one revision at 100% traffic', result.stderr)
+        result = self.run_step('Verify active Auth revision', **(params | {'DEPLOY_NEEDED': ''}))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('invalid deploy decision', result.stdout)
+        result = self.run_step('Verify active Auth revision', **(params | {'PREVIOUS_GIT_SHA': ''}))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('full source SHA', result.stdout)
 
     def test_numeric_secret_pins_pass_unversioned_names_to_iam(self):
         source = (ROOT / 'services/auth-server/deploy.sh').read_text()

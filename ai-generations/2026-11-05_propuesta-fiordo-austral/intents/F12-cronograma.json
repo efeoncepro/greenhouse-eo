@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-waves",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Implementación · 16 semanas",
+    "question": "De la firma a producción,",
+    "answer": [
+      "16",
+      "semanas"
+    ]
+  },
+  "body": "Cada fase se **prueba** antes de la siguiente; la prueba técnica de seguridad es la puerta a producción.",
+  "steps": [
+    {
+      "kicker": "Semanas 1–4",
+      "name": "Diseño y seguridad",
+      "desc": "Entrega: arquitectura firmada, matriz de roles, SSO con Entra ID y colector Wazuh."
+    },
+    {
+      "kicker": "Semanas 3–8",
+      "name": "Configuración",
+      "desc": "Entrega: CRM configurado, migración cuadrada e integraciones probadas."
+    },
+    {
+      "kicker": "Semanas 9–12",
+      "name": "Prueba y puesta",
+      "desc": "Entrega: actas de aceptación, informe de la prueba técnica y capacitación."
+    },
+    {
+      "kicker": "Semanas 13–16",
+      "name": "Estabilización",
+      "desc": "Entrega: informe de adopción, calidad de datos y manual de operación."
+    }
+  ],
+  "selectedStep": 3
+}

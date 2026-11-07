@@ -1,0 +1,22 @@
+{
+ "id": "HERO-sophia",
+ "formato": "4:5",
+ "impacto": true,
+ "linea": "engine",
+ "identidad": [
+  {
+   "persona": "sophia"
+  }
+ ],
+ "objetos": [
+  {
+   "objeto": "chaqueta-bomber-efeonce"
+  },
+  {
+   "objeto": "polo-efeonce"
+  }
+ ],
+ "escena": "SCENE (Efeonce studio, Santiago, evening): Sophia stands centred in the frame, framed from the waist up, the body square to the camera and the head almost frontal (both eyes, both eyebrows and both ears visible), looking straight into the lens with a serious, analytical expression with a contained closed-mouth smile, caught at the instant she turns the tablet toward the viewer to show a result that just came in. With both hands she holds a current-generation tablet (thin aluminium unibody, minimal bezels, no third-party logos) at chest height, tilted slightly toward the camera so its screen turns toward the viewer; the screen shows an out-of-focus analytics dashboard, unreadable because it is out of focus, and emits a soft azure blue (#0375DB) glow that lights the fingers and the underside of the chin. She wears the Efeonce corporate uniform: the deep navy bomber jacket of the kit ZIPPED HALFWAY over the deep navy pique polo of the kit, so only ONE emblem is visible on the front: the embroidered one on the left chest of the jacket, above the tablet. Dark jeans below, mostly out of frame. The backdrop is a seamless matte charcoal-grey studio paper, plain and evenly dark, with no panels, no windows, no lamps, no shelves and no props: nothing printed, nothing analog, nothing in the background even out of focus. Key light: hard and low from the far left, raking across the face, one side in open shadow softened by a gentle fill; a second light low behind her, gelled azure blue (#0375DB), draws a thin azure rim on the hair and shoulders, separating the figure from the backdrop. 85mm lens at f/2.8 from about 2.5 m, camera at chest height. The whole frame is cool and contemporary; the only colour accent is the glow of the screen.",
+ "lecho": "sin-lecho",
+ "sinLechoPorque": "Plate para recorte: se separa del fondo y se compone en el hero web de efeoncepro.com, donde firma el encabezado del sitio (norma de superficie web §4.1). Un primer plano desenfocado taparía la cintura y rompería el recorte."
+}

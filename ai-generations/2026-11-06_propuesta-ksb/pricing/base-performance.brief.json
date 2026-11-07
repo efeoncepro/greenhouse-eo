@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-06",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "ksb-base-performance",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "CLP",
+  "periods": 12,
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  },
+  "lines": [
+    {
+      "lineId": "cuenta",
+      "profile": "ECG-016",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.08"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: contraparte y reporte mensual",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "paid",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.15"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: Google Search y LinkedIn, optimización",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "leadgen",
+      "profile": "ECG-021",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.08"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: una landing y formularios nativos, traspaso a C4C",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "analitica",
+      "profile": "ECG-031",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.05"
+      },
+      "dedicationEvidence": {
+        "reference": "KSB 2027, estimado: conversiones y reporte mensual",
+        "effectiveFrom": "2026-11-01",
+        "effectiveUntil": "2027-12-31",
+        "status": "estimated"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ]
+}

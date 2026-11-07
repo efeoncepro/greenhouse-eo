@@ -1,0 +1,139 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "4d83cacf6aef",
+  "key": "4d83cacf6aef567ab2ec2e9607f4c62274350f722d17c49b22831e2c50299cdb",
+  "status": "completed",
+  "createdAt": "2026-10-28T17:28:28.198Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_propuesta-armor/plates/BR3v-sin-isotipo-isotipo-acabado.png",
+    "imageSha256": "2db2c7ed5f54ab78936f74d7f08de33a1bc6e2924dd70c16424e1414ff136513",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-28_propuesta-armor/plates/BR3v-mask-todo-menos-logo.png",
+    "maskSha256": "6c82466f9810f2d6dacae88256eac5e530b3c74d1c828b87f608c510ed1e6bda",
+    "maskConvention": "white-editable",
+    "width": 1792,
+    "height": 1024,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-sunburst",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Keep the exact composition, the woman, her pose, hair, jacket, floor and framing unchanged. Relight only the ring of light: the whole ring becomes a thin, faint line of saturated red-orange light (#F83902) with a soft orange halo; a short arc on its upper-left (from about 10 to 11 o'clock) is thicker and brighter in the same orange, and the small sphere at the tip of that arc is the brightest point in the frame, a near-white warm core with an orange glow. The ring's reflection on the polished floor and the haze immediately around the ring take its orange light. The rest of the hall, the upper sky and the whole left half stay cool deep navy (deep blue #0375DB and cool white); no orange cast on the dark left area. Her hair and shoulder rim may pick up a faint warm edge from the ring. No new objects, no particles, no flares, no text.",
+    "providerPrompt": "Image 1 is the photo to edit; the result keeps its framing.\nImage 2 is the same photo with a magenta outline that marks the exact area where the change goes. Put the change inside that outline only, keep the same camera position and framing as image 1, and do not reproduce the outline.\nKeep the exact composition, the woman, her pose, hair, jacket, floor and framing unchanged. Relight only the ring of light: the whole ring becomes a thin, faint line of saturated red-orange light (#F83902) with a soft orange halo; a short arc on its upper-left (from about 10 to 11 o'clock) is thicker and brighter in the same orange, and the small sphere at the tip of that arc is the brightest point in the frame, a near-white warm core with an orange glow. The ring's reflection on the polished floor and the haze immediately around the ring take its orange light. The rest of the hall, the upper sky and the whole left half stay cool deep navy (deep blue #0375DB and cool white); no orange cast on the dark left area. Her hair and shoulder rim may pick up a faint warm edge from the ring. No new objects, no particles, no flares, no text.\nChange only that area. Preserve the framing, camera angle, lighting, color temperature and every other object of image 1 exactly. Do not add text or logos."
+  },
+  "mask": {
+    "touchedFraction": 0.9947531563895089,
+    "editable": 1820536,
+    "soft": 4844,
+    "protected": 9628
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 1792,
+      "height": 1024
+    },
+    "target": {
+      "width": 1792,
+      "height": 1024
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0373,
+    "basis": "1 × salida 1792x1024 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 20.757,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 0,
+        "bestError": 0,
+        "misaligned": false
+      },
+      "providerMaskSent": false,
+      "colorShift": [
+        -0.83,
+        -7.06,
+        -13.68
+      ],
+      "protected": {
+        "pixels": 9628,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 1820536,
+        "maxDelta": 213,
+        "meanDelta": 20.792,
+        "worst": {
+          "x": 1624,
+          "y": 236
+        }
+      },
+      "seam": {
+        "pixels": 4844,
+        "maxDelta": 95,
+        "meanDelta": 7.727,
+        "worst": {
+          "x": 1299,
+          "y": 383
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 9628,
+        "maxDelta": 147,
+        "meanDelta": 21.966,
+        "worst": {
+          "x": 1319,
+          "y": 419
+        }
+      },
+      "outputUsd": 0.0373,
+      "providerModel": "gpt-image-2.5-sunburst",
+      "usage": {
+        "input_tokens": 3277,
+        "input_tokens_details": {
+          "image_tokens": 2958,
+          "text_tokens": 319
+        },
+        "output_tokens": 1243,
+        "output_tokens_details": {
+          "image_tokens": 1243,
+          "text_tokens": 0
+        },
+        "total_tokens": 4520
+      },
+      "meta": {
+        "size": "1792x1024",
+        "quality": "high",
+        "providerMask": false
+      }
+    }
+  ]
+}

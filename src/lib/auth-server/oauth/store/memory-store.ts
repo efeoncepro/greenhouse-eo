@@ -271,6 +271,36 @@ export class InMemoryOAuthStore implements OAuthStorePort {
     return count
   }
 
+  async revokeConsentAndGrants({ subject, environmentId, clientId, scopes, revokedBy, reason, now }: {
+    subject: string
+    environmentId: string
+    clientId: string
+    scopes: readonly string[] | null
+    revokedBy: string
+    reason: string
+    now: Date
+  }) {
+    const selectedScopes = scopes ? new Set(scopes) : null
+    let consentsRevoked = 0
+
+    for (const row of this.consents) {
+      if (row.status !== 'active' || row.subject !== subject || row.environmentId !== environmentId ||
+        row.clientId !== clientId || (selectedScopes && !selectedScopes.has(row.scope))) continue
+      row.status = 'revoked'
+      row.revokedAt = now
+      row.revokedBy = revokedBy
+      row.revokeReason = reason
+      consentsRevoked += 1
+    }
+
+    const match = (row: { subject: string; environmentId: string; clientId: string }) =>
+      row.subject === subject && row.environmentId === environmentId && row.clientId === clientId
+
+    const tokens = this.revokeWhere(match, match, now, `consent_revoked:${reason}`)
+
+    return { consentsRevoked, ...tokens }
+  }
+
   async recordAuditEvent(event: OAuthAuditEvent) {
     this.audit.push({ ...clone(event), eventId: `oae-${generateOpaqueId()}`, occurredAt: new Date() })
   }

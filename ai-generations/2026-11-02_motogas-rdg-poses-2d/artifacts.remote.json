@@ -1,0 +1,245 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:57:02.659Z",
+  "run": "ai-generations/2026-11-02_motogas-rdg-poses-2d",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_motogas-rdg-poses-2d",
+  "totalBytes": 29718385,
+  "fileCount": 39,
+  "files": [
+    {
+      "path": "entrega/hoja-sobre-blanco.png",
+      "sizeBytes": 685611,
+      "sha256": "0ab078fbb1453d7078389901320a39c06d6a9c980a5fe100555d379a13d964f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/hoja-sobre-blanco.png"
+    },
+    {
+      "path": "entrega/hoja-sobre-gris-tela.png",
+      "sizeBytes": 764097,
+      "sha256": "e93453cc77adcad966365c27d2ad6e2e22b723e12102772a4c476f166aed9881",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/hoja-sobre-gris-tela.png"
+    },
+    {
+      "path": "entrega/hoja-sobre-rojo.png",
+      "sizeBytes": 767537,
+      "sha256": "a978501d8488b9b1cd1a79efe5325d110bf627f73cb034cfc0c77f278baf0307",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/hoja-sobre-rojo.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-00-base-v01.png",
+      "sizeBytes": 247025,
+      "sha256": "40ea752ec273fd3de7fd8ef04ae9595beda616a067a7c45513935a4c71d93f7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-00-base-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-01-megafono-v01.png",
+      "sizeBytes": 359454,
+      "sha256": "6200221c150259014c432868d451061af6dd902b87791715cb29c8cfef6a03db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-01-megafono-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-02-corriendo-v01.png",
+      "sizeBytes": 336419,
+      "sha256": "217b75a8890cdd9a2588593cff556e707d21ce44a4fa9a09fb7e72ac93730137",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-02-corriendo-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-03-senalando-v01.png",
+      "sizeBytes": 306910,
+      "sha256": "3dda07ed12af2f2eddc67d4324e398f18c50bc2d5a8e9499f5f063d9ec233bdd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-03-senalando-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-04-apoyado-v01.png",
+      "sizeBytes": 286206,
+      "sha256": "058af3fb0abc0eb8944c56142d0ee582227f2cb51f790c5e5e33d7360ef6d727",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-04-apoyado-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-05-celular-v01.png",
+      "sizeBytes": 332219,
+      "sha256": "be0625daef7d8ae32433c8cdb5e2d58deba88d2a47a61f922250c69d7ab672da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-05-celular-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-06-saludando-v01.png",
+      "sizeBytes": 320805,
+      "sha256": "56f8d0853a357db92a5ab61ff1a80b0a7515bbcdd1c653630fee0ee60fb0675c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-06-saludando-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-07-pensando-v01.png",
+      "sizeBytes": 297029,
+      "sha256": "c77695e02edeef34e6abd13862a4a46e660fe281d4b2f17acf19b8e9d672cd79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-07-pensando-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-08-celebrando-v01.png",
+      "sizeBytes": 382579,
+      "sha256": "389aa3d50ebb11febc4b147825b34033ea764dccc628879c1ee78d21b7320c2c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-08-celebrando-v01.png"
+    },
+    {
+      "path": "entrega/motogas-rdg-2d-09-guino-v01.png",
+      "sizeBytes": 310537,
+      "sha256": "d8ecc1790dc97f42e75e4263d03083bfa8793c743e44d885f6d7804e9a147f2f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/entrega/motogas-rdg-2d-09-guino-v01.png"
+    },
+    {
+      "path": "fuente/rdg-avatar-2019-render.png",
+      "sizeBytes": 419254,
+      "sha256": "2b4abba58f26b9819ec0a31fe7d9de395b2df268e1442750baed0e3747899ec3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/fuente/rdg-avatar-2019-render.png"
+    },
+    {
+      "path": "fuente/rdg-canon-2019.png",
+      "sizeBytes": 120362,
+      "sha256": "fcde1974dda62114766464f9a4a9c1fb5adb27121e79b04b19529e603a5f8f49",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/fuente/rdg-canon-2019.png"
+    },
+    {
+      "path": "fuente/rdg-ref-gris-1600.png",
+      "sizeBytes": 231957,
+      "sha256": "5d674df229b045533026114ce7859b563cf8ab14aeef7888a1cad4bbb999d202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/fuente/rdg-ref-gris-1600.png"
+    },
+    {
+      "path": "poses/rdg-01-megafono-v01.png",
+      "sizeBytes": 1954875,
+      "sha256": "4a66315688887ff58f5e761fb67136d8ba983136c75dea34cff5f092a0746a96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-01-megafono-v01.png"
+    },
+    {
+      "path": "poses/rdg-02-corriendo-v01.png",
+      "sizeBytes": 1951395,
+      "sha256": "c0f9d39fd29d0b08c30854167b9f77419221f04eee2d03059d87f0b8e57a1536",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-02-corriendo-v01.png"
+    },
+    {
+      "path": "poses/rdg-03-senalando-v01.png",
+      "sizeBytes": 1912689,
+      "sha256": "f4ee8426b5b9585da0d8f4f02534eed2420e5a8ae0d7f3eae35e47988f5da1de",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-03-senalando-v01.png"
+    },
+    {
+      "path": "poses/rdg-04-apoyado-v01.png",
+      "sizeBytes": 1905806,
+      "sha256": "52d3bc27c70ffacc18d72a52a6a9c2c5916dd37bbe18b14680d99d0df5b6ba3d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-04-apoyado-v01.png"
+    },
+    {
+      "path": "poses/rdg-05-celular-v01.png",
+      "sizeBytes": 1914159,
+      "sha256": "bda9b035821bc1983882e9c954387967217294b62da99a5169f27e88220a0e1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-05-celular-v01.png"
+    },
+    {
+      "path": "poses/rdg-06-saludando-v01.png",
+      "sizeBytes": 1944116,
+      "sha256": "58c7d31ebec149abde19378fc2ae750f36af51df4dd0c4f52447500daa43b779",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-06-saludando-v01.png"
+    },
+    {
+      "path": "poses/rdg-07-pensando-v01.png",
+      "sizeBytes": 1916909,
+      "sha256": "f5b4c946365f769b7e1e786360d1dc39a408bc77f58b1f60940292f12f15848b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-07-pensando-v01.png"
+    },
+    {
+      "path": "poses/rdg-08-celebrando-v01.png",
+      "sizeBytes": 2001078,
+      "sha256": "7bb2201c71dfa4b016cc0e90be899f0eacfdb4a8e6b64f12cbcf1f32e9fdd133",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-08-celebrando-v01.png"
+    },
+    {
+      "path": "poses/rdg-09-guino-v01.png",
+      "sizeBytes": 1940628,
+      "sha256": "1d3f2763a75d428fc1f1d99e304a4e7dad2424eeb332a337c67691b75b0b17aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-09-guino-v01.png"
+    },
+    {
+      "path": "poses/rdg-10-sentado-v01.png",
+      "sizeBytes": 1907815,
+      "sha256": "0fd086e873e9ae1e8c61bd514330ec6845566acb858f4586250f748b3d9f5e4e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/poses/rdg-10-sentado-v01.png"
+    },
+    {
+      "path": "qa/hoja-piloto-sobre-blanco.png",
+      "sizeBytes": 354337,
+      "sha256": "bbda73ea61c1b4fac479793f766161bc3ba05360feb9ea1099a54a1058ac65d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/qa/hoja-piloto-sobre-blanco.png"
+    },
+    {
+      "path": "qa/zoom-megafono-cara.png",
+      "sizeBytes": 143622,
+      "sha256": "5065f6992b9d2c16d9735f1010b3e920f788ca13c47b907f40078a8f50165b65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/qa/zoom-megafono-cara.png"
+    },
+    {
+      "path": "vector/rdg-2d-00-base-v01.png",
+      "sizeBytes": 250323,
+      "sha256": "cad50ab88438ec4f1a90eac4648db1717ed4c3bbe0d4837eb6bf6917cfc53ed4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-00-base-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-01-megafono-v01.png",
+      "sizeBytes": 375698,
+      "sha256": "a229b2a6cd3ef1c3cea143e339cf0ccbbfd74f1642e25dbca68a47e67dce79ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-01-megafono-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-02-corriendo-v01.png",
+      "sizeBytes": 351500,
+      "sha256": "3cb8c380b4a410c40f9ddeed66a790cc9b38abbdfd8b6f1c3ce9c36add127058",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-02-corriendo-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-03-senalando-v01.png",
+      "sizeBytes": 324393,
+      "sha256": "7bbfa0ab14511566b44830ee5e685df2f77196e3d077d6af595a95aa18bb0142",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-03-senalando-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-04-apoyado-v01.png",
+      "sizeBytes": 314358,
+      "sha256": "9d61f4b2613b935264065f8e5bb58e61767a258e5fd95902a7ae6021259200f4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-04-apoyado-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-05-celular-v01.png",
+      "sizeBytes": 353897,
+      "sha256": "12a9bcc388400089d12e0f3410dcceb3577231d46ab09be9004bf468fc64f4c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-05-celular-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-06-saludando-v01.png",
+      "sizeBytes": 345438,
+      "sha256": "1fdb46dc817622dad2383daaa532e5a3f07ae347e883792980a269daf4a1fb9c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-06-saludando-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-07-pensando-v01.png",
+      "sizeBytes": 330796,
+      "sha256": "69a01fb51346b4c0a1d6d647f6e8357a6c45a8f3e913c0ecb903ce4bef7c2966",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-07-pensando-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-08-celebrando-v01.png",
+      "sizeBytes": 402747,
+      "sha256": "49ef7b3f5e4ff150c55af04f2a2145676318b77a9628be51ea1df0bb0d9412c7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-08-celebrando-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-09-guino-v01.png",
+      "sizeBytes": 340530,
+      "sha256": "2dec5b8ce646643f9eed64416626882cc2dc25c97f29f2a948d58093d4eea6c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-09-guino-v01.png"
+    },
+    {
+      "path": "vector/rdg-2d-10-sentado-v01.png",
+      "sizeBytes": 313275,
+      "sha256": "fd7581b932cc2bc618fb18b72255e15c474cf98e2cc63f8eee7b58fcf642c467",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_motogas-rdg-poses-2d/vector/rdg-2d-10-sentado-v01.png"
+    }
+  ]
+}

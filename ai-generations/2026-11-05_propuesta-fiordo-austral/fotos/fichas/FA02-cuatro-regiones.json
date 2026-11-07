@@ -1,0 +1,44 @@
+{
+  "id": "FA02-cuatro-regiones",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "julio"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): he stands on the RIGHT third of the frame, his face at about 80 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. His right hand is held open at chest height on the camera-left side of his body, palm up, the elbow bent close to his side and the hand near his body, never reaching toward the lens, his hand at about 68 % of the frame width and never further left than 64 % of the frame width; his left arm hangs relaxed at his side, out of the action. Resting just above that open palm floats ONE small sphere of clear glass and azure light (#0375DB), about 12 cm across, the brightest thing in the frame. Exactly FOUR thin, clean threads of cool white-blue light come out of the far depth of the hall and reach the sphere from BEHIND it, travelling toward the lens: ONE drops from high in the hall, above his camera-left shoulder; ONE comes from far behind that same shoulder, at shoulder height; ONE rises from low in the depth, just above the far end of the table, at about 62 % of the frame width; ONE comes straight from the deepest point of the hall directly behind the sphere. Each thread passes beside his camera-left shoulder or arm, never behind his head, never in front of his body, never across his face, his chest or the mark on his jacket. They read like four distant regions being joined into one single place: thin, smooth and calm, never a tangle, soft and out of focus far away and sharp only in the last few centimetres where they enter the sphere; all four stay entirely inside the right 40 % of the frame. Inside the sphere, tiny points of cool white light are neatly gathered. ONE single tiny point glows magenta-pink (#E86BD0) inside the sphere, the only accent in the frame; it lights nothing around it. His head stays almost frontal, tilted only slightly down, and his eyes look DOWN at the sphere on his palm, never at the dark left of the frame and never into the lens: both eyes open, the full round iris of each eye visible with white on both sides, each upper lid with its own crease; a calm, assured closed-mouth half-smile, as if he had just gathered the four threads himself. The light of the sphere paints his face, hand and jacket from below and to the side. Thin haze catches the threads. The LEFT 60% of the frame is calm, deep dark studio space with only faint haze: no threads, no objects, no light shapes. Rich contrast, no text, no letters, no numbers, no maps, no globes, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "julio"
+    }
+  ],
+  "linea": "revenue-hubspot",
+  "llave": {
+    "fuente": "the small sphere of clear glass and azure light floating just above his open right palm",
+    "lado": "to his right side (camera-left), at chest height, below and to the side of his face",
+    "tamano": "about 12 cm across",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "a row of large cold blue practical lights high and far behind him on the right, melted into round bokeh, giving the hall its scale; the four thin threads come out of that depth; nothing in the left 60 % of the frame",
+  "fenomeno": {
+    "que": "four thin threads of light from four distant directions converge into one single small sphere on his open palm",
+    "esServicio": "un solo CRM para el equipo comercial de cuatro regiones: Asia, Europa, Norteamérica y Sudamérica"
+  }
+}

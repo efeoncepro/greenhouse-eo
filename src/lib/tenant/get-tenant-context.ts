@@ -35,6 +35,8 @@ export interface TenantContext {
 
   // Account 360 — nullable until M1 migration populates data
   spaceId?: string
+  /** TASK-2096 — several active Spaces: `spaceId` is absent and the Space must come with the request. */
+  spaceSelectionRequired?: boolean
   organizationId?: string
   organizationName?: string
 
@@ -91,6 +93,7 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
 
     // Account 360
     ...(session.user.spaceId ? { spaceId: session.user.spaceId } : {}),
+    ...(session.user.spaceSelectionRequired ? { spaceSelectionRequired: true } : {}),
     ...(session.user.organizationId ? { organizationId: session.user.organizationId } : {}),
     ...(session.user.organizationName ? { organizationName: session.user.organizationName } : {}),
 

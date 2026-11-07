@@ -2030,3 +2030,25 @@ El módulo gana una pieza de configuración: qué parte del sitio de una organiz
 - **Estado:** tabla aplicada y alcance v1 de Berel fijado el 2026-10-12; código en Vercel staging y `ops-worker`;
   Vercel Production sin release.
 
+
+## Delta 2026-11-05 — `seo_gsc_daily` no es total; reader `search-control` (ISSUE-191)
+
+- **`seo_gsc_daily` es detalle, no total.** La tabla materializa sólo `query × page` (TASK-1302). Al pedir la dimensión
+  consulta, Google omite las consultas anonimizadas y aplica límites de filas: toda suma de clics o impresiones desde
+  esta tabla es un subconjunto. Medido en Berel, octubre de 2026: blog 1.065 contra 4.094 del control; sitio completo
+  14.899 contra 32.790 (`byProperty`) o 34.219 (`byPage`).
+  [ISSUE-191](../issues/open/ISSUE-191-seo-gsc-daily-undercounts-clicks-hidden-queries.md) sigue abierto.
+- **Reader nuevo `readSeoSearchControlForWindow`** (`src/lib/growth/seo/search-control/`, método
+  `gsc_search_control_v1`). Lee Search Console en vivo con el reader autorizado de la organización y sin la dimensión
+  consulta (`[]`, `['date']`, `['page']`), `type=web`, `dataState=final`, `aggregationType=byPage`. El alcance de
+  contenido viaja como expresión de página (`page-expression.ts`, mismo veredicto que `isPathInContentScope`) y el
+  reader falla si vuelve una página fuera del alcance. `sc-domain:` mide el dominio y sus subdominios.
+- **Consumers.** Efeonce Insights (capítulo SEO, adapter `seo_report_adapter_v2`) y el collector del valor orgánico
+  ([ADR](GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md), que comparte la expresión de página). El tablero del módulo y
+  los demás readers de `seo_gsc_daily` (`readSeoOverviewKpisForWindow` incluido) **siguen sumando el subconjunto**. La
+  dirección propuesta en el issue —materializar una serie de control sin consulta y versionar el método— está pendiente.
+- **Pendiente de la regla del módulo:** el reader no tiene lane ecosystem ni tool MCP propios; hoy lo consume sólo
+  código del servidor.
+- **Estado:** code complete local (`a01a043dc`, `4c2de9aca`, `b583cd93f` en `develop`), sin push ni release. Sin
+  migración ni cambio de `seo_gsc_daily`. Requiere `GROWTH_SEARCH_CONSOLE_ENABLED=true` y las credenciales OAuth de
+  Search Console en el runtime consumidor.

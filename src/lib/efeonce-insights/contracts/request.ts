@@ -13,6 +13,18 @@ export const INSIGHT_REQUEST_VERSION = 'insight_request_v1' as const
 export const INSIGHT_MODULES = ['seo', 'aeo', 'ico'] as const
 export type InsightModule = (typeof INSIGHT_MODULES)[number]
 
+/**
+ * Estándar del informe (decisión del operador, 2026-11-06): la visibilidad en Google y la visibilidad en motores de
+ * respuesta van juntas. Un encargo con `seo` siempre lleva `aeo`, con todo lo que el Grader mida en la ventana; si no hay
+ * análisis, el capítulo AEO lo declara como límite, nunca desaparece. Caso fuente: el informe de octubre 2026 de Berel
+ * salió sólo con el blog y sin AEO porque la vista previa recortó los módulos.
+ */
+export const INSIGHT_REQUIRED_COMPANION_MODULES: ReadonlyArray<{ module: InsightModule; requires: InsightModule }> = [{ module: 'seo', requires: 'aeo' }]
+
+/** Módulos que el estándar exige y el encargo no trae (vacío = completo). */
+export const missingCompanionModules = (modules: readonly InsightModule[]): InsightModule[] =>
+  INSIGHT_REQUIRED_COMPANION_MODULES.filter(rule => modules.includes(rule.module) && !modules.includes(rule.requires)).map(rule => rule.requires)
+
 export const INSIGHT_OUTPUTS = ['deck_pdf', 'report_pdf', 'web'] as const
 export type InsightOutput = (typeof INSIGHT_OUTPUTS)[number]
 

@@ -1,0 +1,959 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:43:46.913Z",
+  "run": "ai-generations/2026-10-22_grok-bot-fuente",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_grok-bot-fuente",
+  "totalBytes": 28583472,
+  "fileCount": 158,
+  "files": [
+    {
+      "path": "brief/captura-pagina/avatar-01-92px.png",
+      "sizeBytes": 4427,
+      "sha256": "35ab69090c051360bdd2b3d298388c87f87f2261f94c129b205152e1afa2f615",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-01-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-02-92px.png",
+      "sizeBytes": 4439,
+      "sha256": "7c4c5e28ed20105f2968bae25a6532ce8c3eb628e4e718af5347273f1189e3c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-02-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-03-92px.png",
+      "sizeBytes": 4001,
+      "sha256": "142967be96f4cf23ca956fe472a6e81b14f30d5c9de0830d431b20d401a137c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-03-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-04-92px.png",
+      "sizeBytes": 3383,
+      "sha256": "61b2ab907e38ff621da36f056ac8cb71305453bf99c002a274127a4da43ff339",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-04-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-05-92px.png",
+      "sizeBytes": 3602,
+      "sha256": "73f1df293a779162180e0985294bc26c9d683b86877966db8f44abca1d495dd2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-05-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-06-92px.png",
+      "sizeBytes": 3998,
+      "sha256": "559ec3a3d045492f61805e32f34723ddc71ef6032a55150e71927a88621492fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-06-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-07-92px.png",
+      "sizeBytes": 3869,
+      "sha256": "ae8d67d4cf1fa9dfba26a123e581041e55f993aa535e79ec3d6f1d36ec80fd59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-07-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-08-92px.png",
+      "sizeBytes": 4276,
+      "sha256": "d44c567ad8d51e1aad4b344c4876f02876e45d19770590b02896b68e9741fe7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-08-92px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-09-128px.png",
+      "sizeBytes": 6471,
+      "sha256": "ab3ddc5719bd646d7562a1721a5428c38b87010e451fcb2d6e24d8a9d5dfccdf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-09-128px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-10-80px.png",
+      "sizeBytes": 3798,
+      "sha256": "6826f506e1d55968ea01c0be475aeda0e7561a58e3cbc2f1fa46f2caa7a67e3e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-10-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-11-80px.png",
+      "sizeBytes": 3324,
+      "sha256": "759f0ef8f1e12a1d4875e9a4bef1c85bb0c86d793a0d38dc8bf7d5f8ff53ddac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-11-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-12-80px.png",
+      "sizeBytes": 3454,
+      "sha256": "a674a62a5093b408acfad5d185832ba80802f51cea083c9cb618ff195cd15fc7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-12-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-13-80px.png",
+      "sizeBytes": 3347,
+      "sha256": "c75bc98f9032412ff5122ffa04e760095e2ec60aab3f1852654326db330beef3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-13-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-14-80px.png",
+      "sizeBytes": 3819,
+      "sha256": "eb13ecec209911d431d0a701ef4cea8a98283495339f136ed49b316ee5a9fb13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-14-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-15-80px.png",
+      "sizeBytes": 3645,
+      "sha256": "bec5de3be19a93dc1c7e97ac7c336388b9780eed2569b4f086bae1aa363c8a61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-15-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-16-80px.png",
+      "sizeBytes": 3444,
+      "sha256": "b6c96efbbcf40fc3a593afdcc0abd1cfe9e35933713d53175bf441e0748c183d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-16-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/avatar-17-80px.png",
+      "sizeBytes": 2982,
+      "sha256": "88440a373c3ec82f64e12381d1fa5b46338cf6b1c8e44f119fc6006ae9d99839",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/avatar-17-80px.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-01.png",
+      "sizeBytes": 443156,
+      "sha256": "4b5ead991f21222bfb63944e4ce26580c5b5aacb62f20cb9711c3ab41e76032b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-01.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-02.png",
+      "sizeBytes": 89986,
+      "sha256": "9a05d6fe435f48e29a9d9b104fcb582b102f765726dd0524285a0ec7808df745",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-02.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-03.png",
+      "sizeBytes": 691591,
+      "sha256": "0df6e463dfed246a3184b806fb0d086c244f8c0d057270b6bd9c971953a65359",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-03.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-04.png",
+      "sizeBytes": 38739,
+      "sha256": "5b8a2a3cf370391de68ddc86a31051178cf938b2013e80a5fe262f9c7c00f341",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-04.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-05.png",
+      "sizeBytes": 24296,
+      "sha256": "cb90abff3171ab9dafefa60c74ed1459d24af525be6073c93f3dd9d717a20697",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-05.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-06.png",
+      "sizeBytes": 64272,
+      "sha256": "ddebf2b482390adb53638097d06b362481c9ee4651052f29910596b7ce205efd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-06.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-07.png",
+      "sizeBytes": 4332,
+      "sha256": "31c0438d771b52100a8ad5a7d0b7ccebc77572241e55f7b195d0f1f51f5dd4c6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-07.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-08.png",
+      "sizeBytes": 8202,
+      "sha256": "65d2b2ee1097a19c7b8c3889e04c37b0f40993cadc193c0d2f92e1987a3395a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-08.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-09.png",
+      "sizeBytes": 42564,
+      "sha256": "86ba4a9fd508ee49eb835b0d772527daf10754b07d901b681acf45bd645b69b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-09.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-10.png",
+      "sizeBytes": 91166,
+      "sha256": "36990759c30d6f046d35d397d2a6cf3fbf63fc04f60598385ef904f8deff0259",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-10.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-11.png",
+      "sizeBytes": 68303,
+      "sha256": "aef3577a6df8d92880107a2ddf5c5b93aab625f847ae682ebe46f16858ad253d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-11.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-12.png",
+      "sizeBytes": 553781,
+      "sha256": "947524588ba90f82d94e9b25b0bb7bc598c79a5d6d5ea8dfaf1d759ba318b9da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-12.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-13.png",
+      "sizeBytes": 78129,
+      "sha256": "eecc956b75b4867691ac0664af63d9e4dd208a88fa813063ad00a4b38eda7fd2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-13.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-14.png",
+      "sizeBytes": 105065,
+      "sha256": "fd331c84b58144a66816b1067d5890b871b5bbf53f4f31b4b9d0bc6e02f01c64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-14.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-15.png",
+      "sizeBytes": 36307,
+      "sha256": "494c115ba699251292eccf5457ce0d8e8bb55fe290cee976878f28766ae7f068",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-15.png"
+    },
+    {
+      "path": "brief/captura-pagina/figura-16.png",
+      "sizeBytes": 173413,
+      "sha256": "c6a85f493fcb4f61513d9171fb7428a9bf009c7831963b644afedb2062c93d65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/figura-16.png"
+    },
+    {
+      "path": "brief/captura-pagina/pagina-completa.png",
+      "sizeBytes": 5139663,
+      "sha256": "e7e603ebbd7e7ad2f41ef9e858900ad9dd23d4dd6a8994f87d9d6c566bbdd147",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/captura-pagina/pagina-completa.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-00-tinta-heroe-09090B-2048.png",
+      "sizeBytes": 89886,
+      "sha256": "5ddcd3774a8521848259d1cdfaba55faef4420338ae7e4a44d6221de688f113f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-00-tinta-heroe-09090B-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-01-circulo-1084FE-2048.png",
+      "sizeBytes": 92372,
+      "sha256": "3690d7f6f2e106ce9869d3771b5b5c07c9785d9a462c59e7ebe3a71c438e5710",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-01-circulo-1084FE-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-02-huevo-FF6700-2048.png",
+      "sizeBytes": 83489,
+      "sha256": "b6769a5b47ee28b00fcd99e5e906848f2b1980c32d3b1ae8436fce9b3115a352",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-02-huevo-FF6700-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-03-squircle-00BCA6-2048.png",
+      "sizeBytes": 93670,
+      "sha256": "0867a607158f1e0448d5cf635d9173f640b82b1d4635cda67f79c2f0732441d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-03-squircle-00BCA6-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-04-pildora-FF263C-2048.png",
+      "sizeBytes": 67461,
+      "sha256": "5add7b75728c2bca8d8556d49f9a733a4ec0e684b17c8459682f310546709802",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-04-pildora-FF263C-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-05-triangulo-FF309B-2048.png",
+      "sizeBytes": 77553,
+      "sha256": "cf6be906e0b3ec78faf22bcd68c74664da2cbd324d10e8a402b1c2c9ac9dbac5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-05-triangulo-FF309B-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-06-hexagono-9159FE-2048.png",
+      "sizeBytes": 84235,
+      "sha256": "32061ccb0c66138257a35b24eaf7090272c315b89c43f2e551a3fbcaef9af0ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-06-hexagono-9159FE-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-07-nube-FF9800-2048.png",
+      "sizeBytes": 76170,
+      "sha256": "c48341f23ed07d48367f20c7f9a6df2151424e71846dbc710d6d7ea4b9097620",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-07-nube-FF9800-2048.png"
+    },
+    {
+      "path": "brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-08-gota-97683D-2048.png",
+      "sizeBytes": 81172,
+      "sha256": "16732592ebb7db247edd43e31a2462d2a55e2dee5e8a29fb890bd40b89738e18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/descartado-svg-estatico-sin-ojos/grok-bot-forma-08-gota-97683D-2048.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-1.png",
+      "sizeBytes": 46874,
+      "sha256": "96913e93f671657fc82a4c2822d26de5c60823a455b705285b3cfc1db6a6fcbe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-1.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-2.png",
+      "sizeBytes": 47138,
+      "sha256": "75cd6b64ecbf216d013007f6df592c41b2a5a6eb7261aeca33d5531854afee5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-2.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-3.png",
+      "sizeBytes": 47039,
+      "sha256": "c9116efff36cdaa4b1ecd5188e0eb2a55f28cb35073f556b6998eef9ade47fee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-3.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-4.png",
+      "sizeBytes": 47272,
+      "sha256": "5dec094d0d18b5d2777868c426afdc5381c344a6d4d1fae8d63a28b4c4d64b5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-4.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-5.png",
+      "sizeBytes": 46973,
+      "sha256": "0b0811187c22a20e557576594bd02c5676149c6875ca2b862e28bee4377d6cb5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-5.png"
+    },
+    {
+      "path": "brief/hd/estados/1-idle-6.png",
+      "sizeBytes": 47296,
+      "sha256": "924e0f20205b4db3674f71ae7ca8bbcb411c9ead8702cad44c92c32e52584e3b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/1-idle-6.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-1.png",
+      "sizeBytes": 47237,
+      "sha256": "90cb2f61ef90e49cbbbb32369d0145d67651284ceebc0a0b50dc657ee7d12dcb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-1.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-2.png",
+      "sizeBytes": 46898,
+      "sha256": "1fdfb92ec9ba0fb5c167520e39f4d28bef2ef0aadc777112c0103e2a2ea843c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-2.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-3.png",
+      "sizeBytes": 46859,
+      "sha256": "66f0d55372dcb9a4f6b5a8c361e68a46a6f6200324f2184fd7f9a42313d68ba8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-3.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-4.png",
+      "sizeBytes": 54730,
+      "sha256": "513ff9060f5ed1ba1b12f66cc8b22c12ed19a0219fad07d8cfe29a569dee729c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-4.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-5.png",
+      "sizeBytes": 67527,
+      "sha256": "f9b2a953ff840a6f1e02f0abd9f0b786543d187ced89f0368c0cdf61797b2a9a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-5.png"
+    },
+    {
+      "path": "brief/hd/estados/2-working-6.png",
+      "sizeBytes": 47169,
+      "sha256": "4b22d32e6fec918d3f6b2897d75a792b597340bb21a10e777aedaecd4b25a226",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/2-working-6.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-1.png",
+      "sizeBytes": 46994,
+      "sha256": "380c98801c4387a4ea96b3237d83d3701c68f4ed36308421e0cf66225af39359",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-1.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-2.png",
+      "sizeBytes": 46436,
+      "sha256": "f1e97ec219bb4b8cb4da3aaf2a0fa2c6f93d5ddc396e14ae36b4cc32eea03f25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-2.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-3.png",
+      "sizeBytes": 46793,
+      "sha256": "73c823a4b1f2456a54309e11194ddb28eb2fd94a3a9d2db9693cb9ceb5592fc9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-3.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-4.png",
+      "sizeBytes": 46892,
+      "sha256": "f25412312b3cc476ae4ab4fb2d7cb0d4bfd33f8d5d6ed13557193310b2c6b2a5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-4.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-5.png",
+      "sizeBytes": 46479,
+      "sha256": "b8bd5303ca7ab84e4a253c814545941beda6d3b1248032de3cf3d768721db52d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-5.png"
+    },
+    {
+      "path": "brief/hd/estados/3-waiting-6.png",
+      "sizeBytes": 46774,
+      "sha256": "d65fa8e5430e570cf75c0cf0f01ab8603f2f3ff3263041742f33bb0d003f83a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/3-waiting-6.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-1.png",
+      "sizeBytes": 41390,
+      "sha256": "4111ff0563335d312d37e683992e57a89fb3731fa9d6ef8b5f8110abb1776326",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-1.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-2.png",
+      "sizeBytes": 41265,
+      "sha256": "235aaf30a5e63619bfc7630bc02c15384a02e7706329186f8b7d98300c0bba04",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-2.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-3.png",
+      "sizeBytes": 41280,
+      "sha256": "f6b807157a9e3f252e1ac6e50be928fc833127ec929346a9068763f5b4957faa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-3.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-4.png",
+      "sizeBytes": 41280,
+      "sha256": "f6b807157a9e3f252e1ac6e50be928fc833127ec929346a9068763f5b4957faa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-4.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-5.png",
+      "sizeBytes": 41379,
+      "sha256": "b04a6f5901fab9ad1755c7f33704a825d4e1d0354d1d2136dbbe36275f3c08e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-5.png"
+    },
+    {
+      "path": "brief/hd/estados/4-blocked-6.png",
+      "sizeBytes": 41301,
+      "sha256": "4c7f33945b1862ba8b0a90b01d1d607862e7bbe6603a6702686e330dd23ff36e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/4-blocked-6.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-1.png",
+      "sizeBytes": 41215,
+      "sha256": "8edd5d8c5b4d2dfd996b462e96c8d22357ff8d60e9671d626ea01953c52342ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-1.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-2.png",
+      "sizeBytes": 41241,
+      "sha256": "e1a3852c226c8e35bc18689a004a32bdf0e384916173682d636b508391f14e73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-2.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-3.png",
+      "sizeBytes": 41269,
+      "sha256": "f566bd8a54e8f212a992e9bfd33744ab538515a0d46ced937abd959837aa8f28",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-3.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-4.png",
+      "sizeBytes": 41235,
+      "sha256": "86a6394cfa2c747f4c439b68de249fbf131658bc58716e7b24b01b8c43882d17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-4.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-5.png",
+      "sizeBytes": 41247,
+      "sha256": "7793df88520bc1068b26d9f92fdfdb6d734b7d38bd10fb97be95f1ef2af848f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-5.png"
+    },
+    {
+      "path": "brief/hd/estados/5-thinking-6.png",
+      "sizeBytes": 41211,
+      "sha256": "e84b366e6f3efbdf5b01568916a67765f606f3d568d38a597f454e9160a72db3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/5-thinking-6.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-1.png",
+      "sizeBytes": 47366,
+      "sha256": "1380a635ccacdba8358cf49e34d53b5d5d8753db91bd073f4062a603cabd65d2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-1.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-2.png",
+      "sizeBytes": 65495,
+      "sha256": "b978d7bfbd569defb41c40dafc3f9317ca9a36da0c1546a76ec4e52eeab33d58",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-2.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-3.png",
+      "sizeBytes": 90030,
+      "sha256": "46909660597b047bcbc34e6477a9ba82d4ca02e94b515597146bf4f5d5959424",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-3.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-4.png",
+      "sizeBytes": 98886,
+      "sha256": "5d1e26441c72987daa3f626f06652a3ba3645d79f448472cbf752bc8d8c3fc63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-4.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-5.png",
+      "sizeBytes": 96073,
+      "sha256": "e5db525909c60d272825b97600c9b3abd737ee1bb16753b225615c6f41309d82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-5.png"
+    },
+    {
+      "path": "brief/hd/estados/6-done-6.png",
+      "sizeBytes": 95194,
+      "sha256": "1a196627721b5254d64d59b6ed32bf087245cf4b53d60e6045d15e059a06b157",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/estados/6-done-6.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-01-1084FE.png",
+      "sizeBytes": 315546,
+      "sha256": "b392026064c013235a5d22284bc2820219c64ded626703753f086bf20c03a393",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-01-1084FE.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-02-FF6700.png",
+      "sizeBytes": 341248,
+      "sha256": "726fcef9bcb19100c7959b3259b44fab8cb155173708124a54aa44498dd839e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-02-FF6700.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-03-00BCA6.png",
+      "sizeBytes": 276431,
+      "sha256": "da05aa80b9b2b7d8d61a6602ee5026b3c4b51feae233f44709078abb59e96e5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-03-00BCA6.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-04-FF263C.png",
+      "sizeBytes": 405548,
+      "sha256": "9cbc2ad20d9a8c250a4654d80240ee6f2b59bbb542309e185d1d061001758002",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-04-FF263C.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-05-FF309B.png",
+      "sizeBytes": 343630,
+      "sha256": "73139a337f7d6868f41be9ddf58b6675af5efd0b3ec46acb22edd3f9b7467202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-05-FF309B.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-06-9159FE.png",
+      "sizeBytes": 346125,
+      "sha256": "8696e63cf4bbe81c84b1144a74083274acebd98fba7113c6bdd23056cd6222fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-06-9159FE.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-07-FF9800.png",
+      "sizeBytes": 386613,
+      "sha256": "0f461a15a9d9648d58b83f8275f11e5f711f83a404635b71ec461422cd6f4164",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-07-FF9800.png"
+    },
+    {
+      "path": "brief/hd/formas/forma-08-97683D.png",
+      "sizeBytes": 368884,
+      "sha256": "438380b8036ea935e7d8d0d9ceb7426e486827f3d96f63e47c4b3bf7de84c19d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/formas/forma-08-97683D.png"
+    },
+    {
+      "path": "brief/hd/hoja/hoja-8-formas-oficial-3x.png",
+      "sizeBytes": 59020,
+      "sha256": "bb0f49039f02b980592ab77032ea2a8a87f97a5b1e674534a794f3b275c168d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/hd/hoja/hoja-8-formas-oficial-3x.png"
+    },
+    {
+      "path": "brief/tira-hd.png",
+      "sizeBytes": 193914,
+      "sha256": "7e09265bf32eaca4c35f6ac83ecd4210102f84806c4dbc115ddcc829552c548b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/tira-hd.png"
+    },
+    {
+      "path": "brief/tira-og.png",
+      "sizeBytes": 375763,
+      "sha256": "fc87fee7880840551e263b2be9b73e21c00962f35760e8c9907eb854d768293b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/tira-og.png"
+    },
+    {
+      "path": "brief/tira-revision.png",
+      "sizeBytes": 195519,
+      "sha256": "fc6376acf33c3e45895de929430ab2154144e8f26b4ac2a18f64329a0199b037",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/tira-revision.png"
+    },
+    {
+      "path": "brief/tira-svg.png",
+      "sizeBytes": 157703,
+      "sha256": "06866b327fa33371a16270b17cbdd8ee567e3f860ffc806afc6d0fe388c8ff94",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/tira-svg.png"
+    },
+    {
+      "path": "brief/tira-video.png",
+      "sizeBytes": 256523,
+      "sha256": "ba13df1eb529342cd3bfbc8b8356335ae7bb71d249173b352b3567e38d862a76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/brief/tira-video.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-01-idle-frente.png",
+      "sizeBytes": 67775,
+      "sha256": "23549ff32b419cb6e2e9bb263ae421179228a3db514288b27f4d58512825fb66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-01-idle-frente.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-02-pensando-tres-puntos.png",
+      "sizeBytes": 36429,
+      "sha256": "9493d89da830381b9a384a661efe91128a428ade7686a80da39d2dfd73d6d50a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-02-pensando-tres-puntos.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-03-idle-mirada-arriba-derecha.png",
+      "sizeBytes": 64278,
+      "sha256": "c19c2304698ba614e616fa3f5ca905ce17dc03b5e0c1897a4aec03f49b992993",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-03-idle-mirada-arriba-derecha.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-04-ojos-entrecerrados.png",
+      "sizeBytes": 56400,
+      "sha256": "9c8a05f8828ee17a2187bd0f45671409cd5cc4951032f4de182ae222121c3a20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-04-ojos-entrecerrados.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-05-ojos-grandes-frente.png",
+      "sizeBytes": 77257,
+      "sha256": "4c56b9a061950b6e67ee4986797e0fd8ccf4dda33bb8505349b936c5d4656275",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-05-ojos-grandes-frente.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-06-exclamacion-inclinada.png",
+      "sizeBytes": 29933,
+      "sha256": "0cee6d49a0b6b4214b34fdef7fd6726b6cd43b50e638c07ad1d4d57d03b9013d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-06-exclamacion-inclinada.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-07-ojos-redondos-con-aviso.png",
+      "sizeBytes": 80265,
+      "sha256": "e235539dd97b704ee6bbecefb859fe7b47deba75307bc964a64ecdcd81e6e576",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-07-ojos-redondos-con-aviso.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-08-bloqueado-exclamacion.png",
+      "sizeBytes": 29527,
+      "sha256": "a675f69e65cebaf41d46aad12cb2c5d606090d9f65c06d6ccb3b521381e85bce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-08-bloqueado-exclamacion.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-09-forma-huevo.png",
+      "sizeBytes": 59853,
+      "sha256": "afccbde5f65d196b929070af46d343f08d4f244e66ec62ef0a784f94925f5e12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-09-forma-huevo.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-10-forma-hexagono.png",
+      "sizeBytes": 61848,
+      "sha256": "bbe9f95302350e30df3154b37192297ebdb9b6af8b1c29be46d1763921876902",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-10-forma-hexagono.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-11-forma-triangulo-con-arcos.png",
+      "sizeBytes": 115702,
+      "sha256": "30629c463135df8b88a91dee9c1b66978114dc9d2e871eb5c25953a9185380c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-11-forma-triangulo-con-arcos.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-12-listo-arcos-de-color.png",
+      "sizeBytes": 327223,
+      "sha256": "5c73884397a5a66d561b340fd9eb627c577f6afb8c26ea9257c56fdefe98b1b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-12-listo-arcos-de-color.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-13-listo-arcos-esfera.png",
+      "sizeBytes": 276401,
+      "sha256": "39c9bc6e2cd840cea19944a60163b7f389516f710f465b42bd3b8a3f19e6b3b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-13-listo-arcos-esfera.png"
+    },
+    {
+      "path": "cuadros/grok-bot-video-14-guino.png",
+      "sizeBytes": 94543,
+      "sha256": "4a35adebf6175ab90a69164a6e22333a165835a9a4595a320530968a2bc1fb41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/grok-bot-video-14-guino.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-01.png",
+      "sizeBytes": 67775,
+      "sha256": "23549ff32b419cb6e2e9bb263ae421179228a3db514288b27f4d58512825fb66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-01.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-02.png",
+      "sizeBytes": 36429,
+      "sha256": "9493d89da830381b9a384a661efe91128a428ade7686a80da39d2dfd73d6d50a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-02.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-03.png",
+      "sizeBytes": 64278,
+      "sha256": "c19c2304698ba614e616fa3f5ca905ce17dc03b5e0c1897a4aec03f49b992993",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-03.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-04.png",
+      "sizeBytes": 56400,
+      "sha256": "9c8a05f8828ee17a2187bd0f45671409cd5cc4951032f4de182ae222121c3a20",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-04.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-05.png",
+      "sizeBytes": 61311,
+      "sha256": "4302bd35fa6843649034cd27d3fe680344c2c4bdb79fd63d958498a10c4724a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-05.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-06.png",
+      "sizeBytes": 77257,
+      "sha256": "4c56b9a061950b6e67ee4986797e0fd8ccf4dda33bb8505349b936c5d4656275",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-06.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-07.png",
+      "sizeBytes": 29933,
+      "sha256": "0cee6d49a0b6b4214b34fdef7fd6726b6cd43b50e638c07ad1d4d57d03b9013d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-07.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-08.png",
+      "sizeBytes": 30679,
+      "sha256": "c1a278ef3c0d14fd7af947b12c80207536f499b5135ca379d54a5192e3f3ee98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-08.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-09.png",
+      "sizeBytes": 64576,
+      "sha256": "3a239e7e2f0bad8e1804fba52f186e810db19d2bcaaec20678ff9489c5b509e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-09.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-10.png",
+      "sizeBytes": 80265,
+      "sha256": "e235539dd97b704ee6bbecefb859fe7b47deba75307bc964a64ecdcd81e6e576",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-10.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-11.png",
+      "sizeBytes": 29527,
+      "sha256": "a675f69e65cebaf41d46aad12cb2c5d606090d9f65c06d6ccb3b521381e85bce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-11.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-12.png",
+      "sizeBytes": 34317,
+      "sha256": "897d5168dc846452e697c4dba788deb6965e3ab9e0a034832dbb3d922d64616c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-12.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-13.png",
+      "sizeBytes": 62648,
+      "sha256": "145b69c7f2ea679eebbec8b662b7b5dd36d479968194b505ab8dfffa546bde7e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-13.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-14.png",
+      "sizeBytes": 20953,
+      "sha256": "5919f8dc9044c8f77cc4e83c0c43ccd8633504c4327f3f3afd7d8bf20ff87701",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-14.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-15.png",
+      "sizeBytes": 67105,
+      "sha256": "75d9b4e5c11c92c7f5d5e9e322e7072433c30718f4acfc30666cba82eafab083",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-15.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-16.png",
+      "sizeBytes": 59853,
+      "sha256": "afccbde5f65d196b929070af46d343f08d4f244e66ec62ef0a784f94925f5e12",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-16.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-17.png",
+      "sizeBytes": 57672,
+      "sha256": "bd6a77c2a1c22d452a22ff2de5ffe70e631ca037a022b486a34c9fba06ec0fb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-17.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-18.png",
+      "sizeBytes": 61848,
+      "sha256": "bbe9f95302350e30df3154b37192297ebdb9b6af8b1c29be46d1763921876902",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-18.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-19.png",
+      "sizeBytes": 115702,
+      "sha256": "30629c463135df8b88a91dee9c1b66978114dc9d2e871eb5c25953a9185380c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-19.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-20.png",
+      "sizeBytes": 92000,
+      "sha256": "f79c970696756817a5518ed044fd2cc64bd4c529ec22f7d715a207afc8d36628",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-20.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-21.png",
+      "sizeBytes": 327223,
+      "sha256": "5c73884397a5a66d561b340fd9eb627c577f6afb8c26ea9257c56fdefe98b1b9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-21.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-22.png",
+      "sizeBytes": 276401,
+      "sha256": "39c9bc6e2cd840cea19944a60163b7f389516f710f465b42bd3b8a3f19e6b3b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-22.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-23.png",
+      "sizeBytes": 94543,
+      "sha256": "4a35adebf6175ab90a69164a6e22333a165835a9a4595a320530968a2bc1fb41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-23.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-24.png",
+      "sizeBytes": 83649,
+      "sha256": "9f7d298d589ae6bf34d49968d3500e5803e06cf86d8d42c3c1dce44d9ff2410d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-24.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-25.png",
+      "sizeBytes": 27940,
+      "sha256": "01c97d08bccb930efbebbf081c4b73f2261599a0d9ce54ed710d6211f10be2fa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-25.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-26.png",
+      "sizeBytes": 21987,
+      "sha256": "e37874f6306255c64d66d0cf8d98a2936bc764bcc0f1f626097220029340ecb8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-26.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-27.png",
+      "sizeBytes": 64851,
+      "sha256": "dcdad405671b02fc774fa2700c776b632fc1603c42deafa83ecdb5995a955e57",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-27.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-28.png",
+      "sizeBytes": 29530,
+      "sha256": "fc4c5c739944869521816a3f580530e7716157c980dd19e91e436c1dd3c8e5d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-28.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-29.png",
+      "sizeBytes": 51307,
+      "sha256": "339ee23c0ec37bedd2f03e1a1cfe5a5a361726ec9de543035af3baa371f1d558",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-29.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-30.png",
+      "sizeBytes": 69077,
+      "sha256": "efce17defcf2b1e522b3987a91955af53c1268bd27d980824860b38f9296c0f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-30.png"
+    },
+    {
+      "path": "cuadros/video-benji/benji-31.png",
+      "sizeBytes": 61907,
+      "sha256": "335215e334cad687f881535ed179f5f3abcdbde85bc91e38a1480d19cc732c84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/cuadros/video-benji/benji-31.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-1-idle-2048.png",
+      "sizeBytes": 104130,
+      "sha256": "3f550b828e83cae50697103e8b81ab0130e4faa0ae1c60d08622a3ea02760663",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-1-idle-2048.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-2-working-2048.png",
+      "sizeBytes": 105177,
+      "sha256": "5b06c9a28d9c72465f96d2f62d5bdeb3c1e48d07f92500543e8acc899a6d9586",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-2-working-2048.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-3-waiting-2048.png",
+      "sizeBytes": 127769,
+      "sha256": "5c6aa76dcce0c57ddd67b0bd0499dbdfd3074e7de2561b4df88a1b88809d99e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-3-waiting-2048.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-4-blocked-2048.png",
+      "sizeBytes": 33834,
+      "sha256": "ef69e5a83a6d6dee3b44b90602e7cf72b237087b0a21e633a224976971b65f31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-4-blocked-2048.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-5-thinking-2048.png",
+      "sizeBytes": 38124,
+      "sha256": "5dbc37e0ef6c2873b4223a4d80b359f3f7703000c6d199e60a1ed583dcfb7c73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-5-thinking-2048.png"
+    },
+    {
+      "path": "fuente/estados-svg-oficial/grok-bot-estado-6-done-2048.png",
+      "sizeBytes": 181153,
+      "sha256": "2527c9ac24dbf801aa4502265db877bff9c66acbbd5e15dc3d6d8a458f27992d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/estados-svg-oficial/grok-bot-estado-6-done-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-01-circulo-1084FE-2048.png",
+      "sizeBytes": 106085,
+      "sha256": "2d4656cf31bde056eb9c2a8d5cff6f35e2f016f8986547faafa8f0f5dae5d66c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-01-circulo-1084FE-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-02-huevo-FF6700-2048.png",
+      "sizeBytes": 97023,
+      "sha256": "2098645910bb02c19117c3a33c16aa88cc7ff487bbbc8bbaa9e74bfb03bdacc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-02-huevo-FF6700-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-03-squircle-00BCA6-2048.png",
+      "sizeBytes": 110409,
+      "sha256": "200b1a01d1b2ce44bea886011e9e68bf429cb3c583bd261592bf91ea5b100f4f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-03-squircle-00BCA6-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-04-pildora-FF263C-2048.png",
+      "sizeBytes": 79055,
+      "sha256": "a82ad90aae35d73bae09c0e010814d89c8685d17fd09ad550eb4689ca9ed9cbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-04-pildora-FF263C-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-05-triangulo-FF309B-2048.png",
+      "sizeBytes": 90077,
+      "sha256": "a946d94e2d1d95c7355ed3fc2b7e18ee55f248aa8fdcd1b3b81481e8badfcd3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-05-triangulo-FF309B-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-06-hexagono-9159FE-2048.png",
+      "sizeBytes": 101392,
+      "sha256": "2e9f9ee0a48fca300826bf65bbdceae5f731a6919e1d4f0d09ce96655d077127",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-06-hexagono-9159FE-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-07-nube-FF9800-2048.png",
+      "sizeBytes": 87514,
+      "sha256": "f5b62d9ca4569c80fa2f72009e3ebc8c37a2fb7ec34c168e4be561998b287b9d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-07-nube-FF9800-2048.png"
+    },
+    {
+      "path": "fuente/formas-svg-oficial/grok-bot-forma-08-gota-97683D-2048.png",
+      "sizeBytes": 96527,
+      "sha256": "e54dd1b92204ae7cc81a1ed050d16d3a6125caba30d392357ce5fc774cc9cdd1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/formas-svg-oficial/grok-bot-forma-08-gota-97683D-2048.png"
+    },
+    {
+      "path": "fuente/grok-bot-exploraciones-de-estilo-x-ai-descartadas.png",
+      "sizeBytes": 691591,
+      "sha256": "0df6e463dfed246a3184b806fb0d086c244f8c0d057270b6bd9c971953a65359",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/grok-bot-exploraciones-de-estilo-x-ai-descartadas.png"
+    },
+    {
+      "path": "fuente/grok-bot-hoja-8-formas-x-ai-designing-3x.png",
+      "sizeBytes": 59020,
+      "sha256": "bb0f49039f02b980592ab77032ea2a8a87f97a5b1e674534a794f3b275c168d8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/grok-bot-hoja-8-formas-x-ai-designing-3x.png"
+    },
+    {
+      "path": "fuente/grok-bot-icono-animado-benji-taylor-2026-08-11-1458.mp4",
+      "sizeBytes": 6306796,
+      "sha256": "94332b488f68ef32470aad6b5e4401c6fc432757343bc6c5f8eff2498d81fe65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/grok-bot-icono-animado-benji-taylor-2026-08-11-1458.mp4"
+    },
+    {
+      "path": "fuente/grok-bot-xai-designing-og.png",
+      "sizeBytes": 59378,
+      "sha256": "005d4966982888a8a19850c4001926ce533258f9e63bd54b6b706de20acfbc99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/grok-bot-xai-designing-og.png"
+    },
+    {
+      "path": "fuente/grok-bot-xai-introducing-og.png",
+      "sizeBytes": 1503005,
+      "sha256": "6c5543fd88fd53c520b27c54e74cdd7c2d60250dd479b8641b9e757392846e7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/fuente/grok-bot-xai-introducing-og.png"
+    },
+    {
+      "path": "hoja-de-contacto.png",
+      "sizeBytes": 599580,
+      "sha256": "97b7a7364f2ea860f7db20eca2e8802c100f444863819c01531f504c5bea54b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_grok-bot-fuente/hoja-de-contacto.png"
+    }
+  ]
+}

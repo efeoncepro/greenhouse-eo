@@ -1,0 +1,2 @@
+  ⤢ lienzo 2048x2560 · escena 2048x2048 en (0, 512) · relleno previo mirror · fundido 100 px
+FATAL: El prompt nombra "greenhouse". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.

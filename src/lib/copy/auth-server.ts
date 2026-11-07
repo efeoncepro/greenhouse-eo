@@ -73,7 +73,13 @@ export const GH_AUTH_SERVER = {
     'efeonce.mcp.hiring.read': 'Leer información de procesos de selección',
     'efeonce.mcp.globe.credits.funding.ensure': 'Cargar créditos de Globe. Esta acción mueve dinero real.',
     'efeonce.mcp.seo.write': 'Modificar la configuración SEO de tus organizaciones',
-    'efeonce.mcp.identity.write': 'Invitar y administrar a las personas de tu organización en Efeonce'
+    'efeonce.mcp.identity.write': 'Invitar y administrar a las personas de tu organización en Efeonce',
+    // TASK-2095 — clases de la audiencia Rooms (carril CLI de agentes).
+    'efeonce.mcp.rooms.read': 'Leer tus salas de Rooms, sus borradores y su cobertura',
+    'efeonce.mcp.rooms.read.client': 'Leer lo que escriben tus clientes en Rooms: preguntas, invitados y actividad',
+    'efeonce.mcp.rooms.author': 'Crear y editar borradores de salas en Rooms, incluidas sus imágenes',
+    'efeonce.mcp.rooms.release': 'Publicar salas e invitar a clientes en Rooms. Tu cliente verá el resultado.',
+    'efeonce.mcp.rooms.access': 'Dar y quitar acceso a las salas y al espacio de Rooms'
   } as Record<string, string>,
   scope_description_fallback: (scope: string) => `Permiso ${scope}`,
 

@@ -1,0 +1,126 @@
+{
+  "id": "lima-3-dias",
+  "notion_url": "https://app.notion.com/p/325df068860b47a2b905edf73cee6887",
+  "titulo": "Qué hacer en Lima en 3 días: itinerario por zonas para tu primera visita",
+  "slug": "/que-hacer-en-lima/",
+  "mercado": "CL",
+  "version": "v3 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · encuadre a la altura de los ojos de quien llega caminando · escala amplia · luz temprana · orienta",
+      "registro": "D",
+      "archivo": "que-hacer-en-lima-3-dias-plaza-mayor.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Plaza Mayor de Lima temprano en la mañana, punto de partida de un itinerario de 3 días",
+      "que_muestra": "la Plaza Mayor a primera hora, con poca gente, rejas de comercios a medio subir y la Catedral al fondo, en el tercio derecho; el encuadre es el de quien acaba de llegar caminando a la plaza. Debe leerse como el centro despertando, no como postal turística llena.",
+      "hora_clima": "primera mañana del relato, temprano; cielo claro o con el gris propio de Lima según la temporada, sin lluvia fuerte; luz baja abundante, sombras abiertas, cielo sin quemar ni reemplazado",
+      "personas": "pocas, pequeñas y a media distancia, en acciones espontáneas (caminando, abriendo un local); nadie mira al lente; ningún rostro identificable en primer plano",
+      "primer_plano": "el borde de una reja de comercio a medio subir muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar la plaza",
+      "ancla_pov": "es tu primera mañana en Lima y el centro todavía está despertando",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin la plaza llena de turistas",
+        "sin cambio de guardia en cuadro (se ilustraría un horario que el texto no puede garantizar)"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la Plaza Mayor de Lima con la Catedral en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la Catedral y el piso de la plaza tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Mañana: Huaca Pucllana», día 2",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "al doblar la esquina · sin persona en cuadro · escala media · luz de mañana",
+      "registro": "D",
+      "archivo": "huaca-pucllana-miraflores-entre-edificios.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Pirámide de adobe de la Huaca Pucllana rodeada de edificios de departamentos en Miraflores, Lima",
+      "que_muestra": "la pirámide de adobe con los edificios de departamentos detrás, sin recortar los edificios: el contraste es el contenido. Si la foto muestra solo la pirámide, no sirve para este artículo. Punto focal en la línea donde el adobe se cruza con los departamentos.",
+      "hora_clima": "mañana del día 2, como en el relato; cielo claro o gris limeño, sin lluvia; luz natural abundante, sombras abiertas, sin gran angular que deforme la escala",
+      "personas": "fotografía el viajero desde la vereda, al doblar la esquina, mirando la huaca; si aparecen otras personas, lejanas y pequeñas; nadie sobre la estructura; ningún rostro identificable",
+      "primer_plano": "el borde de un árbol o de una reja de la vereda muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar la línea adobe–edificios",
+      "ancla_pov": "El contraste es tan raro que cuesta encuadrarla en una foto",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin recortar los edificios",
+        "sin la huaca iluminada de noche (el relato es de mañana)"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la Huaca Pucllana con los edificios de Miraflores en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Mediodía: un mercado de barrio», día 3",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "mano del viajero · escala cercana · luz de mañana",
+      "registro": "E",
+      "archivo": "mercado-surquillo-frutas-peruanas.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Puesto de frutas peruanas en el Mercado N.º 1 de Surquillo, en Lima, con chirimoyas, lúcumas y granadillas",
+      "que_muestra": "un puesto de frutas en un pasillo estrecho del mercado, con chirimoyas, lúcumas y granadillas a la vista, y la mano del viajero recibiendo media chirimoya con una cuchara. El contenido es la fruta peruana en mano: si no se reconocen las frutas, la imagen no sirve.",
+      "hora_clima": "mañana del día 3, como en el relato; luz natural de mañana que entra al pasillo, sombras abiertas, sin flash",
+      "personas": "fotografía el viajero y mira la chirimoya que recibe; quien atiende el puesto, al fondo y fuera de foco, con el rostro no identificable, mira la fruta; otras personas pequeñas en el pasillo; nadie mira al lente",
+      "primer_plano": "el borde de una caja de madera con frutas muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la mano ni la chirimoya",
+      "ancla_pov": "Una chirimoya partida a la mitad y comida con cuchara, una lúcuma o una granadilla explican el Perú mejor que cualquier vitrina",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles de puestos reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostros reconocibles en primer plano",
+        "sin puesto vacío ni ordenado tipo supermercado",
+        "sin frutas que no sean peruanas"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de un pasillo del Mercado N.º 1 de Surquillo en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1 · anterior: BANNER 2 (tarea propia ya creada en la v2)",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado CHL; no se produce ni se enlaza hasta que Paid / Ad Ops cree la fila es-cl con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "home_market": "CHL",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (sin fila 🟢 para este mercado)",
+    "titular": "Huacas, cebiche y acantilados",
+    "cta": "Ver vuelos a Lima",
+    "archivo": "banner-ruta-santiago-lima.webp",
+    "alt": "Banner de SKY: ruta Santiago–Lima, huacas, cebiche y acantilados",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "bajada a las catacumbas de San Francisco (restos óseos: tono delicado y fidelidad del recinto)",
+    "malecón de Miraflores al atardecer (se evaluó como portada y contradecía la primera escena; su ficha quedó archivada)",
+    "la infografía del itinerario (producida y archivada en el cuerpo de la v2; el blog no usa infografías por ahora)",
+    "parapentes sobre los acantilados (actividad regulada que depende del viento: no se promete)",
+    "Puente de los Suspiros (postal intercambiable con cualquier guía de Barranco)"
+  ]
+}

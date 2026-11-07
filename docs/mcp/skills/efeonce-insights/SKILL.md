@@ -178,6 +178,10 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
 
 - `modules`: subset of the catalog modules whose `available` is `true`. A module marked
   `module_not_assigned` or `no_active_spaces` will not produce evidence; do not include it.
+  **Standard: `seo` always goes with `aeo`.** Search visibility is reported in Google and in answer engines
+  together, with every AEO measure available for the window. A request with `seo` and without `aeo` is rejected
+  (`modules debe incluir aeo`). If the organization has no AEO analysis in the window, keep `aeo` and use
+  `policy.allowPartial` so the chapter states the limit; never drop it.
 - `period`: `{ start, endExclusive, timeZone }` with civil dates `YYYY-MM-DD` and an IANA zone.
   The window is `[start, endExclusive)`: August 2026 is `2026-08-01` to `2026-09-01`. Whole calendar
   months unlock monthly sources (ETV, ICO); arbitrary ranges only serve daily sources (Search Console).
@@ -261,6 +265,22 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
   with `outside_content_scope`. The answer-engines chapter is never scoped. A snapshot without `contentScope`
   measured the whole site. The scope is fixed when the edition is generated; an edition generated earlier keeps the
   population it was sealed with.
+- **Search totals.** In editions generated with the current search adapter, clicks, impressions, CTR, position, the
+  weekly blocks, the whole-site reference and the page movers come from a Search Console total requested without the
+  query dimension. Google hides anonymized queries when the query dimension is requested, so a sum over queries is a
+  subset, never a total. The query movers are that partial detail; the "what moved the clicks" waterfall carries a
+  measured step for the queries Google does not show so it adds up to the chapter total. Never rebuild a total by
+  adding the query rows, and never compare an edition's totals with a query-level export.
+- **Estimated advertising value** (`organic_value_usd`, unit `usd`, `estimated`) is what buying the clicks with a
+  known price would cost in Google Ads, valued with cost-per-click prices already captured for the edition's market.
+  Its `numerator`/`denominator` (also `organic_value.valued_clicks`) say how many clicks had a price out of the total:
+  coverage is partial and the value is never extrapolated. Its `freshness.asOf` is the date the prices were captured,
+  not the month measured. Never call it revenue, savings or return on investment; without any price it is a rejection,
+  never zero.
+- **Visits from social networks** (`site.social_sessions`, and `social_source.*` per network with the total as
+  denominator) are unpaid social and video visits measured by Google Analytics over the same population as the
+  organic visits. Report them as visits from social networks; never as "social search" and never as a result of the
+  search work.
 - ETV is `estimated` and carries its methodology version; Search Console figures are `observed`.
   Do not average, sum or compare across methods. ICO RpA may be `suppressed` by its evidence policy;
   OTD always carries its numerator and denominator per space and month — never average percentages
@@ -336,12 +356,12 @@ does not change: plans are immutable. Describe it as it is.
 
 ## Recipes
 
-Monthly SEO + ICO edition for a client, previous month comparison:
+Monthly SEO + AEO + ICO edition for a client, previous month comparison:
 
-1. `get_insights_catalog { organizationId }` → confirm `seo` and `ico` available.
-2. Propose to the human: modules `["seo","ico"]`, period `2026-08-01`→`2026-09-01`
+1. `get_insights_catalog { organizationId }` → confirm `seo`, `aeo` and `ico` available.
+2. Propose to the human: modules `["seo","aeo","ico"]`, period `2026-08-01`→`2026-09-01`
    `America/Santiago`, comparison `previous_period`, audience `client`, outputs `["report_pdf"]`,
-   idempotencyKey `insights-<org>-2026-08-seo-ico`.
+   idempotencyKey `insights-<org>-2026-08-seo-aeo-ico`.
 3. `create_insight_edition { organizationId, request }` → read `generation.outcome`.
 4. `get_insight_edition { editionId, includeEvidence: true }` → summarize facts with units and as-of,
    list rejections as limits, and state that issuing is pending human review.

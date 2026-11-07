@@ -97,7 +97,8 @@ describe('step-up browser behavior', () => {
   it('verifies alphanumeric backup code and returns only after verified status', async () => {
     const f = domFixture()
 
-    expect(f.root.querySelector('[data-step-code-label]')!.textContent).toBe(AUTH_STEP_UP_COPY.codeLabel)
+    // Con el controlador, el campo arranca en las seis casillas; sin él, queda el campo de texto con la etiqueta mixta.
+    expect(f.root.querySelector('[data-step-code-label]')!.textContent).toBe(AUTH_STEP_UP_COPY.digitsLabel)
 
     f.fetcher
       .mockResolvedValueOnce(reply({ status: 'rejected' }, 400))
@@ -238,5 +239,53 @@ describe('step-up browser behavior', () => {
     ])
     expect(navigate).toHaveBeenCalledWith(model.returnTo)
     dom.window.close()
+  })
+})
+
+
+describe('2026-11-02 — código en seis casillas y modo de respaldo', () => {
+  it('sin controlador, el formulario queda con el campo de texto visible y la etiqueta mixta', () => {
+    // Sólo el marcado: el controlador serializado en el <script> también nombra los selectores.
+    const html = renderStepUpPage({ ...model }).body.split('<script')[0]
+
+    expect(html).toContain('data-mode="backup"')
+    expect(html).toContain(AUTH_STEP_UP_COPY.codeLabel)
+    expect(html.match(/data-otp-cell/g)).toHaveLength(6)
+  })
+
+  it('las casillas escriben el campo real, reparten un pegado y retroceden con borrar', () => {
+    const f = domFixture()
+    const cells = Array.from(f.root.querySelectorAll<HTMLInputElement>('[data-otp-cell]'))
+    const code = f.root.querySelector<HTMLInputElement>('[name="code"]')!
+
+    expect(f.root.querySelector<HTMLElement>('[data-otp]')!.dataset.mode).toBe('digits')
+    cells[0].value = '4'
+    cells[0].dispatchEvent(new f.dom.window.Event('input'))
+    cells[1].value = '82913'
+    cells[1].dispatchEvent(new f.dom.window.Event('input'))
+    expect(code.value).toBe('482913')
+    expect(cells.map(cell => cell.value).join('')).toBe('482913')
+
+    cells[5].value = ''
+    cells[5].dispatchEvent(new f.dom.window.Event('input'))
+    cells[5].dispatchEvent(new f.dom.window.KeyboardEvent('keydown', { key: 'Backspace' }))
+    expect(code.value).toBe('4829')
+  })
+
+  it('el modo de respaldo muestra el campo de texto, limpia lo escrito y vuelve a las casillas', () => {
+    const f = domFixture()
+    const toggle = f.root.querySelector<HTMLButtonElement>('[data-otp-toggle]')!
+    const cells = Array.from(f.root.querySelectorAll<HTMLInputElement>('[data-otp-cell]'))
+
+    expect(toggle.hidden).toBe(false)
+    cells[0].value = '1'
+    cells[0].dispatchEvent(new f.dom.window.Event('input'))
+    toggle.click()
+    expect(f.root.querySelector<HTMLElement>('[data-otp]')!.dataset.mode).toBe('backup')
+    expect(f.root.querySelector('[data-step-code-label]')!.textContent).toBe(AUTH_STEP_UP_COPY.backupLabel)
+    expect(f.root.querySelector<HTMLInputElement>('[name="code"]')!.value).toBe('')
+    expect(cells[0].value).toBe('')
+    toggle.click()
+    expect(f.root.querySelector<HTMLElement>('[data-otp]')!.dataset.mode).toBe('digits')
   })
 })

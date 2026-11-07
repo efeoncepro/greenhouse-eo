@@ -2,14 +2,91 @@
 
 ## Status
 
-- Status: `Proposed`
-- Date: `2026-10-27`
-- Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio decide aceptación y apertura.
+- Status: `Accepted` — modelo B
+- Date: `2026-10-27` (propuesta); `2026-11-06` (aceptación)
+- Accepted by: Julio Reyes, 2026-11-06, en sesión con el agente tras la explicación A′/B.
+- Owner: `Core/Spaces + Identity + Services`; Finance valida atribución; Julio aceptó el modelo B el 2026-11-06 y decide la apertura.
 - Scope: cuentas operativas, bridge legacy, contexto autorizado, sync, atribución y reporting por servicio.
 - Reversibility: `two-way-but-slow` para la transición de datos; `two-way` para el prototipo local.
-- Confidence: `medium`; la evidencia local no certifica migración, transacciones ni rollout.
-- Validated as of: `2026-10-27`, código del checkout y discovery sellado en `4be89a9d4`; sin nueva conexión productiva.
+- Confidence: `medium`; B aceptado con evidencia local de permisos/Finance/routing/historia; integración y rollout pendientes.
+- Validated as of: `2026-11-01`, componentes reales en PostgreSQL efímero (TASK-2094); sin conexión productiva.
+- Epic: [EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md), formalizado 2026-11-06; ejecuta este modelo por tasks dueñas.
 - Primera unidad: [TASK-2073](../tasks/complete/TASK-2073-operational-account-bridge-local-prototype.md).
+
+## Aceptación 2026-11-06 — modelo B
+
+Julio aceptó **B: client comercial compartido y contexto Space/Service explícito** después de comparar A′ y B
+con la evidencia de TASK-2094 y la [revisión contra código](../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md).
+A′ queda descartada salvo que se cumpla una condición de *Revisit When*.
+
+Qué cambia: B es el objetivo de diseño para TASK-2096–2102 y las dueñas externas de EPIC-057. Ninguna unidad
+crea un segundo `client` ni un bridge por Space, y todo consumer client-only se convierte a Space/Service
+explícito antes de la apertura.
+
+Qué no cambia: aceptar el modelo no aplica migrations, no crea Spaces ni filas reales, no cambia flags ni
+conexiones y no abre SKY. Cada schema o contrato persistido se revisa en su task, y la apertura sigue en
+TASK-1852 con autorización propia.
+
+## Revisión inicial 2026-11-01 — Recomendación A′ suspendida
+
+La [revisión crítica con tres subagentes](../audits/client-portal/2026-11-01-sky-bridge-critical-review.md), ampliada
+por la [revisión profunda de seis frentes](../audits/client-portal/2026-11-01-sky-deep-review/README.md),
+suspende la recomendación de aceptar A′. Las 97 pruebas del modelo siguen pasando, pero no ejercitan grants,
+refresh, perfiles/P&L financieros o rematerialización histórica reales. A′ y B requieren comparación con DB
+local aislada y commands/readers reales. El modelo Organization→Spaces se mantiene como dirección; bridge y
+schema siguen pendientes. La medición/preview interna del Blog puede desarrollarse sin esperar al alta del
+segundo Space; la apertura departamental exige aislamiento completo. No hay autorización de provisioning.
+
+## Incremento local TASK-2094
+
+[Contrato candidato Blog](EFEONCE_INSIGHTS_BLOG_MEASUREMENT_CONTRACT_V1.md) y
+[evaluación con componentes reales](../audits/client-portal/2026-11-01-sky-real-component-validation/README.md):
+89 pruebas pasan, 27 sobre PG16 efímero. A′ conserva selectividad por client pero requiere provisioning operativo
+sin duplicación comercial; B revela default de sesión dependiente de metadata. Ambos reproducen revocación
+insuficiente, replay de owner Services y alcance org de Account360. Snapshot sellado y rollback local sí probados.
+No es una implementación completa de ninguno de los bridges. Decisión sigue pendiente de contexto/grants,
+refresh, P&L, ICO histórico, sincronización y entrega reales sobre fixtures; sin mutaciones de producción.
+
+## Incremento local de autoridad — 2026-11-01
+
+[Pruebas de permisos/contexto](../audits/client-portal/2026-11-01-sky-space-context-validation/README.md):
+78 nuevas, total 167 PASS. El recurso real de Insights mezcla reports departamentales bajo la Organization
+con A′ y B; el parámetro Space no basta. Callbacks cookie y sesiones App difieren al desactivar usuario.
+Contexto experimental, principal fresco, grant por Space/verbo y binding Service/report permiten el mismo
+comportamiento seguro bajo ambos bridges, incluida revocación SEO que conserva Diseño del usuario dual.
+A′ no obtiene ventaja de autorización por separar client_id. El contrato requerido es común; la decisión del
+bridge depende ahora de compatibilidad de readers/writers, owner comercial y preservación histórica. No se
+acepta el ADR ni se autoriza provisioning; falta integración HTTP/UI, concurrencia, Finance/ICO y distribución.
+
+## Recomendación actual — B, tras Finance/routing/historia local
+
+[Comparación ejecutada](../audits/client-portal/2026-11-01-sky-finance-routing-validation/README.md):
+**204 pruebas PASS**, 37 nuevas. El trigger real de asignación de gastos rechaza A′ cuando el gasto conserva
+el owner comercial y el servicio SEO usa otro client. Cambiar el gasto al client hijo permite asignarlo, pero
+divide P&L. La atribución de costos laborales también cambia por esa identidad. B conserva el owner actual
+y permite asignación explícita al servicio SEO. A′ requeriría normalización aún no implementada en esos puntos.
+
+Se recomienda **B como objetivo técnico**, sin declarar aceptación del ADR ni seguridad productiva. Los
+incrementos anteriores son evidencia histórica, no la recomendación vigente. Los riesgos de replay Notion y
+reconstrucción de períodos existen en ambos modelos; no justifican otro client. La transacción de atribución
+sí revierte una sustitución fallida. ICO fue probado sólo a nivel de llamadas con puerto SQL simulado.
+Siguiente: U01 contexto por Space en una ruta/reader real local; después bindings y protección temporal.
+No se requiere otra ronda de discovery general para formular esta recomendación.
+
+## Corrección 2026-11-06 — revisión contra código
+
+La [revisión del programa contra el código](../audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)
+mantiene B y corrige tres lecturas de la evidencia anterior:
+
+- **Sesión.** El laboratorio cargó `session_360` desde `scripts/setup-postgres-identity-v2.sql`, que ordena por
+  `updated_at`. La vista vigente (migración TASK-987) produce una fila por Space activo del client y
+  `identity-store.ts` toma `LIMIT 1` sin orden. Con dos Spaces el Space de sesión no depende de la metadata, como
+  se afirmó arriba: es arbitrario. El defecto es más grave y el contrato del punto 2 no cambia.
+- **Revocación.** Para un usuario inactivo, el refresh conserva los claims anteriores sin límite de tiempo, no sólo
+  hasta el siguiente refresh.
+- **Finance bajo B.** El falso candidato único de Diseño es un riesgo de A′. Bajo B, una factura sin señal de
+  servicio queda ambigua y sin atribuir: es correcto, pero reduce la cobertura de Diseño y debe medirse. Además,
+  un período cerrado del P&L operativo se reescribe con el estado vigente; la protección temporal lo incluye.
 
 ## Context
 
@@ -39,10 +116,10 @@ Se propone una Organization con varios Spaces. El Space histórico conserva iden
 indicadores y ediciones de Diseño. La nueva relación Blog SEO/AEO se aloja en un Space propio. Un Space puede
 contener varios Servicios de la misma operación; no se crea una Organization por departamento ni un master Account.
 
-Tras la comparación local, se recomienda **A′: bridge operativo legacy distinto por Space, con un único owner
-comercial/financiero**. B (client compartido con contexto Space en todos los consumers) sigue siendo viable
-si se retiran todos sus selectores client-only antes de abrir. La preferencia condicionada a foundations
-no autoriza insertar filas reales.
+El modelo aceptado es **B: client comercial compartido y contexto Space/Service explícito**.
+Sustituye la preferencia A′ del simulador del 27-10. Los caminos departamentales deben retirar selección
+implícita y aislamiento client-only antes de abrir. Los consolidados comerciales conservan su dueño y
+autoridad propios. Aceptar B no autoriza insertar filas reales, aplicar migrations ni hacer provisioning.
 
 El bridge operativo no representa otra empresa, Company de HubSpot, perfil Finance, factura, pago o persona.
 Su representación persistida —campo/relación de owner y rol del bridge— se diseñará en una unidad posterior.
@@ -54,15 +131,23 @@ de forma canónica antes del cutover, A′ queda bloqueada; no se acepta duplica
 1. El contexto efectivo es Organization + Space y, cuando aplica, Service. El servidor cruza membership vigente,
    capacidades/entitlements y propiedad del recurso. Ni `client_id`, un rol global, el selector de UI ni la
    pertenencia a la Organization conceden por sí solos acceso a otro Space.
-2. Una persona puede operar ambos Spaces con un principal y contexto activo persistente. El refresh no vuelve
-   a resolver `LIMIT 1`. El consolidado corporativo exige autoridad explícita adicional.
+2. Una persona puede operar ambos Spaces con un principal. Cada request declara su contexto y el servidor
+   lo intersecta con grants vigentes y ownership del recurso. La preferencia de contexto persistida no redirige
+   writes de otra pestaña. El refresh no vuelve a resolver `LIMIT 1`; cambiar metadata del Space no cambia
+   autoridad ni selección. El consolidado corporativo exige autoridad explícita adicional.
 3. HubSpot conserva campos comerciales. Greenhouse resuelve Servicio→Space mediante mapping explícito y vigencia.
    Un sync ambiguo queda pendiente observable; no elige el primer Space ni vuelve a asignar el servicio.
 4. Fuente→Space tiene ownership inequívoco y no se copia una fuente de Diseño a SEO. Proyecto→Servicio requiere
    binding propio y vigencia: `module_id` referencia `service_modules`, no `services.service_id`.
-5. Finance normaliza bridge→owner comercial **antes** de seleccionar candidatos y pesos. Una factura sin señal
-   de servicio se mantiene sin atribuir; no se asigna a Diseño porque SEO cambió de bridge. Consolidación cuenta
-   hechos por identidad canónica, conserva correcciones/supersessions y no copia snapshots cerrados.
+5. Finance conserva un owner comercial único. Bajo B el client es compartido y no hay bridge que normalizar: ningún
+   resolver elige un Space por client con `LIMIT 1` y la selección de candidatos parte de Space/Servicio explícito.
+   Bajo A′ (no recomendado), el owner bridge→comercial se normalizaría **antes** de seleccionar candidatos y pesos.
+   Una factura sin señal de servicio se mantiene sin atribuir y la pérdida de cobertura es observable; no se asigna
+   a Diseño por ser el único candidato. Consolidación cuenta hechos por identidad canónica, conserva
+   correcciones/supersessions y no copia snapshots cerrados. Owner común no obliga a una sola factura/contrato ni
+   elimina la atribución por Space/Servicio. Recalcular un periodo previo no reinterpreta su propiedad usando
+   mappings o flags `active` actuales, y un período cerrado del P&L operativo no se reescribe en su revisión
+   vigente: una reclasificación crea revisión explícita con el primitive de reapertura existente.
 6. Cachés y readers incluyen Space/Service, período y versión de autoridad cuando corresponda; una revocación
    vuelve a evaluarse antes de servir resultados. El org scope no sustituye la cuenta operativa.
 7. Ownership de una edición histórica es inmutable. Un retry busca la clave existente antes de validar el mapping
@@ -71,7 +156,10 @@ de forma canónica antes del cutover, A′ queda bloqueada; no se acepta duplica
 8. Blog exige GA4 + GSC + corridas del motor AEO. El scope se aplica en cada productor: URL/landing en GA4,
    página en GSC, citas URL en AEO con denominador completo del panel. AI referrals no sustituye corridas AEO.
    Fuentes ausentes o sin cobertura no son cero; `allowPartial` no evita estos requisitos. Un scope borrado/null
-   no habilita medición de toda la Organization. Fechas de baseline y prestación se declaran por separado.
+   no habilita medición de toda la Organization. Se validan productor, ventana actual, propiedad/conexión,
+   scope y calidad por separado: algún fact por módulo, sólo facts comparativos o filas en cada día no certifican
+   el encargo. Adquisición y actividad GA4 son indicadores distintos. Fechas de baseline y prestación se declaran
+   por separado, sin atribuir causalidad del desempeño histórico al servicio nuevo.
 9. Distribución vuelve a validar destinatarios antes de cada envío nuevo. Un bearer share no prueba identidad
    departamental. Un envío aceptado o ambiguo se reconcilia antes de reintentar; la auditoría no reenvía.
 
@@ -97,11 +185,13 @@ puede retrasar apertura, antes que producir indicadores o atribuciones incorrect
 
 ### Orden de transición
 
-1. ADR + comparación local A′/B (TASK-2073); aceptación del puente con sus límites.
+1. ADR aceptado con B el 2026-11-06; TASK-2073 conserva su cierre como simulación y TASK-2094 su evidencia con
+   componentes reales aislados. Integrar y certificar los contratos siguientes antes de aplicar B en runtime.
 2. U01 contexto/membership/refresh; U02 routing de servicios/fuentes; **U02F owner Finance y selección de
    candidatos**. Estas foundations preceden a U03, incluso si el nuevo Space se pensara crear inactivo.
 3. U03 provisioning hijo idempotente; U04 readers/caches; U05 bindings/historia/ICO/capacidad.
-4. U06 GA4/GSC/AEO; U07 informes/recurrencia/distribución; U08 QA sintético; U09 alta autorizada de SKY;
+4. U06 GA4/GSC/AEO puede avanzar en paralelo desde el inicio como desarrollo/validación interna, sin otro Space.
+   U07 informes/recurrencia/distribución requiere ownership y autoridad completos; U08 QA sintético; U09 alta autorizada de SKY;
    U10 operación durable. Ver [plan integral](../audits/client-portal/2026-10-27-sky-multi-account-discovery/05-decisions-transition-and-execution-plan.md).
 
 **No hay un rollback seguro que consista sólo en ocultar SEO.** Los writers compatibles deben mantenerse o
@@ -109,18 +199,22 @@ pausarse de forma acotada y probada. Restaurar sync antiguo tras el split puede 
 
 ## Runtime Contract
 
-Este ADR Proposed no cambia runtime. TASK-2073 sólo añade tooling local con fixtures sintéticos, sin importar
+Aceptar este ADR no cambia runtime por sí mismo. TASK-2073 sólo añade tooling local con fixtures sintéticos, sin importar
 stores, cargar `.env`, abrir sockets, usar credenciales ni ejecutar comandos remotos. No modifica `src/`,
 schemas, migrations, flags, fuentes reales, historial o configuración de SKY.
 
 Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en el prototipo:
 
-- `src/lib/tenant/identity-store.ts`, `src/auth.ts`, `src/lib/entitlements/effective-reader.ts` (contexto/acceso).
-- `src/lib/services/service-sync.ts`, `src/lib/services/upsert-service-from-hubspot.ts` (routing).
+- `src/lib/tenant/identity-store.ts`, `src/lib/tenant/access.ts`, `src/lib/auth.ts`,
+  `src/lib/entitlements/effective-reader.ts` y la vista `greenhouse_serving.session_360` (contexto/acceso).
+- `src/lib/services/service-sync.ts`, `src/lib/services/upsert-service-from-hubspot.ts`, el intake y handler de
+  webhooks HubSpot, el backfill y los writers Notion→PG (routing; inventario completo en TASK-2097).
 - `src/lib/client-lifecycle/commands/provision-client-from-wizard.ts` y
-  `src/lib/commercial/party/commands/instantiate-client-for-party.ts` (commands existentes, no reutilizar como alta hija).
+  `src/lib/commercial/party/commands/instantiate-client-for-party.ts` (commands existentes, no reutilizar como alta
+  hija); `src/app/api/admin/spaces/route.ts` existe pero rechaza un segundo Space activo y no asigna `numeric_code`.
 - `src/lib/space-notion/space-notion-store.ts`, `src/lib/account-360/facet-cache.ts` (fuentes/cache).
-- `src/lib/service-attribution/materialize.ts` (candidatos Finance).
+- `src/lib/finance/canonical.ts`, `src/lib/service-attribution/materialize.ts` (candidatos Finance) y
+  `src/lib/cost-intelligence/compute-operational-pl.ts` (P&L por período).
 - TASK-1852 conserva habilitación; 1853/1854 métricas/portal; 1960 informe por servicio; 2033 scope de contenido.
   TASK-2073 no implementa sus superficies ni modifica su lifecycle.
 
@@ -128,9 +222,9 @@ Owners existentes que deberán evolucionar por sus unidades, sin duplicarlos en 
 
 - La prueba no puede garantizar owner comercial único, historia inmutable o rechazo de ambigüedad.
 - Se identifica un consumer client-only que mezcla Finance, cuentas o fuentes y no puede normalizarse.
-- Los consumers ya son íntegramente Space-aware: reevaluar retirada del bridge A′ en favor de B.
+- Aparece evidencia de un consumer que impide B; reevaluar el costo de normalizar A′ con owner canónico.
 - Cambia ownership de los dominios, el modelo legal/comercial o el mecanismo de grants.
-- Antes de cualquier migration/provisioning real: aceptar ADR, validar contrato persistido y obtener evidencia
+- Antes de cualquier migration/provisioning real: validar contrato persistido y obtener evidencia
   de transacciones, concurrencia, recuperación y permiso de rollout en las unidades dueñas.
 
 ## Evidencia y límite de aceptación
@@ -144,3 +238,14 @@ anchors de código local. Ambas variantes pasan con primitives explícitas; A′
 predicados client-only modelados y exige normalización Finance previa para evitar un falso candidato único de
 Diseño. No demuestra transacciones, migración o integración real. Typecheck global baseline agotó heap; lint
 global sin errores y 26 warnings existentes. Detalle y recibo reproducible en la evaluación enlazada arriba.
+
+## Programa de ejecución — 2026-11-06
+
+[EPIC-057](../epics/in-progress/EPIC-057-operational-accounts-under-organization.md) registra TASK-2096–2102
+y coordina TASK-2094. Reutiliza las dueñas de EPIC-045/046/022 sin reparentarlas. Su matriz por hitos sustituye
+el listado U00–U10 sin IDs del discovery para planificar; el discovery conserva su fecha y evidencia.
+Formalizar no acepta el ADR, no aplica migrations ni habilita SKY. UI, envío y apertura siguen en sus dueñas.
+
+U01 (TASK-2096, 2026-11-06) implementa los puntos 1–2 del contrato en local: resolver `src/lib/tenant/space-authority/`,
+tabla `greenhouse_core.space_access_grants` y `session_360` sin elección por orden. Migraciones sin aplicar a la base
+compartida; invariantes en `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Autoridad por cuenta operativa.

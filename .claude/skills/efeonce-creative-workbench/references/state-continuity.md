@@ -1,5 +1,162 @@
 # Corte de continuidad: 2026-09-30
 
+## SKY en Claude Design — corte 2026-11-04 (actualizado al 2026-11-06)
+
+Trabajo hecho fuera del harness, en el canvas de Claude Design: bocetos y adaptaciones para
+revisión, sin corridas de Workbench ni aprobación del cliente registrada. Cómo operarlo en
+[sky-design-canvas.md](sky-design-canvas.md); formatos, tamaños y nombres en
+[sky-format-catalog.md](sky-format-catalog.md); scripts y parámetros en [sky-black-pipeline.md](sky-black-pipeline.md);
+fotografía de evento en
+[sky-photography.md](sky-photography.md); casos en [lessons.md](lessons.md).
+
+| Artifact (privado del operador) | Estado al cierre |
+| --- | --- |
+| Design System «SKY Airline — Performance» · https://claude.ai/artifact/Rc3NFQNXvjDgkWsxrzSEei | Desde las 126 adaptaciones (37 composiciones) del pack SKY `0.1.0`; 60 colores, 10 componentes + Cover, Metric Regular/Semibold/Bold/Black. Falta Metric Medium |
+| Canvas «SKY CyberSky Perú — Adaptaciones» · https://claude.ai/artifact/QTy12G38oQYB1xrnZmkpee | **Versión 72** (2026-11-06, doceava ronda del lote GIF + POPUP: sólo imágenes y tableros `g-gif`); la 70 fue la de las rutas foco de Chile y Perú internacional, la 51 cerró la séptima ronda y la 53 la octava. Pruebas de difuminado en un canvas aparte: https://claude.ai/artifact/4hLzroeuZPzSrE6X3LKCBC. Páginas: Internacionales, Nacionales, Plantillas, KV Black · HM, KV Black · Animación GIF, KV Black · Popup y Story, KV Black · PMAX y HPH, KV Black · Grilla por mercado, KV Black · Rutas foco Perú, KV Black · Chile KV listo, la del neón (v57, abajo) y «KV Black · Rutas foco Chile y Perú inter» (`kv-black-rutas-foco`) |
+
+**2026-11-06, neón del logo BLACK:** exploración en el canvas (v57, página «KV Black · Neón del logo (exploración)», ronda 4): neón elegante solo en los dos acentos de esquina del marco, con letras y foto intactas, en tres escalones (acentos · + marco · + letras) más una chispa animada. Las rondas 1–3 se rechazaron (sin impacto, biselada, no elegante). Entregado a Daniela en OneDrive `10_Noviembre/BLACK SKY 2026 - NEON LOGO (PROPUESTA 2026-11-06)/`, con el logo en PNG de 4000 px (ES/PT/EN). Espera que Dianesty (SKY) elija; no cambia piezas aprobadas. Detalle en [sky-black-pipeline.md](sky-black-pipeline.md) §4.10.
+
+Producción: CyberSky Perú en 66 piezas (22 destinos × popup/post/story) con 21 selfies generadas
+(~USD 5,3, clave personal autorizada) y entrega en PDF de 66 páginas
+(`~/Downloads/SKY-CyberSky-Peru-adaptaciones.pdf`, 23 MB); BLACK con 12 KV fijos, 12 animados
+(GIF, MP4 y MP4 con audio), 24 estáticos popup/story, PMAX de los 12 KV (con el 1200×628 nuevo) y HPH
+genérico de Chile más PE INTER, AR, UY, BR y US en 4 formatos (con la lista de banderas del mercado). Segunda ronda
+(pedidos de Daniela por Teams): logo BLACK corregido en todas las fuentes (fecha 25 nov–2 dic, línea flexible, menos
+resplandor) y todo rehecho desde `src2/`; 12 mensajes de la grilla por mercado con KV, popup, GIF y story video (12 MP4
+de 15,7 s); 13 rutas foco de Perú con popup y story; Chile «KV listo» (TikTok 3, DAT 2, PMAX 4) desde los editables. Entregables locales no versionados en
+`ai-generations/2026-11-04_sky-black-gif/` y `ai-generations/2026-11-04_sky-cybersky-peru/`; el
+taller completo vive desde el 2026-11-06 en `ai-generations/2026-11-04_sky-black-gif/taller/` y se retoma con
+`doctor.sh` (ver más abajo). El kit en OneDrive no se
+modificó; el 2026-11-05 la entrega (sin `scripts/`) se copió a la carpeta nueva
+`Despliegue Base/ENTREGABLES BLACK (Efeonce 2026-11-05)/`: 321 archivos (626 MB) verificados
+byte a byte. Mapeo en [sky-design-canvas.md](sky-design-canvas.md#entregables-y-scripts-locales).
+Tercera ronda (2026-11-05): fotos aprobadas en las 15 rutas foco (CSV de Daniela), «Vuela por el Perú» y AR
+Santiago/Lima; foto completa con degradado superior del 20 % a 0, créditos arriba a la izquierda y story con
+PromPerú entre precio y pie; orden y nomenclatura en `10_Noviembre/BLACK SKY 2026/` (155 archivos, sólo .gif en
+GIF + POPUP); canvas versión 38.
+Cuarta ronda (2026-11-05, 11 comentarios del canvas): velo diagonal adaptativo del logo (reemplaza al degradado plano),
+regla destino ↔ flecha de precio a 40 px (`brecha.cjs` y `compose.cjs`, también en popups de los KV del kit), Chile
+Travel pegado a la esquina, AR Santiago en verano, story de Tacna reencuadrada, stories con PromPerú centrado y
+marca de agua y ubicación pegadas arriba, aro de banderas de 2 px (KV, GIF y HPH por mercado). Detalle en
+[sky-black-pipeline.md](sky-black-pipeline.md) §4.5; canvas versión 40.
+Quinta ronda (2026-11-05, Teams y Frame.io): gradiente de referencia de Daniela (`GRAFICOS/Gradiente para imagenes`,
+negro 69 % → 0) en lugar del velo diagonal; a todo el alto tapaba caras (Julio lo rechazó) y quedó acotado bajo el
+logo (0,42 / 0,50 / 0,46 del alto), con comparación A/B enviada. Talara y Chiclayo con foto del banco PromPerú y
+ubicación del CSV; Iquitos, Talara y Chiclayo reencuadrados con `lift` (reflejo del agua abajo); stories en video
+de AR Lima, AR Santiago y «Vuela por el Perú» con la foto del destino en intro y brandlift. Canvas versión 44;
+«BLACK SKY 2026» (46 archivos) y entregables de OneDrive actualizados. Detalle en pipeline §4.6.
+Sexta ronda (2026-11-05, revisión de Daniela en Frame.io sobre las 30 piezas de rutas): Ayacucho sin personas
+(reencuadre), Trujillo popup con más cielo, crédito de la story a 18 px y stories de Piura, Arequipa, Juliaca y
+Pucallpa expandidas hacia arriba con GPT Image 2.6 Flare (fal sin saldo; ≈ USD 0,15, aprobado por Julio). Canvas
+versión 47; «BLACK SKY 2026» (30 archivos) y entregables actualizados. Frame no se puede responder desde aquí.
+Detalle en pipeline §4.7.
+Lo aprobado y lo ajustado quedaron separados en `10_Noviembre/BLACK SKY 2026 - APROBADO` (12) y
+`BLACK SKY 2026 - PARA REVISION` (18 + LEEME), con la estructura de Daniela (catálogo §5.4).
+Séptima ronda (2026-11-05, segunda revisión en Frame y Teams): Talara con Playa Las Pocitas y Piura con Playa Vichayito
+(foto y ubicación de su carpeta), story de Tarapoto expandida, piso más alto en el popup de Cusco y degradado inferior
+negro en las piezas con foto de destino. Canvas versión 51; carpetas de estado en 19 aprobadas y 11 en revisión.
+Detalle en pipeline §4.8. Se regeneraron los GIF de AR Lima, AR
+Santiago, BR Perú, BR Santiago, «Vuela por el Perú» y las seis piezas con banderas, y la story en video de las nueve
+de ese grupo que la tienen (ids nuevos en `vid-blobs.json`). `organizar.cjs` ya compara por tamaño y fecha sin leer el
+destino: «BLACK SKY 2026» quedó con 155 archivos (73 actualizados) y `ENTREGABLES BLACK` al día con `rsync -a` sin
+`--checksum`.
+Continuidad: las rondas siguientes se llevan en la sesión derivada «SKY BLACK: siguientes rondas de ajustes del
+canvas». Desde el 2026-11-06 el taller completo (scripts, kit corregido `src2/`, fotos, fuentes y proyecto del canvas) vive
+en `ai-generations/2026-11-04_sky-black-gif/taller/`, sin rutas al scratchpad viejo; se retoma con `bash
+taller/kvhm-canvas/doctor.sh` ([sky-black-pipeline.md](sky-black-pipeline.md) §0 y §17). `scripts/` quedó superada. Desde el 2026-11-06 el Workbench también construye las 39 piezas con cifras
+(familia `brands/sky-airline/campaigns/black-2026/`, en `main` del Workbench por PR #35, squash `a47fea2`; jobs con
+`null` hasta que SKY dé precios y fechas; [sky-black-pipeline.md](sky-black-pipeline.md) §19).
+2026-11-06 (octava ronda): Daniela aprobó todo; la story de Pucallpa, tras subir la torre (pipeline §4.9). Las 30 rutas
+foco están aprobadas; sólo faltan las cifras de SKY. Canvas versión 53. Workbench al día en `main` (PR #36, `8ed1c00`).
+Pendientes en [sky-format-catalog.md](sky-format-catalog.md) §6.3; el nuevo de esta ronda: confirmar con Daniela que
+la regla de la flecha también vale para los popups de los KV del kit.
+2026-11-06, rondas novena a doceava (lote GIF + POPUP y rutas de Perú; Daniela y Dianesty en Frame «V2»/«V3» y
+Teams; pipeline §4.11–§4.14): logo BLACK nuevo con el resplandor original; **sin GIF**: la pieza animada se entrega
+sólo como `BS_GIF_<PIEZA>_AUDIO.mp4`, **en BT.709 etiquetado** (el verde del logo caía de 221 a 189); story y story
+video los exporta Daniela; difuminado superior = prueba B (45 % arriba, curva suave) y **sólo si hace falta**
+(`VELO_AUTO=1`), piso negro al 15 % sólo si el pie es claro (`PISO_SUTIL=1`); sin sombras de texto, sin sombra
+lateral ni velo de lista; si el gradiente no alcanza, se adapta la foto (`adaptar-foto.cjs`) y, si aún no, foto nueva;
+píldora rosada de origen adaptativa (`pildora.cjs`: avión fijo, 35 px tras la última letra); Uruguay con lista de
+destinos con nombre y «DESDE MONTEVIDEO» (supuesto). Se corre con `ronda12.sh`. Entregado en OneDrive
+`BLACK SKY 2026/<HM>/GIF + POPUP/<pieza>/` (popup + MP4 con audio) y `HM PE/RUTAS FOCO/<DESTINO>/` (popup + story),
+con copia en `BLACK SKY 2026 - PARA REVISION/` y `LEEME - GIF + POPUP Y RUTAS PERU (2026-11-06).txt`. Canvas v74.
+Commits `b6f376bbc2` (ronda 11) y `daf801dbcd` (ronda 12).
+2026-11-06, rutas foco de Chile y Perú internacional: 16 rutas (Chile 3 DOM + 8 INTER, Perú 5 INTER), **sólo popup
+y story**, enviadas a revisión. Dónde está cada cosa:
+
+| Qué | Dónde y estado |
+| --- | --- |
+| Piezas | OneDrive `10_Noviembre/BLACK SKY 2026/HM CL/RUTAS FOCO/` (11) y `HM PE/RUTAS FOCO/` (5); copia idéntica en `BLACK SKY 2026 - PARA REVISION/` con `LEEME.txt`. Al aprobarse, cada pieza pasa a `- APROBADO` |
+| Notion | Las 32 subtareas de pieza en «Listo para revisión», fecha de envío 2026-11-06; las agrupadoras no se tocaron |
+| Canvas | Versión 70, página `kv-black-rutas-foco`; imágenes como assets con ids en `rf-blobs.json` ([sky-design-canvas.md](sky-design-canvas.md), «Rutas foco de Chile y Perú internacional») |
+| Scripts | Taller `ai-generations/2026-11-04_sky-black-gif/taller/kvhm-canvas/`: `rutas-foco.cjs`, `rutas-foco.sh`, `rf-page.cjs`, `rf-entregar.cjs`, `cielo.cjs` ([sky-black-pipeline.md](sky-black-pipeline.md) §4.13, SSOT) |
+| Commits | En develop, sin push: `04a4c05fbb` (entrega), `065ad465af` (difuminado B, v67), `187b9f2f38` (ajustes de Daniela, v70), `d6c2ba173` (re-render tras la doceava ronda) |
+
+El re-render tras la doceava ronda de la otra sesión salió idéntico píxel a píxel: la entrega y el canvas v70 siguen
+vigentes. 🔴 Los scripts compartidos (`compose.cjs`, `destinos.cjs`, `fotos-destino.json`, `pildora.cjs`,
+`adaptar-foto.cjs`) los edita también la sesión de las rondas; coordinar antes de renderizar.
+
+Pendientes sin confirmar por el operador:
+
+- Rutas foco de Chile y Perú internacional: precios en 000, origen de Chile («DESDE SANTIAGO» inferido) y fechas del
+  pie; legal débil sobre la foto en el popup de Cusco y en la story de Concepción; «el árbol» que Daniela pidió
+  eliminar (no está claro si es Buenos Aires o Río; no se hizo inpainting pagado).
+
+- Segunda ronda BLACK: BR «Voe para Peru» (¿piezas de alianza PromPerú o KV?), «Vuela por Perú» con regiones sin
+  fotos (propuesta), «Encuentra destinos» de Chile hecho con el clúster internacional (el pedido decía «clúster inter
+  de Perú»), frases INTER del brandlift y sus traducciones AR/PT/EN, ubicación de la foto en las rutas (desde la
+  tercera ronda sale del CSV; placeholder sólo en Chiclayo y Talara), tapa vertical en español (recortada de la
+  horizontal).
+- Cuarta ronda BLACK: regla de la flecha aplicada también a los popups de los KV del kit, por confirmar con Daniela.
+- Onceava ronda BLACK (Dianesty): ¿USA suma Buenos Aires? ¿Uruguay lleva Miami? «DESDE MONTEVIDEO» en Uruguay es
+  supuesto.
+- Entrega en OneDrive: confirmar que la sincronización terminó (la copia local no prueba que ya
+  esté en la nube).
+
+- CyberSky: «S/» (el KV dice «$/»), separador de miles con coma (1,043), origen Lima y la
+  contradicción del legal (tramo Lima–X vs X–Lima); elementos sólo del KV de Cusco omitidos en
+  el resto (upsell Tarifa Light, logos PromPerú/«Y tú qué planes», crédito de foto).
+- BLACK: las inconsistencias del kit listadas en
+  [sky-design-canvas.md](sky-design-canvas.md#inconsistencias-del-kit-black-a-corregir-en-la-fuente)
+  siguen en la fuente (banderas y logos mal nombrados, legales trazados, «tramo» en CL INTER,
+  PE DOM-RUTA invertido, URL sin «www», «FROM [ORIGEN]» sin traducir, verdes/morados no
+  unificados). Logos de alianza y URL no están puestos en ningún KV. Derechos de la foto del KV
+  y de la medalla de Puntualidad (generadas con IA) sin validar antes de pautar.
+- «Internacional» en AR, UY, BR y US: corregido el 2026-11-04 en los 24 estáticos y en las 4 animaciones.
+- HPH por mercado: rehecho genérico y sin precio desde la referencia (decisión del operador). Falta
+  confirmar las traducciones «COM GRANDES DESCONTOS», «WITH BIG DISCOUNTS», «Ver voos» y «See
+  flights».
+
+## Berel en el Workbench — corte 2026-11-02
+
+Segundo cliente con sistema propio, en `brands/berel/**` y `projects/berel/**`; una marca por corrida y
+nada de Efeonce/AXIS/SKY. El canon de oficio vive en la skill Greenhouse `berel-graphic-line`; aquí solo el
+estado del harness. Ocho PR fusionados el 2026-11-02 (el repo admite **solo squash**: `allow_merge_commit`
+y `allow_rebase_merge` en false), `origin/main` en `6756732`:
+
+| PR | Qué dejó |
+| --- | --- |
+| #21 | Remates terminados en fotografía; libro alineado |
+| #22 | Producto en escena por vía híbrida (hoy respaldo `restituir`) |
+| #23 | Tomas fotográficas (`takes`), banda del titular medida (`scripts/medir-plate.mjs`), pieza `tomas-fotograficas` de 48 |
+| #24 | Escala del producto por diámetro real (`--referencia`/`--suelo`, sin `--alto`) y toma `detalle` |
+| #25 | Presencia planeada en el plate; renders maqueta excluidos (`excludedRenders`) |
+| #26 | Método guiado por defecto (GPT Image 2.5 redibuja desde el render) con presencia 1,4×; `verificar` + OCR consultivo |
+| #27 | Dos logos permitidos: el de la etiqueta del producto en escena no cuenta (`berel-recipes.json` → `never`) |
+| #28 | Reel de transformación: `contracts/berel-video-reels.json`, `compose/video.mjs`, `scripts/reel.mjs` |
+
+Contratos: `berel-recipes`, `berel-tokens`, `berel-color-evidence`, `berel-photo-registers` (v1, candidato) y
+`berel-video-reels` (candidato). CLIs: `componer`, `ajustar-muro`, `color-cercano`, `prompt-plate`,
+`medir-plate`, `producto-en-escena` (`colocar`/`verificar`/`restituir`) y `reel`
+(`cuadros`/`capas`/`qa`/`armar`/`comparar`). Pruebas: `node --test brands/berel/test/*.test.mjs` = 35/35;
+`npm run gates` verde. Recursos fuera de Git en `clients/berel/.resources-local/` (fuentes, catálogo, logos,
+fotos, `products/` y, desde #28, `video/`: tapa de cierre vigente y música del mes, Envato Elements con la
+licencia del squad). Los binarios de corridas van en `projects/berel/<pieza>/salidas/` o `runs/`, ignorados.
+
+Sigue `gated` en `clients/brands.json` (sin pack sellado). Nada aprobado por Berel (Daniela, Andrés o Melkin):
+contratos candidatos, piezas y reels piloto sin aprobación de diseño ni del cliente. Los commits de la skill
+Greenhouse `berel-graphic-line` de esta sesión están en develop sin push.
+
 ## Identidad Git — corrección persistente 2026-10-01
 
 El operador exigió resolver los rechazos recurrentes por autor Git. Mac: include condicional

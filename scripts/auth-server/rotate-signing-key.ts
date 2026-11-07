@@ -4,7 +4,7 @@
  * Uso (el runtime del servicio NO puede crear versiones KMS; esto corre con la
  * identidad del operador o de un job con permisos de administración de la llave):
  *
- *   pnpm auth-server:rotate-key                  # crea versión KMS, registra y ACTIVA; la anterior → retiring
+ *   pnpm auth-server:rotate-key                  # command durable (baseline/90d requeridos)
  *   pnpm auth-server:rotate-key --status         # lista llaves registradas y sus estados
  *   pnpm auth-server:rotate-key --register <versionName> [--no-activate]
  *   pnpm auth-server:rotate-key --retire <kid> [--force]
@@ -13,9 +13,8 @@
  * Nunca imprime material privado: sólo `kid`, versión KMS y estado.
  */
 
-import { KeyManagementServiceClient } from '@google-cloud/kms'
-
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
+import { parseRotationArgs } from './rotate-signing-key-args'
 
 import {
   createCloudKmsSigner,
@@ -24,15 +23,8 @@ import {
   registerSigningKeyVersion,
   retireSigningKey
 } from '@/lib/auth-server/keys'
-
-const args = process.argv.slice(2)
-const hasFlag = (flag: string) => args.includes(flag)
-
-const valueOf = (flag: string): string | undefined => {
-  const index = args.indexOf(flag)
-
-  return index >= 0 ? args[index + 1] : undefined
-}
+import { runKeyRotationTick } from '@/lib/auth-server/maintenance/key-rotation'
+import { createIssuerPublicationPort, createRotationKmsPort } from '@/lib/auth-server/maintenance/key-rotation-kms'
 
 const actor = process.env.AUTH_SERVER_ROTATION_ACTOR?.trim() || `cli:${process.env.USER ?? 'unknown'}`
 
@@ -55,57 +47,55 @@ const printKeys = async () => {
 }
 
 const main = async () => {
+  const action = parseRotationArgs(process.argv.slice(2))
+
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('ops')
 
-  if (hasFlag('--status')) {
+  if (action.kind === 'status') {
     await printKeys()
+
+    return
+  }
+
+  if (action.kind === 'retire') {
+    const retired = await retireSigningKey({ kid: action.kid, actor, force: action.force })
+
+    console.log(`retired kid=${retired.kid} at ${retired.retiredAt?.toISOString()}`)
+    console.log('After JWKS/cache verification, disable the retired KMS version to prevent further signing →')
+    console.log('A disabled KMS version remains billable; disabling it does not stop version charges.')
+    console.log(`  gcloud kms keys versions disable ${retired.kmsKeyVersion.split('/').slice(-1)[0]} --key auth-server-es256 --keyring auth-server --location us-east4 --project efeonce-group`)
+
+    return
+  }
+
+  if (action.kind === 'create') {
+    const keyName = getAuthServerKmsKeyName()
+
+    const result = await runKeyRotationTick({
+      enabled: true, dryRun: false, keyName, actor,
+      executionId: `cli:${Date.now()}`,
+      kms: createRotationKmsPort(), publication: createIssuerPublicationPort()
+    })
+
+    console.log(`rotation status=${result.status}${result.operationId ? ` operation=${result.operationId}` : ''}`)
+
+    if (result.status !== 'verified' && result.status !== 'not_due') {
+      throw new Error(`Rotation did not complete: ${result.status}`)
+    }
 
     return
   }
 
   const keyName = getAuthServerKmsKeyName()
   const signer = createCloudKmsSigner()
-
-  const retireKid = valueOf('--retire')
-
-  if (retireKid) {
-    const retired = await retireSigningKey({ kid: retireKid, actor, force: hasFlag('--force') })
-
-    console.log(`retired kid=${retired.kid} at ${retired.retiredAt?.toISOString()}`)
-    console.log('Next: disable the KMS version to stop billing it →')
-    console.log(`  gcloud kms keys versions disable ${retired.kmsKeyVersion.split('/').slice(-1)[0]} --key auth-server-es256 --keyring auth-server --location us-east4 --project efeonce-group`)
-
-    return
-  }
-
-  let versionName = valueOf('--register')
-
-  if (!versionName) {
-    const client = new KeyManagementServiceClient()
-    const [version] = await client.createCryptoKeyVersion({ parent: keyName })
-
-    if (!version.name) {
-      throw new Error('KMS did not return the new version name')
-    }
-
-    versionName = version.name
-    console.log(`created KMS version ${versionName.split('/').slice(-1)[0]} (state=${String(version.state)})`)
-
-    // Una versión HSM puede tardar unos segundos en pasar de PENDING_GENERATION a ENABLED.
-    for (let attempt = 0; attempt < 30; attempt += 1) {
-      const [current] = await client.getCryptoKeyVersion({ name: versionName })
-
-      if (current.state === 'ENABLED') break
-      await new Promise(resolve => setTimeout(resolve, 2_000))
-    }
-  }
+  const versionName = action.versionName
 
   const result = await registerSigningKeyVersion({
     signer,
     versionName,
     actor,
-    activate: !hasFlag('--no-activate'),
+    activate: action.activate,
     keyName
   })
 

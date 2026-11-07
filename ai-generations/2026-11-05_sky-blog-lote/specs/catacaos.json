@@ -1,0 +1,127 @@
+{
+  "id": "catacaos",
+  "notion_url": "https://app.notion.com/p/3911784af13f4eb3974bc44eb59c6a09",
+  "titulo": "Piura más allá de la playa: qué conocer en una escapada a Catacaos",
+  "slug": "/catacaos/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "catacaos-calle-comercio-viajera-sombreros.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando por la calle Comercio de Catacaos, en Piura, entre tiendas con sombreros de paja toquilla colgados en la entrada",
+      "que_muestra": "una calle de casas bajas con tiendas abiertas a ambos lados; en las entradas cuelgan sombreros de paja toquilla y se ven vitrinas con joyas; una viajera camina por el centro de la calle, de espaldas, mirando hacia una de las tiendas. Tiene que leerse como calle de artesanía de pueblo, no como centro comercial.",
+      "hora_clima": "media mañana (la llegada del relato); sol fuerte del norte, cielo despejado; luz natural abundante, sombras abiertas bajo los aleros, fachadas con detalle sin quemar",
+      "personas": "la viajera a media distancia, de espaldas, caminando sin pose ni mirada al lente; vendedores y otros paseantes pequeños y lejanos, en acciones espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "el ala de un sombrero de paja colgado en una entrada, muy cerca del lente y muy fuera de foco, por el borde lateral, sin tapar a la viajera",
+      "ancla_pov": "bajas a la calle Comercio y los sombreros de paja cuelgan en las puertas como si fueran cortinas",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni nombres legibles de tiendas reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin productos industriales ni souvenirs genéricos",
+        "sin autos dominando la calle"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la calle Comercio de Catacaos en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera y la línea de tiendas con sombreros tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Dentro del taller el ruido de la calle se apaga…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "F — Encuentro social",
+      "modificadores": "artesana y viajero · cuerpo parcial · escala cercana · luz interior de mañana",
+      "registro": "E",
+      "archivo": "catacaos-artesana-tejido-paja-toquilla-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos de una artesana tejiendo un sombrero de paja toquilla en Catacaos mientras un viajero toca el tejido",
+      "que_muestra": "en primer término, las manos de una artesana tejiendo un sombrero de paja toquilla a medio hacer sobre su regazo; desde el borde del cuadro entra la mano del viajero, que toca el ala del sombrero con la punta de los dedos. Al fondo, desenfocado, el interior sencillo de un taller con fibras y sombreros apilados. La decisión que muestra es la del viajero: entender el oficio antes de comprar.",
+      "hora_clima": "media mañana, dentro del taller (después de la calle del relato); luz natural que entra por una puerta o ventana lateral, abundante y suave, sombras abiertas, fibras con detalle",
+      "personas": "fotografía el propio viajero, de pie frente a la artesana; en cuadro solo las manos y el regazo de ella y la mano de él; la artesana mira su tejido; ningún rostro en cuadro; ropa sencilla, sin logos",
+      "primer_plano": "hebras de paja suelta sobre la mesa, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar las manos",
+      "ancla_pov": "Si te deja, pasa la mano por el tejido: es más fino y más apretado de lo que parece desde la vitrina",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni nombres de talleres reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin rostro de la artesana (persona real reconocible)",
+        "sin máquinas ni sombreros industriales",
+        "sin precios ni etiquetas"
+      ],
+      "fidelidad": "técnica identificable → requiere foto real REF-01 del tejido de paja toquilla en un taller de Catacaos en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Al sur del pueblo, el valle se abre…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "caminata hacia el sitio · persona sola · escala amplia · luz de mañana alta",
+      "registro": "E",
+      "archivo": "narihuala-huaca-adobe-viajero-sendero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero caminando hacia los muros de adobe de la huaca del sitio arqueológico de Narihualá, cerca de Catacaos",
+      "que_muestra": "un sendero de tierra seca que lleva hacia los muros de adobe de la huaca de Narihualá, que ocupan el fondo del cuadro; un viajero camina por el sendero, de espaldas, a media distancia, con un sombrero de paja. Lo que demuestra es la escala y la antigüedad del sitio frente a la persona: Catacaos no es solo compras. Si la huaca no se ve completa o se confunde con una construcción moderna, la imagen no sirve.",
+      "hora_clima": "media mañana o mediodía temprano, con sol alto; cielo despejado; luz natural abundante, sombras abiertas, adobe con textura y sin quemar",
+      "personas": "fotografía un acompañante que camina unos pasos detrás; el viajero mira la huaca; nadie mira al lente; ropa ligera, sin logos; ningún rostro identificable; sin otras personas trepando ni sobre los muros",
+      "primer_plano": "una rama seca de algarrobo o una mata del borde del sendero, muy cerca del lente y muy fuera de foco, por el borde inferior o lateral, sin tapar la huaca",
+      "ancla_pov": "Caminas hacia ellos por un sendero de tierra seca, el calor sube del suelo y el silencio es casi total",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni señalética legible",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin personas sobre los muros arqueológicos",
+        "sin reconstrucciones inventadas de la huaca",
+        "sin pirámides de piedra ni arquitectura que no sea adobe"
+      ],
+      "fidelidad": "sitio arqueológico identificable → requiere foto real REF-01 actual de la huaca de Narihualá en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "PIU",
+      "ciudad": "Piura"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-piura",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Filigrana, paja toquilla y picantería",
+    "cta": "Ver vuelos a Piura",
+    "archivo": "banner-ruta-lima-piura-catacaos.webp",
+    "alt": "Banner de SKY de la ruta Lima–Piura: filigrana, paja toquilla y picantería",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "vitrina de filigrana en primer plano — joyas de piezas reales identificables y reflejos difíciles; queda en el gancho",
+    "plato de seco de chabelo en la picantería — exige fidelidad de un plato regional y repite recurso de otras guías",
+    "procesión de Semana Santa — personas reales identificables y acto religioso",
+    "fachada de la iglesia San Juan Bautista — falta fuente patrimonial y referencia real",
+    "sombreros apilados en una tienda — postal de mercado intercambiable"
+  ]
+}

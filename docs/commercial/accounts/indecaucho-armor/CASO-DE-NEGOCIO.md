@@ -443,13 +443,16 @@ ARMOR para lanzar.
 | Quién contrata, moneda | Términos | Pregunta a Vanessa | Proponer en USD |
 
 **Siguientes pasos internos:**
-1. **Pricing:** costeado el 27/10 en [PRICING-PILOTO-90D.md](PRICING-PILOTO-90D.md) con el método del pack de
-   Performance (el cotizador V3 no tiene oferta de performance ni mercado Ecuador). Recomendado: puesta en marcha
-   **USD 5.400** + operación **USD 5.200/mes** × 3 = **USD 21.000** de fee (margen ~55 %; piso 45 % en
-   USD 17.079), más USD 18.000 de medios pagados por ARMOR: **USD 39.000** en total. Pendiente de aprobación.
+1. **Pricing:** [fee V3 calculado el27/10](COSTEO-V3-2026-10-27.md) tras agregar Performance/Ecuador al catálogo
+   localv14 por mandato de Julio. Honorarios **USD22.450** (primer período11.350; siguientes5.550 × 2),
+   medios separados **hasta USD18.000**; sobre **USD40.450** antes de impuestos/terceros. Margen modelado59,28%,
+   sin líneas bajo piso, reglas Performance/EC estimadas. Sustituye los21.000 provisionales y el bloqueo anterior.
+   Estado `requires_review`; aprobación, capacidad, accesos, entidad/tributos y envío pendientes.
 2. **Julio:** aprobar escenario recomendado, empaque y fee; decidir si se envían preguntas a Vanessa antes del
    jueves (sólo con su autorización).
-3. **Propuesta:** documento para Vanessa y versión ejecutiva para gerencia con los mismos hechos y límites.
+3. **Propuesta:** [borrador de90días preparado para revisión](PROPUESTA-90-DIAS-BORRADOR.md), con inicio dentro
+   del plazo, ruta básica hacia Kommo y límites de producción/integración. Este borrador acota las ideas de
+   diseño/automatización del caso; no convierte CAPI, SLA, forecast o integraciones a medida en compromisos.
    Entrega jueves 29 o viernes 30.
 
 ---
@@ -461,7 +464,8 @@ ARMOR para lanzar.
 - [x] Investigación de empresa, competencia, mercado, medios y medición con fuentes al 27/10.
 - [x] Escenarios de medios con supuestos y recomendación.
 - [ ] Baseline económico (tasas de Kommo, ticket, contribución): pendiente de ARMOR.
-- [ ] Fee costeado por Pricing y aprobado por Julio.
+- [x] Fee calculado por Pricing/V3:22.450USD en90días; [artefacto y revisión](COSTEO-V3-2026-10-27.md).
+- [ ] Fee y alcance aprobados por Julio; reglas estimadas, capacidad/accesos y entidad/tributos validados.
 - [ ] Propuesta preparada y enviada.
 - [ ] Terna, selección o adjudicación: sin evidencia.
 

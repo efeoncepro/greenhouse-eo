@@ -1,0 +1,30 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "dawn",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Propuesta técnica · LIC-MKT-2026-001",
+    "question": "Propuesta",
+    "answer": [
+      "Marketing",
+      "digital 2027"
+    ]
+  },
+  "body": "Preparada para **KSB Chile S.A.** · Noviembre 2026",
+  "selection": {
+    "target": "client-logo",
+    "label": "Efeonce",
+    "participantKind": "role"
+  },
+  "clientLogo": {
+    "path": "ai-generations/2026-11-06_propuesta-ksb/assets/ksb-logo-blanco-1200.png",
+    "alt": "KSB"
+  }
+}

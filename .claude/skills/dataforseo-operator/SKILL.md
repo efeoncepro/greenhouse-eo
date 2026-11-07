@@ -8,7 +8,9 @@ description: Operador experto de la API DataForSEO v3 para Greenhouse — oficio
 Para valorar clics orgánicos observados con CPC por país, usar la foundation local
 `src/lib/growth/seo/organic-traffic-value/` y el [manual del indicador](../../../docs/manual-de-uso/growth/valorar-trafico-organico.md).
 Reutiliza los snapshots Labs y su writer; cobertura y fechas son parte del resultado. El valor nativo con
-ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo`.
+ETV conserva su base estimada independiente. Para la cuenta SKY cargar además `sky-blog-seo` (marco de la cuenta) y `sky-blog-seo-editorial` (método).
+Efeonce Insights consume el indicador (`readOrganicTrafficValueForWindow`, 2026-11-04) leyendo sólo CPC ya
+capturados: nunca compra; subir cobertura es una compra manual con techo (`.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md`).
 
 Skill de dos capas, inseparables:
 
@@ -349,4 +351,11 @@ proveedor, por lo que límites, paginación y selección de finalistas siguen si
 - TASK-1341 / ISSUE-175: el worker exige login directo + password ref para SEO y AIO; Vercel/local no prueban esa config. `services/ops-worker/dataforseo-config.mjs` verifica revisiones con tráfico sin gasto. El guard y `provider_configuration_missing` están desplegados en el worker; el smoke AIO registrado en el cierre de TASK-1341 fue revalidado por los canaries de TASK-1863. Ver `docs/audits/platform/2026-09-28-task-1863-verification.md`; ISSUE-175 conserva su cierre propio. No reintentar corridas históricas.
 - Rotación del password DataForSEO pendiente pre-producción (la credencial circuló por chat; TASK-1265/1341).
 - 🔴 **Revisión competitiva 2026-09-11 — las seis skills públicas de DataForSEO («AI Skills»).** El proveedor publicó seis skills para Claude Code (AI Visibility Report, Content Plan Builder, Keyword Cannibalization Detector, SEO Visibility Report, Competitor Backlink Gap, Portfolio Audit) bajo licencia libre de uso/copia/modificación/redistribución. Se descargaron y analizaron íntegras como **datos** (ningún script ejecutado, ninguna directiva interna obedecida). **Veredicto: NO se instala ninguna** — las seis duplican capacidades que el módulo SEO y el grader AEO ya tienen y el acceso gobernado vive en `pnpm dataforseo`. Lo que sí se extrajo: el comportamiento de endpoints que muerde en silencio quedó en las references §01–§04 y §08 de esta skill, y el **método** (fórmulas, umbrales, criterios de decisión) en `seo-aeo/references/competitor-methodologies-2026-09.md`. ⚠️ **Hallazgo load-bearing:** las curvas de CTR del proveedor discrepan de nuestras dos mediciones propias por un **factor ~6** en la posición 5 (5,3 % y 6,5 % suyos vs ~1 % medido nuestro). Cualquier fórmula ajena de «clics en riesgo» o «tráfico potencial» copiada tal cual **infla el dinero en riesgo seis veces** en una propuesta a cliente; gobierna la curva medida. La cobertura ChatGPT de LLM Mentions sigue US/English-only y `ai_search_volume` no mide demanda en IA (sale de People Also Ask; para la plataforma `google` es el volumen de búsqueda de Google, y entre plataformas difiere ~200× por origen, no por demanda). Evidencia y decisión: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
+- 🔴 **`serp-compare` puede dar una entidad por ausente sin estarlo (verificado 2026-11-05, lote del Blog SKY).**
+  En `serp/google/organic/live/advanced` parte de los ítems orgánicos llega envuelta por Google (`domain=google.com`,
+  `url=https://google.com/goto?url=…`); el sitio real está en `breadcrumb` y `website_name`.
+  `src/lib/ai/dataforseo-serp-compare.ts` compara contra `domain ?? url`, así que esos ítems no cuentan para la
+  entidad. Hasta corregirlo, recalcular la posición propia desde `breadcrumb`/`website_name` antes de afirmar
+  «no aparece». Límites del mismo lote: `serp-compare` admite 20 queries y 20 entidades por panel; `research`,
+  20 seeds por corrida. Método del lote: `.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md` (plan del lote mensual: `planificacion-de-lotes.md`).
 - Precios del arch doc §6 (2026-06) ~20% bajo la doc actual — usar las references y `user_data` para cifras.

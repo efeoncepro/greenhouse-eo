@@ -1,0 +1,24 @@
+  ✂ recorte 545x481 en (1774, 1077) → 1088x960 · la zona con contexto ocupa 3.1 % de la imagen: se genera recortada a 1088x960
+  $ costo estimado ≈ USD 0.046 · 1 × salida 1088x960 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 140/255 · salida USD 0.0461
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/tacna/inpaint/36cf78c99986/manifest.json
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 32 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 21.5/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/fix/iquitos/inpaint/fe948f0f3561/manifest.json
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/alpaca-img2-fix-maestro.png (edit) …
+  ✓ 9060KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2713 (img 1518 · txt 1195) · out 13342 · total 16055
+done
+alpaca-img2 exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/cajamarca-img2-fix-maestro.png (edit) …
+  ✓ 14644KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2706 (img 1452 · txt 1254) · out 13342 · total 16048
+done
+cajamarca-img2 exit=0
+done

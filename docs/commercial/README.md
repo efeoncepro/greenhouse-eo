@@ -29,6 +29,10 @@ Haulmerresuelto. Los bloques de guardado iniciales que siguen conservan sus cifr
   y [BICE VIDA](prospects/bice-vida-2026-10/SALES-NAVIGATOR-2026-10-29.md) conservan aplicaciones y descartes.
   Configuración y guardado autorizados; sin comunicaciones, créditos consumidos ni altas CRM.
 
+- [MG Indusol / Mayra — presentación B2B industrial, 28/10/2026](prospecting-agent/runs/2026-10-28-mg-indusol-mayra.md):
+  correo autorizado con brochure 360° completo, firma gráfica y CCO; Enviados y EMAIL `SENT` verificados.
+  Contact automático de Documents no equivale a calificación; vigencia/tamaño ICP pendientes, sin secuencia.
+
 - [ARMOR EPPS / Indecaucho — discovery y caso de negocio](accounts/indecaucho-armor/README.md):
   preparación de la reunión27/10, investigación de marca/canal/demanda, caso v0 y continuidad desde
   la transcripción HubSpot/Notion. Invitación y confirmación enviadas; terna aún por decidir.
@@ -44,7 +48,7 @@ aceptada el 15/10/2026. Marca/cuenta primero y separador ` | `; nuevas altas aut
 El histórico se normaliza sólo por lote autorizado con identidad/dedupe, antes/después y readback;
 no reescribir snapshots fechados ni alterar asociaciones para acomodar el nombre.
 
-- Brochure oficial para presentar la agencia completa: «Agencia de Marketing 360°» (aprobado 2026-10-16; 84 láminas y corto de 26) en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Antes de enviarlo afuera: cifras de ANAM y «12 meses» de Berel. [Detalle](../documentation/creative/composicion-de-decks-y-brochures.md#el-brochure-oficial-agencia-de-marketing-360).
+- Brochure oficial para presentar la agencia completa: «Agencia de Marketing 360°» (84 láminas y corto de 26) en OneDrive `Alineación/4. Comercial/Brochures/2026/Agencia de Marketing 360/`. Aprobación íntegra ratificada por Julio el 17/10: usar el original y su documento existente de HubSpot, sin recortes ni nueva validación de cifras/casos. [Política vigente](../operations/EFEONCE_APPROVED_BROCHURES_POLICY_V1.md) · [composición](../documentation/creative/composicion-de-decks-y-brochures.md#el-brochure-oficial-agencia-de-marketing-360).
 - [Correos desde Outlook de Julio: firma oficial y BCC HubSpot](../operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Requisito previo a enviar; registro CRM verificado por separado.
 
 - [Outreach personalizado del 13/10/2026](follow-up-agent/runs/2026-10-13-outreach-personalizado.md): seis correos enviados por Outlook web con firma gráfica, brochure contextual y actividades HubSpot `SENT`; Rafael excluido. Referencia para próximos primeros contactos y su verificación.

@@ -1,0 +1,4 @@
+  $ costo estimado ≈ USD 0.053 (1 × 1756 tokens de salida × USD 30/1M, factor 2.6 medido sobre 2.5; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/experiencia-mesa-compartida.png …
+  ✗ ./ai-generations/2026-11-05_propuesta-mambrino/muestras/experiencia-mesa-compartida.png FAILED: fetch failed
+done

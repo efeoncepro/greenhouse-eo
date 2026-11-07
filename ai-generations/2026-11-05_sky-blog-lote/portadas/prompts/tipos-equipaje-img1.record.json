@@ -1,0 +1,22 @@
+{
+ "registro": "D",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the edge of the door frame",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "tipos-equipaje",
+ "input": {
+  "id": "tipos-equipaje",
+  "registro": "D",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "entrance door of an ordinary apartment",
+  "escena": "from the standing traveler's view, three pieces lined up from smallest to largest next to the front door: a backpack, a wheeled carry-on suitcase and a large checked suitcase, with a folded jacket on the backpack. The three must read clearly different in size; their tops sit in the upper half of the frame. It is the article's comparison made image",
+  "hora": "early morning",
+  "clima": "indoors, abundant natural light from a side window, open shadows, natural colour",
+  "primerPlano": "the edge of the door frame",
+  "borde": "lower-left corner",
+  "prohibir": "recognisable luggage brands, airline tags, measuring tapes or figures, people"
+ }
+}

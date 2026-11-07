@@ -1,0 +1,55 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-risk",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Continuidad e incidentes",
+    "question": "Cada riesgo, con su",
+    "answer": [
+      "Cobertura"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 2
+  },
+  "body": "Cada riesgo tiene su respuesta escrita y probada antes de pasar a producción.",
+  "headers": {
+    "risk": "El riesgo",
+    "how": "Cómo lo cubrimos"
+  },
+  "risks": [
+    {
+      "risk": "Caída del servicio",
+      "name": "Continuidad HubSpot",
+      "how": "Réplica en tres centros de datos; Efeonce escala y reporta cada 2 h."
+    },
+    {
+      "risk": "Pérdida de datos",
+      "name": "Respaldo inmutable",
+      "how": "Copia diaria en el tenant de Fiordo Austral y restauración de prueba trimestral."
+    },
+    {
+      "risk": "Incidente de seguridad",
+      "name": "Respuesta en 1 h",
+      "how": "Guardia permanente, contención en 4 h, evidencia preservada e informe de causa raíz."
+    },
+    {
+      "risk": "Acceso indebido",
+      "name": "Alertas en Wazuh",
+      "how": "Inicios anómalos y sesiones simultáneas detectados, con cierre remoto."
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "TI",
+    "participantKind": "department"
+  }
+}

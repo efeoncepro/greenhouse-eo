@@ -1,0 +1,29 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:51:13.630Z",
+  "run": "ai-generations/2026-10-29_sky-operacion",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-29_sky-operacion",
+  "totalBytes": 1369147,
+  "fileCount": 3,
+  "files": [
+    {
+      "path": "assets/adriana.png",
+      "sizeBytes": 134990,
+      "sha256": "0cfb25d4527399ab689387e813e487fb3aa782d98031da5ad4ce80a02f6d6824",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_sky-operacion/assets/adriana.png"
+    },
+    {
+      "path": "out/agenda/01-deck-decision-agenda.png",
+      "sizeBytes": 102490,
+      "sha256": "5308f987369090b09c88fff1b17723d7d21aceff92758fe13499353ca44a123e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_sky-operacion/out/agenda/01-deck-decision-agenda.png"
+    },
+    {
+      "path": "out/equipo/01-deck-content-team.png",
+      "sizeBytes": 1131667,
+      "sha256": "92cebbeebe766d53fe89348e834a678155d2f5e1d5151ddc85735fa29d93a0e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-29_sky-operacion/out/equipo/01-deck-content-team.png"
+    }
+  ]
+}

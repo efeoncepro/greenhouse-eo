@@ -216,6 +216,14 @@
       ],
       "port": 3210,
       "url": "http://127.0.0.1:3210"
+    },
+    {
+      "name": "auth-dev-ui",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "auth-server:dev-ui"
+      ],
+      "port": 19036
     }
   ]
 }

@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-score-ring",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Matriz de cumplimiento",
+    "question": "Los 74 requisitos, uno a",
+    "answer": [
+      "Uno"
+    ]
+  },
+  "body": "Cada requisito de seguridad de las bases, con su respuesta y su evidencia en el anexo.",
+  "dimensions": [
+    {
+      "name": "% cumple con Sales Hub",
+      "weight": 39
+    },
+    {
+      "name": "% con control de Efeonce",
+      "weight": 45
+    },
+    {
+      "name": "% en desarrollo, fase 1",
+      "weight": 13
+    },
+    {
+      "name": "% no cumple, declarado",
+      "weight": 3
+    }
+  ],
+  "total": {
+    "value": "74",
+    "label": "requisitos respondidos",
+    "source": "Matriz de cumplimiento, anexo de esta propuesta"
+  },
+  "ctaButton": {
+    "text": "Ver la matriz completa",
+    "descriptor": "Anexo · 74 requisitos"
+  }
+}

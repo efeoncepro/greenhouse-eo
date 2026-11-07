@@ -322,6 +322,9 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: selector enumera sólo cuentas autorizadas, conserva contexto por request/pestaña y destino explícito en deep links; no concede permisos ni cambia otra pestaña mediante preferencia global.
+- [ ] EPIC-057: actualizar wireframe/flow y GVC del dueño para Diseño/SEO/dual, revocación y respuesta tardía; UI ready permanece no hasta mapping y evidencia. No hardcode por nombre SKY.
+
 - [x] Paquete documental detallado: alternativas, pantallas, copy, estados, responsive, flow y motion versionados el 2026-09-09; evidencia en los cuatro documentos enlazados. No acredita implementación.
 - [ ] H54-01..12 verificados: fuente/coverage, comparabilidad, respuesta tardía de período, derivados y publicación, deep links y negativas de acceso.
 - [ ] Efeonce Insights conserva edición/corte propios; no se confunde con Nexa Insights ni se muestran drafts internos; no enlaces aspiracionales.
@@ -363,3 +366,11 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 ## Open Questions
 
 Sin preguntas que bloqueen el registro. El plan de ejecución debe resolver los paths/DDL propuestos y readiness real antes de código. Para ejecutar en Codex: /goal explícito y task-hook; este registro no inicia implementación.
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Interfaz dueña de selección y contexto de cuenta; consume TASK-2096/2100 y TASK-1853. No nueva task UI paralela.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

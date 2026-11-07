@@ -219,3 +219,39 @@ un directorio scratch gitignoreado, excluirlo en los **tres** planos —`.gitign
 ESLint y `exclude` de tsconfig—; declararlo en dos de tres deja el gate roto por el tercero.
 ⚠️ `tsconfig.json` se lee con `require()` en varios scripts, así que es JSON estricto: **no** admite
 comentarios. La razón se documenta acá, no en el archivo.
+
+## Delta 2026-11-04 — carril de push desde una sesión de agente
+
+Cuando el operador autoriza un push y lo ejecuta un agente desde su propia shell, cinco cosas se
+comportan distinto de la terminal del operador. Caso fuente: los pushes del 2026-11-04 a `develop`
+de `greenhouse-eo` (61 commits pendientes y luego uno más) y a `main` del runtime del sitio público
+(39 commits pendientes).
+
+1. **Antes de empujar `develop`, mirar el release y contar lo que se sube.** Confirmar que no haya un
+   release a producción en vuelo (`gh run list --workflow production-release.yml`) y contar los commits
+   pendientes (`git rev-list --count <remoto>..HEAD`): el push sube todo lo pendiente, también lo de
+   otras sesiones, no sólo lo tuyo.
+2. **SSH puede fallar sólo en la shell del agente.** `git push` por SSH devolvió
+   `Permission denied (publickey)` aunque `ssh -T git@github.com` autentica desde la terminal del
+   operador: la shell del agente no ve esa llave. Alternativa que funcionó, por HTTPS con la credencial
+   de `gh`:
+
+   ```bash
+   git -c credential.helper= -c "credential.helper=!gh auth git-credential" \
+     push https://github.com/efeoncepro/<repo>.git HEAD:<rama>
+   ```
+
+3. **Commits que tocan `.github/workflows/**` necesitan el scope `workflow`.** Sin él, GitHub rechaza el
+   push con «refusing to allow an OAuth App to create or update workflow … without workflow scope». Lo
+   renueva el operador, porque es interactivo: `gh auth refresh -h github.com -s workflow`.
+4. **Un `Internal Server Error` del remoto puede ser transitorio.** Pasó dos veces; antes de reintentar,
+   confirmar con `git fetch` que el remoto no se movió, y solo entonces repetir el push.
+5. **El pre-push juzga todo el árbol de trabajo, incluidos archivos sin seguimiento.** Un archivo no
+   versionado de otra sesión con errores de lint bloqueó el push aunque no estaba en ningún commit
+   (ver el delta 2026-08-31). **NUNCA** saltar el hook con `--no-verify` sin autorización explícita del
+   operador. **NUNCA** mover archivos del usuario al scratchpad de la sesión ni a `/tmp` para destrabar
+   el hook: el scratchpad se borra si la sesión se reinicia, y así se perdió una carpeta local no
+   versionada. Si algo debe salir del árbol, lo resuelve el operador; o, como mucho, se mueve a una ruta
+   ignorada **dentro del repo** y se devuelve en el mismo comando, en primer plano.
+
+Después del push sigue valiendo el delta 2026-08-29: leer el veredicto de CI del SHA empujado.

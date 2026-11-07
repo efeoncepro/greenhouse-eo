@@ -1,0 +1,52 @@
+{
+  "id": "GF26-A",
+  "model": "gpt-image-2.6-sunburst",
+  "quality": "high",
+  "complexity": "high",
+  "size": "2048x1152",
+  "sourceRecipe": "NX7d",
+  "promptFile": "ai-generations/2026-11-05_glitch-flash-images-2-6/pruebas-propias/prompts/GF26-A.txt",
+  "promptSha256": "fcc3c6c7b543e32154442b911c28f8aa4d52d59a9345ea0faf7e3aeb397e890a",
+  "references": [
+    {
+      "order": 1,
+      "path": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal-v2.png",
+      "sha256": "2937f1fe3d37383d2e80b74282a8543eb30e161c92c25d98717552ac8a850aa2"
+    },
+    {
+      "order": 2,
+      "path": "ai-generations/_identidad-nexa/5-expresiones-frente/nexa-expr-22-determinacion.png",
+      "sha256": "d6f30d581251b186d4292a5bac91f45f17e2834ae50d862e707a5d04ccd34d55"
+    },
+    {
+      "order": 3,
+      "path": "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png",
+      "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
+    },
+    {
+      "order": 4,
+      "path": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-13-puesto-frente-sin-rostro-1200x1330-v01-fondo-estudio.png",
+      "sha256": "db9ab79d68cfeece7a28a9c795df1e021e3599d70252d57cc44e3ef0865d416c"
+    },
+    {
+      "order": 5,
+      "path": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-traje-bionico-nexa-10-detalle-placa-isotipo-1600x1600-v01-fondo-estudio.png",
+      "sha256": "77314300dfd9b36df54ed9eab8a50d8449c02ee76ec4cfe022ad3839a464b196"
+    },
+    {
+      "order": 6,
+      "path": "ai-generations/2026-10-01_traje-bionico-nexa/final/efeonce-lentes-bionicos-nexa-21-tres-cuartos-1600x1600-v01-transparente.png",
+      "sha256": "524d6398be9ff3ad043595ce88995c7a62c125459415c7d3f62d6aaad57e9944"
+    },
+    {
+      "order": 7,
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-investigacion-05-cine.png",
+      "sha256": "94aedf9b8d9ec051012a5491a18887c4e7246c5da30f98617c2fb3541c1801ca"
+    },
+    {
+      "order": 8,
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/sparks/spark-contenido-05-cine.png",
+      "sha256": "2aebfeb8e20195782db5241d38f998f2983ab42e3ca92f439b2dee183bdcc2d3"
+    }
+  ]
+}

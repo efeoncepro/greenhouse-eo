@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "voice",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-progress",
+  "voice": {
+    "eyebrow": "02 · Vívelo",
+    "question": "¿Cómo avanza el trabajo?",
+    "answer": ["A la", "vista"]
+  },
+  "body": "Siguen el plan en Notion y aprueban cada pieza en Frame.io, comentando **sobre** la imagen.",
+  "plan": {
+    "tool": { "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg", "name": "Notion" },
+    "kicker": "En Notion",
+    "title": "Plan de performance",
+    "meta": "Semana 2 de 4",
+    "columns": [
+      { "name": "En curso", "cards": [ { "title": "Campaña Search", "tag": "Dermatoestética" }, { "title": "Eventos y tablero", "tag": "Medición" } ] },
+      { "name": "En revisión", "cards": [ { "title": "Landing de demo", "tag": "Esperando su visto bueno", "highlight": true } ] },
+      { "name": "Listo", "cards": [ { "title": "WhatsApp corregido", "tag": "Preparación" }, { "title": "Plan de pruebas", "tag": "Estrategia" } ] }
+    ]
+  },
+  "review": {
+    "tool": { "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg", "name": "Frame.io" },
+    "kicker": "En Frame.io",
+    "title": "Landing de demo",
+    "versions": ["v1", "v2"],
+    "piece": { "plateRef": "ai-generations/2026-11-04_propuesta-intermedica/assets/landing-dermatoestetica.png", "alt": "La pieza en revisión: maqueta de la landing de dermatoestética" },
+    "pin": "1",
+    "comments": [
+      { "mark": "1", "author": "Intermedica", "version": "v1", "text": "¿Sumamos el botón de WhatsApp?" },
+      { "own": true, "author": "Efeonce", "version": "v2", "text": "Listo, quedó en la v2." }
+    ],
+    "secondary": "Comentar",
+    "primary": "Aprobar"
+  }
+}

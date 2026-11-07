@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-day-release-cycle",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Cambios controlados",
+    "question": "Todo cambio, antes de producción, pasa por",
+    "answer": [
+      "Prueba y",
+      "control"
+    ]
+  },
+  "body": "Se prueba en una cuenta de pruebas con datos de ejemplo, su equipo lo **valida** y recién entonces se publica.",
+  "release": {
+    "kicker": "Cambio 03 · Sales Hub",
+    "title": "Alerta de cliente sin contacto",
+    "icon": "sales",
+    "currentStep": 3,
+    "videoTool": "loom",
+    "videoDuration": "3:12",
+    "presenterInitials": "EF",
+    "videoCaption": "Qué cambia para ventas, en 3 minutos",
+    "approveCta": "Aprobar cambio"
+  },
+  "tools": [
+    {
+      "tool": "teams",
+      "kicker": "Microsoft Teams",
+      "label": "Video del cambio"
+    },
+    {
+      "tool": "microsoft-365",
+      "kicker": "Microsoft 365",
+      "label": "Acta en SharePoint"
+    },
+    {
+      "tool": "hs-icon:sales",
+      "kicker": "HubSpot",
+      "label": "Cuenta de pruebas"
+    },
+    {
+      "tool": "microsoft-365",
+      "kicker": "Microsoft 365",
+      "label": "Aviso por Outlook"
+    }
+  ]
+}

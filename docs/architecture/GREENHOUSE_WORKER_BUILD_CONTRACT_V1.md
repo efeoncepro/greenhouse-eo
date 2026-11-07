@@ -20,6 +20,7 @@ The current build units covered by this contract are:
 | `ico-batch-worker` | `services/ico-batch/Dockerfile` | `.github/workflows/ico-batch-deploy.yml` |
 | `artifact-worker` | `services/artifact-worker/Dockerfile` | `.github/workflows/artifact-worker-deploy.yml` |
 | `auth-server` | `services/auth-server/Dockerfile` | `.github/workflows/auth-server-deploy.yml` |
+| `auth-key-maintenance` (local candidate) | `services/auth-key-maintenance/Dockerfile` | `.github/workflows/auth-key-maintenance-deploy.yml` |
 
 The machine-readable registry lives in `scripts/ci/worker-build-contract-gate.mjs`. A new Node worker is not
 part of the platform contract until it is registered there and passes both worker gates.
@@ -32,6 +33,13 @@ files, so the deploy-path check is cheap and complete). Its image copies only `p
 `vendor/`, `tsconfig.json`, `src/`, `services/auth-server/` and `services/_shared/`; it does **not** copy
 branding or fonts (no PDF/render surface), so a missing brand asset can never be an `auth-server` build
 failure. Runbook: `docs/operations/runbooks/auth-server.md`.
+
+`auth-key-maintenance` (TASK-1833) is a one-shot Job built from an exact main SHA.
+Its release workflow has only `workflow_call`, and the orchestrator runs it only
+after dedicated IAM/PG provisioning is recorded. Each approved invocation builds
+the definition, so no deploy-path skip list is needed. The Job stays OFF/dry-run
+and is not executed by its deploy. Runtime deps are checked by the same gate;
+its eventual Cloud Run drift mapping is added only with the first actual Job.
 
 ## Package-manager source of truth
 

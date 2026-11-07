@@ -1,0 +1,7 @@
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 61 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 14.2/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/stgo3-sky/inpaint/6915d4716f57/manifest.json
+FIN

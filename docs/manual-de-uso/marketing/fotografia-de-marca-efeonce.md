@@ -1,9 +1,9 @@
 # Manual: producir una foto de marca Efeonce
 
 > **Tipo de documento:** Manual de uso (operador)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-10-03 por Claude (1.1: elenco de marca y grupos de 3 a 5, ropa elegida según quién la viste y cómo está parada, las 25 expresiones de Nexa, `pnpm foto:rostro`, referencias que se bajan solas del canon y qué hacer al sumar algo nuevo)
+> **Última actualización:** 2026-11-01 por Claude (1.2: en «Antes de empezar», quién paga la generación: `--openai-key personal` mientras quede crédito. Antes, 2026-10-03 — 1.1: elenco de marca y grupos de 3 a 5, ropa elegida según quién la viste y cómo está parada, las 25 expresiones de Nexa, `pnpm foto:rostro`, referencias que se bajan solas del canon y qué hacer al sumar algo nuevo)
 > **Documentación relacionada:** [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Lenguaje fotográfico (maestro)](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Elenco de marca](../../operations/brand-photography/EFEONCE_BRAND_CAST_V1.md) · [Selección de referencias de marca](../../operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · [Almacenamiento de `ai-generations/`](../../operations/AI_GENERATIONS_STORAGE_V1.md) · [Explicación funcional: elenco y referencias](../../documentation/creative/elenco-y-referencias-de-fotografia.md)
 
 ## Lo más corto que funciona
@@ -47,6 +47,7 @@ No sirve para piezas de clientes ni para trendjacking que toma prestada una est�
 | Acceso a generación | `pnpm ai:image` funcionando (el secreto de OpenAI se resuelve solo; si falla, ver problemas comunes) |
 | Leer 10 minutos | La tabla de principios de [Colorimetría §1](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md#1-principios-en-una-tabla) y el catálogo de tomas |
 | Presupuesto | ≈ USD 0,05 por imagen en `high`; ≈ USD 0,09 en `xhigh`; ediciones ≈ USD 0,07–0,10 |
+| Quién paga | Agrega `--openai-key personal` a cada `pnpm ai:image` mientras quede crédito en la cuenta personal; sin el flag paga la clave de la empresa. Nunca lo dejes en `.env.local`. Si OpenAI responde 429 / `insufficient_quota`, se acabó el crédito: quita el flag. Ver [alternar la clave de OpenAI](../ai-tooling/alternar-clave-openai.md) |
 | Una idea concreta | Qué servicio se ve trabajando, en qué industria **que no sea de un cliente real** y en qué ciudad |
 | `gcloud` con sesión | Las referencias aprobadas (caras, prendas, expresiones) se bajan solas del bucket canon al armar el prompt; para eso `gcloud storage` tiene que funcionar. No necesitas tenerlas en disco de antemano |
 

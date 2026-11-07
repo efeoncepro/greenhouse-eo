@@ -52,22 +52,31 @@
 - **Rol:** paso de **finish** — subir resolución/detalle de frames e imagen y de **secuencias de video**.
   Tenemos **MCP y API**.
 
-## Gemini Omni 1.1 Flash — CLI local Cloud (2026-09-24)
+## Gemini Omni Flash — CLI local Cloud (1.2 por defecto desde 2026-11-05)
 
-`pnpm ai:omni --help` opera en `efeonce-group` la identidad Cloud exacta
-`gemini-omni-1.1-flash-preview` por Interactions `v1beta1` en `global`, con ADC y salida en GCS privado.
-`gemini-omni-1.1-flash` es la identidad distinta de Developer API; no hay fallback entre ellas. La CLI
-ofrece `--task text|image|frames|reference|edit|extend`: usa `--estimate` para validar/cotizar sólo el video
-output nominal sin enviar, y `--yes` para cada POST. Los archivos locales necesitan `--staging-uri`; la
+`pnpm ai:omni --help` opera en `efeonce-group` por Interactions `v1beta1` en `global`, con ADC y salida en GCS
+privado. Por defecto usa **`gemini-omni-1.2-flash`** (GA, PayGo estándar); `--model 1.1` usa la identidad
+Preview `gemini-omni-1.1-flash-preview`. Las identidades Developer API (`gemini-omni-1.2-flash`,
+`gemini-omni-1.1-flash`) usan otra superficie; no hay fallback entre superficies. La CLI ofrece
+`--task text|image|frames|reference|edit|extend|upscale`: usa `--estimate` para validar/cotizar sólo el video
+output nominal sin enviar, y `--yes` para cada POST. En 1.2: texto, imagen y referencias de 3 a 15 s;
+first/last frame y extend de 3 a 10 s (extend acepta un fuente de cualquier largo); `upscale` sube un borrador
+360p→720p/1080p o 720p→1080p/4K con `--source-resolution`; `--previous <interaction-id>` encadena edit o upscale
+sobre el turno anterior. Video output ≈ USD 0,023/s a 360p y 0,07/s a 720p; `--max-usd` vale 1 por defecto y
+bloquea un clip de 15 s a 720p (≈ USD 1,04). Los archivos locales necesitan `--staging-uri`; la
 salida exige `--gcs-output`. Tras un timeout, recupera con `--status` o `--wait` y el interaction ID;
 no reenvíes a ciegas. Contrato, flags y recetas:
 `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
 
-**Evidencia acotada:** los seis modos completaron corridas técnicas 2026-09-24 a 360p, 16:9 y 3 s;
+**Evidencia acotada (1.1):** los seis modos completaron corridas técnicas 2026-09-24 a 360p, 16:9 y 3 s;
 `extend` produjo 6 s acumulados. Se verificaron MP4 H.264/AAC de 640×360 a 24 fps. No están probados
 4K ni edición stateful con `previous_interaction_id`. SKY sí añadió pilotos de edición 1080×1920/24 fps: uno de 9,5 s rechazado por continuidad y otro de 6,5 s integrado con empalmes revisados; ver `../companions/video-postproduction-and-delivery.md`. Siguen sin acreditarse de forma general continuidad temporal fina,
 escucha de audio, C2PA ni factura real. `edit` usa un MP4 fuente y puede llevar imágenes de referencia;
 `extend` usa un MP4 fuente. Ninguna corrida habilita Globe ni aprueba un entregable comercial.
+**1.2:** identidad GA confirmada en vivo en Model Garden el 2026-11-05 y canary `text` 360p/16:9/3 s completado ese mismo
+día: MP4 640×360 a 24 fps con audio, 5.793 tokens de video ≈ USD 0,070, igual a `--estimate`. También completado `upscale --previous`
+360p→720p (8.688 tokens = estimación; sin `input`: la API rechaza texto en upscale). Sin canary: `edit --previous`,
+upscale por archivo, 1080p/4K y las demás tareas. Contrato y fuentes: `GEMINI_OMNI_VERTEX.md` («Actualización 2026-11-05»).
 
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
@@ -103,7 +112,7 @@ Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **pr
   previa → devolvió una toma **casi idéntica** (mismo mundo/luz/composición). **Condicionamiento observado en ese caso, no garantía de continuidad:** encadena las tomas → cada toma usa el **último frame de la anterior como referencia** +
   el prompt del beat siguiente. Sin eso, tomas text-to-video independientes se ven como escenas sueltas.
 
-> **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s; la **consistencia entre tomas** se
+> **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10 s (15 s con 1.2); la **consistencia entre tomas** se
 > puede mejorar con **reference-chaining** (frame anterior como referencia), pero exige QA temporal. Cuando se requiere exactitud, el logo/UI/texto se compone con assets reales; respeta cualquier alcance generativo explícitamente aceptado. Diseña el
 > corte para no necesitar composite in-frame: beats de UI a **pantalla completa**, mundo/humano en **cortes
 > separados**, hilados por transición (pull-back/match-cut).
@@ -148,8 +157,8 @@ Ahí la pantalla la renderiza el modelo con pantallas video-safe como referencia
 - **RRSS desde un paquete de stills ficticios, sin copy/practical exacto** → Gemini Omni image-to-video (ver `workflows/living-social-wall-clips.md`); no confundir el canal con la regla de motor.
 - **Dispositivo con UI legible dentro de la toma** → Seedance 2.5 (Higgsfield MCP) con pantallas video-safe como
   `image_references`; nunca pantalla verde + reemplazo por tracking. Titular y logo de la pieza, en overlay.
-- **Broadcast** → Veo 3.1. **Microescena flexible o edición de MP4 con instrucción** → Gemini Omni 1.1 por
-  `pnpm ai:omni`; la cadena conversacional stateful aún no está probada. Selección completa:
+- **Broadcast** → Veo 3.1. **Microescena flexible o edición de MP4 con instrucción** → Gemini Omni 1.2 por
+  `pnpm ai:omni` (1.1 con `--model 1.1`); la cadena conversacional stateful aún no está probada. Selección completa:
   `workflows/engine-selection-by-fidelity-contract.md`.
 - **Tipo kinética / mograph de precisión / 3D** → AE/Blender/Houdini o animador local HTML/Playwright/Sharp/FFmpeg con reloj por cuadro y alcance aprobado. SKY probó cartelas alpha y URL Luminosidad; ver companion de posproducción.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft

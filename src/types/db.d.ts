@@ -341,6 +341,68 @@ export interface GreenhouseAuthCorporateSessionEvidence {
   upstream_link_id: string;
 }
 
+export interface GreenhouseAuthEmailOtpBudgets {
+  expires_at: Timestamp;
+  state_key: string;
+  value: Json;
+}
+
+export interface GreenhouseAuthEmailOtpChallenges {
+  expires_at: Timestamp;
+  state_key: string;
+  value: Json;
+}
+
+export interface GreenhouseAuthFirstPartyAccessHandles {
+  auth_time: Timestamp;
+  client_id: string;
+  code_hash: string;
+  created_at: Timestamp;
+  expires_at: Timestamp;
+  revoked_at: Timestamp | null;
+  session_hash: string;
+  subject: string;
+  token_hash: string;
+}
+
+export interface GreenhouseAuthFirstPartyClients {
+  allow_local_development: Generated<boolean>;
+  client_id: string;
+  client_secret_hash: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  product: string;
+  redirect_uris: string[];
+  session_max_age_seconds: number;
+  status: Generated<string>;
+  token_endpoint_auth_method: string;
+}
+
+export interface GreenhouseAuthFirstPartyCodes {
+  auth_time: Timestamp;
+  client_id: string;
+  code_challenge: string;
+  code_hash: string;
+  consumed_at: Timestamp | null;
+  created_at: Timestamp;
+  expires_at: Timestamp;
+  invalidated_at: Timestamp | null;
+  nonce: string;
+  redirect_uri: string;
+  session_hash: string;
+  subject: string;
+}
+
+export interface GreenhouseAuthFirstPartyLoginTransactions {
+  authorization_url: string;
+  client_id: string;
+  consumed_at: Timestamp | null;
+  expires_at: Timestamp;
+  fresh_after: Timestamp | null;
+  previous_session_hash: string | null;
+  transaction_hash: string;
+}
+
 export interface GreenhouseAuthInternalLoginTransactions {
   browser_binding_hash: string;
   consumed_at: Timestamp | null;
@@ -493,6 +555,36 @@ export interface GreenhouseAuthSigningKeyEvents {
   event_type: string;
   kid: string;
   occurred_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseAuthSigningKeyRotationEvents {
+  actor: string;
+  event_id: Generated<string>;
+  execution_id: string;
+  git_sha: string | null;
+  occurred_at: Generated<Timestamp>;
+  operation_id: string;
+  phase: string;
+  result: string;
+}
+
+export interface GreenhouseAuthSigningKeyRotationOperations {
+  candidate_kid: string | null;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  evidence_ref: string | null;
+  fencing_version: Generated<Int8>;
+  key_name: string;
+  kms_version: string | null;
+  lease_owner: string | null;
+  lease_until: Timestamp | null;
+  operation_id: Generated<string>;
+  operation_kind: Generated<string>;
+  overlap_not_before: Timestamp | null;
+  phase: string;
+  predecessor_kid: string;
+  updated_at: Generated<Timestamp>;
+  verified_at: Timestamp | null;
 }
 
 export interface GreenhouseAuthSigningKeys {
@@ -4692,6 +4784,24 @@ export interface GreenhouseCoreSkillCatalog {
   skill_code: string;
   skill_name: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSpaceAccessGrants {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  grant_id: Generated<string>;
+  granted_by: string;
+  identity_profile_id: string;
+  organization_id: string;
+  reason: string;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+  valid_from: Generated<Timestamp>;
+  valid_to: Timestamp | null;
+  verbs: string[];
+  version: Generated<number>;
 }
 
 export interface GreenhouseCoreSpaceNotionPublicationTargets {
@@ -13147,6 +13257,7 @@ export interface GreenhouseServingServiceSlaComplianceSnapshots {
 
 export interface GreenhouseServingSession360 {
   active: boolean | null;
+  active_space_count: number | null;
   auth_mode: string | null;
   avatar_url: string | null;
   client_default_locale: string | null;
@@ -13179,6 +13290,7 @@ export interface GreenhouseServingSession360 {
   route_groups: string[] | null;
   space_id: string | null;
   space_public_id: string | null;
+  space_selection_required: boolean | null;
   status: string | null;
   tenant_type: string | null;
   timezone: string | null;
@@ -14162,6 +14274,12 @@ export interface DB {
   "greenhouse_auth.cimd_cache": GreenhouseAuthCimdCache;
   "greenhouse_auth.client_consents": GreenhouseAuthClientConsents;
   "greenhouse_auth.corporate_session_evidence": GreenhouseAuthCorporateSessionEvidence;
+  "greenhouse_auth.email_otp_budgets": GreenhouseAuthEmailOtpBudgets;
+  "greenhouse_auth.email_otp_challenges": GreenhouseAuthEmailOtpChallenges;
+  "greenhouse_auth.first_party_access_handles": GreenhouseAuthFirstPartyAccessHandles;
+  "greenhouse_auth.first_party_clients": GreenhouseAuthFirstPartyClients;
+  "greenhouse_auth.first_party_codes": GreenhouseAuthFirstPartyCodes;
+  "greenhouse_auth.first_party_login_transactions": GreenhouseAuthFirstPartyLoginTransactions;
   "greenhouse_auth.internal_login_transactions": GreenhouseAuthInternalLoginTransactions;
   "greenhouse_auth.magic_link_tokens": GreenhouseAuthMagicLinkTokens;
   "greenhouse_auth.oauth_audit_events": GreenhouseAuthOauthAuditEvents;
@@ -14172,6 +14290,8 @@ export interface DB {
   "greenhouse_auth.refresh_tokens": GreenhouseAuthRefreshTokens;
   "greenhouse_auth.sessions": GreenhouseAuthSessions;
   "greenhouse_auth.signing_key_events": GreenhouseAuthSigningKeyEvents;
+  "greenhouse_auth.signing_key_rotation_events": GreenhouseAuthSigningKeyRotationEvents;
+  "greenhouse_auth.signing_key_rotation_operations": GreenhouseAuthSigningKeyRotationOperations;
   "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
   "greenhouse_auth.totp_backup_codes": GreenhouseAuthTotpBackupCodes;
   "greenhouse_auth.totp_enrollments": GreenhouseAuthTotpEnrollments;
@@ -14380,6 +14500,7 @@ export interface DB {
   "greenhouse_core.sister_platform_oauth_clients": GreenhouseCoreSisterPlatformOauthClients;
   "greenhouse_core.sister_platform_request_logs": GreenhouseCoreSisterPlatformRequestLogs;
   "greenhouse_core.skill_catalog": GreenhouseCoreSkillCatalog;
+  "greenhouse_core.space_access_grants": GreenhouseCoreSpaceAccessGrants;
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;

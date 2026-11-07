@@ -1,0 +1,8 @@
+{
+  "replace": [
+    { "from": "Sandbox", "to": "Prueba", "count": 1 },
+    { "from": "Pruebas", "to": "Validación", "count": 1 },
+    { "from": "Tu aprobación", "to": "Su aprobación", "count": 1 },
+    { "from": "asset-ref:file:tool-loom", "to": "asset-ref:file:tool-teams", "count": 1 }
+  ]
+}

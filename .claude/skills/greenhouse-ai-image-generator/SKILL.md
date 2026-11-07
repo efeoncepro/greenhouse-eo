@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image, Nano Banana 2.1 via the direct Google CLI, Imagen, or Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max, the GPT Image 2.6 family (Sunburst/Flare, 2026-11-04: complexity, native SVG, animated GIF and markup, all through `pnpm ai:image` since 2026-11-05, plus when to pick 2.5 or 2.6), plus local editing of existing images and video with verified delta 0 outside the zone (`pnpm ai:inpaint image|erase|expand|background|move|place|video`, `pnpm ai:mask`, `pnpm ai:layers`) and the relight status. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image, Nano Banana 2.1 via the direct Google CLI, Imagen, or Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -103,32 +103,38 @@ Do not call image providers from parallel scripts if the helper covers the case.
 ## Elegir modelo (leer ANTES de generar)
 
 Resumen operativo de la guía canónica `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
-(as-of 2026-09-16). Etiquetas: **[verificado]** corrida real del repo · **[oficial]** proveedor · **[tercero]**
+(as-of 2026-09-16; delta GPT Image 2.6 2026-11-05). Etiquetas: **[verificado]** corrida real del repo · **[oficial]** proveedor · **[tercero]**
 ranking fechado · **[decisión]** del operador · **sin dato** = no existe evidencia, no se rellena.
 
 ### Carriles: dónde vive cada motor
 
 | Carril | Superficie | Motores |
 |---|---|---|
-| OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
+| OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare, y GPT Image 2.6 Sunburst y Flare (2026-11-04; en la CLI desde 2026-11-05 con `complexity`, SVG, GIF y `markup`) [contrato] |
 | Google directo (Vertex, `global`) | `pnpm ai:nano` local; runtime `generateImage` independiente | CLI: **Nano Banana 2.1** (`gemini-nano-banana-2.1`, default). Runtime conserva Nano Banana 2; Pro sigue sin superficie. [Manual y cobertura](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) |
-| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
+| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.2 Flash `gemini-omni-1.2-flash` (GA, default desde 2026-11-05; 1.1 Preview con `--model 1.1`): texto, imagen, cuadros inicial/final, referencias, edición, extensión y upscale de video, clips de hasta 15 s |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
 | BytePlus directo (operador local) | `pnpm ai:byteplus`, `pnpm ai:layers` | Ruta por defecto para Seedream, Layerize, Seedance y Seed Speech del contrato Johor; tarifas de cuenta, secretos en Secret Manager. Manual `docs/manual-de-uso/creative-studio/byteplus-directo.md` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
-Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video 1.1
-usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiable. Recraft por fal
+Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video
+usa Cloud (1.2 por defecto); las identidades Developer API no son intercambiables con las Cloud. Recraft por fal
 (23 endpoints) no está conectado.
 
 ### Árbol de decisión — imagen
 
-1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield (CLI con sesión desde 2026-09-24, SVG real aún sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator` (`ai_get_skill illustrator-vector-art`; estado en `higgsfield-provider`). GPT Image y Seedream son **raster siempre**.
+1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield (CLI con sesión desde 2026-09-24, SVG real aún sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator` (`ai_get_skill illustrator-vector-art`; estado en `higgsfield-provider`). Desde 2026-11-05: **GPT Image 2.6 Flare con `pnpm ai:image --format svg`** (SVG limpio verificado; el modelo autor `--svg-model` se cobra aparte, §GPT Image 2.6). GPT Image hasta 2.5 y Seedream son **raster siempre**.
+   **¿Loop animado corto (sticker, micro-loop) y no video?** → **GPT Image 2.6 Flare con `pnpm ai:image --format gif`**
+   (verificado; 640² admite hasta 9 cuadros y a 1024² no cabe una hoja de 2 o más; §GPT Image 2.6).
+   Movimiento de cámara, duración o audio → `motion-design-studio`.
 2. **¿La pieza lleva copy, logo, CTA, precio o legal finales?** → el modelo entrega **sólo el clean plate**;
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
 3. **¿Edición donde la precisión manda o entregable final?** → `gpt-image-2.5-sunburst` en `xhigh`/`max`, #1 en
-   edición en Arena y Artificial Analysis [tercero, 2026-09-07/16]. **¿Editar SÓLO una zona y dejar el resto
+   edición en Arena y Artificial Analysis [tercero, 2026-09-07/16]. En `high`/`xhigh`/`max` 2.6 Sunburst cuesta lo
+   mismo: para una pieza de producción, **compara 2.5 y 2.6 Sunburst en la toma real**; la identidad de personas
+   sigue en 2.5 Sunburst hasta un canario. **¿Corrección dibujada?** → `pnpm ai:image --markup` o trazos rojos sobre
+   la foto, 2.5 o 2.6 (§GPT Image 2.6). **¿Editar SÓLO una zona y dejar el resto
    idéntico?** → **`pnpm ai:inpaint`** (TASK-1965 + TASK-1973), nunca `ai:image --mask` a mano. **Playbook completo
    (intención → comando → modelo → flags → qué mirar al 100 % → costos): [`references/inpainting-and-editing.md`](references/inpainting-and-editing.md).**
    Lo mínimo: máscara con `pnpm ai:mask` (blanco = editable) → el comando recorta, genera, recompone sobre la
@@ -138,18 +144,20 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
    no escala) · `erase` · `move` · `place` (objeto de otra foto) · `background` · `expand` · `video` (`flux3-edit`
    [verificado]). `pnpm ai:layers` (Seedream Layerize sobre cualquier imagen) da máscara por elemento
    (`ai:mask --from-layer`) y clean plate; **las capas nunca son píxeles finales** y **la base se cobra como una capa**.
-   Defaults medidos [verificado 2026-10-02/03]: zona con máscara → **Flare** · 🔴 **Sunburst NUNCA con máscara**
-   (panel negro 3 de 3: el pipeline lo hace editar sin máscara + guía de zona + corrección de color) · **borrar** →
+   Defaults medidos [verificado 2026-10-02/03]: zona con máscara → **Flare** (2.5, o 2.6 PASS 2026-11-05) · 🔴 **Sunburst 2.5 y 2.6 NUNCA con máscara**
+   (panel negro 3 de 3 en 2.5, 1 de 1 en 2.6: el pipeline lo hace editar sin máscara + guía de zona + corrección de color) · **borrar** →
    clean plate con capas (gratis) o **Sunburst por instrucción** (Flare con máscara y Flux Fill dibujan otro objeto;
    Seedream deja fantasma) · **expandir** → **Flux Fill** (`fal:flux-pro-fill`), nunca GPT Image (Flare achica la
    escena, Sunburst copia el espejo). **Reiluminar:** no hay relight conectado (estado en el playbook §7).
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
-   OpenAI recomienda 2.5 para integraciones nuevas [oficial].
+   OpenAI recomienda 2.5 para integraciones nuevas [oficial]. **GPT Image 2.6 no cambia este carril**: cuesta ~4×
+   más en `low` y ~3× en `medium` (cifras en la guía §5.1); explorar e iterar barato sigue en 2.5 Flare, y 2.6 entra
+   por capacidad (SVG, GIF, `complexity`) o por comparación en la pieza final (§GPT Image 2.6).
 5. **¿Necesitas Batch API (mitad de precio) o el contrato fija `gpt-image-2`?** → `gpt-image-2` (único con Batch;
-   el CLI no usa Batch). Ojo: el default del CLI (`gpt-image-2 · high · 1536x1024` ≈ USD 0,165) cuesta lo mismo
-   que 2.5 en `max`.
+   el CLI no usa Batch). Ojo: `gpt-image-2 · high · 1536x1024` (≈ USD 0,165, el default del CLI hasta el 2026-11-05)
+   cuesta lo mismo que 2.5 en `max`; el default del CLI hoy es `gpt-image-2.5-flare`.
 6. **¿Abrir muchos territorios barato o una serie relacionada?** → `seedream5-lite` (USD 0,035/imagen;
    `max_images` 1–6 vía `--input`).
 7. **¿Materialidad, atmósfera, color, look development, fusión multirreferencia orientada a material, cambio
@@ -175,7 +183,7 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
     Foto Efeonce siempre por `design-studio`, ficha + `pnpm foto:prompt` y cine-reviewer; mismo
     canon con cualquier motor. Si las referencias exceden el inline de 20 MiB, preparar copias
     de transporte con procedencia y revisar detalle (Nexa: JPEG98 4:4:4 sin cambio geométrico).
-    El default de `pnpm ai:image` continúa `gpt-image-2`; no se promueve Nano al runtime/Globe.
+    El default de `pnpm ai:image` es `gpt-image-2.5-flare` (desde 2026-11-05); no se promueve Nano al runtime/Globe.
 
 **Rankings: preséntalos con fecha y fuente, sin elegir uno como verdad.** OpenArt Arena imagen (2026-09-16):
 Seedream 5 Pro #1, GPT Image 2 #2, Nano Banana Pro #3. Arena y Artificial Analysis (2026-09-07/16): Sunburst y
@@ -207,6 +215,13 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
   Tabla derivada de la fórmula [inferencia sobre oficial]. `auto` no es estimable. Un tamaño no cuadrado mayor
   puede costar menos que uno cuadrado menor. Editar suma la imagen base como entrada (2,3× en `low`, ~1,04× en
   `max`) [verificado]. Sigue la regla: ninguna cifra entra a una propuesta sin re-medir.
+- **GPT Image 2.6 también es estimable:** `pnpm ai:image --model gpt-image-2.6-* … --estimate` imprime el costo y sale
+  sin llamar a la API; aplica a la grilla 2.5 el factor medido (2.6 cuesta ~4× en `low`, ~3× en `medium` e igual en
+  `high`/`xhigh`/`max`; cifras en la guía §5.1). El GIF no tiene estimación y en SVG sólo se estima el raster de
+  referencia (el modelo autor se cobra aparte) [contrato 2026-11-05].
+- **Quién paga no cambia el precio ni el modelo:** la generación creativa operada por ti se carga al perfil
+  `personal` (`--openai-key personal`) mientras quede crédito; producto y runtime, a la clave de la empresa. Regla
+  completa en §CLI `pnpm ai:image`.
 - **Rate limits de 2.5 publicados, iguales a `gpt-image-2`** [oficial 2026-09-16]: Tier 1 100 000 TPM / 5 IPM ·
   T2 250 000 / 20 · T3 800 000 / 50 · T4 3 000 000 / 150 · T5 8 000 000 / 250.
 - **Seedream en fal** [oficial fal, 2026-09-16]: Pro USD 0,0675 (área ≤ 1536²) · 0,135 (hasta 2048²) + 0,0045 por
@@ -218,9 +233,10 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
 Toda elección de video se hace con `motion-design-studio` → `workflows/engine-selection-by-fidelity-contract.md`
 (contrato de fidelidad por toma). Lo mínimo que debes saber desde esta skill:
 
-**Gemini Omni 1.1 Flash:** `pnpm ai:omni --help` y
-`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo.
-Los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
+**Gemini Omni Flash:** `pnpm ai:omni --help` y
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo. Desde
+2026-11-05 el default es **1.2 Flash** (`gemini-omni-1.2-flash`, GA): clips de hasta 15 s, `--task upscale`
+(borrador 360p/720p → 1080p/4K) y `--previous <id>`; sin clip 1.2 generado todavía. Para 1.1 (`--model 1.1`), los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
 `efeonce-group` el 2026-09-24 a 360p, 16:9 y 3 s; `extend` devolvió 6 s acumulados. `edit` recibe video
 fuente e imagen opcional; **no** se ha probado la cadena `previous_interaction_id`/edición stateful en 1.1.
 720p/1080p/4K, 9:16, continuidad fina, C2PA y factura real siguen sin verificar. La CLI sólo produce
@@ -289,7 +305,7 @@ Cárgala antes de fijar modelo, tamaño, calidad o costo. Lo que esta skill nece
 | Necesitas Batch API (mitad de precio) | `gpt-image-2` | 2.5 no tiene Batch. ⚠️ Corregido 2026-09-16: el costo de 2.5 **sí** es estimable antes de gastar y sus rate limits **sí** están publicados (ver §Elegir modelo) |
 
 **Calidad — el techo subió.** `low · medium · high · xhigh · max · auto` (default `auto`). `xhigh` y `max`
-existen **sólo** en 2.5. Regla de la casa: `low` para exploración, `high` como piso para texto pequeño,
+existen en 2.5 y 2.6 (no en `gpt-image-2`). Regla de la casa: `low` para exploración, `high` como piso para texto pequeño,
 infografía o retrato, y `xhigh`/`max` **sólo** para el entregable final. OpenAI no documenta qué significa cada
 escalón ni cuánto consume; **hay que medirlo** (ver costo abajo).
 
@@ -363,7 +379,9 @@ Método de dirección: `design-studio` → `modules/13_LAYOUT_DESIGN_AND_FINISHI
 ### Patrones de prompt oficiales (guía vigente = abril 2026, escrita para `gpt-image-2`)
 
 ⚠️ Al 2026-09-08 **OpenAI no publicó guía de prompting para 2.5**: la del cookbook está fechada 2026-04-21 y
-escrita para `gpt-image-2`. Cítala como guía de la familia GPT Image, nunca como guía de 2.5.
+escrita para `gpt-image-2`. Cítala como guía de la familia GPT Image, nunca como guía de 2.5. Delta 2026-11-05:
+con 2.6 sí hay guía oficial (`developers.openai.com/api/docs/guides/image-prompting`); sus puntos nuevos están en
+§GPT Image 2.6. Si también aplica a 2.5 es [sin dato].
 
 - **Orden del prompt:** background/escena → sujeto → detalles clave → constraints, más el uso previsto (ad, UI
   mock, infografía) que fija el "modo" y el nivel de acabado. Para pedidos complejos, segmentos etiquetados y
@@ -407,21 +425,206 @@ assets repo-bound.
 - **Compartir prompt** — en móvil: Share → Prompt template → Copy link.
 - Disponible en todos los tiers, web/iOS/Android y Codex. **Los límites de generación por plan NO están
   publicados por OpenAI**; las cifras que circulan en blogs son rumor y no entran a una propuesta.
+- **Con Images 2.6 (2026-11-04), sólo en ChatGPT, sin API** [tercero]: **imágenes de referencia guardadas** (uno
+  mismo, mascotas, personajes) y **edición de GIF cuadro por cuadro**. Sirven para explorar en la app; ninguna tiene
+  equivalente en `pnpm ai:image` ni en la API, así que no las prometas en un flujo repo-bound. Web grounding: [sin dato].
 
-## CLI: `pnpm ai:image` (familia GPT Image, 2.5 incluida)
+## GPT Image 2.6 — Sunburst y Flare (delta de proveedor 2026-11-04; operativo en la CLI desde 2026-11-05)
+
+OpenAI publicó `gpt-image-2.6-sunburst` (*"detailed visual work"*) y `gpt-image-2.6-flare` (*"fast iteration"*) el
+2026-11-04; en ChatGPT y Codex se llama «ChatGPT Images 2.6» [oficial]. No hay id plano `gpt-image-2.6`, no hay tier
+mini y no hay snapshot fechado: el id es el snapshot [oficial]. Tarifas, tokens medidos, latencias, endpoints y
+rankings viven en la guía canónica §5.1 (la matriz `OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` todavía no
+recoge 2.6 al 2026-11-05); esta sección lleva método, ruteo, comandos y trampas. Canarios propios:
+`ai-generations/2026-11-05_gpt-image-2-6-canary/` (API directa y `cli/`).
+
+✅ **`pnpm ai:image` acepta 2.6 desde 2026-11-05 [contrato].** Queda **superseded** la advertencia anterior de esta
+skill («el CLI no acepta 2.6 / pendiente de soporte en el CLI»). Contrato en `src/lib/ai/openai-image.ts`: los dos ids
+2.6 están en el allowlist; una tabla de capacidades por modelo (`complexity`, `svgOutput`, `gifOutput` sólo 2.6,
+`markup` 2.5 y 2.6) y una validación única (`assertOpenAIImageOptionsSupported`) que comparten helper, CLI y
+`ai:inpaint`, así que una opción que el modelo no soporta aborta antes de gastar. El default del CLI y del runtime
+**sigue siendo `gpt-image-2`**: 2.6 se pide explícito con `--model`. `pnpm ai:image --help` trae la tabla «¿2.5 o 2.6?».
+
+**¿2.5 o 2.6?** [decisión propuesta con evidencia 2026-11-05]
+
+| Necesidad | Modelo | Por qué |
+|---|---|---|
+| Explorar / iterar raster en `low` o `medium` | **`gpt-image-2.5-flare`** | 2.6 cuesta ~4× más en `low` y ~3× en `medium` (cifras en la guía §5.1) |
+| Pieza final raster en `high`/`xhigh`/`max` | **2.5 Sunburst o 2.6 Sunburst: comparar en la toma real** | en esas calidades cuestan lo mismo; la calidad relativa no está medida en nuestras piezas |
+| Vector SVG desde un prompt | **2.6 Flare** `--format svg` (Recraft V4.1 como alternativa) | sólo 2.6 genera SVG en la familia GPT Image |
+| GIF animado corto (loop, sticker) | **2.6 Flare** `--format gif` (640² hasta 9 cuadros) | sólo 2.6; movimiento real, cámara o audio → `motion-design-studio` |
+| Edición guiada por marcas (markup o rayado) | **2.6 o 2.5** con `--markup` o con trazos pintados sobre la foto | ambos verificados; la capa markup no suma costo de entrada |
+| Editar una zona con verificación de delta 0 | `pnpm ai:inpaint image` con **Flare** (2.5 default; 2.6 opcional) | Sunburst 2.5 y 2.6 con máscara = panel negro |
+| Identidad de personas (fotografía de marca) | **`gpt-image-2.5-sunburst`** (canon) | identidad en 2.6 sin canario |
+| Texto denso / layouts | 2.6 con `--complexity high` es candidato [oficial, sin medir]; o 2.5 Sunburst | — |
+| Batch API (mitad de precio) | `gpt-image-2` | 2.6 no tiene Batch [oficial] |
+
+**Comandos verificados** (todos corridos vía CLI el 2026-11-05; un agente que opera la corrida pasa
+`--openai-key personal` en `ai:image` y antepone `OPENAI_API_KEY_PROFILE=personal` en `ai:inpaint`, §CLI):
+
+```bash
+# Cotizar sin llamar a la API (imprime el costo con el factor 2.6 y sale)
+pnpm ai:image --openai-key personal --model gpt-image-2.6-flare --quality low --size 1024x1024 \
+  --prompt "…" --estimate
+
+# Raster con complexity (sólo 2.6)
+pnpm ai:image --openai-key personal --model gpt-image-2.6-sunburst --quality low --complexity medium \
+  --size 1536x1024 --prompt "…" --out a.png
+
+# SVG nativo (también se infiere de la extensión .svg de --out)
+pnpm ai:image --openai-key personal --model gpt-image-2.6-flare --format svg --quality low --size 1024x1024 \
+  --prompt "Flat icon …" --out icono.svg
+
+# GIF animado: 640² admite hasta 9 cuadros
+pnpm ai:image --openai-key personal --model gpt-image-2.6-flare --quality low --size 640x640 \
+  --frames 6 --frame-ms 150 --prompt "… seamless loop" --out loop.gif
+
+# Markup: capa de anotaciones aparte, sobre la base
+pnpm ai:image --openai-key personal --model gpt-image-2.6-flare --quality low --complexity low \
+  --image base.png --markup marcas.png \
+  --prompt "Follow the red annotations: … Do not render the annotations. Keep everything else identical." --out edit.png
+
+# Rayado sobre la foto (trazos aplanados, sin --markup)
+pnpm ai:image --openai-key personal --model gpt-image-2.6-flare --quality low --image base-rayada.png \
+  --prompt "Remove the objects scribbled over in red … and the red scribbles. Keep everything else identical." \
+  --out sin-libreta.png
+
+# Zona con máscara y verificación: Flare 2.6 por el pipeline
+OPENAI_API_KEY_PROFILE=personal pnpm ai:inpaint image --image base.png --mask mask.png --prompt "…" \
+  --model gpt-image-2.6-flare --quality low --run <dir>
+```
+
+Flags 2.6 de `ai:image`: `--complexity low|medium|high` (sólo 2.6) · `--format png|jpeg|webp|gif|svg` ·
+`--svg-model <id>` (default `gpt-5.5`) · `--svg-effort none|minimal|low|medium|high|xhigh|max` (default `low`) ·
+`--frames N` (2–64; avisa sobre 16) · `--frame-ms N` (20–2000) · `--markup <png>` (2.5 y 2.6; exige `--image`; no
+combina con `--mask`) · `--compression 0-100` (jpeg/webp) · `--moderation auto|low` · `--estimate`. En SVG y GIF el
+`--background` sólo viaja si lo pasas explícito. La CLI avisa cuando 2.6 en `low`/`medium` cuesta N× su gemelo 2.5.
+
+**Oficio: editar con marcas**
+
+- **Markup (capa aparte)** [verificado en 2.5 Flare, 2.6 Flare y 2.6 Sunburst]: dibuja la corrección en un **PNG
+  transparente del mismo tamaño que la base**, con **trazos rojos** (un óvalo alrededor de lo que cambia más una nota
+  de texto corta, o un boceto a mano alzada de lo que debe aparecer). La CLI valida que tenga alfa y el mismo tamaño,
+  y lo envía como `markup` (no se aplana sobre la base). El prompt nombra la intención y cierra con *"Follow the red
+  annotations: … Do not render the annotations. Keep everything else identical."* El modelo no dibujó las anotaciones
+  en ninguna corrida. La capa **no suma tokens de imagen de entrada**: sólo se cobra la base.
+- **Rayado (marcas aplanadas en la foto)** [verificado 1 de 1 por caso, `low`]: pinta los trazos rojos **directamente
+  sobre la foto** y pásala como `--image`, sin `--markup`. Para borrar: tacha el objeto y pide *"Remove the objects
+  scribbled over in red … and the red scribbles. Keep everything else identical."* (borró una libreta en Flare 2.6 y
+  en Flare 2.5). Para agregar: un boceto rojo de una lámpara pintado sobre la foto se convirtió en lámpara real
+  (Sunburst 2.6). Nombra siempre los trazos en el prompt para que también los quite.
+- 🔴 **Ninguna de las dos recompone ni verifica**: `ai:image` devuelve la imagen que redibujó el modelo, y 2.6 redibuja
+  la imagen entera (deriva media medida fuera de la zona de 12–17/255). Si el resto debe quedar idéntico al píxel,
+  usa `pnpm ai:inpaint` (recompone sobre la original y verifica delta 0) o recompón tú antes de entregar.
+- `ai:inpaint image --sketch` es otro mecanismo (guía compuesta dentro del pipeline con máscara); no lo confundas con
+  `--markup`.
+
+**Oficio: SVG y GIF**
+
+- 🔴 **SVG exige un modelo autor** (`svg.model`): sin él la API responde 400 `missing_required_parameter`
+  [verificado]. La CLI lo resuelve con `--svg-model` (default `gpt-5.5`) y `--svg-effort` (default `low`). El SVG sale
+  estático (sin scripts, recursos externos ni rasters), `n: 1`, sólo en generations [oficial]. El cobro llega en dos
+  líneas: `usage` del raster de referencia (controlado por `--quality`) + **`svg_usage` del modelo autor, que se
+  cobra aparte** a su tarifa; la CLI imprime `svg_usage` y su `--estimate` sólo cubre el raster y avisa del resto.
+- 🔴 **GIF: la hoja interna de cuadros tiene presupuesto de píxeles.** A **1024² no cabe ninguna hoja de 2 o más
+  cuadros** (2, 4 y 9 cuadros → 400; con 9, *"sheet 3072x3072 exceeds pixel budget"*). A **640² salieron 9 cuadros**
+  (y 6 vía CLI); a 816², 2 cuadros [verificado]. Baja el tamaño por cuadro cuando subas cuadros; el área mínima de
+  imagen no aplica al cuadro (640² pasó). `size` es cada cuadro; el loop se describe en el prompt (*"seamless loop"*),
+  no es parámetro; `--frames` 2–64 y `--frame-ms` 20–2000. El GIF **no tiene estimación** de costo en la CLI.
+- **GIF también funcionó en edits** (2 cuadros, 816², sobre una foto, 1 de 1) [verificado], aunque la guía oficial
+  dice *"not supported on edits"*: contradicción; no lo prometas como flujo hasta repetirlo.
+
+**Qué trae de nuevo (resumen)**
+
+| Novedad | Qué hace | Evidencia |
+|---|---|---|
+| `complexity` `low·medium·high` | "Planning effort" separado de `quality`, sin cargo propio; default `high` si se omite. Bajo = ediciones enfocadas; alto = texto denso y layout, con más latencia y riesgo de *"unwanted changes"* | [oficial]; 🔴 `low`/`medium` **no abaratan** (mismos tokens que omitirlo) [verificado 2026-11-05]; efecto en calidad [sin dato] |
+| SVG nativo | ver §Oficio: SVG y GIF | [oficial + verificado 2026-11-05] |
+| GIF animado | ver §Oficio: SVG y GIF; en nuestra org salió en loop infinito aunque la referencia lo marca preview | [oficial + verificado 2026-11-05] |
+| `markup` (edits, 2.5 y 2.6) | anotaciones en capa aparte; no combina con máscara | [verificado 2026-11-05] (la referencia oficial dice sólo 2.5; el changelog, 2.5 y 2.6) |
+| Mejora declarada | Consistencia de edición, preservación de detalle y respuesta a bocetos y anotaciones | [oficial, system card]; no medida por nosotros |
+
+🔴 **Costo: «versión nueva» no es «mismo precio», pero sólo en `low` y `medium`.** Las tarifas por token son idénticas
+a 2.5 [oficial]; 2.6 gasta **~4× más tokens de salida en `low` y ~3× en `medium`**, y en **`high`, `xhigh` y `max`
+cuesta lo mismo que 2.5** [verificado 2026-11-05]. Flare y Sunburst 2.6 gastan lo mismo. La fórmula de grilla de
+§Costo de imagen no reproduce 2.6 por sí sola; `--estimate` aplica el factor medido sobre la grilla 2.5. Cifras en
+la guía §5.1. En la primera corrida, Sunburst 2.6 `medium` fue **más lento** que 2.5 con el mismo prompt, pese al
+"50 % faster" del anuncio.
+
+**Guía de prompting 2.6** [oficial, `https://developers.openai.com/api/docs/guides/image-prompting`] — lo que cambia
+o confirma respecto de §Patrones de prompt oficiales:
+
+- Sunburst es el *"base model for workflows that need more detail or precise edits"*.
+- Secciones rotuladas escena / sujeto / detalles / restricciones, no un párrafo largo.
+- Texto entre comillas con posición y tipografía; deletrear marcas; pedir *"no extra text"*; `medium`/`high` para
+  texto chico. En infografías y charts, revisar etiquetas y relaciones factuales: inventa números.
+- Personaje: referencia reutilizable + rasgos repetidos + *"Do not redesign the character"*.
+- Numerar cada imagen de entrada y darle un rol.
+- Editar: *"change only X"* + lista de lo que se conserva, **un cambio por turno**. Las ediciones repetidas cambian
+  detalles y el prompt no garantiza píxel exacto: se compone sobre la original (eso hace `pnpm ai:inpaint`).
+- *"A drawn checkerboard is not transparency"*: la transparencia se valida decodificando el alfa.
+- *"A higher setting doesn't guarantee a better result"*.
+
+**Trampas**
+
+- 🔴 **Sunburst (2.5 Y 2.6) edita sin máscara; Flare, con máscara.** Sunburst 2.6 con la máscara del pipeline
+  `ai:inpaint` (RGB negro bajo el alfa) devolvió **panel negro** (1 de 1, el pipeline lo detectó y salió REVISAR).
+  **Flare 2.6 por el pipeline: PASS, sin panel** [verificado 2026-11-05]. `ai:inpaint` ya acepta 2.6: manda Flare 2.6
+  con máscara, Sunburst 2.6 sin máscara (como 2.5) y a los modelos con `complexity` les envía `complexity: low`
+  (recomendación oficial para ediciones acotadas; no cambia el costo).
+- 🔴 **Identidad de personas sin canario en 2.6**: la fotografía de marca sigue en `gpt-image-2.5-sunburst` hasta que
+  un canario de identidad diga lo contrario.
+- 🔴 **`complexity: low` no abarata**: úsalo por comportamiento (edición enfocada), nunca como ahorro.
+- **Editar con 2.6 gasta más salida que generar** a igual tamaño y calidad [verificado].
+- **Endpoints**: la ficha sólo declara Images API (generations y edits); Batch, Responses y Chat Completions figuran
+  como no soportados [oficial]. El tool `image_generation` de Responses con `tool.model: "gpt-image-2.6-flare"`
+  respondió 200 en nuestra prueba y `runOpenAIImageTool` acepta `imageModel` [verificado 2026-11-05], pero 2.6 ahí no
+  está garantizado: no se construye encima. `revised_prompt` no viene en Images API.
+- **Gateways**: Azure/Foundry no tiene 2.6 [oficial Microsoft]; fal, OpenRouter (sin SVG, GIF ni markup) e
+  Higgsfield lo listan [tercero]. La ruta canónica sigue siendo OpenAI directo.
+- **Primeros días** [tercero]: SDK y docs con retraso, proxies que descartan `complexity` y una regresión reportada
+  de `complexity` en Responses + `gpt-image-2`. Si un parámetro nuevo «no hace nada», verifica que viajó.
+- **Seguridad no es argumento comercial**: el system card mide en Flare una caída significativa de safe-generation
+  [oficial]. Provenance igual que 2.5 (C2PA + SynthID en ChatGPT, Codex y API) [oficial]: aplica §Provenance.
+- **Lo que no promete**: nada en lo oficial cambia las limitaciones de §«Lo que 2.5 NO mejora» (texto chico, layout
+  con jerarquía, identidad garantizada). Rankings preliminares del 2026-11-04 [tercero]: en Arena no supera a 2.5
+  Sunburst y en Design Arena sale primero; se contradicen y manda la prueba contra el brief.
+
+## CLI: `pnpm ai:image` (familia GPT Image, 2.5 y 2.6 incluidas)
 
 For terminal/operator-driven generation — `product-design-loop` concepts, mockup fixtures, icon/asset batches — use the canonical CLI instead of writing an ad-hoc `scripts/_gen-*.ts`:
 
 ```bash
 pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x1152|WxH] \
               [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] \
-              [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] \
-              [--count N] [--timeout 280000] [--open]
+              [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst|gpt-image-2.6-flare|gpt-image-2.6-sunburst] \
+              [--count N] [--timeout 280000] [--open] [--openai-key personal] [--estimate]
+              # 2.6 / edits: [--complexity low|medium|high] [--format png|jpeg|webp|gif|svg]
+              #   [--svg-model <id>] [--svg-effort none|minimal|low|medium|high|xhigh|max]
+              #   [--frames N] [--frame-ms N] [--markup <png>] [--compression 0-100] [--moderation auto|low]
 pnpm ai:image --prompt-file <path>          # long prompts
 pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
+- 🔴 **Qué clave paga (desde 2026-11-01).** La clave sale de un resolver único (`src/lib/ai/openai-api-key.ts`), el
+  mismo para texto e imagen. Sin perfil paga la **clave de la empresa** (`greenhouse-openai-api-key`); con
+  `--openai-key personal` (o `OPENAI_API_KEY_PROFILE=personal` en el entorno) paga el secreto
+  `greenhouse-openai-api-key-personal`: cuenta OpenAI personal de Julio Reyes, 200 USD de crédito cargados el
+  2026-11-01, que la CLI lee con la cuenta de servicio `greenhouse-portal` (no con tu ADC). **Regla del operador:**
+  - **Generación creativa que corres tú** (piezas, conceptos, pruebas, iteraciones con `ai:image` / `ai:inpaint`, y los
+    wrappers `foto:*` que llaman a `ai:image`) → pasa `--openai-key personal` **explícito en cada comando** mientras
+    quede crédito. `ai:inpaint` y los wrappers no tienen flag: antepón `OPENAI_API_KEY_PROFILE=personal`.
+  - **Producto y runtime** (Vercel, workers, `pnpm dev`, flujos canónicos del portal) → **siempre** la de la empresa.
+    **NUNCA** dejes el perfil como default en `.env.local` (lo leen todos los procesos locales, `pnpm dev` incluido) ni
+    declares `OPENAI_API_KEY_PROFILE` en Vercel, workers o CI.
+  - Si el perfil no resuelve, la corrida **falla** («La clave OpenAI del perfil … no está disponible … No se usó la
+    clave canónica.»): nunca cae a la de la empresa en silencio. Si OpenAI responde **429 / `insufficient_quota`** con
+    el perfil personal, se acabó el crédito: avisa al operador y vuelve a la de la empresa quitando el flag.
+  - Cada imagen termina con `· clave personal` o `· clave default` (y el resultado del helper trae `keyProfile` junto
+    a `secretSource`). **Al reportar una generación, di qué clave pagó.** Probado en real: `--openai-key personal
+    --quality low --size 1024x1024` → `gpt-image-2 · 1024x1024 · low · clave personal`, ≈ USD 0,006. Manual:
+    [`alternar-clave-openai.md`](../../../docs/manual-de-uso/ai-tooling/alternar-clave-openai.md).
 - ✅ **El helper YA transporta la familia 2.5** (delta 2026-09-16, TASK-1851). Queda **superseded** la
   advertencia anterior de esta skill, que decía que 2.5 no se podía probar por ningún camino. Contrato real,
   verificado en `src/lib/ai/openai-image.ts`:
@@ -429,7 +632,7 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
      canónico, verificados contra `GET /v1/models`.
   2. `pnpm ai:image --model gpt-image-2.5-flare` resuelve la **grilla de tamaños moderna** (16:9 → `2048x1152`,
      no `1536x1024`) y **no** envía `input_fidelity`.
-  3. `--quality` acepta `xhigh` y `max`, que existen **sólo** en 2.5.
+  3. `--quality` acepta `xhigh` y `max`, que existen en 2.5 y, desde 2026-11-05, también en 2.6.
 - 🔴 **Las tres puertas de entrada fallan RUIDOSAMENTE, y de eso depende que no pagues un modelo creyendo que
   usas otro.** Un `--model` o un `--quality` inválido **aborta antes de cualquier I/O**; pedir `xhigh`/`max` a un
   modelo anterior a 2.5 aborta al arrancar el CLI con mensaje accionable; y un `OPENAI_IMAGE_MODEL` desconocido
@@ -443,7 +646,14 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
 - OpenAI documents native `background: transparent` for `gpt-image-2` in **preview**, with PNG or WebP. The
   canonical helper/CLI preserves the requested GPT Image 2 identity, rejects transparent JPEG before network I/O
   and never falls back silently to deprecated `gpt-image-1.5`.
-- GPT Image outputs are still **raster**. For real vectors use Higgsfield + Recraft V4.1 (fal slug verified live
+- ✅ **2.6 está en el allowlist desde 2026-11-05** [contrato]: `--model gpt-image-2.6-sunburst|flare` corre, con
+  `--complexity` (sólo 2.6), `--format svg|gif` (sólo 2.6; también por la extensión de `--out`), `--markup` (2.5 y
+  2.6; exige `--image`, PNG con alfa del mismo tamaño, no con `--mask`) y `--estimate`. Una opción que el modelo no
+  soporta aborta antes de gastar (validación única `assertOpenAIImageOptionsSupported`, la misma de `ai:inpaint`).
+  Comandos verificados, flags y oficio en §GPT Image 2.6. `gpt-image-1` se corta antes de la red (apagado
+  2026-10-23) y `gpt-image-1.5` / `gpt-image-1-mini` se cortarán desde 2026-12-01.
+- Through this CLI, GPT Image 2 and 2.5 outputs are **raster**; 2.6 adds native SVG (`--format svg`) and animated GIF
+  (`--format gif`). For other real vectors use Higgsfield + Recraft V4.1 (fal slug verified live
   2026-07-19: `fal-ai/recraft/v4.1/text-to-vector`, text-driven, carries the `fal-ai/` prefix).
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
 - For a slide-integrated, extractable asset, generate on a **uniform studio background**
@@ -883,6 +1093,11 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
   2026-09-16: el costo de 2.5 sí se estima antes de gastar y sus rate limits sí están publicados. Desde 2026-09-16 el helper
   transporta **ambas** familias, así que la elección ya es de necesidad, no de lo que el código soporta.
   `organization-logo-generation.ts` fija `gpt-image-2` a propósito y no se toca sin decisión explícita.
+  **Delta 2026-11-05 — GPT Image 2.6:** el helper y `pnpm ai:image` lo transportan desde 2026-11-05. Explorar e
+  iterar en `low`/`medium` sigue en 2.5 (2.6 cuesta ~4×/~3× más ahí; igual en `high`/`xhigh`/`max`). 2.6 abre SVG
+  nativo y GIF animado, suma `complexity`, y para la pieza final raster se compara contra 2.5 Sunburst en la toma;
+  identidad de personas sigue en 2.5 Sunburst (§GPT Image 2.6). No cambies el default del runtime ni del CLI por el
+  lanzamiento.
   Nunca rutees trabajo nuevo a `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` ni `chatgpt-image-latest`:
   todos deprecados, con apagado en octubre (`gpt-image-1`, **2026-10-23**) o diciembre 2026. Lee la matriz de
   capacidades antes de cambiar modelo, precios o constraints de salida.
@@ -897,12 +1112,12 @@ Marketing con Manzanitas con el roster y perfiles sociales con Nexa; la publicid
   **Nano Banana 2** (`gemini-3.1-flash-image`, vía Vertex con `getGoogleGenAIClient`), sobreescribible con la env
   `GOOGLE_GEMINI_IMAGE_MODEL`; vive sólo en el generador del producto. **`pnpm ai:nano` usa Nano Banana 2.1**
   (`gemini-nano-banana-2.1`) con contrato local independiente; ver [manual](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md)
-  y decisión 12. `pnpm ai:image` conserva OpenAI y default `gpt-image-2`. **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
+  y decisión 12. `pnpm ai:image` conserva OpenAI (default `gpt-image-2.5-flare` desde 2026-11-05). **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
   en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por
   pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni van **directo por Google, nunca por
-  fal** (decisión del operador). La CLI Omni 1.1 Cloud es `pnpm ai:omni`; el slug fal del modelo anterior
+  fal** (decisión del operador). La CLI Omni Cloud es `pnpm ai:omni` (1.2 por defecto); el slug fal del modelo anterior
   (`google/gemini-omni-flash/*`) no es su transporte. Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
   Nano Banana 2 #5.
 - **Grok Imagine imagen v2.0 (xAI): evaluado, no conectado.** `xai/grok-imagine-image/v2.0/{text-to-image,edit}`

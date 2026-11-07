@@ -65,6 +65,17 @@ El operador aprobó el logo de Efeonce Rooms, «eslabón leve»: las dos «o» d
 
 Ejemplo corregido: «Rooms» con la esfera posada donde se cruzan las órbitas («el punto de encuentro») → la misma palabra con la esfera a la 1:30 de la segunda órbita. Motivo: el concepto no puede depender de una lectura que el público no hace. [ADR de la marca](../../../../docs/architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md).
 
+## Efeonce ID: la órbita vive en la D, y lo justo — 2026-11-01
+
+El operador aprobó la marca de Efeonce ID (la cuenta de Efeonce Auth). «ID» no tiene O, así que la órbita vive en la D: asta, **tramo recto** y media órbita, con la esfera Growth a la 1:30.
+
+- **Un nombre sin O se resuelve en la letra que ya tiene una curva**, no con un símbolo nuevo. La panza de una D es media órbita; la de una P, una B o una R también podría serlo (pero nunca una R dentro de una órbita: ®).
+- **La media órbita nace de una recta, no del asta.** Sin tramo recto, el arco sale del asta, deja un muñón entre el asta y la esfera y el anillo fino parece un alambre pegado a una barra gruesa. Con la recta, la letra se lee como letra y el trazo llega a la esfera. No se resuelve engrosando el anillo: 80 y 96 volvían a pesar.
+- **No sumar significado que la silueta ya da.** El operador leyó la D con la esfera como la yema de un dedo; la huella (surcos concéntricos en la panza, órbitas interiores en una órbita vacía) lo explicaba de más y quedó «muy pesada y no tan limpia para el logo e incluso para nuestra línea gráfica». En trazo fino sumaba un tercer grosor y desaparecía bajo 48 px. La línea es «lo justo».
+- **La marca de la cuenta no ocupa el escenario del login.** En la pantalla de entrada de Efeonce Auth va el favicon (isotipo chico) y lo que vive en el formulario (lockup del encabezado, botón «Continuar con Efeonce ID»); el panel lateral es del carrusel de novedades.
+
+Ejemplo corregido: «ID» con media órbita pegada al asta → la misma D con una recta de 110 unidades antes del arco. Motivo: el arco pegado se leía como un alambre y dejaba un trazo accidental arriba. [ADR de la marca](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md).
+
 ## Wave, Reach y Globe: logotipo propio, lockup de familia (H3) — 2026-10-09
 
 El operador llevó Wave, Reach y Globe a la familia: «ya no es Wave solo ni Wave by Efeonce, sino Efeonce Wave». **Cada producto conserva su logotipo; la familia vive en el lockup.**

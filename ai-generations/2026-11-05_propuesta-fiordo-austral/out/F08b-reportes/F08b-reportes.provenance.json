@@ -1,0 +1,15 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "687962e30d65ba4d86525bc5f5da60f0662de48d76bdf0e8a2dc9d0cfdd963db",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-report-formats",
+  "plates": [],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "cover-by-hand-reportes-sin-leyenda-2026-11-06"
+}

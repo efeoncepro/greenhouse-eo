@@ -1,0 +1,48 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "recipe": "method-staircase",
+  "voice": {
+    "eyebrow": "Automatizaciones",
+    "question": "Las alertas y tareas llegan",
+    "answer": [
+      "Solas"
+    ]
+  },
+  "body": "Reglas fijas y auditables para que ningún cliente se enfríe y ninguna oportunidad avance sin aprobación.",
+  "levels": [
+    {
+      "name": "Alerta",
+      "descriptor": "cliente que se enfría"
+    },
+    {
+      "name": "Tarea",
+      "descriptor": "después de cada reunión"
+    },
+    {
+      "name": "Seguimiento",
+      "descriptor": "correo y recordatorio"
+    },
+    {
+      "name": "Aprobación",
+      "descriptor": "antes de avanzar la etapa"
+    },
+    {
+      "name": "Cierre próximo",
+      "descriptor": "aviso al vendedor"
+    }
+  ],
+  "note": "Cada regla queda documentada y se prueba antes de activarla.",
+  "selection": {
+    "target": "level",
+    "level": 1,
+    "label": "Comercial",
+    "participantKind": "department"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

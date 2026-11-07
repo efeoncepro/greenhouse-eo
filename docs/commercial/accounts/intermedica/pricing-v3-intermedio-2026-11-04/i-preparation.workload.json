@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-i-preparation-2026-11-04-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-11-04",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "tracking-prep",
+      "label": "Inventario 2 recorridos, hasta 15 destinos/CTAs, 1 formulario, hasta 6 eventos, tablero y QA",
+      "hoursPerMonth": "24",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-preparation:tracking-prep",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "web-prep",
+      "label": "Correcciones de destinos/CTAs y formulario en sitio existente",
+      "hoursPerMonth": "10",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-preparation:web-prep",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "lead-prep",
+      "label": "Diccionario comercial, estrategia de recorridos y sesion de entrega",
+      "hoursPerMonth": "14",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-preparation:lead-prep",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "tracking",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "tracking-prep",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "web",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "web-prep",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "lead",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "lead-prep",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

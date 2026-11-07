@@ -25,33 +25,32 @@ históricas de este ADR a contratación externa y pareo obligatorio de proveedor
 de cobertura y cierre de hallazgos críticos/altos; el informe declara sus límites y no es certificación de un tercero.
 No autoriza comprar servicios ni implica haber completado la evaluación o desplegado el piloto.
 
-## Control de despliegue preparado en PR, sin integración — 2026-10-26
+## Control de despliegue vigente — 2026-11-01
 
-`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. **Estado: LOCAL+PR,
-retenido por el operador; no es todavía el contrato efectivo del YAML remoto.** PR #263 HEAD `5e1fc2554`
-y PR #264 HEAD `aabd6d78d` siguen abiertas, sin merge ni despliegue. El remoto todavía permite pushes de
-`develop` al servicio único. El control preparado usará sólo pushes a `main`, promoción por `production-release.yml` desde `main` o dispatch
-productivo desde `main`. Al integrarse, todas las vías seleccionarían el Environment `production` y un único lock del
-servicio, sin cancelar un despliegue activo. Este contrato propuesto sustituiría las referencias históricas de este
-ADR a staging sobre el mismo servicio una vez integrado; no declarar esa sustitución aplicada hoy.
+`auth-server` es producción en `auth.efeonce.org`; no existe un servicio Auth staging. El control de despliegue está
+en `main` desde el release `935583f88db0` (2026-11-01) y sustituye las referencias históricas de este ADR a staging
+sobre el mismo servicio. PR #263/#264, que lo preparaban, se cerraron como superadas.
 
-En el control preparado, el SHA completo debe estar publicado en `main` y ser el checkout construido. Antes de crear una revisión,
-el workflow preparado identifica la única revisión con 100% del tráfico y rechaza una fuente desconocida, tráfico
-dividido o reemplazar código vivo no promovido por un target anterior o divergente. Publicar un fix del
-control no promueve el runtime servido desde `develop`: ese caso queda bloqueado antes de build/deploy,
-con error explícito. El release amplio y la activación first-party/OTP siguen siendo decisiones separadas.
+- **Vías:** `.github/workflows/auth-server-deploy.yml` sólo despliega desde push a `main`, desde la promoción por
+  `production-release.yml` o por dispatch productivo desde `main`. Todas usan el Environment `production` y un único
+  lock del servicio, sin cancelar un despliegue activo. Un push a `develop` no despliega Auth.
+- **SHA:** el SHA completo debe estar publicado en `main` y ser el checkout construido.
+- **Tráfico antes de crear la revisión:** el workflow exige una única revisión con 100 % del tráfico y rechaza tráfico
+  dividido o una fuente desconocida.
+- **Commit servido:** debe ser ancestro del objetivo. En un release por squash (`develop`→`main`) no lo es, así que se
+  acepta sólo si es ancestro de la coincidencia de árbol **más antigua** en `origin/develop`. Se rechaza un runtime
+  servido más nuevo y el caso revert (un árbol repetido más tarde). Tests: `scripts/auth-server/test_deploy_contract.py`;
+  incidente: [ISSUE-184](../issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md).
+- **Tráfico tras el deploy:** debe enrutar a la última revisión. Si se fija con `--to-revisions` (rollback o activación
+  manual), el deploy gobernado publica la revisión nueva con 0 %
+  ([ISSUE-185](../issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)). Desde el 2026-11-01 el
+  servicio está en `--to-latest`. Comprobar el tráfico antes de cada dispatch sigue siendo manual; un guard que verifique
+  el tráfico después del deploy es una mejora pendiente.
+- **Montajes OTP:** el deploy retira los montajes de HMAC y autoridad Rooms cuando el flag OTP está OFF. Flags y
+  cohortes conservan sus inputs gobernados (variables de repo GitHub).
 
-El runtime vivo conserva Resend production v1 y Sentry `production`. El drift preparado verificará ambos
-y el deploy preparado retirará los montajes OTP con el flag OFF. Flags y cohorte conservan sus inputs gobernados. La eliminación efectiva
-del disparador de `develop` exige actualizar también su YAML remoto: GitHub evalúa el workflow de la rama
-que recibe el push. Las PR estrechas de control se publican por separado sobre cada base, sin incorporar
-el historial local ni código runtime/UI. Preparar o fusionar esas PR no acredita un deploy: comprobar
-checks, ausencia de build cuando el guard bloquee y revisión con tráfico después de una publicación autorizada.
-Antes de la futura integración de PR #264, proteger de forma gobernada los deploys artifact/commercial/ico/ops
-que coinciden con el nuevo path de test `src/lib/**`; ninguna protección temporal se aplicó ahora.
-Seguimiento CI26Oct: PR #263 y #264 CI completo y Vercel PASS; ambas siguen abiertas por retención humana. La retención no bloquea nueva UI aislada; no autoriza el release #262 ni activación.
-Estado vivo: [readback del 26 de octubre 17:38:40 Chile](../audits/rooms/2026-10-26-docs-skills-state-readback.json).
-Secuencia y retención: [runbook](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+Fusionar o desplegar no acredita un runtime: comprobar checks y hacer readback de la revisión con tráfico (`GIT_SHA`,
+flags, discovery, JWKS, `readyz`). Estado vivo: [ledger de Auth](../../.claude/skills/efeonce-auth/references/program-ledger.md).
 
 ## Contrato vigente de acceso interno y federación
 
@@ -77,6 +76,27 @@ PR225 y el canary interno acreditan el carril real de emisión/lectura/revocaci�
 pantallas Efeonce ID quedaron publicadas y verificadas; el estado mutable de revisión vive en Handoff y en las
 tasks, no en este ADR. TASK-1832 acreditó clientes externos sintéticos, pero su cleanup y la primera cohorte real
 siguen separados. No se declara aquí cierre de TASK-1831/1832 ni disponibilidad general para clientes externos.
+
+## Delta 2026-11-01 — segunda audiencia: Rooms (TASK-2095)
+
+La decisión fijaba una sola audiencia (`https://mcp.efeonce.org/mcp`). Desde la revisión `auth-server-00172-zcn`
+(hotfix acotado PR #267, 2026-11-01) el emisor tiene una segunda: la API de Rooms
+(`https://efeonce-rooms.vercel.app/api/v1`, variable de repo GitHub `AUTH_SERVER_ROOMS_AUDIENCE`; vacía = apagada).
+La pidió la [enmienda D1-bis del carril de agentes de Rooms](rooms/EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01),
+que habilita a un agente a operar Rooms por CLI con el login de una persona interna. El operador la aceptó en
+producción el 2026-11-02.
+
+- **No es un emisor nuevo ni un grant nuevo.** Reutiliza code + PKCE, refresh rotativo con reuso, revocación e
+  introspección. Lo nuevo es la audiencia y dos clientes first-party pre-registrados: `efeonce-rooms-cli` (público)
+  y `efeonce-rooms-resource` (confidencial, solo introspección).
+- **Un token, una audiencia.** El `aud` se deriva de las clases de scope pedidas; mezclar familias se rechaza.
+  Las clases `efeonce.mcp.rooms.*` son restringidas a los clientes que las listan y solo para personas internas.
+- **Rooms sí introspecta.** A diferencia del gateway, Rooms consulta la introspección con caché de 30 s como
+  máximo, así que revocar corta en menos de 30 s. Access token de la audiencia Rooms: 300 s.
+- **La autoridad sobre Rooms la decide Rooms.** El token prueba persona, cliente y clases; Rooms aplica la autoridad
+  de esa persona y el scope solo la recorta.
+
+Contrato técnico: [OAuth Contract §Delta 2026-11-01](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#delta-2026-11-01--segunda-audiencia-rooms-task-2095).
 
 ## Context
 

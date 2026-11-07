@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "the edge of a white sillar arcade column",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "arequipa",
+ "input": {
+  "id": "arequipa",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Plaza de Armas of Arequipa, Peru, seen from inside one of its white sillar stone arcades (portales)",
+  "escena": "from the shade of the white volcanic-stone arcade, the bright plaza with palm trees opens outside and, far behind, the cone of El Misti volcano rises against a clean blue sky; a woman traveler walks along the arcade toward the light, at medium distance. It must read as a historic centre of white volcanic stone, not any colonial plaza",
+  "hora": "close to midday with the sun high over the sillar",
+  "clima": "clear sky, open shadows inside the arcade, highlights of the white stone and sky retained",
+  "primerPlano": "the edge of a white sillar arcade column",
+  "borde": "lower-left corner",
+  "refLugar": "the Plaza de Armas of Arequipa: its cathedral, palm trees and the position and shape of El Misti behind it",
+  "prohibir": "snow on El Misti not present in the reference, changing the real proportion or position of the volcano relative to the plaza, readable shop signs",
+  "extra": "SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

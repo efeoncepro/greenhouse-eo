@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "el canto de una columna de sillar",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "yanahuara",
+ "input": {
+  "id": "yanahuara",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Mirador de Yanahuara, Arequipa, Perú, con el Misti",
+  "escena": "la galería de arcos de sillar blanco del Mirador de Yanahuara vista en diagonal, con el Misti enmarcado entre dos arcos y la ciudad baja de techos claros a sus pies; la viajera, de pie bajo uno de los arcos, mira hacia el volcán. Debe leerse como el mirador real: arcos de piedra volcánica blanca, no una arquería genérica. Personas: la viajera a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; otros visitantes, si aparecen, lejanos y en acciones espontáneas; ningún rostro identificable en primer plano",
+  "hora": "final de la tarde, con el sol bajo calentando el sillar (la hora que recomienda el relato)",
+  "clima": "cielo despejado; luz cálida abundante, sombras abiertas bajo los arcos, altas luces del cielo y del sillar conservadas",
+  "primerPlano": "el canto de una columna de sillar",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin inscripciones legibles inventadas en los arcos, sin rótulos de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin cambiar la posición real del Misti respecto del mirador, sin nieve inventada en el volcán si la referencia no la tiene",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "Mirador de Yanahuara, Arequipa, Perú, con el Misti (its real forms, scale and spatial relationships)"
+ }
+}

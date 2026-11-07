@@ -18,14 +18,14 @@
     "graphic_signature_verified": true,
     "attendees": "Julio organizer; Katia only external attendee, reply sender .ec",
     "attendee_response": "none_at_readback",
-    "status": "invitation_sent_acceptance_pending",
+    "status": "discovery_completed_case_v1_validated",
     "supersedes_operational_next_step_of": "indecaucho_document_signal_2026_10_26",
-    "next_step": "Attend discovery 27Oct14:30Chile; recover HubSpot/Notion transcript after meeting and update business case with evidence. One focal review scheduled27Oct16Chile; no generic follow-up, reenrollment or proposal send.",
+    "next_step": "Review media assumptions, cost and approve fee with Pricing, prepare proposal for29-30Oct. Confirm Kommo aggregates, technical documentation, assessor capacity/channel rules and buying criteria. No new outbound or additionalCRM authorized by this review.",
     "new_deal_or_stage_change": false,
     "research": "three authorized subagents; public brand/product documents, market reference mechanisms, digital demand and methodology; facts versus selfclaims versus hypotheses; no private analytics",
     "account_dossier": "../accounts/indecaucho-armor/README.md",
     "business_case": "../accounts/indecaucho-armor/CASO-DE-NEGOCIO.md",
-    "business_case_version": "v0_pre_discovery",
+    "business_case_version": "v1_post_discovery_validated_2026_10_27",
     "meeting_playbook": "../accounts/indecaucho-armor/REUNION-2026-10-27.md",
     "attendee_response_readback_at": "2026-10-26T17:40:33Z",
     "confirmation_email": {
@@ -43,20 +43,34 @@
       "Notion"
     ],
     "transcript_source_confirmation_date": "2026-10-26",
-    "transcript_read": false,
+    "transcript_read": true,
     "post_meeting_review": {
       "automation_id": "armor-leer-discovery-y-completar-caso",
       "kind": "thread heartbeat",
-      "status": "ACTIVE_at_configuration_readback",
+      "status": "executed_completed_automation_deleted",
       "scheduled_local": "2026-10-27T16:00:00-03:00",
       "scheduled_utc": "2026-10-27T19:00:00Z",
       "occurrences": 1,
       "prompt_scope": "read accessible HubSpot/Notion meeting transcript and update internal business case and exact existing TASK119625704196; no outbound or other CRM changes",
       "configuration_verified": true,
-      "execution_verified": false,
+      "execution_verified": true,
       "protocol": "../accounts/indecaucho-armor/POSTREUNION.md",
       "allowed_crm_write": "Only existing TASK119625704196:read first, update body/status/internal review date if meeting changes, then readback; no new tasks, email, Deal/Lead or stage.",
-      "task_id": "119625704196"
+      "task_id": "119625704196",
+      "completed_at": "2026-10-27T19:05:36+00:00",
+      "case_already_prepared_before_review": true,
+      "case_rewritten": false,
+      "validation_note": "../accounts/indecaucho-armor/POSTREUNION.md#validación-programada-del-2710--1600-chile",
+      "automation_deleted": true,
+      "automation_delete_confirmed": true,
+      "task_status_readback": "COMPLETED",
+      "body_and_fields_readback": true,
+      "owner_due_type_priority_preserved": true,
+      "key_attribution_limits": [
+        "Kommo name ambiguous in transcript; prior Julio clarification retained",
+        "Media budget and forecasts are internal scenarios, not buyer approval",
+        "90daypilot, LinkedInAds and GoogleAds, audiences and proposal deadline confirmed; delivery scope details remain proposed"
+      ]
     },
     "global_followup_scheduler_status": "PAUSED_observed_and_preserved",
     "crm_closeout": {
@@ -64,7 +78,7 @@
       "note_id": "119606905700",
       "task_id": "119625704196",
       "owner_id": "75788512",
-      "task_status": "NOT_STARTED",
+      "task_status": "COMPLETED",
       "task_type": "TODO",
       "task_priority": "MEDIUM",
       "task_due_utc": "2026-10-27T19:00:00Z",
@@ -74,8 +88,32 @@
       "contact_and_company_associations_verified_for_both": true,
       "existing_historical_note_preserved": true,
       "email_activity_duplicated": false,
-      "readback_recorded_at": "2026-10-26T18:01:20+00:00"
-    }
+      "readback_recorded_at": "2026-10-26T18:01:20+00:00",
+      "latest_task_readback_recorded_at": "2026-10-27T19:05:36+00:00"
+    },
+    "recipient_preferred_name": "Vanessa",
+    "recipient_name_source": "self-introduction transcript utterance6 at00:40; no CRM rename",
+    "meeting_realization_verified": true,
+    "meeting_activity_id": "119610757452",
+    "transcript_id": "4193705736",
+    "transcript_status": "READY",
+    "transcript_utterances_available": 104,
+    "transcript_coverage_millis": {
+      "first": 9680,
+      "last": 938642
+    },
+    "transcript_sources_reconciled": [
+      "HubSpot meeting transcript",
+      "Notion meeting notes/transcript; same recording"
+    ],
+    "audio_reviewed": false,
+    "proposal_delivery_commitment": {
+      "source": "Julio at14:54",
+      "earliest": "2026-10-29",
+      "latest": "2026-10-30",
+      "is_buyer_budget_approval": false
+    },
+    "shortlist_presentation_planned": "2026-11-04"
   },
   "indecaucho_document_signal_2026_10_26": {
     "snapshot_only": true,
@@ -147,7 +185,7 @@
     "evidence": "runs/2026-10-18-indecaucho-katia-hubspot.md"
   },
   "schema_version": 1,
-  "observed_at": "2026-10-23T19:09:01.988888+00:00",
+  "observed_at": "2026-10-26T12:14:03.851974+00:00",
   "timezone": "America/Santiago",
   "automation": {
     "id": "seguimiento-comercial-plazos-y-pr-ximos-pasos",
@@ -167,65 +205,46 @@
   "notion_task_data_source_id": "2a539c2f-efe7-8177-a02d-000b4e8604c0",
   "owner_notion_id": "98be6859-4b84-4dee-a8f2-5546d770c44b",
   "coverage": {
-    "cut": "2026-10-23-1600",
-    "hubspot_portal_id": "48713323",
-    "pipelines": 2,
-    "deals_total": 297,
-    "deals_pages": [
-      100,
-      100,
-      97
+    "status": "partial_crm_blocked",
+    "hubspot_deals_fresh": 0,
+    "hubspot_tasks_fresh": 0,
+    "hubspot_leads_fresh": 0,
+    "hubspot_inventory_complete": false,
+    "hubspot_last_complete_inventory_at": "2026-10-23T19:09:01.988888+00:00",
+    "hubspot_blockers": [
+      "MCP reauthentication required",
+      "CLI AUTH_TOKEN_EXPIRED",
+      "UI portal48713323 blocked for overdue invoice814356022"
     ],
-    "open_deals": 72,
-    "closed_deals": 222,
-    "deals_without_stage": 3,
-    "tasks_owner_all_states_before_write": 217,
-    "tasks_pages": [
+    "outlook_messages": 379,
+    "outlook_message_pages": [
       100,
       100,
-      17
+      100,
+      79
     ],
-    "tasks_created": 1,
-    "tasks_updated_unique": 6,
-    "task_write_operations": 7,
-    "tasks_independent_readbacks": 7,
-    "task_association_readbacks": 21,
-    "leads_modified_since": "2026-10-08T00:00:00Z",
-    "leads_recent": 231,
-    "leads_pages": [
-      100,
-      100,
-      31
-    ],
-    "outlook_received_since": "2026-10-21T12:15:00Z",
-    "outlook_messages": 326,
-    "outlook_pages": [
-      100,
-      100,
-      100,
-      26
-    ],
-    "outlook_last_message_observed": "2026-10-23T18:58:15Z",
-    "sentitems": 46,
-    "sentitems_since": "2026-10-21T12:15:00Z",
-    "drafts_before_write": 58,
-    "drafts_filter": "none; complete folder",
-    "drafts_created": 0,
-    "drafts_updated": 0,
-    "notion_owner_all_states": 86,
-    "calendar_fresh_read": false,
-    "licitalab_fresh_fiches": 12,
-    "mercadopublico_direct_calendars": 1,
+    "outlook_window_start": "2026-10-21T19:00:00Z",
+    "outlook_sent_messages": 37,
+    "outlook_sent_complete": true,
+    "outlook_drafts": 59,
+    "outlook_drafts_complete": true,
+    "notion_owner_tasks": 86,
+    "notion_owner_tasks_complete": true,
+    "licitalab_fiches": 10,
+    "mercadopublico_fiches": 2,
+    "mercadopublico_failed_fiches": 1,
     "wherex_authenticated_read": false,
     "linkedin_fresh_read": false,
+    "calendar_fresh_read": false,
+    "sequences_fresh_read": false,
     "base_documents_complete_review": false,
     "limitations": [
-      "Todos los Deals y TASK de Julio paginados. Leads modificados desde8Oct más investigación/acciones históricas, no todo histórico.",
-      "Wherex ficha bloqueada por login; avisos recibidos sí revisados. CMF estado actual no confirmado.",
-      "Foros, originales y contratos no auditados integralmente en esta corrida; no GO inferido.",
-      "Saldo vivo factura HubSpot no verificado; acceso funcional no prueba pago.",
-      "Calendario no releído esta tarde, lectura matinal permanece histórica. Secuencias no reauditadas ni activadas.",
-      "SKY: metadata PDF y Enviados verifican envío, contenido binario no abierto; no recepción humana ni aceptación acreditadas."
+      "CRM inventory, task dedupe and native long-term read blocked; zero fresh reads does not mean zero records.",
+      "Wherex425935 login redirect and subsequent CDP timeout; email and repo evidence only.",
+      "Ñuble official webpage inaccessible; LicitaLAB deadline read fresh.",
+      "No complete reread of bases/foro/attachments and no GO inferred.",
+      "Calendar/LinkedIn not rechecked; mail window is not all-channel coverage.",
+      "Notion histories can be stale against newer sent messages; preserved without commercial duplication."
     ]
   },
   "actions": [
@@ -264,8 +283,11 @@
       "last_content_readback_at": "2026-10-13T19:15:09.136075+00:00",
       "associations_verified_at": "2026-10-13T19:15:09.136075+00:00",
       "alert_suppressed_until": "2027-04-06",
-      "retrieved_by_native_id_this_run": true,
-      "review_execution_observed": false
+      "retrieved_by_native_id_this_run": false,
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended",
+      "last_retrieval_attempt_at": "2026-10-26T12:14:03.851974+00:00",
+      "retrieval_blocker": "Account suspended; keep23Oct readback historical"
     },
     {
       "key": "followup:65806293639:indap",
@@ -767,7 +789,8 @@
       "legacy_notion_task_id": "3f339c2f-efe7-8103-af22-f97a2c787968",
       "legacy_notion_task_status": "Sin empezar",
       "action_kind": "internal_commercial_followup",
-      "sent_observed_at": "2026-10-19T21:17:43Z"
+      "sent_observed_at": "2026-10-19T21:17:43Z",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65757239717:tvn",
@@ -794,7 +817,8 @@
       "owner_hubspot_id": "75788512",
       "last_content_readback_at": "2026-10-19T12:04:06Z",
       "associations_verified_at": "2026-10-19T12:04:06Z",
-      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-0900.md"
+      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-0900.md",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:63837046880:mineduc",
@@ -860,7 +884,8 @@
         ]
       },
       "last_sent_at": "2026-10-22T22:05:43Z",
-      "next_action": "Revisar respuesta y agenda26Oct10Chile; no repetir correo ni asumir reunión aceptada."
+      "next_action": "Revisar respuesta y agenda26Oct10Chile; no repetir correo ni asumir reunión aceptada.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65806491771:yanbal",
@@ -913,11 +938,11 @@
       "key": "followup:65832889458:olivos",
       "deal_id": "65832889458",
       "tender_id": null,
-      "title": "Olivos del Sur — esperar revisión interna; secuencia autorizada existente",
+      "title": "Olivos del Sur — esperar señal del comprador; secuencia pausada",
       "internal_due": "2026-10-13T13:00:00.000Z",
       "notion_task_id": "3f339c2f-efe7-816a-ac13-e481cac46a1d",
       "notion_url": "https://app.notion.com/p/3f339c2fefe7816aac13e481cac46a1d",
-      "status": "waiting_internal_buyer_review",
+      "status": "waiting_buyer_signal_sequence_paused",
       "write_status": "verified",
       "draft_location": "notion_task",
       "last_task_status_readback_at": "2026-10-13T12:22:10.969518+00:00",
@@ -954,13 +979,14 @@
         "manual_followup_pending": false
       },
       "notion_status": "En curso",
-      "last_followup_summary": "Seguimiento enviado21Oct10:19Chile; respuesta10:39 acusa revisión interna sin reunión/brief/plazo. Secuencia posterior autorizada317665660 para29Oct/12Nov/3Dic; contacto inscrito confirmado porMCP. No duplicar seguimiento manual ni modificar secuencia. Histórico Notion conservado sin migración.",
+      "last_followup_summary": "Aplicación autorizada25Oct: Emily secuencia317665660 pausada; esperar que identifique oportunidad. No reactivar por calendario. Fuente documental25Oct, no readbackCRM26Oct.",
       "last_content_readback_at": "2026-10-13T12:22:10.969518+00:00",
       "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00",
-      "communications_status": "authorized_sequence_no_manual_duplicate",
+      "communications_status": "paused",
       "sequence_id": "317665660",
       "next_sequence_step_santiago": "2026-10-29T11:34:00-03:00",
-      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-1600.md"
+      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-1600.md",
+      "last_documentary_review_at": "2026-10-26T12:14:03.851974+00:00"
     },
     {
       "key": "followup:65718062956:berel",
@@ -1473,7 +1499,8 @@
       "next_internal_review_on": "2026-10-22",
       "action_kind": "internal_review",
       "deadline_type": "internal_proposed_no_external_deadline",
-      "last_outreach_at": "2026-10-21T16:56:38Z"
+      "last_outreach_at": "2026-10-21T16:56:38Z",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:delivery:sky-blog-access",
@@ -1554,7 +1581,7 @@
       "last_followup_summary": "Res403/22Oct publicada; fragmentos pp2–5,8–9: C2=20.000sesiones;70/30sobrebruto;30%incluyetodofee;netoenportal/bruto<=23.5M;60–90días;experienciaconrespaldoejecución;landingINAPI/mediciónproveedor. Falta lectura integral. Cierre2Nov16Chile. No pedir respuestas ya publicadas ni crear duplicado Notion.",
       "last_task_status_readback_at": "2026-10-12T19:12:40.457626+00:00",
       "tender_source_is_closed": false,
-      "deadline_last_readback_at": "2026-10-23T12:15:21.602168+00:00",
+      "deadline_last_readback_at": "2026-10-26T12:14:03.851974+00:00",
       "tender_is_closed": false,
       "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00",
       "official_tender_status": "Publicada",
@@ -1619,7 +1646,8 @@
       "legacy_notion_role": "historical; existing HubSpot task reused, no Notion migration/write this run",
       "review_execution_observed": false,
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "socialcare2027:56549453888:operation",
@@ -1647,7 +1675,8 @@
       "legacy_notion_role": "historical; existing HubSpot task reused, no Notion migration/write this run",
       "review_execution_observed": false,
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "socialcare2027:56549453888:brief",
@@ -1675,7 +1704,8 @@
       "legacy_notion_role": "historical; existing HubSpot task reused, no Notion migration/write this run",
       "review_execution_observed": false,
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "socialcare2027:56549453888:pricing",
@@ -1703,7 +1733,8 @@
       "legacy_notion_role": "historical; existing HubSpot task reused, no Notion migration/write this run",
       "review_execution_observed": false,
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65871170058:socopur",
@@ -1800,7 +1831,7 @@
       "tender_source_status": "Publicada",
       "last_content_readback_at": "2026-10-13T12:22:10.969518+00:00",
       "tender_source_is_closed": false,
-      "deadline_last_readback_at": "2026-10-23T12:15:21.602168+00:00",
+      "deadline_last_readback_at": "2026-10-26T12:14:03.851974+00:00",
       "tender_is_closed": false,
       "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00"
     },
@@ -1824,7 +1855,7 @@
       "question_deadline_candidate": "2026-10-13T23:59:00-03:00",
       "question_deadline_certainty": "Derived from publication05Oct and eight calendar days in bases pp9-10; exact portal calendar not independently read",
       "external_deadline_kind": "offer_close_not_question_close",
-      "deadline_last_readback_at": "2026-10-23T12:15:21.602168+00:00",
+      "deadline_last_readback_at": "2026-10-26T12:14:03.851974+00:00",
       "tender_is_closed": false,
       "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00"
     },
@@ -1872,7 +1903,7 @@
       "deadline_source": "https://app.licitalab.cl/search/details/1591-19-LP26",
       "tender_source_status": "Publicada",
       "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00",
-      "deadline_last_readback_at": "2026-10-23T12:15:21.602168+00:00",
+      "deadline_last_readback_at": "2026-10-26T12:14:03.851974+00:00",
       "official_tender_status": "Publicada",
       "deadline_timezone_note": "America/Santiago operational reference; page does not explicitly label timezone",
       "questions_deadline_local_displayed": "2026-10-19T23:59:00",
@@ -1888,16 +1919,20 @@
       "notion_url": "https://app.notion.com/p/3f839c2fefe78125861cd348578f7ceb",
       "write_status": "verified",
       "draft_location": null,
-      "title": "HubSpot — conciliar factura y prevenir suspensión comercial",
+      "title": "HubSpot — resolver suspensión por factura 814356022",
       "internal_due": "2026-10-14T15:00:00.000Z",
       "notion_status": "Sin empezar",
-      "status": "todo",
-      "last_followup_summary": "Clave: followup\\:ops\\:hubspot-814356022. Aviso oficial13Oct: factura814356022 USD1.296 con15días atraso y suspensión anunciada23Oct si no hay registro. Conciliar pago o comprobante con Finanzas; validar estado en facturación oficial. Riesgo para acceso comercial y secuencias; correo no acredita saldo vivo ni autoriza pago. Revisión interna14Oct12, no plazo del proveedor.",
+      "status": "account_suspended_requires_operator_action",
+      "last_followup_summary": "26Oct09Chile: suspensión efectiva confirmada en UI de Cuenta y facturación y aviso oficial. Factura814356022 USD1296 vencida28Sep; UI advierte no incluir créditos recientes. Conciliar pago/comprobante con Finanzas hoy. MCP/CLI no autenticados y CRM inaccesible. Misma tareaNotion actualizada y releída, plazo interno vencido preservado. Sin pagos ni envíos.",
       "last_task_status_readback_at": "2026-10-13T12:22:10.969518+00:00",
       "external_deadline": "2026-10-23",
       "deadline_precision": "date_only",
       "deadline_source": "Official HubSpot billing warning email 13Oct; current balance not independently verified",
-      "last_notion_status_readback_at": "2026-10-22T19:10:01.246921+00:00"
+      "last_notion_status_readback_at": "2026-10-26T12:14:03.851974+00:00",
+      "last_content_readback_at": "2026-10-26T12:14:03.851974+00:00",
+      "billing_source": "https://app.hubspot.com/account-and-billing/48713323/overview",
+      "billing_observed_at": "2026-10-26T12:14:03.851974+00:00",
+      "payment_verified": false
     },
     {
       "key": "followup:company:30825221458:sky1450-award",
@@ -1929,7 +1964,8 @@
           "30825221458"
         ],
         "deals": []
-      }
+      },
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65718062956:berel-postmeeting-20261013",
@@ -1963,7 +1999,8 @@
         ]
       },
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-0900.md",
-      "deadline_type": "internal_proposed_no_external_deadline"
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:lead:5504-368-COT26",
@@ -2008,7 +2045,8 @@
       ],
       "source_coverage_note": "LicitaLAB recovered; independent buyer award/OC not read",
       "next_action": "Conciliar resultado; no preparar nueva postulación a este proceso cerrado.",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:lead:564162-1037-COT26",
@@ -2039,7 +2077,8 @@
       "tender_is_closed": false,
       "tender_source_is_closed": false,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-1600.md",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65950672644:subdere-admisibilidad",
@@ -2078,7 +2117,8 @@
       "tender_is_closed": true,
       "tender_source_is_closed": true,
       "deadline_last_readback_at": "2026-10-23T19:09:01.988888+00:00",
-      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida."
+      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65958079532:tarapaca-linea2-foro",
@@ -2116,7 +2156,8 @@
       "tender_is_closed": true,
       "deadline_last_readback_at": "2026-10-20T19:14:19.399234+00:00",
       "deadline_source": "LicitaLAB CLI20Oct16h; direct MP afternoon unavailable",
-      "external_deadline": "2026-10-20T18:00:00Z"
+      "external_deadline": "2026-10-20T18:00:00Z",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65948666534:ubb-calificacion",
@@ -2141,7 +2182,8 @@
       "deal_id": "65948666534",
       "review_execution_observed": false,
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-0900.md",
-      "submission_status": "unverified_no_receipt_in_reviewed_window"
+      "submission_status": "unverified_no_receipt_in_reviewed_window",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65969254199:energia-sharepoint-gate",
@@ -2164,7 +2206,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-1600.md",
       "deal_id": "65969254199",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65952374446:memoria-pacifico-gate",
@@ -2187,7 +2230,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-1600.md",
       "deal_id": "65952374446",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:27779623513:forus-bounce",
@@ -2210,7 +2254,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-0900.md",
       "company_id": "27779623513",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65970954279:teva-admisibilidad",
@@ -2233,7 +2278,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-0900.md",
       "deal_id": "65970954279",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:59204233570:uniminuto-brief",
@@ -2256,7 +2302,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-0900.md",
       "company_id": "59204233570",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:59209671002:heineken-capacidad",
@@ -2279,7 +2326,8 @@
       "draft_location": null,
       "source_report": "docs/commercial/follow-up-agent/runs/2026-10-14-0900.md",
       "company_id": "59209671002",
-      "review_execution_observed": false
+      "review_execution_observed": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:59098790832:care-0705-gate",
@@ -2308,7 +2356,8 @@
       "radar_active": false,
       "decision": "NO-BID",
       "communications_status": "stopped",
-      "decision_source": "docs/commercial/prospecting-agent/runs/2026-10-15-0858.md"
+      "decision_source": "docs/commercial/prospecting-agent/runs/2026-10-15-0858.md",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65718150708:partner-meeting",
@@ -2344,7 +2393,8 @@
           "65718150708"
         ]
       },
-      "deadline_type": "internal_proposed_no_external_deadline"
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:62535094842:pilar-blog-meeting",
@@ -2386,7 +2436,8 @@
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-0900.md",
       "audit_sent_at": "2026-10-23T15:36:09Z",
       "audit_attachment_verified": true,
-      "current_required_action": "Confirmar recepción humana y coordinar accesos/recuperación; no repetir entrega."
+      "current_required_action": "Confirmar recepción humana y coordinar accesos/recuperación; no repetir entrega.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:longavi-4085-482-483:decision-prorroga",
@@ -2416,7 +2467,8 @@
       "internal_due_utc": "2026-10-14T21:00:00Z",
       "deadline_freshness": "COT last read14Oct;15Oct403. No loss/submission inferred.",
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65718062956:partner-meeting",
@@ -2448,7 +2500,8 @@
         ],
         "contacts": [],
         "companies": []
-      }
+      },
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:34264439413:licitacion-1541-calificacion",
@@ -2514,7 +2567,8 @@
       "submission_pending": false,
       "deadline_requires_submission_action": false,
       "submission_reconfirmed_by_user_on": "2026-10-22",
-      "alert_suppression_reason": "Oferta presentada20Oct; cierre general del proceso no requiere nueva presentación. Reactivar ante requerimiento observado o revisión interna26Oct."
+      "alert_suppression_reason": "Oferta presentada20Oct; cierre general del proceso no requiere nueva presentación. Reactivar ante requerimiento observado o revisión interna26Oct.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:87929193780:anam-acceso-20261015",
@@ -2540,7 +2594,8 @@
       "draft_location": "hubspot_task_body",
       "draft_status": "prepared_not_sent_requires_ticket_status_check",
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-19-1600.md",
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65972505911:ufro-salud-mental-gate",
@@ -2570,7 +2625,8 @@
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-16-1600.md",
       "official_tender_status": "Cerrada",
       "submission_status": "unverified_no_receipt_in_reviewed_window",
-      "deadline_timezone_note": "America/Santiago operational reference; page does not explicitly label timezone"
+      "deadline_timezone_note": "America/Santiago operational reference; page does not explicitly label timezone",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65806299318:sernageomin-licencias-gate",
@@ -2600,7 +2656,8 @@
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-16-1600.md",
       "official_tender_status": "Cerrada",
       "submission_status": "unverified_no_receipt_in_reviewed_window",
-      "deadline_timezone_note": "America/Santiago operational reference; page does not explicitly label timezone"
+      "deadline_timezone_note": "America/Santiago operational reference; page does not explicitly label timezone",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:30825221458:sky-1547-gate",
@@ -2639,7 +2696,8 @@
       },
       "deadline_last_readback_at": "2026-10-21T12:20:42Z",
       "capability_policy": "docs/operations/EFEONCE_LOCAL_PRODUCTION_CAPABILITY_V1.md",
-      "deadline_type": "internal_proposed_no_external_deadline"
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65832650852:puelche-licencias-gate",
@@ -2682,7 +2740,8 @@
         "contacts": [],
         "companies": []
       },
-      "external_status": "Cerrada"
+      "external_status": "Cerrada",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:company:39129628052:simoniz-113-rfi",
@@ -2730,7 +2789,8 @@
         "companies": [
           "39129628052"
         ]
-      }
+      },
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65739892553:partner-update",
@@ -2761,7 +2821,8 @@
         "deals": [
           "65739892553"
         ]
-      }
+      },
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:66450601027:proposal-review",
@@ -2804,7 +2865,8 @@
       "submission_observed_at": "2026-10-20T21:11:31Z",
       "next_internal_review_on": "2026-10-23",
       "quote_expiry": "2026-11-04",
-      "quote_expiry_is_buyer_deadline": false
+      "quote_expiry_is_buyer_deadline": false,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:256566833779:email-bounce-review",
@@ -2845,7 +2907,8 @@
       "associations_readback_verified": true,
       "linkedin_inmail_sent_at": "2026-10-20T17:44:00-03:00",
       "linkedin_fresh_readback_this_run": false,
-      "next_internal_review_on": "2026-10-26"
+      "next_internal_review_on": "2026-10-26",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:238290900361:lol-credit-review",
@@ -2878,7 +2941,8 @@
         "companies": [],
         "deals": []
       },
-      "associations_readback_verified": true
+      "associations_readback_verified": true,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:256738197623:izipay-bounce-review",
@@ -2916,7 +2980,8 @@
         "deals": []
       },
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-1600.md",
-      "last_followup_summary": "<h3>Actualización 21/10/2026 · corte 16:00 Chile</h3><p>Actualización posterior: Iris respondió RFQ001 y Julio confirmó interés a las 11:49 Chile. Iris, Ariana y Diego muestran hs_sequences_is_enrolled=false en lectura fresca; no siguen inscritos como decía el histórico de esta tarea. Laura permanece sin reintento; propiedad de inscripción ausente hoy no prueba false, expediente documenta cero inscritos. No adivinar correo ni reinscribir. La admisión/documentos del proceso se revisa por tarea separada; no duplicar la confirmación enviada.</p>"
+      "last_followup_summary": "<h3>Actualización 21/10/2026 · corte 16:00 Chile</h3><p>Actualización posterior: Iris respondió RFQ001 y Julio confirmó interés a las 11:49 Chile. Iris, Ariana y Diego muestran hs_sequences_is_enrolled=false en lectura fresca; no siguen inscritos como decía el histórico de esta tarea. Laura permanece sin reintento; propiedad de inscripción ausente hoy no prueba false, expediente documenta cero inscritos. No adivinar correo ni reinscribir. La admisión/documentos del proceso se revisa por tarea separada; no duplicar la confirmación enviada.</p>",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:159750086264:aws-operating-call",
@@ -2952,7 +3017,8 @@
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-1600.md",
       "last_followup_summary": "<h3>Actualización 21/10/2026 · corte 16:00 Chile</h3><p>Borrador existente de la mañana corregido en Outlook UI el 21/10 16h: párrafos separados y firma gráfica oficial canónica antes del historial; CCO HubSpot y destinatario José se conservan. No enviado. La firma textual histórica de abajo queda superada: política vigente exige firma gráfica para todos los correos. Usar el borrador guardado, no copiar la firma textual del histórico. Confirmar disponibilidad y revisar SmartHub, primer cliente y condiciones; relación activa no prueba crédito aprobado ni acceso AWS habilitado.</p>",
       "draft_signature": "official_graphical",
-      "draft_readback_at": "2026-10-21T19:14:03.369565+00:00"
+      "draft_readback_at": "2026-10-21T19:14:03.369565+00:00",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:256183808584:ingram-google-onboarding",
@@ -2983,7 +3049,8 @@
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-21-1600.md",
       "last_followup_summary": "<p>Clave: followup:256183808584:ingram-google-onboarding</p><p>Respuesta primaria Joelvis21/10 12:29Chile: vinculación Google completada y Efeonce habilitada como partner; no onboarding comercial Google adicional. Distingue alta como cliente Ingram/Xvantage todavía necesaria en https://onboarding.ingrammicro.com/. Pide documentación consolidada en PDF, no ZIP; lista en imagen del correo aún no inspeccionada. Preparar checklist y expediente antes de cualquier formulario/aceptación; esta tarea no autoriza enviar documentación, aceptar términos ni comprometer compras/crédito.</p><p>Revisión interna23/10 10Chile, no deadline impuesto. Workspace/Chrome con Víctor; GCP/GeminiEnterprise conJoelvis; preventaCOELATAM y escalaciónNicolás. Descuentos y pago al contado citados son condiciones indicativas del proveedor, no margen de una cotización validada. No pedir nuevamente vinculaciónGoogle ya confirmada. Dedupe206TASK todos estados, búsqueda global Ingram y asociaciónJoelvis sin equivalente;86históricosNotion. Asociar sólo contacto existente verificado.</p>",
       "action_kind": "internal_review",
-      "deadline_type": "internal_proposed_no_external_deadline"
+      "deadline_type": "internal_proposed_no_external_deadline",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:59717761399:rfq001-admission-review",
@@ -3021,11 +3088,25 @@
           "66481946424"
         ]
       },
-      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-0900.md",
+      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-30-1349-izipay-respuesta-registrada.md",
       "last_followup_summary": "<h3>Actualización 22/10/2026 · corte mañana Chile</h3><p>Iris respondió 21/10 16:37:50 Chile: tomó nota del interés y enviará novedades durante las próximas semanas. Interés enviado y acusado; NO falta confirmar hoy ni presentar propuesta el 22/10. La respuesta no confirma admisión de proveedor extranjero, equivalencia E-RUT/RUC, presupuesto, bases ni calendario. Deal administrativo 66481946424 creado en actuación focal autorizada de Julio, leído hoy; asociar esta TASK existente. Próxima revisión INTERNA 29/10 10:00 Chile, anticipable si llegan novedades. No enviar recordatorio, reinscribir ni activar secuencias; Iris/Ariana/Diego finalizados según auditoría nativa de ayer19:26. HOLD para recomendar postulación/gasto hasta requisitos.</p>",
       "action_kind": "internal_review",
       "deadline_type": "internal_proposed_no_external_deadline",
-      "deal_id": "66481946424"
+      "deal_id": "66481946424",
+      "crm_revalidation_status": "reply_note_contact_and_deal_verified_2026_10_30; existing task not revalidated_or_updated",
+      "buyer_reply_history": [
+        {
+          "received_at": "2026-10-30T16:26:51Z",
+          "summary": "Marketing todavía trabaja en la información; Compras espera tener mayor detalle la próxima semana (2–8 de noviembre), sin día comprometido, y comunicará novedades. Esperar respuesta, sin nuevo recordatorio hoy. Bases, calendario y admisión desde Chile continúan pendientes.",
+          "crm_note_id": "120015317862",
+          "checked_at": "2026-10-30T13:49:05.887030-03:00",
+          "report": "docs/commercial/follow-up-agent/runs/2026-10-30-1349-izipay-respuesta-registrada.md"
+        }
+      ],
+      "latest_buyer_reply_at": "2026-10-30T16:26:51Z",
+      "latest_buyer_reply_summary": "Marketing todavía trabaja en la información; Compras espera tener mayor detalle la próxima semana (2–8 de noviembre), sin día comprometido, y comunicará novedades. Esperar respuesta, sin nuevo recordatorio hoy. Bases, calendario y admisión desde Chile continúan pendientes.",
+      "current_next_action": "Esperar novedades de Compras; no enviar hoy. Expectativa del comprador para la semana2–8Nov, sin fecha comprometida.",
+      "current_crm_note_id": "120015317862"
     },
     {
       "key": "followup:256968083769:kibernum-reply-review",
@@ -3058,7 +3139,8 @@
         "deals": []
       },
       "last_followup_summary": "<p>Clave: followup:256968083769:kibernum-reply-review</p><p>Francisca Gutiérrez Reyes publicó búsqueda de agencia Growth para Colombia. Actuación focal autorizada22Oct: correo enviado00:56Chile con brochure360 íntegro, firma gráfica y CCO, EMAIL119266980893 SENT; InMail distinto verificado en expediente. Enviados de Outlook cruzado hoy. No hay respuesta por correo en ventana revisada; LinkedIn no reabierto por heartbeat. Mantener una conversación por cuenta y no repetir primer contacto. Revisión INTERNA27Oct10Chile: buscar respuesta en ambos canales, restricciones y siguientes pasos; preparar decisión para Julio. Esta tarea NO autoriza envío, secuencia, créditos, contactar adyacentes ni crear Lead/Deal. Fuente docs/commercial/prospecting-agent/runs/2026-10-22-0056-kibernum-growth-colombia.md.</p>",
-      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-0900.md"
+      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-0900.md",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:56494806307:berel-7084-review",
@@ -3095,7 +3177,8 @@
       "deadline_source": "Wherex425380 autenticado + correo oficial22Oct19:05Chile",
       "deadline_last_readback_at": "2026-10-23T12:15:21.602168+00:00",
       "tender_is_closed": true,
-      "next_action": "Conciliar comprobante propio o decisión; no preparar como vigente."
+      "next_action": "Conciliar comprobante propio o decisión; no preparar como vigente.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65832697782:aysen-bid-review",
@@ -3132,7 +3215,8 @@
       "tender_source_status": "Publicada",
       "tender_is_closed": false,
       "tender_source_is_closed": false,
-      "current_required_action": "Revisar admisibilidad, equipo, medios, costos y caja; decidir participación antes del27Oct15Chile."
+      "current_required_action": "Revisar admisibilidad, equipo, medios, costos y caja; decidir participación antes del27Oct15Chile.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:65966292255:chillan-hosting-review",
@@ -3167,7 +3251,8 @@
       "tender_is_closed": true,
       "tender_source_is_closed": true,
       "deadline_last_readback_at": "2026-10-23T19:09:01.988888+00:00",
-      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida."
+      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:66560488750:gana-loti-1552-review",
@@ -3206,7 +3291,8 @@
       "external_deadline": "2026-10-30T21:00:00Z",
       "contractual_hold": true,
       "currency": "COP",
-      "price_status": "internal_scenario_not_final_approved"
+      "price_status": "internal_scenario_not_final_approved",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:signal:wherex:CMF-1197",
@@ -3235,7 +3321,8 @@
       "last_followup_summary": "Actualización 23/10/2026 · corte 16:00 Chile Corte23Oct16h: plazo conocido23Oct16Chile ya alcanzado. Última ficha autenticada leída esta mañana; correo oficial22Oct confirma esa ampliación. Relectura actual bloqueada: navegador disponible redirige a login. No afirmar estado Cerrada ni nueva prórroga. Verificar ficha y comprobante propio antes de otra acción; no inferir pérdida, no enviar ni postular. Mantener fecha interna histórica vencida y distinguir ENVASES CMF del regulador.",
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-1600.md",
       "unassociated_reason": "No pertinent existing CRM object verified; native CLI supports standalone owner TASK. No entity created or wrong homonym associated.",
-      "current_required_action": "Verificar ficha y comprobante; plazo conocido23Oct16h, estado vivo bloqueado por login."
+      "current_required_action": "Verificar ficha y comprobante; plazo conocido23Oct16h, estado vivo bloqueado por login.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:signal:5768-74-COT26:salesforce-renewal-review",
@@ -3249,7 +3336,7 @@
       "owner_hubspot_id": "75788512",
       "internal_due": "2026-10-22T20:00:00Z",
       "internal_due_utc": "2026-10-22T20:00:00Z",
-      "status": "closed_pending_submission_reconciliation",
+      "status": "deserted_pending_submission_reconciliation",
       "action_kind": "internal_review",
       "write_status": "verified",
       "last_task_status_readback_at": "2026-10-23T19:09:01.988888+00:00",
@@ -3261,14 +3348,18 @@
         "companies": [],
         "deals": []
       },
-      "last_followup_summary": "Actualización 23/10/2026 · corte 16:00 Chile Ficha LicitaLAB5768-74-COT26 leída23Oct16h muestra CERRADA, cierre EXTERNO23Oct10Chile. Ya no pedir envío futuro. Conciliar comprobante de postulación por plataforma o decisión expresa de Julio; ausencia de correo no prueba que no se presentó. No marcar perdida ni reactivar. Conserva fecha interna vencida y restricciones de suministro/SKU.",
+      "last_followup_summary": "26Oct: LicitaLAB Desierta y aviso23Oct coinciden; no prueba ausencia de postulación. TASK119351329034 no actualizada: CRM bloqueado.",
       "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-22-1600.md",
       "unassociated_reason": "No pertinent existing CRM object verified; native CLI supports standalone owner TASK. No entity created or wrong homonym associated.",
-      "tender_source_status": "Cerrada",
+      "tender_source_status": "Desierta",
       "tender_is_closed": true,
       "tender_source_is_closed": true,
-      "deadline_last_readback_at": "2026-10-23T19:09:01.988888+00:00",
-      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida."
+      "deadline_last_readback_at": "2026-10-26T12:14:03.851974+00:00",
+      "current_required_action": "Conciliar comprobante de plataforma o decisión del operador; no envío futuro ni pérdida inferida.",
+      "external_deadline": "2026-10-23T13:00:00.000Z",
+      "deadline_source": "https://app.licitalab.cl/search/details/5768-74-COT26",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended",
+      "last_documentary_review_at": "2026-10-26T12:14:03.851974+00:00"
     },
     {
       "key": "followup:254351743369:bounce-review",
@@ -3303,7 +3394,8 @@
       "contact_id": "254351743369",
       "company_id": "59137325387",
       "communications_status": "stopped_pending_bounce_review",
-      "next_contact_at": null
+      "next_contact_at": null,
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:257217550764:fundacion-luz-internal-review",
@@ -3343,7 +3435,8 @@
         "deals": []
       },
       "last_followup_summary": "<p>Clave: followup:257217550764:fundacion-luz-internal-review</p><p>Revisión INTERNA 27/10/2026 10:00 America/Santiago; no fecha del comprador. Mariana Campos Pérez: InMail y correo enviados el22/10 según expediente; Outlook Sent confirma correo22:18:35Chile. Contact257217550764 y Company59806188192 verificados. Email inferido/no verificado usado por excepción informada y expresa del operador; SENT y ausencia de rebote no validan buzón, entrega ni lectura.</p><p>Releer respuesta, rebote, hilo y restricciones antes de decidir próximos pasos. No hay Deal ni necesidad calificada. Publicación pide PR, campaña audiovisual y street marketing; Fundación Luz como compradora concreta, brief, presupuesto, calendario y decisor pendientes. Si no responde, proponer a Julio una decisión con contexto; esta tarea NO autoriza seguimiento, borrador al correo inferido, secuencia, nutrición ni contactos adyacentes.</p><p>Expediente: docs/commercial/prospecting-agent/runs/2026-10-22-fundacion-luz-mariana.md. No duplicado encontrado en216TASK todos los estados ni búsqueda global Mariana; históricos Notion consultados.</p>",
-      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-23-0900.md"
+      "last_update_report": "docs/commercial/follow-up-agent/runs/2026-10-23-0900.md",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
     },
     {
       "key": "followup:257310314681:arcor-creative-review",
@@ -3367,7 +3460,46 @@
       "internal_due": "2026-10-28T13:00:00Z",
       "last_content_readback_at": "2026-10-23T19:09:01.988888+00:00",
       "associations_verified_at": "2026-10-23T19:09:01.988888+00:00",
-      "last_followup_summary": "Correo a Ignacio/Arcor enviado23Oct10:38Chile; visualización no respuesta. Revisión interna28Oct10Chile, sin autorización de contacto adicional; contacto257310314681 verificado."
+      "last_followup_summary": "Correo a Ignacio/Arcor enviado23Oct10:38Chile; visualización no respuesta. Revisión interna28Oct10Chile, sin autorización de contacto adicional; contacto257310314681 verificado.",
+      "crm_revalidation_status": "blocked_2026_10_26_account_suspended"
+    },
+    {
+      "key": "followup:66672959873:mattis-1555-review",
+      "title": "Mattis1555 — revisar propuesta preparada y conciliar horario",
+      "deal_id": "66672959873",
+      "company_id": "34264439413",
+      "status": "prepared_pending_internal_review",
+      "action_kind": "internal_review",
+      "task_system": "hubspot",
+      "hubspot_task_id": null,
+      "write_status": "not_attempted_crm_blocked_pending_dedupe",
+      "owner_hubspot_id": "75788512",
+      "internal_due": "2026-10-27T15:00:00Z",
+      "deadline_type": "conflicting_sources_conservative_cutoff",
+      "external_deadline_candidate": "2026-10-30T19:00:00Z",
+      "external_deadline_confirmed": false,
+      "deadline_evidence": "Wherex email23Oct14Colombia =16Chile vs localcapture18withouttimezone; liveportalunavailable",
+      "last_followup_summary": "MD23bloques y simulaciónV3 COP190150000 netos preparados; no GO/precio final/capacidad/elegibilidad aprobados. Preguntas ya enviadas23Oct según análisis24Oct; no repetir. Ficha/foro actuales bloqueados.",
+      "source_document": "docs/commercial/tenders/mattis-branding-marketing-inmobiliario-1555/README.md",
+      "last_documentary_review_at": "2026-10-26T12:14:03.851974+00:00"
+    },
+    {
+      "key": "followup:257702795832:utp-admission-review",
+      "title": "UTP — revisar respuesta sobre admisión de proveedores",
+      "contact_id": "257702795832",
+      "company_id": "59898421569",
+      "status": "waiting_admission_reply",
+      "action_kind": "internal_review",
+      "task_system": "hubspot",
+      "hubspot_task_id": null,
+      "write_status": "not_attempted_crm_blocked_pending_dedupe",
+      "owner_hubspot_id": "75788512",
+      "internal_due": "2026-10-30T13:00:00Z",
+      "external_deadline": null,
+      "next_contact_at": null,
+      "last_followup_summary": "Presentación25Oct en Enviados, a canalCompras conCCGustavo. No nueva respuesta identificada. Documents23segundos no aceptación. Revisar30Octinterno, no permiso de envío/LinkedIn.",
+      "source_document": "docs/commercial/prospecting-agent/runs/2026-10-25-utp-gustavo.md",
+      "last_documentary_review_at": "2026-10-26T12:14:03.851974+00:00"
     },
     {
       "key": "indecaucho_armor_discovery_20261027",
@@ -3378,26 +3510,29 @@
       "internal_due": "2026-10-27T16:00:00-03:00",
       "internal_due_utc": "2026-10-27T19:00:00Z",
       "timezone": "America/Santiago",
-      "status": "pending_internal_review",
-      "write_status": "created_and_readback_verified",
+      "status": "completed_internal_review",
+      "write_status": "existing_task_updated_and_readback_verified",
       "task_system": "HubSpot",
       "hubspot_task_id": "119625704196",
       "hubspot_task_url": "https://app.hubspot.com/tasks/48713323/view/all/task/119625704196",
-      "hubspot_task_status": "NOT_STARTED",
+      "hubspot_task_status": "COMPLETED",
       "hubspot_task_type": "TODO",
       "hubspot_task_priority": "MEDIUM",
       "owner_hubspot_id": "75788512",
       "hubspot_continuity_note_id": "119606905700",
       "associations_verified_at": "2026-10-26T18:01:20+00:00",
-      "last_content_readback_at": "2026-10-26T18:01:20+00:00",
+      "last_content_readback_at": "2026-10-27T19:05:36+00:00",
       "communications_status": "buyer replied; invitation and confirmation sent; no generic follow-up authorized",
       "next_contact_at": null,
-      "review_execution_observed": false,
+      "review_execution_observed": true,
       "automation_id": "armor-leer-discovery-y-completar-caso",
       "automation_occurrences": 1,
       "dossier": "../accounts/indecaucho-armor/README.md",
       "protocol": "../accounts/indecaucho-armor/POSTREUNION.md",
-      "last_followup_summary": "Read HubSpot/Notion transcript after27Octdiscovery, update internal business case with evidence and exact existingTASK; no proposal send, newDeal or stagechange."
+      "last_followup_summary": "Full available104utterances crosschecked with Notion; existing business-casev1 preserved. ExactTASKbody/status updated and readbackCOMPLETED; fee, buyer data and proposal stillpending. No new email/Deal/Lead/stage/commit.",
+      "review_completed_at": "2026-10-27T19:05:36+00:00",
+      "last_task_status_readback_at": "2026-10-27T19:05:36+00:00",
+      "automation_status": "deleted_after_single_review"
     }
   ],
   "outlook_drafts": {
@@ -3811,20 +3946,22 @@
     ]
   },
   "last_run": {
-    "triggered_at": "2026-10-23T19:00:20.352Z",
-    "completed_at": "2026-10-23T19:09:01.988888+00:00",
-    "report": "docs/commercial/follow-up-agent/runs/2026-10-23-1600.md",
-    "status": "completed_with_partial_external_source_coverage",
-    "tasks_created": 1,
-    "tasks_updated": 6,
-    "task_readbacks": 7,
-    "task_association_readbacks": 21,
-    "task_write_operations": 7,
+    "triggered_at": "2026-10-26T12:00:04.532Z",
+    "completed_at": "2026-10-26T12:14:03.851974+00:00",
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-26-0900.md",
+    "status": "partial_crm_blocked_account_suspended",
+    "tasks_created": 0,
+    "tasks_updated": 0,
+    "task_readbacks": 0,
+    "task_association_readbacks": 0,
+    "task_write_operations": 0,
+    "notion_operational_tasks_updated": 1,
+    "notion_operational_readbacks": 1,
     "drafts_created_outlook": 0,
     "drafts_updated_outlook": 0,
     "emails_sent": 0,
     "submissions": 0,
-    "next_cut": "2026-10-26T12:00:00Z"
+    "next_cut": "2026-10-26T19:00:00Z"
   },
   "utem_submission_update": {
     "at": "2026-10-08T18:01:38.577483+00:00",
@@ -4313,20 +4450,20 @@
     }
   ],
   "previous_run": {
-    "triggered_at": "2026-10-23T11:59:58.124Z",
-    "completed_at": "2026-10-23T12:15:21.602168+00:00",
-    "report": "docs/commercial/follow-up-agent/runs/2026-10-23-0900.md",
+    "triggered_at": "2026-10-23T19:00:20.352Z",
+    "completed_at": "2026-10-23T19:09:01.988888+00:00",
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-23-1600.md",
     "status": "completed_with_partial_external_source_coverage",
     "tasks_created": 1,
-    "tasks_updated": 3,
-    "task_readbacks": 4,
-    "task_association_readbacks": 12,
+    "tasks_updated": 6,
+    "task_readbacks": 7,
+    "task_association_readbacks": 21,
     "task_write_operations": 7,
     "drafts_created_outlook": 0,
     "drafts_updated_outlook": 0,
     "emails_sent": 0,
     "submissions": 0,
-    "next_cut": "2026-10-23T19:00:00Z"
+    "next_cut": "2026-10-26T12:00:00Z"
   },
   "manual_closure_update": {
     "observed_at": "2026-10-09T12:19:29.835850+00:00",
@@ -10641,5 +10778,223 @@
       "Ajinomoto1043_1044_1045": "27Oct16Peru=18Chile"
     },
     "gana1554": "New popcorn service27Oct14Colombia=16Chile; distinct1541and1552; not qualified"
-  }
+  },
+  "coverage_history_2026_10_23_1600": {
+    "cut": "2026-10-23-1600",
+    "hubspot_portal_id": "48713323",
+    "pipelines": 2,
+    "deals_total": 297,
+    "deals_pages": [
+      100,
+      100,
+      97
+    ],
+    "open_deals": 72,
+    "closed_deals": 222,
+    "deals_without_stage": 3,
+    "tasks_owner_all_states_before_write": 217,
+    "tasks_pages": [
+      100,
+      100,
+      17
+    ],
+    "tasks_created": 1,
+    "tasks_updated_unique": 6,
+    "task_write_operations": 7,
+    "tasks_independent_readbacks": 7,
+    "task_association_readbacks": 21,
+    "leads_modified_since": "2026-10-08T00:00:00Z",
+    "leads_recent": 231,
+    "leads_pages": [
+      100,
+      100,
+      31
+    ],
+    "outlook_received_since": "2026-10-21T12:15:00Z",
+    "outlook_messages": 326,
+    "outlook_pages": [
+      100,
+      100,
+      100,
+      26
+    ],
+    "outlook_last_message_observed": "2026-10-23T18:58:15Z",
+    "sentitems": 46,
+    "sentitems_since": "2026-10-21T12:15:00Z",
+    "drafts_before_write": 58,
+    "drafts_filter": "none; complete folder",
+    "drafts_created": 0,
+    "drafts_updated": 0,
+    "notion_owner_all_states": 86,
+    "calendar_fresh_read": false,
+    "licitalab_fresh_fiches": 12,
+    "mercadopublico_direct_calendars": 1,
+    "wherex_authenticated_read": false,
+    "linkedin_fresh_read": false,
+    "base_documents_complete_review": false,
+    "limitations": [
+      "Todos los Deals y TASK de Julio paginados. Leads modificados desde8Oct más investigación/acciones históricas, no todo histórico.",
+      "Wherex ficha bloqueada por login; avisos recibidos sí revisados. CMF estado actual no confirmado.",
+      "Foros, originales y contratos no auditados integralmente en esta corrida; no GO inferido.",
+      "Saldo vivo factura HubSpot no verificado; acceso funcional no prueba pago.",
+      "Calendario no releído esta tarde, lectura matinal permanece histórica. Secuencias no reauditadas ni activadas.",
+      "SKY: metadata PDF y Enviados verifican envío, contenido binario no abierto; no recepción humana ni aceptación acreditadas."
+    ]
+  },
+  "deadline_readbacks_2026_10_26_0900": [
+    {
+      "code": "1040538-11-LP26",
+      "name": "CAMPAÑA COMUNICACIONAL Y PLAN DE MEDIOS PARA LA PR",
+      "status": "Publicada",
+      "closes_at": "2026-10-26T18:00:00.000Z",
+      "closes_at_local": "26-10-2026 15:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/1040538-11-LP26"
+    },
+    {
+      "code": "1138297-12-LE26",
+      "name": "Servicios de producción audiovisual y elaboración de fichas de locaciones para la promoción internacional de las industrias creativas de la Región de Atacama. ",
+      "status": "Publicada",
+      "closes_at": "2026-10-26T18:01:00.000Z",
+      "closes_at_local": "26-10-2026 15:01",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/1138297-12-LE26"
+    },
+    {
+      "code": "1332-12-LP26",
+      "name": "CAMPAÑA: AYSEN TE CONECTA",
+      "status": "Publicada",
+      "closes_at": "2026-10-27T18:00:00.000Z",
+      "closes_at_local": "27-10-2026 15:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/1332-12-LP26"
+    },
+    {
+      "code": "757-90-LP26",
+      "name": "[DIPOL] CAMPAÑA PRÁCTICA DE ACTIVIDAD FÍSICA",
+      "status": "Publicada",
+      "closes_at": "2026-10-27T18:00:00.000Z",
+      "closes_at_local": "27-10-2026 15:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/757-90-LP26"
+    },
+    {
+      "code": "1591-19-LP26",
+      "name": "CAMPAÑA COMUNICACIONAL PROGRAMA GIRA DE ESTUDIO",
+      "status": "Publicada",
+      "closes_at": "2026-10-29T18:00:00.000Z",
+      "closes_at_local": "29-10-2026 15:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/1591-19-LP26"
+    },
+    {
+      "code": "519302-9-LE26",
+      "name": "DISEÑO IMPLEMENTACIÓN MEDICION MARKETING DIGITAL",
+      "status": "Publicada",
+      "closes_at": "2026-11-02T19:00:00.000Z",
+      "closes_at_local": "02-11-2026 16:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/519302-9-LE26"
+    },
+    {
+      "code": "530885-40-COT26",
+      "name": "WD 5075 Licencia Canva",
+      "status": "Publicada",
+      "closes_at": "2026-10-26T13:00:00.000Z",
+      "closes_at_local": "26-10-2026 10:00",
+      "is_closed": false,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/530885-40-COT26"
+    },
+    {
+      "code": "5485-868-COT26",
+      "name": "Servicio de Diseño y Hosting de un sitio web",
+      "status": "Cerrada",
+      "closes_at": "2026-10-24T23:00:00.000Z",
+      "closes_at_local": "24-10-2026 20:00",
+      "is_closed": true,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/5485-868-COT26"
+    },
+    {
+      "code": "831830-40-COT26",
+      "name": "Servicio de plataforma autoadministrable de envíos de email marketing.",
+      "status": "Cerrada",
+      "closes_at": "2026-10-23T21:00:00.000Z",
+      "closes_at_local": "23-10-2026 18:00",
+      "is_closed": true,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/831830-40-COT26"
+    },
+    {
+      "code": "5768-74-COT26",
+      "name": "WD 5066 Renovación Licencias Salesforce",
+      "status": "Desierta",
+      "closes_at": "2026-10-23T13:00:00.000Z",
+      "closes_at_local": "23-10-2026 10:00",
+      "is_closed": true,
+      "read_at": "2026-10-26T12:14:03.851974+00:00",
+      "source": "https://app.licitalab.cl/search/details/5768-74-COT26"
+    }
+  ],
+  "morning_delta_2026_10_26": {
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-26-0900.md",
+    "billing_risk_key": "followup:ops:hubspot-814356022",
+    "billing_effective_suspension_verified": true,
+    "protected_sequence_pauses_document": "docs/commercial/analyses/2026-10-prospeccion/APLICACION-HUBSPOT-2026-10-25.md",
+    "paused_accounts": [
+      "Unilever",
+      "Olivos",
+      "Toyota",
+      "NIASA"
+    ],
+    "human_drafts_preserved": true,
+    "pending_crm_task_keys": [
+      "followup:66672959873:mattis-1555-review",
+      "followup:257702795832:utp-admission-review"
+    ],
+    "pending_crm_dedupe": true,
+    "mattis_deadline_conflict": true,
+    "mattis_questions_do_not_repeat": "Analysis24Oct records sent23Oct; olderREADME draftstatus superseded; currentforumunavailable",
+    "utp_sent_copy_read": true,
+    "no_new_external_contact_recommended_today": true
+  },
+  "mail_sources_2026_10_26_0900": [
+    {
+      "subject": "Acción necesaria: Realiza un pago para restablecer al acceso a tu cuenta de HubSpot",
+      "received_at": "2026-10-26T01:17:38Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQVy2yiAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEMAAAR61VaBWh6QqphZWDfIIRIAAQVy2yiAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Proveedor UTP - Creatividad, diseño y branding - Perú: cobertura digital nacional",
+      "received_at": "2026-10-25T15:11:37Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQVy5XHAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEJAAAR61VaBWh6QqphZWDfIIRIAAQVy5XHAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Wherex - Cambio fecha de cierre Licitación [40] de la Empresa QROMA",
+      "received_at": "2026-10-23T21:04:54Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQUdJQxAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQUdJQxAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Wherex – Nueva Licitación de Grupo Reditos [Lic - 1555]",
+      "received_at": "2026-10-23T20:44:28Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQUdJQwAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAA9rotrAAAR61VaBWh6QqphZWDfIIRIAAQUdJQwAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "subject": "Cambio en el proceso de Compra Ágil | 5768-74-COT26",
+      "received_at": "2026-10-23T19:36:06Z",
+      "message_id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAALV-ngQAAAR61VaBWh6QqphZWDfIIRIAAQUdDooAAA=",
+      "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAALV%2FngQAAAR61VaBWh6QqphZWDfIIRIAAQUdDooAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    }
+  ]
 }

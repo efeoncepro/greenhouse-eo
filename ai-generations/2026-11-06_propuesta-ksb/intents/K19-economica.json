@@ -1,0 +1,57 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "use": "proposal",
+  "recipe": "content-pricing",
+  "line": "growth",
+  "theme": "dark",
+  "layout": "live",
+  "voice": {
+    "eyebrow": "Económica",
+    "question": "Dos niveles; medios",
+    "answer": [
+      "Aparte"
+    ]
+  },
+  "body": "Esencial cubre las tres líneas; Mínimo, sólo la primera. Los medios se pagan **al costo**, sin comisión.",
+  "quote": {
+    "kicker": "Oferta económica · 12 meses",
+    "title": "Para KSB Chile",
+    "lines": [
+      {
+        "name": "Pauta y leads",
+        "desc": "SEM, LinkedIn y Meta, landings y MQL a C4C",
+        "period": "/ mes"
+      },
+      {
+        "name": "Contenidos y redes",
+        "desc": "LinkedIn, Instagram, Facebook y YouTube",
+        "period": "/ mes"
+      },
+      {
+        "name": "Medios",
+        "desc": "En las cuentas de KSB, al costo",
+        "period": "/ mes"
+      }
+    ],
+    "totalLabel": "Total mensual",
+    "tax": "neto + IVA",
+    "cta": "Ver anexo económico"
+  },
+  "chips": [
+    {
+      "kicker": "Cómo se cobra",
+      "text": "Tarifa fija mensual,\nsin comisión sobre medios"
+    },
+    {
+      "kicker": "Sin sorpresas",
+      "text": "Valores netos,\nIVA no incluido"
+    }
+  ],
+  "selection": {
+    "target": "cta"
+  }
+}

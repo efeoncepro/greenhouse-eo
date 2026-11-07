@@ -1,8 +1,12 @@
+import sharp from 'sharp'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   assertOpenAIImageInputFidelitySupported,
+  assertOpenAIImageModelAvailable,
+  assertOpenAIImageOptionsSupported,
   assertOpenAIImageSizeSupported,
+  isOpenAIImageOutputFormat,
   editOpenAIImage,
   estimateOpenAIImageOutputTokens,
   estimateOpenAIImageOutputUsd,
@@ -17,7 +21,8 @@ import {
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
   runOpenAIImageTool,
-  type OpenAIImageModel
+  type OpenAIImageModel,
+  type OpenAIImageSize
 } from '@/lib/ai/openai-image'
 
 vi.mock('server-only', () => ({}))
@@ -335,7 +340,7 @@ describe('GPT Image 2.5 family contract (TASK-1851)', () => {
 
     await expect(
       generateOpenAIImage({ prompt: 'An icon.', model: 'gpt-image-2', quality })
-    ).rejects.toThrow(/only exists on the GPT Image 2.5 family/)
+    ).rejects.toThrow(/only exists on the GPT Image 2.5 and 2.6 families/)
 
     expect(fetchMock).not.toHaveBeenCalled()
   })
@@ -417,6 +422,206 @@ describe('ai:image — validación local y estimación de costo', () => {
     expect(isOpenAIImageBackground('transparent')).toBe(true)
     expect(isOpenAIImageBackground('clear')).toBe(false)
     expect(isOpenAIImageFormat('webp')).toBe(true)
+    // `isOpenAIImageFormat` es el conjunto RASTER (entrada, transparencia, compresión); gif y svg son de salida.
     expect(isOpenAIImageFormat('gif')).toBe(false)
+    expect(isOpenAIImageOutputFormat('gif')).toBe(true)
+    expect(isOpenAIImageOutputFormat('svg')).toBe(true)
+    expect(isOpenAIImageOutputFormat('tiff')).toBe(false)
+  })
+})
+
+describe('GPT Image 2.6 family contract (Sunburst/Flare, 2026-11-04)', () => {
+  const jsonResponse = (extra: Record<string, unknown> = {}) =>
+    new Response(JSON.stringify({ data: [{ b64_json: 'aW1hZ2U=' }], ...extra }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+  const pngWith = async (width: number, height: number, alpha: boolean) =>
+    new Uint8Array(
+      await sharp({ create: { width, height, channels: alpha ? 4 : 3, background: alpha ? { r: 0, g: 0, b: 0, alpha: 0 } : '#ffffff' } })
+        .png()
+        .toBuffer()
+    )
+
+  it.each(['gpt-image-2.6-sunburst', 'gpt-image-2.6-flare', 'gpt-image-2-2026-04-21'])('recognizes %s as a supported model', model => {
+    expect(isOpenAIImageModel(model)).toBe(true)
+  })
+
+  // Tokens medidos el 2026-11-05 (ai-generations/2026-11-05_gpt-image-2-6-canary/results.json). `high` midió 1.758: el
+  // factor 1 lo estima en 1.756, dentro de ±0,2 %.
+  it.each([
+    ['low', '1024x1024', 824],
+    ['low', '2048x1152', 660],
+    ['medium', '1024x1024', 1449],
+    ['high', '1024x1024', 1756],
+    ['xhigh', '1024x1024', 3122],
+    ['max', '1024x1024', 7024]
+  ] as const)('estimates 2.6 %s at %s close to the measured usage', (quality, size, tokens) => {
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.6-flare', quality, size })).toBe(tokens)
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.6-sunburst', quality, size })).toBe(tokens)
+  })
+
+  it('does not reuse the 2.5 grid for 2.6: low costs ~4.2x the 2.5 twin', () => {
+    const low26 = estimateOpenAIImageOutputUsd({ model: 'gpt-image-2.6-flare', quality: 'low', size: '1024x1024' })!
+    const low25 = estimateOpenAIImageOutputUsd({ model: 'gpt-image-2.5-flare', quality: 'low', size: '1024x1024' })!
+
+    expect(low26 / low25).toBeGreaterThan(4)
+  })
+
+  it('does not estimate GIF (the frame sheet does not follow the grid) but estimates the SVG raster reference', () => {
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.6-flare', quality: 'low', size: '816x816', format: 'gif' })).toBeNull()
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.6-flare', quality: 'low', size: '1024x1024', format: 'svg' })).toBe(824)
+  })
+
+  it('sends complexity, SVG options and returns svg_usage on a 2.6 generation', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ svg_usage: { model: 'gpt-5.5', input_tokens: 10, output_tokens: 5 } }))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await generateOpenAIImage({
+      prompt: 'Flat icon.',
+      model: 'gpt-image-2.6-flare',
+      size: '1024x1024',
+      quality: 'low',
+      format: 'svg',
+      complexity: 'low',
+      svg: { model: 'gpt-5.5', reasoningEffort: 'low' }
+    })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect(JSON.parse(String(request.body))).toEqual({
+      model: 'gpt-image-2.6-flare',
+      prompt: 'Flat icon.',
+      n: 1,
+      size: '1024x1024',
+      quality: 'low',
+      output_format: 'svg',
+      complexity: 'low',
+      svg: { model: 'gpt-5.5', reasoning: { effort: 'low' } }
+    })
+    expect(result.svgUsage).toMatchObject({ model: 'gpt-5.5', output_tokens: 5 })
+  })
+
+  it('sends GIF frame options on a 2.6 generation', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await generateOpenAIImage({ prompt: 'Loop.', model: 'gpt-image-2.6-flare', size: '640x640' as OpenAIImageSize, quality: 'low', format: 'gif', gif: { frameCount: 9, frameDurationMs: 120 } })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect(JSON.parse(String(request.body))).toMatchObject({ output_format: 'gif', frame_count: 9, frame_duration_ms: 120 })
+  })
+
+  it.each([
+    [{ model: 'gpt-image-2.5-flare', complexity: 'low' }, /no acepta complexity/],
+    [{ model: 'gpt-image-2.5-sunburst', format: 'svg', svg: { model: 'gpt-5.5' } }, /no genera SVG/],
+    [{ model: 'gpt-image-2', format: 'gif' }, /no genera GIF/],
+    [{ model: 'gpt-image-2.6-flare', format: 'svg' }, /svg\.model/],
+    [{ model: 'gpt-image-2.6-flare', format: 'gif', gif: { frameCount: 1 } }, /frame_count/],
+    [{ model: 'gpt-image-2.6-flare', format: 'gif', gif: { frameDurationMs: 5 } }, /frame_duration_ms/],
+    [{ model: 'gpt-image-2.6-flare', format: 'png', outputCompression: 80 }, /sólo aplica a jpeg y webp/],
+    [{ model: 'gpt-image-2.6-flare', format: 'png', gif: { frameCount: 4 } }, /sólo aplican con formato gif/]
+  ] as const)('rejects unsupported 2.6 options before any network call (%#)', async (input, message) => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(generateOpenAIImage({ prompt: 'x', quality: 'low', size: '1024x1024', ...(input as object) } as never)).rejects.toThrow(message)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects SVG on edits and markup combined with a mask before any network call', async () => {
+    const fetchMock = vi.fn()
+    const base = { bytes: await pngWith(64, 64, false), filename: 'base.png', mimeType: 'image/png' }
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    expect(() => assertOpenAIImageOptionsSupported({ model: 'gpt-image-2.6-flare', operation: 'edit', format: 'svg', svg: { model: 'gpt-5.5' } })).toThrow(/sólo existe al generar/)
+    await expect(editOpenAIImage({ prompt: 'x', image: base, mask: base, markup: base, model: 'gpt-image-2.6-flare' })).rejects.toThrow(/no se combina con mask/)
+    await expect(editOpenAIImage({ prompt: 'x', image: base, markup: base, model: 'gpt-image-2' })).rejects.toThrow(/no acepta markup/)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('sends a transparent markup layer of the same size as the base on a 2.5/2.6 edit', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await editOpenAIImage({
+      prompt: 'Follow the red marks.',
+      image: { bytes: await pngWith(64, 64, false), filename: 'base.png', mimeType: 'image/png' },
+      markup: { bytes: await pngWith(64, 64, true), filename: 'marks.png', mimeType: 'image/png' },
+      model: 'gpt-image-2.6-flare',
+      complexity: 'low',
+      size: '1024x1024'
+    })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const body = request.body as FormData
+
+    expect(body.get('markup')).toBeInstanceOf(Blob)
+    expect(body.get('complexity')).toBe('low')
+  })
+
+  it('rejects a flattened or mis-sized markup layer before any network call', async () => {
+    const fetchMock = vi.fn()
+    const image = { bytes: await pngWith(64, 64, false), filename: 'base.png', mimeType: 'image/png' }
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      editOpenAIImage({ prompt: 'x', image, markup: { bytes: await pngWith(64, 64, false), filename: 'm.png', mimeType: 'image/png' }, model: 'gpt-image-2.6-flare' })
+    ).rejects.toThrow(/canal alfa/)
+    await expect(
+      editOpenAIImage({ prompt: 'x', image, markup: { bytes: await pngWith(32, 32, true), filename: 'm.png', mimeType: 'image/png' }, model: 'gpt-image-2.6-flare' })
+    ).rejects.toThrow(/mismo que la primera imagen/)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('cuts retired models before the network and keeps the dated shutdowns', async () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(generateOpenAIImage({ prompt: 'x', model: 'gpt-image-1' })).rejects.toThrow(/se apagó el 2026-10-23/)
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(() => assertOpenAIImageModelAvailable('gpt-image-1.5', '2026-11-30')).not.toThrow()
+    expect(() => assertOpenAIImageModelAvailable('gpt-image-1.5', '2026-12-01')).toThrow(/se apagó/)
+  })
+
+  it('validates GIF frame size without the per-image area minimum (640x640 with 9 frames passed live)', () => {
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2.6-flare', size: '640x640', format: 'gif' })).not.toThrow()
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2.6-flare', size: '640x640' })).toThrow('área')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2.6-flare', size: '650x650', format: 'gif' })).toThrow('múltiplos de 16')
+  })
+
+  it('sets the image model of the Responses tool only when asked', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 'resp_1', output: [{ type: 'image_generation_call', id: 'ig_1', result: 'aW1hZ2U=' }] }), { status: 200 })
+    )
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await runOpenAIImageTool({ prompt: 'x', imageModel: 'gpt-image-2.6-flare', size: '1024x1024' })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect(JSON.parse(String(request.body)).tools[0].model).toBe('gpt-image-2.6-flare')
+  })
+
+  it('lists models by capability from the capability table', () => {
+    expect(openAIImageModelsWith('svgOutput')).toEqual(['gpt-image-2.6-sunburst', 'gpt-image-2.6-flare'])
+    expect(openAIImageModelsWith('markup')).toEqual([
+      'gpt-image-2.6-sunburst',
+      'gpt-image-2.6-flare',
+      'gpt-image-2.5-sunburst',
+      'gpt-image-2.5-sunburst-2026-09-08',
+      'gpt-image-2.5-flare',
+      'gpt-image-2.5-flare-2026-09-08'
+    ])
   })
 })

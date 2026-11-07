@@ -70,7 +70,7 @@ Si el operador conserva una UI o marca diegética generativa, registra esa toler
 no amplíes por tu cuenta la composición local a toda la película. En SKY se autorizaron cartelas/cierre
 locales, con UI y avión generativos. Reusa la autorización vigente para entregar a revisión; aprobación
 creativa final y publicación siguen separadas. **Gasto gobernado** en cada generación. Contrato Omni:
-[manual CLI Omni1.1](../../../../docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md); `efeonce/GEMINI_OMNI_VERTEX.md` conserva el contrato/historial de su carril.
+[manual CLI Omni (1.2 por defecto, 1.1 con `--model 1.1`)](../../../../docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md); `efeonce/GEMINI_OMNI_VERTEX.md` conserva el contrato/historial de su carril.
 
 **El estado técnico no es aprobación creativa.** Un video Omni o Seedance `completed` entra a revisión temporal; sólo si requiere geometría/acción inexistente se itera con el modelo. Retime, orden, repetición y texto exacto se resuelven sobre el clip existente. Si se pide foley nativo, revisar audio y video por separado y rescatar sólo eventos aprobados sobre la placa aceptada.
 

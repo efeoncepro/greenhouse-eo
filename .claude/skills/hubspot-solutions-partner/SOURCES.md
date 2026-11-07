@@ -4,8 +4,8 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de producto de este ledger: 2026-09-19.** Pricing y programa conservan verificaciones fechadas por
-sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
+**As-of de producto de este ledger: 2026-09-19.** Precios de lista: **2026-11-05** (portal Efeonce 48713323).
+Pricing y programa conservan verificaciones fechadas por sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
 ---
@@ -155,16 +155,48 @@ Breeze (capa IA) · **HubSpot AEO** (producto nuevo, USD 50/mo standalone; **inc
 Bundle: **Customer Platform**. Ningún Hub agregado ni retirado en 2026 — hubo renames + expansión.
 ✅ [legal.hubspot.com — Product & Services Catalog](https://legal.hubspot.com/hubspot-product-and-services-catalog)
 
-### Pricing ✅ (anual; el precio mayor suele ser mes-a-mes — confírmalo en la cotización)
-| Hub | Starter | Professional | Enterprise | Onboarding **obligatorio** |
+### Pricing ✅ — as-of 2026-11-05, fuente: portal Efeonce 48713323
+
+**Precio de lista vigente:**
+- **Pricebook:** `src/lib/growth/hubspot-pricing/` (TASK-1405).
+- **CLI:** `pnpm --silent pricing:v3 hubspot list|estimate`.
+- **Evidencia:** [snapshot del portal del 05/11/2026](../../../docs/services/hubspot-as-a-service/HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md).
+
+En una oferta, las licencias van **separadas de la implementación**. Las factura HubSpot al cliente (`settlement client_direct`); nunca entran al margen de Efeonce.
+
+Los precios se leyeron en `app.hubspot.com/pricing/48713323/<slug>`, en USD y más impuestos. Son el precio que HubSpot le ofrece a **esta cuenta**, en la vista por defecto. Los montos de onboarding **no aparecen en el portal**; conservan la marca y el as-of 2026-09-19 del catálogo legal.
+
+| Hub | Starter | Professional | Enterprise | Onboarding **obligatorio** (as-of 2026-09-19) |
 |---|---|---|---|---|
-| Marketing | USD 20/seat (promo USD 7) · 1.000 contactos | **USD 800/mo** · 3 core seats · 2.000 contactos | **desde USD 3.600/mo** · 5 seats · 10.000 contactos | **USD 3.000 / USD 7.000** ✅ |
-| Sales | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** ✅ |
-| Service | USD 20/seat | **USD 90/seat** | **desde USD 150/seat** | **USD 1.500 / USD 3.500** ✅ |
-| Content | USD 20/seat | **USD 450/mo** | desde USD 1.500/mo | ❌ no declarado |
-| Data | USD 20/seat | **USD 720/mo** · 5.000 créditos | desde USD 2.000/mo · 10.000 créditos | ❌ no declarado |
-| Revenue | Free tier | desde USD 95/mo | desde USD 140/mo | ❌ no declarado |
-| **Customer Platform** | USD 20/seat | **USD 1.300/mo** · 6 seats | **desde USD 4.700/mo** · 8 seats | ❌ **NO PUBLICADO — PÍDELO** |
+| Marketing | USD 20/mo · licencia adicional desde USD 50/mo · 1.000 contactos | **USD 890/mo** · 3 licencias · 2.000 contactos · adicional desde USD 50 | **USD 3.600/mo** · 5 licencias · 10.000 contactos · adicional desde USD 75 | **USD 3.000 / USD 7.000** ✅ |
+| Sales | USD 20/mo | **USD 100/licencia/mo** ⚠️ | **USD 150/licencia/mo** | **USD 1.500 / USD 3.500** ✅ |
+| Service | USD 20/mo | **USD 100/licencia/mo** ⚠️ | **USD 150/licencia/mo** | **USD 1.500 / USD 3.500** ✅ |
+| Content | USD 20/mo · 1 licencia | **USD 500/mo** · 3 licencias | **USD 1.500/mo** · 5 licencias | ❌ no declarado |
+| Data | USD 20/mo | **USD 800/mo** · 1 licencia · 5.000 créditos | **USD 2.000/mo** · 1 licencia · 10.000 créditos | ❌ no declarado |
+| Revenue | Free tier (facturación y pagos) | **USD 95/licencia/mo** | **USD 140/licencia/mo** | ❌ no declarado |
+| Smart CRM | — (no capturado) | **USD 50/licencia/mo** | **USD 75/licencia/mo** | ❌ no declarado |
+| **HubSpot para marketers** (Marketing + Content) | — | **USD 1.000/mo** · 3 licencias · 2.000 contactos | **USD 3.800/mo** · 5 licencias · 10.000 contactos | ❌ no declarado |
+| **Customer Platform** | USD 20/mo · 1 licencia · todos los Starter | **USD 1.450/mo** · 6 licencias · 2.000 contactos · 5.000 créditos | **USD 4.700/mo** · 8 licencias · 10.000 contactos · 10.000 créditos | ❌ **NO PUBLICADO — PÍDELO** |
+
+⚠️ **Sales y Service Pro:**
+- El portal marca «suscripción actual» y muestra **USD 100 por licencia**.
+- La página pública con compromiso anual se ha visto en **USD 90** (secundaria).
+- Cotiza con el valor del portal, salvo que HubSpot confirme otro para el negocio.
+
+**Customer Platform:** el portal avisa «descuentos disponibles solo para clientes nuevos, oferta por tiempo limitado».
+
+**Créditos y complementos (as-of 2026-11-05, portal):**
+- **Créditos adicionales:** USD 10 por 1.000, renovación mensual.
+- **USD 200/mo:** aumento de usuarios, workflows, listas, equipos o informes.
+- **USD 500/mo:** límite de API.
+- **Otros límites:** propiedades personalizadas USD 220/mo · SSL personalizado USD 100/mo · anuncios USD 100/mo · SMS ventas y servicio USD 75/mo · WhatsApp (+1.000 mensajes) USD 70/mo · firmas electrónicas USD 60/mo · minutos de llamadas, videos y contexto conversacional USD 50/mo cada uno · números de teléfono USD 25/mo.
+
+**Cambios frente al as-of 2026-09-19:**
+- Marketing Pro: 800 → **890**.
+- Sales y Service Pro: 90 → **100**.
+- Content Pro: 450 → **500**.
+- Data Pro: 720 → **800**.
+- Customer Platform Pro: 1.300 → **1.450**.
 
 ❌ **Unidad de cobro de Revenue Hub** (USD 95/USD 140: ¿por seat, por cuenta?). Existe un **Revenue Seat** formal ✅,
 lo que sugiere que escala por seat. **Confírmalo con el rep antes de cotizar.**
@@ -374,7 +406,7 @@ cargo de la implementación, y HubSpot elimina el cargo obligatorio del contrato
 (te lo construyen).
 ⚠️ **Desde el 2026-07-15, solo los partners CERTIFICADOS pueden waivear el onboarding del cliente.**
 ✅ **Efeonce TIENE la Partner Certification** (confirmado por el operador, 2026-07-13) → **el waiver está
-disponible**. 🎯 En un **Marketing Hub Pro** le borras **USD 3.000 de un costo anual de USD 9.600 = 31% de descuento
+disponible**. 🎯 En un **Marketing Hub Pro** le borras **USD 3.000 de un costo anual de USD 10.680 (USD 890 × 12, portal 2026-11-05) = 28% de descuento
 en el año 1**, y **el HubSpot directo no puede igualarlo**. **Es la ventaja estructural del canal partner.**
 → `modules/11` § 2 (tabla de dimensionamiento del waiver por producto).
 

@@ -1,0 +1,69 @@
+[
+  {
+    "url": "https://deploymentsafety.openai.com/chatgpt-images-2-6",
+    "status": 200,
+    "final": "https://deploymentsafety.openai.com/chatgpt-images-2-6"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/changelog",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/changelog"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/guides/image-generation",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/guides/image-generation"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/guides/image-prompting"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/models/gpt-image-2.6-flare",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/models/gpt-image-2.6-flare"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/models/gpt-image-2.6-sunburst",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/models/gpt-image-2.6-sunburst"
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/pricing",
+    "status": 200,
+    "final": "https://developers.openai.com/api/docs/pricing"
+  },
+  {
+    "url": "https://developers.openai.com/api/reference/resources/images/methods/edit",
+    "status": 200,
+    "final": "https://developers.openai.com/api/reference/resources/images/methods/edit"
+  },
+  {
+    "url": "https://developers.openai.com/api/reference/resources/images/methods/generate",
+    "status": 200,
+    "final": "https://developers.openai.com/api/reference/resources/images/methods/generate"
+  },
+  {
+    "url": "https://efeoncepro.com/design/creative-workflows/",
+    "status": 200,
+    "final": "https://efeoncepro.com/design/creative-workflows/"
+  },
+  {
+    "url": "https://efeoncepro.com/glitch/",
+    "status": 200,
+    "final": "https://efeoncepro.com/glitch/"
+  },
+  {
+    "url": "https://help.openai.com/en/articles/11084440-images-in-chatgpt",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://openai.com/index/introducing-chatgpt-images-2-5/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://openai.com/index/introducing-images-2-6/",
+    "error": "HTTP Error 403: Forbidden"
+  }
+]

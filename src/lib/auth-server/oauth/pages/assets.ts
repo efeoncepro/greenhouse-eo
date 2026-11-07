@@ -1,15 +1,15 @@
 import { createHash } from 'node:crypto'
 
-import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ID_FAVICON_SVG } from './efeonce-isotipo.generated'
 import { AUTH_FONT_ASSETS, AUTH_FONT_LICENSES } from './fonts.generated'
 import { AUTH_LOGIN_STAGE_ASSETS } from './login-stage.generated'
 
 /**
- * Favicon del emisor: el isotipo institucional, pintado con el azul de acento en vez del navy de
- * marca. La pestaña es lo único que no puede adaptarse al esquema del navegador —un SVG de favicon
- * no hereda `color`—, y el navy sobre una barra oscura desaparece; el acento se lee en las dos.
+ * Favicon del emisor: la marca de Efeonce ID (operador, 2026-11-01). Es la teja oscura con el isotipo
+ * chico en negativo, que se lee igual sobre una pestaña clara y sobre una oscura: un SVG de favicon no
+ * hereda el esquema del navegador. Se genera con `pnpm auth-server:brand-assets:generate`.
  */
-const FAVICON_SVG = EFEONCE_ISOTIPO_SVG.replace(/currentColor/gu, '#0375db')
+const FAVICON_SVG = EFEONCE_ID_FAVICON_SVG
 
 /** Exact bundled paths only: serving fonts never reads a user-selected filesystem path. */
 const assets = new Map<string, { body: Buffer; contentType: string; sha256: string }>([

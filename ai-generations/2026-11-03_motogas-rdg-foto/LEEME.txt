@@ -1,0 +1,7 @@
+Rey del Gas · registro fotográfico (prueba del 2026-11-03)
+- plates/: escenas generadas (cocina con Lipigas 15 kg; pasaje de Lo Prado un domingo), compuestos con el Rey 2D,
+  integración (el modelo agrega sombras) y el pasaje con el cielo ampliado (1792x2240).
+- final/: fondos horneados (vector original encima con luz) y el muro de la cocina para la tabla.
+- piezas/: vistas previas 1080x1350 (oferta, tabla, horario). Generador: tools/foto.py.
+- brief/: prompts de escena, integración y ampliación. Modelo: gpt-image-2.5-sunburst xhigh, clave personal.
+Datos de prueba: lista del 26/08/26 (Lo Prado). No es definitivo.

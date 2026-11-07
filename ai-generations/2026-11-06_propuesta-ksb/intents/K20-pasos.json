@@ -1,0 +1,72 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "decision",
+  "recipe": "decision-next-steps",
+  "voice": {
+    "eyebrow": "Próximos pasos",
+    "question": "El siguiente paso es",
+    "answer": [
+      "Presentar"
+    ]
+  },
+  "body": "Como finalistas, presentamos el plan del primer trimestre.",
+  "agenda": {
+    "kicker": "01 · Finalistas · 1–3 de diciembre",
+    "title": "El plan del Q1, en vivo",
+    "descriptor": "Línea base, landings por segmento, tablero y calendario de Expomin",
+    "days": [
+      {
+        "weekday": "Lun",
+        "day": "30"
+      },
+      {
+        "weekday": "Mar",
+        "day": "1"
+      },
+      {
+        "weekday": "Mié",
+        "day": "2"
+      },
+      {
+        "weekday": "Jue",
+        "day": "3"
+      },
+      {
+        "weekday": "Vie",
+        "day": "4"
+      }
+    ],
+    "times": [
+      "09:30",
+      "11:30",
+      "15:00",
+      "17:00"
+    ],
+    "chosen": {
+      "day": 3,
+      "time": 2
+    },
+    "summary": "A coordinar con Marketing de KSB",
+    "cta": "Agendar la presentación"
+  },
+  "nextSteps": [
+    {
+      "number": "02",
+      "label": "Estrategia",
+      "title": "Plan 2027",
+      "desc": "Del 15 al 28 de diciembre, con su equipo."
+    },
+    {
+      "number": "03",
+      "label": "Inicio",
+      "title": "Enero 2027",
+      "desc": "Ramp-up y línea base desde el primer día."
+    }
+  ]
+}

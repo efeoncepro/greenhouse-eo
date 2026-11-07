@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "espuma de una ola que se retira sobre la arena,",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "mancora",
+ "input": {
+  "id": "mancora",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "playa de Máncora, Piura, Perú",
+  "escena": "la orilla de la playa de Máncora con olas que rompen en varias líneas detrás; un viajero sale del agua y camina por la arena húmeda con una tabla de surf bajo el brazo, mojado, hacia el borde derecho del cuadro. Al fondo, lejos y pequeños, otros surfistas en el agua. Tiene que leerse como playa de olas y movimiento, distinta de las tres playas tranquilas del resto del artículo. Personas: el viajero a media distancia, de perfil o de espaldas, caminando sin pose ni mirada al lente; surfistas del fondo pequeños, en acción espontánea; ningún rostro identificable en primer plano",
+  "hora": "final de la tarde, con el sol todavía sobre el mar (la tarde del relato)",
+  "clima": "cielo despejado o con nubes altas, sin lluvia; luz cálida abundante, sombras abiertas, espuma y cielo con altas luces conservadas",
+  "primerPlano": "espuma de una ola que se retira sobre la arena,",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin marcas legibles en la tabla ni en la ropa, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin sol ya hundido, sin poses de surfista para cámara, sin hoteles de lujo dominando el fondo",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "playa de Máncora, Piura, Perú (its real forms, scale and spatial relationships)"
+ }
+}

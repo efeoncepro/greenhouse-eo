@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:47:12.457Z",
+  "run": "ai-generations/2026-10-23_blog-portada-slider",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-23_blog-portada-slider",
+  "totalBytes": 6482251,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "slide-aeo-diagnostico.png",
+      "sizeBytes": 2360995,
+      "sha256": "9018dfaf23a53d6005a9cc869492d93ebf10773eda7d6f5220e939c06eb49856",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-aeo-diagnostico.png"
+    },
+    {
+      "path": "slide-aeo-diagnostico.webp",
+      "sizeBytes": 45282,
+      "sha256": "bb66d8d93013229eef9bccbc10cd03cdc8b34e1c8a89513bde6cceb6b6248b59",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-aeo-diagnostico.webp"
+    },
+    {
+      "path": "slide-caso-anam-customer-agent.png",
+      "sizeBytes": 1980486,
+      "sha256": "1b311ca8fc3cb6e83afde733507ea55a5cbe3595f21f9d019e43abeed27a4056",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-caso-anam-customer-agent.png"
+    },
+    {
+      "path": "slide-caso-anam-customer-agent.webp",
+      "sizeBytes": 55890,
+      "sha256": "75ce5cc4c05ca92b90ac16e62ae47911b4dddbcee0b0220417a61b95895a55ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-caso-anam-customer-agent.webp"
+    },
+    {
+      "path": "slide-guia-web-agentica.png",
+      "sizeBytes": 1994604,
+      "sha256": "dd3c7d2827d6f3c3abe279fa28d0ae0a33ef3b7dceb9db543a7a4de937b6f8c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-guia-web-agentica.png"
+    },
+    {
+      "path": "slide-guia-web-agentica.webp",
+      "sizeBytes": 44994,
+      "sha256": "7f6e302e31e22f8cd91f27cbe5891e43a321d4b398b3f2531fa4204d4289b809",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-23_blog-portada-slider/slide-guia-web-agentica.webp"
+    }
+  ]
+}

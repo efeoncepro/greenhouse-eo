@@ -1,0 +1,17 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "revenue-hubspot",
+  "theme": "dark",
+  "role": "close",
+  "recipe": "close-proposal",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-10-20_propuesta-assetplan/plates/BR3h-v3-logo-acabado.png",
+    "alt": "Nexa, de espaldas, camina hacia una órbita de luz azul de Efeonce en el horizonte, con una sola esfera rosada en lo alto"
+  }
+}

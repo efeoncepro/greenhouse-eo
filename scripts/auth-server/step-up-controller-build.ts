@@ -23,6 +23,8 @@ export async function generateStepUpController(check = false) {
     format: 'iife',
     target: 'es2022',
     write: false,
+    // Keep bundled source paths stable when a managed worktree links the shared node_modules.
+    preserveSymlinks: true,
     keepNames: false,
     minify: false,
     tsconfig: resolve(root, 'tsconfig.json')

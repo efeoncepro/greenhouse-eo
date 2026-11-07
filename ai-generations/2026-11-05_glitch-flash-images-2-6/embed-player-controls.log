@@ -1,0 +1,19 @@
+### Result
+[{"id":"1243362697","buttons":[{"label":null,"title":null,"text":"Reproducir"},{"label":"Silenciar","title":null,"text":""},{"label":null,"title":null,"text":"Configuración"},{"label":null,"title":null,"text":"Velocidad"},{"label":null,"title":null,"text":"Imagen en imagen"},{"label":null,"title":null,"text":"Pantalla completa"}],"videos":1},{"id":"1242918503","buttons":[{"label":null,"title":null,"text":"Reproducir"},{"label":"Silenciar","title":null,"text":""},{"label":null,"title":null,"text":"Configuración"},{"label":null,"title":null,"text":"Velocidad"},{"label":null,"title":null,"text":"Imagen en imagen"},{"label":null,"title":null,"text":"Pantalla completa"},{"label":null,"title":null,"text":"Mostrar los controles"},{"label":"Cerrar el menú.","title":null,"text":""},{"label":"Cerrar el menú.","title":null,"text":""}],"videos":1}]
+### Ran Playwright code
+```js
+await (async (page) => {
+ const result=[];
+ for(const id of ['1243362697','1242918503']){
+  const iframe=page.locator('.entry-content iframe[src*="'+id+'"]');
+  await iframe.scrollIntoViewIfNeeded();
+  const frame=page.frames().find(f=>f.url().includes('player.vimeo.com/video/'+id));
+  result.push({id,buttons:await frame.locator('button').evaluateAll(bs=>bs.map(b=>({label:b.getAttribute('aria-label'),title:b.getAttribute('title'),text:b.innerText}))),videos:await frame.locator('video').count()});
+ }
+ return result;
+})(page);
+```
+
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

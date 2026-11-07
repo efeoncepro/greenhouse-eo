@@ -1,0 +1,98 @@
+{
+  "id": "noticia-talara",
+  "notion_url": "https://app.notion.com/p/64ee12a9310a4c5c984a3d2a657e022e",
+  "titulo": "SKY inicia vuelos entre Lima y Talara y fortalece su conexión con el norte del Perú",
+  "slug": "/sky-vuelos-lima-talara-temporada-2026/",
+  "mercado": "PE",
+  "version": "v2 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba de la bajada, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "llegada al aeropuerto · persona sola · cuerpo parcial · escala media · luz de tarde",
+      "registro": "D",
+      "archivo": "talara-aeropuerto-llegada-viajero-tabla.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero con mochila y una tabla de surf en su funda caminando por la sala de llegadas del aeropuerto de Talara, en Piura",
+      "que_muestra": "el interior de una sala de llegadas pequeña y luminosa; un viajero, de espaldas y a media distancia, camina hacia la salida con una mochila y una tabla de surf en su funda bajo el brazo; por los ventanales del fondo entra la luz de la tarde. Tiene que leerse como llegada a un aeropuerto regional de playa, no como gran terminal.",
+      "hora_clima": "final de la tarde, con luz natural cálida que entra por los ventanales; interior luminoso, sombras abiertas, ventanales sin quemar",
+      "personas": "el viajero de espaldas, caminando, sin pose ni mirada al lente; otros pasajeros pequeños y lejanos; personal, si aparece, con ropa neutra, de espaldas y sin uniformes reconocibles; ningún rostro identificable",
+      "primer_plano": "el borde de una columna o de una banca de la sala, muy cerca del lente y muy fuera de foco, por un lateral, sin tapar al viajero",
+      "ancla_pov": "Con los vuelos de SKY, Talara suma otra forma de llegar a una costa conocida por el surf",
+      "no": [
+        "sin texto ni logos",
+        "sin señalética ni pantallas legibles",
+        "sin logos de aerolíneas",
+        "sin aviones a la vista por los ventanales",
+        "sin cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cintas de equipaje con marcas"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del interior de la sala de llegadas del aeropuerto de Talara en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero con la tabla y la luz de los ventanales tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Talara es además la puerta de entrada…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "traslado desde el aeropuerto · persona sola · cuerpo parcial · escala media · luz de tarde",
+      "registro": "E",
+      "archivo": "talara-aeropuerto-salida-viajero-auto.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero cargando su maleta en un auto a la salida del aeropuerto de Talara, con la luz de la tarde",
+      "que_muestra": "a la salida del terminal, un viajero de espaldas sube su maleta de mano a la maletera abierta de un auto; el cielo despejado y el paisaje seco de la costa al fondo. Muestra el paso que sigue al vuelo: el traslado hacia la costa.",
+      "hora_clima": "final de la tarde, después de la llegada; cielo despejado; luz cálida abundante, sombras abiertas, cielo sin quemar",
+      "personas": "fotografía un acompañante desde unos pasos atrás; el viajero, de espaldas o de perfil, mira la maleta; el conductor, si aparece, de espaldas y con ropa neutra; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "el borde de la maleta o de la puerta del auto, muy cerca del lente y muy fuera de foco, por un lateral, sin tapar al viajero",
+      "ancla_pov": "otra forma de llegar a la costa de Piura",
+      "no": [
+        "sin texto ni logos",
+        "sin placas de auto legibles",
+        "sin logos de empresas de taxi o de alquiler",
+        "sin señalética del aeropuerto legible",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del exterior del aeropuerto de Talara en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER (consultado el 05/11/2026); no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TYL",
+      "ciudad": "Talara"
+    },
+    "home_market": "PER",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (ruta no catalogada para PER al 05/11/2026)",
+    "titular": "Del aeropuerto a las olas",
+    "cta": "Ver vuelos a Talara",
+    "archivo": "banner-ruta-lima-talara-noticia.webp",
+    "alt": "Banner de SKY de la ruta Lima–Talara: del aeropuerto a las olas",
+    "posicion": "después de «¿Cómo comprar pasajes de Lima a Talara?», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "EXCEPCIÓN: noticia con dos imágenes en lugar de tres (sin escenas de destino propias; prohibido generar aviones)",
+    "avión de SKY en la pista de Talara — prohibido generar aviones y uniformes SKY; era el ALT del borrador",
+    "playa de Lobitos al atardecer — ya está en la guía de Talara",
+    "puerta de embarque en Lima — señalética y pantallas legibles",
+    "mano con la tarjeta de embarque en el celular — marca y datos legibles"
+  ]
+}

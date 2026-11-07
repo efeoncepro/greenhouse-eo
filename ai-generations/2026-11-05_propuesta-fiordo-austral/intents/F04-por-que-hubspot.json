@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-provider-fit",
+  "line": "revenue-hubspot",
+  "voice": {
+    "eyebrow": "Edición recomendada",
+    "question": "¿Pro o Enterprise?",
+    "answer": [
+      "Pro",
+      "primero"
+    ]
+  },
+  "body": "Para un equipo de diez personas recomendamos **Professional**: adopción rápida y licencia proporcionada.",
+  "note": "Recomendación para 10 usuarios · Enterprise queda como opción",
+  "verdicts": [
+    {
+      "glyph": "embudo",
+      "title": "Pro",
+      "description": "Diez usuarios, valor en semanas y controles de Efeonce."
+    },
+    {
+      "glyph": "seguridad",
+      "title": "Enterprise",
+      "description": "Auditoría por API, sandbox y permisos por campo, nativos."
+    },
+    {
+      "glyph": "integracion",
+      "title": "Con QAD",
+      "description": "Fase opcional: clientes y pedidos desde el ERP."
+    },
+    {
+      "glyph": "checklist",
+      "title": "Planillas",
+      "description": "Lo que hay hoy: sin historial común ni alertas."
+    }
+  ],
+  "selectedVerdict": 1
+}

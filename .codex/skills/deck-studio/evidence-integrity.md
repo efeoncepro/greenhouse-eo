@@ -7,7 +7,7 @@
 
 ---
 
-## Anti-fabricación — las 4 formas de mentir sin darse cuenta
+## Anti-fabricación — las 5 formas de mentir sin darse cuenta
 
 ### 1. La cifra sin procedencia
 
@@ -51,6 +51,20 @@ El evaluador **cruza el CV contra la persona**. Presentar una cara fabricada com
 
 Una persona **decorativa** puede ser IA. **Jamás presentada como "su equipo".**
 **Si falta la foto de alguien, se pide la foto. No se fabrica.**
+
+### 5. El crédito, el acceso o la frase que no son nuestros
+
+Caso fuente: kickoff SKY SEO Blog (2026-11-01), un deck que el cliente ve en sala con nosotros.
+
+- **La acción va a nombre de quien la hizo.** El cliente restauró los artículos y concedió los accesos:
+  no se redacta como logro nuestro.
+- **Se confirma qué propiedad o acceso tenemos de verdad** antes de afirmar una capacidad (p. ej.
+  Search Console del blog ≠ del dominio principal).
+- **Una frase inventada nunca se presenta como el copy actual del cliente.** Si ilustra el contraste,
+  se rotula «Descripción genérica».
+- **El título describe lo que la lámina muestra.** Un título que elogia al cliente por tareas menores
+  es, en palabras del operador, «absurdo»; se reemplazó por «Lo que ya está resuelto y lo que cerramos
+  en noviembre».
 
 ---
 
@@ -164,6 +178,8 @@ o una ñ que no está en el subset).
   y falla cerrado si no cabe.
 - **NUNCA** una cara de IA presentada como una persona real del equipo. **Se pide la foto.**
 - **NUNCA** promuevas un artefacto `internal` a la entrega. **Ante la duda, es interno.**
+- **NUNCA** te atribuyas lo que hizo el cliente, ni afirmes un acceso que no confirmaste, ni presentes
+  una frase inventada como su copy actual.
 - **NUNCA** inventes el límite de peso. **Sale de LAS BASES.**
 - **NUNCA** entregues un PDF con fuentes no embebidas. **Lo que tú ves no es lo que él ve.**
 - **NUNCA** entregues como único formato un deck rasterizado a imagen. **Es inadmisible bajo EAA/508**

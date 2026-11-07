@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1ea983fe12c2c728b73391e633bbf0d3cae5722f4f8902fe5c89ae3a221d14de",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.breather",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:FA10-en-la-feria",
+      "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA10-en-la-feria.png",
+      "sha256": "0a0d43673a4e561e0a819c5c300559dbafb2fe5a53ff2fb267d7e466fd96e18e"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

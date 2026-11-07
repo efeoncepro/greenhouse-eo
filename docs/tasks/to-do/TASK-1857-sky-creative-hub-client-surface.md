@@ -423,6 +423,8 @@ Ninguna credencial ni env var. La certificación con usuarias reales de Sky la a
 
 ## Acceptance Criteria
 
+- [ ] EPIC-057: el acceso y la población histórica de Diseño permanecen acotados a su Space al introducir SEO; regresión del recorrido existente sin copiar/mover proyectos ni habilitar Creative Hub a SEO por compartir client.
+
 - [ ] `/creative-hub` responde 200 con hero + secciones para una persona con `cliente.creative_hub` asignado y sin líneas legacy.
 - [ ] Persona sin el módulo → redirect exacto `/home?denied=creative-hub` con `<ModuleNotAssignedEmpty>` «Creative Hub».
 - [ ] Interno entra por bypass D1 sin impersonar; ninguna sesión `authMode=agent` obtiene privilegios extra.
@@ -457,3 +459,11 @@ Ninguna credencial ni env var. La certificación con usuarias reales de Sky la a
 
 - ¿Los datos creativos de Sky llegan por `notion_ops` o por Globe? Discovery lo verifica; si no llegan, la
   página abre en `empty` honesto y se decide con el operador la fuente (fuera de esta task).
+
+## Delta 2026-11-06 — Dependencia externa de EPIC-057
+
+Regresión/preservación Diseño; no se convierte en implementación del espacio SEO ni se modifica su lifecycle por este EPIC.
+
+[EPIC y grafo por hitos](../../epics/in-progress/EPIC-057-operational-accounts-under-organization.md).
+Conserva parent/lifecycle y criterios previamente verificados. El delta registra trabajo pendiente, no lo implementa
+ni autoriza cambios productivos, envíos o historia de Diseño.

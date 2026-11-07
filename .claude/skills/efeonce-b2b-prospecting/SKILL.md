@@ -5,6 +5,14 @@ description: Investiga cuentas B2B para Efeonce, identifica compradores y contac
 
 # Prospección B2B Efeonce
 
+## Workflow de capturas y contacto contextual
+
+Si Julio entrega publicaciones/perfiles y pide investigar, registrar y contactar, o invoca el
+**workflow de prospección contextual**, cargar [señal LinkedIn → CRM → InMail y email](references/linkedin-signal-to-outreach.md).
+Conserva la investigación de empresa/necesidad, correo verificable, alta sin duplicados, mensajes humanos
+y robustos, landings pertinentes, brochure original con enlace HubSpot y readback por canal.
+Reutilizar el mandato explícito para esos objetivos; no volver a pedir una aprobación genérica de envío.
+
 ## LinkedIn y presupuesto InMail
 
 Aplicar la [política de Sales Navigator Core](../../../docs/operations/EFEONCE_LINKEDIN_SALES_NAVIGATOR_POLICY_V1.md):

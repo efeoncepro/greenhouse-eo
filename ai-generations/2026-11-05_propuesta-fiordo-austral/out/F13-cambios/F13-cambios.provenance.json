@@ -1,0 +1,36 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "47a3e2b0ba06bcf13a8a3b357a4c837ae3aa4227e2bcc616dd746f4bf8b217d1",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day-release-cycle",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:hubspot-icon-sales",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/partners/hubspot-icon-sales.svg",
+      "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb"
+    },
+    {
+      "ref": "asset-ref:file:tool-loom",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/loom-isotype.svg",
+      "sha256": "2a7e0e61ee329de167259708019f8009c84d0aa37a579448e60962f795c88cd0"
+    },
+    {
+      "ref": "asset-ref:file:tool-teams",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:tool-microsoft-365",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/microsoft-365-isotype.svg",
+      "sha256": "0ab6e300c363d518d30fbb835b358958a21e751a39932863f95ea1702c0a6d6e"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  },
+  "adjustment": "patch-F13-cambios-2026-11-06"
+}

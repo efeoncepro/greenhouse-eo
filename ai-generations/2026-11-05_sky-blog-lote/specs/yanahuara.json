@@ -1,0 +1,132 @@
+{
+  "id": "yanahuara",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781ec9361cfceb410871e",
+  "titulo": "Mirador de Yanahuara: cómo llegar y qué ver en el barrio más fotografiado de Arequipa (H1 por confirmar)",
+  "slug": "/mirador-de-yanahuara/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + B Viajero integrado",
+      "modificadores": "persona sola · escala media · luz de final de tarde · orienta",
+      "registro": "D",
+      "archivo": "mirador-yanahuara-arcos-sillar-misti-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera bajo los arcos de sillar del Mirador de Yanahuara, en Arequipa, con el volcán Misti enmarcado al fondo",
+      "que_muestra": "la galería de arcos de sillar blanco del Mirador de Yanahuara vista en diagonal, con el Misti enmarcado entre dos arcos y la ciudad baja de techos claros a sus pies; la viajera, de pie bajo uno de los arcos, mira hacia el volcán. Debe leerse como el mirador real: arcos de piedra volcánica blanca, no una arquería genérica.",
+      "hora_clima": "final de la tarde, con el sol bajo calentando el sillar (la hora que recomienda el relato); cielo despejado; luz cálida abundante, sombras abiertas bajo los arcos, altas luces del cielo y del sillar conservadas",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; otros visitantes, si aparecen, lejanos y en acciones espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "el canto de una columna de sillar muy cerca del lente y muy fuera de foco, por el borde izquierdo, sin tapar el arco que enmarca el volcán",
+      "ancla_pov": "Arcos blancos que encuadran el Misti",
+      "no": [
+        "sin texto ni logos",
+        "sin inscripciones legibles inventadas en los arcos",
+        "sin rótulos de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cambiar la posición real del Misti respecto del mirador",
+        "sin nieve inventada en el volcán si la referencia no la tiene"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de los arcos del Mirador de Yanahuara con el Misti al fondo en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el arco, el volcán enmarcado y la viajera tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina que sales de la Plaza de Armas…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "calle en subida · otra persona integrada · escala media · luz de media tarde",
+      "registro": "E",
+      "archivo": "yanahuara-calle-sillar-caminata-barrio.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Calle empedrada de Yanahuara con casas de sillar y portones de madera, recorrida a pie en dirección a la plaza",
+      "que_muestra": "una calle angosta y empedrada que sube entre fachadas de sillar con portones de madera y ventanas con rejas; un acompañante camina unos pasos adelante, en dirección a la plaza, y al fondo asoma la torre de la iglesia. Debe leerse como barrio residencial tradicional, tranquilo y caminable.",
+      "hora_clima": "media tarde, durante la caminata del relato; cielo despejado; luz natural abundante, sombras abiertas en la calle, altas luces del sillar conservadas",
+      "personas": "fotografía el viajero que camina; el acompañante, de espaldas, avanza por la vereda; vecinos, si aparecen, lejanos y en actividades propias; ningún rostro identificable; nadie mira al lente",
+      "primer_plano": "el borde de un portón de madera o de una reja muy cerca del lente y muy fuera de foco, por el borde derecho, sin tapar la calle",
+      "ancla_pov": "la calle empieza a subir suave, las fachadas cambian de color y aparecen las primeras casas de sillar con portones de madera",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin números de casa legibles",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin tráfico intenso ni buses turísticos",
+        "sin balcones de madera de estilo limeño"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una calle del barrio de Yanahuara en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Si ves un puesto de queso helado, pide uno…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "copa de queso helado · escala cercana · luz de media tarde",
+      "registro": "E",
+      "archivo": "yanahuara-queso-helado-mano-iglesia.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mano sosteniendo una copa de queso helado espolvoreado con canela frente a la fachada de la iglesia de San Juan Bautista de Yanahuara",
+      "que_muestra": "en primer término, la mano del viajero con una copa de queso helado espolvoreado con canela; detrás, desenfocada pero reconocible, la fachada de piedra labrada de la iglesia de San Juan Bautista de Yanahuara y un trozo de cielo azul. La relación entre el postre y la fachada es el contenido: demuestra que la visita al barrio es una pausa y no solo una foto desde el mirador.",
+      "hora_clima": "media tarde en la plaza, antes del atardecer en el mirador (el orden del relato); cielo despejado; luz natural abundante, sombras abiertas, sin quemar el blanco del postre ni del sillar",
+      "personas": "fotografía el propio viajero con la otra mano; solo su mano en cuadro; al fondo, transeúntes pequeños y desenfocados; ningún rostro identificable; nadie mira al lente",
+      "primer_plano": "la copa y la mano nítidas en el tercio inferior; el borde de una banca de la plaza muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo",
+      "ancla_pov": "Es el postre clásico de Arequipa, hecho con leche, azúcar y canela",
+      "no": [
+        "sin texto ni logos",
+        "sin envases con marca",
+        "sin rótulos legibles del puesto o de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin helado de máquina ni toppings que no correspondan",
+        "sin alterar los relieves de la fachada"
+      ],
+      "fidelidad": "lugar y producto identificables → requiere fotos reales REF-01 de la fachada de la iglesia de San Juan Bautista de Yanahuara y REF-02 de un queso helado arequipeño en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.foto",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "AQP",
+      "ciudad": "Arequipa"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Arcos blancos frente al Misti",
+    "cta": "Ver vuelos a Arequipa",
+    "archivo": "banner-ruta-lima-arequipa-yanahuara.webp",
+    "alt": "Banner de SKY de la ruta Lima–Arequipa: arcos blancos frente al Misti",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "nota": "La mitad foto se toma de la IMG 1 aprobada (no se genera otra)",
+    "callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** B · `ruta.foto` (mitad color, mitad foto de la serie; el titular nunca sobre la foto)<br />**Ruta:** Lima (LIM) → Arequipa (AQP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Arcos blancos frente al Misti” (5 palabras; la ruta Lima → Arequipa es el elemento principal y el titular va en segundo nivel)<br />**CTA (lo escribe el compositor):** Ver vuelos a Arequipa →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-arequipa<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-arequipa-yanahuara.webp` · **ALT:** “Banner de SKY de la ruta Lima–Arequipa: arcos blancos frente al Misti”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, la mitad foto se toma de la IMG 1 aprobada (no se genera otra)"
+  },
+  "descartes": [
+    "primer plano de una inscripción en un arco — exige texto legible y real, que no se puede generar sin inventar la frase",
+    "puente sobre el río Chili — sin referencia real del tramo y sin ancla en una escena larga",
+    "fachada de la iglesia sola — postal sin acción; queda integrada como fondo de la IMG 3",
+    "mirador de noche — el texto no recomienda ir de noche y no hay fuente de horario"
+  ]
+}

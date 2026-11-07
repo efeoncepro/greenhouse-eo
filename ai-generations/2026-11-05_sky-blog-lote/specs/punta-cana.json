@@ -1,0 +1,130 @@
+{
+  "id": "punta-cana",
+  "notion_url": "https://app.notion.com/40239c2fefe7817c8651e40d40dbdcbc",
+  "titulo": "Dónde queda Punta Cana y cuándo conviene viajar",
+  "slug": "/donde-queda-punta-cana/",
+  "mercado": "CL",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + B — Viajero integrado",
+      "modificadores": "viajera sola en la orilla · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "donde-queda-punta-cana-playa-bavaro-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando por la orilla de Playa Bávaro, en Punta Cana, República Dominicana, con palmeras y agua turquesa",
+      "que_muestra": "el arco largo de arena clara de Playa Bávaro con la línea de palmeras inclinadas hacia el mar y el agua turquesa en calma; una viajera camina por la orilla, a media distancia, con el agua en los pies. Debe leerse como llegada al Caribe dominicano, no como publicidad de un resort.",
+      "hora_clima": "media mañana del primer día (la llegada del gancho); cielo despejado con nubes bajas aisladas; luz tropical abundante, sombras abiertas y altas luces conservadas en la arena",
+      "personas": "la viajera de espaldas o de perfil, caminando sin pose ni mirada al lente; si aparecen otros bañistas, lejanos y pequeños; ningún rostro identificable",
+      "primer_plano": "hojas de palmera muy cerca del lente y muy fuera de foco, por el borde superior o lateral, sin tapar a la viajera ni la línea de playa",
+      "ancla_pov": "la arena clara de Bávaro bajo los pies y una fila de palmeras que se inclina hacia el mar",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin fachadas ni pulseras de resorts identificables",
+        "sin camastros con marcas",
+        "sin sargazo inventado ni agua de color irreal"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de Playa Bávaro en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; tienen que sobrevivir la viajera, la línea de palmeras y el agua turquesa. Viajera en el tercio inferior; dejar la mitad superior con cielo despejado para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Buena parte del alojamiento son resorts frente al mar…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la proa de un catamarán rumbo a Isla Saona · otros pasajeros integrados · escala amplia · luz de mañana · explica",
+      "registro": "E",
+      "archivo": "punta-cana-catamaran-isla-saona-agua-clara.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde la proa de un catamarán rumbo a Isla Saona, cerca de Punta Cana, con agua turquesa transparente y fondo de arena",
+      "que_muestra": "la proa de un catamarán sobre agua turquesa tan clara que se ve el fondo de arena; al frente, la línea baja de palmeras de Isla Saona. La transparencia del agua es el contenido: si no se ve el fondo, la imagen no sirve.",
+      "hora_clima": "mañana, cielo despejado y mar calmo (el día de salida del relato); luz abundante, sombras abiertas, altas luces conservadas en el agua",
+      "personas": "fotografía el viajero sentado en la red de la proa, mirando hacia la isla; dos o tres pasajeros de espaldas o de perfil miran el agua o fotografían; tripulación fuera de cuadro; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "el borde de la red de la proa o una cuerda, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el agua",
+      "ancla_pov": "el agua se vuelve tan clara que el fondo de arena se ve desde la borda",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin nombre ni logo del operador en el barco",
+        "sin parlantes ni bebidas con marca",
+        "sin vista de dron"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la costa de Isla Saona vista desde el mar en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Macao es otra cosa…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial + B — Viajero integrado",
+      "modificadores": "viajero de pie en la orilla frente al oleaje · escala media · luz de tarde · demuestra",
+      "registro": "D",
+      "archivo": "punta-cana-playa-macao-oleaje-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero de pie en la orilla de Playa Macao, en Punta Cana, mirando el oleaje con espuma y viento",
+      "que_muestra": "la playa abierta de Macao con olas que rompen y espuma blanca, la arena revuelta por el viento y vegetación baja detrás; un viajero de pie en la orilla, con la ropa movida por el viento, mira el mar. El contraste con el agua quieta de Juanillo y de la bahía de Saona es el argumento: tiene que leerse como otra playa, más salvaje.",
+      "hora_clima": "tarde, cielo con nubes altas y viento; luz abundante, sombras abiertas y altas luces conservadas en la espuma",
+      "personas": "el viajero de espaldas o de perfil, sin pose ni mirada al lente; nadie dentro del agua; ningún rostro identificable",
+      "primer_plano": "pasto costero o arena levantada muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar al viajero",
+      "ancla_pov": "abierta al oleaje, con más viento y más espuma, y se disfruta más caminándola que flotando",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin surfistas en primer plano",
+        "sin bañistas en el agua",
+        "sin cuatrimotos ni excursiones con marca"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de Playa Macao en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "ruta_texto": "Santiago (SCL) → Punta Cana (PUJ) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "titular": "Arena clara y agua turquesa",
+    "cta": "Ver vuelos a Punta Cana",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-punta-cana",
+    "archivo": "banner-ruta-santiago-punta-cana.webp",
+    "alt": "Banner de SKY: ruta de Santiago a Punta Cana, con arena clara y agua turquesa",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin el mapa de México ni de Cancún en la ruta dibujada",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "PUJ",
+      "ciudad": "Punta Cana"
+    },
+    "home_market": "CHL",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)"
+  },
+  "descartes": [
+    "El mapa en la pantalla del teléfono — interfaz y mapa con marca legible",
+    "La salida del aeropuerto con la maleta — señalética y marcas del terminal",
+    "La piscina del resort — postal intercambiable con cualquier destino",
+    "Piscinas naturales de Saona con bañistas — repite el agua de IMG 2"
+  ]
+}

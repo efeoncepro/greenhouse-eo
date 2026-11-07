@@ -171,6 +171,28 @@ arruina: **si mezclas el diagnóstico con la venta, el cliente descuenta el diag
 
 ---
 
+### 7. Kickoff de cuenta (cliente recién ganado)
+
+| | |
+|---|---|
+| **Narrador** | ✅ sí (sesión de ~60 min), y queda como registro |
+| **Su trabajo** | **alinear y cerrar las decisiones de arranque**, no volver a vender |
+| **Estructura** | agenda → equipo → lo que nos pidieron → diagnóstico → qué significa recuperar (meta → escenarios → cómo medimos) → plan → voz/visual → cómo trabajamos (roles, día a día, flujo) → decisiones de hoy → cierre |
+| **Densidad** | media; ~34 láminas para 60 min; el detalle **se mueve a un anexo**, no se corta |
+
+**Kickoff ≠ deck de venta.** El equipo es **el que atiende la cuenta**: nombres y rol real en esa
+cuenta. Sale la prueba de venta («+85 expertos más en Latam», tamaño de la red): «Esto funciona
+para venta pero para kick-off no» (operador, 2026-11-01). Se reutiliza la lámina canónica
+`content-team` («¿Quién trabaja en mi …? Tu squad.», fichas en abanico, el líder de cuenta al
+centro y seleccionado), nunca una inventada.
+
+**«Lo que nos pidieron» enmarca el deck:** cada bloque siguiente responde a un pedido. La medición
+va **dentro** de «qué significa recuperar», porque «validar escenarios y regla de medición» es la
+decisión n.º 1 del día. Caso fuente: kickoff SKY SEO Blog, 34 + 4 de anexo
+(`ai-generations/2026-10-31_kickoff-seo-sky/canvas/project/`).
+
+---
+
 ## Tabla de decisión rápida
 
 | Arquetipo | Narrador | Densidad | Registro | Barra de evidencia | Lo que lo mata |
@@ -181,6 +203,7 @@ arruina: **si mezclas el diagnóstico con la venta, el cliente descuenta el diag
 | **QBR** | sí | media | según cliente | **máxima** | esconder lo malo · provocar en renovación |
 | **Readout diagnóstico** | ambos | media | usted | **máxima** | mezclar hallazgo con venta |
 | **Webinar** | ✅ | **baja** | tú | media | leer las láminas |
+| **Kickoff de cuenta** | ✅ | media + **anexo** | según cliente | alta | volver a vender · equipo que no atiende la cuenta |
 
 ---
 
@@ -195,6 +218,8 @@ arruina: **si mezclas el diagnóstico con la venta, el cliente descuenta el diag
 - **NUNCA** provoques en una **renovación**. Tú ERES el status quo: sacudirlo es regalarle el deal a
   tu competidor.
 - **NUNCA** mezcles el diagnóstico con la venta en el mismo respiro. **El dato habla primero, solo.**
+- **NUNCA** prueba de venta en un kickoff (tamaño de la red, «+N expertos»). El equipo es el que atiende
+  la cuenta, con la lámina canónica `content-team`.
 - **SIEMPRE** que hagan falta escenario **y** leave-behind → **dos artefactos**, no un compromiso.
 - **SIEMPRE** en una licitación: **modela la fórmula de puntuación ANTES de escribir.** La aritmética
   le gana a la prosa.

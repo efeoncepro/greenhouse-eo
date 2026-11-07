@@ -1,0 +1,5 @@
+Expression: determined and happy, open smile, eyebrows angled forward.
+
+POSE AND CAMERA: running fast to the right, mid-stride, one leg stretched forward and one back, arms swinging in opposite directions, the body slightly tilted forward. THREE-QUARTER VIEW from the front right, eye level.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow under the shoes, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. Every prop touches the character or is held by it; nothing floats loose. Props carry no letters, numbers or logos. The whole figure fully visible with generous margin, centered.

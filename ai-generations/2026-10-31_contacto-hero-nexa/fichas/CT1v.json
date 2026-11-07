@@ -1,0 +1,44 @@
+{
+  "id": "CT1v",
+  "formato": "9:16",
+  "impacto": true,
+  "nota": "Versión vertical nativa del hero de Contacto (CT1b, aprobado por el operador el 2026-10-30) para teléfono. Misma escena recompuesta en 9:16: la página la muestra en un bloque de ~390×560 con object-fit cover y el texto va debajo, sobre #001a33; el pie de la foto se funde a oscuro.",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "escucha-empatica"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark design studio at night, VERTICAL frame): she sits behind the far end of a long dark matte walnut table that runs straight toward the camera, centered horizontally in the frame, framed from the waist up, wearing the royal blue EFEONCE HOODIE, no lanyard, no smartwatch, no rings. REALISTIC ADULT PROPORTIONS: camera about two meters away at the height of her eyes, 85mm, she does not lean toward the lens. There is about a quarter of the frame height of calm dark space above her head, and her face sits just above the middle of the frame. POSE: her RIGHT forearm, on the frame-left side of her body, rises from the table and her chin rests lightly on her loosely closed right hand; her right elbow rests on the table a little left of the frame center; her left forearm lies flat on the table; the embroidered mark on her left chest stays fully visible, nothing in front of it. She looks straight into the lens with a warm, attentive expression, the face of someone who is listening to you. A bright, crisp ring of glowing teal light, clearly the brightest thing in the frame, hovers just above the table around her right elbow, no wider than her shoulders, tilted up toward the camera so it reads as an open ellipse, never a flat line; it passes in front of her forearm and behind it, and the ring stays entirely BELOW 55% of the frame height. On the NEAR side of the ring, closest to the camera, where the ring passes in front of her right forearm, a short brighter teal arc (about one sixth of the ring) ends in ONE small cool-white sphere at its tip, right in front of her forearm: that arc is the long-exposure light trail of a message that has just arrived, brightest at the sphere and fading smoothly into the thin ring behind it, with a few tiny sparks around the sphere, while she stays perfectly still and razor sharp. The far side of the ring carries no sphere and no dot, and the bright arc never ends in a hard cut: it always fades into the thread of the ring. That glowing arc and its sphere are the only key light and it is STRONG and hard: a bright teal edge sculpts the frame-left side of her face, cheekbone, jaw and hand, the nose shadow falls clearly on her frame-right cheek, and the frame-right half of her face drops into deep shadow that still keeps detail; the glow only grazes the hoodie and never floods her chest. The haze above the ring catches its glow as a soft visible column of light rising toward her face and stopping at her face. A crisp, bright cool rim light from behind and above separates her hair and shoulders from the dark. A slim premium aluminium laptop stands open on the table at the frame-right edge, beside her left forearm, seen from its thin side edge, small and partly cut by the frame edge, its screen off and dark, no glow on her, no logo and no marks. Everything above her head is calm deep navy darkness with only faint haze: no window, no bokeh, no light, no objects there. The bottom part of the frame is the dark near end of the table, falling smoothly into near black. The whole frame is cool and contemporary: teal light against deep navy darkness, nothing warm, amber or golden. Rich contrast, punchy saturated teal, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the near end of the same long dark walnut table, the lens only a few centimetres behind its near edge, soft out of focus and outside the reach of the ring of light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep darkness of the studio with only faint haze",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CT1b",
+  "alcance": "nexa",
+  "llave": {
+    "fuente": "the short bright teal arc of the ring and its small cool-white sphere, hovering just above the table in front of her right elbow",
+    "lado": "below her face and to the left of it (frame left), slightly in front of her",
+    "distancia": "about 35 cm below and in front of her chin"
+  },
+  "primerPlano": "the top of the dark matte leather backrest of an empty chair on our side of the table, the visitor's seat, at the bottom-left corner very close to the lens, large and soft out of focus, cut by the frame edge, outside every light",
+  "fondo": "about five metres behind her, only beside and below the height of her head (between 38% and 75% of the frame height), a tall dark window on the frame-right side with the cold lights of a night city melted into large round bokeh, dim and out of focus; nothing bright above her head",
+  "fenomeno": {
+    "que": "a thin tilted ring of teal light (#36C8BF) hovers just above the table around her right elbow, entirely below 55% of the frame height; on its near side, in front of her right forearm, a short brighter teal arc ends in ONE small cool-white sphere at its tip, the long-exposure trail of a message that has just arrived",
+    "esServicio": "Contacto: le escribes a Efeonce, Nexa te escucha y tu mensaje ya entró en órbita hacia el equipo que lo resuelve"
+  }
+}

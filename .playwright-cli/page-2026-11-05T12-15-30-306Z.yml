@@ -1,0 +1,536 @@
+- generic [ref=f130e1]:
+  - generic [ref=f130e2]:
+    - list [ref=f130e3]:
+      - listitem [ref=f130e4]:
+        - generic [ref=f130e5] [cursor=pointer]
+    - list:
+      - listitem: —   
+    - link "Skip to content" [ref=f130e24] [cursor=pointer]:
+      - /url: "#main"
+    - generic:
+      - button "Abrir menú" [ref=f130e25] [cursor=pointer]
+      - banner [ref=f130e29]:
+        - link "Efeonce, ir al inicio" [ref=f130e30] [cursor=pointer]:
+          - /url: /
+      - generic [ref=f130e32]:
+        - generic [ref=f130e33]: ¿QUÉ NECESITAS HOY?
+        - list [ref=f130e34]:
+          - listitem [ref=f130e35]:
+            - button [expanded] [ref=f130e36] [cursor=pointer]:
+              - generic [ref=f130e38]: Growth
+              - generic [ref=f130e39]: ¿Lo medimos?
+            - list [ref=f130e43]:
+              - listitem [ref=f130e44]:
+                - link [ref=f130e45] [cursor=pointer]:
+                  - /url: /agencia-inbound-marketing/
+                  - generic [ref=f130e49]: Loop Marketing
+              - listitem [ref=f130e50]:
+                - link [ref=f130e51] [cursor=pointer]:
+                  - /url: https://think.efeoncepro.com/brand-visibility
+                  - generic [ref=f130e58]: Efeonce AI Visibility Report
+              - listitem [ref=f130e59]:
+                - link [ref=f130e60] [cursor=pointer]:
+                  - /url: /agenda/
+                  - generic [ref=f130e66]: Diagnóstico
+          - listitem [ref=f130e67]:
+            - button [ref=f130e68] [cursor=pointer]:
+              - generic [ref=f130e70]: Brand
+              - generic [ref=f130e71]: ¿Quién crea mi contenido?
+          - listitem [ref=f130e74]:
+            - button [ref=f130e75] [cursor=pointer]:
+              - generic [ref=f130e77]: Engine
+              - generic [ref=f130e78]: ¿Te encuentra la IA?
+          - listitem [ref=f130e81]:
+            - button [ref=f130e82] [cursor=pointer]:
+              - generic [ref=f130e84]: Voice
+              - generic [ref=f130e85]: ¿Dónde invierto?
+          - listitem [ref=f130e88]:
+            - button [ref=f130e89] [cursor=pointer]:
+              - generic [ref=f130e91]: Revenue
+              - generic [ref=f130e92]: ¿Y el reporte del viernes?
+    - generic [ref=f130e95]:
+      - generic [ref=f130e97]:
+        - generic [ref=f130e102]:
+          - generic [ref=f130e103]:
+            - link "Glitch" [ref=f130e105] [cursor=pointer]:
+              - /url: https://efeoncepro.com/category/glitch/
+            - generic [ref=f130e106]: • 12 min de lectura
+          - 'heading "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio" [level=1] [ref=f130e107]'
+          - list [ref=f130e109]:
+            - listitem [ref=f130e110]:
+              - generic [ref=f130e112]:
+                - link "Por Julio Reyes" [ref=f130e113] [cursor=pointer]:
+                  - /url: https://efeoncepro.com/author/jreysgo/
+                - time [ref=f130e115]: 28 sep 2026
+        - generic [ref=f130e116]:
+          - generic [ref=f130e119]:
+            - link "Facebook" [ref=f130e120] [cursor=pointer]:
+              - /url: https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fefeoncepro.com%2Fglitch%2Fglitch-flash-claude-sonnet-5-5%2F
+              - generic [ref=f130e121]: 
+            - link "Linkedin" [ref=f130e122] [cursor=pointer]:
+              - /url: https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fefeoncepro.com%2Fglitch%2Fglitch-flash-claude-sonnet-5-5%2F&title=Glitch+Flash%3A+Sonnet+5.5+roza+a+Opus%2C+a+mitad+de+precio&source=Efeonce
+              - generic [ref=f130e123]: 
+            - link "Pinterest" [ref=f130e124] [cursor=pointer]:
+              - /url: http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fefeoncepro.com%2Fglitch%2Fglitch-flash-claude-sonnet-5-5%2F&description=Glitch+Flash%3A+Sonnet+5.5+roza+a+Opus%2C+a+mitad+de+precio
+              - generic [ref=f130e125]: 
+            - link "X" [ref=f130e126] [cursor=pointer]:
+              - /url: https://x.com/intent/tweet?text=Glitch+Flash%3A+Sonnet+5.5+roza+a+Opus%2C+a+mitad+de+precio,+https%3A%2F%2Fefeoncepro.com%2Fglitch%2Fglitch-flash-claude-sonnet-5-5%2F
+              - generic [ref=f130e127]: 
+          - navigation "breadcrumb" [ref=f130e130]:
+            - list [ref=f130e131]:
+              - listitem [ref=f130e132]:
+                - link "Home" [ref=f130e133] [cursor=pointer]:
+                  - /url: https://efeoncepro.com/
+              - listitem [ref=f130e136]:
+                - link "Glitch" [ref=f130e137] [cursor=pointer]:
+                  - /url: https://efeoncepro.com/category/glitch/
+              - listitem [ref=f130e140]: "Glitch Flash: Sonnet 5.5 roza a Opus, a mitad de precio"
+          - main [ref=f130e143]:
+            - article [ref=f130e144]:
+              - generic [ref=f130e145]:
+                - paragraph [ref=f130e146]: Glitch Flash · 28 de septiembre de 2026
+                - paragraph [ref=f130e147]:
+                  - strong [ref=f130e148]: El micrófono se abre… en modo Flash, porque esta noticia no esperaba al lunes.
+                - paragraph [ref=f130e149]: Anthropic lanzó Claude Sonnet 5.5, su modelo del medio. En casi todas las pruebas queda a un par de puntos de Opus 5.5, el modelo grande que presentó la semana pasada. En una, lo supera. Y cuesta la mitad.
+                - paragraph [ref=f130e150]: "Por eso no es un lanzamiento más: el modelo del medio dejó de ser el plan B."
+                - paragraph [ref=f130e151]: Vamos.
+                - generic [ref=f130e152]:
+                  - heading "Tabla de contenidos" [level=2] [ref=f130e153]
+                  - list [ref=f130e154]:
+                    - listitem [ref=f130e155]:
+                      - link "Qué anunció Anthropic" [ref=f130e156] [cursor=pointer]:
+                        - /url: "#h-que-anuncio-anthropic"
+                    - listitem [ref=f130e157]:
+                      - link "Los números, uno al lado del otro" [ref=f130e158] [cursor=pointer]:
+                        - /url: "#h-los-numeros-uno-al-lado-del-otro"
+                    - listitem [ref=f130e159]:
+                      - link "El esfuerzo también se elige" [ref=f130e160] [cursor=pointer]:
+                        - /url: "#h-el-esfuerzo-tambien-se-elige"
+                    - listitem [ref=f130e161]:
+                      - link "Qué dicen las empresas que lo probaron" [ref=f130e162] [cursor=pointer]:
+                        - /url: "#h-que-dicen-las-empresas-que-lo-probaron"
+                    - listitem [ref=f130e163]:
+                      - link "Más allá del código" [ref=f130e164] [cursor=pointer]:
+                        - /url: "#h-mas-alla-del-codigo"
+                    - listitem [ref=f130e165]:
+                      - link "El modelo del medio dejó de ser el plan B" [ref=f130e166] [cursor=pointer]:
+                        - /url: "#h-el-modelo-del-medio-dejo-de-ser-el-plan-b"
+                    - listitem [ref=f130e167]:
+                      - 'link "Seguridad: lo que trae el modelo" [ref=f130e168] [cursor=pointer]':
+                        - /url: "#h-seguridad-lo-que-trae-el-modelo"
+                    - listitem [ref=f130e169]:
+                      - link "Lo que cambia para tu equipo" [ref=f130e170] [cursor=pointer]:
+                        - /url: "#h-lo-que-cambia-para-tu-equipo"
+                    - listitem [ref=f130e171]:
+                      - link "Lo que falta ver" [ref=f130e172] [cursor=pointer]:
+                        - /url: "#h-lo-que-falta-ver"
+                - heading "Qué anunció Anthropic" [level=2] [ref=f130e173]
+                - 'figure "Imagen: Anthropic (video de lanzamiento de Claude Sonnet 5.5)." [ref=f130e174]':
+                  - 'img "Banner de Glitch Flash: fotograma del video de lanzamiento de Claude Sonnet 5.5, un dial graduado en duotono navy que se desarma en bytes." [ref=f130e175]'
+                - paragraph [ref=f130e177]:
+                  - text: "Sonnet 5.5 es el segundo modelo de la familia Claude 5.5, una semana después de Opus 5.5. Anthropic lo presenta como su complemento más rápido y barato: Opus queda para el trabajo complejo que exige juicio sostenido; Sonnet, para las tareas acotadas del día a día, corregir bugs y armar documentos, presentaciones y planillas bien terminados. Según el"
+                  - link "anuncio oficial" [ref=f130e178] [cursor=pointer]:
+                    - /url: https://www.anthropic.com/claude-sonnet-5-5
+                  - text: ", también tiene «buen ojo para el diseño»."
+                - list [ref=f130e179]:
+                  - listitem [ref=f130e180]:
+                    - strong [ref=f130e181]: "Velocidad:"
+                    - text: genera más de 30% más rápido que Sonnet 5. Es el Sonnet más rápido que Anthropic ha lanzado.
+                  - listitem [ref=f130e182]:
+                    - strong [ref=f130e183]: "Precio:"
+                    - text: USD 2 por millón de tokens de entrada, USD 10 de salida y USD 0,20 en lectura de caché. Es lo mismo que Sonnet 5 y la mitad que Opus 5.5 (USD 4 y USD 20). La escritura en caché cuesta USD 2,50, contra USD 5 en Opus.
+                  - listitem [ref=f130e184]:
+                    - strong [ref=f130e185]: "Costo por tarea:"
+                    - text: según Anthropic, hasta 30% menos que su antecesor, porque necesita muchos menos tokens y agrupa las llamadas a herramientas para terminar el mismo trabajo en menos pasos.
+                  - listitem [ref=f130e186]:
+                    - strong [ref=f130e187]: "Disponibilidad:"
+                    - text: desde hoy en las apps de Claude, en Claude Code, en la API (claude-sonnet-5-5) y en AWS, Google Cloud y Microsoft Azure, con opción de retención cero de datos.
+                - paragraph [ref=f130e188]: El tercero de la familia, Haiku 5.5, pensado para alto volumen y bajo costo, llega en las próximas semanas.
+                - heading "Los números, uno al lado del otro" [level=2] [ref=f130e189]
+                - 'figure "Fuente: Anthropic, anuncio de Claude Sonnet 5.5 (28 de septiembre de 2026)." [ref=f130e190]':
+                  - table [ref=f130e191]:
+                    - rowgroup [ref=f130e192]:
+                      - row [ref=f130e193]:
+                        - columnheader "Prueba" [ref=f130e194]
+                        - columnheader "Sonnet 5.5" [ref=f130e195]
+                        - columnheader "Opus 5.5" [ref=f130e196]
+                        - columnheader "Sonnet 5" [ref=f130e197]
+                    - rowgroup [ref=f130e198]:
+                      - row [ref=f130e199]:
+                        - cell "Terminal-Bench 4.0 (programación con agentes)" [ref=f130e200]
+                        - cell "70,6%" [ref=f130e201]
+                        - cell "66,4%" [ref=f130e202]
+                        - cell "10,3%" [ref=f130e203]
+                      - row [ref=f130e204]:
+                        - cell "CursorBench 4.0 (programación en sesiones reales)" [ref=f130e205]
+                        - cell "55,5%" [ref=f130e206]
+                        - cell "57,8%" [ref=f130e207]
+                        - cell "34,1%" [ref=f130e208]
+                      - row [ref=f130e209]:
+                        - cell "FrontierCode 1.1, esfuerzo máximo" [ref=f130e210]
+                        - cell "46,2%" [ref=f130e211]
+                        - cell "54,4%" [ref=f130e212]
+                        - cell "42,4%" [ref=f130e213]
+                      - row [ref=f130e214]:
+                        - cell "OSWorld 2.1 (uso del computador)" [ref=f130e215]
+                        - cell "80,1%" [ref=f130e216]
+                        - cell "81,8%" [ref=f130e217]
+                        - cell "57,0%" [ref=f130e218]
+                      - row [ref=f130e219]:
+                        - cell "GDPval-AA v2.1 (trabajo de conocimiento, puntaje)" [ref=f130e220]
+                        - cell "1844" [ref=f130e221]
+                        - cell "1846" [ref=f130e222]
+                        - cell "1449" [ref=f130e223]
+                      - row [ref=f130e224]:
+                        - cell "AA-Briefcase v1.1 (trabajo de largo aliento, puntaje)" [ref=f130e225]
+                        - cell "1811" [ref=f130e226]
+                        - cell "1822" [ref=f130e227]
+                        - cell "1359" [ref=f130e228]
+                      - row [ref=f130e229]:
+                        - cell "Humanity's Last Exam" [ref=f130e230]
+                        - cell "64,5%" [ref=f130e231]
+                        - cell "67,7%" [ref=f130e232]
+                        - cell "54,9%" [ref=f130e233]
+                      - row [ref=f130e234]:
+                        - cell "Chartography (lectura de gráficos)" [ref=f130e235]
+                        - cell "61,6%" [ref=f130e236]
+                        - cell "64,4%" [ref=f130e237]
+                        - cell "15,6%" [ref=f130e238]
+                - paragraph [ref=f130e240]: "Opus sigue arriba en casi todas, pero en la mayoría por menos de tres puntos. La excepción es FrontierCode con esfuerzo máximo, donde la distancia sube a ocho. Y en Terminal-Bench 4.0, la prueba de programación con agentes, el orden se invierte: gana Sonnet por cuatro. El salto frente a Sonnet 5 es el otro titular: de 10,3% a 70,6% en esa misma prueba, y unos 400 puntos más en GDPval-AA."
+                - paragraph [ref=f130e241]: Anthropic también se compara con GPT-6 Sol, de OpenAI. En FrontierCode, Sonnet 5.5 con esfuerzo alto iguala el mejor puntaje de GPT-6 Sol por cerca de una quinta parte del costo por tarea, y en trabajo de conocimiento de largo aliento y lectura de gráficos queda por encima. Las cifras de GPT-6 Sol llevan notas al pie en el anuncio, así que conviene leerlas con esa cautela.
+                - paragraph [ref=f130e242]: "Y hay un matiz que Anthropic pone por escrito: los benchmarks muestran sólo una cara del modelo. En sus pruebas, Opus 5.5 sigue siendo claramente más fuerte en el trabajo complejo y abierto que exige juicio sostenido."
+                - heading "El esfuerzo también se elige" [level=2] [ref=f130e243]
+                - paragraph [ref=f130e244]: Sonnet 5.5 permite ajustar cuánto «piensa» antes de responder. Con esfuerzo bajo responde más rápido y gasta menos tokens; con esfuerzo alto razona por más tiempo y revisa mejor su trabajo, a un costo mayor por tarea. En las apps de Claude y en Claude Code viene en esfuerzo medio; en la plataforma para desarrolladores, en alto.
+                - paragraph [ref=f130e245]: "Lo más interesante del anuncio no está en el máximo, está en el mínimo. Según Anthropic:"
+                - list [ref=f130e246]:
+                  - listitem [ref=f130e247]: En Terminal-Bench 4.0, con esfuerzo medio, supera de lejos el mejor puntaje de Sonnet 5 por menos de una décima parte del costo por tarea.
+                  - listitem [ref=f130e248]: En CursorBench, con esfuerzo bajo, supera el mejor puntaje de Sonnet 5 también por menos de una décima parte del costo.
+                  - listitem [ref=f130e249]: En AA-Briefcase, con esfuerzo medio, supera el mejor puntaje de Sonnet 5 por cerca de una novena parte del costo.
+                  - listitem [ref=f130e250]: En FrontierCode, con esfuerzo alto, saca 10 puntos más que Sonnet 5 en el mismo ajuste, por cerca de una quinceava parte del costo por tarea.
+                - paragraph [ref=f130e251]: "Un detalle para quien lo configure: en FrontierCode rinde mejor con esfuerzo extra alto (52,1%) que con el máximo (46,2%). Más esfuerzo no siempre es mejor resultado."
+                - heading "Qué dicen las empresas que lo probaron" [level=2] [ref=f130e252]
+                - paragraph [ref=f130e253]: "El anuncio trae resultados de empresas que tuvieron acceso anticipado. Los más concretos:"
+                - list [ref=f130e254]:
+                  - listitem [ref=f130e255]:
+                    - strong [ref=f130e256]: "Zendesk:"
+                    - text: con cientos de casos reales de soporte, tomó menos decisiones equivocadas y procesó los tickets 20% más rápido que los modelos de Claude que usan hoy en producción.
+                  - listitem [ref=f130e257]:
+                    - strong [ref=f130e258]: "Slack:"
+                    - text: sin cambiar ningún prompt, superó a Sonnet 5 en casi todas sus evaluaciones internas de Slackbot, en menos pasos y con cerca de 14% menos tokens de salida.
+                  - listitem [ref=f130e259]:
+                    - strong [ref=f130e260]: "Box:"
+                    - text: más preciso, 2,4 veces más rápido y con 12% menos tokens. Además vuelve a revisar los datos en los documentos de origen y encuentra errores que Sonnet 5 no veía.
+                  - listitem [ref=f130e261]:
+                    - strong [ref=f130e262]: "Lovable:"
+                    - text: un tercio menos de llamadas a herramientas y cerca de la mitad de ejecuciones de terminal para terminar una tarea.
+                  - listitem [ref=f130e263]:
+                    - strong [ref=f130e264]: "Base44:"
+                    - text: en 118 aplicaciones construidas, llegó a la calidad de Opus 5 en 3,6 iteraciones por aplicación, contra 7,7 de Opus 5.
+                  - listitem [ref=f130e265]:
+                    - strong [ref=f130e266]: "Atlassian:"
+                    - text: sus agentes Rovo pueden correr hasta 30% más rápido que con Sonnet 5.
+                  - listitem [ref=f130e267]:
+                    - strong [ref=f130e268]: "Unity:"
+                    - text: completó 90% de las tareas de su prueba de varios pasos en Unity Editor y programación.
+                  - listitem [ref=f130e269]:
+                    - strong [ref=f130e270]: "Epic Games:"
+                    - text: en sus pruebas pasó la vara de calidad que se espera de un modelo de gama superior, con decenas de miles de líneas de código y tareas de varias horas.
+                - paragraph [ref=f130e271]: Son testimonios que Anthropic eligió para su anuncio. Sirven como señal de dónde rinde el modelo, no como estudio independiente.
+                - heading "Más allá del código" [level=2] [ref=f130e272]
+                - paragraph [ref=f130e273]: El salto no es sólo de programación. En GDPval-AA, que mide tareas reales de 44 ocupaciones en nueve industrias, Sonnet 5.5 queda prácticamente empatado con Opus 5.5. También se acerca a Opus en uso del computador y en lectura de gráficos.
+                - paragraph [ref=f130e274]: "Anthropic cuenta una prueba interna que le habla directo a marketing y finanzas: le entregaron los materiales de resultados trimestrales de una empresa pública, las transcripciones de su llamada con inversionistas y una plantilla de presentación, y le pidieron una revisión operativa de 10 láminas. Dos expertos consideraron que el primer borrador estaba listo para enviarse tal cual."
+                - paragraph [ref=f130e275]: "En diseño, los probadores destacaron que pule interfaces y sigue plantillas de presentaciones con muy poca edición. Y un dato de color que no es menor: es el primer Sonnet que termina Pokémon Rojo mirando sólo capturas de pantalla, una prueba de razonamiento de largo aliento y comprensión de imágenes."
+                - heading "El modelo del medio dejó de ser el plan B" [level=2] [ref=f130e276]
+                - complementary "Glitch" [ref=f130e277]:
+                  - paragraph [aria-hidden] [ref=f130e278]: Glitch
+                  - generic [ref=f130e279]: "Durante mucho tiempo la regla fue sencilla: si la tarea importaba, ibas al modelo más grande. Sonnet 5.5 la rompe justo donde más duele, en el trabajo de agentes que escriben código y ejecutan tareas: ahí el modelo del medio no sólo alcanza al grande, lo pasa. Por la mitad del precio.La pregunta ya no es «¿cuál es el mejor modelo?», sino «¿para qué tarea necesito de verdad el más caro?»."
+                - paragraph [ref=f130e280]:
+                  - text: Es la misma conversación que abrimos con
+                  - link "GPT-5.6 y ChatGPT Work" [ref=f130e281] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/glitch/gpt-5-6-y-chatgpt-work-openai/
+                  - text: ": no se trata de elegir un modelo, sino de repartir el trabajo entre niveles de inteligencia. Con Sonnet 5.5, esa repartición se vuelve bastante más barata."
+                - 'heading "Seguridad: lo que trae el modelo" [level=2] [ref=f130e282]'
+                - list [ref=f130e283]:
+                  - listitem [ref=f130e284]:
+                    - strong [ref=f130e285]: "Alineación:"
+                    - text: en una auditoría de comportamiento con cerca de 1.850 escenarios, iguala o mejora a Sonnet 5 en la mayoría de las medidas de alineación, resistencia al mal uso y honestidad. Anthropic dice no haber encontrado evidencia de que persiga objetivos contrarios a los del usuario.
+                  - listitem [ref=f130e286]:
+                    - strong [ref=f130e287]: "Ciberseguridad:"
+                    - text: es el primer Sonnet que sale con salvaguardas como las de Opus 5.5. Corregir bugs en el trabajo normal no cambia, pero las tareas de ciberseguridad de mayor riesgo pasan a Sonnet 5, y se ve cuando ocurre.
+                  - listitem [ref=f130e288]:
+                    - strong [ref=f130e289]: "Destilación:"
+                    - text: estrena clasificadores que impiden extraer su razonamiento a escala con cuentas falsas, y el razonamiento queda ligado a la cuenta que lo generó.
+                  - listitem [ref=f130e290]:
+                    - strong [ref=f130e291]: "Biología:"
+                    - text: mantiene las mismas salvaguardas que Sonnet 5.
+                - heading "Lo que cambia para tu equipo" [level=2] [ref=f130e292]
+                - list [ref=f130e293]:
+                  - listitem [ref=f130e294]:
+                    - strong [ref=f130e295]: Revisa qué modelo corre en cada flujo.
+                    - text: Si todo pasa por el modelo grande por costumbre, ahí hay un costo que nadie está mirando.
+                  - listitem [ref=f130e296]:
+                    - strong [ref=f130e297]: Mide por tarea terminada, no por token.
+                    - text: El ahorro que promete Sonnet 5.5 viene de usar menos tokens y menos pasos, algo que la tarifa por millón no muestra. Lo contamos en
+                    - 'link "Glitch #16" [ref=f130e298] [cursor=pointer]':
+                      - /url: https://efeoncepro.com/glitch/glitch-costo-real-ia-tarea/
+                    - text: .
+                  - listitem [ref=f130e299]:
+                    - strong [ref=f130e300]: Empieza por el esfuerzo bajo o medio.
+                    - text: Según los números del anuncio, ahí está la mejor relación entre resultado y costo; sube sólo cuando la tarea lo pida.
+                  - listitem [ref=f130e301]:
+                    - strong [ref=f130e302]: Reserva el modelo grande
+                    - text: para lo que exige pensar en profundidad y donde equivocarse sale caro.
+                  - listitem [ref=f130e303]:
+                    - strong [ref=f130e304]: Prueba antes de migrar.
+                    - text: Corre tus propias tareas con los dos modelos y compara resultado, tiempo y costo. Los benchmarks del anuncio son una pista, no tu caso. Y si usas la API con el razonamiento apagado, revisa la guía de migración de Anthropic antes de cambiar.
+                - heading "Lo que falta ver" [level=2] [ref=f130e305]
+                - paragraph [ref=f130e306]: Todas las cifras de este Flash son de Anthropic y de las empresas que eligió para su anuncio. Faltan las evaluaciones independientes que confirmen la velocidad y el ahorro en tareas reales, fuera de las pruebas del laboratorio.
+                - paragraph [ref=f130e307]: También falta Haiku 5.5, que completa la familia en las próximas semanas y puede mover otra vez la cuenta de qué modelo usar para cada cosa.
+                - paragraph [ref=f130e308]: Lo vamos a seguir mirando. Si los números aguantan, esta semana cambió la forma de armar un stack de IA.
+                - separator [ref=f130e309]
+                - paragraph [ref=f130e310]:
+                  - strong [ref=f130e311]: El micrófono se cierra. — El equipo editorial de Glitch.
+                  - text: ¿Te llegó por otro lado?
+                  - link "Suscríbete a Glitch" [ref=f130e312] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/glitch/
+                  - text: y recibe la edición completa cada lunes.
+      - region "Sobre el autor" [ref=f130e317]:
+        - img "Julio Reyes" [ref=f130e319]
+        - generic [ref=f130e324]:
+          - paragraph [ref=f130e325]: Escribe
+          - paragraph [ref=f130e326]: Julio Reyes.
+          - paragraph [ref=f130e327]: Managing & GTM Director · Efeonce Group
+          - paragraph [ref=f130e328]: "Más de 12 años diseñando sistemas de marketing, crecimiento y operaciones creativas para empresas medianas y grandes de Latinoamérica: banca, manufactura, retail y SaaS."
+          - list [ref=f130e329]:
+            - listitem [ref=f130e330]:
+              - link "Inteligencia artificial aplicada al marketing" [ref=f130e331] [cursor=pointer]:
+                - /url: https://efeoncepro.com/category/ai/
+            - listitem [ref=f130e332]:
+              - link "Loop Marketing" [ref=f130e333] [cursor=pointer]:
+                - /url: https://efeoncepro.com/category/loop-marketing/
+            - listitem [ref=f130e334]:
+              - link "SEO/AEO" [ref=f130e335] [cursor=pointer]:
+                - /url: https://efeoncepro.com/category/aeo/
+          - generic [ref=f130e336]:
+            - link "Ver sus 44 artículos" [ref=f130e337] [cursor=pointer]:
+              - /url: https://efeoncepro.com/author/jreysgo/
+            - generic [ref=f130e340]:
+              - link "Instagram de Julio Reyes" [ref=f130e341] [cursor=pointer]:
+                - /url: https://www.instagram.com/cesargrowth/
+              - link "LinkedIn de Julio Reyes" [ref=f130e344] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/cesargrowth/
+      - 'link "Next Post Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda" [ref=f130e347] [cursor=pointer]':
+        - /url: https://efeoncepro.com/glitch/glitch-17-modelo-commodity-control-escaso/
+        - generic [ref=f130e349]:
+          - generic [ref=f130e350]: Next Post
+          - 'heading "Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda" [level=5] [ref=f130e351]'
+      - generic [ref=f130e353]:
+        - heading "Related Posts" [level=4] [ref=f130e354]
+        - generic [ref=f130e355]:
+          - generic [ref=f130e357]:
+            - 'link "Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda" [ref=f130e358]':
+              - /url: https://efeoncepro.com/glitch/glitch-17-modelo-commodity-control-escaso/
+              - figure [ref=f130e359]:
+                - img "Portada edición 17 de glitch" [ref=f130e360]
+                - list [ref=f130e362]:
+                  - listitem [ref=f130e363]:
+                    - img "Julio Reyes" [ref=f130e365]
+                  - listitem [ref=f130e366]:
+                    - generic [ref=f130e367]: Por
+                    - text: Julio Reyes
+            - generic [ref=f130e368]:
+              - generic [ref=f130e369]:
+                - generic [ref=f130e370]: 28/07/2026
+                - generic [ref=f130e371]: • 14 min de lectura
+              - heading [level=4] [ref=f130e372]:
+                - 'link "Glitch #17: Agente rompe la jaula, la confianza reordena el frontier, la correa manda" [ref=f130e373] [cursor=pointer]':
+                  - /url: https://efeoncepro.com/glitch/glitch-17-modelo-commodity-control-escaso/
+              - paragraph [ref=f130e374]: Un agente escapó de su jaula, el frontier se elige por confianza y el open-weight récord ya se descarga. Lo escaso ya no es el modelo.
+              - link "Glitch" [ref=f130e376] [cursor=pointer]:
+                - /url: https://efeoncepro.com/category/glitch/
+              - link "Read More" [ref=f130e377] [cursor=pointer]:
+                - /url: https://efeoncepro.com/glitch/glitch-17-modelo-commodity-control-escaso/
+          - generic [ref=f130e382]:
+            - 'link "Glitch #16: Open-weight que descargas, precio que miente, canal sin dueño" [ref=f130e383]':
+              - /url: https://efeoncepro.com/glitch/glitch-costo-real-ia-tarea/
+              - figure [ref=f130e384]:
+                - 'img "Diseño publicitario para el newsletter Glitch Edición #16, con una mujer profesional en traje gris y un gráfico de barras ascendent" [ref=f130e385]'
+                - list [ref=f130e387]:
+                  - listitem [ref=f130e388]:
+                    - img "Julio Reyes" [ref=f130e390]
+                  - listitem [ref=f130e391]:
+                    - generic [ref=f130e392]: Por
+                    - text: Julio Reyes
+            - generic [ref=f130e393]:
+              - generic [ref=f130e394]:
+                - generic [ref=f130e395]: 21/07/2026
+                - generic [ref=f130e396]: • 13 min de lectura
+              - heading [level=4] [ref=f130e397]:
+                - 'link "Glitch #16: Open-weight que descargas, precio que miente, canal sin dueño" [ref=f130e398] [cursor=pointer]':
+                  - /url: https://efeoncepro.com/glitch/glitch-costo-real-ia-tarea/
+              - paragraph [ref=f130e399]: "El modelo ya se descarga y se afina sobre tu data. Pero poseer los pesos no resuelve la otra mitad del problema: un precio que se mueve y un canal donde tu marca se dibuja sin tu permiso."
+              - link "Glitch" [ref=f130e401] [cursor=pointer]:
+                - /url: https://efeoncepro.com/category/glitch/
+              - link "Read More" [ref=f130e402] [cursor=pointer]:
+                - /url: https://efeoncepro.com/glitch/glitch-costo-real-ia-tarea/
+      - generic [ref=f130e411]:
+        - heading "Leave a Reply" [level=4] [ref=f130e412]
+        - generic [ref=f130e413]:
+          - paragraph [ref=f130e414]:
+            - text: Tu dirección de correo electrónico no será publicada.
+            - generic [ref=f130e415]: Los campos obligatorios están marcados con *
+          - paragraph [ref=f130e416]:
+            - generic [ref=f130e417]: Nombre *
+            - textbox "Nombre *" [ref=f130e418]
+          - paragraph [ref=f130e419]:
+            - generic [ref=f130e420]: Correo electrónico *
+            - textbox "Correo electrónico *" [ref=f130e421]
+          - paragraph [ref=f130e422]:
+            - generic [ref=f130e423]: Web
+            - textbox "Web" [ref=f130e424]
+          - paragraph [ref=f130e425]:
+            - checkbox "Guarda mi nombre, correo electrónico y web en este navegador para la próxima vez que comente." [ref=f130e426]
+            - text: Guarda mi nombre, correo electrónico y web en este navegador para la próxima vez que comente.
+          - paragraph [ref=f130e427]:
+            - generic [ref=f130e428]: Comentario *
+            - textbox "Comentario *" [ref=f130e429]
+          - paragraph [ref=f130e430]:
+            - checkbox "Recibir un correo electrónico con los siguientes comentarios a esta entrada." [ref=f130e431]
+            - text: Recibir un correo electrónico con los siguientes comentarios a esta entrada.
+          - paragraph [ref=f130e432]:
+            - checkbox "Recibir un correo electrónico con cada nueva entrada." [ref=f130e433]
+            - text: Recibir un correo electrónico con cada nueva entrada.
+          - paragraph [ref=f130e434]:
+            - button "Publicar el comentario" [ref=f130e435] [cursor=pointer]
+    - contentinfo [ref=f130e436]:
+      - generic [ref=f130e438]:
+        - list [ref=f130e440]:
+          - listitem [ref=f130e441]:
+            - link [ref=f130e444] [cursor=pointer]:
+              - /url: https://efeoncepro.com/
+              - img "Efeonce" [ref=f130e445]
+          - listitem [ref=f130e446]:
+            - generic [ref=f130e447]:
+              - paragraph [ref=f130e448]: Trabajamos con organizaciones en Latinoamérica y Estados Unidos.
+              - img "Chile, Colombia, México, Perú y Estados Unidos" [ref=f130e449]:
+                - img "Chile" [ref=f130e450]
+                - img "Colombia" [ref=f130e451]
+                - img "México" [ref=f130e452]
+                - img "Perú" [ref=f130e453]
+                - img "Estados Unidos" [ref=f130e454]
+          - listitem [ref=f130e455]:
+            - generic [ref=f130e456]:
+              - link "Facebook" [ref=f130e457] [cursor=pointer]:
+                - /url: https://www.facebook.com/efeonce.cl/
+                - generic [ref=f130e458]: 
+              - link "Instagram" [ref=f130e459] [cursor=pointer]:
+                - /url: https://www.instagram.com/efeoncepro/
+                - generic [ref=f130e460]: 
+              - link "LinkedIn" [ref=f130e461] [cursor=pointer]:
+                - /url: https://linkedin.com/company/efeoncecl
+                - generic [ref=f130e462]: 
+              - link "YouTube" [ref=f130e463] [cursor=pointer]:
+                - /url: https://www.youtube.com/@efeoncelatam
+                - generic [ref=f130e464]: 
+        - list [ref=f130e466]:
+          - listitem [ref=f130e467]:
+            - navigation [ref=f130e468]:
+              - heading "Explora" [level=2] [ref=f130e469]
+              - list [ref=f130e470]:
+                - listitem [ref=f130e471]:
+                  - link "Servicios" [ref=f130e472] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/#servicios
+                - listitem [ref=f130e473]:
+                  - link "Cómo trabajamos" [ref=f130e474] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/#metodo
+                - listitem [ref=f130e475]:
+                  - link "Casos de éxito" [ref=f130e476] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/portafolio/
+                - listitem [ref=f130e477]:
+                  - link "Blog" [ref=f130e478] [cursor=pointer]:
+                    - /url: https://efeoncepro.com/blog/
+        - list [ref=f130e480]:
+          - listitem [ref=f130e481]:
+            - region [ref=f130e482]:
+              - heading [level=3] [ref=f130e483]:
+                - img "Glitch" [ref=f130e484]
+              - paragraph [ref=f130e485]: El newsletter semanal de IA, marketing y negocios, en tu correo.
+              - generic [ref=f130e486]:
+                - link "Suscríbete a Glitch" [ref=f130e487] [cursor=pointer]:
+                  - /url: https://efeoncepro.com/blog/
+                - paragraph [aria-hidden] [ref=f130e488]: Al suscribirte aceptas la política de privacidad. Te das de baja cuando quieras.
+        - list [ref=f130e490]:
+          - listitem [ref=f130e491]:
+            - region [ref=f130e492]:
+              - heading "Contacto" [level=2] [ref=f130e493]
+              - paragraph [ref=f130e494]: Casa matriz
+              - paragraph [ref=f130e495]: Dr. Manuel Barros Borgoño 71, of. 1105Providencia, Santiago de Chile
+              - paragraph [ref=f130e496]:
+                - link "hola@efeoncepro.com" [ref=f130e497] [cursor=pointer]:
+                  - /url: mailto:hola@efeoncepro.com
+              - list [ref=f130e498]:
+                - listitem [ref=f130e499]:
+                  - link "600 914 0660" [ref=f130e500] [cursor=pointer]:
+                    - /url: tel:6009140660
+                  - generic [ref=f130e501]: Solo desde Chile
+                - listitem [ref=f130e502]:
+                  - link "+1 (239) 235-2073" [ref=f130e503] [cursor=pointer]:
+                    - /url: tel:+12392352073
+                  - generic [ref=f130e504]: Estados Unidos
+          - listitem [ref=f130e505]:
+            - region [ref=f130e506]:
+              - heading "Trabaja con nosotros" [level=2] [ref=f130e507]
+              - paragraph [ref=f130e508]: Conoce nuestras vacantes y encuentra tu próximo desafío.
+              - link "Ver vacantes (se abre en una pestaña nueva)" [ref=f130e509] [cursor=pointer]:
+                - /url: https://greenhouse.efeoncepro.com/public/careers
+                - text: Ver vacantes
+                - generic [ref=f130e514]: (se abre en una pestaña nueva)
+          - listitem [ref=f130e515]:
+            - region [ref=f130e516]:
+              - generic [ref=f130e517]:
+                - heading "Nuestros partners" [level=2] [ref=f130e518]
+                - link "Volver arriba" [ref=f130e519] [cursor=pointer]:
+                  - /url: "#page"
+                  - text: Volver arriba
+                  - generic [aria-hidden] [ref=f130e520]: ↑
+              - list [ref=f130e521]:
+                - listitem [ref=f130e522]:
+                  - img "HubSpot" [ref=f130e523]
+                - listitem [ref=f130e524]:
+                  - img "Salesforce" [ref=f130e525]
+                - listitem [ref=f130e526]:
+                  - img "Adobe" [ref=f130e527]
+                - listitem [ref=f130e528]:
+                  - img "Microsoft" [ref=f130e529]
+                - listitem [ref=f130e530]:
+                  - img "AWS" [ref=f130e531]
+                - listitem [ref=f130e532]:
+                  - img "Google Cloud" [ref=f130e533]
+                - listitem [ref=f130e534]:
+                  - img "Claude" [ref=f130e535]
+                - listitem [ref=f130e536]:
+                  - img "OpenAI" [ref=f130e537]
+                - listitem [ref=f130e538]:
+                  - img "BytePlus" [ref=f130e539]
+      - generic [ref=f130e544]:
+        - generic [ref=f130e545]: © 2026 Efeonce Group SpA. Todos los derechos reservados.
+        - generic [ref=f130e546]:
+          - link "Privacidad y cookies" [ref=f130e547] [cursor=pointer]:
+            - /url: /politica-de-privacidad
+          - text: "|"
+          - button "Preferencias de cookies" [ref=f130e548] [cursor=pointer]
+  - dialog [active] [ref=f130e549]:
+    - generic [ref=f130e550]:
+      - generic [ref=f130e552]:
+        - paragraph [ref=f130e553]: PRIVACIDAD, A TU MEDIDA
+        - heading "Tu visita. Tus reglas." [level=2] [ref=f130e554]: Tu visita.Tus reglas.
+        - paragraph [ref=f130e555]:
+          - text: Usamos cookies para que el sitio funcione. Con tu permiso, también para mejorarlo y mostrarte publicidad relevante. Tú eliges.
+          - link "Política de privacidad" [ref=f130e556] [cursor=pointer]:
+            - /url: https://efeoncepro.com/politica-de-privacidad/
+      - generic [ref=f130e558]:
+        - button "Personalizar preferencias" [ref=f130e559] [cursor=pointer]: Configurar Personalizar preferencias
+        - generic [ref=f130e560]:
+          - button "Aceptar todas" [ref=f130e561] [cursor=pointer]: Aceptar Aceptar todas
+          - button "Solo esenciales" [ref=f130e562] [cursor=pointer]: Rechazar Solo esenciales
+        - paragraph [ref=f130e563]: Puedes cambiarlo después.

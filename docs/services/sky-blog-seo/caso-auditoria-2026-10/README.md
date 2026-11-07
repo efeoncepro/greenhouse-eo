@@ -2,8 +2,13 @@
 
 Expediente del encargo de Julio del 23-10-2026: auditar el Blog SKY a partir de las reuniones con SKY, revisar
 lo que se había avanzado el 15-10, armar el informe de entrega con el renderer A4 premium y preparar los correos.
-Estado al 31-10-2026: **informe enviado el 23-10 a Pilar y Natalia; accesos entregados; los 9 artículos de Perú
-restaurados; kickoff el 02-11.** Insumos del deck: [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md).
+Estado al 01-11-2026: **informe enviado el 23-10 a Pilar y Natalia; SKY entregó administrador de WordPress y
+restauró los 9 artículos de Perú; el Search Console de Efeonce es sólo la propiedad del blog; deck del kickoff
+armado para el 02-11.** Delta 05-11: el token de Search Console también lee `www` y su historia del blog quedó
+exportada; proyección y conversión en [PROYECCION_2026-11.md](PROYECCION_2026-11.md). Insumos, deck, equipo y sistema visual: [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md).
+Método reutilizable de este caso (auditoría, proyección, lotes y producción): skill
+[`sky-blog-seo-editorial`](../../../../.claude/skills/sky-blog-seo-editorial/SKILL.md), capítulo
+[auditoría y diagnóstico](../../../../.claude/skills/sky-blog-seo-editorial/references/auditoria-y-diagnostico.md).
 
 ## Qué pidió SKY (reuniones)
 
@@ -25,15 +30,17 @@ de la empresa Sky Airlines (`30825221458`).
 | --- | --- | --- |
 | Hechos verificados (fuente única de cifras) | [HECHOS.md](HECHOS.md) | Vigente al corte 21/23-10 |
 | Auditoría consolidada interna | [docs/audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md](../../../audits/growth/2026-10-23-sky-blog-seo-audit-consolidada.md) | Commit `ac2372eed` |
-| Informe A4 para SKY (23 páginas) | `outputs/sky-blog-seo-audit-2026-10-23/informe/Efeonce - Auditoria SEO Blog SKY (23-10-2026).pdf` (sha256 `f9ee0e01…87e18`) | Generado y revisado página por página; no enviado |
+| Informe A4 para SKY (23 páginas) | `outputs/sky-blog-seo-audit-2026-10-23/informe/Efeonce - Auditoria SEO Blog SKY (23-10-2026).pdf` (sha256 `f9ee0e01…87e18`) | Generado, revisado página por página y enviado el 23-10 a Pilar y Natalia |
 | Copia para adjuntar | OneDrive › Alineación › 1. Clientes (Interno) › Sky - SEO-AEO › Auditoría SEO 2026-10 | Misma huella; carpeta interna (no la compartida con SKY) |
 | Plan del informe y generador | `outputs/.../informe/sky-blog-audit.plan.json` · [`scripts/seo/sky-blog-audit-report.ts`](../../../../scripts/seo/sky-blog-audit-report.ts) | Regenerable: `pnpm exec tsx scripts/seo/sky-blog-audit-report.ts` + `pnpm report:compose … --asset org-logo:sky=…/sky-official.svg` |
 | Tablas de apoyo | `outputs/sky-blog-seo-audit-2026-10-23/` (clasificación de 1.697 posts, backlog editorial, canibalización, cobertura de rutas, redirecciones) | Commit `ac2372eed` |
 | Correo a Natalia (artículos de Perú) | [correos/01-natalia-articulos-peru.md](correos/01-natalia-articulos-peru.md) | Borrador; puede omitirse si sale el correo formal |
-| Correo formal a Nicolá, Pilar y Natalia | [correos/02-entrega-auditoria.md](correos/02-entrega-auditoria.md) | Borrador con el PDF adjunto |
+| Correo formal de entrega con el PDF | [correos/02-entrega-auditoria.md](correos/02-entrega-auditoria.md) | Enviado el 23-10 a Pilar y Natalia, con copia a Valentina y Daniela; Nicolá no iba ([insumos del kickoff](KICKOFF_2026-11-02_INSUMOS.md)) |
 | Perú: demanda e intención por destino | [PERU_PRIMER_LOTE.md](PERU_PRIMER_LOTE.md) | Base del lote (Semrush PE) |
 | Lote inicial: 15 nuevos + 25 optimizaciones | [LOTE_INICIAL_PARA_APROBACION.md](LOTE_INICIAL_PARA_APROBACION.md) | Propuesta para aprobar con Natalia; reemplaza a `PERU_TITULOS_PARA_APROBACION.md` |
 | Insumos del kickoff 02-11 (estado al 31-10, expectativa a corregir, decisiones) | [KICKOFF_2026-11-02_INSUMOS.md](KICKOFF_2026-11-02_INSUMOS.md) | Para la sesión que arma el deck |
+| Deck del kickoff (34 láminas + 4 de anexo) | Artifact privado https://claude.ai/artifact/JQ3k1siSTNxgUiqu1NsaHE · fuente `ai-generations/2026-10-31_kickoff-seo-sky/canvas/project/` · PDF en `…/deck/out/` | Armado el 01-11; PDF en generación. Detalle en [insumos §7](KICKOFF_2026-11-02_INSUMOS.md#7-deck-y-equipo-confirmados-el-01-11) |
+| Proyección a 24 meses y aporte a la venta (pedido del kickoff 02-11) | [PROYECCION_2026-11.md](PROYECCION_2026-11.md) · correo [03-proyeccion-y-conversion.md](correos/03-proyeccion-y-conversion.md) · PDF y planilla en OneDrive › Workspace › Clientes › Sky Airlines › Proyección Blog 2026-11 | Preparado el 05-11; sin enviar |
 | Página ejecutiva (borrador previo) | Artifact privado «Auditoría Blog SKY» | Superada por el PDF |
 
 ## Decisiones tomadas en el caso
@@ -61,10 +68,10 @@ de la empresa Sky Airlines (`30825221458`).
 | Pendiente | Dueño | Condición de cierre |
 | --- | --- | --- |
 | ~~Revisar y enviar el correo formal con el PDF~~ | Julio | Enviado el 23-10 a Pilar y Natalia (Nicolá no iba) |
-| Saber quién retiró los 9 artículos de Perú (restaurados al 31-10: 8 en 200, `viajar-a-peru` → `/viajar-a-peru-2/`) | Natalia / SKY | Respuesta registrada |
-| Exportar el Search Console de `www.skyairline.com` (historia previa; vence nov-2026 a ene-2027) | SKY (acceso) + Efeonce | Export guardado en el expediente |
+| Saber quién retiró los 9 artículos de Perú (SKY los restauró: 8 en 200, `viajar-a-peru` → `/viajar-a-peru-2/`) | Natalia / SKY | Respuesta registrada |
+| Historia de Search Console: Efeonce sólo tiene la propiedad del blog; la historia previa vive en `www.skyairline.com` (vence nov-2026 a ene-2027). Decisión pedida a SKY en el kickoff | SKY (acceso a `www`) + Efeonce (export) | Export guardado en el expediente |
 | Revisar acciones manuales y problemas de seguridad en GSC | Efeonce | Captura fechada en la auditoría |
-| Comprobar el acceso de administrador a WordPress (entregado el 27-10 a Julio, Valentina y `mkt@`; cambiar las claves enviadas por correo) | Efeonce | Ingreso comprobado y claves cambiadas |
+| Comprobar el ingreso y cambiar las claves de WordPress enviadas por correo (SKY entregó administrador el 27-10 a Julio, Valentina y `mkt@`; confirmado por Julio el 01-11) | Efeonce | Ingreso comprobado y claves cambiadas |
 | Reemplazar el logo de SKY de la organización en Greenhouse por el oficial | Efeonce | Logo oficial adjunto |
 | Copiar el PDF a «04 Entregables» del canal compartido | Julio | Sólo después del envío |
 | Validar con SKY los escenarios nov–ene | Julio en el kickoff 02-11 | Acuerdo registrado en Notion |

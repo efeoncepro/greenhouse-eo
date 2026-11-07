@@ -19,10 +19,9 @@
 ## Corte operativo posterior — 2026-10-26
 
 Rooms sigue primero; el canary OIDC/OTP real acotado ya pasó con Microsoft/MFA, PNG privado y un correo
-recibido, y quedó cerrado. Auth first-party/OTP false, sin montajes HMAC/authority; no hay apertura de
-cohorte ni migración Greenhouse (TASK-2063). PR #263/#264 del control de deploy siguen abiertas y retenidas;
-el guard del workspace todavía no protege los YAML remotos. Nueva UI puede desarrollarse aislada,
-sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+recibido, y quedó cerrado. Desde el 2026-11-01 first-party/OTP están ON sólo para Rooms (`auth-server-00170-qlx`) y el
+guard de deploy productivo vive en `main`; no hay apertura de cohorte ni migración Greenhouse (TASK-2063). Nueva UI puede desarrollarse aislada,
+sin publicación ni activación implícitas. [Runbook vigente](../operations/runbooks/auth-server.md#estado-operativo--2026-11-01).
 
 ## Estado de implementación al aceptar la decisión (2026-09-07)
 
@@ -264,7 +263,9 @@ uso, PKCE, nonce/state, redacción de logs y auditoría durable forman parte del
 - **Transacción y autorización:** `src/lib/auth-server/oauth/authorize.ts` y stores asociados. La rama
   `first_party_sign_in` debe ser explícita y no insertar una fila falsa de consentimiento delegado.
 - **Superficie del issuer:** `src/lib/auth-server/persons/pages.ts` y
-  `src/lib/auth-server/oauth/pages/render.ts`, consumiendo sólo contexto ya validado.
+  `src/lib/auth-server/oauth/pages/render.ts` (shell con La órbita en `orbit-shell.ts`, local en `develop` sin
+  release), consumiendo sólo contexto ya validado. La marca de un cliente first-party en el consentimiento sale de su
+  `client_id` exacto (`FIRST_PARTY_CLIENT_MARKS`, hoy `efeonce-rooms-cli`), nunca del nombre declarado ni de un id DCR.
 - **OIDC first-party:** contrato separado para authorization code, ID token/user identity y audience del RP.
   No reutiliza el access token, audience, `gv` ni consentimiento del MCP como sustituto.
 - **Entrada y callback por producto:** Rooms TASK-2065 primero; Greenhouse TASK-2063 después, con routes server-side, con destino

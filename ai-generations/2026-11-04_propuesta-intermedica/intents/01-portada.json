@@ -1,0 +1,24 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "voice",
+  "voice": {
+    "eyebrow": "Propuesta · Noviembre 2026",
+    "question": "¿Performance comercial?",
+    "answer": ["Performance", "comercial"]
+  },
+  "body": "Preparada para **Intermedica** · Confidencial",
+  "selection": { "target": "client-logo", "label": "Efeonce", "participantKind": "role" },
+  "clientLogo": {
+    "path": "ai-generations/2026-11-04_propuesta-intermedica/logos/intermedica-blanco.png",
+    "alt": "Intermedica Solutions"
+  },
+  "column": { "topPx": 220 }
+}

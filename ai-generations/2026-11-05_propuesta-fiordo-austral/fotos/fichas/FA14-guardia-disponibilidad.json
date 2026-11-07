@@ -1,0 +1,21 @@
+{
+  "id": "FA14-guardia-disponibilidad",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "linea": "revenue-hubspot",
+  "identidad": [{ "persona": "antonio", "vista": "45-der" }],
+  "objetos": [{ "objeto": "chaqueta-bomber-efeonce", "persona": "antonio" }],
+  "escena": "SCENE (documentary photograph, the Efeonce support desk at dusk, the on-call specialist checks that the client's CRM is up): in focus, the man from the reference images, wearing the NAVY EFEONCE BOMBER JACKET over a plain navy polo, sits at a clean desk and leans slightly toward a single large, current, borderless monitor, his right hand resting on a slim aluminium trackpad; his eyes are on the screen, calm and attentive, never on the lens. The monitor is the brightest thing in the frame and its cool white light lifts his face and hand from the front-left. On the screen, out of focus and seen at a slight angle, a long row of thin vertical bars, almost all in one even soft green tone with a single short amber bar, like a service status history, under a thin header band that glows in azure blue (#0375DB), the only saturated blue in the frame: abstract shapes only, no readable text, no numbers, no logos. A slim current smartphone lies face down on the desk. Behind him, soft and far out of focus, a dark office wall with a few cool, distant practical lights melted into small round bokeh. The whole frame is cool and contemporary: nothing warm, amber or golden except that one tiny bar on the screen; no tungsten. Hardware of the current generation only: no plastic laptop, no thick bezels, no cables, no paper, no books, no plants, no mugs. 85mm f/1.8, camera about two meters away at chest height. LENS FRAMING (essential, compact): his whole head, his hand on the trackpad and the near part of the monitor are CLOSE TOGETHER, all inside ONE circle whose diameter is about 72% of the frame height, centred at 74% of the frame width and at 54% of the frame height, with air around his head inside that circle: the top of his head sits well below the top edge of the circle and his face is near the centre of the circle; nothing essential outside that circle. The LEFT 45% of the frame holds only the calm, evenly shadowed dark office wall: no lights, no objects, no people, no text.",
+  "lecho": {
+    "objeto": "the near, out-of-focus dark matte edge of the desk at the bottom of the frame, outside the monitor light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed dark office wall on the left 45 % of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "nota": "Foto del oficio detrás de la cifra para content-measure (disponibilidad 99,9 %) de la propuesta Fiordo Austral (06/11/2026). Reemplaza HS5b, que venía de la lámina de licencias del deck HubSpot, no estaba encuadrada para el lente y le cortaba la cara (comentario de Julio). Encuadre del lente copiado de P1-deck-lente-edicion. Antonio es elenco ficticio de la línea revenue-hubspot: no es una persona del equipo."
+}

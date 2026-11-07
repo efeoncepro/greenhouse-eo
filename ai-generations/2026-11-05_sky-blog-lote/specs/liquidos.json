@@ -1,0 +1,139 @@
+{
+  "id": "liquidos",
+  "notion_url": "https://app.notion.com/p/40239c2fefe78142aa3ef11bf7ea359b",
+  "titulo": "Líquidos en el avión: cuántos mililitros puedes llevar en cabina",
+  "slug": "/liquidos-en-avion/",
+  "mercado": "CL/PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + POV del viajero",
+      "modificadores": "persona sola · escala cercana · luz de día interior · orienta",
+      "registro": "D",
+      "archivo": "liquidos-avion-neceser-bolsa-transparente.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Manos guardando frascos pequeños de crema y perfume en una bolsa plástica transparente sobre una mesa, junto a una maleta de mano abierta",
+      "que_muestra": "desde los ojos del viajero, sus manos meten un frasco pequeño en una bolsa plástica transparente con cierre, sobre una mesa de casa; alrededor, un perfume, un tubo de crema y un champú de viaje, y al costado una maleta de mano abierta con ropa doblada. Debe leerse como «armando la bolsa de líquidos antes de viajar», no como bodegón de productos.",
+      "hora_clima": "de día, interior de casa, la tarde antes del viaje; luz natural abundante de ventana, sombras abiertas, color natural",
+      "personas": "solo las manos y antebrazos del viajero, en ropa de casa; sin rostro; gesto natural, sin pose de producto",
+      "primer_plano": "el borde de la maleta abierta o de una prenda doblada muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la bolsa",
+      "ancla_pov": "la bolsa transparente sobre la mesa, todavía abierta",
+      "no": [
+        "sin texto ni logos legibles en frascos, tubos ni maleta",
+        "sin marcas de perfume reconocibles",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cifras de mililitros inventadas en las etiquetas",
+        "sin aerosoles industriales ni productos de limpieza"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01; los envases van sin marca ni etiqueta legible",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; las manos, la bolsa y al menos un frasco tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «En la cinta del control, la bandeja avanza…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "en el control de seguridad · mano del viajero + otras personas integradas · escala media · luz interior de terminal",
+      "registro": "E",
+      "archivo": "liquidos-avion-bandeja-control-seguridad.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Bolsa transparente con frascos pequeños dentro de una bandeja que avanza por la cinta del control de seguridad de un aeropuerto",
+      "que_muestra": "desde los ojos del viajero, su mano termina de empujar una bandeja gris por la cinta; dentro van una chaqueta doblada, un teléfono boca abajo y la bolsa transparente con frascos pequeños bien visibles; adelante, la boca del escáner y otra bandeja que ya entra. La bolsa separada del resto es el contenido de la imagen.",
+      "hora_clima": "interior de terminal, de día; luz abundante y pareja, sombras abiertas, sin reflejos que quemen la bolsa",
+      "personas": "fotografía el viajero, que mira su bandeja; adelante, otro pasajero de espaldas recoge sus cosas; personal de seguridad, si aparece, de cuerpo parcial y en ropa neutra, mirando la pantalla del escáner; nadie mira al lente",
+      "primer_plano": "el borde de la bandeja siguiente o la manga del viajero muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar la bolsa",
+      "ancla_pov": "la bandeja avanza con la chaqueta doblada, el teléfono y la bolsa transparente a la vista",
+      "no": [
+        "sin texto ni logos",
+        "sin señalética ni carteles de seguridad legibles",
+        "sin insignias ni uniformes de autoridad aeroportuaria reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin marcas de perfume reconocibles",
+        "sin pantallas de escáner con imágenes legibles"
+      ],
+      "fidelidad": "escena genérica de control de seguridad (sin aeropuerto identificable) → no requiere REF-01; el personal en ropa neutra y cuerpo parcial para no generar uniformes de una autoridad real"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «La noche antes, con la maleta grande abierta sobre la cama…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "manos del viajero · escala cercana · luz de noche interior",
+      "registro": "E",
+      "archivo": "liquidos-avion-botella-maleta-bodega.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos envolviendo una botella de vidrio en un suéter dentro de una maleta de bodega abierta sobre una cama",
+      "que_muestra": "desde los ojos del viajero, sus manos envuelven una botella de vidrio sin etiqueta legible en un suéter grueso y la acomodan al centro de una maleta grande abierta, rodeada de ropa doblada; a un costado, un frasco grande de crema que tampoco entra en la bolsa de cabina. Demuestra lo que el texto argumenta: lo que no cumple la regla de la cabina viaja seguro abajo, bien protegido.",
+      "hora_clima": "noche, interior de casa (la noche antes del relato); luz cálida de lámpara, abundante y suave, sombras abiertas",
+      "personas": "solo las manos y antebrazos del viajero, en ropa de casa; sin rostro; la acción es espontánea, sin pose",
+      "primer_plano": "la tapa abierta de la maleta o una prenda doblada muy cerca del lente y muy fuera de foco, por el borde superior o inferior, sin tapar la botella",
+      "ancla_pov": "envuelves la botella de vino en un suéter grueso y la acomodas al centro, entre la ropa",
+      "no": [
+        "sin texto ni logos",
+        "sin etiquetas de vino o licor reconocibles",
+        "sin marcas de maleta",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin botellas abiertas ni derrames",
+        "sin bidones ni envases artesanales sin sello"
+      ],
+      "fidelidad": "escena genérica (sin lugar identificable) → no requiere REF-01; la botella va sin etiqueta legible"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "LSC",
+      "ciudad": "La Serena"
+    },
+    "home_market": "CHL",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-la-serena",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Tu neceser completo, sin bolsa",
+    "cta": "Ver vuelos a La Serena",
+    "archivo": "banner-ruta-santiago-la-serena.webp",
+    "alt": "Banner de SKY de la ruta Santiago–La Serena: tu neceser completo, sin bolsa",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": {
+      "_head": "BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+      "ID": "N?_BAN-1",
+      "Receta": "A · `ruta.color` (morado SKY, ruta dibujada)",
+      "Ruta": "Santiago (SCL) → La Serena (LSC) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+      "Titular": "“Tu neceser completo, sin bolsa” (5 palabras; la ruta Santiago–La Serena es el elemento principal y el titular va en segundo nivel, sin repetir el H1) · beneficio que sostiene el texto: en vuelos dentro de Chile, perfumes, cremas y geles no tienen restricción de 100 ml",
+      "CTA (lo escribe el compositor)": "Ver vuelos a La Serena →",
+      "Enlace del banner": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-la-serena",
+      "Formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+      "Archivo": "`banner-ruta-santiago-la-serena.webp`",
+      "ALT": "“Banner de SKY de la ruta Santiago–La Serena: tu neceser completo, sin bolsa”",
+      "No": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+    }
+  },
+  "descartes": [
+    "frasco grande retenido sobre el mesón del control — escena negativa y obliga a mostrar personal de seguridad en primer plano",
+    "neceser en la cabina del avión — prohibido: no se generan cabinas SKY",
+    "tienda del aeropuerto con perfumes — rótulos y marcas reales",
+    "medicamentos y biberón sobre la mesa — repite la portada"
+  ]
+}

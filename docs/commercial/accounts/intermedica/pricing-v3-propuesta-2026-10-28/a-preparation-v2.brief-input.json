@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-10-28",
+  "offerId": "performance-commerce-distribution",
+  "engagementCode": "monthly",
+  "engagementForm": "on_demand",
+  "accountId": "intermedica-pe-propuesta-2026-10-28",
+  "offerMarketCountry": "PE",
+  "outputCurrency": "USD",
+  "periods": 1,
+  "lines": [
+    {
+      "lineId": "measure",
+      "profile": "ECG-031",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "web",
+      "profile": "ECG-012",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    },
+    {
+      "lineId": "media",
+      "profile": "ECG-008",
+      "talentCountry": "CL",
+      "headcount": 1,
+      "dedication": {
+        "unit": "fte",
+        "value": "0.1"
+      },
+      "allocationMode": "shared",
+      "allocationPolicyId": "allocation:shared",
+      "kitId": "managed-service-core",
+      "choices": []
+    }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+    "kind": "not_resolved"
+  }
+}

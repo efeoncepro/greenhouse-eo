@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "el extremo de la baranda o la hoja de una palmera del malecón",
+ "sinPrimerPlano": null,
+ "borde": "lower-left corner",
+ "id": "iquitos",
+ "input": {
+  "id": "iquitos",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "malecón Tarapacá de Iquitos, Loreto, Perú, sobre el río",
+  "escena": "el malecón Tarapacá de Iquitos con su baranda y el piso del paseo en primer término; una viajera apoyada en la baranda mira hacia el río, ancho y color café, y hacia la línea verde de selva de la otra orilla. Tiene que leerse como ciudad frente al río, con la selva a la vista pero lejos. Personas: la viajera a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; si aparecen paseantes, lejanos y pequeños, en acciones espontáneas; ningún rostro identificable",
+  "hora": "media mañana",
+  "clima": "cielo húmedo con nubes blancas y claros, sin lluvia; luz natural abundante, sombras abiertas, altas luces del cielo y reflejos del río conservados",
+  "primerPlano": "el extremo de la baranda o la hoja de una palmera del malecón",
+  "borde": "lower-left corner",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin agua azul ni turquesa, sin fauna exótica posada en el malecón, sin edificios inventados",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "malecón Tarapacá de Iquitos, Loreto, Perú, sobre el río (its real forms, scale and spatial relationships)"
+ }
+}

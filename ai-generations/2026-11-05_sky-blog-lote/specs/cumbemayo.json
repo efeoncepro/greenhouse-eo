@@ -1,0 +1,127 @@
+{
+  "id": "cumbemayo",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781baa85affe24f51336d",
+  "titulo": "Cumbemayo y Granja Porcón: dos escapadas desde Cajamarca",
+  "slug": "/cumbemayo-granja-porcon/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de mañana nublada · orienta",
+      "registro": "D",
+      "archivo": "cumbemayo-bosque-de-piedras-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando por un sendero entre las formaciones del bosque de piedras de Cumbemayo, en Cajamarca, en una mañana nublada",
+      "que_muestra": "el bosque de piedras de Cumbemayo: formaciones de roca altas y verticales a ambos lados de un sendero de pasto de altura, con nubes bajas que asoman entre las piedras; una viajera con casaca y mochila pequeña camina hacia el fondo por el sendero y la escala de la roca la hace pequeña. Debe leerse como paisaje de altura con piedra gigante, no como desierto ni como montaña nevada.",
+      "hora_clima": "media mañana, con nubes bajas o neblina que se levanta (la mañana del relato); sin lluvia; luz difusa abundante, sombras abiertas, cielo blanco sin quemar",
+      "personas": "la viajera a media distancia, de espaldas, caminando sin pose ni mirada al lente; si aparecen otras personas, lejanas y pequeñas en el sendero; ningún rostro identificable en primer plano",
+      "primer_plano": "matas de pasto de altura muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar a la viajera",
+      "ancla_pov": "entre formaciones de piedra que la erosión fue tallando",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles ni carteles del sitio",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin nieve",
+        "sin rocas con caras o figuras evidentes (la pareidolia la pone el lector)",
+        "sin personas trepando las formaciones"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del bosque de piedras de Cumbemayo en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, al menos dos formaciones completas y el sendero tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Imagina que bajas del auto…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "siguiendo el canal · persona sola fuera de cuadro · escala media · luz de mañana",
+      "registro": "D",
+      "archivo": "cumbemayo-canal-preinca-agua.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Canal preinca de Cumbemayo tallado en la roca, con agua corriendo, visto desde el sendero que lo acompaña",
+      "que_muestra": "la vista del viajero de pie en el sendero, mirando hacia adelante a lo largo del canal: una ranura angosta tallada en la roca, con ángulos rectos y agua que corre por dentro, que se aleja en perspectiva hacia el pasto de altura y las formaciones de piedra del fondo. Tiene que leerse la precisión del corte: es la razón de la visita.",
+      "hora_clima": "media mañana nublada, como en el relato; sin lluvia; luz difusa abundante que deja ver el agua y la textura de la piedra, sombras abiertas",
+      "personas": "fotografía el viajero desde el sendero; nadie dentro del canal ni tocándolo; si aparece otra persona, lejana y pequeña en el sendero, caminando; ningún rostro identificable",
+      "primer_plano": "la punta de una zapatilla de trekking sobre el pasto del borde del sendero, muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar el canal",
+      "ancla_pov": "un canal angosto tallado en la piedra, con ángulos rectos que no parecen naturales, y el agua corriendo por dentro",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles del sitio",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin personas pisando, tocando o sentadas sobre el canal",
+        "sin agua turquesa ni cascadas",
+        "sin petroglifos inventados"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de un tramo del canal de Cumbemayo en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es media tarde y el camino hacia el norte…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "dos personas · escala media · luz de tarde filtrada",
+      "registro": "E",
+      "archivo": "granja-porcon-sendero-pinos-tarde.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Dos viajeros caminando por un sendero entre pinos en Granja Porcón, Cajamarca, a media tarde",
+      "que_muestra": "un sendero de tierra cubierto de agujas de pino, con troncos rectos y altos a ambos lados y luz de tarde que entra en franjas entre las copas; dos viajeros caminan hacia el fondo conversando, uno señala algo entre los árboles. La escena demuestra el contraste del artículo: a pocas horas de la piedra de Cumbemayo, el paisaje es bosque.",
+      "hora_clima": "media tarde, como en el relato; sin lluvia; luz cálida filtrada por las copas, sombras abiertas, cielo que asoma sin quemar",
+      "personas": "fotografía el viajero que va unos pasos atrás, mirando a sus acompañantes y el bosque; los dos viajeros, de espaldas o de perfil, caminan y conversan; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "una rama baja de pino muy cerca del lente y muy fuera de foco, por el borde superior izquierdo, sin tapar a los viajeros",
+      "ancla_pov": "El aire huele a resina, el suelo está blando de agujas y, de pronto, el paisaje andino que esperabas se vuelve bosque",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles legibles de la cooperativa",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin animales del zoológico en cuadro (fidelidad de especies)",
+        "sin bosque tropical ni helechos de selva: son pinos de altura"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de un sendero entre pinos de Granja Porcón en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "bloqueado",
+    "motivo_bloqueo": "ruta no catalogada como 🟢 Activa en Precios y Rutas SKY para el mercado PER; no se produce ni se enlaza hasta que Paid / Ad Ops la catalogue con URL limpia",
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "CJA",
+      "ciudad": "Cajamarca"
+    },
+    "home_market": "PER",
+    "url": null,
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (sin fila 🟢 para este mercado)",
+    "titular": "Agua tallada en la piedra",
+    "cta": "Ver vuelos a Cajamarca",
+    "archivo": "banner-ruta-lima-cajamarca-cumbemayo.webp",
+    "alt": "Banner de SKY: ruta Lima–Cajamarca, agua tallada en la piedra",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "cueva con petroglifos (fidelidad crítica: un grabado inventado sobre un sitio real es un error atribuible a SKY)",
+    "animales del zoológico de Granja Porcón (fidelidad de especies y lectura de bienestar animal)",
+    "mesa con productos de la cooperativa (rótulos y marcas reales en cuadro)",
+    "frailones en primer plano con forma de monje evidente (fuerza la pareidolia y arriesga una roca inventada)",
+    "vista panorámica del valle desde Cumbemayo (postal intercambiable)"
+  ]
+}

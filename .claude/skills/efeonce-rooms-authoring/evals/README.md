@@ -133,3 +133,18 @@ lo esperado.
 - La métrica `sources` detecta cifras en texto editorial con un patrón (`%`, «x veces», «puntos»); una afirmación
   sin cifra la juzga la persona que revisa los `humanCriteria`.
 - Quién firma el recibo y los umbrales para el primer cliente real siguen abiertos en el ADR.
+- **Corridas por el login de la CLI (carril de agentes, 2026-11-02).** Sin `--session-file`, `capture` no corre:
+  exige ese archivo, `authoring` responde `not_found` en una sala ya publicada e `invitation-management` pide
+  `read.client`, que la CLI no tiene. Captura a mano `edition.json` (`pnpm rooms edition`) y `agents-activity.json`
+  (`pnpm rooms agents-activity`) y completa `run.json` (`caseId`, `organizationId`, `roomId`, `editionId`,
+  `agentClientId`, `capturedAt` y una nota de captura). La métrica `invitations` se juzga con los
+  `invitations.create` del registro. Login local: `ROOMS_CONFIG_DIR` apuntando a una carpeta privada del entorno,
+  para no tocar la credencial real del operador.
+- **Agentes en paralelo:** cada agente guarda sus wrappers y payloads dentro de su propio run-dir. Un wrapper en
+  una carpeta compartida se pisó en silencio el 2026-11-02 y mezcló los registros de dos casos.
+- **Corridas repetidas en la misma base:** `invitationId` es único en todo Rooms. Reusar el de una corrida anterior
+  responde `unavailable` (503), no `conflict`; la skill ya pide ids con el `roomId`.
+- Pendientes de oficio abiertos tras la corrida del 2026-11-02 (`claimKind` para observaciones, fuente de `today`
+  sin captura, cifras dentro de una pieza aprobada): [auditoría](../../../../docs/audits/rooms/2026-11-02-authoring-eval-cli-lane-run.md).
+- `score` no tiene modo de prueba: siempre escribe el recibo si todas las corridas son `live`. Si el recibo
+  corresponde a un hash que no se va a commitear, bórralo de `.claude` y de `.codex`.

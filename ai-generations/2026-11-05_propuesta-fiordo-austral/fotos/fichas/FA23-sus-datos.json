@@ -1,0 +1,46 @@
+{
+  "id": "FA23-sus-datos",
+  "formato": "16:9",
+  "impacto": true,
+  "registro": "cine",
+  "desde": "RV1b",
+  "alcance": "deck-seccion",
+  "linea": "revenue-hubspot",
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "complicidad"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce",
+      "persona": "nexa"
+    }
+  ],
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a vast dark hall at night): she stands on the RIGHT third of the frame, her face at about 76 % of the frame width, framed from the waist up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. About one and a half metres behind her, just beyond her left shoulder (camera-right) and at shoulder height, never hidden by her body, ONE long, slim archive drawer is pulled fully out of a dark cabinet: open, EMPTY and dark inside, no light in it, softly out of focus but its shape still readable; its inside is exactly the length and width of the case she holds. Farther back, 4 to 6 metres away, the rest of the archive wall recedes into darkness on the right. She is in the act of handing it over to the viewer: with both hands, one under each end, she holds a slim, closed case of clear glass and brushed dark metal, about 35 cm long, a forearm's length in front of her body at the height of her lowest ribs, and turns it toward the lens the way one turns an object to give it, its clasp facing the camera; her elbows are slightly forward of her body, both forearms fully visible, nothing else in her hands. The whole case stays within the width of her own torso, never reaching toward the left of the frame. Between the left edge of the frame and her nearer hand there is a wide band of empty darkness, more than half of the frame wide. The top edge of the case stays a full hand's width BELOW the embroidered mark on her left chest (camera-right), which stays entirely visible and free above her left forearm; the mark only catches the light of the case at a glancing angle and keeps its white thread colour. Both jacket cuffs cover her wrists; no watch screen is visible. Inside the glass, neat, complete layers of tiny azure blue (#0375DB) and cool white points, the blue carrier of the frame, and thin lines are packed edge to edge, nothing missing, like a whole archive ready to travel. They are abstract points and lines only: no characters, no table cells, nothing legible. The clasp is a thin flat bar of brushed dark metal, flush with the lid, no taller than a finger's width; ONE single pinhead-sized point glows magenta-pink (#E86BD0) set into it, the only accent in the frame; it lights nothing around it. The clasp is never a lens, never a camera, never a round sensor or button. Her head stays almost frontal and she looks straight into the lens, at the person she is handing the case to — on purpose, this overrides any note that sends her gaze to the empty side: both eyes open, the full round iris of each eye visible with white on both sides. Her face keeps the long oval of Image 1: the same chin length and the same jaw width as the reference, cheeks never fuller; the cool light from the case below does not widen her jaw. Her expression is complicity, not a polite smile: a knowing closed-mouth smile, one corner of her mouth a little higher than the other, her eyes slightly narrowed and warm, as if telling the viewer that nothing was left behind. The cool light inside the case paints her face, hands and jacket from below. Thin haze catches the light. The LEFT 55 % of the frame is calm, deep dark space with only faint haze: no drawers, no objects, no light shapes. Rich contrast, no text, no letters, no numbers, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred near edge of a matte black archive reading counter close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark studio space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "llave": {
+    "fuente": "the cool white light packed inside the glass case she holds out",
+    "lado": "in front of her body at the height of her lowest ribs, slightly to her right side (camera-left), below her face",
+    "tamano": "about 35 cm long",
+    "distancia": "about 50 cm below her face"
+  },
+  "fondo": "the rest of the archive drawer wall far behind her on the right, 4 to 6 metres away, closed and dark, melted into soft focus with a few cold blue practical lights as round bokeh; nothing in the left half of the frame",
+  "fenomeno": {
+    "que": "the whole archive, complete, packed inside a closed glass case that she hands over, while its empty drawer stays open behind her",
+    "esServicio": "salida sin amarras: si Fiordo Austral se va, se lleva todos sus datos, completos"
+  },
+  "nota": "Lámina 23 «Si se van, se llevan / Sus datos.» de la propuesta Fiordo Austral (06/11/2026). Reemplaza HS4 del deck HubSpot (Antonio con un cubo). Nexa, el agente de Efeonce, devuelve los datos."
+}

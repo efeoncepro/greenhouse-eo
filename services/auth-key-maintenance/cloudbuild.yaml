@@ -1,0 +1,25 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    secretEnv:
+      - AXIS_PACKAGES_READ_TOKEN
+    args:
+      - -ceu
+      - |
+        trap 'rm -f .npmrc' EXIT
+        umask 077
+        printf '%s\n' \
+          '@efeoncepro:registry=https://npm.pkg.github.com' \
+          "//npm.pkg.github.com/:_authToken=$${AXIS_PACKAGES_READ_TOKEN}" > .npmrc
+        DOCKER_BUILDKIT=1 docker build \
+          --secret id=axis_npmrc,src=.npmrc \
+          -t '${_IMAGE}' \
+          -f services/auth-key-maintenance/Dockerfile .
+images:
+  - '${_IMAGE}'
+availableSecrets:
+  secretManager:
+    - versionName: projects/efeonce-group/secrets/axis-packages-read-token/versions/latest
+      env: AXIS_PACKAGES_READ_TOKEN
+options:
+  logging: CLOUD_LOGGING_ONLY

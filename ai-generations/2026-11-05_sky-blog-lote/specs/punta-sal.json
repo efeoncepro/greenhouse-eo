@@ -1,0 +1,128 @@
+{
+  "id": "punta-sal",
+  "notion_url": "https://app.notion.com/p/40239c2fefe78112ac76c0af757ee2c1",
+  "titulo": "Punta Sal: dónde queda, cómo llegar desde Tumbes y qué hacer en su playa",
+  "slug": "/punta-sal/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + POV del viajero",
+      "modificadores": "persona sola · escala amplia · luz de mañana · orienta",
+      "registro": "D",
+      "archivo": "punta-sal-grande-orilla-manana-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera caminando por la orilla de Punta Sal Grande, en Tumbes, con el mar de oleaje suave a su lado por la mañana",
+      "que_muestra": "la franja larga de arena clara de Punta Sal Grande, que se curva hacia el fondo; el mar azul verdoso entra en la orilla con olas mínimas y casi sin espuma. Una viajera camina por la línea del agua, alejándose, con un sombrero en la mano. Tiene que leerse la longitud de la playa y la calma del mar.",
+      "hora_clima": "primeras horas de la mañana (la caminata del relato); cielo despejado; luz natural abundante y suave, sombras abiertas, arena clara sin quemar y agua con color conservado",
+      "personas": "la viajera a media distancia, de espaldas, caminando sin pose ni mirada al lente; si aparecen otras personas, lejanas y pequeñas, en acciones espontáneas; ningún rostro identificable en primer plano",
+      "primer_plano": "la línea de espuma fina de una ola mínima sobre la arena mojada, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera",
+      "ancla_pov": "Caminas por la orilla de Punta Sal Grande y la arena clara no se termina",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de hoteles reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin sombrillas ni reposeras de resort en primer plano",
+        "sin olas rompiendo",
+        "sin bañistas en traje de baño en primer plano"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la playa de Punta Sal Grande en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la línea de la orilla y la curva de la playa tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «El remo entra al agua sin ruido…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde el kayak · persona sola · escala media · luz de media mañana",
+      "registro": "E",
+      "archivo": "punta-sal-kayak-proa-punta-roca.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Proa de un kayak con un remo entrando al agua frente a la punta rocosa de Punta Sal Chica, en Tumbes",
+      "que_muestra": "la vista de quien rema sentado en un kayak: la proa en la parte baja del cuadro, la pala del remo entrando al agua por un costado y, al frente, la punta de roca de Punta Sal Chica con el agua calma y clara. La playa se ve lejana y pequeña a un lado.",
+      "hora_clima": "media mañana; cielo despejado; luz natural luminosa, reflejos del agua sin quemar, sombras abiertas",
+      "personas": "fotografía el propio viajero desde el asiento del kayak, mirando hacia la punta; solo sus manos y el remo en cuadro; ninguna otra persona cerca; ningún rostro",
+      "primer_plano": "la punta de la proa del kayak y unas gotas en el borde, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la punta de roca",
+      "ancla_pov": "El remo entra al agua sin ruido y la punta de roca se acerca despacio",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas en el kayak, el remo ni el chaleco",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin motos de agua ni lanchas cerca",
+        "sin olas rompiendo",
+        "sin fauna marina inventada"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la punta rocosa de Punta Sal Chica vista desde el agua en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Cerca de las rocas, ponte la máscara y asómate…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "máscara de snorkel · escala cercana · luz de media mañana",
+      "registro": "E",
+      "archivo": "punta-sal-mascara-snorkel-agua-transparente.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mano sosteniendo una máscara de snorkel sobre el agua transparente de Punta Sal, con rocas visibles en el fondo",
+      "que_muestra": "la mano del viajero sostiene una máscara de snorkel mojada justo sobre la superficie; debajo, el agua es tan clara que se ven la arena y unas rocas del fondo; al fondo del cuadro, la punta de roca y un trozo de playa. Lo que demuestra es la transparencia del agua: si el fondo no se ve, la imagen no sirve.",
+      "hora_clima": "media mañana, con sol alto (el mismo paseo del relato); luz natural abundante que atraviesa el agua, reflejos controlados, sin quemar la superficie",
+      "personas": "fotografía el propio viajero, de pie con el agua a la cintura, mirando hacia abajo; solo su mano y su antebrazo en cuadro; ningún rostro",
+      "primer_plano": "gotas y el borde de la máscara muy cerca del lente y muy fuera de foco, por el borde superior derecho, sin tapar el fondo",
+      "ancla_pov": "El agua es tan transparente que ves tus propios pies sobre la arena y, más allá, las rocas de la punta",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas en la máscara ni en la ropa",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin peces de colores de arrecife tropical ni corales que no correspondan",
+        "sin tortugas ni fauna inventada"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del agua y las rocas de Punta Sal Chica en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TBP",
+      "ciudad": "Tumbes"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tumbes",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Mar suave y arena clara",
+    "cta": "Ver vuelos a Tumbes",
+    "archivo": "banner-ruta-lima-tumbes-punta-sal.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tumbes: mar suave y arena clara",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "bote frente al muelle de Canoas de Punta Sal — rótulos y nombres pintados en embarcaciones reales; queda como gancho y cierre en el texto",
+    "Hervideros con lodo burbujeante — excursión secundaria del artículo, y falta referencia real",
+    "ballena jorobada desde un bote — promete un avistamiento que no se garantiza y exige fidelidad de fauna",
+    "atardecer en Punta Sal Grande — postal intercambiable",
+    "adulto y niño en el agua — ya es la IMG 3 de /mancora/"
+  ]
+}

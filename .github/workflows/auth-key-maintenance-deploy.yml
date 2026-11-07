@@ -1,0 +1,61 @@
+name: Auth Key Maintenance Job Deploy
+
+# TASK-1833: definition-only deploy through the approved production release.
+# No push or dispatch trigger; this workflow never runs the Job or Scheduler.
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      expected_sha:
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+
+concurrency:
+  group: auth-key-maintenance-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: production
+    env:
+      ENV: production
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      DEPLOYER_SA: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      AUTH_KEY_MAINTENANCE_PG_PASSWORD_REF: ${{ vars.AUTH_KEY_MAINTENANCE_PG_PASSWORD_REF }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Verify released commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != refs/heads/main || "${{ inputs.environment }}" != production ||
+                ! "${EXPECTED_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'ERROR: the Job may deploy only from an exact main release SHA.' >&2
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor "${EXPECTED_SHA}" origin/main
+          git checkout --detach "${EXPECTED_SHA}"
+          [[ "$(git rev-parse HEAD)" == "${EXPECTED_SHA}" ]]
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SA }}
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: efeonce-group
+      - name: Build and deploy disabled Job definition
+        run: bash services/auth-key-maintenance/deploy.sh

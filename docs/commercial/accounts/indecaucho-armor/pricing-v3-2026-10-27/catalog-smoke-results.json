@@ -1,0 +1,30 @@
+[
+  {
+    "offer": "creative-managed-service",
+    "market": "EC",
+    "status": "calculated",
+    "net": "2690.00",
+    "diagnostics": []
+  },
+  {
+    "offer": "seo-aeo-managed-service",
+    "market": "EC",
+    "status": "calculated",
+    "net": "3280.00",
+    "diagnostics": []
+  },
+  {
+    "offer": "talent-assurance-staffing",
+    "market": "EC",
+    "status": "calculated",
+    "net": "1900.00",
+    "diagnostics": []
+  },
+  {
+    "offer": "performance-commerce-distribution",
+    "market": "EC",
+    "status": "calculated",
+    "net": "3280.00",
+    "diagnostics": []
+  }
+]

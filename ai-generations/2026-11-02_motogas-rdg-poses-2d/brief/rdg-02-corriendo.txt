@@ -1,0 +1,20 @@
+The reference image is the official mascot "El Rey del Gas": a flat 2D vector cartoon of a red LPG gas cylinder with a tilted yellow crown. Redraw THIS SAME CHARACTER in a new pose, as if the original illustrator drew another page of the same model sheet.
+
+STYLE — non-negotiable, identical to the reference:
+- Flat 2D vector illustration, cel style, 1930s rubber-hose cartoon mascot. NO gradients, NO shading, NO highlights, NO glow, NO texture, NO 3D, NO drop shadow on the floor.
+- Exactly four colors and nothing else: pure red #FF0000, crown yellow #FFC214, pure white #FFFFFF and pure black #000000. Every area is one solid color.
+- Thick black outlines of variable weight, heavier on the lower and right-hand edges, with the same separate black offset stroke under the shoes and along the body that the reference has.
+- Background: one flat uniform medium gray #808080 filling the whole canvas. No floor, no ground line, no shadow, no vignette.
+- No text, no letters, no logo, no watermark.
+
+CHARACTER — keep every trait exactly:
+- Body: a red gas cylinder, slightly tapered, about 2.3 body-widths tall including crown and shoes, with the black horizontal band near the bottom and the red handle/valve guard on top acting as its neck.
+- Crown: yellow, five rounded points in two rows, a black band line, worn TILTED and resting on the handle exactly like the reference.
+- Face on the upper part of the body: two big white eyes joined like a figure "8" with black oval pupils; one big open "D" smile with a row of white teeth and a red tongue. Same expression and proportions as the reference. No nose, no ears, no eyebrows.
+- Thin black noodle arms, white cartoon gloves with four fingers. Thin black noodle legs, big rounded white shoes with black outlines.
+- Same size of eyes, mouth, crown and shoes relative to the body as the reference. Do not redesign, simplify or restyle him.
+
+Center the full character in the frame with generous gray margin on all sides; nothing touches or is cut by the edges.
+
+NEW POSE — "Running":
+He runs fast toward the right of the frame in a dynamic side three-quarter view, body leaning forward. Mid-stride: the front leg stretched forward with the big white shoe lifted, the back leg kicked up behind. Both noodle arms pump in opposite directions with gloved fists. The tilted crown stays on his head. Big happy open smile with teeth and tongue, pupils looking to the right where he is running. Behind him, on the left, three short thick black horizontal speed lines and two small black puffs show motion. Keep the full character and the speed lines inside the frame.

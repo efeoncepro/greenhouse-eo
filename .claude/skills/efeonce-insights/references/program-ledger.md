@@ -730,6 +730,8 @@ sus hallazgos por página lo respetan.
 
 ## Sessions (append as you go; newest first)
 
+- 2026-11-05 · Claude · Estado de entrega de Berel octubre «sólo blog» (aclaración del 2026-11-04): el informe salió de la **vista previa local** (`preview-edition.ts --modules=seo --title=…`), NO del flujo de producción (crear → render en `artifact-worker` → emitir → compartir/enviar); no hay edición persistida de octubre. PDF copiados a la carpeta interna de informes de Berel en OneDrive como `BEREL_INFORME_OCTUBRE_2026_A4.pdf` y `BEREL_INFORME_OCTUBRE_2026_DECK.pdf`. Correo al cliente **redactado y mostrado al operador, no enviado** (debía salir el lunes 2026-11-02; pide disculpas y explica las dos métricas nuevas: visitas desde redes y medición completa de clics en Google; por decisión del operador NO menciona el valor publicitario, que sí muestran los PDF). Los cuatro commits (`f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`) siguen sin push ni release: nada corre en Vercel ni en el `ops-worker`. Para que una edición real use el control, el runtime necesita `GROWTH_SEARCH_CONSOLE_ENABLED` + el cliente OAuth de Search Console. El valor de meses nuevos exige compra CPC manual con techo.
+- 2026-11-04 · Claude · Berel octubre «sólo blog»: ISSUE-191 (el capítulo SEO sumaba `query × page`; ahora lee el control de Search Console en vivo y la cascada suma las consultas que Google no muestra), valor publicitario estimado (`organic_value_usd` + `organic_value.valued_clicks`, método del piloto SKY, reader `readOrganicTrafficValueForWindow`) y visitas desde redes (`site.social_sessions`, `social_source.*`). Compra CPC MX USD 0,04836 autorizada por el operador. Vista previa local A4 18 / deck 14, 0 violaciones. Pendiente: decisión sobre la guía que cambió de URL (25→310 y 229→0 se leen como dos páginas), release, tablero SEO (ISSUE-191).
 - 2026-10-12 · Claude · la línea semanal de clics dibuja sólo semanas completas y la lectura nombra el bloque que queda fuera (el operador vio en el deck de Berel una línea que caía bajo un titular que decía «subieron»). Aplica a toda organización. Push a `develop` y deploy del `ops-worker` con TASK-2033 Slices 1–5, por instrucción del operador.
 - 2026-10-12 · Claude · Berel: logos oficiales cargados en la organización (`default` y `on_dark`; el anterior era una imagen generada con IA) y portada fijada en blanca. Con variante oscura la regla `auto` elegía navy, y la portada navy no tiene la zona «Qué mide este informe»: el alcance de contenido desaparecía de la portada del A4. `preview-edition.ts` acepta `--cover=light|dark`.
 - 2026-10-12 · Claude · TASK-2033 Slices 1–5 en develop local (sin push): alcance de contenido por organización, migración aplicada y alcance v1 de Berel fijado con autorización del operador. La vista previa real encontró tres fallas que ninguna prueba vio: el render fallaba cerrado con slugs de artículo de 65 caracteres (`pageLabelOf`), la lectura sin nombre decía «La página que más cambió fue subió…», y el predicado por fila tardaba 5 s por consulta. GA4 del contenido cae 51,9 % por un pico de agosto. Pendiente: Slice 6 (MCP), release.
@@ -906,3 +908,22 @@ sus hallazgos por página lo respetan.
   PR #250, junto con TASK-1974/1975); Think `0c5701a` antes. Watchdog `ok` 6/6.
 - **Pendiente:** glifos Trazo para clics, impresiones, CTR y posición (para retirar Tabler), los 10 isotipos sin
   productor (entran con TASK-1991/1992), promoción de `channelForDomain`/vocabulario y cifra adaptativa (`03e19f3ee`, ya hechos en develop). El canal no es campo autorado: la validación vive en el resolver, no falta agregarla al plan. Decisión de visitas por asistente y `metricIcon` pendientes.
+
+## TASK-2094 — SKY Blog local (2026-11-01, in-progress)
+
+Contrato de medición candidato y pruebas reales acotadas; 89 casos, 27 PG16. No acepta A′/B ni activa runtime.
+Continuidad y límites: `docs/audits/client-portal/2026-11-01-sky-real-component-validation/README.md`.
+Siguiente: contexto/grants/refresh reales antes de escoger bridge; ownership e historia integral pendientes.
+
+Incremento posterior TASK-2094: 78 pruebas permisos/contexto (total167), callbacks cookie/App/resource Insights
+reales y candidato SQL; no cambia src. Evidencia: `docs/audits/client-portal/2026-11-01-sky-space-context-validation/`.
+Corte siguiente: 204 PASS, 37 nuevas Finance/routing/historia. Recomendación B: owner comercial único,
+Spaces explícitos; A′ divide P&L si se rekeyean gastos para pasar el trigger. Writer y rebuild requieren
+protección temporal en ambos. ICO probado sólo por llamadas simuladas. Evidencia actual:
+`docs/audits/client-portal/2026-11-01-sky-finance-routing-validation/`. Próximo U01 ruta/reader real local;
+integración integral, aceptación ADR y apertura real pendientes. Sin src/producción/historia real modificados.
+
+Formalización 2026-11-06: EPIC-057 + TASK-2096–2102 to-do; TASK-2094 ahora hija, conserva 204 tests históricos.
+Grafo/ownership: `docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md`. Insights/portal
+conservan sus parents y reciben criterios pendientes. Contratos primero, certificación2094 después y gate
+SKY SEO1852 al final; ninguna implementación o ejecución externa por este registro.

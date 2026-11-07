@@ -60,6 +60,9 @@ comprobar el cuerpo persistido del borrador por una lectura nueva cuando se vaya
 la captura del compose no basta para declararlo guardado. Antes de enviar, verificar el cuerpo final vivo,
 los enlaces nativos de cada brochure, destinatarios, una firma gráfica y CCO. Tras enviar, leer el mensaje
 concreto de Enviados y comprobar esos mismos elementos: no deducirlos de un borrador anterior.
+Si el editor nativo conserva el cuerpo vacío, recuperar el mismo borrador en Outlook web; la
+[ruta de recuperación verificada](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md#persistencia-de-contenido-enriquecido--observación-del-24102026)
+conserva el HTML oficial y exige una nueva lectura persistida antes del envío autorizado.
 
 En Documentos, crear cada enlace sobre el original aprobado con el destinatario efectivo. Confirmar
 por lectura que no exige email al visitante y permite descarga cuando ése sea el alcance; un toggle

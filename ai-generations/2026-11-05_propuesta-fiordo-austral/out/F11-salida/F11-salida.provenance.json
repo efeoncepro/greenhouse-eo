@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "35abeccb5e1f52f22cf9d4a91545e6e767e399a5e379591c19757d7eb702b6fb",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine.purpose",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:FA23-sus-datos",
+      "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA23-sus-datos.png",
+      "sha256": "e40765574cdd4a74e9285a5688de3052cb2ffb01b862a4fa00687a9f0b0503e7"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

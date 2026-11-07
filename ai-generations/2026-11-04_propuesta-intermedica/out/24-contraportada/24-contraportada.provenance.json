@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "ce3b26a6301a5abd41de77522d38905861fd768cd3117f41f09ec5ab9a509825",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:VOX3-sin-isotipo-isotipo-acabado",
+      "path": "ai-generations/2026-10-28_propuesta-armor/plates/VOX3-sin-isotipo-isotipo-acabado.png",
+      "sha256": "7a878378ba9defa48e08dee35597aeb9e6c4352598cda919b09817d0af4d61b4"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-a-creative-2026-10-28-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-10-28",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "design-scope",
+      "label": "a-creative: bloque de trabajo design",
+      "hoursPerMonth": "12",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:a-creative:design",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "copy-scope",
+      "label": "a-creative: bloque de trabajo copy",
+      "hoursPerMonth": "6",
+      "source": {
+        "reference": "intermedica:alcance-y-bloques-estimados-28oct:a-creative:copy",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "design",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "design-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    },
+    {
+      "lineId": "copy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "copy-scope",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloque estimado por entregables; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

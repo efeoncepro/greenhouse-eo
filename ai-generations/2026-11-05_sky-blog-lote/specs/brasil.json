@@ -1,0 +1,131 @@
+{
+  "id": "brasil",
+  "notion_url": "https://app.notion.com/40239c2fefe781c99236f383a8351fbf",
+  "titulo": "Viajar a Brasil desde Chile: documentos, moneda y qué saber antes de volar",
+  "slug": "/viaje-a-brasil-3/",
+  "mercado": "CL",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "E — POV de mano, objeto o alimento + D — POV de recorrido",
+      "modificadores": "en la fila del control migratorio de salida · otras personas integradas · escala media · luz interior de aeropuerto · orienta",
+      "registro": "E",
+      "archivo": "viajar-brasil-desde-chile-fila-control-migratorio.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero en la fila del control migratorio de un aeropuerto de Chile, con su documento de identidad y la tarjeta de embarque en la mano",
+      "que_muestra": "la mano del viajero sosteniendo un documento de identidad tamaño tarjeta, de canto o por el reverso, junto a una tarjeta de embarque doblada; delante, la fila que avanza hacia los mesones de control, fuera de foco, en un hall amplio y luminoso. Debe leerse como el momento de salir del país, no como un trámite angustiante.",
+      "hora_clima": "de día, con luz natural que entra por ventanales al hall; luz abundante, sombras abiertas y altas luces conservadas en los ventanales",
+      "personas": "fotografía el viajero que espera su turno, mirando su mano; las personas de la fila están de espaldas, con mochilas y bolsos, en acción espontánea; el personal de control queda lejos, en ropa neutra, de cuerpo parcial; ningún rostro identificable",
+      "primer_plano": "la correa de una mochila muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la mano ni el documento",
+      "ancla_pov": "Tienes la cédula en la mano y la tarjeta de embarque doblada entre los dedos",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin datos, foto, número ni diseño legible del documento (no se reproduce una cédula real)",
+        "sin señalética de la PDI ni de aeropuertos reales",
+        "sin uniformes policiales identificables"
+      ],
+      "fidelidad": "sin lugar identificable (hall de aeropuerto genérico) → no requiere REF-01 de lugar; el documento no debe imitar el diseño de la cédula chilena, solo su formato de tarjeta",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la mano con el documento y la tarjeta de embarque tienen que sobrevivir a los recortes. Mano y documento en el tercio inferior derecho; mitad superior despejada (hall desenfocado) para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «El error típico se comete la noche anterior…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "mesa con la mochila abierta la noche antes del viaje · sin personas además del viajero · escala cercana · luz cálida de interior · explica",
+      "registro": "E",
+      "archivo": "viajar-brasil-desde-chile-documentos-mesa-noche.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Mesa con una mochila abierta, un documento de identidad, un pasaporte y una hoja con la dirección del alojamiento, la noche antes de viajar a Brasil",
+      "que_muestra": "sobre una mesa de madera, una mochila abierta, un documento de identidad tamaño tarjeta y un pasaporte cerrados, una hoja doblada con una dirección escrita a mano (ilegible) y un cargador; la mano del viajero dobla la hoja para guardarla. Debe leerse como el armado del viaje, no como una foto de producto.",
+      "hora_clima": "de noche, la víspera del vuelo (la noche anterior del relato); luz cálida de lámpara, abundante, sombras abiertas y sin quemar el papel",
+      "personas": "fotografía el viajero sentado frente a la mesa, mirando lo que guarda; solo sus manos en cuadro; nadie más",
+      "primer_plano": "el borde de la mochila muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar los documentos",
+      "ancla_pov": "Yo la llevaría anotada en papel, junto con el comprobante del pasaje de regreso",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin texto legible en la hoja ni en los documentos",
+        "sin portadas reales de pasaporte reproducidas con escudo legible",
+        "sin dinero ni billetes",
+        "sin tarjetas bancarias"
+      ],
+      "fidelidad": "sin lugar identificable → no requiere REF-01; documentos genéricos, sin imitar el diseño de documentos oficiales"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Sales del aeropuerto y el calor húmedo te llega de golpe…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "F — Encuentro social + E — POV de mano, objeto o alimento",
+      "modificadores": "en un quiosco al aire libre · el vendedor integrado · escala cercana · luz de mediodía · cierra emoción",
+      "registro": "E",
+      "archivo": "viajar-brasil-coco-helado-primer-obrigado.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero recibe un coco helado con bombilla en un quiosco al aire libre en Brasil, en su primer día de viaje",
+      "que_muestra": "el intercambio entre la mano del vendedor, que pasa un coco verde abierto con una bombilla, y la mano del viajero que lo recibe; al fondo, fuera de foco, vegetación tropical y una calle con luz fuerte. El gesto del intercambio es el contenido: sin él, es una foto de bebida.",
+      "hora_clima": "cerca del mediodía, día caluroso y húmedo (la salida del aeropuerto del relato); luz natural abundante bajo el toldo del quiosco, sombras abiertas, altas luces del fondo conservadas",
+      "personas": "fotografía el viajero que recibe el coco y mira el intercambio; el vendedor aparece de cuerpo parcial (brazos y torso), en ropa neutra, mirando el coco; ningún rostro identificable; nadie mira al lente",
+      "primer_plano": "el borde del mostrador del quiosco o una hoja de palmera muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar el coco",
+      "ancla_pov": "cuando te lo pasan, te sale tu primer «obrigado»",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin billetes ni monedas reproducidos",
+        "sin marcas en vasos, bombillas o carros",
+        "sin postal de playa famosa reconocible"
+      ],
+      "fidelidad": "sin lugar identificable (quiosco genérico) → no requiere REF-01; coherencia tropical brasileña sin monumentos ni playas reconocibles"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "ruta_texto": "Santiago (SCL) → São Paulo (GRU) · Home Market CHL · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "titular": "El primer «obrigado» te espera",
+    "cta": "Ver vuelos a São Paulo",
+    "url": "https://skyairline.com/flights/es-cl/vuelos-desde-santiago-a-sao-paulo",
+    "archivo": "banner-ruta-santiago-sao-paulo.webp",
+    "alt": "Banner de SKY: ruta de Santiago a São Paulo, para el primer «obrigado» del viaje",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "formatos": "1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`",
+    "no": "sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin documentos ni pasaportes dibujados",
+    "origen": {
+      "iata": "SCL",
+      "ciudad": "Santiago"
+    },
+    "destino": {
+      "iata": "GRU",
+      "ciudad": "São Paulo"
+    },
+    "home_market": "CHL",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)"
+  },
+  "descartes": [
+    "La cinta de equipaje y el paso por la aduana — exige señalética de «nada que declarar» para entenderse",
+    "El niño con su mochila en el control de la PDI — menor identificable en un control policial",
+    "Billetes de reales en la mano — reproducción de moneda",
+    "El enchufe en la pared del hotel — escena pobre"
+  ]
+}

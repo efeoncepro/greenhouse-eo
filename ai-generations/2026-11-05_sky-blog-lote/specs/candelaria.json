@@ -1,0 +1,133 @@
+{
+  "id": "candelaria",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781f4b4a4efea698ff1c0",
+  "titulo": "Fiesta de la Candelaria en Puno: qué ver y cómo organizar el viaje en 2027",
+  "slug": "/fiesta-de-la-candelaria-puno/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "B — Viajero integrado + A Destino contextual",
+      "modificadores": "espectador de espaldas en primer término · escala amplia · luz de primera hora · orienta",
+      "registro": "D",
+      "archivo": "candelaria-puno-diablada-calle-espectador.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero abrigado mirando pasar un conjunto de diablada con máscaras brillantes por una calle de Puno durante la fiesta de la Candelaria",
+      "que_muestra": "una calle de Puno con casas de dos pisos y cerros al fondo; un conjunto de diablada avanza por el centro con máscaras de colores y trajes bordados que brillan con la primera luz, y detrás, desenfocados, músicos de banda con instrumentos de bronce. El viajero, con gorro y casaca, mira desde la vereda junto a otros espectadores. Debe leerse como fiesta en la calle de una ciudad del altiplano, no como escenario ni teatro.",
+      "hora_clima": "primera hora de la mañana, con el sol recién sobre los techos (el amanecer del relato); cielo despejado y aire frío; luz abundante y rasante, sombras abiertas, altas luces del cielo y de los bordados conservadas",
+      "personas": "el viajero a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; los danzantes con máscara, en pleno paso; espectadores de la vereda en segundo plano, de espaldas o de perfil; ningún rostro sin máscara identificable en primer plano",
+      "primer_plano": "el hombro y el borde del gorro de otro espectador muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al conjunto que baila",
+      "ancla_pov": "Bronces que suenan antes de que salga el sol, máscaras de diablada que brillan con la primera luz",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales ni estandartes con nombres de conjuntos reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin máscaras copiadas de un conjunto identificable",
+        "sin vallas publicitarias ni marcas de cerveza o patrocinadores",
+        "sin noche ni fuegos artificiales"
+      ],
+      "fidelidad": "lugar y danza identificables → requiere fotos reales REF-01 de una calle del recorrido de la parada en Puno y REF-02 de trajes y máscaras de diablada en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el diablo con máscara más cercano, el viajero y la línea de la calle tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Vas a entrar al estadio con la gradería todavía fría…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la gradería · viajero integrado · escala amplia · luz de mañana",
+      "registro": "E",
+      "archivo": "candelaria-estadio-danza-originaria-graderia.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde la gradería del estadio de un conjunto de danza originaria con ponchos y polleras durante el concurso de la Candelaria en Puno",
+      "que_muestra": "la vista desde una fila alta de la gradería: abajo, en la cancha, un conjunto de danza originaria en formación, con ponchos y polleras de colores y músicos con sikus y tambores; en la gradería, espectadores abrigados y, al fondo, cerros secos del altiplano. Un acompañante del viajero, sentado una fila más abajo, mira la cancha.",
+      "hora_clima": "media mañana, primera jornada del concurso en el relato; cielo despejado o con nubes altas, sin lluvia; luz natural abundante, sombras abiertas, sin quemar el cielo",
+      "personas": "fotografía el viajero desde su asiento; el acompañante, de espaldas, mira la cancha; los danzantes, lejanos y en pleno paso; ningún rostro identificable en primer plano; nadie mira al lente",
+      "primer_plano": "la baranda o el borde del asiento de la gradería muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la cancha",
+      "ancla_pov": "abajo, en la cancha, un conjunto de danza originaria avanza al ritmo de sikus y tambores",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin publicidad ni marcadores del estadio legibles",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin trajes de luces ni lentejuelas en esta escena (es el concurso de danzas originarias)",
+        "sin vestimentas de una comunidad real reconocible copiadas con detalle"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del estadio de la Universidad Nacional del Altiplano durante el concurso y REF-02 de vestimenta de danzas originarias de Puno en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es de noche, la parada todavía no termina…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "manos con guantes y vaso caliente · escala cercana · luz de noche con alumbrado público",
+      "registro": "E",
+      "archivo": "candelaria-noche-manos-vaso-caliente-parada.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Manos con guantes sosteniendo un vaso de bebida caliente frente a un conjunto que baila de noche en una calle de Puno durante la Candelaria",
+      "que_muestra": "en primer término, las manos del viajero con guantes de lana alrededor de un vaso del que sale vapor; detrás, desenfocado, un conjunto con trajes de luces que pasa por la calle bajo el alumbrado público, con destellos de bordados y de instrumentos de bronce. La relación entre el vapor del vaso y la fiesta en movimiento es el contenido: demuestra el frío de la noche y por qué vale la pena quedarse.",
+      "hora_clima": "noche, después de horas de parada (el momento del relato); cielo despejado y frío seco; luz cálida del alumbrado y de la propia calle, sin flash, con detalle en las manos y destellos controlados en el fondo",
+      "personas": "fotografía el propio viajero con la cámara a la altura del pecho; solo sus manos en cuadro; al fondo, danzantes y espectadores desenfocados, ninguno identificable; nadie mira al lente",
+      "primer_plano": "el vaso y los guantes nítidos en el tercio inferior; el borde de la manga de la casaca muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo",
+      "ancla_pov": "Las manos frías se calientan con un vaso de bebida caliente, la banda que pasa te hace vibrar el pecho",
+      "no": [
+        "sin texto ni logos",
+        "sin marcas en el vaso",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin bebidas alcohólicas ni botellas",
+        "sin fuegos artificiales inventados",
+        "sin flash duro"
+      ],
+      "fidelidad": "escena genérica de calle en fiesta → requiere foto real REF-01 de la parada de noche en Puno para trajes y alumbrado en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "JUL",
+      "ciudad": "Juliaca"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-juliaca",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Bronces, máscaras y febrero en Puno",
+    "cta": "Ver vuelos a Juliaca",
+    "archivo": "banner-ruta-lima-juliaca-candelaria.webp",
+    "alt": "Banner de SKY de la ruta Lima–Juliaca: bronces, máscaras y febrero en Puno",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Juliaca (JUL) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Bronces, máscaras y febrero en Puno” (6 palabras; la ruta Lima → Juliaca es el elemento principal y el titular va en segundo nivel)<br />**CTA (lo escribe el compositor):** Ver vuelos a Juliaca →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-juliaca<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-juliaca-candelaria.webp` · **ALT:** “Banner de SKY de la ruta Lima–Juliaca: bronces, máscaras y febrero en Puno”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo, sin máscaras ni trajes de conjuntos reales reconocibles"
+  },
+  "descartes": [
+    "procesión de la Virgen en la Plaza Mayor — imagen religiosa real: riesgo de fidelidad y de sensibilidad devocional",
+    "primer plano de una máscara de diablada — exige copiar el trabajo de un mascarero o conjunto identificable",
+    "banda de bronce en plena parada — repite la energía de la portada",
+    "lancha a los Uros durante la fiesta — pertenece al artículo del lago Titicaca",
+    "caporales saltando en el estadio — repite la escena del estadio de IMG 2"
+  ]
+}

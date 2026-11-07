@@ -1,0 +1,8 @@
+  $ costo estimado ≈ USD 0.082 (2 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-30_mattis-propuesta/tempo/renders/11-vertical-fachada.png …
+  ✓ 2612KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 234 (img 0 · txt 234) · out 1372 · total 1606
+→ ./ai-generations/2026-10-30_mattis-propuesta/tempo/renders/12-vertical-balcon.png …
+  ✓ 2728KB · gpt-image-2.5-sunburst · 1024x1536 · high
+    usage: in 237 (img 0 · txt 237) · out 1372 · total 1609
+done

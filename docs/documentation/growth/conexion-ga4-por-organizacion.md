@@ -1,5 +1,11 @@
 # Conexión GA4 por organización
 
+> **Tipo de documento:** Documentacion funcional (lenguaje simple)
+> **Version:** 1.1
+> **Creado:** 2026-10-04 por Julio Reyes
+> **Ultima actualizacion:** 2026-11-05 por Claude
+> **Documentacion tecnica:** [GA4 Connection UI V1](../../architecture/growth/ga4-connection-ui-v1.md) · [Tracking Engine §19.7](../../architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md)
+
 La conexión permite a un operador vincular una propiedad Google Analytics 4 a la organización abierta
 para leer actividad del sitio. Usa consentimiento Google de sólo lectura y una propiedad por
 organización. Greenhouse no instala medición ni modifica eventos de la propiedad al conectarla.
@@ -31,6 +37,21 @@ sumando página por página; la diferencia de 3 no tiene causa determinada.
 Conversions aún no está admitido por el reader. Integración al grader y señal de salud de token siguen
 pendientes en TASK-1284. TASK-1787 entrega la serie de referrals IA de producto y consume la conexión
 existente; no duplica el resolver ni espera el cierre de todas las ampliaciones de TASK-1284.
+
+## Consultas puntuales sin la conexión (desde 2026-11-05)
+
+Para análisis o informes hechos por una persona o un agente desde la terminal existe un segundo camino: la
+herramienta `pnpm ga4:query`. Lee GA4 con la cuenta de servicio de Efeonce, sólo puede leer y no usa esta conexión
+ni sus credenciales. Sirve para cualquier propiedad que haya agregado esa cuenta de servicio como Lector; si no la
+agregó, responde «sin acceso». No alimenta el portal, los dashboards ni Insights: esos siguen leyendo por la
+conexión de cada organización.
+
+Al 2026-11-05 funciona con efeoncepro.com. Sky todavía no agregó la cuenta de servicio, así que sus datos se siguen
+leyendo por su conexión.
+
+> Detalle técnico: [manual de la CLI](../../manual-de-uso/growth/consultar-ga4-por-cli.md) ·
+> [`scripts/ga4/query.ts`](../../../scripts/ga4/query.ts) ·
+> [Tracking Engine §19.7](../../architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md).
 
 ## Disponibilidad y evidencia
 

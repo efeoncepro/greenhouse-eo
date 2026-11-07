@@ -1,0 +1,86 @@
+{
+  "tenderId": "F09e-continuidad",
+  "slides": [
+    {
+      "slideId": "deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-2-of-4-growth"
+        },
+        "voice": {
+          "question": "Cada riesgo, con su",
+          "answer": "Cobertura",
+          "eyebrow": "Continuidad e incidentes"
+        },
+        "body": "Cada riesgo tiene su respuesta escrita y probada antes de pasar a producción.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Caída del servicio",
+            "name": "Continuidad HubSpot",
+            "how": "Réplica en tres centros de datos; Efeonce escala y reporta cada 2 h."
+          },
+          {
+            "risk": "Pérdida de datos",
+            "name": "Respaldo inmutable",
+            "how": "Copia diaria en el tenant de Fiordo Austral y restauración de prueba trimestral."
+          },
+          {
+            "risk": "Incidente de seguridad",
+            "name": "Respuesta en 1 h",
+            "how": "Guardia permanente, contención en 4 h, evidencia preservada e informe de causa raíz."
+          },
+          {
+            "risk": "Acceso indebido",
+            "name": "Alertas en Wazuh",
+            "how": "Inicios anómalos y sesiones simultáneas detectados, con cierre remoto."
+          }
+        ],
+        "selection": {
+          "label": "TI",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk"
+    }
+  ]
+}

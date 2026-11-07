@@ -1,0 +1,455 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:51:48.420Z",
+  "run": "ai-generations/2026-10-31_kickoff-seo-sky",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-31_kickoff-seo-sky",
+  "totalBytes": 43201369,
+  "fileCount": 74,
+  "files": [
+    {
+      "path": "assets/close.png",
+      "sizeBytes": 1156812,
+      "sha256": "6bdd393868f09380daeaa3352ff82bbd7b1b4746987a4f38cad792224603c118",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/assets/close.png"
+    },
+    {
+      "path": "assets/cover.png",
+      "sizeBytes": 540390,
+      "sha256": "e7e53c0060b2e3eb4ab0225e36b2858a218eb2aa26df3c1289cfdec79d242287",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/assets/cover.png"
+    },
+    {
+      "path": "assets/ref-estilo-d-reloj-de-flores.jpg",
+      "sizeBytes": 920743,
+      "sha256": "363d37cdbdbec3b361eb2b879e953af30a258ebdc4bc9b91233623a919900683",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/assets/ref-estilo-d-reloj-de-flores.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p02-000.jpg",
+      "sizeBytes": 96004,
+      "sha256": "b864ed1706a145938fc5a65296384dcdb921fcc760069bfb8a96256fdb344e97",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p02-000.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p02-001.jpg",
+      "sizeBytes": 563467,
+      "sha256": "2a1ccfd945d642d1e623235ac2a93a6cd444ee93e8633bf64fa5de9f6d166a7e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p02-001.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p02-002.jpg",
+      "sizeBytes": 589301,
+      "sha256": "9b20704e4cf79263be2bd1613c7dae10a7c0e6886f0f807ee62c8aa68d04f525",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p02-002.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p02-003.jpg",
+      "sizeBytes": 417712,
+      "sha256": "aaa55ae6a52ece0bdecf29a52a13a67de14f10248effdf97f51a2ab459428f7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p02-003.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p07-000.jpg",
+      "sizeBytes": 94939,
+      "sha256": "2be8fce8b72e17093f0e3c38aec47e1b27a8961d6226e6b8733de9b17a10b707",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p07-000.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p07-001.jpg",
+      "sizeBytes": 448282,
+      "sha256": "2d7b25413ad3cbc88e0f0554bd9420124ee6039d384a26fcd51fa1d427b0170a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p07-001.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p07-002.jpg",
+      "sizeBytes": 554036,
+      "sha256": "044a3c209ba399c1dc5ae4a7ac8fbb6f54e6e49b29ec0d70863f92f6f9b438f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p07-002.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p07-003.jpg",
+      "sizeBytes": 546245,
+      "sha256": "7bf17b6ae21dd958967aab8cfa279f0f1a8b9cc5c1e09dfe4df7f852b058bae8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p07-003.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p07-004.jpg",
+      "sizeBytes": 589656,
+      "sha256": "6bcbecbcf80b6ee56e50e5b9a614795185f624869165d8c7af0effa18f9a7f23",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p07-004.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p13-000.jpg",
+      "sizeBytes": 94939,
+      "sha256": "2be8fce8b72e17093f0e3c38aec47e1b27a8961d6226e6b8733de9b17a10b707",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p13-000.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p13-001.jpg",
+      "sizeBytes": 548006,
+      "sha256": "60e395b9e13a0feb468f85f79ae66a92ac031cb0cb087cef833dbab97b5ecf07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p13-001.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p13-002.jpg",
+      "sizeBytes": 483397,
+      "sha256": "f4ba8e882f1cc9936c281e94f2bd5b9fef0a5efa020f84bdfe402557fa53c61c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p13-002.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p13-003.jpg",
+      "sizeBytes": 494805,
+      "sha256": "0265d1e60fc19f429eec9fbda2861a89466e8585e7875cb5038d4a9efcc8310b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p13-003.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p14-000.jpg",
+      "sizeBytes": 94939,
+      "sha256": "2be8fce8b72e17093f0e3c38aec47e1b27a8961d6226e6b8733de9b17a10b707",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p14-000.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p14-001.jpg",
+      "sizeBytes": 452827,
+      "sha256": "39f8320c026d1fec18ecab85353591f21d746e0b22fcf12e3772f367f7b4b9cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p14-001.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p14-002.jpg",
+      "sizeBytes": 348575,
+      "sha256": "ad5386ec32e4bcd5c29d4f0b8e10f55a91f2ce2eb68f1fca22d8b74c2fd751bb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p14-002.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/img/p14-003.jpg",
+      "sizeBytes": 344519,
+      "sha256": "bfa1bb2cba94a3a9a3e30012c2a115d3ca2d22c9283ee306f92f0294d4e006fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/img/p14-003.jpg"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-01.png",
+      "sizeBytes": 1063683,
+      "sha256": "d1923a9a11d67e4f4b4056e97e12a1ed8db081a709cc8eb9745e6a3d59641196",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-01.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-02.png",
+      "sizeBytes": 371817,
+      "sha256": "d1fd7e2eeaa51d55b4d2b4c1ab6adb751bdc27634c7adfe787cd824bac50d446",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-02.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-03.png",
+      "sizeBytes": 42591,
+      "sha256": "cec91b1e7294bb8d1dd0e8825f09dd5e4d09ba42dade011cb78ccb5276c53578",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-03.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-04.png",
+      "sizeBytes": 522322,
+      "sha256": "73cc960956a58f0aed69735f585b634c93e9a66c19a050b0ff1a2ad0472c9113",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-04.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-05.png",
+      "sizeBytes": 45496,
+      "sha256": "2320a0cdef3145a0643aec390444e8c766306129f9b9356d297756fc56548c56",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-05.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-06.png",
+      "sizeBytes": 527788,
+      "sha256": "0ab51d65e0c599a510053d1bfd3643531aa3e89317ee75bcfe719bf867c51ffb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-06.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-07.png",
+      "sizeBytes": 673868,
+      "sha256": "67e096c11c70995658d102cc883a5f7bdd3b895f818a6d031095a3ad3b29edbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-07.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-08.png",
+      "sizeBytes": 523258,
+      "sha256": "be889603fe521d26e4a9b8c0fc2d9a93b27db75957e6c0c19441e8ba06f06153",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-08.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-09.png",
+      "sizeBytes": 545723,
+      "sha256": "328aa1920f7535a6e945b52c152ac2fbb7e031b4a1564b4eca25d1f6bd1804c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-09.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-10.png",
+      "sizeBytes": 43627,
+      "sha256": "b393e98613ecd866a1ee082c2cd1e45f59cb3477ee3adf41369f4e76947b36ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-10.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-11.png",
+      "sizeBytes": 568464,
+      "sha256": "d26a30f8c279d7d7a4fd92f0b425c7a22df231f3c02fbf869c46fe6e80dbff1a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-11.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-12.png",
+      "sizeBytes": 43158,
+      "sha256": "4b2966b7594de2e89a3f825ab3c08978e9ff65ce07d67692a2e6533b0c4a7918",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-12.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-13.png",
+      "sizeBytes": 380327,
+      "sha256": "a00edc628e3f5032b7096fd74195f4c4e080fd35fc61c801b91d7ff8af4a729c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-13.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-14.png",
+      "sizeBytes": 380433,
+      "sha256": "cf487cefecc525a06253443f02ffafde1acb83ab620073b53faf1212fe996e2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-14.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-15.png",
+      "sizeBytes": 488072,
+      "sha256": "9c8dfa9d83f6644704fdf5fbc2ec12094e5f99fa68c8f1e8d6945ec95cec58e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-15.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-16.png",
+      "sizeBytes": 52798,
+      "sha256": "bb95e36efe42aea072f9d0a5e80cd0c7305bc4d328ecdb33c7aaa6c90a582767",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-16.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-17.png",
+      "sizeBytes": 38120,
+      "sha256": "22e5ffbcb16bed1668531d4ce90a1bd3b4f7e8957a332a84220f1b6f4f7bda3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-17.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/p-18.png",
+      "sizeBytes": 332665,
+      "sha256": "8e9a06dfb7f79f89db4afb73ac15badc498ee7e1149684ea85301eaa25dfd903",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/p-18.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/sheet1.png",
+      "sizeBytes": 3718327,
+      "sha256": "c8dac0c83dad71892440ddf83b268e33f0f952e30866ff4b74fe04ac1e781e05",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/sheet1.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/sheet2.png",
+      "sizeBytes": 3503745,
+      "sha256": "436a186f2944a58094e3aa8193feb29ac316e49d6ae4a39d0e7c6af2e8763346",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/sheet2.png"
+    },
+    {
+      "path": "daniela-sistema-visual/pages/sheet3.png",
+      "sizeBytes": 2483032,
+      "sha256": "df9db5f5264ea9b26541b7aa08bb90a22b21bf63cd63b25c882743c643fd529a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/daniela-sistema-visual/pages/sheet3.png"
+    },
+    {
+      "path": "deck/assets/close.png",
+      "sizeBytes": 1156812,
+      "sha256": "6bdd393868f09380daeaa3352ff82bbd7b1b4746987a4f38cad792224603c118",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/close.png"
+    },
+    {
+      "path": "deck/assets/cover.png",
+      "sizeBytes": 539328,
+      "sha256": "940682e07fcef0217be464236c9eb8c336ccd7e5c0a3cd61a4f8b2c2365adcf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/cover.png"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-1-full.jpg",
+      "sizeBytes": 301706,
+      "sha256": "ac0fd20514a6dbb500644b48167f69c40415b96278072fcc75b1bb31e865bd5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-1-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-1.jpg",
+      "sizeBytes": 187403,
+      "sha256": "ab348b0ee6ba2848fb679da43753ada3ffcf4ccf21d26b40390b82dc7e807ce1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-1.jpg"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-2-full.jpg",
+      "sizeBytes": 222860,
+      "sha256": "c66670d26c62a7566c25bbe99b9fb99fe445355d62c933c392a022390291ff36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-2-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-2.jpg",
+      "sizeBytes": 142689,
+      "sha256": "89f1fc0f05a4310074fc8ed41094b9c9c4ac30481c35aa227ec8ff3a9599dc73",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-2.jpg"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-3-full.jpg",
+      "sizeBytes": 221232,
+      "sha256": "a4451bcec5725178242386fa46027501d395ceff1783613fd406a399aee9124e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-3-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-equipaje-3.jpg",
+      "sizeBytes": 140767,
+      "sha256": "6c2c74ce7ae1df47d3c9df4b49d2d2d252fb22029a89d54cbc9645bf5f7db209",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-equipaje-3.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-1-full.jpg",
+      "sizeBytes": 390887,
+      "sha256": "20a04434bc4ac8ea297366955968ae6bff900b794b134c47d2f192ab20107f45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-1-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-1.jpg",
+      "sizeBytes": 270681,
+      "sha256": "7992417ebd227b42310bb169fb53bd108f6ff4fea57f35b74afe55bac6c20a34",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-1.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-2-full.jpg",
+      "sizeBytes": 404460,
+      "sha256": "72c269363af7c503674d151f7165209ed5b56086919cf30e870ca0ef65ba46c1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-2-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-2.jpg",
+      "sizeBytes": 263150,
+      "sha256": "f2f1a2d4747e2ca6c640ceb09b5dbfb8b6c85b675ebbfb6b77950ef639e1a5ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-2.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-3-full.jpg",
+      "sizeBytes": 274987,
+      "sha256": "fa06962b86b75f603341b5a316c8e7b9af87803846646f799c4b3bc386c6adb6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-3-full.jpg"
+    },
+    {
+      "path": "deck/assets/dani-funcion-3.jpg",
+      "sizeBytes": 179123,
+      "sha256": "fc91218b0eac4b3ab1f6a6effbb4e15a5285235c82fc45d754dec7c9bd4c7479",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-funcion-3.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p07-001.jpg",
+      "sizeBytes": 278637,
+      "sha256": "83883deac2e2c23cfb5ec50886b705e38782fd9260a75c9b07bc3783d8a33ac4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p07-001.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p07-002.jpg",
+      "sizeBytes": 365605,
+      "sha256": "704140e9a65a0bb126fb1cae1029921e889ced51f0b19785977c1d3df4f9488d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p07-002.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p07-003.jpg",
+      "sizeBytes": 354697,
+      "sha256": "a843c64e64e757d1aff858ff7ba6d4b686eae2455645cd740cec51700ca156d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p07-003.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p07-004.jpg",
+      "sizeBytes": 386693,
+      "sha256": "1d08fb713bb2747829399234e7f1343065720c0851d5f43b91a776da6eedfe22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p07-004.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p13-001.jpg",
+      "sizeBytes": 372464,
+      "sha256": "7918bd887de57f0486786eca776c7b7fc158d6d56a34bf2bc96783f3bcb7cecd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p13-001.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p13-002.jpg",
+      "sizeBytes": 327262,
+      "sha256": "3e99cbc0e5aa8dff3649f6f453118eba9d0f5c5627e23598fce894864a5193cd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p13-002.jpg"
+    },
+    {
+      "path": "deck/assets/dani-p13-003.jpg",
+      "sizeBytes": 317391,
+      "sha256": "d1fbc17fdcae17dd0576387e1e23ea8233094da7026c75b39ff17c85c9f00a99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/dani-p13-003.jpg"
+    },
+    {
+      "path": "deck/assets/ref-d.jpg",
+      "sizeBytes": 355680,
+      "sha256": "91a198d08fe5e0378e04592bbd2cae7a42c08fb7e7828bc3d68d86526df6ae13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/ref-d.jpg"
+    },
+    {
+      "path": "deck/assets/ref-estilo-d-reloj-de-flores.jpg",
+      "sizeBytes": 920743,
+      "sha256": "363d37cdbdbec3b361eb2b879e953af30a258ebdc4bc9b91233623a919900683",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/ref-estilo-d-reloj-de-flores.jpg"
+    },
+    {
+      "path": "deck/assets/squad-andres.png",
+      "sizeBytes": 811008,
+      "sha256": "ae9b16d7e72588b7d88d12cdabf34b80015e1d5b50f1e9e2e06f05de9ca56c6e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/squad-andres.png"
+    },
+    {
+      "path": "deck/assets/squad-daniela.png",
+      "sizeBytes": 810072,
+      "sha256": "09f855e35b9532ccb7cad4f8a29b375df1ae686a949856ea4267d754fb0f1a53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/squad-daniela.png"
+    },
+    {
+      "path": "deck/assets/squad-julio.png",
+      "sizeBytes": 884026,
+      "sha256": "71728dfe3a8fccac6ec99338ebf176dc8eca6247f22beb0714a633657f9bf27e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/squad-julio.png"
+    },
+    {
+      "path": "deck/assets/squad-melkin.png",
+      "sizeBytes": 833856,
+      "sha256": "3ed018d2435331cb1978bf46ef5a4580a9661ef5625d359a358da5d34146d085",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/squad-melkin.png"
+    },
+    {
+      "path": "deck/assets/squad-valentina.png",
+      "sizeBytes": 807307,
+      "sha256": "c268125b320560a51815243e9d2a223288d41e4c3a954a744d95edaf6ab5e18b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/squad-valentina.png"
+    },
+    {
+      "path": "deck/assets/team.png",
+      "sizeBytes": 1081492,
+      "sha256": "54035354b292d63f9829c24c7b681a6a511033db01b804e432dd352cf5125d8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/deck/assets/team.png"
+    },
+    {
+      "path": "out/close/01-deck-close-proposal.png",
+      "sizeBytes": 1156812,
+      "sha256": "6bdd393868f09380daeaa3352ff82bbd7b1b4746987a4f38cad792224603c118",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/out/close/01-deck-close-proposal.png"
+    },
+    {
+      "path": "out/cover/01-deck-cover-proposal.png",
+      "sizeBytes": 539328,
+      "sha256": "940682e07fcef0217be464236c9eb8c336ccd7e5c0a3cd61a4f8b2c2365adcf3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/out/cover/01-deck-cover-proposal.png"
+    },
+    {
+      "path": "out/team-logo/01-deck-content-team.png",
+      "sizeBytes": 1081492,
+      "sha256": "54035354b292d63f9829c24c7b681a6a511033db01b804e432dd352cf5125d8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/out/team-logo/01-deck-content-team.png"
+    },
+    {
+      "path": "out/team/01-deck-content-team.png",
+      "sizeBytes": 1091811,
+      "sha256": "9a4c3b303988b4c943edb3aa58852200fb03bbbd65b209613144650c41ef33e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-31_kickoff-seo-sky/out/team/01-deck-content-team.png"
+    }
+  ]
+}

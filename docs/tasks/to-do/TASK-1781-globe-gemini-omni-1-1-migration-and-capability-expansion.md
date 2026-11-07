@@ -1,5 +1,9 @@
 # TASK-1781 — Globe Gemini Omni 1.1 Migration and Capability Expansion
 
+## Delta 2026-11-05
+
+- Google publicó **Gemini Omni 1.2 Flash** (`gemini-omni-1.2-flash`, GA en Cloud, `locations/global`, PayGo estándar; verificado con GET de solo lectura al modelo publicado). Cambios frente a 1.1: clips de 3 a 15 s (frames y extend siguen en 3 a 10 s), nuevo task `upscale` (360p→720p|1080p, 720p→1080p|4k), edición en varios turnos con `previous_interaction_id`, y video de salida a USD 12/1M tokens frente a USD 17,5. En la Developer API, `gemini-omni-1.1-flash` se enruta solo a 1.2 desde 2026-12-03; para `gemini-omni-1.1-flash-preview` en Cloud no hay fecha de retiro anunciada. Antes de ejecutar esta task, conviene decidir si la migración de Globe apunta a 1.2 en lugar de 1.1. Solo cambió la CLI local `pnpm ai:omni` (ver `GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md` §Delta 2026-11-05); Globe sigue sin cambios de runtime, flota ni promoción.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

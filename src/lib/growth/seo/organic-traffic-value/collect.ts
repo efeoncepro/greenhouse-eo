@@ -4,6 +4,28 @@ import { readSearchConsoleAnalytics } from '../../search-console/reader'
 import { getSearchConsoleConnection } from '../../search-console/connection-store'
 import type { SearchConsoleAnalyticsParams, SearchConsoleAnalyticsRow } from '../../search-console/contracts'
 import { normalizeMarketKeyword } from '../keyword-market-data'
+import { isPathInContentScope, type SeoContentScopeRuleV1 } from '../content-scope/contracts'
+import { searchConsolePageExpression } from '../search-control/page-expression'
+
+/**
+ * Host de la propiedad: una propiedad por URL (`https://blog.x.com/`) fija el host exacto; una propiedad de dominio
+ * (`sc-domain:x.com`) cubre el dominio y sus subdominios, así que el host pedido debe pertenecerle.
+ */
+const assertHostBelongsToProperty = (siteUrl: string, hostname: string) => {
+  if (siteUrl.startsWith('sc-domain:')) {
+    const domain = siteUrl.slice('sc-domain:'.length).toLowerCase()
+    const host = hostname.toLowerCase()
+
+    if (host !== domain && !host.endsWith(`.${domain}`)) throw new Error('site_hostname_mismatch')
+
+    return
+  }
+
+  if (new URL(siteUrl).hostname !== hostname) throw new Error('site_hostname_mismatch')
+}
+
+/** Compatibilidad: la expresión vive en el módulo de control de Search Console. */
+export const organicValuePageExpression = searchConsolePageExpression
 
 /** Extrae evidencia. No compra CPC, no cambia tracking ni crea una edición de Insights. */
 export const collectOrganicTrafficValueInputs = async (input: {
@@ -12,13 +34,16 @@ export const collectOrganicTrafficValueInputs = async (input: {
   hostname: string
   range: { startDate: string; endDate: string }
   maxPages?: number
+  /** Reglas del alcance de contenido (TASK-2033): controles y detalle miden sólo ese contenido. */
+  scopeRules?: readonly SeoContentScopeRuleV1[]
 }) => {
-  if (new URL(input.siteUrl).hostname !== input.hostname) throw new Error('site_hostname_mismatch')
+  assertHostBelongsToProperty(input.siteUrl, input.hostname)
   const connection = await getSearchConsoleConnection(input.organizationId)
 
   if (!connection || connection.status !== 'active' || connection.siteUrl !== input.siteUrl)
     throw new Error('connected_site_does_not_match')
-  const escapedHost = input.hostname.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  const scopeRules = input.scopeRules && input.scopeRules.length > 0 ? input.scopeRules : undefined
 
   const common: SearchConsoleAnalyticsParams = {
     range: input.range,
@@ -28,7 +53,15 @@ export const collectOrganicTrafficValueInputs = async (input: {
     dimensionFilterGroups: [
       {
         groupType: 'and',
-        filters: [{ dimension: 'page', operator: 'includingRegex', expression: `^https?://${escapedHost}/` }]
+        filters: [
+          {
+            dimension: 'page',
+            operator: 'includingRegex',
+            expression: organicValuePageExpression(input.hostname, scopeRules, {
+              includeSubdomains: input.siteUrl === `sc-domain:${input.hostname.toLowerCase()}`
+            })
+          }
+        ]
       }
     ]
   }
@@ -61,7 +94,12 @@ export const collectOrganicTrafficValueInputs = async (input: {
   const pageRows = await read(['page'], true)
   const queryRows = await read(['page', 'query', 'country'], true)
 
+  // Defensa: si Google devolviera una página fuera del alcance pedido, el resultado no mide lo que dice medir.
+  if (scopeRules && [...pageRows, ...queryRows].some(row => !isPathInContentScope(row.keys[0]!, scopeRules)))
+    throw new Error('page_outside_content_scope')
+
   return {
+    scope: scopeRules ? { rules: [...scopeRules] } : null,
     organizationId: input.organizationId,
     siteUrl: input.siteUrl,
     hostname: input.hostname,

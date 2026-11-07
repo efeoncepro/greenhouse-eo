@@ -1,0 +1,13 @@
+High quality 3D render of this exact character: GASFIELD, the mascot of the Chilean gas shop "Gas Don Julio". Images 1 and 2 are the approved 3D model sheet views (front and three-quarter) and define its SHAPE, PROPORTIONS and SATIN FINISH. Image 3 is the official 2D drawing and confirms the shape.
+
+Character invariants (exactly as in images 1 and 2):
+- Body: a domestic LPG gas cylinder shaped like a rounded barrel or lantern, about 1.1 times taller than it is wide, with gently rounded top and bottom shoulders and slightly bulging sides. It is NOT a sphere, NOT a capsule and NOT a tall thin bottle.
+- One horizontal weld seam ring runs around the whole body at about 55% of its height, just below the mouth.
+- On top: a short central valve stub, surrounded by a thin circular protective guard hoop that floats above the shoulders on four thin vertical posts. The hoop diameter is about half the body width.
+- At the bottom: a short, narrower cylindrical foot collar, about 40% of the body width and 8% of the body height. The legs come out of the underside of the body, one on each side of this collar.
+- Color: saturated red only (main #E31917, shadow side #CF1317, warm highlight #EB5F46). Subtle vertical pressing ribs on the body are allowed. No other colors on the body.
+- Face on the upper half of the front: exactly TWO tall oval glossy black eyes with small white highlights, set wide apart at about 30% of the body height; thin black arched eyebrows above them; ONE wide open smile with white teeth and a pink tongue, centered at about 45% of the height. No nose, no ears, no cheeks painted.
+- Limbs: thin, smooth, matte black rubbery noodle limbs. Arms attach on the left and right sides at about 60% of the body height. Hands are round black cartoon mitten-gloves with a thumb. Legs are about half the body height long and end in rounded black oval shoes.
+- Never add text, logos, labels, clothing, hats, accessories, a nose, ears or extra limbs.
+
+Material and style: premium vinyl designer toy with a SATIN soft-touch matte finish on the red, exactly like images 1 and 2: broad, soft, diffuse highlights, no sharp specular hotspots, no wet look; matte black rubber for the limbs, hands and shoes; eyes as glossy black domes with a small white highlight.

@@ -1,0 +1,129 @@
+{
+  "id": "manglar",
+  "notion_url": "https://app.notion.com/p/d89aecf21c984a81a46a20675764a089",
+  "titulo": "Manglares de Tumbes: qué es un manglar y cómo es recorrerlo por primera vez",
+  "slug": "/manglares-de-tumbes/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual + viajero integrado",
+      "modificadores": "grupo pequeño · escala amplia · luz de primera hora · orienta",
+      "registro": "D",
+      "archivo": "manglares-tumbes-estero-zarumilla-canoa-manana.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Canoa con dos viajeros y un guía avanzando por el estero Zarumilla entre paredes de mangle, en el Santuario Nacional Los Manglares de Tumbes",
+      "que_muestra": "un estero ancho de agua quieta y oscura, con paredes verdes de mangle a ambos lados y raíces que bajan en arco hasta el agua; a media distancia, una canoa con dos viajeros sentados y un guía de pie que impulsa la embarcación. El agua refleja el cielo claro. Tiene que leerse como manglar (raíz aérea sobre agua salobre), no como río de selva.",
+      "hora_clima": "primera hora de la mañana (la entrada del relato); cielo despejado o con bruma ligera que se levanta; luz natural luminosa y suave, sombras abiertas, verdes con detalle y altas luces del cielo conservadas",
+      "personas": "fotografiado desde el embarcadero o desde otra embarcación detenida; los dos viajeros miran hacia las raíces de la orilla, de perfil o de espaldas; el guía, de espaldas, impulsa la canoa; nadie mira al lente; ropa neutra, chalecos sin logos; ningún rostro identificable",
+      "primer_plano": "hojas de mangle de una rama cercana, muy cerca del lente y muy fuera de foco, por el borde superior o lateral, sin tapar la canoa",
+      "ancla_pov": "Las raíces salen del agua en arcos, el aire huele a barro salado y, cuando el guía apaga el motor, el estero se queda en silencio",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en la embarcación",
+        "sin rótulos legibles de negocios reales ni carteles del SERNANP",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cocodrilos ni fauna en primer plano (no se promete avistamiento)",
+        "sin lianas, palmeras ni vegetación amazónica"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del estero Zarumilla o del embarcadero de Puerto 25 en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la canoa con las personas y las dos paredes de mangle tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «La segunda mitad del recorrido, en la ruta tradicional, es a pie…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "C — Acción espontánea",
+      "modificadores": "caminata sobre fango · persona sola · escala media · luz de media mañana bajo follaje",
+      "registro": "E",
+      "archivo": "manglares-tumbes-sendero-fango-botas.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero con botas caminando sobre el fango de un sendero entre raíces de mangle en el Santuario Nacional Los Manglares de Tumbes",
+      "que_muestra": "un viajero, de espaldas y a media distancia, avanza con botas de caña alta por un sendero de fango húmedo entre raíces de mangle que se cruzan a la altura de las rodillas; el follaje cierra el cuadro arriba y deja pasar luz filtrada. La decisión que muestra es la del equipo: sin botas, este tramo no se hace.",
+      "hora_clima": "media mañana (después del bote del relato); aire húmedo; luz natural filtrada por el follaje, abundante y con sombras abiertas, sin quemar los claros",
+      "personas": "fotografía un acompañante que camina detrás, a pocos pasos; el viajero mira el suelo y las raíces donde pisa; nadie mira al lente; ropa neutra de manga larga, sin logos; ningún rostro identificable",
+      "primer_plano": "una raíz de mangle cubierta de barro, muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar al viajero",
+      "ancla_pov": "El barro se pega a las botas y hace un ruido de succión con cada paso",
+      "no": [
+        "sin texto ni logos",
+        "sin carteles ni señalética legible del SERNANP",
+        "sin rótulos de negocios reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin pasarelas de madera que no existan en el sendero",
+        "sin fauna en primer plano",
+        "sin vegetación de selva amazónica"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 del sendero El Gallegos o de un sendero sobre fango del santuario en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Cuando la marea baja, el manglar se desnuda…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde el bote detenido · sin personas · escala cercana · luz de mediodía",
+      "registro": "E",
+      "archivo": "manglares-tumbes-raices-marea-baja-barro.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Raíces de mangle rojo al descubierto con marea baja y barro con hoyos de cangrejo en los manglares de Tumbes",
+      "que_muestra": "desde el borde de un bote detenido, a ras del agua, una maraña de raíces de mangle rojo al descubierto, cubiertas de barro brillante y con pequeños charcos entre ellas; en el fango se ven hoyos de cangrejo. Lo que demuestra es el otro estado del manglar, el de marea baja, que el lector no imagina si solo vio el canal inundado. Si las raíces se ven sumergidas, la imagen no sirve.",
+      "hora_clima": "cerca del mediodía, con marea baja; luz natural abundante filtrada por las copas, barro con brillo sin quemar, sombras abiertas",
+      "personas": "fotografía el viajero desde el bote, inclinado hacia la orilla; no aparece en cuadro; sin otras personas",
+      "primer_plano": "el borde del bote o la mano del viajero apoyada en la borda, muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar las raíces",
+      "ancla_pov": "Las raíces que en la mañana estaban sumergidas aparecen cubiertas de barro brillante",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos ni señalética",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin basura ni plásticos",
+        "sin cocodrilos ni cangrejos gigantes en primer plano",
+        "sin conchas negras dispuestas como bodegón"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de raíces de mangle rojo con marea baja en los manglares de Tumbes en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TBP",
+      "ciudad": "Tumbes"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tumbes",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Raíces, esteros y motor apagado",
+    "cta": "Ver vuelos a Tumbes",
+    "archivo": "banner-ruta-lima-tumbes-manglares.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tumbes: raíces, esteros y motor apagado",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes"
+  },
+  "descartes": [
+    "garza tigre en el estero al amanecer — promete un avistamiento y exige fidelidad de fauna",
+    "extractor recolectando conchas negras en canoa — persona real reconocible por su oficio; requiere consentimiento y fidelidad",
+    "proa de lancha en un canal de Puerto Pizarro — ya es la IMG 2 del piloto de Zorritos",
+    "cocodrilo de Tumbes — especie con presencia en disputa entre fuentes",
+    "plato de conchas negras — ya es la IMG 3 del piloto de Zorritos"
+  ]
+}

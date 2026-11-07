@@ -73,6 +73,8 @@ Adaptación a México: español mexicano estándar ..................... modules
 Banners, imágenes y ficha visual ................................... modules/05_BANNERS_IMAGENES.md
 Material de marca Berel (ficha sin diseño) ......................... modules/05_BANNERS_IMAGENES.md
 Derivados sociales ................................................. modules/06_DERIVADOS_SOCIALES.md
+Producto en escena: qué producto y dónde (el cómo: berel-graphic-line) . modules/05_BANNERS_IMAGENES.md
+Reel: formato entregado, música Envato del mes, handoff ............ modules/06_DERIVADOS_SOCIALES.md
 Selección de canales, capacidad y exclusiones reversibles .......... modules/15_DISTRIBUCION_SELECTIVA.md
 Conteo del cupo mensual por archivo y excedente .................... modules/15_DISTRIBUCION_SELECTIVA.md
 Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md
@@ -306,6 +308,10 @@ Plantillas ......................................................... templates/
     imagen muestre la acción rotulada y que título, subtítulo, contenido y cierre cumplan una misma función.
     Anotar un riesgo como hipótesis de Efeonce, nunca como comentario ya hecho por Berel; en Frame.io
     comentar la versión exacta y verificar el envío. Módulo 20.
+71. 🔴 **Pieza temporal reescrita como evergreen = ángulo desde lo que la URL ya gana, sin edades ni aniversarios.**
+    La paleta oficial del cliente nombra los colores aunque el catálogo use otro nombre; las fichas se reespecifican
+    contra lo que la fuente sostiene (nada de escudo actual en uniformes históricos) y la matriz social se reevalúa.
+    Caso Rayados N52 (2026-11-05): módulos 03, 05, 06, 09 y 15.
 
 ## Lo que no se toca
 

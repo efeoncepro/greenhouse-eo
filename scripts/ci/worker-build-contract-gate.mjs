@@ -35,7 +35,15 @@ export const WORKER_BUILD_UNITS = [
     // TASK-1828 — Efeonce auth server (authorization server propio, EPIC-044).
     name: 'auth-server',
     dockerfile: 'services/auth-server/Dockerfile',
-    workflow: '.github/workflows/auth-server-deploy.yml'
+    workflow: '.github/workflows/auth-server-deploy.yml',
+    orchestratorOnly: true
+  },
+  {
+    // TASK-1833 — definition-only Cloud Run Job, always built on an approved release.
+    name: 'auth-key-maintenance',
+    dockerfile: 'services/auth-key-maintenance/Dockerfile',
+    workflow: '.github/workflows/auth-key-maintenance-deploy.yml',
+    strictOrchestrator: true
   }
 ]
 
@@ -195,7 +203,29 @@ const validateAgentContextToolchain = ({ workflow, pnpmVersion }) => {
   return errors
 }
 
-export const validateWorkerWorkflowPaths = ({ path, workflow }) => {
+export const validateWorkerWorkflowPaths = ({ path, workflow, orchestratorOnly = false, strictOrchestrator = false }) => {
+  if (strictOrchestrator) {
+    const triggers = workflow?.on ?? {}
+    const errors = []
+
+    if (Object.hasOwn(triggers, 'push')) errors.push(`${path}: Job no puede desplegar por push`)
+    if (Object.hasOwn(triggers, 'workflow_dispatch')) errors.push(`${path}: Job no acepta dispatch aislado`)
+    if (!Object.hasOwn(triggers, 'workflow_call')) errors.push(`${path}: falta workflow_call del orquestador`)
+
+    return errors
+  }
+
+  if (orchestratorOnly) {
+    const triggers = workflow?.on ?? {}
+    const errors = []
+
+    if (Object.hasOwn(triggers, 'push')) errors.push(`${path}: Auth no puede desplegar por push`)
+    if (!Object.hasOwn(triggers, 'workflow_call')) errors.push(`${path}: falta workflow_call del orquestador`)
+    if (!Object.hasOwn(triggers, 'workflow_dispatch')) errors.push(`${path}: falta workflow_dispatch de emergencia`)
+
+    return errors
+  }
+
   const paths = workflow?.on?.push?.paths ?? []
 
   if (!Array.isArray(paths)) return [`${path}: on.push.paths debe ser una lista explícita`]
@@ -259,7 +289,8 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
 
     const workflow = YAML.parse(readText(root, unit.workflow))
 
-    errors.push(...validateWorkerWorkflowPaths({ path: unit.workflow, workflow }))
+    errors.push(...validateWorkerWorkflowPaths({ path: unit.workflow, workflow,
+      orchestratorOnly: unit.orchestratorOnly, strictOrchestrator: unit.strictOrchestrator }))
   }
 
   for (const path of ['.dockerignore', '.gcloudignore']) {
@@ -304,7 +335,7 @@ export const runWorkerBuildContractGate = (root = repoRoot) => {
     `✓ ${localDependencies.length} dependencia(s) file: existen, están versionadas y coinciden con el lockfile`
   )
   console.log(`✓ ${WORKER_BUILD_UNITS.length} build units copian todos los inputs locales antes de instalar`)
-  console.log('✓ Docker/Cloud Build contexts y triggers incluyen los inputs compartidos')
+  console.log('✓ Docker/Cloud Build contexts, triggers y Auth workflow_call conservan sus contratos')
 
   return 0
 }

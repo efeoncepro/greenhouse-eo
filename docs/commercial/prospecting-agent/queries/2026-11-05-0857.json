@@ -1,0 +1,2996 @@
+{
+  "schema_version": 1,
+  "automation_id": "prospecci-n-hubspot-reporte-diario",
+  "run_id": "2026-11-05-0857",
+  "timezone": "America/Santiago",
+  "started_at": "2026-11-05T08:57:56.807881-03:00",
+  "research_cutoff": "2026-11-05T09:12:02.129497-03:00",
+  "week_start_local": "2026-11-02T00:00:00-03:00",
+  "week_end_local": "2026-11-05T09:12:02.129497-03:00",
+  "first_pass_48h": {
+    "from": "2026-11-03T08:57:56.807881-03:00",
+    "to": "2026-11-05T08:57:56.807881-03:00",
+    "filter_precision": "date borders plus recency2 approximate48h; publication checked independently"
+  },
+  "overlap": {
+    "from": "2026-11-01T09:15:05-03:00",
+    "basis": "último corte4/11 09:15:05 menos72h",
+    "limit": "API SECOP consultó desde1/11 día; web semanal/variantes sin filtro. No cobertura continua de fuentes bloqueadas."
+  },
+  "counts": {
+    "discovery_queries": 56,
+    "weekly_discovery_queries": 48,
+    "weekly_pct": 85.71,
+    "native_discovery_queries": 1,
+    "native_discovery_scope": "SECOP: 15 filas coincidentes desde1/11, incluye solape dominical; watermark3/11",
+    "coverage_cells": 20,
+    "qualified_new": 0,
+    "new_hsp": 2,
+    "new_local_ids": [
+      "HSP-0066",
+      "HSP-0067"
+    ],
+    "new_initiative_existing_id": "HSP-0022",
+    "new_hypotheses_qualified": 0,
+    "purchase_controls": 19
+  },
+  "coverage": [
+    {
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-1",
+        "Dweek-1"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Chile",
+      "service_line": "web",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-2",
+        "Dweek-2"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Chile",
+      "service_line": "creative",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-3",
+        "Dweek-3"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-4",
+        "Dweek-4"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-5",
+        "Dweek-5"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-1",
+        "Dweek-1"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-2",
+        "Dweek-2"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Perú",
+      "service_line": "creative",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-3",
+        "Dweek-3"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-4",
+        "Dweek-4"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Perú",
+      "service_line": "media",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-5",
+        "Dweek-5"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-1",
+        "Dweek-1"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "web",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-2",
+        "Dweek-2"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "creative",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-3",
+        "Dweek-3"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-4",
+        "Dweek-4"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-5",
+        "Dweek-5"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "México",
+      "service_line": "seo_aeo",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-1",
+        "Dweek-1"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "México",
+      "service_line": "web",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-2",
+        "Dweek-2"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "México",
+      "service_line": "creative",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-3",
+        "Dweek-3"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-4",
+        "Dweek-4"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    },
+    {
+      "country": "México",
+      "service_line": "media",
+      "discovery_query_count": 2,
+      "batches": [
+        "D48-5",
+        "Dweek-5"
+      ],
+      "qualified_new": 0,
+      "scope": "search exposure, not exhaustive direct surveillance"
+    }
+  ],
+  "queries": [
+    {
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Chile (SEO OR AEO OR \"posicionamiento orgánico\") (agencia OR proveedor OR licitación OR buscamos) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-1",
+      "executed_at": "2026-11-05T11:58:33.215Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Perú (SEO OR AEO OR \"posicionamiento orgánico\") (agencia OR proveedor OR licitación OR buscamos) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-1",
+      "executed_at": "2026-11-05T11:58:33.215Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Colombia (SEO OR AEO OR \"posicionamiento orgánico\") (agencia OR proveedor OR licitación OR buscamos) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-1",
+      "executed_at": "2026-11-05T11:58:33.215Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "seo_aeo",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "México (SEO OR AEO OR \"posicionamiento orgánico\") (agencia OR proveedor OR licitación OR buscamos) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-1",
+      "executed_at": "2026-11-05T11:58:33.215Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "web",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Chile (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-2",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Perú (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-2",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "web",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Colombia (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-2",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "web",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "México (\"desarrollo web\" OR \"rediseño web\" OR \"sitio web\") (licitación OR convocatoria OR \"buscamos agencia\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-2",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "creative",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Chile (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (buscamos OR convocatoria OR licitación) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-3",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "creative",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Perú (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (buscamos OR convocatoria OR licitación) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-3",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "creative",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Colombia (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (buscamos OR convocatoria OR licitación) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-3",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "creative",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "México (\"agencia creativa\" OR \"producción audiovisual\" OR contenidos) (buscamos OR convocatoria OR licitación) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-3",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Chile (HubSpot OR CRM) (implementación OR migración OR integración OR \"recomiendan proveedor\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-4",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Perú (HubSpot OR CRM) (implementación OR migración OR integración OR \"recomiendan proveedor\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-4",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Colombia (HubSpot OR CRM) (implementación OR migración OR integración OR \"recomiendan proveedor\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-4",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "México (HubSpot OR CRM) (implementación OR migración OR integración OR \"recomiendan proveedor\") after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-4",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Chile (\"agencia de medios\" OR \"plan de medios\" OR programática OR DOOH) (buscamos OR licitación OR convocatoria) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-5",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "media",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Perú (\"agencia de medios\" OR \"plan de medios\" OR programática OR DOOH) (buscamos OR licitación OR convocatoria) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-5",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "Colombia (\"agencia de medios\" OR \"plan de medios\" OR programática OR DOOH) (buscamos OR licitación OR convocatoria) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-5",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "media",
+      "pass": "48h_intersected_week",
+      "filter": "after:2026-11-02 before:2026-11-06; recency 2; date-only borders approximate; exact source date required",
+      "q": "México (\"agencia de medios\" OR \"plan de medios\" OR programática OR DOOH) (buscamos OR licitación OR convocatoria) after:2026-11-02 before:2026-11-06",
+      "batch_id": "D48-5",
+      "executed_at": "2026-11-05T11:58:33.220Z",
+      "result_scope": "batch; see evidence, no inferred per-query attribution",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "seo_aeo",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Chile (\"buscamos agencia\" OR \"recomiendan\" OR licitación) (SEO OR AEO) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-1",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "seo_aeo",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia\" OR \"recomiendan\" OR licitación) (SEO OR AEO) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-1",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "seo_aeo",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos agencia\" OR \"recomiendan\" OR licitación) (SEO OR AEO) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-1",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "seo_aeo",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts México (\"buscamos agencia\" OR \"recomiendan\" OR licitación) (SEO OR AEO) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-1",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "web",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Chile (\"buscamos agencia\" OR licitación OR proveedor) (web OR ecommerce) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-2",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia\" OR licitación OR proveedor) (web OR ecommerce) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-2",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "web",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos agencia\" OR licitación OR proveedor) (web OR ecommerce) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-2",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "web",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts México (\"buscamos agencia\" OR licitación OR proveedor) (web OR ecommerce) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-2",
+      "executed_at": "2026-11-05T11:58:58.931Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "creative",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Chile (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria audiovisual\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-3",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "creative",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria audiovisual\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-3",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "creative",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria audiovisual\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-3",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "creative",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts México (\"buscamos agencia\" OR \"licitación agencia\" OR \"convocatoria audiovisual\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-3",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "crm_hubspot",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Chile (\"buscamos\" OR \"recomiendan\" OR \"necesitamos\") (HubSpot OR CRM) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-4",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "crm_hubspot",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Perú (\"buscamos\" OR \"recomiendan\" OR \"necesitamos\") (HubSpot OR CRM) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-4",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "crm_hubspot",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos\" OR \"recomiendan\" OR \"necesitamos\") (HubSpot OR CRM) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-4",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "crm_hubspot",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts México (\"buscamos\" OR \"recomiendan\" OR \"necesitamos\") (HubSpot OR CRM) after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-4",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Chile (\"buscamos agencia de medios\" OR \"licitación medios\" OR \"planning buying\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-5",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "media",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Perú (\"buscamos agencia de medios\" OR \"licitación medios\" OR \"planning buying\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-5",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts Colombia (\"buscamos agencia de medios\" OR \"licitación medios\" OR \"planning buying\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-5",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "media",
+      "pass": "week_linkedin_public",
+      "filter": "site:linkedin.com/posts after:2026-11-01 before:2026-11-06; recency7; source publication required",
+      "q": "site:linkedin.com/posts México (\"buscamos agencia de medios\" OR \"licitación medios\" OR \"planning buying\") after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dweek-5",
+      "executed_at": "2026-11-05T11:58:58.932Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "cross_service",
+      "pass": "week_private_direct",
+      "filter": "absolute week + recency7",
+      "q": "Chile (\"solicitud de propuestas\" OR \"buscamos agencia\" OR \"recomendación de agencia\") noviembre 2026 after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-1",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "cross_service",
+      "pass": "week_buyer_public",
+      "filter": "absolute week + recency7",
+      "q": "Chile (licitación OR convocatoria OR RFP) (comunicación OR CRM OR web OR marketing) \"noviembre\" \"2026\" after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-1",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "cross_service",
+      "pass": "unfiltered_private",
+      "filter": "none",
+      "q": "Chile (\"buscamos agencia\" OR \"selección de agencia\" OR \"solicitud de propuestas\") marketing 2026",
+      "batch_id": "Dcross-1",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Chile",
+      "service_line": "cross_service",
+      "pass": "unfiltered_corporate",
+      "filter": "none",
+      "q": "Chile (Ariba OR Coupa OR Wherex OR proveedores) (licitación OR RFP) (agencia OR SEO OR CRM OR audiovisual)",
+      "batch_id": "Dcross-1",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "cross_service",
+      "pass": "week_private_direct",
+      "filter": "absolute week + recency7",
+      "q": "Perú (\"solicitud de propuestas\" OR \"buscamos agencia\" OR \"recomendación de agencia\") noviembre 2026 after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-2",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "cross_service",
+      "pass": "week_buyer_public",
+      "filter": "absolute week + recency7",
+      "q": "Perú (licitación OR convocatoria OR RFP) (comunicación OR CRM OR web OR marketing) \"noviembre\" \"2026\" after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-2",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "cross_service",
+      "pass": "unfiltered_private",
+      "filter": "none",
+      "q": "Perú (\"buscamos agencia\" OR \"selección de agencia\" OR \"solicitud de propuestas\") marketing 2026",
+      "batch_id": "Dcross-2",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Perú",
+      "service_line": "cross_service",
+      "pass": "unfiltered_corporate",
+      "filter": "none",
+      "q": "Perú (Ariba OR Coupa OR Wherex OR proveedores) (licitación OR RFP) (agencia OR SEO OR CRM OR audiovisual)",
+      "batch_id": "Dcross-2",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "cross_service",
+      "pass": "week_private_direct",
+      "filter": "absolute week + recency7",
+      "q": "Colombia (\"solicitud de propuestas\" OR \"buscamos agencia\" OR \"recomendación de agencia\") noviembre 2026 after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-3",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "cross_service",
+      "pass": "week_buyer_public",
+      "filter": "absolute week + recency7",
+      "q": "Colombia (licitación OR convocatoria OR RFP) (comunicación OR CRM OR web OR marketing) \"noviembre\" \"2026\" after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-3",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "cross_service",
+      "pass": "unfiltered_private",
+      "filter": "none",
+      "q": "Colombia (\"buscamos agencia\" OR \"selección de agencia\" OR \"solicitud de propuestas\") marketing 2026",
+      "batch_id": "Dcross-3",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "Colombia",
+      "service_line": "cross_service",
+      "pass": "unfiltered_corporate",
+      "filter": "none",
+      "q": "Colombia (Ariba OR Coupa OR Wherex OR proveedores) (licitación OR RFP) (agencia OR SEO OR CRM OR audiovisual)",
+      "batch_id": "Dcross-3",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "cross_service",
+      "pass": "week_private_direct",
+      "filter": "absolute week + recency7",
+      "q": "México (\"solicitud de propuestas\" OR \"buscamos agencia\" OR \"recomendación de agencia\") noviembre 2026 after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-4",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "cross_service",
+      "pass": "week_buyer_public",
+      "filter": "absolute week + recency7",
+      "q": "México (licitación OR convocatoria OR RFP) (comunicación OR CRM OR web OR marketing) \"noviembre\" \"2026\" after:2026-11-01 before:2026-11-06",
+      "batch_id": "Dcross-4",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "cross_service",
+      "pass": "unfiltered_private",
+      "filter": "none",
+      "q": "México (\"buscamos agencia\" OR \"selección de agencia\" OR \"solicitud de propuestas\") marketing 2026",
+      "batch_id": "Dcross-4",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    },
+    {
+      "country": "México",
+      "service_line": "cross_service",
+      "pass": "unfiltered_corporate",
+      "filter": "none",
+      "q": "México (Ariba OR Coupa OR Wherex OR proveedores) (licitación OR RFP) (agencia OR SEO OR CRM OR audiovisual)",
+      "batch_id": "Dcross-4",
+      "executed_at": "2026-11-05T12:01:38.199Z",
+      "result_scope": "batch",
+      "outcome": "Resultados por lote en batches; filtrados como fuentes/proveedores/vacantes/históricos o controles; sin atribución individual inventada."
+    }
+  ],
+  "batches": [
+    {
+      "id": "D48-1",
+      "checked_at": "2026-11-05T11:58:33.215Z",
+      "outcome": "SEO/AEO: vacantes de Casaideas y proveedores; no demanda B2B calificada.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "D48-2",
+      "checked_at": "2026-11-05T11:58:33.220Z",
+      "outcome": "Web: Indian Motos investigada; resto incluye freelancers e históricos.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "D48-3",
+      "checked_at": "2026-11-05T11:58:33.220Z",
+      "outcome": "Audiovisual: WCS, UNICEF, ACNUR y otros revisados según controles; vacantes excluidas.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "D48-4",
+      "checked_at": "2026-11-05T11:58:33.220Z",
+      "outcome": "CRM: predominan directorios y oferta de partners, no compradores confirmados.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "D48-5",
+      "checked_at": "2026-11-05T11:58:33.220Z",
+      "outcome": "Medios: históricos, FENAVI y Cartagena a control; no compra abierta certificada.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dweek-1",
+      "checked_at": "2026-11-05T11:58:58.931Z",
+      "outcome": "LinkedIn SEO/AEO: perfiles, proveedores, publicaciones educativas; no demanda disponible.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dweek-2",
+      "checked_at": "2026-11-05T11:58:58.931Z",
+      "outcome": "LinkedIn web: UNICEF y Socopur conocidos, proveedores y otra compra fuera de alcance.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dweek-3",
+      "checked_at": "2026-11-05T11:58:58.932Z",
+      "outcome": "LinkedIn creativo: Pierre Fabre/Socopur históricos; Metro histórico; INFONAVIT equipos.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dweek-4",
+      "checked_at": "2026-11-05T11:58:58.932Z",
+      "outcome": "LinkedIn CRM: perfiles, proveedores y migración histórica; sin nueva demanda semanal confirmada.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dweek-5",
+      "checked_at": "2026-11-05T11:58:58.932Z",
+      "outcome": "LinkedIn medios: relaciones/adjudicaciones de proveedores y vacantes; no atribuir compra disponible.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dcross-1",
+      "checked_at": "2026-11-05T12:01:38.199Z",
+      "outcome": "Chile: plan digital Santiago, Coquimbo y USACH a screening; enlaces históricos adicionales.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dcross-2",
+      "checked_at": "2026-11-05T12:01:38.199Z",
+      "outcome": "Perú: predomina reclutamiento; consultoría30/10 histórica no recomendada.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dcross-3",
+      "checked_at": "2026-11-05T12:01:38.199Z",
+      "outcome": "Colombia: procesos anteriores, proveedores/logística y personas naturales; SECOP contrastado aparte.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    },
+    {
+      "id": "Dcross-4",
+      "checked_at": "2026-11-05T12:01:38.199Z",
+      "outcome": "México: FONATUR conocida, históricos IAB/UNGM, Olinia socios inversores y otras compras fuera de alcance.",
+      "private_evidence": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json",
+      "scope": "pooled_search_results; every query executed as listed"
+    }
+  ],
+  "validation_queries": [
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "q": "\"1422039-39-LE26\" bases \"contrato\"",
+      "checked_at": "2026-11-05T12:02:55.771Z",
+      "batch_id": "V1"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "q": "\"Cartagena\" \"PLAN DE MEDIOS\" \"2026\" \"noviembre\" SECOP",
+      "checked_at": "2026-11-05T12:02:55.771Z",
+      "batch_id": "V1"
+    },
+    {
+      "country": "Chile",
+      "service_line": "web",
+      "q": "\"Camino a Frankfurt\" \"2027\" \"rediseño\" licitación 2026",
+      "checked_at": "2026-11-05T12:02:55.771Z",
+      "batch_id": "V1"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "q": "\"Indian Motos\" \"BUSCAMOS AGENCIA\" web",
+      "checked_at": "2026-11-05T12:02:55.771Z",
+      "batch_id": "V1"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "q": "\"Indian Motos\" \"[persona redactada]\" marketing web",
+      "checked_at": "2026-11-05T12:03:41.975Z",
+      "batch_id": "V3",
+      "pii_redacted": true,
+      "exact_query_private_file": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar/research-bundle.json"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "q": "\"Indian Motos\" (\"gerente de marketing\" OR \"jefe de marketing\" OR \"compras\" OR \"tecnología\")",
+      "checked_at": "2026-11-05T12:03:41.975Z",
+      "batch_id": "V3"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "q": "\"tvsperu.com\" \"razón social\" Indian Motos",
+      "checked_at": "2026-11-05T12:03:41.975Z",
+      "batch_id": "V3"
+    },
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "q": "\"Corporación de Desarrollo Territorial y Turismo\" \"dotación\" personal 2026",
+      "checked_at": "2026-11-05T12:03:41.975Z",
+      "batch_id": "V3"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "q": "site:porkcolombia.co \"2026-447\"",
+      "batch_id": "V4",
+      "checked_at": "2026-11-05T12:04:10.028Z"
+    },
+    {
+      "country": "Colombia",
+      "service_line": "media",
+      "q": "\"Servicios de estrategia y pauta\" \"Foro de Sostenibilidad\" 2026",
+      "batch_id": "V4",
+      "checked_at": "2026-11-05T12:04:10.028Z"
+    },
+    {
+      "country": "Chile",
+      "service_line": "media",
+      "q": "\"1422039-39-LE26\" \"adjudicada\"",
+      "batch_id": "V4",
+      "checked_at": "2026-11-05T12:04:10.028Z"
+    },
+    {
+      "country": "Perú",
+      "service_line": "web",
+      "q": "Perfil del publicador [persona redactada] desde actualización corporativa IndianMotos",
+      "pii_redacted": true,
+      "result": "999; no retry/identity inferred",
+      "source": "https://pe.linkedin.com/company/indianmotossac"
+    }
+  ],
+  "source_operations": [
+    {
+      "market": "México",
+      "service_lines": [
+        "creative"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "status": "buyer_detail_read_documents_captcha",
+      "observation": "Ficha vigente; oferta 9/11 11 UTC-6; 4 anexos; acta cargada 3/11 11:22, 1.0517817 MB. Descarga del acta exige CAPTCHA; no resuelto. Modelo no leído.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "reconciliation_upper_bound; browser interval 08:59-09:01 Santiago for browser rows"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "media"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=2741-78-LE26",
+      "status": "buyer_detail_read_original_blocked",
+      "observation": "Ficha 2/11 18:36:01, preguntas 5/11 17, ofertas 16/11 16 sin zona. No permite subcontratación; remite a 11.5. Dos anexos listados. Ver 4227.pdf produjo ERR_BLOCKED_BY_CLIENT; sin descarga íntegra.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "reconciliation_upper_bound; browser interval 08:59-09:01 Santiago for browser rows"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "creative"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1664-28-L126",
+      "status": "buyer_detail_read",
+      "observation": "Ficha: publicación 2/11 09:37:10, preguntas 5/11 11, ofertas 11/11 17; zona no rotulada. Seis cápsulas verticales con rodaje en hospital. Original no obtenido.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "reconciliation_upper_bound; browser interval 08:59-09:01 Santiago for browser rows"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "web"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=601-17-LE26",
+      "status": "buyer_detail_read",
+      "observation": "Ficha: respuestas previstas 5/11 17; ofertas 10/11 15:10; publicación 30/10 15:08:29. 24 meses; contrato futuro, no prueba de firma. Garantía 31/12/2029 no es fin contractual.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "reconciliation_upper_bound; browser interval 08:59-09:01 Santiago for browser rows"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "media"
+      ],
+      "url": "https://system.wherex.com/secured/supplier_user/proposal/get/7612134",
+      "status": "login_required",
+      "observation": "Qualitor: redirige a inicio de sesión; sin foro, inventario ni calendario actuales.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "reconciliation_upper_bound; browser interval 08:59-09:01 Santiago for browser rows"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "media"
+      ],
+      "url": "https://app.licitalab.cl/",
+      "status": "read_document_extracts_session_expired",
+      "observation": "documents1422039-39 devuelve2archivos y ask-docs devuelve extractos de bases Santiago y SanFelipe; no originales íntegros. session informa OAuth vencido26/10, exit3; no search/login ejecutados.",
+      "checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "timestamp_precision": "document evidence reconciled at cutoff; command outputs private"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1422039-39-LE26",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=2446-335-LE26",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=5067-152-LE26",
+      "status": "blocked_http403",
+      "observation": "HTTP 403; sin lectura del contenido decisivo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Chile",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1725-224-LE26",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://peru.unfpa.org/es/submission",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/317123",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://ibcperu.org/convocatorias",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://pe.linkedin.com/company/indianmotossac",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.procolombia.co/convocatorias-procolombia",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://fenavi.org/contrataciones/",
+      "status": "blocked_timeout",
+      "observation": "Tiempo agotado; no se actualiza marcador de éxito.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://colombia.wcs.org/es-es/WCS-COLOMBIA/TRABAJA-CON-NOSOTROS/ID/26720/WCS-Colombia-busca-servicio-especializado-en-comunicaciones-y-produccion-audiovisual.aspx",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://colombialicita.com/licitacion/315152561",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://comprasmx.buengobierno.gob.mx/sitiopublico/",
+      "status": "javascript_shell_only",
+      "observation": "Portada/capa JavaScript sin inventario verificable.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.tianguisdigital.cdmx.gob.mx/",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/304949",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://olinia.secihti.mx/?vista=documento",
+      "status": "javascript_shell_only",
+      "observation": "Portada/capa JavaScript sin inventario verificable.",
+      "checked_at": "2026-11-05T12:02:21.355Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.claroestado.cl/licitacion/1422039-39-LE26",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:03:16.244Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://ganacontratos.com/co/licitaciones/CO1.REQ.11285454",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:03:16.244Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://pe.linkedin.com/company/indianmotossac",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:03:16.244Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "México",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.claroestado.cl/licitacion/2446-335-LE26",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:03:16.244Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700",
+      "status": "blocked_captcha",
+      "observation": "CAPTCHA impide acceder al expediente; sin resolución o evasión.",
+      "checked_at": "2026-11-05T12:04:10.028Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162539",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:04:10.028Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://porkcolombia.co/contrataciones/",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:04:10.028Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://porkcolombia.co/contratacion/",
+      "status": "read_text",
+      "observation": "Texto recuperado; alcance según ficha en reporte. No inventario exhaustivo ni documento contractual por sí solo.",
+      "checked_at": "2026-11-05T12:04:44.541Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.tvsperu.com/",
+      "status": "blocked_tool_access",
+      "observation": "Lector sin acceso; sin asumir ausencia de demanda.",
+      "checked_at": "2026-11-05T12:06:18.932Z",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "status": "read_api_partial",
+      "observation": "watermark: registros 1. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:03:15.221363+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "status": "read_api_partial",
+      "observation": "weekly-discovery: registros 15. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:03:15.904612+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "status": "read_api_partial",
+      "observation": "candidate-cartagena: registros 5. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:03:17.238759+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "status": "read_api_partial",
+      "observation": "pork-process: registros 1. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:04:31.241000+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "status": "read_api_partial",
+      "observation": "cartagena-process: registros 2. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:04:39.335347+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "status": "read_api_partial",
+      "observation": "pork-contract: registros 0. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:04:40.092430+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "status": "read_api_partial",
+      "observation": "cartagena-contract: registros 0. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:04:40.753521+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "status": "read_api_partial",
+      "observation": "unal-contract: registros 0. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:04:41.489089+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "status": "blocked_timeout",
+      "observation": "contract_crosscheck: sin respuesta útil. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:05:49.898779+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Colombia",
+      "service_lines": [
+        "cross_service"
+      ],
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "status": "blocked_timeout",
+      "observation": "contract_crosscheck: sin respuesta útil. Ventana del dataset hasta 3/11; cero filas no prueba ausencia contractual.",
+      "checked_at": "2026-11-05T12:06:19.082801+00:00",
+      "timestamp_precision": "tool_start_utc"
+    },
+    {
+      "market": "Perú",
+      "service_lines": [
+        "creative"
+      ],
+      "url": "https://www.ungm.org/Public/Notice/317123",
+      "status": "supplement_document_403",
+      "checked_at": "2026-11-05T12:03:41.975Z",
+      "observation": "Tool click resolution fetched supplementalUNICEFdocument2122785 instead of intendedCartagena link;403. No content read; Cartagena opened by explicit primaryURL later."
+    }
+  ],
+  "native_operations": [
+    {
+      "system": "SECOP II",
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "parameters": {
+        "$select": "max(fecha_de_publicacion_del) as last"
+      },
+      "checked_at": "2026-11-05T12:03:15.221363+00:00",
+      "http_status": 200,
+      "label": "watermark",
+      "data": [
+        {
+          "last": "2026-11-03T00:00:00.000"
+        }
+      ]
+    },
+    {
+      "system": "SECOP II",
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "parameters": {
+        "$select": "nombre_del_procedimiento,entidad,fecha_de_publicacion_del,estado_del_procedimiento,referencia_del_proceso,urlproceso,id_del_proceso,precio_base,adjudicado,fase",
+        "$limit": 200,
+        "$where": "fecha_de_publicacion_del >= '2026-11-01T00:00:00' AND (upper(nombre_del_procedimiento) like '%AUDIOVISUAL%' OR upper(nombre_del_procedimiento) like '%PAUTA%' OR upper(nombre_del_procedimiento) like '%PUBLICIDAD%' OR upper(nombre_del_procedimiento) like '%SITIO WEB%' OR upper(nombre_del_procedimiento) like '%CRM%' OR upper(nombre_del_procedimiento) like '%HUBSPOT%' OR upper(nombre_del_procedimiento) like '%AGENCIA%' OR upper(nombre_del_procedimiento) like '%POSICIONAMIENTO%' OR upper(nombre_del_procedimiento) like '%PORTAL WEB%' OR upper(nombre_del_procedimiento) like '%DIFUSIÓN%' OR upper(nombre_del_procedimiento) like '%PLAN DE MEDIOS%')"
+      },
+      "checked_at": "2026-11-05T12:03:15.904612+00:00",
+      "http_status": 200,
+      "label": "weekly-discovery",
+      "data": [
+        {
+          "nombre_del_procedimiento": "Suministro de servicios para el uso y aprovechamiento de componentes digitales; gestión de contenidos; diseño; mejoramiento de experiencia y posicionamiento definido para los portales de internet del",
+          "entidad": "EMPRESAS PUBLICAS DE MEDELLIN E.S.P.",
+          "fecha_de_publicacion_del": "2026-11-01T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "CW403083",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160437"
+          },
+          "id_del_proceso": "CO1.REQ.11306276",
+          "precio_base": "766333692",
+          "adjudicado": "No",
+          "fase": "Fase de ofertas"
+        },
+        {
+          "nombre_del_procedimiento": "ADQUIRIR ARTICULOS VARIOS DE PUBLICIDAD",
+          "entidad": "UNIVERSIDAD DEL VALLE",
+          "fecha_de_publicacion_del": "2026-11-01T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "MIC_751_2026",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11158563"
+          },
+          "id_del_proceso": "CO1.REQ.11304666",
+          "precio_base": "43800000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "Capacitación - Materiales Design estudio Publicidad",
+          "entidad": "Universidad de Medellín",
+          "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "OC 70547-149528",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11161818"
+          },
+          "id_del_proceso": "CO1.REQ.11290143",
+          "precio_base": "3949607",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "Prestación de servicios de apoyo a la gestión en el proceso de comunicaciones del Concejo Municipal de Envigado; para la producción y difusión de contenidos digitales en los canales institucionales de",
+          "entidad": "CONCEJO DE ENVIGADO",
+          "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "01-00-09-20-102-26",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11161741"
+          },
+          "id_del_proceso": "CO1.REQ.11307553",
+          "precio_base": "8000000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "SE REQUIERE LA ADQUISICIÓN DE CUATRO (4) UNIDADES AUDIOVISUALES PARA SUMINISTRAR A LAS SEDES (04. LÓPEZ MENDOZA; 05. AGUA COLORADA; 07. PETAQUERO Y 08. LA MESA). COMO PARTE DE LA DOTACIÓN PEDAGÓGICA P",
+          "entidad": "Institución Educativa Cabrerita",
+          "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "2026-11",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160758"
+          },
+          "id_del_proceso": "CO1.REQ.11306848",
+          "precio_base": "9400000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PROFESIONALES PARA LA PRODUCCIÓN DE CONTENIDOS AUDIOVISUALES Y PIEZAS GRÁFICAS EN EL MARCO DEL PROYECTO: NO. 9245680 DE 2026. PTIES - IMPLEMENTACIÓN TÉCNICA DE LOS PROGRAMAS DE",
+          "entidad": "UNIVERSIDAD NACIONAL DE COLOMBIA",
+          "fecha_de_publicacion_del": "2026-11-02T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "UNAL-MED-2026-4468873",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160259"
+          },
+          "id_del_proceso": "CO1.REQ.11306473",
+          "precio_base": "1890000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PUBLICIDAD Y PRODUCCIONES H.C SAS",
+          "entidad": "CORPORACIÓN INTERUNIVERSITARIA DE SERVICIOS - CIS",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "ODC-8994",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162111"
+          },
+          "id_del_proceso": "CO1.REQ.11300755",
+          "precio_base": "240000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTAR LOS SERVICIOS DE APOYO A LA GESTIÓN A LA SECRETARÍA DE PAZ Y DERECHOS HUMANOS EN LA CREACIÓN; DISEÑO Y DIFUSIÓN DE PIEZAS PUBLICITARIAS PARA EL FORTALECIMIENTO DE LAS ESTRATEGIAS DE COMUNICACI",
+          "entidad": "MUNICIPIO DE NEIVA",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Seleccionado",
+          "referencia_del_proceso": "MNSPDHCDPS2506-2026-2",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162732"
+          },
+          "id_del_proceso": "CO1.REQ.11308598",
+          "precio_base": "5750000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "AGENCIA DE VIAJES Y TURISMO AVIATUR SAS",
+          "entidad": "INNOVATECH E.I.C.E.",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "2026-04-28-001",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11163445"
+          },
+          "id_del_proceso": "CO1.REQ.10571783",
+          "precio_base": "30000000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS DE APOYO A LA GESTION COMO DOCENTE FORMADOR EN FOTOGRAFÍA; CINEMATOGRAFÍA Y ARTES AUDIOVISUALES",
+          "entidad": "MUNICIPIO DE LA CEJA",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Seleccionado",
+          "referencia_del_proceso": "2026.10.14.06.834",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11163250"
+          },
+          "id_del_proceso": "CO1.REQ.11308736",
+          "precio_base": "1175000",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PUBLICIDAD Y PRODUCCIONES H.C SAS",
+          "entidad": "CORPORACIÓN INTERUNIVERSITARIA DE SERVICIOS - CIS",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "ODC-8998",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162118"
+          },
+          "id_del_proceso": "CO1.REQ.11300792",
+          "precio_base": "3480750",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "EQUIPOS AUDIOVISUALES",
+          "entidad": "INSTITUCION EDUCATIVA MUNICIPAL FRANCISCO JOSE DE CALDAS",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "2026-007",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162067"
+          },
+          "id_del_proceso": "CO1.REQ.11308456",
+          "precio_base": "17668500",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "Prestación de Servicios profesionales como líder de cuentas de la Central de Medios de la Agencia de Telemedellín.",
+          "entidad": "ASOCIACIÓN CANAL LOCAL DE TELEVISIÓN DE MEDELLIN - TELEMEDELLIN",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "CTO-0514-2026",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11163432"
+          },
+          "id_del_proceso": "CO1.REQ.11289401",
+          "precio_base": "17752942",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "Servicios de estrategia y pauta de comunicaciones (plan de medios impreso; digital; radial y televisiva) orientados a la difusión y visibilidad nacional del Foro de Sostenibilidad Porkcolombia-FNP",
+          "entidad": "ASOCIACIÓN COLOMBIANA DE PORCICULTORES",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "2026-447",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162539"
+          },
+          "id_del_proceso": "CO1.REQ.11308630",
+          "precio_base": "299011041",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "Prestar los servicios profesionales como comunicadora social para presentar las noticias en el Sistema Informativo de Telemedellin y otros productos audiovisuales del canal y sus clientes.",
+          "entidad": "ASOCIACIÓN CANAL LOCAL DE TELEVISIÓN DE MEDELLIN - TELEMEDELLIN",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "CTO-0513-2026",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11163312"
+          },
+          "id_del_proceso": "CO1.REQ.11309551",
+          "precio_base": "9046672",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        }
+      ]
+    },
+    {
+      "system": "SECOP II",
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "parameters": {
+        "$select": "nombre_del_procedimiento,entidad,fecha_de_publicacion_del,estado_del_procedimiento,referencia_del_proceso,urlproceso,id_del_proceso,precio_base,adjudicado,fase",
+        "$where": "upper(nombre_del_procedimiento) like '%PLAN DE MEDIOS%' AND upper(entidad) like '%CARTAGENA%'",
+        "$order": "fecha_de_publicacion_del DESC",
+        "$limit": 5
+      },
+      "checked_at": "2026-11-05T12:03:17.238759+00:00",
+      "http_status": 200,
+      "label": "candidate-cartagena",
+      "data": [
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS (Manifestación de interés (Menor Cuantía))",
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "fecha_de_publicacion_del": "2026-10-28T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "SAMC-SEGD-003-2026 (Manifestación de interés (Menor Cuantía))",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700"
+          },
+          "id_del_proceso": "CO1.REQ.11285454",
+          "precio_base": "1700000000",
+          "adjudicado": "No",
+          "fase": "Manifestación de interés (Menor Cuantía)"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS (Manifestación de interés (Menor Cuantía))",
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "fecha_de_publicacion_del": "2026-10-28T00:00:00.000",
+          "estado_del_procedimiento": "Publicado",
+          "referencia_del_proceso": "SAMC-SEGD-003-2026 (Manifestación de interés (Menor Cuantía))",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700"
+          },
+          "id_del_proceso": "CO1.REQ.11285454",
+          "precio_base": "1700000000",
+          "adjudicado": "No",
+          "fase": "Manifestación de interés (Menor Cuantía)"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS",
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "fecha_de_publicacion_del": "2026-10-15T00:00:00.000",
+          "estado_del_procedimiento": "Evaluación",
+          "referencia_del_proceso": "SAMC-SEGD-003-2026",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11071394"
+          },
+          "id_del_proceso": "CO1.REQ.11216674",
+          "precio_base": "1700000000",
+          "adjudicado": "No",
+          "fase": "Presentación de observaciones"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA EL DESARROLLO DE UN PLAN DE MEDIOS DEL DEPARTAMENTO ADMINISTRATIVO DE TRÁNSITO Y TRANSPORTE DATT; PARA LA DIVULGACIÓN DE CAMPAÑAS EDUCATIVAS Y FORTALECIMIENTO EN SEGURIDAD",
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "fecha_de_publicacion_del": "2026-06-10T00:00:00.000",
+          "estado_del_procedimiento": "Evaluación",
+          "referencia_del_proceso": "COT-DATT-10-2026",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.10370024"
+          },
+          "id_del_proceso": "CO1.REQ.10514432",
+          "precio_base": "0",
+          "adjudicado": "No",
+          "fase": "Presentación de oferta"
+        },
+        {
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS (Manifestación de interés (Menor Cuantía)) (Presentación de oferta)",
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "fecha_de_publicacion_del": "2026-03-19T00:00:00.000",
+          "estado_del_procedimiento": "Seleccionado",
+          "referencia_del_proceso": "SAMC-SEGD-001-2026 (Manifestación de interés (Menor Cuantía)) (Presentación de oferta)",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.10138458"
+          },
+          "id_del_proceso": "CO1.REQ.10281072",
+          "precio_base": "1700000000",
+          "adjudicado": "Si",
+          "fase": "Presentación de oferta"
+        }
+      ]
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "parameters": {
+        "id_del_proceso": "CO1.REQ.11308630",
+        "$limit": 3
+      },
+      "checked_at": "2026-11-05T12:04:31.241000+00:00",
+      "http_status": 200,
+      "label": "pork-process",
+      "data": [
+        {
+          "entidad": "ASOCIACIÓN COLOMBIANA DE PORCICULTORES",
+          "id_del_proceso": "CO1.REQ.11308630",
+          "referencia_del_proceso": "2026-447",
+          "nombre_del_procedimiento": "Servicios de estrategia y pauta de comunicaciones (plan de medios impreso; digital; radial y televisiva) orientados a la difusión y visibilidad nacional del Foro de Sostenibilidad Porkcolombia-FNP",
+          "fase": "Presentación de oferta",
+          "fecha_de_publicacion_del": "2026-11-03T00:00:00.000",
+          "precio_base": "299011041",
+          "modalidad_de_contratacion": "Contratación régimen especial",
+          "duracion": "27",
+          "unidad_de_duracion": "día(s)",
+          "proveedores_invitados": "0",
+          "numero_de_lotes": "0",
+          "estado_del_procedimiento": "Publicado",
+          "adjudicado": "No",
+          "nombre_del_proveedor": "FUNDACIÓN EL ESPECTADOR",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162539"
+          }
+        }
+      ]
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/p6dx-8zbt.json",
+      "parameters": {
+        "id_del_proceso": "CO1.REQ.11285454",
+        "$limit": 3
+      },
+      "checked_at": "2026-11-05T12:04:39.335347+00:00",
+      "http_status": 200,
+      "label": "cartagena-process",
+      "data": [
+        {
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "id_del_proceso": "CO1.REQ.11285454",
+          "referencia_del_proceso": "SAMC-SEGD-003-2026 (Manifestación de interés (Menor Cuantía))",
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS (Manifestación de interés (Menor Cuantía))",
+          "fase": "Manifestación de interés (Menor Cuantía)",
+          "fecha_de_publicacion_del": "2026-10-28T00:00:00.000",
+          "precio_base": "1700000000",
+          "modalidad_de_contratacion": "Selección Abreviada de Menor Cuantía",
+          "duracion": "0",
+          "unidad_de_duracion": "Mes(es)",
+          "proveedores_invitados": "0",
+          "numero_de_lotes": "2",
+          "estado_del_procedimiento": "Publicado",
+          "adjudicado": "No",
+          "nombre_del_proveedor": "No Definido",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700"
+          }
+        },
+        {
+          "entidad": "ALCALDÍA DEL DISTRITO TURÍSTICO Y CULTURAL DE CARTAGENA DE INDIAS",
+          "id_del_proceso": "CO1.REQ.11285454",
+          "referencia_del_proceso": "SAMC-SEGD-003-2026 (Manifestación de interés (Menor Cuantía))",
+          "nombre_del_procedimiento": "PRESTACIÓN DE SERVICIOS PARA LA EJECUCIÓN DEL PLAN DE MEDIOS ESTRATÉGICO DEL DISTRITO DE CARTAGENA DE INDIAS (Manifestación de interés (Menor Cuantía))",
+          "fase": "Manifestación de interés (Menor Cuantía)",
+          "fecha_de_publicacion_del": "2026-10-28T00:00:00.000",
+          "precio_base": "1700000000",
+          "modalidad_de_contratacion": "Selección Abreviada de Menor Cuantía",
+          "duracion": "0",
+          "unidad_de_duracion": "Mes(es)",
+          "proveedores_invitados": "0",
+          "numero_de_lotes": "2",
+          "estado_del_procedimiento": "Publicado",
+          "adjudicado": "No",
+          "nombre_del_proveedor": "No Definido",
+          "urlproceso": {
+            "url": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700"
+          }
+        }
+      ]
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "parameters": {
+        "proceso_de_compra": "CO1.REQ.11308630",
+        "$limit": 20
+      },
+      "checked_at": "2026-11-05T12:04:40.092430+00:00",
+      "http_status": 200,
+      "label": "pork-contract",
+      "data": []
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "parameters": {
+        "proceso_de_compra": "CO1.REQ.11285454",
+        "$limit": 20
+      },
+      "checked_at": "2026-11-05T12:04:40.753521+00:00",
+      "http_status": 200,
+      "label": "cartagena-contract",
+      "data": []
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "parameters": {
+        "proceso_de_compra": "CO1.REQ.11306473",
+        "$limit": 20
+      },
+      "checked_at": "2026-11-05T12:04:41.489089+00:00",
+      "http_status": 200,
+      "label": "unal-contract",
+      "data": []
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "parameters": {
+        "$select": "nombre_entidad,proceso_de_compra,id_contrato,referencia_del_contrato,estado_contrato,descripcion_del_proceso,fecha_de_firma,fecha_de_inicio_del_contrato,fecha_de_fin_del_contrato,proveedor_adjudicado,valor_del_contrato,urlproceso",
+        "$where": "upper(nombre_entidad) like '%PORCICULTORES%' AND (upper(descripcion_del_proceso) like '%SOSTENIBILIDAD%' OR referencia_del_contrato='2026-447')",
+        "$limit": 10
+      },
+      "checked_at": "2026-11-05T12:05:49.898779+00:00",
+      "http_status": null,
+      "data": {
+        "error": "The read operation timed out"
+      }
+    },
+    {
+      "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+      "parameters": {
+        "$select": "nombre_entidad,proceso_de_compra,id_contrato,referencia_del_contrato,estado_contrato,descripcion_del_proceso,fecha_de_firma,fecha_de_inicio_del_contrato,fecha_de_fin_del_contrato,proveedor_adjudicado,valor_del_contrato,urlproceso",
+        "$where": "upper(nombre_entidad) like '%CARTAGENA%' AND upper(descripcion_del_proceso) like '%PLAN DE MEDIOS%'",
+        "$limit": 10,
+        "$order": "fecha_de_firma DESC"
+      },
+      "checked_at": "2026-11-05T12:06:19.082801+00:00",
+      "http_status": null,
+      "data": {
+        "error": "The read operation timed out"
+      }
+    }
+  ],
+  "purchase_controls": [
+    {
+      "hsp_id": "HSP-0063",
+      "entity": "Hospital de Fresia / Servicio de Salud del Reloncaví",
+      "market": "Chile",
+      "process": "1664-28-L126",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1664-28-L126",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-02T09:37:10.61",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-04T09:04:41.530017-03:00",
+      "deadline_at": "2026-11-11T17:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicada",
+      "participation": "no verificada para Efeonce",
+      "awardee": "No acreditado; controles deshabilitados no demuestran inexistencia.",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "Formalización futura según bases; no estado efectivo",
+      "signed_at": "no verificado",
+      "execution_start": "No verificado; no derivar de fechas estimadas.",
+      "execution_end": "Extracto anterior: hasta 60 días desde orden aceptada o recepción previa, entrega máxima 20 días hábiles; fechas efectivas no verificadas.",
+      "documents_read": [
+        "Ficha actual; extractos anteriores identificados en corrida 4/11."
+      ],
+      "document_block": "Original íntegro/expediente efectivo no leído.",
+      "reasoning": "Calendario leído; contrato efectivo, original íntegro y admisibilidad insuficientes.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "calendar": {
+        "questions_end": "2026-11-05T11:00:00",
+        "answers": "2026-11-06T17:00:00",
+        "timezone": null
+      },
+      "budget": {
+        "amount": 900000,
+        "currency": "CLP",
+        "includes_tax": true,
+        "evidence": "lectura primaria/extractos 4/11, no nuevo presupuesto calculado"
+      }
+    },
+    {
+      "hsp_id": "HSP-0064",
+      "entity": "Municipalidad de San Felipe",
+      "market": "Chile",
+      "process": "2741-78-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=2741-78-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-02T18:36:01.167",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-04T09:04:41.530017-03:00",
+      "deadline_at": "2026-11-16T16:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicada",
+      "participation": "no verificada para Efeonce",
+      "awardee": "No acreditado; controles deshabilitados no demuestran inexistencia.",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "Formalización futura según bases; no estado efectivo",
+      "signed_at": "no verificado",
+      "execution_start": "No verificado; no derivar de fechas estimadas.",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Ficha actual; listado de 4227.pdf y formulario",
+        "RAG 4227.pdf pp1,17,21,29,37,40 y formulario, extractos; no lectura íntegra"
+      ],
+      "document_block": "Visor original ERR_BLOCKED_BY_CLIENT. Ficha prohíbe subcontratar con remisión a 11.5; extracto p21 numeración 11.4/11.5 distinta; p40 admite acuerdo acreditado para soporte impreso. Sin interpretación concluyente de admisión de agencia.",
+      "reasoning": "Mantener HOLD: incompatibilidad potencial entre no subcontratación y terceros/medios; no afirmar exclusión definitiva sin texto íntegro y criterio comprador.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "calendar": {
+        "questions_end": "2026-11-05T17:00:00",
+        "answers": "2026-11-09T17:00:00",
+        "timezone": null
+      }
+    },
+    {
+      "hsp_id": "HSP-0062",
+      "entity": "Superintendencia de Salud",
+      "market": "Chile",
+      "process": "601-17-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=601-17-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-30T15:08:29",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-02",
+      "deadline_at": "2026-11-10T15:10:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicada",
+      "participation": "no verificada para Efeonce",
+      "awardee": "No acreditado; controles deshabilitados no demuestran inexistencia.",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "Formalización futura según bases; no estado efectivo",
+      "signed_at": "no verificado",
+      "execution_start": "No verificado; no derivar de fechas estimadas.",
+      "execution_end": "24 meses previstos; fecha final efectiva desconocida; 31/12/2029 es vencimiento de garantía.",
+      "documents_read": [
+        "Ficha actual; extractos históricos de bases parte1 pp24-25 y parte2 pp1,7 no equivalen a lectura íntegra."
+      ],
+      "document_block": "Original íntegro/expediente efectivo no leído.",
+      "reasoning": "Calendario leído; contrato efectivo, original íntegro y admisibilidad insuficientes.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "calendar": {
+        "answers_scheduled": "2026-11-05T17:00:00",
+        "timezone": null
+      }
+    },
+    {
+      "hsp_id": "HSP-0058",
+      "entity": "FONATUR",
+      "market": "México",
+      "process": "IA-21-W3N-021W3N003-N-131-2026",
+      "result": "hold",
+      "primary_source": "https://comprasmx.buengobierno.gob.mx/sitiopublico/#/sitiopublico/detalle/0caf8773a3e14bd6909845fef4a49c98/procedimiento",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-26T18:24:00-06:00",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-10-29",
+      "deadline_at": "2026-11-09T11:00:00-06:00",
+      "deadline_timezone": "America/Mexico_City / UTC-6 explícito",
+      "deadline_stage": "recepción de ofertas",
+      "stage": "VIGENTE",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "2026-12-02 estimado, no efectivo",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Ficha y metadatos de cuatro anexos; acta cargada 3/11 11:22 UTC-6, 1.0517817 MB"
+      ],
+      "document_block": "CAPTCHA al descargar acta; no resuelto. Invitación, anexo técnico y modelo no leídos.",
+      "reasoning": "Invitación nacional; admisión no acreditada, acta y modelo bloqueados. VIGENTE no basta.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "calendar": {
+        "questions_end": "2026-11-02T11:00:00-06:00",
+        "meeting": "2026-11-03T11:00:00-06:00",
+        "award_planned": "2026-11-11T17:00:00-06:00"
+      },
+      "requirements": "Electrónica nacional; sin propuestas conjuntas; garantía10% a10días según ficha, no contrato efectivo."
+    },
+    {
+      "hsp_id": "HSP-0065",
+      "entity": "Universidad Nacional de Colombia, sede Medellín",
+      "market": "Colombia",
+      "process": "UNAL-MED-2026-4468873 / CO1.REQ.11306473",
+      "result": "hold",
+      "primary_source": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160259",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-02",
+      "published_at_precision": "día; 00:00 sin zona; no latencia exacta",
+      "first_seen_at": "2026-11-04T09:03:26.851294-03:00",
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicado / presentación de oferta según dataset",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fila oficial del dataset semanal, leída hoy; consulta contratos por REQ sin filas"
+      ],
+      "document_block": "Ficha/expediente con bloqueo anterior; hoy no se eludió CAPTCHA SECOP ni se obtuvo original.",
+      "reasoning": "Registro de procesos y contratos acotado; cero contratos por REQ no acredita ausencia. Sin calendario ni vía para empresa.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false
+    },
+    {
+      "hsp_id": "HSP-0066",
+      "entity": "Indian Motos S.A.C. / TVS Motor Perú",
+      "market": "Perú",
+      "process": "Rediseño corporativo tvsperu.com",
+      "result": "hold",
+      "primary_source": "https://pe.linkedin.com/company/indianmotossac",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": null,
+      "published_at_precision": "6 días en LinkedIn público; no convertir a fecha exacta",
+      "first_seen_at": "2026-11-05T11:58:33.220Z",
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Solicitud pública de agencia; estado de selección desconocido",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Página corporativa de LinkedIn con solicitud íntegra visible, tamaño51–200 y alcance"
+      ],
+      "document_block": "Perfil del publicador999; sitio corporativo inaccesible al lector. No bases, cronograma ni documento contractual publicados en contenido leído.",
+      "reasoning": "Demanda explícita B2B; fecha sólo relativa, calendario, adjudicación y contrato no acreditados. No recomendar postular.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "service_lines": [
+        "web",
+        "crm_hubspot",
+        "seo_aeo"
+      ],
+      "primary_service_line": "web",
+      "size": {
+        "local": "51–200 autodeclarado LinkedIn",
+        "group": "No verificado; representante de TVS no acredita filial",
+        "confidence": "media, no nómina exacta"
+      },
+      "buying_group": "Publicador parcialmente identificado; Marketing/Digital, IT/CRM y Compras por verificar; sin correos laborales individuales.",
+      "first_seen_precision": "discovery batch start UTC; not exact appearance/read moment"
+    },
+    {
+      "hsp_id": "HSP-0067",
+      "entity": "Corporación de Desarrollo Territorial y Turismo de la Región Metropolitana",
+      "market": "Chile",
+      "process": "1422039-39-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1422039-39-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-02",
+      "published_at_precision": "día comprobado en Acto26b-028; 17:58 sólo secundaria sin zona",
+      "first_seen_at": "2026-11-05T12:01:38.199Z",
+      "deadline_at": "2026-11-12T15:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicada según secundaria; acceso primario directo sin lectura",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "Cláusulas futuras: contrato definitivo y órdenes integran contrato; no firma efectiva acreditada",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "60 días sólo secundaria; entregables previstos18/11,10/12,23/12 no fin efectivo",
+      "documents_read": [
+        "Inventario LicitaLAB: Acto de Compra26b-028.pdf y anexos.docx",
+        "Extractos Acto26b-028 pp1,3,9,12,17–20,22,24,37; no PDF íntegro"
+      ],
+      "document_block": "Original íntegro/expediente efectivo no leído.",
+      "reasoning": "Acto/bases semanales leídos por extractos; primaria web inaccesible, original íntegro y estado contractual efectivos no confirmados; tamaño50+ pendiente.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "calendar": {
+        "questions_end": "2026-11-04T11:00:00",
+        "answers": "2026-11-09T23:59:00",
+        "timezone": null
+      },
+      "budget": {
+        "amount": 12000000,
+        "currency": "CLP",
+        "includes_tax": true
+      },
+      "service_lines": [
+        "media",
+        "creative"
+      ],
+      "primary_service_line": "media",
+      "size": {
+        "local": "Desconocida",
+        "group": "Vínculo institucional con Gobierno Regional no acredita nómina compartida"
+      },
+      "requirements": "Registro hábil, experiencia similar, anexos, garantía5%neto a10días según extractos; costo/pauta/cobertura a dimensionar sólo tras gates.",
+      "first_seen_precision": "discovery batch start UTC; not exact appearance/read moment"
+    },
+    {
+      "hsp_id": "HSP-0022",
+      "entity": "Porkcolombia-FNP",
+      "market": "Colombia",
+      "process": "2026-447 / CO1.REQ.11308630",
+      "result": "hold",
+      "primary_source": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11162539",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-03",
+      "published_at_precision": "día; 00:00 sin zona",
+      "first_seen_at": "2026-10-11",
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Publicado / presentación de oferta; régimen especial",
+      "participation": "no verificada para Efeonce",
+      "awardee": "No adjudicación certificada; nombre_del_proveedor=FUNDACIÓN EL ESPECTADOR en fila primaria",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "27 días en proceso, sin inicio/fin efectivos",
+      "documents_read": [
+        "Fila detallada SECOP II y portal corporativo de contrataciones; no documento contractual"
+      ],
+      "document_block": "Expediente SECOP inaccesible, CAPTCHA en el carril; contratos por REQ sin filas y consulta ampliada agotó tiempo.",
+      "reasoning": "El campo oficial nombre_del_proveedor nombra Fundación El Espectador mientras adjudicado=No y apertura=Abierto. Contradicción sin acto/contrato: HOLD; no compra disponible.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "budget": {
+        "amount": 299011041,
+        "currency": "COP"
+      },
+      "service_lines": [
+        "media",
+        "creative"
+      ],
+      "primary_service_line": "media",
+      "new_initiative_existing_hsp": true,
+      "initiative_first_seen_at": "2026-11-05T12:03:15.904612+00:00",
+      "initiative_first_seen_precision": "official query start; first reader completion later"
+    },
+    {
+      "hsp_id": null,
+      "entity": "Alcaldía de Cartagena",
+      "market": "Colombia",
+      "process": "SAMC-SEGD-003-2026 / CO1.REQ.11285454",
+      "result": "hold",
+      "primary_source": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11139700",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-28",
+      "published_at_precision": "día oficial, sin zona; sin latencia exacta",
+      "first_seen_at": "2026-11-05T09:12:02.129497-03:00",
+      "deadline_at": "2026-11-06",
+      "deadline_timezone": null,
+      "deadline_stage": "manifestación de interés, no ofertas",
+      "stage": "Manifestación de interés según fila oficial",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Dataset primario, fila de manifestación y fila anterior de observaciones; secundaria con fecha6/11"
+      ],
+      "document_block": "SECOP CAPTCHA; contratos exactos sin filas y ampliada timeout; no acta/pliego íntegro.",
+      "reasoning": "Publicación anterior descubierta hoy; interés no ofertas, fecha secundaria. No conocida como abierta ni recomendable. CAPTCHA y contrato sin verificar.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "size": {
+        "local": "No verificado",
+        "group": "No aplica"
+      },
+      "budget": {
+        "amount": 1700000000,
+        "currency": "COP"
+      },
+      "no_hsp_reason": "Screening histórico incompleto, sin promoción local a candidata comercial"
+    },
+    {
+      "hsp_id": null,
+      "entity": "UNICEF Perú",
+      "market": "Perú",
+      "process": "LRPS-2026-9206550",
+      "result": "hold",
+      "primary_source": "https://www.ungm.org/Public/Notice/317123",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-06",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-10-16",
+      "deadline_at": "2026-11-09T23:59:00-05:00",
+      "deadline_timezone": "GMT-5 explícito",
+      "deadline_stage": "recepción de ofertas",
+      "stage": "no verificado",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Aviso UNGM actual; recepción y formalidades"
+      ],
+      "document_block": "Originales403 previos; intento de documento de prórroga403 hoy, no evidencia de expediente íntegro.",
+      "reasoning": "Proceso conocido de publicación anterior; original403, términos y contrato pendientes. Mantener HOLD.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false
+    },
+    {
+      "hsp_id": "HSP-0044",
+      "entity": "Simoniz / Qualitor",
+      "market": "Colombia",
+      "process": "SMZ-116 / LIC-116",
+      "result": "hold",
+      "primary_source": "https://system.wherex.com/secured/supplier_user/proposal/get/7612134",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-29",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-10-21",
+      "deadline_at": "2026-11-06T14:00:00-05:00",
+      "deadline_timezone": "Colombia UTC-5 en aviso30/10; UI18sinzona",
+      "deadline_stage": "recepción de ofertas",
+      "stage": "no verificado",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "25/11 según foro30/10 frente01/12 UI; no efectivo",
+      "execution_end": "8/1 temporada, no fin contractual efectivo",
+      "documents_read": [
+        "Relectura expediente30/10 y brief original previamente extraído4p; acceso Wherex actual login; metadatos Outlook del4/11"
+      ],
+      "document_block": "Sin sesión Wherex ni respuesta nuevaLIC116; no contrato efectivo.",
+      "reasoning": "HOLD contractual: ruta Colombia aceptada no acreditada, cronograma contradictorio; aviso de prórroga LIC115 no modifica LIC116.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "budget": {
+        "amount": 70000000,
+        "currency": "COP",
+        "scope": "integral, incluye operación y medios; impuestos por aclarar"
+      }
+    },
+    {
+      "hsp_id": null,
+      "entity": "Municipalidad de Coquimbo",
+      "market": "Chile",
+      "process": "2446-335-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=2446-335-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": null,
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Sólo señal secundaria de suministro difusión; fuente primaria inaccesible; sin ICP, calendario ni expediente. Screening, no alta.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": null,
+      "entity": "Universidad de Santiago de Chile",
+      "market": "Chile",
+      "process": "5067-152-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=5067-152-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-30",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": "2026-11-09T15:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Fecha/cierre secundarios anteriores a la semana; ficha403, sin originales ni calificación. No nueva compra semanal.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": "HSP-0041",
+      "entity": "Subsecretaría de las Culturas y las Artes",
+      "market": "Chile",
+      "process": "1725-224-LE26",
+      "result": "hold",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1725-224-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-15T17:39:51",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": "2026-10-28T12:00:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Calendario primario muestra cierre transcurrido aunque etiquetaPublicada. No recuperar ni inferir adjudicación.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": null,
+      "entity": "WCS Colombia",
+      "market": "Colombia",
+      "process": "Comunicaciones y audiovisual proyecto naturaleza",
+      "result": "hold",
+      "primary_source": "https://colombia.wcs.org/es-es/WCS-COLOMBIA/TRABAJA-CON-NOSOTROS/ID/26720/WCS-Colombia-busca-servicio-especializado-en-comunicaciones-y-produccion-audiovisual.aspx",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-10-13",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": "2026-10-15",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Primaria publica13/10 y cierre15/10; histórica vencida. No postulación ni recuperación automática.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": null,
+      "entity": "ACNUR México",
+      "market": "México",
+      "process": "RFP/2026/ACNUR/MEX/008",
+      "result": "hold",
+      "primary_source": "https://www.ungm.org/Public/Notice/304949",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-06-22",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": "2026-07-31T23:59:00-06:00",
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Aviso primario expirado31/7, no convocatoria semanal ni recuperación.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": null,
+      "entity": "EPM",
+      "market": "Colombia",
+      "process": "CW403083 / CO1.REQ.11306276",
+      "result": "hold",
+      "primary_source": "https://community.secop.gov.co/Public/Tendering/OpportunityDetail/Index?noticeUID=CO1.NTC.11160437",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": "2026-11-01",
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": "2026-11-05",
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "recepción de ofertas",
+      "stage": "Screening; ver fundamento",
+      "participation": "no verificada para Efeonce",
+      "awardee": "no verificado",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Fuente descrita en source_operations o native_operations"
+      ],
+      "document_block": "No contrato/acto/orden efectivos ni documentos íntegros verificados.",
+      "reasoning": "Registro dominical anterior a semana de Santiago; no calendario/documentos. Sólo screening web/contenidos, no demanda disponible.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "screening_only": true,
+      "first_seen_precision": "day only; discovery during this run; see query/tool evidence"
+    },
+    {
+      "hsp_id": "HSP-0034",
+      "entity": "Esenttia",
+      "market": "Colombia",
+      "process": "5600218590 / CO1.REQ.11210476",
+      "result": "adjudicada_descartada",
+      "primary_source": "https://app.hubspot.com/contacts/48713323/record/0-3/66218288550",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": null,
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": null,
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "no nueva participación",
+      "stage": "no verificado",
+      "participation": "no verificada para Efeonce",
+      "awardee": "DACARTEC",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "2026-10-10",
+      "execution_start": "2026-10-15",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Decisión histórica del comprador y STOP operador; CRM closedlost releído hoy, no expediente releído."
+      ],
+      "document_block": "Original íntegro/expediente efectivo no leído.",
+      "reasoning": "Exclusión conservada; no nueva señal ni reactivación.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "carried_evidence": true,
+      "last_checked_scope": "CRM sólo para Esenttia; histórico documental para ProChile",
+      "last_primary_checked_at": "2026-11-04T09:01:41-03:00"
+    },
+    {
+      "hsp_id": "HSP-0033",
+      "entity": "ProChile",
+      "market": "Chile",
+      "process": "1138297-11-LE26",
+      "result": "adjudicada_descartada",
+      "primary_source": "https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=1138297-11-LE26",
+      "last_checked_at": "2026-11-05T09:12:02.129497-03:00",
+      "last_checked_at_precision": "review_reconciliation_upper_bound; see source_operations/native_operations exact calls",
+      "published_at": null,
+      "published_at_precision": "source precision; timezone unknown unless stated",
+      "first_seen_at": null,
+      "deadline_at": null,
+      "deadline_timezone": null,
+      "deadline_stage": "no nueva participación",
+      "stage": "no verificado",
+      "participation": "no verificada para Efeonce",
+      "awardee": "AWNA DIGITAL SPA",
+      "award_act": "no verificado",
+      "purchase_order": "no verificado",
+      "contract_status": "no verificado",
+      "signed_at": "no verificado",
+      "execution_start": "no verificado",
+      "execution_end": "no verificado",
+      "documents_read": [
+        "Control4/11: API y extracto resolución03355p3; no nuevo expediente leído hoy."
+      ],
+      "document_block": "Original íntegro/expediente efectivo no leído.",
+      "reasoning": "Exclusión conservada; no nueva señal ni reactivación.",
+      "outreach_authorized": false,
+      "crm_changes_proposed": [],
+      "paid_credits_authorized": false,
+      "carried_evidence": true,
+      "last_checked_scope": "CRM sólo para Esenttia; histórico documental para ProChile",
+      "last_primary_checked_at": "2026-11-04T09:06:04.764510-03:00"
+    }
+  ],
+  "actions": [
+    {
+      "entity": "Assetplan",
+      "hsp_id": "HSP-0039",
+      "owner": "Julio/Commercial",
+      "action": "Preparar CV del especialista presentado y experiencia de Julio para el hilo existente; esperar decisión sobre tercera reunión.",
+      "evidence": "Deal actual hs_next_step y aviso de grabación/seguimientos4/11; no evidencia nueva de envío de CV",
+      "deadline": "2026-11-30 vigencia propuesta; no deadline comprador",
+      "outreach_executed": false
+    },
+    {
+      "entity": "Qualitor / Simoniz",
+      "hsp_id": "HSP-0044",
+      "owner": "Julio + Legal",
+      "action": "Decidir hoy14Santiago sobre rutaColombia; si no aceptada mantener no presentación.",
+      "deadline": "2026-11-06T14:00:00-05:00 aviso, frente18sinzona UI",
+      "caveat": "LIC115 prorrogada no traslada fecha aLIC116",
+      "outreach_executed": false
+    },
+    {
+      "entity": "Hospital de Fresia / San Felipe",
+      "hsp_ids": [
+        "HSP-0063",
+        "HSP-0064"
+      ],
+      "owner": "Agente, luego equipo audiovisual/medios si evidencia suficiente",
+      "action": "Originales y admisión/economía pendientes; no pedir aprobar postulación.",
+      "deadline": "Consultas hoy11 y17sinzona, respectivamente",
+      "outreach_executed": false
+    },
+    {
+      "entity": "FONATUR / Superintendencia",
+      "hsp_ids": [
+        "HSP-0058",
+        "HSP-0062"
+      ],
+      "owner": "Agente; acceso a originales depende de portal",
+      "action": "Resolver acta/modelo y respuestas actuales antes de propuesta; mantener HOLD.",
+      "deadline": "Ofertas9/11 11CDMX y10/11 15:10sinzona",
+      "outreach_executed": false
+    },
+    {
+      "entity": "Mattis",
+      "hsp_id": "HSP-0051",
+      "owner": "Julio/Finance",
+      "action": "Completar certificado de residencia fiscal según expediente. No reenviar oferta ni declaración ya adjunta.",
+      "deadline": null,
+      "outreach_executed": false
+    }
+  ],
+  "crm": {
+    "portal": 48713323,
+    "identity_verified": "Julio; OAuth propio",
+    "cli_version": "0.18.0 build1705",
+    "connector": "UNAUTHORIZED; no otro MCP intentado",
+    "read_scope": "6deals,1task,1Company result and2ORdedupe searches; exact native outputs private",
+    "dedupe": "Company corporacionrm.cl31570880879 existente; búsqueda acotada por Indian/domain/Pork sin coincidencia y Deals0; no ausencia universal",
+    "writes": 0
+  },
+  "permissions": {
+    "crm_writes": false,
+    "outreach": false,
+    "paid_enrichment": false,
+    "deals": false,
+    "new_tasks": false,
+    "scheduler_changes": false,
+    "commit": false,
+    "push": false,
+    "approval_changes": []
+  },
+  "privacy": {
+    "individual_emails": false,
+    "phones": false,
+    "apollo_raw": false,
+    "secrets": false,
+    "person_query": "V3 nombre redactado; original privado0600",
+    "contact_evidence": "Sólo privado; no perfiles personales completos versionados"
+  },
+  "private_evidence_directory": "/Users/jreye/.codex/agent-data/hubspot-saas-prospecting/reports/2026-11-05-0857-radar",
+  "native_read_operations": [
+    {
+      "system": "LicitaLAB CLI",
+      "command": "documents 1422039-39-LE26 --json",
+      "result": "2 documents; Acto26b-028 and anexos",
+      "time_precision": "during run; upperbound 2026-11-05T09:12:02.129497-03:00"
+    },
+    {
+      "system": "LicitaLAB CLI",
+      "command": "ask-docs 1422039-39-LE26",
+      "query": "Indicar con citas y páginas: publicación y cierre de ofertas y preguntas; proveedor seleccionado o adjudicado, acto y orden de compra, contrato firmado o sólo futuro, firma e inicio/fin efectivos; admisibilidad agencia y subcontratación; presupuesto incluye inversión, cantidades entregables y duración. Distinguir cláusulas futuras de hechos ejecutados.",
+      "flags": "--top-k10 --json",
+      "result": "partial excerpts; raw tool output truncated; follow-up saved complete"
+    },
+    {
+      "system": "LicitaLAB CLI",
+      "command": "ask-docs 2741-78-LE26",
+      "query": "Reproducir íntegra con página la cláusula 11.5 sobre prohibición de subcontratación y requisitos de titularidad o autorización del medio en artículos 6 y especificaciones técnicas. ¿Pueden agencias ofertar medios de terceros? ¿Qué se exige de domicilio, cobertura local y contrato/firma/OC efectiva? No inferir si el documento no lo dice.",
+      "flags": "--top-k8 --json",
+      "result": "partial excerpts; follow-up for missing exact clause"
+    },
+    {
+      "system": "LicitaLAB CLI",
+      "command": "ask-docs 2741-78-LE26",
+      "query": "Citar íntegra la cláusula 11.5 SUBCONTRATACION y la exigencia de titularidad del medio o autorización a terceros, indicando páginas. No dar conclusiones sin texto.",
+      "flags": "--top-k3 --json",
+      "result": "9chunks; p21 restriction11.4/documentation11.5, p40 print agreement; no full original",
+      "checked_at": "2026-11-05T09:05:54.358603-03:00"
+    },
+    {
+      "system": "LicitaLAB CLI",
+      "command": "ask-docs 1422039-39-LE26",
+      "query": "Citar las cláusulas de formalización, firma e inicio/plazo del contrato, los requisitos de elegibilidad para agencias y el alcance de inversión publicitaria. Distinguir fechas propuestas de contratos efectivamente suscritos.",
+      "flags": "--top-k4 --json",
+      "result": "12chunks; future clauses not signed contract; no full original",
+      "checked_at": "2026-11-05T09:05:54.068960-03:00"
+    },
+    {
+      "system": "LicitaLAB CLI",
+      "command": "session",
+      "result": "OAuth expired2026-10-26; exit3; no login/search performed"
+    },
+    {
+      "system": "HubSpot MCP",
+      "command": "get_user_details USER_INFORMATION",
+      "result": "UNAUTHORIZED reauthentication; no other MCP CRM call"
+    },
+    {
+      "system": "HubSpot AgentCLI",
+      "command": "whoami and version",
+      "result": "OAuth Julio portal48713323; v0.18.0build1705; no identity change"
+    },
+    {
+      "system": "HubSpot AgentCLI",
+      "command": "objects get --type deals",
+      "ids": [
+        "66450601027",
+        "67081021485",
+        "66672959873",
+        "66481946424",
+        "66218288550"
+      ],
+      "properties": [
+        "dealname",
+        "dealstage",
+        "hs_next_step",
+        "amount",
+        "closedate"
+      ],
+      "result": "5records; native output private"
+    },
+    {
+      "system": "HubSpot AgentCLI",
+      "command": "objects get --type tasks",
+      "ids": [
+        "119879914252"
+      ],
+      "properties": [
+        "hs_task_status",
+        "hs_timestamp",
+        "hs_task_subject",
+        "hs_task_body"
+      ],
+      "result": "NOT_STARTED; due3Nov10Santiago; stale content vs liveDeal"
+    },
+    {
+      "system": "SECOP II",
+      "command": "read contract dataset schema keys only",
+      "parameters": {
+        "url": "https://www.datos.gov.co/resource/jbjy-vk9h.json",
+        "$limit": 1
+      },
+      "result": "keys inspected only; no individual values versioned"
+    },
+    {
+      "label": "companies-dedupe",
+      "args": [
+        "objects",
+        "search",
+        "--type",
+        "companies",
+        "--filter",
+        "domain@=tvsperu.com,indianmotos.com.pe,porkcolombia.co,corporacionrm.cl",
+        "--filter",
+        "name~Indian Motos",
+        "--filter",
+        "name~Desarrollo Territorial",
+        "--properties",
+        "name,domain,country,numberofemployees,hs_employee_range",
+        "--limit",
+        "20"
+      ],
+      "checked_at": "2026-11-05T12:06:15.180451+00:00",
+      "exit_code": 0,
+      "stderr": "total: 1\n"
+    },
+    {
+      "label": "deals-dedupe",
+      "args": [
+        "objects",
+        "search",
+        "--type",
+        "deals",
+        "--filter",
+        "dealname~1422039-39",
+        "--filter",
+        "dealname~Indian Motos",
+        "--filter",
+        "dealname~2026-447",
+        "--filter",
+        "dealname~Porkcolombia",
+        "--properties",
+        "dealname,dealstage",
+        "--limit",
+        "20"
+      ],
+      "checked_at": "2026-11-05T12:06:16.720729+00:00",
+      "exit_code": 0,
+      "stderr": "total: 0\nNo results.\nThis may mean no records exist, or the object type is incorrect. Run `hubspot objects types` to verify.\n"
+    },
+    {
+      "label": "gana-continuity",
+      "args": [
+        "objects",
+        "get",
+        "--type",
+        "deals",
+        "66560488750",
+        "--properties",
+        "dealname,dealstage,amount,hs_next_step"
+      ],
+      "checked_at": "2026-11-05T12:06:17.676833+00:00",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "system": "Outlook search read-only",
+      "query": "Assetplan received>=2026-11-04",
+      "size": 10,
+      "checked_at": "2026-11-05T12:01:39.172Z",
+      "result_count": 3,
+      "has_more": false,
+      "outcome": "Assetplan3notifications; izipay0; Simoniz1noticeLIC115 notLIC116; full mail evidence private"
+    },
+    {
+      "system": "Outlook search read-only",
+      "query": "izipay received>=2026-11-04",
+      "size": 10,
+      "checked_at": "2026-11-05T12:01:39.173Z",
+      "result_count": 0,
+      "has_more": false,
+      "outcome": "Assetplan3notifications; izipay0; Simoniz1noticeLIC115 notLIC116; full mail evidence private"
+    },
+    {
+      "system": "Outlook search read-only",
+      "query": "SIMONIZ received>=2026-11-04",
+      "size": 10,
+      "checked_at": "2026-11-05T12:01:39.173Z",
+      "result_count": 1,
+      "has_more": false,
+      "outcome": "Assetplan3notifications; izipay0; Simoniz1noticeLIC115 notLIC116; full mail evidence private"
+    }
+  ]
+}

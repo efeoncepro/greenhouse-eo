@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "b6cad7bab1fe",
+  "key": "b6cad7bab1feb3aa70a7812c71666a36d80a62b087083213473703ac3a6ceb4a",
+  "status": "completed",
+  "createdAt": "2026-11-05T09:48:22.143Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma-base.png",
+    "imageSha256": "7ad41d651f55d246af50fa7954f8290a201e0aaddca26a7ca2e2579b83f9bc03",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma-mask.png",
+    "maskSha256": "0e51820c70022751b8ecba9505da472587266465b2b9b7dcde820746a84dda23",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same stone paving of the Plaza de Armas continuing toward the camera in the long soft morning shadow, mid-dark, with the edge of a wooden plaza bench very out of focus at the lower-left corner; above, the same clear sky continues. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas.",
+    "providerPrompt": "Extend this same photograph outward as if the photographer had stepped back a few metres with the same lens: keep everything that is already sharp exactly as it is, and fill the new area with the same stone paving of the Plaza de Armas continuing toward the camera in the long soft morning shadow, mid-dark, with the edge of a wooden plaza bench very out of focus at the lower-left corner; above, the same clear sky continues. Same light, same weather, same colour balance (ochres, blues and skin keep their true tones, moderate contrast, open shadows), same natural grain and real optical depth: the area nearest the lens is very out of focus with soft optical bokeh. The lower half is calm and mid-toned so white text can sit on it. No people added, no lettering, no aircraft. Seamless, with no visible edge between old and new areas."
+  },
+  "mask": {
+    "touchedFraction": 0.8568033854166667,
+    "editable": 6771186,
+    "soft": 335484,
+    "protected": 1187730
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 58.187,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 8.43,
+        "bestError": 8.43,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 1187730,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 6771186,
+        "maxDelta": 253,
+        "meanDelta": 60.114,
+        "worst": {
+          "x": 1362,
+          "y": 955
+        }
+      },
+      "seam": {
+        "pixels": 335484,
+        "maxDelta": 202,
+        "meanDelta": 19.303,
+        "worst": {
+          "x": 1385,
+          "y": 1029
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 1187730,
+        "maxDelta": 255,
+        "meanDelta": 32.865,
+        "worst": {
+          "x": 2762,
+          "y": 387
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1702,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 194
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3545
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

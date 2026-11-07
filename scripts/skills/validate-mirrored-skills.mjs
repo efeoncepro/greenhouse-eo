@@ -25,6 +25,14 @@ const mirroredSkills = [
     claude: '.claude/skills/sky-blog-seo',
   },
   {
+    // Método editorial SEO del Blog SKY (auditoría, proyección, lotes, Playbook integrado). Nace byte-identical
+    // el 2026-11-06: si Codex y Claude planifican o producen con métodos distintos, el mismo lote sale con dos normas.
+    id: 'sky-blog-seo-editorial',
+    mode: 'byte-identical',
+    codex: '.codex/skills/sky-blog-seo-editorial',
+    claude: '.claude/skills/sky-blog-seo-editorial',
+  },
+  {
     // CRM y el adapter account-based conservan los mismos permisos y readbacks en ambos agentes.
     id: 'hubspot-as-a-service',
     mode: 'byte-identical',
@@ -37,6 +45,13 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-b2b-prospecting',
     claude: '.claude/skills/efeonce-b2b-prospecting',
+  },
+  {
+    // Motogas (cliente): biblia de sus tres personajes y línea gráfica de sus cuatro cuentas. Skill viva de cliente.
+    id: 'motogas-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/motogas-graphic-line',
+    claude: '.claude/skills/motogas-graphic-line',
   },
   {
     // La línea gráfica «La órbita» es una skill viva: si Codex y Claude componen con criterios distintos, la marca
@@ -300,6 +315,26 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/berel-content-production',
     claude: '.claude/skills/berel-content-production',
+  },
+  {
+    /*
+     * Entra el 2026-11-02. Linea grafica de Berel (identidad, recetas, grilla del marcador, fotografia
+     * por estrato, pipeline de color, QA visual), exclusiva de ese cliente. Un espejo que diverge haria
+     * que un agente produzca piezas de Berel con umbrales o reglas de fotografia distintos, o que pierda
+     * la advertencia de aislamiento que impide aplicar estas reglas a Efeonce u otra marca.
+     */
+    id: 'berel-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/berel-graphic-line',
+    claude: '.claude/skills/berel-graphic-line',
+  },
+  {
+    // Blog SKY (servicio SEO / Marca): gate de portada, exportación y banner de ruta del Workbench.
+    // Si Codex y Claude divergen, uno exportaría portadas sin medir o banners con copy comercial.
+    id: 'sky-blog-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/sky-blog-graphic-line',
+    claude: '.claude/skills/sky-blog-graphic-line',
   },
   {
     // LicitaLAB expone evidencia comercial y documental sobre licitaciones reales. Si Codex y Claude

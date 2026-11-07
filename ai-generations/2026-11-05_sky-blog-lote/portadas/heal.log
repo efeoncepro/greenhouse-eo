@@ -1,0 +1,52 @@
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/equipaje-bodega-v2-heal/inpaint/f2a6869a5bf4/manifest.json
+equipaje-bodega-v2 healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/equipaje-bodega-v2-heal/inpaint/f2a6869a5bf4/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 223/255 · salida USD 0.0553
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/liquidos-v2-heal/inpaint/a7800557bbbc/manifest.json
+liquidos-v2 healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/liquidos-v2-heal/inpaint/a7800557bbbc/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 241/255 · salida USD 0.0553
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2-heal/inpaint/659fe29e0d28/manifest.json
+tipos-equipaje-v2 healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2-heal/inpaint/659fe29e0d28/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 253/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 14.1/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma-heal/inpaint/2658d7b29932/manifest.json
+cusco-calma healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma-heal/inpaint/2658d7b29932/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 253/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 12.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-cana-heal/inpaint/16ac4eaf9e17/manifest.json
+punta-cana healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-cana-heal/inpaint/16ac4eaf9e17/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 252/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 17.9/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lodge-selva-heal/inpaint/3beef12c7c0a/manifest.json
+lodge-selva healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lodge-selva-heal/inpaint/3beef12c7c0a/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 228/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 19.3/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/titicaca-heal/inpaint/184eb353e25c/manifest.json
+titicaca healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/titicaca-heal/inpaint/184eb353e25c/candidate-1.png
+  ✂ imagen completa → 2560x1440 · recorte desactivado (--crop off)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 205/255 · salida USD 0.0553
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2-heal/inpaint/d8c3a960b351/manifest.json
+noticia-puntual-pe-v2 healed ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2-heal/inpaint/d8c3a960b351/candidate-1.png

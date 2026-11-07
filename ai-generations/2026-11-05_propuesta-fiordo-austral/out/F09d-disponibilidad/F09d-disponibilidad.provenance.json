@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "001cf5f75b73f392f525d9d130d63213657d6da977ecf57d7a26d0f617d9eed1",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-measure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:FA14e-guardia-disponibilidad",
+      "path": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA14e-guardia-disponibilidad.png",
+      "sha256": "e887ec0f8c337f104e5198992d328596678e56db336b665b3956035bb97f8f0c"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

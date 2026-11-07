@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.18
+> **Version:** 1.21
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-10-03 por Claude — (1.18, TASK-1973) nueva sección «Editar fotos y videos que ya existen»: borrar, mover, incorporar un objeto de otra foto, llevar a otro formato, separar en capas, cambiar fondo, rehacer un detalle, dibujar con referencias y editar una zona de video, con la garantía verificada, costos medidos, qué modelo ganó en cada caso y lo que no hace (logos nunca con IA; no hay reiluminación conectada); la tabla de modelos ya no recomienda Sunburst «con máscara»; las capas no sirven para reutilizar un logo. Antes (1.17, TASK-1965) editar una zona de una imagen o de un video tiene comandos propios que recomponen y verifican solos: `pnpm ai:mask` y `pnpm ai:inpaint image|video`; Sunburst con mascara devuelve un panel negro, por eso edita sin mascara. Antes (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-11-05 por Claude — (1.21) la GPT Image 2.6 ya se puede pedir con `pnpm ai:image` y `pnpm ai:inpaint`: vectores SVG, GIF animados cortos, edición guiada por marcas (también en la 2.5) y control de complejidad; cuándo conviene la 2.6 y cuándo la 2.5, con enlace al nuevo manual [generar y editar imágenes con GPT Image](../../manual-de-uso/ai-tooling/generar-y-editar-imagenes-con-gpt-image.md). Antes (1.20) nueva subsección «GPT Image 2.6 (desde 2026-11-04)»: qué trae (vectores SVG, GIF animados cortos, edición guiada por anotaciones, control de «complejidad»), que cuesta 3 a 4 veces más que 2.5 en calidad baja e intermedia e igual en alta, y que todavía no se puede pedir con `pnpm ai:image` (producción sigue en 2.5); la fila de vectores de la tabla de modelos ya no dice que GPT Image sólo entrega píxeles. Antes (1.19) nueva sección «Quién paga las imágenes de OpenAI»: la generación creativa operada por el equipo puede pagarse con una cuenta alterna sin tocar la de la empresa, que sigue pagando todo el producto. Antes (1.18, TASK-1973) nueva sección «Editar fotos y videos que ya existen»: borrar, mover, incorporar un objeto de otra foto, llevar a otro formato, separar en capas, cambiar fondo, rehacer un detalle, dibujar con referencias y editar una zona de video, con la garantía verificada, costos medidos, qué modelo ganó en cada caso y lo que no hace (logos nunca con IA; no hay reiluminación conectada); la tabla de modelos ya no recomienda Sunburst «con máscara»; las capas no sirven para reutilizar un logo. Antes (1.17, TASK-1965) editar una zona de una imagen o de un video tiene comandos propios que recomponen y verifican solos: `pnpm ai:mask` y `pnpm ai:inpaint image|video`; Sunburst con mascara devuelve un panel negro, por eso edita sin mascara. Antes (1.16) la CLI de Higgsfield volvió a tener sesión (1.1.26) y el primer SVG real sigue pendiente. Antes (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -84,7 +84,7 @@ La decisión completa, con evidencia, costos y comandos, está en la guía técn
 | Textura, material, atmósfera y "look" de una campaña | **Seedream 5 Pro** | Su fuerte medido es la riqueza de material y luz |
 | Desarmar una pieza terminada en capas editables | **Seedream 5 Pro layerize** | Es el único que separa capas con fondo transparente |
 | Formatos muy alargados (más de 3 a 1) | **Seedream 5 Pro** | GPT Image llega hasta 3 a 1 |
-| Vectores reales (SVG) | **Recraft** vía Higgsfield | GPT Image y Seedream sólo entregan imágenes de píxeles (la CLI `higgsfield` volvió a tener sesión el 2026-09-24 con la versión 1.1.26; el primer SVG real sigue pendiente de corrida) |
+| Vectores reales (SVG) | **Recraft** vía Higgsfield | Seedream y GPT Image 2.5 sólo entregan imágenes de píxeles. GPT Image 2.6 sí entrega SVG y desde el 2026-11-05 se pide con `pnpm ai:image --model gpt-image-2.6-flare --format svg` (ver «GPT Image 2.6» más abajo). La CLI `higgsfield` volvió a tener sesión el 2026-09-24 con la versión 1.1.26; el primer SVG real de Recraft sigue pendiente de corrida |
 
 **Video** (todo por `pnpm ai:fal`)
 
@@ -131,8 +131,8 @@ Dentro de GPT Image hay una familia nueva, **GPT Image 2.5**, con dos variantes:
 - **Flare** — la rápida, pensada para el uso de todos los días.
 - **Sunburst** — pensada para edición de precisión, cuando hay que corregir o ajustar con detalle.
 
-También sigue disponible la versión anterior, **GPT Image 2**, que todavía es la que usa el comando si no se
-elige otra. OpenAI recomienda la 2.5 para trabajos nuevos; la 2 sigue vigente y es la única que permite pedidos en
+También sigue disponible la versión anterior, **GPT Image 2**, que se pide nombrándola (`--model gpt-image-2`): desde el
+2026-11-05 el comando usa **2.5 Flare** si no se elige otra. OpenAI recomienda la 2.5 para trabajos nuevos; la 2 sigue vigente y es la única que permite pedidos en
 lote a mitad de precio.
 
 Dos novedades de la familia 2.5 que se notan en el resultado:
@@ -141,6 +141,63 @@ Dos novedades de la familia 2.5 que se notan en el resultado:
   pieza es grande o va a verse muy de cerca.
 - **Fondo transparente con soporte pleno**, útil para íconos y assets recortados que se apoyan sobre
   cualquier color de fondo.
+
+### GPT Image 2.6 (desde 2026-11-04)
+
+OpenAI lanzó el 2026-11-04 la familia **GPT Image 2.6**, otra vez con dos variantes: **Sunburst** (para trabajo
+detallado y ediciones precisas) y **Flare** (para iterar rápido). No hay una versión «mini».
+
+**Qué trae de nuevo**
+
+- **Vectores (SVG)**: puede entregar un dibujo vectorial en vez de una imagen de píxeles. Sirve para íconos y piezas
+  simples; el vector es estático y sale de a uno por pedido. En la prueba del 2026-11-05 salió un SVG limpio.
+- **GIF animados cortos**: unos pocos cuadros que se repiten. Nuestra cuenta tiene acceso y la prueba funcionó, pero
+  el tamaño de cada cuadro tiene un límite que baja cuando se piden más cuadros (9 cuadros de 640×640 caben; de
+  1024×1024, no).
+- **Edición guiada por marcas**: en vez de una máscara, se le entrega un dibujo encima de la imagen (óvalos, flechas,
+  un boceto, notas) que indica qué cambiar. Funciona también en la 2.5, y también rayando directo la foto (por
+  ejemplo, tachar un objeto para borrarlo). Probado el 2026-11-05: el modelo siguió las marcas y no las dibujó.
+- **Control de «complejidad»** (`low`, `medium`, `high`): cuánto planifica el modelo antes de dibujar. Bajo sirve
+  para ediciones acotadas; alto, para texto denso o diagramación. No cambia el precio: en la prueba, bajarlo no
+  abarató nada.
+
+**Qué cuesta, en simple**
+
+El precio por unidad es el mismo que el de la 2.5, pero la 2.6 **usa mucho más en calidad baja e intermedia**: en
+las pruebas del 2026-11-05 una imagen cuadrada costó unas **4 veces** más en `low` y unas **3 veces** más en `medium`
+que con la 2.5. En `high`, `xhigh` y `max` cuesta **lo mismo**. Por eso, explorar ideas baratas sigue siendo más
+conveniente con la 2.5. La 2.6 tampoco admite pedidos en lote a mitad de precio. Las cifras exactas están en la [guía de selección de modelos, §5.1](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+
+**Estado hoy (desde 2026-11-05)**
+
+- **Ya se puede pedir con `pnpm ai:image`**: acepta `gpt-image-2.6-flare` y `gpt-image-2.6-sunburst`, y suma vectores
+  SVG, GIF animados, edición con marcas y el control de complejidad. Antes de gastar, `--estimate` muestra el costo
+  sin llamar a OpenAI y avisa cuando la 2.6 sale más cara que la 2.5. `pnpm ai:inpaint` (editar una zona dejando el
+  resto idéntico) también acepta la 2.6.
+- Si no se elige modelo, el comando usa **GPT Image 2.5 Flare** (desde el 2026-11-05). GPT Image 2 se puede seguir
+  pidiendo con `--model gpt-image-2`. El motor del portal (runtime) no cambió.
+
+**Cuándo usar cada una, en simple**
+
+| Para | Conviene | Por qué |
+|---|---|---|
+| Explorar ideas y probar variantes | **2.5 Flare** | Con la 2.6 cada prueba barata cuesta 3 a 4 veces más |
+| La pieza final en calidad alta | **2.5 o 2.6 Sunburst** | Cuestan lo mismo; conviene comparar las dos en la pieza real |
+| Un ícono o pieza simple en vector | **2.6 Flare** | Sólo la 2.6 entrega SVG |
+| Una animación corta que se repite | **2.6 Flare** | Sólo la 2.6 entrega GIF; para video de verdad hay otras herramientas |
+| Cambiar algo marcándolo con un dibujo | **2.5 o 2.6** | Las dos siguen las marcas |
+| Cambiar una zona y que el resto quede exacto | `pnpm ai:inpaint` con Flare | Con máscara, Sunburst devuelve un rectángulo negro; el comando lo evita solo |
+| Fotos de marca con personas reales | **2.5 Sunburst** | Falta probar que la 2.6 respeta la identidad |
+
+Paso a paso, comandos y problemas comunes: [generar y editar imágenes con GPT Image](../../manual-de-uso/ai-tooling/generar-y-editar-imagenes-con-gpt-image.md).
+
+Aparte de la 2.6: los modelos `gpt-image-1.5`, `gpt-image-1-mini` y `chatgpt-image-latest` se apagan el 2026-12-01,
+y `gpt-image-1` ya se apagó el 2026-10-23. No usar ninguno: desde su fecha de apagado, el comando los corta antes de gastar.
+
+> Detalle técnico: [guía de selección de modelos, §5.1](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) ·
+> [guía operativa para agentes](../../operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md) ·
+> [manual de uso](../../manual-de-uso/ai-tooling/generar-y-editar-imagenes-con-gpt-image.md) ·
+> `src/lib/ai/openai-image.ts` · `scripts/ai/generate-image.ts`
 
 ## Editar solo una parte de una imagen (desde 2026-09-16)
 
@@ -307,6 +364,25 @@ lo mismo que la **alta de la 2.5**.
 
 Los precios de los proveedores cambian. Antes de comprometer un costo con un cliente hay que volver a
 calcularlo o medirlo, no citar estas cifras como si fueran permanentes.
+
+### Quién paga las imágenes de OpenAI (desde 2026-11-01)
+
+Hay dos cuentas de OpenAI y cada una paga un tipo de trabajo distinto:
+
+| Trabajo | Quién paga |
+|---|---|
+| Todo lo que forma parte del producto: el portal, los procesos automáticos y lo que corre en el servidor | La cuenta de la empresa, siempre |
+| Las piezas, conceptos y pruebas que el equipo o un agente genera a mano con los comandos de imagen | Una cuenta alterna con crédito propio (hoy, la personal de Julio Reyes), mientras le quede crédito |
+
+La cuenta alterna se elige **en cada comando**, a propósito; si no se indica, paga la de la empresa. Nunca queda
+puesta por defecto, para que el producto no termine pagado por la cuenta alterna sin que nadie lo note. Si la cuenta
+alterna no está disponible, el comando se detiene con un error en vez de usar la de la empresa por su cuenta. Al
+terminar cada imagen el comando dice qué cuenta pagó. Cuando a la cuenta alterna se le acaba el crédito, OpenAI
+lo avisa con un error; en ese caso se vuelve a la cuenta de la empresa simplemente dejando de indicarla.
+
+> Detalle técnico: [manual para alternar la clave de OpenAI](../../manual-de-uso/ai-tooling/alternar-clave-openai.md) ·
+> [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
+> código `src/lib/ai/openai-api-key.ts`.
 
 ## Ahora avisa en vez de sustituir en silencio
 

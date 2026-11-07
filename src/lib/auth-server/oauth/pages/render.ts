@@ -1,20 +1,20 @@
 import type { ConsentContextResolution } from '../consent-context'
 /**
  * Páginas HTML nativas del emisor: CSS generado bajo hash CSP y marca del SSOT.
- * TASK-2064 adapta sólo el login a V4; consentimiento y verificación conservan su shell.
- * El controlador de login se agrega desde persons/pages.ts con nonce, sin runtime React/Next.
+ * El login usa V4 (TASK-2064). Todo lo demás —consentimiento, step-up, segundo factor, enlaces, sesión y errores—
+ * usa el shell con la órbita aprobado el 2026-11-02 (`./orbit-shell`): formulario en papel y panel oscuro.
+ * Los controladores se agregan con nonce desde persons/*, sin runtime React/Next.
  */
 
-import { EFEONCE_BRAND_NAME } from '@/config/efeonce-brand'
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
+import { AUTH_ORBIT_COPY, headingText, type OrbitHeading } from '@/lib/copy/auth-server-orbit'
 
 import type { OAuthErrorCode } from '../errors'
-import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
 import { renderClientMark } from './client-marks'
-import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
 import { renderLoginV4Body, type LoginPresentation } from './login-v4'
+import { orbitBrand, orbitFootnote, orbitHeading, orbitHint, renderOrbitPanel, type OrbitPanel } from './orbit-shell'
 
 export const escapeHtml = (value: string): string =>
   value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char)
@@ -31,18 +31,25 @@ const STYLES = AUTH_SERVER_STYLES
 const clientContext = (clientName: string, clientId: string): string => {
   const mark = renderClientMark({ clientId, clientName })
 
-  return `<div class="id-context" data-capture="id-client">
-      <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span>
-      <span class="id-client">${mark.html}<strong>${escapeHtml(clientName)}</strong></span>
-      ${mark.verified ? '' : `<span class="id-unverified" data-capture="id-client-unverified">${ICON_ALERT}<span><strong>${escapeHtml(GH_AUTH_SERVER.application_unverified_label)}.</strong> ${escapeHtml(GH_AUTH_SERVER.application_unverified_hint)}</span></span>`}
+  return `<div class="os-section" data-capture="id-client">
+      <div class="os-card">${mark.html}<span><span class="os-label">${escapeHtml(AUTH_ORBIT_COPY.consent.clientLabel)}</span><strong class="os-value">${escapeHtml(clientName)}</strong></span>${mark.verified ? '' : `<span class="os-badge">${escapeHtml(AUTH_ORBIT_COPY.consent.unverifiedBadge)}</span>`}</div>
+      ${mark.verified ? '' : `<p class="os-warning" data-capture="id-client-unverified"><strong>${escapeHtml(GH_AUTH_SERVER.application_unverified_label)}.</strong> ${escapeHtml(GH_AUTH_SERVER.application_unverified_hint)}</p>`}
     </div>`
 }
 
-export const layout = (
-  title: string,
-  body: string,
-  options: { state?: 'login' | 'consent' | 'verification'; clientName?: string; clientId?: string } & LoginPresentation = {}
-): string => {
+export type LayoutOptions = {
+  state?: 'login' | 'consent' | 'verification'
+  /** Titular con la órbita; si falta, el body trae el suyo (sólo el login V4). */
+  heading?: OrbitHeading
+  /** Panel de escritorio. Por defecto, la órbita alrededor del ícono de seguridad. */
+  panel?: OrbitPanel
+  /** Pantallas cortas centradas; las de listas largas, alineadas a la izquierda. */
+  align?: 'center' | 'start'
+  clientName?: string
+  clientId?: string
+} & LoginPresentation
+
+export const layout = (title: string, body: string, options: LayoutOptions = {}): string => {
   const state = options.state ?? 'verification'
 
   return `<!doctype html>
@@ -55,13 +62,17 @@ export const layout = (
 <title>${escapeHtml(title)} · ${escapeHtml(GH_AUTH_SERVER.brand_title)}</title>
 <style>${STYLES}</style>
 </head>
-<body>
-${state === 'login' ? renderLoginV4Body(body, options) : `<div class="id-canvas" data-state="${state}">
-  <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
-    <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
-    ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
-    <div class="id-surface">${body}</div>
+${state === 'login' ? `<body>\n${renderLoginV4Body(body, options)}` : `<body class="os-body">
+<div class="os-root" data-state="${state}">
+  <main class="os-main" data-capture="id-shell" data-state="${state}" data-surface-recipe="orbitFlow" aria-labelledby="page-title">
+    <div class="os-form" data-align="${options.align ?? 'center'}">
+      ${orbitBrand()}
+      ${options.heading ? orbitHeading(options.heading) : ''}
+      ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
+      <div class="os-surface">${body}</div>
+    </div>
   </main>
+  ${renderOrbitPanel(options.panel ?? { kind: 'icon', glyph: 'seguridad' })}
 </div>`}
 </body>
 </html>`
@@ -72,22 +83,30 @@ ${state === 'login' ? renderLoginV4Body(body, options) : `<div class="id-canvas"
  * callejón sin salida servido con 401 (lo alcanzaba `consent-endpoint`). Sin destino de retorno se
  * va igual a `/login`, que es lo que la persona necesita; con destino, se preserva.
  */
-export const renderLoginRequiredPage = (returnTo?: string): string =>
-  layout(
-    GH_AUTH_SERVER.login_required_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.login_required_body)}</p>
-  <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>
-  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${ICON_ARROW_RIGHT}${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
-  )
+export const renderLoginRequiredPage = (returnTo?: string): string => {
+  const copy = AUTH_ORBIT_COPY.loginRequired
 
-export const renderStepUpRequiredPage = (returnTo?: string): string =>
-  layout(
-    GH_AUTH_SERVER.step_up_required_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
-  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a></div>`
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(copy.body)}</p>
+  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>
+  ${orbitFootnote(AUTH_ORBIT_COPY.footnoteNotInitiated)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'integracion' } }
   )
+}
+
+export const renderStepUpRequiredPage = (returnTo?: string): string => {
+  const copy = AUTH_ORBIT_COPY.stepUpRequired
+
+  return layout(
+    headingText(copy.heading),
+    `<p>${escapeHtml(copy.body)}</p>
+  ${orbitHint(copy.hint)}
+  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${escapeHtml(copy.cta)}</a></div>
+  ${orbitFootnote(copy.footnote)}`,
+    { heading: copy.heading, panel: { kind: 'icon', glyph: 'seguridad' } }
+  )
+}
 
 export type ConsentPageInput = {
   authorizationContextId?: string | null
@@ -120,36 +139,41 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
     throw new Error('multi_org_consent_context_required')
   }
 
-  const organizationItems = input.organizations.map(organization => `<li>
-    ${ICON_BUILDING}
+  const organizationItems = input.organizations.map(organization => `<li class="os-org">
     <strong>${escapeHtml(organization.organizationName)}</strong>
     <details><summary>${escapeHtml(GH_AUTH_SERVER.consent_capabilities_label)}</summary>
       <ul>${organization.capabilities.map(capability => `<li><code>${escapeHtml(capability)}</code></li>`).join('')}</ul>
     </details>
   </li>`).join('')
 
+  // Lectura y escritura se distinguen por el TEXTO del chip, no por un color: el teal no va en texto ni en fondos.
   const scopeItems = input.scopes
     .map(scope => {
       const description = GH_AUTH_SERVER.scope_descriptions[scope] ?? GH_AUTH_SERVER.scope_description_fallback(scope)
-      // El icono distingue leer de escribir de un vistazo; el badge de texto sigue siendo el que
-      // porta el significado, porque el icono es decorativo (`aria-hidden`).
       const write = isWriteScope(scope)
 
-      return `<li class="id-scope" data-kind="${write ? 'write' : 'read'}">${write ? ICON_PENCIL : ICON_EYE}<span class="id-scope-kind" data-kind="${write ? 'write' : 'read'}">${escapeHtml(write ? GH_AUTH_SERVER.scope_write_label : GH_AUTH_SERVER.scope_read_label)}</span><p>${escapeHtml(description)}</p><code class="code">${escapeHtml(scope)}</code></li>`
+      return `<li data-kind="${write ? 'write' : 'read'}"><span class="os-chip" data-kind="${write ? 'write' : 'read'}">${escapeHtml(write ? GH_AUTH_SERVER.scope_write_label : GH_AUTH_SERVER.scope_read_label)}</span><p class="os-scope-desc">${escapeHtml(description)}</p><span class="os-scope-code">${escapeHtml(scope)}</span></li>`
     })
     .join('\n    ')
 
+  const copy = AUTH_ORBIT_COPY.consent
+
   return layout(
-    GH_AUTH_SERVER.consent_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
-  <p>${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_intro : GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
-  <p class="id-destination" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
-  <h2 class="id-muted">${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_organizations_label : input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
-  <ul class="id-organizations" data-capture="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
-  ${multiOrg ? `<p data-capture="id-multi-org-authority">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_boundary)}</p>${input.moreOrganizationsAvailable ? `<p class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_more)}</p>` : ''}` : ''}
-  <ul class="id-permissions" data-capture="id-scopes" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
+    headingText(copy.heading),
+    `<p>${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_intro : GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
+  <div class="os-text-left os-surface">
+  <p class="os-card-stack" data-capture="id-redirect-host"><span class="os-label">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <strong class="os-value">${escapeHtml(input.redirectHost.trim())}</strong> <span class="os-label">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
+  <section class="os-section">
+  <h2 class="os-section-title">${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_organizations_label : input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
+  <ul class="os-list" data-capture="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
+  ${multiOrg ? `<p class="os-code" data-capture="id-multi-org-authority">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_boundary)}</p>${input.moreOrganizationsAvailable ? `<p class="os-code">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_more)}</p>` : ''}` : ''}
+  </section>
+  <section class="os-section">
+  <h2 class="os-section-title">${escapeHtml(copy.scopesTitle(input.scopes.length))}</h2>
+  <ul class="os-list" data-capture="id-scopes" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
     ${scopeItems}
   </ul>
+  </section>
   <form method="post" action="${escapeHtml(input.actionPath)}" data-capture="id-form">
     <input type="hidden" name="client_id" value="${escapeHtml(input.clientId)}">
     <input type="hidden" name="scope" value="${escapeHtml(input.scopes.join(' '))}">
@@ -160,9 +184,9 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
       <button class="primary" type="submit" name="decision" value="allow">${escapeHtml(GH_AUTH_SERVER.consent_allow_cta)}</button>
     </div>
   </form>
-  <p class="muted">${escapeHtml(GH_AUTH_SERVER.consent_footer)}</p>
-  <p class="code">${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`,
-    { state: 'consent', clientName: input.clientName, clientId: input.clientId }
+  </div>
+  <p class="os-footnote">${escapeHtml(GH_AUTH_SERVER.consent_footer)} ${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`,
+    { state: 'consent', heading: copy.heading, clientName: input.clientName, clientId: input.clientId, panel: { kind: 'icon', glyph: 'integracion' } }
   )
 }
 
@@ -173,10 +197,18 @@ const ERROR_BODIES: Partial<Record<OAuthErrorCode, string>> = {
   slow_down: GH_AUTH_SERVER.error_rate_limited_body
 }
 
-export const renderErrorPage = (code: OAuthErrorCode): string =>
-  layout(
-    GH_AUTH_SERVER.error_title,
-    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.error_title)}</h1>
-  <p class="id-alert" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</span></p>
-  <p class="code">${escapeHtml(GH_AUTH_SERVER.error_code_label)}: ${escapeHtml(code)}</p>`
+/**
+ * Sin acción a propósito: el emisor no sabe a dónde volver cuando la solicitud de la aplicación no es válida
+ * (`page-contract.test.ts`). La salida es la propia aplicación, y el texto lo dice.
+ */
+export const renderErrorPage = (code: OAuthErrorCode): string => {
+  const copy = AUTH_ORBIT_COPY.error
+
+  return layout(
+    headingText(copy.heading),
+    `<p class="os-alert" role="alert" data-capture="id-status">${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</p>
+  <p>${escapeHtml(copy.recovery)}</p>
+  <p class="os-footnote os-code">${escapeHtml(GH_AUTH_SERVER.error_code_label)}: <strong>${escapeHtml(code)}</strong></p>`,
+    { heading: copy.heading, panel: { kind: 'word', lines: AUTH_ORBIT_COPY.errorWord } }
   )
+}

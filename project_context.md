@@ -14,7 +14,7 @@ Marca → ejecución escalable: [dirección y límites](docs/architecture/EFEONC
 
 CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
-[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md). [MD](docs/manual-de-uso/comercial/construir-una-licitacion.md).
+[CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3·EC](data/pricing/README.md). [MD](docs/manual-de-uso/comercial/construir-una-licitacion.md).
 
 ## Documentación
 
@@ -26,7 +26,7 @@ CRM: provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 Next.js 16/MUI 7/Vuexy/TS · `Handoff.md` · historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[B2B: permisos y Primary](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
+[B2B contextual](docs/manual-de-uso/comercial/operar-prospeccion-b2b.md).
 [CRM](docs/operations/EFEONCE_CRM_RECORD_NAMING_POLICY_V1.md).
 [Outlook](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): firma gráfica siempre.
 [Customer Agent: llamadas](docs/manual-de-uso/hubspot/configurar-customer-agent-llamadas.md).
@@ -149,10 +149,11 @@ Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVE
 [colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md) ·
 [QA Frame.io](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md).
 
-WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
+WordPress: `efeonce-public-site-wordpress`; [Home](docs/architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
 Misceláneas propuestas; Ohio live, Theme Builder sin probar. Elegibilidad ≠ indexación.
-Footer: [estado](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+[Footer](docs/audits/public-site/2026-10-14-footer-composition-v2.md).
+[Blog/Vimeo](docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md).
 
 ### Lectura mínima obligatoria
 

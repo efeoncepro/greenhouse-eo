@@ -324,3 +324,11 @@ derivada de este registro documental.
 - Construir un segundo motor de informes, métricas, contratos o autorizaciones.
 - Construir app móvil, web push o push nativo en esta fase; se preserva el contrato para un adapter futuro.
 - Reparentar o superseder las tasks existentes; el registro no autoriza su ejecución.
+
+## Delta 2026-11-06 — Coordinación con EPIC-057
+
+[EPIC-057: cuentas operativas](../in-progress/EPIC-057-operational-accounts-under-organization.md) provee
+contexto por Space, routing, owner Finance, alta hija, readers compartidos y protección temporal. Las tasks
+de este EPIC conservan parent/lifecycle/ownership; sus deltas y checkboxes registran consumo multi-Space.
+No duplicar informe, selector, builder, renderer, scheduler, sender o login. Dependencias por hito: foundation
+habilitación1852 disponible para construir; apertura SKY SEO1852 posterior a certificación2094 y permiso concreto.

@@ -1,0 +1,159 @@
+{
+  "state": "hypothesis_only",
+  "date": "2026-10-27",
+  "binding": false,
+  "notAV3CalculatedQuote": true,
+  "catalogVersion": "operating-review-2026-10-22-v13",
+  "catalogSha256": "54f7bf0202232f23a69b9712981cd933861477732b562b223a85687144ec4490",
+  "capacityHoursPerFteMonth": "180",
+  "assumptions": [
+    "All roster costs use Chile-reference target costs; actual roster unassigned.",
+    "Performance Lead 5500/month and overhead 12% come from hypothesis-only Performance pack.",
+    "Additional 12% reserve is a prudential sensitivity, not an approved Performance V3 rule.",
+    "No market factor or engagement multiplier invented; therefore no V3-derived price.",
+    "USD and tax treatment require commercial/Finance confirmation.",
+    "Setup occurs within days 1-14 of the same 90-day service; operations cover days 1-90."
+  ],
+  "results": {
+    "setup": {
+      "lines": [
+        {
+          "profile": "ECG-008",
+          "hours": 24,
+          "fte": "0.1333333333333333333333333333",
+          "monthlyReferenceCost": "3100",
+          "cost": "413.33",
+          "source": "cost:ECG-008:unknown@3"
+        },
+        {
+          "profile": "ECG-009",
+          "hours": 24,
+          "fte": "0.1333333333333333333333333333",
+          "monthlyReferenceCost": "1800",
+          "cost": "240.00",
+          "source": "cost:ECG-009:unknown@3"
+        },
+        {
+          "profile": "performance-lead-assumption",
+          "hours": 8,
+          "fte": "0.04444444444444444444444444444",
+          "monthlyReferenceCost": "5500",
+          "cost": "244.44",
+          "source": "Performance pricing pack V1: unvalidated Performance Lead assumption"
+        },
+        {
+          "profile": "ECG-031",
+          "hours": 32,
+          "fte": "0.1777777777777777777777777778",
+          "monthlyReferenceCost": "1800",
+          "cost": "320.00",
+          "source": "cost:ECG-031:unknown@3"
+        },
+        {
+          "profile": "ECG-012",
+          "hours": 24,
+          "fte": "0.1333333333333333333333333333",
+          "monthlyReferenceCost": "1600",
+          "cost": "213.33",
+          "source": "cost:ECG-012:unknown@3"
+        },
+        {
+          "profile": "ECG-021",
+          "hours": 16,
+          "fte": "0.08888888888888888888888888889",
+          "monthlyReferenceCost": "2000",
+          "cost": "177.78",
+          "source": "cost:ECG-021:unknown@3"
+        },
+        {
+          "profile": "ECG-011",
+          "hours": 24,
+          "fte": "0.1333333333333333333333333333",
+          "monthlyReferenceCost": "1500",
+          "cost": "200.00",
+          "source": "cost:ECG-011:unknown@3"
+        },
+        {
+          "profile": "ECG-016",
+          "hours": 8,
+          "fte": "0.04444444444444444444444444444",
+          "monthlyReferenceCost": "2125",
+          "cost": "94.44",
+          "source": "cost:ECG-016:unknown@3"
+        }
+      ],
+      "hours": 160,
+      "teamCost": "1903.33",
+      "loadedCost": "2131.73",
+      "feeProposed": "5400",
+      "baseMargin": "0.6052345679012345679012345680",
+      "additionalReserveScenario": "255.81",
+      "costWithReserveScenario": "2387.54",
+      "marginWithReserveScenario": "0.5578629629629629629629629630",
+      "basePriceAt55PercentMargin": "4737.19"
+    },
+    "monthly": {
+      "lines": [
+        {
+          "profile": "ECG-008",
+          "hours": 56,
+          "fte": "0.3111111111111111111111111111",
+          "monthlyReferenceCost": "3100",
+          "cost": "964.44",
+          "source": "cost:ECG-008:unknown@3"
+        },
+        {
+          "profile": "ECG-009",
+          "hours": 20,
+          "fte": "0.1111111111111111111111111111",
+          "monthlyReferenceCost": "1800",
+          "cost": "200.00",
+          "source": "cost:ECG-009:unknown@3"
+        },
+        {
+          "profile": "ECG-019",
+          "hours": 24,
+          "fte": "0.1333333333333333333333333333",
+          "monthlyReferenceCost": "2000",
+          "cost": "266.67",
+          "source": "cost:ECG-019:unknown@3"
+        },
+        {
+          "profile": "performance-lead-assumption",
+          "hours": 11,
+          "fte": "0.06111111111111111111111111111",
+          "monthlyReferenceCost": "5500",
+          "cost": "336.11",
+          "source": "Performance pricing pack V1: unvalidated Performance Lead assumption"
+        },
+        {
+          "profile": "ECG-011",
+          "hours": 10,
+          "fte": "0.05555555555555555555555555556",
+          "monthlyReferenceCost": "1500",
+          "cost": "83.33",
+          "source": "cost:ECG-011:unknown@3"
+        }
+      ],
+      "hours": 121,
+      "teamCost": "1850.56",
+      "loadedCost": "2072.62",
+      "feeProposed": "5200",
+      "baseMargin": "0.6014188034188034188034188035",
+      "additionalReserveScenario": "248.71",
+      "costWithReserveScenario": "2321.33",
+      "marginWithReserveScenario": "0.5535903846153846153846153846",
+      "basePriceAt55PercentMargin": "4605.83"
+    },
+    "term": {
+      "hours": 523,
+      "fee": "21000",
+      "mediaCeiling": "18000",
+      "combinedPlanningEnvelope": "39000",
+      "loadedCost": "8349.59",
+      "costWithReserveScenario": "9351.53",
+      "baseMargin": "0.6024004761904761904761904762",
+      "marginWithReserveScenario": "0.5546890476190476190476190476"
+    }
+  }
+}

@@ -14,6 +14,11 @@
 > [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). No se
 > incorporan pricing ni disponibilidad territorial por inferencia.
 
+> **Delta 2026-11-05 — precios de licencias:** la lista vigente sale del
+> [snapshot del portal Efeonce](HUBSPOT_PORTAL_PRICING_SNAPSHOT_2026-11-05.md), que siembra el pricebook de TASK-1405
+> (`pnpm --silent pricing:v3 hubspot list|estimate`). En toda oferta, la licencia HubSpot va como línea separada de la
+> implementación: la factura HubSpot al cliente y no entra al margen de Efeonce.
+
 > **Transformación humano-agente:** el método provider-neutral para pasar de readiness a equipos operativos vive en
 > [`Hybrid Human-Agent Transformation V1`](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
 > Agent Hub & Agentic Operations es su carril HubSpot, no un sinónimo de activar agentes aislados.

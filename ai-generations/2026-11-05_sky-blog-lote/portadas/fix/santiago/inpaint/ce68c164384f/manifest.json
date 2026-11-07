@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "ce68c164384f",
+  "key": "ce68c164384fd735c09a3a6a550b78e0d38ce741ca61967e17ade444e314ed89",
+  "status": "completed",
+  "createdAt": "2026-11-05T19:04:27.120Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/maestros-r/santiago-ano-nuevo-img1-maestro.png",
+    "imageSha256": "a4463fca924549210acbcdbec0d306a418c4f757e50b896d6f4eb0b80e0ae54c",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/portadas/fix/santiago-mask.png",
+    "maskSha256": "04ebf1b00008ee551b55a184e1553a6d720880d42ed8fed9676f3087cef2443d",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same wide asphalt avenue continuing smoothly toward the camera with one continuous pavement surface, continuous lane markings and consistent perspective, empty road in this area with no people, the same dusk light and soft out-of-focus near the lens; no break or step in the ground",
+    "providerPrompt": "the same wide asphalt avenue continuing smoothly toward the camera with one continuous pavement surface, continuous lane markings and consistent perspective, empty road in this area with no people, the same dusk light and soft out-of-focus near the lens; no break or step in the ground"
+  },
+  "mask": {
+    "touchedFraction": 0.15524811921296297,
+    "editable": 944868,
+    "soft": 342822,
+    "protected": 7006710
+  },
+  "crop": {
+    "mode": "full",
+    "box": {
+      "left": 0,
+      "top": 0,
+      "width": 3840,
+      "height": 2160
+    },
+    "target": {
+      "width": 2560,
+      "height": 1440
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 100 % de la imagen (umbral 25 %)"
+  },
+  "estimate": {
+    "usd": 0.0553,
+    "basis": "1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 29.164,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 6.42,
+        "bestError": 6.42,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 7006710,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 944868,
+        "maxDelta": 242,
+        "meanDelta": 34.874,
+        "worst": {
+          "x": 1239,
+          "y": 886
+        }
+      },
+      "seam": {
+        "pixels": 342822,
+        "maxDelta": 206,
+        "meanDelta": 13.426,
+        "worst": {
+          "x": 1353,
+          "y": 862
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 7006710,
+        "maxDelta": 251,
+        "meanDelta": 19.386,
+        "worst": {
+          "x": 1708,
+          "y": 1023
+        }
+      },
+      "outputUsd": 0.0553,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1576,
+        "input_tokens_details": {
+          "image_tokens": 1508,
+          "text_tokens": 68
+        },
+        "output_tokens": 1843,
+        "output_tokens_details": {
+          "image_tokens": 1843,
+          "text_tokens": 0
+        },
+        "total_tokens": 3419
+      },
+      "meta": {
+        "size": "2560x1440",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

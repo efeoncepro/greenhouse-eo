@@ -10,8 +10,9 @@
 > **Validated as of:** 2026-07-04 (pricing Vertex/Magnific/Higgsfield + disponibilidad de modelos verificados en vivo esta fecha)
 
 > **Nota de lectura 2026-09-24:** las tablas de Omni, precio, región y slices siguientes describen la propuesta
-> del 2026-07-04 y no el carril actual. La CLI local vigente es `pnpm ai:omni`, con Gemini Omni 1.1 Cloud
-> `gemini-omni-1.1-flash-preview` por Cloud Interactions en `global`; ofrece generación, edición y extensión.
+> del 2026-07-04 y no el carril actual. La CLI local vigente es `pnpm ai:omni`, con Gemini Omni 1.2 Flash
+> `gemini-omni-1.2-flash` (GA desde 2026-11-05; 1.1 Preview con `--model 1.1`) por Cloud Interactions en `global`;
+> ofrece generación, edición, extensión y upscale.
 > Consultar la [guía de selección](GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) y el
 > [manual de la CLI](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) para límites, cuota, precio y evidencia.
 > Esta nota no reactiva el Media Generation Foundry ni cambia el estado `superseded` de esta arquitectura.

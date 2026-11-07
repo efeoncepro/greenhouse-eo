@@ -55,6 +55,10 @@ hermanos). La regresión `node scripts/measurement/verify-hubspot-consent-ui.mjs
 permite revisar antes de publicar; `--live` verifica los assets publicados. Mantener aprobaciones,
 distribución y readback como pasos distintos, con el scope de cada host explícito.
 
+> Delta pantallas de Efeonce ID (A21) verificado contra: greenhouse-eo `develop` en `d14b786d3` (sin release) y efeonce-rooms `main` en `3434ea8` (páginas `/cli/*` en producción) — 2026-11-02.
+
+> Delta Efeonce ID (A20) verificado contra: ADR `EFEONCE_ID_MARK_DECISION_V1.md` y AXIS `main` en `0d45749` (paquete 0.4.32; tags `v0.4.31` y `v0.4.32` publicados) — 2026-11-02. Botón sin implementar; favicon en código de `develop`, sin release.
+
 > Delta familia H3 (B3d) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (paquete 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta ficha de autor del blog (A19) verificado contra: la ficha en producción en `efeoncepro.com`
@@ -774,6 +778,102 @@ Contrato: `docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md` · FAQ: `docs/pub
   foto, la capa del avatar se rehace desde la fuente (`ai-generations/2026-10-24_autor-blog/reparar-capa.mjs`): la
   del 2026-09-29 tenía huecos en la bomber que sobre navy no se veían.
 
+### A20. Efeonce ID: marca, favicon y botón «Continuar con Efeonce ID» (aprobado 2026-11-01/02)
+
+> Verificado contra: ADR [`EFEONCE_ID_MARK_DECISION_V1.md`](../../../../docs/architecture/brand/EFEONCE_ID_MARK_DECISION_V1.md)
+> y AXIS `main` en `0d45749` (`axis-brand-assets` 0.4.32; tags `v0.4.31` y `v0.4.32` publicados) — 2026-11-02.
+> Criterio: [criteria.md](criteria.md) («Efeonce ID: la órbita vive en la D, y lo justo»); decisiones:
+> [ledger.md](ledger.md) (2026-11-01 y 2026-11-02).
+
+- **Qué es:** la marca de **Efeonce ID**, la cuenta con la que personas y agentes entran por Efeonce Auth
+  (`auth.efeonce.org`). «La órbita vive en la D»: asta, tramo recto de 110 unidades y media órbita; una sola esfera
+  **Growth** a la 1:30 con corte concéntrico (`#0e8c82` sobre papel, `#36c8bf` sobre oscuro); anillo 64, esfera 88,
+  aire 22. Nada más: la huella con surcos se descartó por pesada.
+- **Qué pieza va dónde:**
+
+  | Pieza | Archivo | Dónde va |
+  |---|---|---|
+  | Lockup **Efeonce \| ID** | `efeonce-id-lockup-*` | **Por defecto:** encabezado del formulario de entrada, correos, documentos. «ID» en el gris de la familia (`#6b6b6b` / `#6f89a2`); sólo la esfera en el acento |
+  | Isotipo (el monograma en un cuadro) | `efeonce-id-isotype-*` | Avatar e ícono de app; **nunca junto al nombre** |
+  | Isotipo chico (anillo 110, esfera 104, aire 30) | `efeonce-id-isotype-small-*` | **Sólo a 32 px o menos**: el favicon |
+  | Logo (el monograma solo) | `efeonce-id-logo-*` | Insumo de las anteriores; el botón «sólo símbolo» lo usa |
+  | Lockup del botón | `efeonce-id-button-lockup-{positive,negative}` | **Sólo dentro** del botón «Continuar con Efeonce ID»; «ID» en la tinta del texto, no en gris |
+
+- **Favicon:** la teja oscura `#001a33`, radio 22 %, con `efeonce-id-isotype-small-negative` al 71,3 % del lado. Está en
+  el código de `auth-server` en `develop` (`scripts/auth-server/efeonce-id-favicon.ts`, `pnpm auth-server:brand-assets:generate`);
+  **sin release**: no llega a `auth.efeonce.org` hasta el próximo release gobernado.
+- **Pantalla de entrada de Efeonce Auth (operador, 2026-11-01):** la marca va **sólo** en el favicon y dentro del
+  formulario (lockup en el encabezado, botón). **Nunca el isotipo grande en el panel lateral:** ese panel es del
+  carrusel de novedades, que se conserva. El lockup del encabezado sigue pendiente de implementar.
+- **Botón «Continuar con Efeonce ID» (aprobado 2026-11-02):** «Continuar con» (Poppins 400) + el lockup del botón,
+  como «Pagar con PayPal». Sello oscuro `#001a33` con texto blanco y lockup `negative` sobre papel o blanco; botón
+  blanco con texto navy, borde y lockup `positive` sobre oscuro o foto. Tamaños: 52 px por defecto, grande 56,
+  compacto 40 (sólo la marca, con nombre accesible «Continuar con Efeonce ID»), ancho completo (formularios y
+  teléfono) y sólo símbolo (el monograma en un círculo de 52, con nombre accesible). Diez estados: reposo; cursor
+  (navy o papel, borde teal y halo teal suave); presionado; foco con teclado (anillo teal sólido, separado); foco +
+  cursor; cargando (la órbita de la familia girando + «Conectando…»); cargando con movimiento reducido (la órbita
+  quieta); conectado (la esfera completa la vuelta); error (vuelve a reposo con «No pudimos conectar. Inténtalo de
+  nuevo.» debajo); deshabilitado. Anatomía exacta: README de `@efeoncepro/axis-brand-assets` («The «Continuar con
+  Efeonce ID» button»); lámina «Botón «Continuar con Efeonce ID» · todos los estados» del canvas
+  `https://claude.ai/code/artifact/4e613ff0-2a09-48c6-8e98-4adffc6da9bd`.
+- **Regla que deja para toda la línea:** un símbolo hecho de letras no va antes de un texto que lo repite (el monograma
+  antes de «Continuar con Efeonce ID» se lee «ID Continuar con Efeonce ID»). Si el símbolo tiene que ir, va en su propio
+  lugar con forma de logo; si no, la marca entra como nombre después de «Continuar con».
+- **Nunca:** el monograma antes del texto ni al final de la frase (la esfera arriba se lee como aviso); la órbita sola a
+  la izquierda (a tamaño de botón parece recargar); el isotipo en su teja dentro del botón (pesado); el lockup de familia
+  con «ID» gris en el botón (a 1x pierde fuerza); el acento en el texto; el isotipo junto al nombre; el isotipo chico
+  sobre 32 px; un SVG editado o rearmado a mano.
+- **Cómo se produce:** archivos de `@efeoncepro/axis-brand-assets` 0.4.31 (12 SVG `efeonce-id-{logo,lockup,isotype,isotype-small}-{positive,negative,white}`)
+  y 0.4.32 (los 2 `button-lockup`), públicos en la página «Logotipos» del Lab. Se regeneran con
+  `node scripts/brand/build-efeonce-id-logos.mjs <directorio>` (14 SVG), se copian a `packages/brand-assets/assets/` y
+  `apps/lab/public/branding/` de AXIS y se sellan con `pnpm seal`. Greenhouse fija 0.4.25 (adopción: TASK-2014).
+- **Estado:** marca y botón aprobados; el botón **no está implementado** (falta la primitive en `axis-ui-primitives` y su
+  adopción en Rooms, Studio y Greenhouse); favicon en código sin release; prueba sin contexto a 16 px pendiente. QA en
+  [qa-checklist.md](qa-checklist.md#efeonce-id-marca-favicon-y-botón-2026-11-02).
+
+### A21. Pantallas de producto de Efeonce ID con La órbita (aprobadas 2026-11-02, en local sin release)
+
+> Decisión: [ledger.md](ledger.md) (2026-11-02, «Pantallas de Efeonce ID con La órbita»); corrección que fija el canon:
+> [lessons.md](lessons.md) (2026-11-02, «inventar figuras de órbita "con significado" rompe el canon»). Canvas aprobado
+> por el operador: `https://claude.ai/artifact/Ku11pKGyPsDceNw8DQxuv2` («Apruebo, implementa»).
+
+- **Qué cubre:** todas las pantallas de Efeonce Auth **salvo el login V4**, que conserva su diseño (escenario con
+  carrusel, §A12 y §A20): consentimiento (también multiorganización y app no verificada), step-up requerido, «Primero,
+  entra a tu cuenta», errores OAuth, error del acceso corporativo, segundo factor TOTP y su activación, enlace mágico
+  (enviado, confirmar, problema), invitación (confirmar, aceptada), acceso retirado, demasiados intentos, sesión iniciada
+  y cerrada. Es una superficie de producto de Efeonce ID, como Rooms (§A13); no abre la excepción del producto
+  Greenhouse de §A12.
+- **Composición:** panel con la órbita a un lado y el formulario o el mensaje centrado al otro. **El panel va sólo en
+  escritorio** (≥ 64 rem); en móvil no hay panel porque son pantallas rápidas (operador). Una sola esfera por pantalla.
+- **La órbita hace uno de dos trabajos, nada más:**
+  1. **Rodea un ícono de área del catálogo AXIS en reposo** (`resolveIcon`, voz Trazo; hoy seguridad, correo,
+     integración y reloj): anillo, arco corto de acento de 50° arriba a la izquierda con la esfera en la punta y halo
+     de 1,86 × el radio (paradas 0,13 / 0,03 / 0). Es la geometría de la órbita canónica de Rooms.
+  2. **Rodea una palabra** («Listo», «Hasta pronto», «De nuevo») con la órbita en reposo aprobada en Rooms: anillo
+     desnudo, y la esfera es el punto de la palabra.
+  Sin ícono del catálogo que calce, va una palabra o la pantalla va sin órbita; el glifo no se dibuja.
+- **Titular:** Bricolage con contraste de pesos (entrada liviana ≈ 340, clave 740). Con panel, el punto final es
+  tipeado (la esfera ya está en la órbita); sin panel (móvil), el punto del titular es la esfera, en `accentOnLight`
+  `#0e8c82`. **El teal nunca va en texto ni en fondos**; lectura y escritura se distinguen con el texto, no con color.
+- **Marca:** cuando la pantalla habla de Efeonce ID, va el **lockup oficial** de Efeonce ID, nunca el nombre en texto
+  (regla del operador, 2026-11-02). El isotipo de Rooms aparece sólo para el cliente first-party `efeonce-rooms-cli`
+  por id exacto (un id parecido registrado por DCR no lo hereda) y nunca dentro de la órbita.
+- **Nunca:** una medida, un loader o una cuenta regresiva que vacíe el anillo; varias esferas o puntos repetidos (uno
+  por dígito o por permiso); un anillo cortado, atenuado o con check; un logo dentro de la órbita; íconos dibujados a
+  mano, en la órbita o en los botones; un loop después de la entrada (anillo, arco, esfera, halo, y queda quieta).
+- **Familia en Rooms:** el fin de `pnpm rooms login` usa la misma familia en el repo `efeonce-rooms` (en producción
+  desde el PR #23): `/cli/conectado` con la palabra «Listo» y `/cli/error` con «Casi», ambas con la órbita en reposo
+  alrededor de la palabra y la fila «Acceso con» + lockup negativo de Efeonce ID (`src/components/orbit-word-stage.tsx`).
+- **Dónde vive el código (greenhouse-eo):** `src/lib/auth-server/oauth/pages/orbit-shell.ts` (`renderOrbitPanel` con
+  `{kind:'icon',glyph}` o `{kind:'word',lines}`, `orbitHeading`, `orbitBrand`), geometría desde
+  `efeonceGraphicLine.orbit` en `orbit-geometry.ts`, assets en `orbit-assets.generated.ts` (lo genera
+  `pnpm auth-server:brand-assets:generate`; nunca a mano), estilos `os-*` en `scripts/auth-server/orbit-shell-styles.ts`,
+  copy en `src/lib/copy/auth-server-orbit.ts`. Las restricciones del emisor siguen mandando: CSP `default-src 'none'`,
+  estilos por hash, sin atributos `style=`. Se itera en `pnpm auth-server:dev-ui` (`127.0.0.1:19036`).
+- **Estado:** implementado en `develop` (`d14b786d3`), sin push ni release; contraste verificado a 1440 y 390 px y
+  revisión en el arnés claro/oscuro. Sin GVC de producción ni flujo real contra el host. `auth-server` es el mismo
+  servicio del login MCP: sólo llega a `auth.efeonce.org` por release gobernado (skill `efeonce-auth`).
+
 ## B. Presentaciones e informes
 
 - **Teléfono (operador 2026-10-25, 0.5.9):** cabecera de perfil — retrato de 112 px a la izquierda y «Escribe», nombre y
@@ -1394,6 +1494,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Landing de servicio/agenda con el agendador nativo | órbita de retrato de Nexa en el hero | agendador real enmarcado, titulares con esfera (salvo el del hero), CTA `accent-growth`, firma del sitio | landing source-led + `<efeonce-meeting-scheduler>` · A17 |
 | Gráfico en un artículo del blog (web, 2026-10-25) | esfera sólo en el punto decisivo, una por pieza (en la Medida, la punta del arco) | acento sólo en la entidad decisiva, texto en tinta, panel papel con halo del Destacado claro, navy `#001a33` en oscuro, tabla HTML con los datos | `efeoncepro/chart` (plugin 0.9.0, ECharts; no es AXIS `charts`) · A18 |
 | Ficha de autor del blog (web) | pieza `portrait` de AXIS (la única esfera) | ficha oscura, nombre con punto tipeado en el acento, cargo, bio corta, isotipos oficiales de redes | `EO_Author_Profile` + `efeonce-editorial-blocks` · A19 |
+| Efeonce ID: favicon, encabezado del formulario y botón «Continuar con Efeonce ID» | ninguna (la órbita vive en la D de la marca) | isotipo chico en teja `#001a33` (favicon); lockup Efeonce \| ID en el encabezado; «Continuar con» + `button-lockup` en el botón; nunca el isotipo grande en el panel lateral del login | `efeonce-id-*` de `axis-brand-assets` 0.4.31/0.4.32 · A20 |
+| Pantallas de producto de Efeonce ID (todas salvo el login V4; en local sin release) | órbita alrededor de un ícono AXIS en reposo o de una palabra; una esfera; panel sólo en escritorio | titular Bricolage con contraste de pesos (punto tipeado con panel, esfera en móvil), lockup oficial de Efeonce ID, sin íconos a mano | `orbit-shell.ts` del `auth-server` · A21 |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Anuncio de alianza (post 4:5 + reel 9:16) | ninguna (la órbita fina sola no tiene punch) | fondo cine con horizonte bajo, íconos oficiales del partner en tres planos con acabado Sunburst, lockup «Efeonce \| Partner» con filete y fila de productos debajo; sin pregunta-respuesta | composición determinística + acabado `gpt-image-2.5-sunburst` · A16 |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |

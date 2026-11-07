@@ -1,0 +1,86 @@
+{
+  "tenderId": "K13-condiciones",
+  "slides": [
+    {
+      "slideId": "deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-2-of-5-growth"
+        },
+        "voice": {
+          "question": "Cada KPI, con su",
+          "answer": "Condición",
+          "eyebrow": "Condiciones de los KPIs"
+        },
+        "body": "Las bases ya condicionan el ROI y el ROAS (punto 6.3). Proponemos lo mismo para los KPIs de funnel.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Sin línea base",
+            "name": "Medición en el mes 1",
+            "how": "Costo por lead, conversión y MQL se miden en el Q1 antes de fijar la meta."
+          },
+          {
+            "risk": "Lead sin gestión",
+            "name": "Acuerdo con ventas",
+            "how": "Tiempo de respuesta y resultado registrado en el CRM para cada lead."
+          },
+          {
+            "risk": "Venta fuera de línea",
+            "name": "Conversiones offline",
+            "how": "Las cotizaciones y ventas del CRM vuelven a Google y LinkedIn."
+          },
+          {
+            "risk": "Ciclo largo",
+            "name": "Lectura por trimestre",
+            "how": "Lead-to-customer y retención se leen sobre el ciclo real de venta."
+          }
+        ],
+        "selection": {
+          "label": "Comercial",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk"
+    }
+  ]
+}

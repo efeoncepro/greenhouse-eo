@@ -1,16 +1,17 @@
 # Invitaciones Rooms: código y enlace en un solo correo
 
-Estado al 26 de octubre: un canary cloud real con un correo recibido PASS y cerrado; first-party/OTP OFF. Canon: [decisión](../../architecture/EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md). Dueños: TASK-2067 Auth y TASK-2066 Rooms.
+Estado al 1 de noviembre de 2026: first-party y OTP de invitación están ON en producción para Rooms
+(`auth-server-00170-qlx` al 100 %, tipo de correo `auth_server_rooms_invitation_otp` en `enabled=true`). Canon:
+[decisión](../../architecture/EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md). Dueños: TASK-2067 Auth y TASK-2066 Rooms.
 
 ## Límite operativo vigente
 
-El canary único ya comprobó Microsoft/MFA en el carril corporativo, OIDC y el recorrido invitado con PNG
-privado; el OTP por correo no se convierte por ello en MFA. Invitación revocada, sala archivada y sesiones
-cerradas. Auth `00168-vzb` al 100%, misma imagen, flags false, HMAC/authority ausentes, tipo de correo OFF;
-Resend production v1 y Sentry production. **No repetir el envío ni activar este recorrido.**
-PR #263/#264 de deploy siguen abiertas y retenidas. El YAML remoto aún conserva el riesgo develop/staging;
-[runbook y corte de CI](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
-El recorrido siguiente describe el contrato para una futura activación autorizada, no una operación disponible hoy.
+- El recorrido está disponible sólo para invitaciones de Rooms del piloto interno. **Ningún cliente real** recibe una
+  invitación sin una autorización nueva del operador y sin cerrar TASK-1833.
+- El canary único del 26 de octubre ya comprobó Microsoft/MFA en el carril corporativo, OIDC y el recorrido invitado con
+  PNG privado; está cerrado y no se repite como prueba de otro deploy. El OTP por correo no se convierte por ello en MFA.
+- El deploy productivo de Auth sólo sale de `main` y el tráfico va a la última revisión; antes de tocar flags o secretos,
+  revisa el [runbook](../../operations/runbooks/auth-server.md#estado-operativo--2026-11-01).
 
 ## Recorrido
 
@@ -20,7 +21,9 @@ El recorrido siguiente describe el contrato para una futura activación autoriza
 4. La persona abre `{RoomsOrigin}/invite#token=<opaque43>`. Rooms lee el fragmento en memoria, limpia la barra mediante history.replaceState y hace POST start con el token. La persona introduce el código **en Rooms**; abrir el enlace no envía otro correo. El bearer no viaja en path/query HTTP ni en Referrer y el código nunca va en la URL.
 5. Rooms llama a `/auth/invitations/email-otp/verify` y consume el proof firmado una sola vez junto con la invitación vigente. La sesión guest queda limitada a esa sala. Este flujo no crea SSO global ni equivale a MFA.
 
-El código vence a los diez minutos; los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
+El código vence a los diez minutos; si vence, la persona pide otro desde el mismo enlace («Enviarme un código nuevo»), sin
+que el equipo tenga que reinvitar. La invitación es mucho más larga que el código: 30 días por defecto y hasta 90 (PR #12 de
+Rooms, en producción desde el 2026-11-01; antes 24 horas), y la sesión del invitado dura 8 horas. Los intentos y reenvíos tienen límites agregados. Un fallo o resultado desconocido del proveedor no permite repetir automáticamente un correo con secreto. `accepted` significa aceptación del despacho, no entrega o lectura.
 
 ## Configuración de runtime
 

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "edition": {
+    "kind": "flash",
+    "slug": "images-2-6",
+    "title": "Images 2.6: nuestra prueba con Nexa",
+    "publishDate": "2026-11-05"
+  },
+  "news": [
+    {
+      "section": "tecnologia",
+      "headline": "Dos escenas cinematográficas y dos correcciones para poner a prueba Images 2.6",
+      "outlet": "Glitch · prueba propia",
+      "date": "2026-11-05",
+      "photo": {
+        "file": "pruebas-propias/plates/GF26-A.png",
+        "credit": "Imagen sintética: Efeonce · GPT Image 2.6 Sunburst",
+        "license": {
+          "kind": "generated",
+          "ref": "GF26-A-receipt"
+        },
+        "fractureEdge": "bottom",
+        "faceRegions": [
+          {
+            "x": 0.605,
+            "y": 0.08,
+            "w": 0.16,
+            "h": 0.29
+          }
+        ]
+      },
+      "pov": {
+        "entry": "La primera imagen",
+        "punch": "es sólo el comienzo"
+      },
+      "why": "Identidad, edición con markup y continuidad: mostramos nuestras salidas y lo que todavía necesita revisión."
+    }
+  ],
+  "cover": {
+    "photo": {
+      "file": "pruebas-propias/GF26-A-cover-source.png",
+      "credit": "Imagen sintética: Efeonce · GPT Image 2.6 Sunburst",
+      "license": {
+        "kind": "generated",
+        "ref": "GF26-A-receipt"
+      },
+      "fractureEdge": "bottom",
+      "faceRegions": [
+        {
+          "x": 0.605,
+          "y": 0.3081984334203655,
+          "w": 0.16,
+          "h": 0.21806788511749345
+        }
+      ]
+    },
+    "headline": {
+      "entry": "Probamos Images 2.6",
+      "punch": "con Nexa en acción"
+    },
+    "lines": [
+      {
+        "section": "tecnologia",
+        "text": "Dos escenas y dos correcciones"
+      },
+      {
+        "section": "marketing",
+        "text": "Prompts, tiempos y continuidad"
+      }
+    ]
+  },
+  "back": {
+    "closingLine": [
+      "la prueba completa",
+      "en nuestro blog."
+    ]
+  },
+  "outputs": {
+    "stills": [
+      "blog:banner"
+    ]
+  }
+}

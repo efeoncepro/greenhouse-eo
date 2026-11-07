@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "38e3b1e0cade",
+  "key": "38e3b1e0cade1dba1c592281f2219f1145ef973551a8b7df5337e915faf78264",
+  "status": "completed",
+  "createdAt": "2026-11-05T11:36:09.250Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/maestros/noticia-talara-img2-maestro.png",
+    "imageSha256": "acec450fedadc3ca0a1913e3aae07994d7839655fb599da0b22f49efa63869a2",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/noticia-talara-img2-mask.png",
+    "maskSha256": "8105eb1014e59671164b12b0ce5748e4411615abd5439f9c24de838e8b42c18f",
+    "maskConvention": "white-editable",
+    "width": 3840,
+    "height": 2160,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.5-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "the same plain white building facade above the windows, with nothing mounted on it; same light",
+    "providerPrompt": "the same plain white building facade above the windows, with nothing mounted on it; same light"
+  },
+  "mask": {
+    "touchedFraction": 0.009497733410493828,
+    "editable": 61686,
+    "soft": 17092,
+    "protected": 8215622
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 734,
+      "top": 109,
+      "width": 951,
+      "height": 646
+    },
+    "target": {
+      "width": 1248,
+      "height": 848
+    },
+    "aspectError": 0.0002976899261729018,
+    "reason": "la zona con contexto ocupa 7.4 % de la imagen: se genera recortada a 1248x848"
+  },
+  "estimate": {
+    "usd": 0.0364,
+    "basis": "1 × salida 1248x848 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 31.897,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": -5,
+        "scale": 1,
+        "stillError": 3.81,
+        "bestError": 3,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 8215622,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 61686,
+        "maxDelta": 150,
+        "meanDelta": 38.397,
+        "worst": {
+          "x": 1307,
+          "y": 455
+        }
+      },
+      "seam": {
+        "pixels": 17092,
+        "maxDelta": 120,
+        "meanDelta": 8.438,
+        "worst": {
+          "x": 1039,
+          "y": 501
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 8215622,
+        "maxDelta": 171,
+        "meanDelta": 0.681,
+        "worst": {
+          "x": 906,
+          "y": 402
+        }
+      },
+      "outputUsd": 0.0364,
+      "providerModel": "gpt-image-2.5-flare",
+      "usage": {
+        "input_tokens": 1087,
+        "input_tokens_details": {
+          "image_tokens": 1053,
+          "text_tokens": 34
+        },
+        "output_tokens": 1212,
+        "output_tokens_details": {
+          "image_tokens": 1212,
+          "text_tokens": 0
+        },
+        "total_tokens": 2299
+      },
+      "meta": {
+        "size": "1248x848",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

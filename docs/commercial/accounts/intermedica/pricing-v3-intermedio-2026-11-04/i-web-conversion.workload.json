@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "intermedica-i-web-conversion-2026-11-04-v1",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "150",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "intermedica:estimacion-capacidad-150-productivas-180-programadas",
+      "effectiveFrom": "2026-11-04",
+      "effectiveUntil": "2027-02-28",
+      "status": "estimated"
+    }
+  },
+  "drivers": [],
+  "fixedWork": [
+    {
+      "workId": "lead-brief",
+      "label": "Brief de oferta y revision por landing (2 x 2 h)",
+      "hoursPerMonth": "4",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-web-conversion:lead-brief",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "copy-landing",
+      "label": "Copy de 2 landings (2 x 4 h)",
+      "hoursPerMonth": "8",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-web-conversion:copy-landing",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "design-landing",
+      "label": "Diseno de 2 landings sobre sistema existente (2 x 6 h)",
+      "hoursPerMonth": "12",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-web-conversion:design-landing",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "web-build",
+      "label": "Construccion WordPress, responsive, CTA formulario/WhatsApp, publicacion (2 x 10 h)",
+      "hoursPerMonth": "20",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-web-conversion:web-build",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "workId": "tracking-landing",
+      "label": "Eventos y QA de medicion por landing (2 x 3 h)",
+      "hoursPerMonth": "6",
+      "source": {
+        "reference": "intermedica:alcance-intermedio-04nov:i-web-conversion:tracking-landing",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "lead",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "lead-brief",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "copy",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "copy-landing",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "design",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "design-landing",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "web",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "web-build",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    },
+    {
+      "lineId": "tracking",
+      "driverShares": [],
+      "fixedWorkShares": [
+        {
+          "workId": "tracking-landing",
+          "share": "1"
+        }
+      ],
+      "reason": "Bloques estimados por entregables del escenario intermedio; validar con responsable de practica."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.01"
+  }
+}

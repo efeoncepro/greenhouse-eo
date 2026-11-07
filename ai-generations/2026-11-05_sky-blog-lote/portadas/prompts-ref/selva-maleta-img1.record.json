@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "a large leaf with raindrops",
+ "sinPrimerPlano": null,
+ "borde": "lower-right corner",
+ "id": "selva-maleta",
+ "input": {
+  "id": "selva-maleta",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "a forest trail in the Peruvian Amazon",
+  "escena": "a damp earth trail between dense jungle vegetation with large leaves shining with water; a woman traveler in a light rain cape, long trousers and a small backpack walks away toward the back of the trail; fine raindrops visible in the air. It must read as Peruvian jungle with a passing shower, not a storm or a movie jungle",
+  "hora": "mid-afternoon",
+  "clima": "fine passing rain under a bright overcast sky, soft abundant light, open shadows, not darkened for drama",
+  "primerPlano": "a large leaf with raindrops",
+  "borde": "lower-right corner",
+  "refLugar": "Peruvian Amazon lowland vegetation along a trail",
+  "prohibir": "lightning or storm, extreme mud, visible animals, movie-style lianas, sunny sky",
+  "extra": "COMPOSITION, MEASURED: the woman walking away is small and farther along the trail: head to feet between 20% and 48% of the frame height, centred between 42% and 58% of the width. The lower half is the calm damp earth of the trail and the out-of-focus leaf, mid-dark, no bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive."
+ }
+}

@@ -23,6 +23,7 @@ privadas reautorizadas; omite referencias excluidas/huérfanas. Anclas temporale
 y duración medida. Puertos X-ray/CRM OFF y handoff `pending` no equivalen a proveedor conectado o envío.
 MCP stdio usa una sesión existente y toolsets explícitos; excluye transferencia binaria, OTP/login y
 OAuth/federación remota. La autoridad productiva no acepta un bearer nativo por inferencia de CLI/MCP.
+(Superado el 2026-11-02 para el bearer de Efeonce ID: ver [§ Bearer de agentes](#bearer-de-agentes-carril-cli-d1-bis).)
 
 Las familias de §1 siguen siendo el **contrato objetivo completo**, no nombres de endpoints disponibles;
 escenarios, equivalencia de la UI final y certificación integral conservan sus gates. Los apartados
@@ -32,6 +33,85 @@ no se aplicaron al cloud del corte8 de26Oct ni se revalidó el deployment remoto
 Entorno aislado construido y detenido; nueva interfaz Claude Design aún sin integrar/aceptar. Canary
 real26Oct ya cerrado, sin repetición. Auth retenido en PR263/264; producción y activación general
 no cambian. [Estado vivo](README.md).
+
+## Acceso interno y espacio de trabajo — vigente al 2026-11-01
+
+Contrato en producción (`efeonce-rooms` PR #9 y PR #10, TASK-2085). Complementa el
+[ADR de acceso interno durable](EFEONCE_ROOMS_DURABLE_INTERNAL_ACCESS_DECISION_V1.md), dueño de `members.*`.
+
+**Entrada sin sesión (307 en el proxy).** En `/rooms` y `/rooms/:roomId/actividad`, si la petición no trae ninguna
+cookie de sesión de Rooms (`__Host-rooms_session`, `rooms_session_local`, `__Host-rooms_guest`, `rooms_guest_local`),
+`src/proxy.ts` responde **307** a `/login?returnTo=<ruta>` antes de que la página haga streaming. Sólo se conserva
+`?accion=` cuando es un id válido; cualquier otro parámetro se descarta. Cabeceras: `Cache-Control: private,
+no-store`, `Referrer-Policy: no-referrer`, `Vary: Cookie`. El proxy mira sólo la **presencia** de la cookie: la
+autoridad sigue en `homeGate` de la página, así que una cookie vencida o inválida llega a la página y ésta decide.
+Lógica pura en `src/server/agents/anonymous-entry.ts` (`hasRoomsSession`, `anonymousEntryRedirect`); prueba
+`tests/auth-anonymous-entry.test.ts`. Antes, `src/app/rooms/loading.tsx` se pintaba primero y `redirect()` viajaba por
+RSC (HTTP 200 y «Cargando la sala…»): [ISSUE-188](../../issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md).
+
+**Nombre legible del espacio.** Rooms crea `organization_id` y es dueño de sus miembros; el nombre es el perfil único
+de esa organización, no una identidad paralela.
+
+| Pieza | Contrato |
+|---|---|
+| Tabla | `rooms.organization_profiles(organization_id text PK, display_name text NOT NULL, updated_at timestamptz)`. `display_name` recortado y de 1 a 80 caracteres (CHECK). Sin FK. `rooms_runtime` tiene `SELECT`, `INSERT` y `UPDATE(display_name, updated_at)`; nada para `PUBLIC`. Migración `1793267000000_rooms-organization-profile` con guarda anti pre-up-marker; su down se niega si hay nombres guardados. |
+| Command | `organization.rename { displayName }` (versión 1), capacidad `members.manage` sobre la organización. Upsert del perfil y recibo de command (`rooms.command_receipts`) como traza con el actor. Misma `Idempotency-Key` y mismo nombre = `replayed: true`; misma clave con otro nombre = `conflict`. Sin `members.manage` = `not_found` (no revela si la organización existe); nombre vacío o mayor a 80 = `invalid_input`; sin sesión = `unauthenticated`. Recibo: `{ operation, organizationId, displayName, replayed }`. |
+| Paridad | API `POST /api/v1/commands`, SDK (`organizationCommandSchemas`), CLI `pnpm rooms execute --operation organization.rename`, MCP stdio en el toolset `members` (nunca en `all`) y catálogo del carril de agentes con clase `author` (`efeonce.mcp.rooms.author`). |
+| Lectura | `profile.get` devuelve `organizationName`. El encabezado (`product-frame.tsx`) y el selector de contexto leen `organizationNames(ids)` sólo con ids de la propia sesión (máximo 50); si falta el nombre o la base no responde devuelve `{}` y la superficie cae al rótulo genérico «Espacio de trabajo». El nombre nunca bloquea la entrada. |
+| Herramienta administrativa | `pnpm access:rename-organization --organization ORG --principal ID --name "…" --agent CLIENT_ID [--apply]` y su variante `pnpm access:production rename-organization …`. Ejecuta el mismo command como el principal interno indicado, cuyo `members.manage` se relee de la base, dentro de `runWithActor({ actorKind: 'agent', channel: 'cli' })`. En seco imprime el nombre actual y el nuevo. [Manual](../../manual-de-uso/rooms/nombrar-espacio-de-trabajo.md). |
+
+Gate de migraciones: toda migración nueva entra en `REVIEWED_MIGRATIONS` (`scripts/design-integration/config.ts`) en el
+mismo PR; `tests/integration-env.test.ts` exige que coincida exactamente con `migrations/*.sql`
+([ISSUE-187](../../issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
+
+## Bearer de agentes (carril CLI, D1-bis)
+
+Vigente al 2026-11-02. Contrato en producción y encendido (`efeonce-rooms` PR #22 y PR #23; TASK-2087 del lado Rooms, TASK-2095 del lado
+Efeonce ID). Decisión: [enmienda D1-bis](EFEONCE_ROOMS_AGENT_LANE_DECISION_V1.md#enmienda-d1-bis--carril-cli-directo-2026-11-01).
+Un agente (Claude Code, Codex) opera Rooms con el login de una persona interna, sin principal propio. La forma
+delegada del gateway (D1 original, con `act`) sigue pendiente: TASK-2086 y TASK-2088.
+
+**Quién emite.** Efeonce ID, segunda audiencia `https://efeonce-rooms.vercel.app/api/v1`, cliente público
+`efeonce-rooms-cli` (authorization code + PKCE S256 por loopback, refresh rotativo con detección de reuso). Access
+token JWT de 300 s. Las clases y la derivación de la audiencia viven en el
+[contrato OAuth de Efeonce ID](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
+
+**Descubrimiento (RFC 9728).** `GET /.well-known/oauth-protected-resource` responde 200 con la audiencia, el emisor y
+el cliente de la CLI cuando el carril está encendido, y 404 cuando está apagado.
+
+**Verificación** (`src/server/agents/bearer.ts`, falla cerrado en cualquier paso):
+
+| Paso | Regla |
+| --- | --- |
+| Firma | JWKS del emisor; `iss`, `aud` (= `ROOMS_AGENT_AUDIENCE`) y `exp` |
+| Cliente | `azp` dentro de `ROOMS_AGENT_CLI_CLIENT_IDS`; un token con `act` se rechaza (la forma delegada todavía no existe) |
+| Introspección | RFC 7662 con el cliente confidencial `efeonce-rooms-resource`, que solo ve activos los tokens de su audiencia. Caché de 30 s como máximo: revocar en Efeonce ID corta en menos de 30 s |
+| Persona | `sub` → `rooms.identity_bindings(issuer, subject)` con principal `internal` (`internalPrincipalFor`). Misma autoridad que la cookie de esa persona; sin binding vigente no hay acceso |
+| Clase | Cada ruta y cada operación exige su clase (`read`, `author`, `release`, `access`; `assertBearerOperation`). El scope recorta la autoridad de la persona, nunca la amplía. Falta de clase = **403** |
+
+**Espacio.** El header `X-Rooms-Organization` (opción `--organization` en la CLI) elige el espacio de trabajo. Solo
+intersecta las organizaciones de la persona; nunca las amplía.
+
+**Canal y precedencia.** Un bearer fuerza el canal `cli` (con `X-Rooms-Agent` para el nombre del agente), así que la
+atribución, los avisos, las reversas y las cuotas de TASK-2084 aplican igual. Si la petición trae cookie de sesión de
+Rooms, **gana la cookie** y el bearer se ignora.
+
+**Variables de entorno de Rooms:**
+
+| Variable | Uso |
+| --- | --- |
+| `ROOMS_AGENT_LANE_ENABLED` | Interruptor. Sin él, Rooms rechaza todo bearer y la metadata responde 404; la cookie sigue igual |
+| `ROOMS_AGENT_AUDIENCE` | Audiencia esperada en `aud` |
+| `ROOMS_AGENT_CLI_CLIENT_IDS` | Lista de `azp` aceptados (`efeonce-rooms-cli`) |
+| `ROOMS_AGENT_INTROSPECTION_CLIENT_ID` | Cliente de introspección (`efeonce-rooms-resource`) |
+| `ROOMS_AGENT_INTROSPECTION_CLIENT_SECRET_SECRET_REF` | En producción, referencia al secreto `rooms-production-agent-introspection-client-secret`. En local se usa el secreto crudo |
+
+Interruptores: `ROOMS_AGENT_LANE_ENABLED=false` en Rooms, suspender `efeonce-rooms-cli` en Efeonce ID o vaciar
+`AUTH_SERVER_ROOMS_AUDIENCE`. Estado por entorno en el
+[ledger de flags](../../operations/FEATURE_FLAG_STATE_LEDGER.md). Pruebas: `tests/agent-bearer.test.ts` y
+`tests/agent-cli-login.test.ts`. En local, `pnpm integration:up` emite tokens con un emisor propio
+(`scripts/design-integration/agent-issuer.ts`). Uso desde la CLI y el MCP stdio:
+[guía de conexión](../../documentation/rooms/backend-api-for-claude-design.md).
 
 ## 1. Paridad por capacidad
 
@@ -98,7 +178,7 @@ La apariencia propia de Rooms consume La órbita según la [dirección visual](.
 
 ## 4. Identidad y acceso
 
-Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. La federación MCP remota mantiene el gateway como adapter, sin transferirle las políticas Rooms; el adapter stdio local reutiliza sesión HTTP existente (§Corte vigente).
+Operadores internos: Efeonce ID y autoridad delegada verificable. El organizationId enviado por el cliente solo intersecta el ámbito del principal; jamás lo amplía. Revocación/expiración vence sobre roles nominales. La federación MCP remota mantiene el gateway como adapter, sin transferirle las políticas Rooms; el adapter stdio local reutiliza el login de `pnpm rooms login` o, si se pasa `--session-file`, la sesión HTTP existente ([§ Bearer de agentes](#bearer-de-agentes-carril-cli-d1-bis)).
 
 Compradores: principal externo limitado a la sala, mediante invitación y sesión verificadas. El canje enlace+código y su sesión local guest se rigen por el [ADR OTP](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md) y el [contrato de invitación](EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md); el alcance actual está en la guía de conexión, sin sesión interna ni SSO por OTP. Un vínculo compartido no concede por defecto acceso a toda la cuenta ni a notas privadas. Modo público de muestra exige publicación explícita independiente de una sala privada.
 
@@ -170,6 +250,13 @@ API/CLI y recovery mixto verificados; no editor ni nueva publicacióncloud.
 R04 se divide en consumerOIDC interno2065 y guest invitations2066. Foundationissuer1834 y loginV42064
 son deAuth; OTP2067 se rige por [ADR correo único](../EFEONCE_AUTH_INVITATION_EMAIL_OTP_DECISION_V1.md).
 Cada room conserva ID estable; cada invitación tiene token opaco revocable, destinatario/version/vigencia.
+
+**Vigencias de la invitación (PR #12 de `efeonce-rooms`, en producción desde el 2026-11-01):** la invitación sigue la vida de
+una propuesta B2B: 30 días por defecto y tope de 90 (`INVITATION_MAX_LIFETIME_DAYS`), siempre acotada por la autoridad de
+quien invita y revocable. El enlace solo nunca autentica: cada entrada pide un código de 10 minutos al correo del
+destinatario, con reenvío por autoservicio. La sesión del invitado dura 8 horas (tope de configuración 12 h; migración
+`1793268000000` amplía el CHECK de `rooms.invitation_sessions`) y cada uso relee estado, versión y autoridad. Antes el tope era
+24 horas para la invitación y 15 minutos (máximo 1 h) para la sesión.
 UN correo Resend contiene enlace y código; Rooms muestra input y verifica S2S. No se presenta como MFA ni
 sesión SSOglobal; proof delissuer tieneaud/RP/invitación/nonce/jti y consumoúnico local. El rol invitado sólo
 lee publicado autorizado. Identidad propia para operador usa OIDC y bindingexplícito, nunca tokensMCP.

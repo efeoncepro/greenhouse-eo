@@ -1,9 +1,9 @@
 # Home de Efeonce — «La órbita»
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-10-29 por Claude
-> **Ultima actualizacion:** 2026-10-29 por Claude
+> **Ultima actualizacion:** 2026-11-04 por Claude
 > **Documentacion tecnica:** [HOME_INICIO_ELEMENTOR_MODULES_V1.md](../../architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md)
 > **Manual:** [operar-home-efeonce.md](../../manual-de-uso/public-site/operar-home-efeonce.md)
 
@@ -90,6 +90,31 @@ Inspector y en Facebook Sharing Debugger.
 
 > Detalle técnico: [SEO y social](../../architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md#seo-y-social).
 
+## Cómo la lee Google (datos estructurados)
+
+Además de lo que ve una persona, cada página del sitio lleva una ficha oculta que le explica a Google qué es la página.
+Una parte de esa ficha es la **ruta de exploración** (el «breadcrumb»): el camino desde la portada hasta la página,
+por ejemplo «Portada › Blog › Artículo». La arma Yoast, el plugin de SEO del sitio.
+
+**Qué pasó el 2026-11-04.** Search Console mandó tres correos iguales avisando «Falta el campo "item"» en las rutas de
+exploración de `efeoncepro.com`. Probablemente son tres porque el sitio está registrado en Search Console más de una
+vez (no está confirmado). El problema estaba sólo en la portada: como es el inicio del camino, su ruta tiene un único
+paso («Portada») y Yoast no le ponía la dirección. Google acepta que el **último** paso de una ruta larga no lleve
+dirección (es la página donde ya estás), pero un paso único es primero y último a la vez, y ahí la dirección es
+obligatoria. Se revisaron las 113 páginas del sitio: el resto estaba bien.
+
+**Qué se corrigió.** Se instaló en el sitio un pequeño ajuste permanente que, cuando una ruta tiene un solo paso, le
+agrega la dirección de la página. En la portada ahora dice que «Portada» es `https://efeoncepro.com/`. Las rutas de
+varios pasos no cambian. Una nueva revisión de las 113 páginas no encontró problemas.
+
+**Qué significa el aviso y qué falta.** No afectaba lo que ven las personas ni impedía que la portada apareciera en
+Google; sólo hacía que Google no pudiera usar esa ruta para mostrarla en los resultados. Falta que alguien con acceso a
+Search Console pulse «Validar corrección» en el informe de Rutas de exploración de cada propiedad que avisó; Google
+tarda días en confirmar. Si llega otro aviso de este tipo, el procedimiento está en el manual
+[responder un aviso de datos estructurados](../../manual-de-uso/public-site/responder-aviso-datos-estructurados-search-console.md).
+
+> Detalle técnico: [Delta 2026-11-04 — `BreadcrumbList` de un solo elemento](../../architecture/public-site/HOME_INICIO_ELEMENTOR_MODULES_V1.md#delta-2026-11-04--breadcrumblist-de-un-solo-elemento).
+
 ## Lo que se quitó
 
 - El cierre de marca del diseño (logo en órbita, «Empower your Growth» y «Desde Santiago, operando en…») no se
@@ -100,5 +125,7 @@ Inspector y en Facebook Sharing Debugger.
 
 ## Pendientes
 
+- En Search Console, «Validar corrección» del aviso de rutas de exploración del 2026-11-04 (ver
+  [Cómo la lee Google](#cómo-la-lee-google-datos-estructurados)).
 - La velocidad de carga medida con PageSpeed y los datos de experiencia real de Google no se han medido todavía.
 - Ver el [backlog global del sitio](../../audits/public-site/2026-10-29-home-orbita-rediseno-y-seo.md#backlog-global).

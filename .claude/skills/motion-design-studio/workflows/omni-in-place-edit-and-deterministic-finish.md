@@ -2,6 +2,8 @@
 
 > **Estado:** validado sólo para ajustes editoriales que no cambian la verdad física del plano. La recuperación Glitch V2 (2026-07-11) delimita una excepción importante.
 >
+> **Delta 2026-11-05 — Omni 1.2 (default de la CLI):** `--task edit` acepta un MP4 fuente de hasta 15 s (la salida conserva su duración) y hasta 2 imágenes de referencia; `--previous <interaction-id>` permite editar sobre el clip del turno anterior sin volver a subirlo (retención 7 días; sin canary live). `--model 1.1` mantiene el contrato que sigue. Ninguna edición 1.2 se ha corrido aún en esta CLI.
+>
 > **Contrato vigente 2026-09-24 — Omni 1.1:** la CLI `pnpm ai:omni --task edit` usa Cloud Interactions, ADC y MP4 existente; no requiere que la fuente haya sido generada por Omni. Entrada de hasta 10 s; edición hereda duración/aspecto y envía resolución. Ver `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` y su ADR. Los canaries de 360p prueban cableado, no fidelidad de campaña. No asumir máscaras, región inmutable, silencio garantizado o turnos stateful: no están verificados por esa CLI. La nota de julio siguiente se conserva sólo como historia de otra versión.
 >
 > **Historia, contrato anterior (2026-07-20):** la **edición Omni migró a la Interactions API** y ahora vive **solo en la superficie Gemini-key** (`generativelanguage.googleapis.com/v1beta/interactions?key=…`), con `previous_interaction_id` + `store:true`. La **Vertex KEYLESS no edita** (`previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`) — sirve solo generación. El piloto Glitch (`@google/genai` con `vertexai:true` sobre `generateContent`) usó un camino **ya retirado**; el aprendizaje operativo (clasificar el cambio, gate temporal, finish determinista) **sigue vigente**, pero el contrato de invocación cambió. Ver `../efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
@@ -50,7 +52,7 @@
 
 1. Verificar duración, fps, dimensiones, audio y hash del master. Guardar un export de rollback.
 2. Escribir un prompt de una sola intención: **qué cambia, cuándo cambia, qué se preserva y qué no debe aparecer**. No combinar cámara, anatomía, estilo, señal y tipografía en un mismo pedido.
-3. Para Omni 1.1 usa la CLI Cloud actual y su manual, `--task edit`, MP4 local de hasta 10 s y resolución declarada. Ejecuta `--estimate` antes de aprobar gasto; conserva ID/estado para recuperar sin volver a enviar POST. El contrato Gemini-key/stateful del encabezado es histórico y no se aplica a este carril.
+3. Usa la CLI Cloud actual y su manual, `--task edit`, MP4 local de hasta 15 s en 1.2 (10 s con `--model 1.1`) y resolución declarada. Ejecuta `--estimate` antes de aprobar gasto; conserva ID/estado para recuperar sin volver a enviar POST. El contrato Gemini-key/stateful del encabezado es histórico y no se aplica a este carril.
 4. Para `task:'edit'`, **no enviar `response_format.aspect_ratio`**: devolvió `400 Aspect ratio cannot be set in response format for edit task`. El edit preserva el aspect del input.
 5. Extraer video sólo de `steps[type='model_output'].content[type='video']`; no recorrer recursivamente la interacción, porque podrías escribir el video de entrada como falso output.
 

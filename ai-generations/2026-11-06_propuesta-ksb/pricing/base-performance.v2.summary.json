@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": "pricing-v3-composition-summary/1",
+  "version": "pricing-v3-resource-composition/1",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "calculationId": "composition-7d1fd06e8c1e703f3ae19438",
+  "replayDigest": "7d1fd06e8c1e703f3ae19438747794295b9d7b2698ea5b9d7f419f11fd850a85",
+  "calculationStatus": "calculated",
+  "reviewStatus": "requires_review",
+  "quoteReviewStatus": "requires_review",
+  "engineVersion": "pricing-v3-local/1.3.0",
+  "totals": {
+    "cost": "13727184",
+    "marketAdjustment": "0",
+    "engagementAdjustment": "0",
+    "undiscountedPrice": "30720000",
+    "roundingAdjustment": "215148",
+    "discount": "0",
+    "uplift": "0",
+    "net": "30720000",
+    "marginAmount": "16992816",
+    "marginRate": "0.5531515625",
+    "tax": null,
+    "grandTotal": null,
+    "cashCommitment": "13727184",
+    "averageMonthlyNet": "2560000",
+    "currency": "CLP"
+  },
+  "commercialAdjustments": [],
+  "priceRounding": {
+    "currency": "CLP",
+    "multiple": "10000",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "rounding:CLP",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "engagementForm": {
+    "form": "on_going",
+    "priceRatio": "1",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "engagement:on_going",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marginRateRoundedDown": "0.553151",
+  "diagnostics": [],
+  "assumptions": [
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.cuenta.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.paid.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.leadgen.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    },
+    {
+      "code": "DEDICATION_ESTIMATED",
+      "path": "lines.analitica.dedicationEvidence",
+      "detail": "The dedication of this line is an estimate: the cost it governs is counted as estimated."
+    }
+  ],
+  "periods": [
+    {
+      "periodId": 1,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 2,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 3,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 4,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 5,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 6,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 7,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 8,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 9,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 10,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 11,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    },
+    {
+      "periodId": 12,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "1143932",
+        "marketAdjustment": "0",
+        "engagementAdjustment": "0",
+        "undiscountedPrice": "2560000",
+        "roundingAdjustment": "17929",
+        "discount": "0",
+        "uplift": "0",
+        "net": "2560000",
+        "marginAmount": "1416068",
+        "marginRate": "0.5531515625",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "1143932",
+        "uniformMonthlyNet": "2560000"
+      }
+    }
+  ],
+  "reviewSignals": [
+    {
+      "code": "HISTORICAL_ONLY",
+      "severity": "review",
+      "count": 12,
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "lineIds": [],
+      "paths": [
+        "snapshot.mode"
+      ]
+    },
+    {
+      "code": "ESTIMATED_SOURCE",
+      "severity": "review",
+      "count": 156,
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "lineIds": [
+        "cuenta",
+        "paid",
+        "leadgen",
+        "analitica"
+      ],
+      "paths": [
+        "request.lines.0.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-0",
+        "snapshot.resources.fee:ECG-016",
+        "request.lines.1.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-1",
+        "snapshot.resources.fee:ECG-008",
+        "request.lines.2.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-2",
+        "snapshot.resources.fee:ECG-021",
+        "snapshot.resources.composed:zapier",
+        "request.lines.3.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-3",
+        "snapshot.resources.fee:ECG-031"
+      ]
+    }
+  ],
+  "marginFloor": {
+    "source": "kernel:MARGIN_BELOW_FLOOR",
+    "flaggedLinePeriods": 0,
+    "lines": []
+  },
+  "toolSelections": {
+    "counts": {
+      "rows": 1680,
+      "included": 108,
+      "clientProvided": 0,
+      "explicitlyExcluded": 0,
+      "notRequiredForWork": 1572
+    },
+    "included": [
+      {
+        "lineId": "cuenta",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "cuenta",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "paid",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "paid",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "leadgen",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "leadgen",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "leadgen",
+        "toolId": "zapier",
+        "reasons": [
+          "task:crm-automation"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "analitica",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "lineId": "analitica",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      }
+    ],
+    "clientProvided": [],
+    "explicitlyExcluded": []
+  },
+  "attributions": [
+    {
+      "toolId": "notion",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "4",
+      "serviceShare": "0.09",
+      "fullMonthlyCost": "96",
+      "attributedMonthlyCost": "8.64",
+      "unallocatedMonthlyCost": "87.36",
+      "consumerCount": 4,
+      "lineIds": [
+        "cuenta",
+        "paid",
+        "leadgen",
+        "analitica"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "4",
+      "serviceShare": "0.09",
+      "fullMonthlyCost": "58.8",
+      "attributedMonthlyCost": "5.292",
+      "unallocatedMonthlyCost": "53.508",
+      "consumerCount": 4,
+      "lineIds": [
+        "cuenta",
+        "paid",
+        "leadgen",
+        "analitica"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "toolId": "zapier",
+      "priceId": "historical",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "1",
+      "serviceShare": "1",
+      "fullMonthlyCost": "49",
+      "attributedMonthlyCost": "49",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 1,
+      "lineIds": [
+        "leadgen"
+      ],
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  ],
+  "creditBudgets": [],
+  "resourceIncrementalCash": [],
+  "cashLedger": [
+    {
+      "key": "human-monthly-and-once",
+      "amount": "1143932",
+      "currency": "CLP",
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    }
+  ],
+  "cashMeaning": "Kernel cashCommitment is attributed modeled commitment, not incremental purchase or an invoice. Incremental cash here covers only declared credit top-ups; seat procurement is not inferred.",
+  "estimateExposure": {
+    "basis": "Shares of the frozen cost components; nothing is recalculated. marginRateLostIfTenPctHigher = 0.10 x costAtRisk / net.",
+    "currency": "CLP",
+    "totalCost": "13727184",
+    "net": "30720000",
+    "estimatedCost": "13560000",
+    "confirmedCost": "167184",
+    "estimatedShareOfCost": "0.987821",
+    "dedicationNotEvidenced": {
+      "lineIds": [],
+      "cost": "0",
+      "shareOfCost": "0.000000"
+    },
+    "priceInputs": [],
+    "estimatedRules": [
+      {
+        "kind": "allocation_policy",
+        "side": "cost",
+        "ids": [
+          "allocation:shared"
+        ],
+        "lineIds": [
+          "cuenta",
+          "paid",
+          "leadgen",
+          "analitica"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "humanCostGoverned": "10620000",
+        "billedFteSetByRuleOn": []
+      },
+      {
+        "kind": "pricing_policy",
+        "side": "price",
+        "ids": [
+          "pricing:ECG-016:performance-commerce-distribution",
+          "pricing:ECG-008:performance-commerce-distribution",
+          "pricing:ECG-021:performance-commerce-distribution",
+          "pricing:ECG-031:performance-commerce-distribution"
+        ],
+        "lineIds": [
+          "cuenta",
+          "paid",
+          "leadgen",
+          "analitica"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      }
+    ],
+    "costInputs": [
+      {
+        "kind": "dedication",
+        "id": "paid",
+        "label": "Paid Media Manager",
+        "lineIds": [
+          "paid"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "5580000",
+        "shareOfCost": "0.406493",
+        "marginRateLostIfTenPctHigher": "0.018165"
+      },
+      {
+        "kind": "dedication",
+        "id": "cuenta",
+        "label": "Project Manager/Account Manager",
+        "lineIds": [
+          "cuenta"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "2040000",
+        "shareOfCost": "0.148610",
+        "marginRateLostIfTenPctHigher": "0.006641"
+      },
+      {
+        "kind": "dedication",
+        "id": "leadgen",
+        "label": "Marketing Automation Specialist",
+        "lineIds": [
+          "leadgen"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "1920000",
+        "shareOfCost": "0.139868",
+        "marginRateLostIfTenPctHigher": "0.006250"
+      },
+      {
+        "kind": "dedication",
+        "id": "analitica",
+        "label": "Analista de Implementación GA4/GTM/Looker",
+        "lineIds": [
+          "analitica"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "1080000",
+        "shareOfCost": "0.078676",
+        "marginRateLostIfTenPctHigher": "0.003516"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-008",
+        "label": "Historical generic platform fee — ECG-008",
+        "billing": "month",
+        "recordId": "fee:ECG-008",
+        "lineIds": [
+          "paid"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.042835",
+        "marginRateLostIfTenPctHigher": "0.001915"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-016",
+        "label": "Historical generic platform fee — ECG-016",
+        "billing": "month",
+        "recordId": "fee:ECG-016",
+        "lineIds": [
+          "cuenta"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.042835",
+        "marginRateLostIfTenPctHigher": "0.001915"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-021",
+        "label": "Historical generic platform fee — ECG-021",
+        "billing": "month",
+        "recordId": "fee:ECG-021",
+        "lineIds": [
+          "leadgen"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.042835",
+        "marginRateLostIfTenPctHigher": "0.001915"
+      },
+      {
+        "kind": "platform_fee",
+        "id": "fee:ECG-031",
+        "label": "Historical generic platform fee — ECG-031",
+        "billing": "month",
+        "recordId": "fee:ECG-031",
+        "lineIds": [
+          "analitica"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.042835",
+        "marginRateLostIfTenPctHigher": "0.001915"
+      },
+      {
+        "kind": "tool",
+        "id": "zapier",
+        "priceId": "historical",
+        "label": "Zapier",
+        "billing": "month",
+        "lineIds": [
+          "leadgen"
+        ],
+        "periodIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "costAtRisk": "588000",
+        "shareOfCost": "0.042835",
+        "marginRateLostIfTenPctHigher": "0.001915"
+      }
+    ]
+  },
+  "fullDetail": "Derived from the frozen composition artifact. Every selection row, attribution assignment, kernel line with its cost components, per-period diagnostic and credit plan lives in that file under semantic.result."
+}

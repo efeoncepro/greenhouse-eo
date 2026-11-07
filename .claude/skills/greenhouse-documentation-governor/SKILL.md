@@ -168,6 +168,13 @@ Use this matrix to choose the smallest complete update set.
   `docs/architecture/agent-invariants/*` companion + a 1-2 line pointer; then run
   `pnpm claude-md check`. The router (not re-accretion) is how `CLAUDE.md` stays
   loadable by subagents.
+- Never add a router row to `CLAUDE.md` as a summary of its rules: a new row is a short
+  pointer to its skill/doc, written after the detail exists there. Never compact a
+  baseline line (`27ce06a11`) unless its exact text already lives in its destination
+  doc/skill — the rule-audit checks reachability verbatim (2026-11-04: router rows
+  pushed it to 35.321 tokens and failed CI; a GVC-bullet compaction left 1 orphan and
+  was reverted). Run `pnpm claude-md check` before committing any `CLAUDE.md` change.
+  Lesson: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md` (Delta 2026-11-04).
 - Never use `Handoff.md` as the canonical architecture source.
 - Never reintroduce `## Delta YYYY-MM-DD` sections in `project_context.md` or
   full session history in the root handoff/archive index.

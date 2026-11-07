@@ -1,0 +1,18 @@
+### Result
+[{"width":390,"scrollWidth":390,"embeds":[{"w":358,"h":201.375,"ratio":1.7777777777777777},{"w":358,"h":89.5,"ratio":4}]},{"width":1440,"scrollWidth":1440,"embeds":[{"w":1112,"h":625.5,"ratio":1.7777777777777777},{"w":1112,"h":278,"ratio":4}]}]
+### Ran Playwright code
+```js
+await (async (page) => {
+ await page.locator('.entry-content iframe[src*="player.vimeo.com"]').evaluateAll(frames=>frames.forEach(f=>{f.style.aspectRatio=f.width+'/'+f.height;f.style.width='100%';f.style.height='auto'}));
+ const metrics=[];
+ for(const width of [390,1440]){
+  await page.setViewportSize({width,height:900});
+  metrics.push(await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,embeds:[...document.querySelectorAll('.entry-content iframe[src*="player.vimeo.com"]')].map(f=>{const r=f.getBoundingClientRect();return{w:r.width,h:r.height,ratio:r.width/r.height}})})));
+ }
+ return metrics;
+})(page);
+```
+
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "node-linker". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

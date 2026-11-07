@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "60190203298",
+      "labels": [
+        "Primary"
+      ],
+      "labelsDisplay": "Primary",
+      "associationTypes": [
+        {
+          "category": "HUBSPOT_DEFINED",
+          "typeId": 5,
+          "label": "Primary",
+          "fromObjectTypeId": null,
+          "toObjectTypeId": null
+        },
+        {
+          "category": "HUBSPOT_DEFINED",
+          "typeId": 341,
+          "fromObjectTypeId": null,
+          "toObjectTypeId": null
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "next": null
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "workbench.surface-color.v1",
+  "targetHex": "#304F74",
+  "seeds": [
+    [
+      0.15,
+      0.1
+    ],
+    [
+      0.35,
+      0.15
+    ],
+    [
+      0.5,
+      0.3
+    ],
+    [
+      0.2,
+      0.4
+    ],
+    [
+      0.4,
+      0.45
+    ]
+  ],
+  "coverage": 0.2526,
+  "hue": 22,
+  "zone": [
+    [
+      0,
+      0
+    ],
+    [
+      0.555,
+      0
+    ],
+    [
+      0.555,
+      0.55
+    ],
+    [
+      0,
+      0.6
+    ]
+  ],
+  "deltaEBefore": 0.93,
+  "deltaEAfter": 0.25,
+  "medianBefore": "#314D72",
+  "medianAfter": "#304F74",
+  "method": "mediana de la superficie llevada al color objetivo en Lab; desplazamiento aditivo ponderado por la luz local (conserva sombra, sol y textura)",
+  "note": "La superficie se mide por su mediana: zonas en sombra o con sol directo se ven más oscuras o más claras que el chip, como en una foto real.",
+  "brandId": "berel",
+  "color": {
+    "name": "Azul Campeón",
+    "code": "432N",
+    "hex": "#304F74"
+  },
+  "input": "n3b.png",
+  "output": "n3b-a.png"
+}

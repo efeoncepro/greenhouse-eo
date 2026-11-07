@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "258752402470",
+      "properties": {
+        "country": "Peru",
+        "createdate": "2026-10-28T21:26:36.567Z",
+        "efeonce_prospecting_contact_kind": "individual_email",
+        "efeonce_prospecting_researched_on": "2026-10-28",
+        "email": "nsuarez@mindfullywellness.pe",
+        "firstname": "Nikol",
+        "hs_linkedin_url": "https://www.linkedin.com/in/nikolsuarez-sales-marketing/",
+        "hs_marketable_status": "false",
+        "hs_object_id": "258752402470",
+        "hubspot_owner_id": "75788512",
+        "jobtitle": "Marketing Coordinator",
+        "lastmodifieddate": "2026-10-28T21:26:54.436Z",
+        "lastname": "Suarez",
+        "lifecyclestage": "opportunity"
+      },
+      "createdAt": "2026-10-28T21:26:36.567Z",
+      "updatedAt": "2026-10-28T21:26:54.436Z",
+      "archived": false,
+      "url": "https://app.hubspot.com/contacts/48713323/record/0-1/258752402470"
+    }
+  ]
+}

@@ -31,7 +31,7 @@ La visibilidad del botón y su inicio de Microsoft se verificaron en el host pú
 `21aa12608`. Ese corte histórico no incluía la nueva prueba humana directa; el canary MCP anterior entró desde OAuth.
 El 26 de octubre, el canary conjunto Rooms sí acreditó Microsoft/MFA y emisión/consumo first-party, sin ampliar
 la cohorte ni los permisos MCP. Quedó cerrado y first-party/OTP volvió a OFF. No generalizar esa evidencia
-a todos los clientes ni repetir el correo del canary. [Estado vigente](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26). La ruta local `/start` usada en pruebas era
+a todos los clientes ni repetir el correo del canary. [Estado vigente](../../operations/runbooks/auth-server.md#estado-operativo--2026-11-01). La ruta local `/start` usada en pruebas era
 un helper temporal de verificación, no una pantalla del producto ni una URL para usuarios.
 
 Si el botón falta, soporte debe comprobar el flag interno y la revisión servida antes de pedirte

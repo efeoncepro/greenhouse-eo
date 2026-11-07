@@ -1,0 +1,20 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-plan",
+  "line": "voice",
+  "theme": "dark",
+  "voice": { "eyebrow": "03 · Plan de trabajo", "question": "¿Qué pasa al empezar?", "answer": ["Movimiento"] },
+  "body": "**Tres** semanas de preparación y tres meses de operación, con una decisión al cierre de cada etapa.",
+  "horizon": 90,
+  "currentStop": 1,
+  "stops": [
+    { "range": "Semanas 1–3", "title": "Preparación", "desc": "WhatsApp y enlaces corregidos, eventos, tablero y prueba de captura." },
+    { "range": "Meses 1–2", "title": "Activación", "desc": "Campañas en dos líneas, primeras pruebas y lectura quincenal con ventas." },
+    { "range": "Mes 3", "title": "Decisión", "desc": "Comparación por línea y canal, y plan de inversión del siguiente ciclo." }
+  ]
+}

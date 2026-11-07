@@ -1,0 +1,840 @@
+{
+  "binding": false,
+  "mode": "historical",
+  "version": "operating-review-2026-10-27-v14",
+  "digest": "6b920a6d13da36eb7ddacc015c7b683a8500f79e68b5817e4b8e7950117b55e2",
+  "resolution": "ambiguous",
+  "candidates": [
+    {
+      "recordId": "profile:ECG-001",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-001",
+        "label": "Creative Operations Lead",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-3",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-002",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-002",
+        "label": "Senior Visual Designer",
+        "seniorityCode": "senior",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "diseñador senior",
+          "senior designer"
+        ],
+        "defaultKitId": "visual-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-003",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-003",
+        "label": "Creative Designer",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-004",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-004",
+        "label": "PR Analyst",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-3",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-005",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-005",
+        "label": "Director de Arte",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-3",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "director de arte"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-006",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-006",
+        "label": "Social Media Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-007",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-007",
+        "label": "Community Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "community-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-008",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-008",
+        "label": "Paid Media Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-009",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-009",
+        "label": "Media Buyer",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-010",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-010",
+        "label": "Content Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-011",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-011",
+        "label": "Copywriter",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "redactor"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-012",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-012",
+        "label": "Desarrollador WordPress",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-3",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "wordpress-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-013",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-013",
+        "label": "Desarrollador Full Stack Junior",
+        "seniorityCode": "junior",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "development-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-014",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-014",
+        "label": "Desarrollador Full Stack Mid",
+        "seniorityCode": "mid",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "development-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-015",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-015",
+        "label": "Desarrollador Full Stack Senior",
+        "seniorityCode": "senior",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "desarrollador senior"
+        ],
+        "defaultKitId": "development-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-016",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-016",
+        "label": "Project Manager/Account Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-3",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "account manager"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-017",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-017",
+        "label": "UX/UI Designer",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-018",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-018",
+        "label": "Video Editor/Motion Graphics Designer",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-019",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-019",
+        "label": "Data Analyst",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-020",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-020",
+        "label": "SEO Specialist",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "SEO AEO"
+        ],
+        "defaultKitId": "seo-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-021",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-021",
+        "label": "Marketing Automation Specialist",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-022",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-022",
+        "label": "Growth Hacker",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-023",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-023",
+        "label": "Influencer Manager",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-024",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-024",
+        "label": "Periodista (PR Digital On/Off)",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-025",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-025",
+        "label": "Implementador HubSpot",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "crm-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-026",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-026",
+        "label": "Desarrollador HubSpot",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "crm-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-027",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-027",
+        "label": "Consultor HubSpot",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "consultor HubSpot estándar"
+        ],
+        "defaultKitId": "crm-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-028",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-028",
+        "label": "Content Creator",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-029",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-029",
+        "label": "UGC Creator",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-030",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-030",
+        "label": "CRO Specialist",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-031",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-031",
+        "label": "Analista de Implementación GA4/GTM/Looker",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-032",
+      "revision": 1,
+      "source": {
+        "reference": "pricing-history:seed-csv",
+        "effectiveFrom": "2026-10-09",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Historical profile; seniority only from title; tier labels are references, not operational approval.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-032",
+        "label": "Consultor HubSpot Premium",
+        "seniorityCode": "not_specified",
+        "tierCode": "historical-tier-4",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "consultor HubSpot premium"
+        ],
+        "defaultKitId": "crm-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-033",
+      "revision": 2,
+      "source": {
+        "reference": "review:profile-default-kit-neutrality:2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval. Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-033",
+        "label": "Trafficker Digital Semi-senior",
+        "seniorityCode": "mid",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "trafficker digital semi-senior",
+          "digital trafficker mid"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-034",
+      "revision": 2,
+      "source": {
+        "reference": "review:profile-default-kit-neutrality:2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Distinct semi-senior role requested by operator; no equivalence to broad Paid Media Manager or Marketing Automation Specialist. Existing base specialist tier1 reused; historical tier label is not operational or commercial approval. Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-034",
+        "label": "Especialista Email y SMS Semi-senior",
+        "seniorityCode": "mid",
+        "tierCode": "historical-tier-1",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "email sms semi-senior",
+          "email marketing sms mid"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    },
+    {
+      "recordId": "profile:ECG-035",
+      "revision": 2,
+      "source": {
+        "reference": "review:profile-default-kit-neutrality:2026-10-22",
+        "effectiveFrom": "2026-10-22",
+        "effectiveUntil": "9999-12-31",
+        "status": "estimated"
+      },
+      "note": "Distinct role: digital ecosystem/business strategy, sector and trend research, competitive benchmarks, priorities and integrated measurement. Not Creative Operations Lead or Content Manager. Historical tier2 reused; this is no compensation or commercial approval. Full research reference: estimate:reditos-2027-case-cost-review:2026-10-22;research:Contravia3.7MM-and-MarketingSero3-4.5MM;user:role-additions-authorized Default corrected to generic-core to preserve ordinary person-capacity provisions. A managed-service demand must explicitly select managed-service-core by actual business scope; no implicit provision waiver.",
+      "kind": "profile",
+      "value": {
+        "profileId": "ECG-035",
+        "label": "Digital Strategist",
+        "seniorityCode": "mid",
+        "tierCode": "historical-tier-2",
+        "requiredCoverages": [
+          "human_salary"
+        ],
+        "aliases": [
+          "estratega digital",
+          "digital strategist semi-senior"
+        ],
+        "defaultKitId": "generic-core"
+      }
+    }
+  ]
+}

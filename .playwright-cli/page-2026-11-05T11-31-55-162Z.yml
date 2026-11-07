@@ -1,0 +1,423 @@
+- generic [active] [ref=f41e1]:
+  - generic [ref=f41e2]: VISTA LOCAL DE REVISIÓN · Texto y medios candidatos · No publicado en WordPress
+  - main [ref=f41e3]:
+    - paragraph [ref=f41e4]: GLITCH FLASH · NO ESPERA AL LUNES
+    - 'heading "Glitch Flash: Images 2.6 y la prueba de la segunda corrección" [level=1] [ref=f41e5]'
+    - paragraph [ref=f41e6]: Propuesta editorial para Julio Reyes · 5 de noviembre de 2026 · 17 min de lectura
+    - figure [ref=f41e7]:
+      - 'img "Glitch Flash: probamos Images 2.6 con Nexa en acción. Dos escenas y dos correcciones." [ref=f41e8]'
+      - generic [ref=f41e9]:
+        - text: Portada Glitch compuesta con una escena propia de Nexa. Es una composición editorial posterior, no una salida cruda del modelo.
+        - 'link "Crédito: Efeonce · composición Glitch Flash sobre prueba propia" [ref=f41e10] [cursor=pointer]':
+          - /url: https://efeoncepro.com/
+        - text: .
+    - paragraph [ref=f41e11]: El micrófono se abre… en modo Flash.
+    - paragraph [ref=f41e12]: La primera imagen puede salir preciosa. El problema aparece cuando alguien pide cambiar el fondo, mantener el producto exactamente igual y mover un detalle que ya estaba aprobado. De pronto estás revisando otra vez la etiqueta, la cara y una mano que antes funcionaba. Una corrección pequeña acaba de convertirse en una revisión completa.
+    - paragraph [ref=f41e13]:
+      - text: "Esa es la parte del lanzamiento de Images 2.6 que me interesa mirar: cuánto control conserva un equipo cuando empieza a trabajar sobre una imagen. OpenAI lo anunció el"
+      - strong [ref=f41e14]: 4 de noviembre de 2026
+      - text: ", con más velocidad, nuevas opciones de edición y formatos que incluyen GIF y SVG."
+      - strong [ref=f41e15]:
+        - link "El anuncio oficial" [ref=f41e16] [cursor=pointer]:
+          - /url: https://openai.com/index/introducing-images-2-6/
+      - text: reúne ejemplos y testimonios de sus primeros usuarios.
+    - paragraph [ref=f41e17]: Hay material para entusiasmarse y también para hacer preguntas bastante concretas. Vamos a revisar qué llegó, qué muestran las demostraciones y cómo evaluar si este lanzamiento sirve para producir una campaña, además de una buena imagen para compartir el día del anuncio.
+    - navigation "Índice" [ref=f41e18]:
+      - group [ref=f41e19]:
+        - generic "En este Flash · 12 secciones" [ref=f41e20] [cursor=pointer]
+    - heading "Qué llegó con Images 2.6" [level=2] [ref=f41e21]
+    - figure [ref=f41e22]:
+      - img "Letras de colores con el nombre Images 2.6 en el anuncio oficial." [ref=f41e23]
+      - generic [ref=f41e24]:
+        - text: Letras de colores con el nombre Images 2.6 en el anuncio oficial.
+        - 'link "Crédito: OpenAI — anuncio oficial de Images 2.6, 4 de noviembre de 2026" [ref=f41e25] [cursor=pointer]':
+          - /url: https://openai.com/index/introducing-images-2-6/
+        - text: .
+    - paragraph [ref=f41e26]:
+      - text: Conviene ordenar los nombres desde el principio.
+      - strong [ref=f41e27]: Images 2.6
+      - text: es el nombre del lanzamiento; en la API aparecen dos modelos.
+      - strong [ref=f41e28]:
+        - link "GPT Image 2.6 Flare" [ref=f41e29] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/models/gpt-image-2.6-flare
+      - text: se orienta a iterar rápido.
+      - strong [ref=f41e30]:
+        - link "GPT Image 2.6 Sunburst" [ref=f41e31] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/models/gpt-image-2.6-sunburst
+      - text: apunta al trabajo visual con mayor detalle. Ambos reciben texto e imágenes.
+    - table [ref=f41e32]:
+      - rowgroup [ref=f41e33]:
+        - row [ref=f41e34]:
+          - columnheader "Superficie" [ref=f41e35]
+          - columnheader "Qué puedes hacer" [ref=f41e36]
+          - columnheader "Qué revisar antes de usarla" [ref=f41e37]
+      - rowgroup [ref=f41e38]:
+        - row [ref=f41e39]:
+          - cell "ChatGPT" [ref=f41e40]
+          - cell "Crear y editar imágenes en una conversación" [ref=f41e41]
+          - cell "Plan, límites y funciones visibles en tu cuenta" [ref=f41e42]
+        - row [ref=f41e43]:
+          - cell "Codex" [ref=f41e44]
+          - cell "Generar y editar imágenes dentro del trabajo con el agente" [ref=f41e45]
+          - cell "Herramientas y acceso disponibles en tu entorno" [ref=f41e46]
+        - row [ref=f41e47]:
+          - 'cell "API: Flare" [ref=f41e48]'
+          - cell "Integrar generación y edición orientadas a iteración rápida" [ref=f41e49]
+          - cell "Calidad, complejidad, latencia y consumo real" [ref=f41e50]
+        - row [ref=f41e51]:
+          - 'cell "API: Sunburst" [ref=f41e52]'
+          - cell "Integrar trabajo visual detallado y correcciones" [ref=f41e53]
+          - cell "Fidelidad de los elementos que necesitas conservar" [ref=f41e54]
+    - paragraph [ref=f41e55]:
+      - text: El
+      - strong [ref=f41e56]:
+        - link "Centro de Ayuda de OpenAI" [ref=f41e57] [cursor=pointer]:
+          - /url: https://help.openai.com/en/articles/11084440-images-in-chatgpt
+      - text: "aclara una distinción importante: Images está disponible en todos los planes, pero las funciones no tienen necesariamente el mismo despliegue. La creación de GIF sigue llegando a ChatGPT. Images con thinking está disponible en Plus, Pro y Business; Enterprise y Edu figuran como próximos. Antes de prometer un flujo a tu equipo, comprueba la cuenta que lo va a ejecutar."
+    - paragraph [ref=f41e58]:
+      - text: También hay continuidad.
+      - strong [ref=f41e59]:
+        - link "Images 2.5, presentado el 8 de septiembre" [ref=f41e60] [cursor=pointer]:
+          - /url: https://openai.com/index/introducing-chatgpt-images-2-5/
+      - text: ", ya trabajaba la fidelidad, los bocetos y la consistencia durante varias ediciones. La historia de 2.6 no empieza desde cero: suma posibilidades sobre una dirección que OpenAI ya venía desarrollando."
+    - heading "La velocidad sirve cuando puedes seguir pensando" [level=2] [ref=f41e61]
+    - paragraph [ref=f41e62]:
+      - text: En su
+      - strong [ref=f41e63]:
+        - link "anuncio oficial" [ref=f41e64] [cursor=pointer]:
+          - /url: https://openai.com/index/introducing-images-2-6/
+      - text: ", OpenAI declara que Images 2.6 genera imágenes"
+      - strong [ref=f41e65]: un 50 % más rápido
+      - text: y que Flare puede entregar resultados
+      - strong [ref=f41e66]: desde seis segundos cuando la calidad está en low
+      - text: . Es una afirmación del proveedor bajo esas condiciones. No equivale a un tiempo garantizado para cualquier escena ni permite calcular cuánto tardará una campaña completa.
+    - figure [ref=f41e67]:
+      - iframe [ref=f41e68]
+      - generic [ref=f41e69]:
+        - text: "Comparación de latencia con anuncio de viajes. Reproducida a 8×: no interpretar como velocidad en tiempo real."
+        - 'link "Crédito: OpenAI" [ref=f41e70] [cursor=pointer]':
+          - /url: https://openai.com/index/introducing-images-2-6/
+        - text: .
+        - link "Abrir video oficial" [ref=f41e71] [cursor=pointer]:
+          - /url: https://player.vimeo.com/video/1243362697?h=7809127775
+        - text: .
+    - paragraph [ref=f41e72]:
+      - text: La comparación oficial de velocidad está reproducida a
+      - strong [ref=f41e73]: 8×
+      - text: ", según la descripción del anuncio. Sirve para observar la secuencia comparada; no para cronometrar una generación como si estuviéramos viendo tiempo real."
+    - paragraph [ref=f41e74]: La velocidad puede cambiar la conversación creativa. Si una alternativa llega mientras el equipo todavía tiene presente la decisión que estaba discutiendo, es más fácil comparar una luz, un encuadre o una intención. Si llega mucho después, alguien tiene que reconstruir el contexto antes de opinar. Reducir esa espera tiene valor, aunque la pieza final tarde más.
+    - paragraph [ref=f41e75]: "Ahora bien, producir alternativas más rápido también puede llenar la mesa de versiones que nadie tiene tiempo de revisar. Una exploración necesita una pregunta: decidir entre una escena íntima y una abierta, probar dos jerarquías o encontrar un fondo que permita leer el titular. Pedir veinte opciones sin saber qué estamos comparando sólo acelera la indecisión."
+    - complementary [ref=f41e76]:
+      - text: GLITCH DROP
+      - paragraph [ref=f41e77]: Si duplicas las alternativas, alguien tendrá que elegir entre ellas.
+      - paragraph [ref=f41e78]: La velocidad necesita un criterio de descarte para convertirse en capacidad de producción.
+    - paragraph [ref=f41e79]: Por eso separaría dos mediciones. Una registra cuánto demora el modelo en devolver una imagen. La otra registra cuánto demora el equipo en aceptar una dirección y llegar a un archivo utilizable. El lanzamiento habla directamente de la primera; el trabajo de cada organización tendrá que demostrar qué pasa con la segunda.
+    - heading "Editar sin volver a negociar toda la imagen" [level=2] [ref=f41e80]
+    - paragraph [ref=f41e81]: Imagina una pieza de producto que ya tiene aprobado el encuadre. Falta cambiar el color de un elemento secundario. El pedido parece sencillo, pero el resultado sólo sirve si la forma del envase, las proporciones y el resto de la escena siguen siendo los que aprobaste.
+    - paragraph [ref=f41e82]:
+      - text: La edición por anotaciones ayuda a expresar dónde está el cambio. El
+      - strong [ref=f41e83]:
+        - link "changelog de la API del 4 de noviembre" [ref=f41e84] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/changelog
+      - text: confirma el soporte de image markup para los modelos compatibles 2.5 y 2.6. La
+      - strong [ref=f41e85]:
+        - link "referencia de edición" [ref=f41e86] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/reference/resources/images/methods/edit
+      - text: describe una capa PNG transparente, del mismo tamaño que la primera imagen, sobre la cual se dibujan las indicaciones.
+    - figure [ref=f41e87]:
+      - img "Cocina con un círculo rojo sobre el florero que se pide editar." [ref=f41e88]
+      - generic [ref=f41e89]:
+        - text: "La imagen original con una anotación que señala el jarrón: el punto de partida de la edición guiada."
+        - 'link "Crédito: OpenAI — imagen de entrada y anotación de su guía oficial" [ref=f41e90] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - figure [ref=f41e91]:
+      - img "La misma cocina con el florero azul y sin la anotación roja." [ref=f41e92]
+      - generic [ref=f41e93]:
+        - text: "El resultado de Sunburst: jarrón azul cobalto y círculo eliminado. Ejemplo publicado por OpenAI; no es una prueba realizada por Efeonce."
+        - 'link "Crédito: OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst" [ref=f41e94] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - paragraph [ref=f41e95]:
+      - text: En el ejemplo de la
+      - strong [ref=f41e96]:
+        - link "guía de prompts de OpenAI" [ref=f41e97] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+      - text: ", una marca roja identifica un florero y la salida lo muestra azul. Mira también la mesa, las sillas y los objetos cercanos. La utilidad de una corrección localizada se juega tanto en el objeto que cambia como en todo aquello que debía quedarse quieto."
+    - paragraph [ref=f41e98]: "Una demostración seleccionada no nos dice qué porcentaje de intentos conserva bien una escena. Sí permite formular una prueba mejor que «haz algo parecido»: partir de la misma imagen, pedir una modificación delimitada y revisar una lista explícita de elementos que deben permanecer. Después repetir el ejercicio con una segunda corrección. Ahí empieza a aparecer la diferencia entre una imagen atractiva y un proceso confiable."
+    - complementary [ref=f41e99]:
+      - text: GLITCH DROP
+      - paragraph [ref=f41e100]: Una corrección pequeña debería tener un perímetro pequeño de revisión.
+      - paragraph [ref=f41e101]: Si cambiar un florero obliga a revisar de nuevo toda la cocina, todavía hay trabajo que el equipo está absorbiendo.
+    - paragraph [ref=f41e102]: Para una marca, ese perímetro puede incluir la geometría de un producto, un personaje, el vestuario, una textura o el espacio reservado para el copy. Escríbelo antes de generar. Si la condición sólo existe en la cabeza de quien aprueba, cada nueva versión vuelve a abrir la misma conversación.
+    - 'heading "Lo pusimos a prueba: dos escenas y dos correcciones" [level=2] [ref=f41e103]'
+    - paragraph [ref=f41e104]:
+      - text: "Hasta aquí, las demostraciones del lanzamiento. También quisimos llevar la pregunta de este Flash a una prueba propia:"
+      - strong [ref=f41e105]: ¿qué pasa cuando una imagen tiene que soportar una segunda corrección?
+    - paragraph [ref=f41e106]: "Trabajamos con Nexa, nuestro personaje de marca, y referencias visuales de su identidad, vestuario y accesorios. Generamos dos escenas originales con GPT Image 2.6 Sunburst, en 2048 × 1152 píxeles, con calidad y complejidad altas. Las dos comparten un universo cinematográfico: un hangar oscuro, imágenes en circulación y los Sparks como compañeros de escena. Es una ficción visual de Efeonce, no la representación de un acontecimiento real."
+    - figure [ref=f41e107]:
+      - img "Nexa despliega a los Sparks y una secuencia de imágenes dentro de un hangar oscuro." [ref=f41e108]
+      - generic [ref=f41e109]:
+        - text: Escena A — salida cruda de GPT Image 2.6 Sunburst. Dos Sparks y una entrega cinematográfica. Ficción de Efeonce.
+        - 'link "Crédito: Efeonce · GPT Image 2.6 Sunburst · prueba propia" [ref=f41e110] [cursor=pointer]':
+          - /url: https://efeoncepro.com/
+        - text: .
+    - paragraph [ref=f41e111]:
+      - text: "La primera escena coloca a Nexa frente a una corriente de imágenes. La segunda pide una acción más concreta: sostener un marco con un paisaje de montaña."
+      - strong [ref=f41e112]: Son dos generaciones distintas
+      - text: ; la segunda no es una corrección de la primera. Esa distinción importa para leer lo que viene.
+    - figure [ref=f41e113]:
+      - img "Nexa sostiene un marco luminoso con una montaña, acompañada por un Spark." [ref=f41e114]
+      - generic [ref=f41e115]:
+        - text: Escena B — salida original cruda, antes de las correcciones. El borde salió luminoso pese a pedir cerámica mate.
+        - 'link "Crédito: Efeonce · GPT Image 2.6 Sunburst · prueba propia" [ref=f41e116] [cursor=pointer]':
+          - /url: https://efeoncepro.com/
+        - text: .
+    - paragraph [ref=f41e117]: "Sobre la segunda imagen hicimos una secuencia de dos ediciones. Primero señalamos el marco con una anotación y pedimos cambiar únicamente su borde pálido por uno naranja mate, conservando la montaña. Después usamos esa salida como entrada de la siguiente operación: reemplazar el paisaje interior por una selva con cascada, manteniendo el borde naranja y el resto de la escena."
+    - paragraph [ref=f41e118]:
+      - text: La indicación se envió como una capa transparente mediante la función nativa de anotaciones.
+      - strong [ref=f41e119]: Las cuatro imágenes se muestran tal como las devolvió el modelo
+      - text: ", sin retoque, recomposición ni una máscara que pegara el cambio sobre el original."
+    - figure [ref=f41e120]:
+      - img "La misma escena de Nexa con el borde del marco naranja y la montaña conservada." [ref=f41e121]
+      - generic [ref=f41e122]:
+        - text: "Corrección 1 — salida cruda: cambia el borde a naranja. Conserva la montaña, el gesto y la perspectiva."
+        - 'link "Crédito: Efeonce · GPT Image 2.6 Sunburst · prueba propia" [ref=f41e123] [cursor=pointer]':
+          - /url: https://efeoncepro.com/
+        - text: .
+    - paragraph [ref=f41e124]: En la primera edición el borde pasa a naranja y la montaña permanece. También se reduce el aspecto luminoso del borde. En la segunda aparece la selva con cascada y se conserva el naranja. Al comparar las tres versiones de esta secuencia, el rostro, los lentes, la mano, el compañero y la perspectiva mantienen una continuidad visual reconocible.
+    - figure [ref=f41e125]:
+      - img "Nexa sostiene el marco naranja con una selva y una cascada después de la segunda corrección." [ref=f41e126]
+      - generic [ref=f41e127]:
+        - text: "Corrección 2 — salida cruda: la montaña se sustituye por selva y cascada; el marco continúa naranja."
+        - 'link "Crédito: Efeonce · GPT Image 2.6 Sunburst · prueba propia" [ref=f41e128] [cursor=pointer]':
+          - /url: https://efeoncepro.com/
+        - text: .
+    - paragraph [ref=f41e129]:
+      - text: "Ahí está el resultado que nos interesaba observar: pudimos encadenar dos pedidos distintos sobre la misma imagen y reconocer el trabajo anterior en la salida siguiente."
+      - strong [ref=f41e130]: Eso no significa que los píxeles fuera del área señalada hayan quedado intactos
+      - text: ": encontramos variaciones fuera de ella. La anotación orientó la edición, pero la imagen completa siguió necesitando revisión."
+    - paragraph [ref=f41e131]: "La salida inicial tampoco cumplió todo el encargo: el borde brillaba aunque se había pedido cerámica mate, y el encuadre de la segunda escena quedó más cerrado de lo solicitado. La continuidad de las ediciones también conserva decisiones y desvíos de la imagen de partida. Estas cuatro salidas permiten examinar un caso; no establecen una tasa de acierto."
+    - paragraph [ref=f41e132]:
+      - text: También registramos tiempos y consumo. Todos los resultados corresponden a Sunburst con calidad alta; para las ediciones bajamos la complejidad a
+      - code [ref=f41e133]: low
+      - text: .
+    - table [ref=f41e134]:
+      - rowgroup [ref=f41e135]:
+        - row [ref=f41e136]:
+          - columnheader "Operación" [ref=f41e137]
+          - columnheader "Complejidad" [ref=f41e138]
+          - columnheader "Tiempo total" [ref=f41e139]
+          - columnheader "Tokens entrada / salida" [ref=f41e140]
+      - rowgroup [ref=f41e141]:
+        - row [ref=f41e142]:
+          - cell "Escena original A" [ref=f41e143]
+          - cell "Alta" [ref=f41e144]
+          - cell "57,5 s" [ref=f41e145]
+          - cell "14.347 / 1.413" [ref=f41e146]
+        - row [ref=f41e147]:
+          - cell "Escena original B" [ref=f41e148]
+          - cell "Alta" [ref=f41e149]
+          - cell "55,2 s" [ref=f41e150]
+          - cell "13.065 / 1.413" [ref=f41e151]
+        - row [ref=f41e152]:
+          - 'cell "Edición 1: borde naranja" [ref=f41e153]'
+          - cell "Baja" [ref=f41e154]
+          - cell "30,8 s" [ref=f41e155]
+          - cell "1.859 / 1.413" [ref=f41e156]
+        - row [ref=f41e157]:
+          - 'cell "Edición 2: selva y cascada" [ref=f41e158]'
+          - cell "Baja" [ref=f41e159]
+          - cell "28,7 s" [ref=f41e160]
+          - cell "1.868 / 1.413" [ref=f41e161]
+    - paragraph [ref=f41e162]:
+      - text: "Los tiempos miden la ejecución completa de nuestra herramienta: incluyen preparación, autenticación, subida, procesamiento y guardado."
+      - strong [ref=f41e163]: No son la latencia del proveedor ni un benchmark
+      - text: . Las generaciones originales recibieron varias referencias; cada edición recibió la imagen anterior y su anotación. Cambiaron las entradas y la tarea, así que estos números describen esta secuencia, sin aislar el efecto de la complejidad ni comparar modelos.
+    - complementary [ref=f41e164]:
+      - text: GLITCH DROP
+      - paragraph [ref=f41e165]: Una segunda corrección permite ver algo que la primera imagen no muestra.
+      - paragraph [ref=f41e166]: La continuidad se comprueba trabajando sobre lo que ya elegiste.
+    - 'heading "Calidad y complejidad: dos decisiones distintas" [level=2] [ref=f41e167]'
+    - paragraph [ref=f41e168]: "El nuevo control de complejidad merece una pausa porque invita a un error conocido: subir todos los parámetros y esperar que eso resuelva el brief."
+    - paragraph [ref=f41e169]:
+      - text: La
+      - strong [ref=f41e170]:
+        - link "referencia de generación" [ref=f41e171] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/reference/resources/images/methods/generate
+      - text: distingue complexity de quality. El primero regula el esfuerzo de planificación; el segundo, la calidad visual de salida. La
+      - strong [ref=f41e172]:
+        - link "guía de generación" [ref=f41e173] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/guides/image-generation
+      - text: recomienda probar complejidad baja para muchas ediciones y reservar niveles mayores para solicitudes con más elementos o restricciones.
+    - paragraph [ref=f41e174]: Pensemos en dos pedidos hipotéticos. En uno cambias el color de una taza. En el otro compones una mesa con varias personas, productos identificables, un gesto particular y espacio para un titular. Los dos pueden necesitar una imagen final cuidada, pero el problema de relaciones entre elementos es muy distinto.
+    - paragraph [ref=f41e175]: Esa separación abre una forma más precisa de experimentar. Mantén la calidad que exige el uso final y cambia la complejidad para observar si mejora el cumplimiento del pedido. Después compara el tiempo y las alteraciones que introduce. El ajuste útil será el que resuelva ese trabajo con menos fricción; no hay una combinación universal para todas las marcas, escenas y correcciones.
+    - paragraph [ref=f41e176]: En un flujo compartido, registra también la configuración. Una persona del equipo debería poder entender cómo se obtuvo una versión aceptada sin reconstruir una tarde completa de pruebas. El prompt ayuda, pero una captura aislada del prompt no guarda por sí sola las referencias, las decisiones y los parámetros que hicieron funcionar el resultado.
+    - blockquote [ref=f41e177]: La siguiente versión también debe conservar lo que ya decidiste.
+    - 'heading "GIF: el movimiento también necesita una intención" [level=2] [ref=f41e178]'
+    - paragraph [ref=f41e179]: "Las animaciones breves son una de las novedades más visibles. El anuncio muestra ejemplos de OpenArt y Town: personajes, reacciones y pequeñas escenas que exploran movimiento. Son demostraciones del lanzamiento, seleccionadas por el proveedor y sus colaboradores; no evaluaciones independientes de una campaña."
+    - figure [ref=f41e180]:
+      - iframe [ref=f41e181]
+      - generic [ref=f41e182]:
+        - text: Montaje oficial de escenas animadas generadas con Images 2.6.
+        - 'link "Crédito: OpenAI" [ref=f41e183] [cursor=pointer]':
+          - /url: https://openai.com/index/introducing-images-2-6/
+        - text: .
+        - link "Abrir video oficial" [ref=f41e184] [cursor=pointer]:
+          - /url: https://player.vimeo.com/video/1242918503?h=5974be9997
+        - text: .
+    - paragraph [ref=f41e185]: "La documentación oficial añade este ejemplo de un personaje con una linterna. Sirve para mirar un loop con una tarea concreta: seguir el gesto, observar qué partes del personaje permanecen y revisar la transición entre el final y el principio."
+    - figure [ref=f41e186]:
+      - img "Personaje con abrigo verde que levanta una linterna frente a una cabaña nevada." [ref=f41e187]
+      - generic [ref=f41e188]:
+        - text: "GIF oficial de Sunburst: nueve fotogramas y un bucle de 1,8 segundos. La novedad se entiende mejor viéndola."
+        - 'link "Crédito: OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst" [ref=f41e189] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - paragraph [ref=f41e190]: "Un GIF puede resolver una reacción, una señal de estado o el pequeño gesto de una mascota. La pregunta creativa viene antes del movimiento: ¿qué debe comunicar ese gesto que una imagen fija no comunica igual? Si no hay respuesta, probablemente sólo estamos agregando actividad a la pieza."
+    - paragraph [ref=f41e191]: Para una marca, revisaría especialmente que el personaje siga siendo reconocible en cada cuadro y que el loop tenga una vuelta natural. Una deformación apenas perceptible en una reproducción puede volverse evidente después de verla repetirse diez veces. También importan el peso del archivo, el tamaño de visualización y el formato que acepte el canal.
+    - paragraph [ref=f41e192]: Esto no convierte a los modelos en un sistema de producción audiovisual completo. Un GIF no trae por sí solo sonido, montaje ni control narrativo de una secuencia larga. Si el destino requiere MP4, habrá otra etapa de preparación. Y si se usa en una interfaz, hay que decidir cuándo se mueve, cuándo se detiene y cómo se comporta para quien prefiere menos animación.
+    - complementary [ref=f41e193]:
+      - text: GLITCH DROP
+      - paragraph [ref=f41e194]: Antes de animar una mascota, decide qué está diciendo con el movimiento.
+      - paragraph [ref=f41e195]: Una identidad también se reconoce por sus gestos; no sólo por su silueta.
+    - paragraph [ref=f41e196]:
+      - text: Al revisar las fuentes el 5 de noviembre, la
+      - strong [ref=f41e197]:
+        - link "guía de generación" [ref=f41e198] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/guides/image-generation
+      - text: admite hasta 64 cuadros por GIF y la
+      - strong [ref=f41e199]:
+        - link "referencia de generación" [ref=f41e200] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/reference/resources/images/methods/generate
+      - text: indica hasta 16. Esa discrepancia entre páginas oficiales impide dar aquí un máximo como condición cerrada. Antes de comprometer una animación, comprueba la operación, el acceso y el archivo real en la cuenta con la que vas a trabajar.
+    - 'heading "SVG: recibir vectores abre otra etapa de trabajo" [level=2] [ref=f41e201]'
+    - paragraph [ref=f41e202]:
+      - text: La salida SVG en la API puede ser especialmente útil para equipos que necesitan gráficos escalables. La
+      - strong [ref=f41e203]:
+        - link "referencia de generación" [ref=f41e204] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/reference/resources/images/methods/generate
+      - text: describe un flujo con una imagen de referencia y un modelo autor que produce el SVG. Eso explica por qué conviene mirar tanto el resultado visual como la estructura del archivo, y por qué su costo puede tener más de un componente.
+    - figure [ref=f41e205]:
+      - img "Ejemplo SVG de Field & Flour con un pan, espigas y un rodillo." [ref=f41e206]
+      - generic [ref=f41e207]:
+        - text: Un SVG generado por Sunburst para la marca ficticia Field & Flour. Sus trazados, formas y colores se pueden editar.
+        - 'link "Crédito: OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst" [ref=f41e208] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - paragraph [ref=f41e209]: El ejemplo oficial de Field & Flour permite revisar una composición con ilustración y lettering. Que un archivo se pueda ampliar no resuelve automáticamente su espaciado, la coherencia del trazo o su funcionamiento en tamaños pequeños. Un vector también puede dibujar una decisión equivocada con una nitidez impecable.
+    - paragraph [ref=f41e210]: "Yo lo evaluaría en tres usos reales: el tamaño al que se va a leer, una reducción exigente y una ampliación donde aparezcan los detalles del trazado. Después comprobaría si el equipo puede editarlo de forma razonable. Un archivo que exige rehacer casi todo para cambiar una palabra tiene un valor distinto al de uno que permite continuar el trabajo."
+    - paragraph [ref=f41e211]: Para un logo o un sistema de iconos, además hay decisiones de identidad que no se delegan a la extensión del archivo. Hay que revisar formas, jerarquía, consistencia con el sistema y usos previstos. En impresión también corresponde verificar el proceso de salida. El SVG puede ser un material de trabajo valioso; su aprobación sigue dependiendo del uso.
+    - heading "Qué muestran las piezas con texto y producto" [level=2] [ref=f41e212]
+    - paragraph [ref=f41e213]: "Los ejemplos oficiales de la guía también incluyen una infografía de una cafetera en español y una escena publicitaria de producto. Son útiles para mirar asuntos más exigentes que el acabado general: legibilidad, relaciones entre partes y reconocimiento del objeto."
+    - figure [ref=f41e214]:
+      - img "Diagrama de una cafetera con etiquetas en español." [ref=f41e215]
+      - generic [ref=f41e216]:
+        - text: OpenAI muestra la traducción al español de una infografía conservando su estructura visual. El texto igual necesita revisión.
+        - 'link "Crédito: OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst" [ref=f41e217] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - paragraph [ref=f41e218]: En una infografía, revisa cada etiqueta y el vínculo entre el texto y la pieza que pretende explicar. Luego reduce la imagen al ancho de un teléfono. La información tiene que seguir siendo comprensible ahí. Una demostración de texto dentro de una imagen tampoco verifica que las afirmaciones técnicas del diagrama sean correctas.
+    - figure [ref=f41e219]:
+      - img "Cartel publicitario de un champú en una escena invernal." [ref=f41e220]
+      - generic [ref=f41e221]:
+        - text: "Una nueva condición sobre una imagen anterior: el mismo concepto de producto convertido en una escena invernal."
+        - 'link "Crédito: OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst" [ref=f41e222] [cursor=pointer]':
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+        - text: .
+    - paragraph [ref=f41e223]: En una escena publicitaria, observa el producto, la escala y lo que ocurre alrededor del envase. Una imagen puede resultar convincente como conjunto y contener un detalle incompatible con el producto real. Esa diferencia importa mucho si la pieza se va a usar para venderlo.
+    - paragraph [ref=f41e224]:
+      - text: Puedes contrastar ambos ejemplos y sus instrucciones completas en la
+      - strong [ref=f41e225]:
+        - link "guía oficial de prompts de OpenAI" [ref=f41e226] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/guides/image-prompting
+      - text: ". Si te interesa aplicarlos a tu marca, conserva esa relación entre el pedido y el resultado: es lo que permite entender qué estás evaluando."
+    - 'heading "Cuánto cuesta: empieza por separar tarifa y resultado" [level=2] [ref=f41e227]'
+    - paragraph [ref=f41e228]:
+      - text: Las tarifas Standard publicadas para Flare y Sunburst coinciden. Estos son los valores consultados el
+      - strong [ref=f41e229]: 5 de noviembre de 2026
+      - text: ", en dólares por millón de tokens, según la"
+      - strong [ref=f41e230]:
+        - link "página oficial de precios" [ref=f41e231] [cursor=pointer]:
+          - /url: https://developers.openai.com/api/docs/pricing
+      - text: .
+    - table [ref=f41e232]:
+      - rowgroup [ref=f41e233]:
+        - row [ref=f41e234]:
+          - columnheader "Componente" [ref=f41e235]
+          - columnheader "Flare 2.6" [ref=f41e236]
+          - columnheader "Sunburst 2.6" [ref=f41e237]
+      - rowgroup [ref=f41e238]:
+        - row [ref=f41e239]:
+          - cell "Texto de entrada" [ref=f41e240]
+          - cell "USD 5" [ref=f41e241]
+          - cell "USD 5" [ref=f41e242]
+        - row [ref=f41e243]:
+          - cell "Texto de entrada en caché" [ref=f41e244]
+          - cell "USD 1,25" [ref=f41e245]
+          - cell "USD 1,25" [ref=f41e246]
+        - row [ref=f41e247]:
+          - cell "Imagen de entrada" [ref=f41e248]
+          - cell "USD 8" [ref=f41e249]
+          - cell "USD 8" [ref=f41e250]
+        - row [ref=f41e251]:
+          - cell "Imagen de entrada en caché" [ref=f41e252]
+          - cell "USD 2" [ref=f41e253]
+          - cell "USD 2" [ref=f41e254]
+        - row [ref=f41e255]:
+          - cell "Imagen de salida" [ref=f41e256]
+          - cell "USD 30" [ref=f41e257]
+          - cell "USD 30" [ref=f41e258]
+    - paragraph [ref=f41e259]: No son precios fijos por imagen. El total depende del consumo de la operación. Tampoco describen la suscripción de ChatGPT. Y la tarifa por token, incluso cuando coincide con la de otro modelo, no prueba que producir la misma pieza vaya a costar lo mismo.
+    - paragraph [ref=f41e260]: "Para decidir en producción, agregaría otra cuenta. Cuántos resultados se descartan, cuántas correcciones requiere el elegido y cuánto tiempo humano consume llegar al archivo aprobado. No hace falta una planilla sofisticada para comenzar: registra la tarea, los intentos, el consumo que devuelve la API y los minutos de revisión."
+    - complementary [ref=f41e261]:
+      - text: GLITCH DROP
+      - paragraph [ref=f41e262]: El costo de una pieza se conoce cuando termina la revisión.
+      - paragraph [ref=f41e263]: Un archivo barato que vuelve tres veces a corrección todavía tiene trabajo por pagar.
+    - paragraph [ref=f41e264]: Esto permite discutir una elección con contexto. Un modelo puede justificar un mayor consumo si evita trabajo posterior; otro puede resultar más conveniente para explorar direcciones que todavía no necesitan detalle. Esas son hipótesis para medir con tareas comparables. Una tabla de tarifas no elige por ti.
+    - heading "Lo que falta comprobar antes de incorporarlo a una campaña" [level=2] [ref=f41e265]
+    - paragraph [ref=f41e266]:
+      - text: La documentación conserva límites sobre consistencia, texto y composiciones complejas. Además, la
+      - strong [ref=f41e267]:
+        - link "system card de Images 2.6" [ref=f41e268] [cursor=pointer]:
+          - /url: https://deploymentsafety.openai.com/chatgpt-images-2-6
+      - text: describe evaluaciones y mitigaciones de seguridad, incluidas las relacionadas con GIF. Esas evaluaciones sirven para entender el tratamiento del riesgo; no certifican la calidad creativa de una pieza ni reemplazan su revisión editorial.
+    - paragraph [ref=f41e269]: Para una campaña, añadiría preguntas que la galería del lanzamiento no puede responder por nosotros. ¿El mismo personaje se sostiene en una serie? ¿La etiqueta conserva sus proporciones después de varias correcciones? ¿Una adaptación deja espacio para el texto que realmente debe llevar? ¿El equipo puede continuar una versión sin depender de quien la generó?
+    - paragraph [ref=f41e270]: También conviene distinguir entre un error del modelo y una decisión que nunca se especificó. Si el equipo no definió cuánto puede cambiar un producto o qué rasgos identifican a un personaje, la revisión termina usando criterios que aparecen después del resultado. Eso vuelve difícil aprender de los intentos y comparar herramientas.
+    - paragraph [ref=f41e271]: No daría por resuelta una comparación con otros generadores a partir de este anuncio. Para elegir entre modelos necesitamos el mismo encargo, referencias equivalentes y condiciones de evaluación claras. Los ejemplos destacados por un proveedor son un punto de partida para investigar, no una clasificación independiente.
+    - heading "Cómo probarlo con una tarea real" [level=2] [ref=f41e272]
+    - paragraph [ref=f41e273]: "Para llevar esta evaluación a tu equipo, elige una tarea recurrente y acotada: una imagen de producto que necesite dos correcciones y una adaptación. Usa material autorizado y deja por escrito lo que debe permanecer. Empieza por entender el comportamiento del flujo antes de extenderlo a una tanda completa."
+    - list [ref=f41e274]:
+      - listitem [ref=f41e275]:
+        - strong [ref=f41e276]: Fija el punto de partida.
+        - text: Guarda referencias, formato, textos exactos y elementos que no pueden cambiar. Separa preferencias de condiciones obligatorias.
+      - listitem [ref=f41e277]:
+        - strong [ref=f41e278]: Haz una comparación controlada.
+        - text: Entrega el mismo encargo a los modelos que quieras evaluar. Registra los parámetros y conserva también los resultados rechazados.
+      - listitem [ref=f41e279]:
+        - strong [ref=f41e280]: Pide correcciones concretas.
+        - text: Cambia un elemento y después otro. Revisa si lo ya aprobado se conserva; no juzgues sólo la primera salida.
+      - listitem [ref=f41e281]:
+        - strong [ref=f41e282]: Mira el archivo en su destino.
+        - text: Prueba la lectura en móvil, la edición del vector o la reproducción del loop según corresponda. Evalúa el uso real.
+      - listitem [ref=f41e283]:
+        - strong [ref=f41e284]: Cierra la cuenta completa.
+        - text: Anota intentos, consumo, minutos de revisión y motivo de aceptación o descarte. Repite antes de convertir un resultado aislado en una regla.
+    - paragraph [ref=f41e285]: "Una prueba así deja algo que una tarde de exploración suele perder: razones para elegir. También hace visible qué parte del proceso necesita mejorar. Puede ser el modelo, una referencia insuficiente, un criterio de aprobación ambiguo o una etapa manual que sigue consumiendo demasiado tiempo."
+    - paragraph [ref=f41e286]:
+      - text: Si quieres profundizar en esa organización del trabajo, en
+      - strong [ref=f41e287]:
+        - link "Creative Workflows" [ref=f41e288] [cursor=pointer]:
+          - /url: https://efeoncepro.com/design/creative-workflows/
+      - text: desarrollamos cómo conectar decisiones creativas, herramientas y continuidad. Es una conversación especialmente pertinente cuando cada lanzamiento hace más fácil producir archivos y más necesario entender qué merece avanzar.
+    - heading "El micrófono se cierra" [level=2] [ref=f41e289]
+    - paragraph [ref=f41e290]: Images 2.6 abre posibilidades interesantes para iterar, dirigir correcciones y llevar una idea hacia otros formatos. La prueba más útil empieza cuando eliges una de esas posibilidades y la llevas a una tarea con condiciones reales.
+    - paragraph [ref=f41e291]: "Me quedaría con una escena sencilla: tienes una pieza que funciona y alguien pide cambiar un detalle. Si el siguiente resultado conserva lo que estaba bien y resuelve el pedido, el equipo avanza. Si obliga a comenzar de nuevo, habrá que entender dónde se perdió el control. Ahí se juega buena parte del valor de este lanzamiento."
+    - paragraph [ref=f41e292]:
+      - text: Para seguir estas conversaciones,
+      - strong [ref=f41e293]:
+        - link "suscríbete a Glitch" [ref=f41e294] [cursor=pointer]:
+          - /url: https://efeoncepro.com/glitch/
+      - text: ": cada lunes, IA, marketing y negocios con una lectura que ayude a decidir. Cuando una noticia no espera al lunes, abrimos el micrófono en modo Flash."
+    - paragraph [ref=f41e295]:
+      - emphasis [ref=f41e296]: "Nota editorial: artículo desarrollado con apoyo de agentes de IA en investigación, estructura, edición y pruebas visuales. Las demostraciones oficiales están atribuidas a sus fuentes. Las escenas de Nexa son ficción sintética producida por Efeonce con GPT Image 2.6 Sunburst; la sección de pruebas identifica sus condiciones y muestra las cuatro salidas del modelo sin retoque. La portada Glitch es una composición posterior identificada como tal. Fuentes y pruebas revisadas el 5 de noviembre de 2026."

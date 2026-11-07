@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "el borde de la baranda del mirador,",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "talara",
+ "input": {
+  "id": "talara",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "bahía de Talara vista desde la ciudad, Piura, Perú",
+  "escena": "desde lo alto, la bahía de Talara con el mar a un lado y, junto a la costa, estructuras petroleras y la ciudad baja; un viajero de pie, de espaldas, apoyado en una baranda, mira la bahía. Tiene que leerse a la vez el mar y la industria: es la seña de Talara frente a las otras playas del norte. Personas: el viajero a media distancia, de espaldas, sin pose ni mirada al lente; ningún rostro identificable en primer plano",
+  "hora": "final de la tarde, con el sol todavía sobre el mar",
+  "clima": "cielo despejado; luz cálida abundante, sombras abiertas, altas luces del cielo y del agua conservadas",
+  "primerPlano": "el borde de la baranda del mirador,",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin logotipos ni nombres legibles de empresas petroleras o de la refinería, sin rótulos de negocios reales, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin humo ni llamas inventadas, sin la estatua del mirador en primer plano (requiere fidelidad aparte)",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "bahía de Talara vista desde la ciudad, Piura, Perú (its real forms, scale and spatial relationships)"
+ }
+}

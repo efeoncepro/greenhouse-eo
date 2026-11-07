@@ -446,3 +446,24 @@ partes, de cada 100, Venn de tres, matriz 2×2, embudo), adaptados a la web, má
   `#001a33` sin recargar.
 - **Uso.** Ningún post publicado lo usa todavía; el primero se autora desde la spec (`kind: 'chart'`) o el editor.
 - **Rollback:** restaurar el `.tar` que imprimió el deploy y purgar la caché.
+
+## Vimeo dentro del artículo (2026-11-05)
+
+Content Factory acepta `kind: 'embed', provider: 'vimeo'` con la URL oficial y un caption de fuente. La URL va
+sola en su línea dentro del wrapper del bloque nativo `core/embed`; no reemplazar un video solicitado por un botón.
+El hash `?h=` de un video no listado se conserva. YouTube mantiene su clase nativa 16:9; Vimeo usa sus dimensiones
+intrínsecas y no recibe una clase de aspecto fija.
+
+En Ohio, `max-width:100%` sólo reducía el ancho del iframe y mantenía su altura. `EO_Editorial_Styles::responsive_vimeo`
+deriva `aspect-ratio` de los atributos de ancho/alto del oEmbed y aplica `width:100%;height:auto` al renderizar el
+iframe. Sólo afecta `providerNameSlug=vimeo`, origen HTTPS exacto `player.vimeo.com`, ruta numérica de video y
+dimensiones positivas finitas. Conserva otros estilos, el caption y el bloque guardado; no requiere JavaScript.
+
+El código vive en `efeonce-public-site-runtime`, `includes/editorial/class-eo-editorial-styles.php`. El despliegue
+acotado `scripts/public-website/deploy-editorial-vimeo-responsive.php` valida sitio, autoridad, ambos SHA-256 y PHP;
+crea backup fuera del árbol público, sustituye un único archivo atómicamente, invalida opcache y purga Kinsta.
+Para rollback se usa el mismo apply con los bytes previos y los hashes invertidos. Marco existente:
+`GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`, carril WordPress/Content Factory vigente.
+
+Primer caso: [Glitch Flash Images 2.6](./glitch-flash-images-2-6/README.md), comparación 16:9 y montaje 4:1;
+evidencia de parser WordPress real y de reproducción en escritorio/móvil en la carpeta del artefacto de ese artículo.

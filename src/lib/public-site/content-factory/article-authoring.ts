@@ -142,7 +142,7 @@ export type GutenbergArticleBlock =
     }
   | {
       kind: 'embed'
-      provider: 'youtube'
+      provider: 'youtube' | 'vimeo'
       url: string
       /** Source credit (Glitch convention «Fuente: <medio>»), rendered as a real figcaption. */
       caption?: GutenbergRichText
@@ -602,9 +602,10 @@ const imageBlock = (block: Extract<GutenbergArticleBlock, { kind: 'image' }>): s
 }
 
 const YOUTUBE_EMBED_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'])
+const VIMEO_EMBED_HOSTS = new Set(['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'])
 
 const assertEmbedUrl = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): string => {
-  if (block.provider !== 'youtube') {
+  if (block.provider !== 'youtube' && block.provider !== 'vimeo') {
     throw new Error(`content_factory_article_embed_provider_unsupported:${String(block.provider)}`)
   }
 
@@ -616,7 +617,16 @@ const assertEmbedUrl = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>
     throw new Error('content_factory_article_embed_url_invalid')
   }
 
-  if (url.protocol !== 'https:' || !YOUTUBE_EMBED_HOSTS.has(url.hostname)) {
+  const hosts = block.provider === 'youtube' ? YOUTUBE_EMBED_HOSTS : VIMEO_EMBED_HOSTS
+
+  if (url.protocol !== 'https:' || url.username || url.password || url.port || !hosts.has(url.hostname)) {
+    throw new Error('content_factory_article_embed_url_invalid')
+  }
+
+  if (
+    block.provider === 'vimeo' &&
+    !(url.hostname === 'player.vimeo.com' ? /^\/video\/\d+\/?$/ : /^\/\d+(?:\/[a-zA-Z0-9]+)?\/?$/).test(url.pathname)
+  ) {
     throw new Error('content_factory_article_embed_url_invalid')
   }
 
@@ -625,13 +635,16 @@ const assertEmbedUrl = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>
 
 const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): string => {
   const url = assertEmbedUrl(block)
+  // Vimeo oEmbed supplies its real dimensions (including wide 4:1 launch reels).
+  // Let WordPress/the theme preserve those instead of imposing YouTube's 16:9.
+  const aspectClass = block.provider === 'youtube' ? 'wp-embed-aspect-16-9 wp-has-aspect-ratio' : ''
 
   const attrs = serializeGutenbergBlockAttributes({
     url,
     type: 'video',
     providerNameSlug: block.provider,
     responsive: true,
-    className: 'wp-embed-aspect-16-9 wp-has-aspect-ratio'
+    ...(aspectClass ? { className: aspectClass } : {})
   })
 
   // Same shape WordPress stores for a captioned embed (Glitch #17, 251605): the
@@ -644,7 +657,7 @@ const embedBlock = (block: Extract<GutenbergArticleBlock, { kind: 'embed' }>): s
 
   return [
     `<!-- wp:embed ${attrs} -->`,
-    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider} wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">\n${escapeGutenbergHtml(url)}\n</div>${caption}</figure>`,
+    `<figure class="wp-block-embed is-type-video is-provider-${block.provider} wp-block-embed-${block.provider}${aspectClass ? ` ${aspectClass}` : ''}"><div class="wp-block-embed__wrapper">\n${escapeGutenbergHtml(url)}\n</div>${caption}</figure>`,
     '<!-- /wp:embed -->'
   ].join('\n')
 }

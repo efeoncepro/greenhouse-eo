@@ -1,0 +1,3 @@
+/* Portada `cover-proposal` · `dawn` sin pregunta (norma: «la portada dice lo que es», operador 2026-10-19), 2026-11-06.
+   Sólo oculta la línea de la pregunta; el resto son las medidas de la receta. Se retira con TASK-2014. */
+.gl-question { display: none !important; }

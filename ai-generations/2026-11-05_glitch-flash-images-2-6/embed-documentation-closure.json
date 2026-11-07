@@ -1,0 +1,166 @@
+{
+  "options": {
+    "base": "HEAD",
+    "json": true,
+    "staged": false,
+    "strict": false,
+    "pathspec": [
+      "Handoff.md",
+      "changelog.md",
+      "project_context.md",
+      "docs/public-site/glitch-flash-images-2-6",
+      "docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md",
+      "src/lib/public-site/content-factory/article-authoring.ts",
+      "src/lib/public-site/content-factory/__tests__/article-authoring-editorial-blocks.test.ts",
+      "scripts/public-website/deploy-editorial-vimeo-responsive.php",
+      ".codex/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md",
+      ".claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md"
+    ]
+  },
+  "changes": [
+    {
+      "status": "M",
+      "path": ".claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md"
+    },
+    {
+      "status": "M",
+      "path": ".codex/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md"
+    },
+    {
+      "status": "M",
+      "path": "changelog.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/public-site/BLOG_EDITORIAL_BLOCK_STYLES_V1.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/article-spec.json",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/articulo.md",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/build-review.mjs",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/enrich-private.php",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/import-media.php",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/measure-own.mjs",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/media-plan.json",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/own-tests.md",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/publish-and-verify.py",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/publish.php",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/readback-private.php",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/README.md",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/research.md",
+      "untracked": true
+    },
+    {
+      "status": "A",
+      "path": "docs/public-site/glitch-flash-images-2-6/run-own-image.py",
+      "untracked": true
+    },
+    {
+      "status": "M",
+      "path": "Handoff.md"
+    },
+    {
+      "status": "M",
+      "path": "project_context.md"
+    },
+    {
+      "status": "A",
+      "path": "scripts/public-website/deploy-editorial-vimeo-responsive.php",
+      "untracked": true
+    },
+    {
+      "status": "M",
+      "path": "src/lib/public-site/content-factory/__tests__/article-authoring-editorial-blocks.test.ts"
+    },
+    {
+      "status": "M",
+      "path": "src/lib/public-site/content-factory/article-authoring.ts"
+    }
+  ],
+  "docsChanged": {
+    "agents": false,
+    "architecture": false,
+    "audits": false,
+    "changelog": true,
+    "claude": false,
+    "clientChangelog": false,
+    "documentation": false,
+    "handoff": true,
+    "manual": false,
+    "operations": false,
+    "projectContext": true,
+    "taskDocs": false,
+    "taskIndexes": false
+  },
+  "signals": {
+    "accessChanged": false,
+    "apiChanged": false,
+    "auditChanged": false,
+    "behaviorChanged": true,
+    "dataChanged": false,
+    "financePayrollChanged": false,
+    "integrationChanged": false,
+    "localSkillChanged": true,
+    "packageWorkflowChanged": false,
+    "releaseCloudChanged": false,
+    "taskLifecycleChanged": false,
+    "uiChanged": false
+  },
+  "findings": [
+    {
+      "level": "info",
+      "code": "closure_docs_look_present",
+      "message": "No obvious missing documentation owner detected for this selected diff.",
+      "docs": []
+    }
+  ]
+}

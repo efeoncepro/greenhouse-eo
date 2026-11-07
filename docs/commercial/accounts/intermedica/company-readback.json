@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "60190203298",
+      "properties": {
+        "city": "Lima",
+        "country": "Peru",
+        "createdate": "2026-10-28T21:23:00.035Z",
+        "description": "Empresa peruana de tecnología y equipamiento médico especializado. Identidad comercial contrastada con web propia y documento público INSN-SB; RUC20523218329 en documento de enero2026. Investigación28/10/2026: solicitud de propuesta para Intermedica recibida por Julio vía LinkedIn de Nikol Suarez; cargo/mandato exacto de ella, entidad contratante y presupuesto por confirmar. Technogym/Mindfully se evalúan separados, sin inferir grupo legal ni relación cliente Efeonce. Caso interno: docs/commercial/accounts/intermedica/CASO-DE-NEGOCIO.md. Fuentes: https://www.intermedica.pe/nosotros/ ; https://www.intermedica.pe/politicas-de-privacidad/ .",
+        "domain": "intermedica.pe",
+        "efeonce_prospecting_researched_on": "2026-10-28",
+        "hs_lastmodifieddate": "2026-10-28T21:23:35.354Z",
+        "hs_object_id": "60190203298",
+        "hubspot_owner_id": "75788512",
+        "industry": "MEDICAL_DEVICES",
+        "lifecyclestage": "opportunity",
+        "name": "Intermedica Solutions S.A.C.",
+        "website": "https://www.intermedica.pe/"
+      },
+      "createdAt": "2026-10-28T21:23:00.035Z",
+      "updatedAt": "2026-10-28T21:23:35.354Z",
+      "archived": false,
+      "url": "https://app.hubspot.com/contacts/48713323/record/0-2/60190203298"
+    }
+  ]
+}

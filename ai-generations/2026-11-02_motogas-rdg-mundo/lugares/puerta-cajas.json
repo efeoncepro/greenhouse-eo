@@ -1,0 +1,18 @@
+[
+  {
+    "k": "2d-heraldo",
+    "left": -46,
+    "top": 1040,
+    "w": 812,
+    "h": 720,
+    "flip": false
+  },
+  {
+    "k": "2d-rey-capa",
+    "left": 778,
+    "top": 922,
+    "w": 304,
+    "h": 340,
+    "flip": true
+  }
+]

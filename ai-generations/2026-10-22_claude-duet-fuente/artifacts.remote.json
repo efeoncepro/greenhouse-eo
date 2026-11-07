@@ -1,0 +1,143 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:41:03.057Z",
+  "run": "ai-generations/2026-10-22_claude-duet-fuente",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_claude-duet-fuente",
+  "totalBytes": 3433329,
+  "fileCount": 22,
+  "files": [
+    {
+      "path": "brief/prensa-9to5mac-claude-duet-2000x1000.jpg",
+      "sizeBytes": 60072,
+      "sha256": "dc1b48573868f651674edc6e9e7bb2146b90ddce10aaaa559346f1fab2743239",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/brief/prensa-9to5mac-claude-duet-2000x1000.jpg"
+    },
+    {
+      "path": "brief/revision-iconos.png",
+      "sizeBytes": 62353,
+      "sha256": "ec46449cd611222777c3321b0b6f1a3094e742ae58d7305cfc3728ffa9f43b30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/brief/revision-iconos.png"
+    },
+    {
+      "path": "brief/revision-lottie.png",
+      "sizeBytes": 181025,
+      "sha256": "d393b876a7abcf76b0eca00b90ff4b1b37576ad7d1d2a5b7bcd2ebb229505a71",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/brief/revision-lottie.png"
+    },
+    {
+      "path": "brief/revision-svg.png",
+      "sizeBytes": 585667,
+      "sha256": "e2cae404ea72b6d62645ab375c35630e857d25160a12fc7225fd994df32a755d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/brief/revision-svg.png"
+    },
+    {
+      "path": "cuadros/claude-duet-app-icon-flat-render-1200.png",
+      "sizeBytes": 84299,
+      "sha256": "0014f1702bfe96564f3086a2809fcae7c5dc6fd4a736d02b4b2b528168f7371f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/claude-duet-app-icon-flat-render-1200.png"
+    },
+    {
+      "path": "cuadros/claude-duet-app-icon-render-1200.png",
+      "sizeBytes": 122122,
+      "sha256": "c99bce10afc14af93ac6659cceea21dff5f4466c4d7ef8df46cad4ccce9d9c2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/claude-duet-app-icon-render-1200.png"
+    },
+    {
+      "path": "cuadros/claude-duet-app-icon-render-1300.png",
+      "sizeBytes": 67647,
+      "sha256": "0adeae2e8f2e26e73d746c653309430beb92777d1ff9725b0e58ed150ad678b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/claude-duet-app-icon-render-1300.png"
+    },
+    {
+      "path": "cuadros/claude-duet-icono-sobre-lavanda-render-1200.png",
+      "sizeBytes": 57553,
+      "sha256": "d08586f1bd25d53cc42e112adf310bc7f08753bde59da736181d34526b349bd6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/claude-duet-icono-sobre-lavanda-render-1200.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f00.png",
+      "sizeBytes": 63231,
+      "sha256": "7ec0323679b753d3f4b89ace7da0fdddd8d5008ca4c463e245c7971fdf2e3283",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f00.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f06.png",
+      "sizeBytes": 63666,
+      "sha256": "182c809d0bf312afef52c9f0e7390ffc070187d70b61918a5d12e2504036317a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f06.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f12.png",
+      "sizeBytes": 32720,
+      "sha256": "6522b82019508d43642be0dbb85a1ea2237d94290eb53ace0ccd21cd62bf2c05",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f12.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f18.png",
+      "sizeBytes": 41816,
+      "sha256": "0e21f2f75f5920364e19ef21c04e68e394512a79abc121de25ba0043e8e00942",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f18.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f24.png",
+      "sizeBytes": 41286,
+      "sha256": "862fc4efed7d8d7f0793caa514abc6835b61661dbb1d952aa3994938e39e1c18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f24.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f30.png",
+      "sizeBytes": 18561,
+      "sha256": "7d97b131cb24694cf993de00054f01057a92966b9c9dabbd4170a803ad1dbea6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f30.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f36.png",
+      "sizeBytes": 65490,
+      "sha256": "25cff7757cbc00978cd2ee9ed858bd0d9a4853298dd7dbeacbbe00af055f8e78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f36.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f42.png",
+      "sizeBytes": 63213,
+      "sha256": "ff32f514ab6e28727ad716d1c804267f27ec17b270c1cc5d32d32a0d9b9175ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f42.png"
+    },
+    {
+      "path": "cuadros/lottie-object-question-f49.png",
+      "sizeBytes": 62687,
+      "sha256": "b5d341d7f2007876d04eb17f1cbfcb589cbd2c0b1439fc2211e18f57a6a41e1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/cuadros/lottie-object-question-f49.png"
+    },
+    {
+      "path": "fuente/claude-com-duet/95a868946ac8a31e5ff832e2899f294aa368b836.png",
+      "sizeBytes": 1198,
+      "sha256": "4004381309500f25e49a1ae639912ce307ea81da74cc383954a1ac8b9d343fe6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/fuente/claude-com-duet/95a868946ac8a31e5ff832e2899f294aa368b836.png"
+    },
+    {
+      "path": "fuente/claude-com-duet/claude-com-icon.png",
+      "sizeBytes": 1588,
+      "sha256": "ce7e8cafe276c4d6820387652d77437772fb2efa7511bff92a4e7664cd2bee51",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/fuente/claude-com-duet/claude-com-icon.png"
+    },
+    {
+      "path": "fuente/claude-duet-apps-integradas-oficial-claude-com.png",
+      "sizeBytes": 975192,
+      "sha256": "c0864c4ecce857cb9a963e3bef5d1f9da29c39fb6c19473f5e384d47a3ed960c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/fuente/claude-duet-apps-integradas-oficial-claude-com.png"
+    },
+    {
+      "path": "fuente/claude-duet-static-og.jpg",
+      "sizeBytes": 197561,
+      "sha256": "4b914fbcac7d30852d1800a4f58ccb4bd4593d19ca3d77bac51e15253e3a2b86",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/fuente/claude-duet-static-og.jpg"
+    },
+    {
+      "path": "hoja-de-contacto.png",
+      "sizeBytes": 584382,
+      "sha256": "ebf934115ca25a6c7c3d6df1e2067b77365d32d8d9802901e561b16c3dcdfe8a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_claude-duet-fuente/hoja-de-contacto.png"
+    }
+  ]
+}

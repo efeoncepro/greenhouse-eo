@@ -1,0 +1,8 @@
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/arequipa-img1-maestro.png (edit) …
+  ✓ 13288KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2386 (img 1508 · txt 878) · out 13342 · total 15728
+done
+arequipa exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/cusco-calma-img1-maestro.png (edit) …

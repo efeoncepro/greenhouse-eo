@@ -1,0 +1,53 @@
+--- a/brands/sky-airline/blog/compose/route-banner.mjs
++++ b/brands/sky-airline/blog/compose/route-banner.mjs
+@@ -170,7 +170,7 @@
+   const faces = loadFaces(resourceDir), P = loadPalette();
+   const cta = recipes.ruta.copy.cta.replace('{destino}', job.destino.ciudad);
+   const parts = [], layers = [];
+-  let photo = null, rn, t;
++  let photo = null, rn, t, ctaAxis = null;
+ 
+   if (job.recipe === 'ruta.color') {
+     const g = L.color.glow;
+@@ -184,7 +184,10 @@
+     const c = L.color.cta, h = c.size + c.padY * 2;
+     if (c.right !== undefined && c.left === undefined) {
+       const probe = pill(faces.bold, cta, { x: 0, y: 0, h, size: c.size, padX: c.padX, fill: P.ctaFill, ink: P.ctaInk });
+-      parts.push(pill(faces.bold, cta, { x: W - c.right - probe.w, y: H - c.bottom - h, h, size: c.size, padX: c.padX, fill: P.ctaFill, ink: P.ctaInk }).svg);
++      // El CTA se centra bajo la ruta dibujada (revisión de Melkin, 2026-11-05): mismo eje que el arco, sin pasar el margen derecho.
++      const rr = L.color.route, x = c.align === 'route' ? Math.min(rr.x + rr.width / 2 - probe.w / 2, W - c.right - probe.w) : W - c.right - probe.w;
++      parts.push(pill(faces.bold, cta, { x, y: H - c.bottom - h, h, size: c.size, padX: c.padX, fill: P.ctaFill, ink: P.ctaInk }).svg);
++      ctaAxis = { cta: x + probe.w / 2, route: rr.x + rr.width / 2 };
+     } else parts.push(pill(faces.bold, cta, { x: c.left, y: H - c.bottom - h, h, size: c.size, padX: 0, fill: P.ctaFill, ink: P.ctaInk, fullWidth: W - c.left - c.right }).svg);
+     if (job.format === 'ruta-movil') check(t.bottom <= L.color.route.y - 12, `el titular (${t.lines.length} líneas) invade la ruta dibujada: acórtalo`);
+   } else {
+@@ -227,7 +230,7 @@
+     qa: {
+       schema: 'sky.blog-route-qa.v0', recipe: job.recipe, format: job.format, size: [W, H], bytes: buffer.length, maxKB: F.maxKB, webpQuality: quality,
+       copy: { ruta: recipes.ruta.copy.ruta.replace('{origen}', job.origen.ciudad).replace('{destino}', job.destino.ciudad), titular: job.titular, cta, alt: job.alt },
+-      layout: { routeNameLines: rn.lines, routeNameBottom: rn.bottom, titleTop: t.top, titleLines: t.lines.length },
++      layout: { routeNameLines: rn.lines, routeNameBottom: rn.bottom, titleTop: t.top, titleLines: t.lines.length, ctaAxis },
+       plane: job.recipe === 'ruta.color' ? { icon: recipes.ruta.plane.file, angleDeg: Number(routeGeometry(L.color.route).angle.toFixed(2)) } : null, route: { ...job.ruta, origen: job.origen.iata, destino: job.destino.iata },
+       fonts: Object.fromEntries(Object.entries(faces).map(([k, f]) => [k, f.postscriptName])), palette: P,
+       photoSha256: photo ? sha(readFileSync(job.photo.file)) : null, warnings,
+--- a/brands/sky-airline/blog/contracts/sky-blog-recipes.json
++++ b/brands/sky-airline/blog/contracts/sky-blog-recipes.json
+@@ -92,7 +92,7 @@
+       "ruta": {
+         "radius": 0,
+         "logo": { "x": 64, "y": 53, "height": 45 },
+-        "color": { "routeName": { "x": 64, "y": 148, "size": 64, "leading": 1.04, "maxWidth": 747, "maxLines": 2 }, "title": { "x": 64, "gap": 16, "size": 34, "leading": 1.16, "maxWidth": 700, "maxLines": 2, "maxBottom": 356 }, "route": { "x": 867, "y": 93, "width": 400, "height": 107, "iataY": 218, "iataSize": 29, "planeSize": 70 }, "cta": { "right": 64, "bottom": 48, "size": 29, "padX": 37, "padY": 19 }, "glow": { "cx": 0.92, "cy": 0, "rx": 693, "ry": 400 } },
++        "color": { "routeName": { "x": 64, "y": 148, "size": 64, "leading": 1.04, "maxWidth": 747, "maxLines": 2 }, "title": { "x": 64, "gap": 16, "size": 34, "leading": 1.16, "maxWidth": 700, "maxLines": 2, "maxBottom": 356 }, "route": { "x": 867, "y": 93, "width": 400, "height": 107, "iataY": 218, "iataSize": 29, "planeSize": 70 }, "cta": { "align": "route", "right": 64, "bottom": 48, "size": 29, "padX": 37, "padY": 19 }, "glow": { "cx": 0.92, "cy": 0, "rx": 693, "ry": 400 } },
+         "foto":  { "split": 667, "routeName": { "x": 64, "y": 122, "size": 54, "leading": 1.04, "maxWidth": 560, "maxLines": 2 }, "title": { "x": 64, "gap": 14, "size": 30, "leading": 1.16, "maxWidth": 540, "maxLines": 2 }, "cta": { "left": 64, "bottom": 48, "size": 28, "padX": 35, "padY": 17 }, "tag": { "left": 29, "bottom": 29, "size": 24, "padX": 16, "padY": 8, "radius": 11 } }
+       },
+       "ruta-movil": {
+--- a/brands/sky-airline/blog/test/route-banner.test.mjs
++++ b/brands/sky-airline/blog/test/route-banner.test.mjs
+@@ -63,6 +63,7 @@
+         assert.match(r.qa.fonts.black, /^Metric-Black/);
+         assert.equal(r.qa.copy.ruta, `${variant.origen.ciudad} → ${variant.destino.ciudad}`);
+         assert.ok(r.qa.layout.routeNameBottom <= r.qa.layout.titleTop, 'la ruta va antes del titular');
++        if (variant.recipe === 'ruta.color' && format === 'ruta') assert.ok(Math.abs(r.qa.layout.ctaAxis.cta - r.qa.layout.ctaAxis.route) < 1, 'el CTA se centra bajo la ruta dibujada');
+       }
+   } finally { (await import('node:fs')).rmSync(tmp, { force: true }); }
+ });

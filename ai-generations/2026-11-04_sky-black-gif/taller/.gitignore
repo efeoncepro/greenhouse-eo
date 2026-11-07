@@ -1,0 +1,27 @@
+# Taller SKY BLACK 2026: en git sólo va el CÓDIGO (scripts y sus datos chicos).
+# El kit corregido (src2/), las fotos, las fuentes con licencia (Metric, Source Sans), el proyecto del
+# canvas y todo lo que se regenera viven en este disco (y en el archivo de ai-generations), nunca en git.
+*
+!*/
+!*.cjs
+!*.sh
+!*.py
+!*.csv
+!*.md
+!*.json
+!.gitignore
+canvas/
+src2/
+fotos-destino/
+expand/
+formatos/
+parts/
+layers/
+png/
+banners/
+chile/
+anim/
+fr-*/
+frames-*/
+story-tmp/
+export/

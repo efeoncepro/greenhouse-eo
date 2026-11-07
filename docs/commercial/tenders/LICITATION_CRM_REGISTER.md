@@ -1,5 +1,55 @@
 # Registro operativo CRM de licitaciones
 
+## KSB Chile — Agencia de Marketing Digital 2027 — licitación privada — bases recibidas y consultas enviadas 06/11/2026
+
+**Delta 06/11/2026:** bases LIC-MKT-2026-001 recibidas de Nelson Urbano (CC Pamela Ojeda) a las 09:27 Santiago;
+cierre **16/11/2026 16:30**. Consultas enviadas por Julio a las 10:12 en el mismo hilo, con firma gráfica y CCO
+(EMAIL 120642546293 `SENT`). Negocio en **UF (CLF)**, presupuesto de licitación 720, ID LIC-MKT-2026-001, cierre
+2026-11-16T19:30:00Z y próximo paso actualizados. Contactos Nelson 260888175661 (Gerente Marketing, celular) y
+Pamela 260888305444 asociados a la empresa y al negocio; ambos los creó HubSpot al registrar los correos, y el cargo
+«Graphic Designer» de Pamela es del enriquecimiento automático, sin verificar. PDF en OneDrive
+`Licitaciones/KSB Chile/01. Bases y anexos originales/`. GO/NO-GO pendiente de las respuestas. Lo siguiente es el
+corte del 05/11.
+
+Estado: `Screening`. Señal en LinkedIn (Nelson Urbano Meza, KSB Chile S.A.), publicada el 05/11/2026; presentación
+16/11/2026 sin hora ni zona; presupuesto base 720 UF/año; vigencia 12 meses + 2 prórrogas.
+
+- **Negocio** [67622242568](https://app.hubspot.com/contacts/48713323/record/0-3/67622242568): **KSB ∣ CL ∣ Agencia de marketing digital 2027 ∣ 2026-11**.
+  - Cita programada como entrada administrativa, Licitación, Prospección directa, Efeonce Digital, Strategic Bets, CLP.
+  - Sin monto ni cierre. Próximo paso: esperar bases; GO/NO-GO por admisibilidad.
+- **Empresa nueva** KSB Chile S.A., 60766270868, hija de KSB 53965760378 (Alemania). Una automatización puso su ciclo de vida en «Oportunidad».
+- **Contacto** buzón `cl.ksb@ksb.com`, 215349028236, reutilizado. Nelson sin Contact (sin correo individual verificado; 0 créditos Apollo).
+- **Correo de solicitud de bases:** enviado por Julio desde Outlook el 05/11/2026 17:23 (20:23:31Z); EMAIL 120622408328 `SENT`, asociado al contacto y al negocio. Brochure Agencia de Marketing 360° por enlace nativo https://hubs.ly/Q04DvcpK0.
+- **Brechas:** Google Partners y Meta Business Partner no verificados; equipo 7+, ROI y referencias industriales sin verificar; ≈ 60 UF/mes, bajo para el equipo exigido.
+- **No se hizo:** lectura de bases, GO, oferta ni consultas formales.
+
+[Expediente y pendientes](ksb-chile-agencia-marketing-digital-2027/README.md).
+
+## Fiordo Austral — CRM — Wherex 428823 — alta y negocio compartido verificados 05/11/2026
+
+Alta autorizada por Julio, con HubSpot como solución elegida.
+
+- **Negocio** [67612649069](https://app.hubspot.com/contacts/48713323/record/0-3/67612649069): **Fiordo Austral ∣ CL ∣ Implementación HubSpot ∣ 428823**.
+  - Pipeline por defecto, etapa inicial administrativa, `newbusiness`, owner Julio 75788512.
+  - Modalidad Licitación y canal WherEX.
+  - Cierre comercial estimado 31/12/2026 (`2026-12-31T15:00:00Z`). Sin monto.
+- **Empresa nueva** Pesquera Fiordo Austral S.A., 60767512668, como Primary.
+- **Nota** 120606904959.
+- **Contactos:** 5, obtenidos de Apollo con 5 créditos y correo verificado: Adquisiciones, Comercial, TI, Finanzas y Gerencia General.
+- **Ciclo de vida:** HubSpot lo pasó solo a `opportunity`, sin calificación humana.
+- **Negocio compartido:** convertido desde Chrome a las 18:28.
+  - Liderazgo Partner.
+  - Sales Hub Enterprise y Professional.
+  - Cercanía: aún sin conversación.
+  - PDM: Maria del Mar Castro.
+  - Etapa en HubSpot: Discovery.
+  - Especialista en crecimiento: pendiente de asignación.
+  - Sin POI.
+- **Pendiente:** confirmar las fechas en Wherex.
+- **No se hizo:** oferta, consultas ni envíos.
+
+[Expediente, contactos y pendientes](fiordo-austral-crm-428823/README.md).
+
 ## Qualitor — Simoniz — SMZ-116 — alta verificada 29/10/2026
 
 **Revisión documental 30/10 — HOLD para ofertar:** [caso v2](simoniz-qualitor-temporada-viajes-smz-116/CASO-DE-NEGOCIO-QUALITOR-SMZ-116.md) y [contraste de respuesta/decisión](simoniz-qualitor-temporada-viajes-smz-116/REVISION-RESPUESTA-2026-10-30.md). Seis consultas contestadas: COP 70 millones integrales, operación incluida, materiales adaptados Simoniz, zonas de afluencia sin listado PDV; respuesta «COLOMBIA» bloquea asumir facturación Chile. Inicio declarado 25/11 vs ítem aún 01/12. Aviso fija 06/11 **14:00 Colombia / 16:00 Chile**, ficha sigue 18:00 sin zona; discrepancia pendiente, sin prórroga. Wherex Editando, 0 COP y sin archivos; sin adjudicación/contrato acreditados en fuentes revisadas. Ruta local a validar por Julio/Legal antes del 03/11 12:00 Colombia; gate interno bid/no-bid propuesto 05/11 12:00 Colombia. Sin cambios ni nuevo readback HubSpot, envío o presentación. Copia OneDrive conserva v1. Los datos CRM siguientes son históricos del 29/10.

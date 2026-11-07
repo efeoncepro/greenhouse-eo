@@ -1,28 +1,41 @@
 # Administrar las novedades del login
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-10-02 por Claude (TASK-1963)
+> **Última actualización:** 2026-11-01 (Efeonce ID consume el feed en producción)
 > **Modulo:** Identity / acceso al portal
-> **Rutas:** `/login` (consumidor), `GET /api/public/login-announcements`, `GET|POST /api/admin/login-announcements`, `PATCH /api/admin/login-announcements/{id}`
+> **Rutas:** `/login` del portal y `https://auth.efeonce.org/login` (consumidores), `GET /api/public/login-announcements`, `GET|POST /api/admin/login-announcements`, `PATCH /api/admin/login-announcements/{id}`
 > **Documentacion relacionada:** [Novedades del login](../../documentation/identity/novedades-del-login.md)
 
 ## Para qué sirve
 
 Para crear, corregir, publicar y retirar las novedades que rotan en el carrusel de la pantalla de ingreso, sin desplegar código. Todavía no hay una pantalla de administración: se opera por la API.
 
-## Límite Auth — 2026-10-26
+## Dónde se ven — desde 2026-11-01
 
-La API de este manual administra novedades del portal Greenhouse. Auth reutiliza V4, pero su consumo
-de este feed sigue pendiente: no publicar datos compartidos para ensayar la nueva UI del issuer.
-Desarrollarla en un entorno aislado no exige activar first-party/OTP ni integrar PR #263/#264, retenidas.
-[Runbook Auth](../../operations/runbooks/auth-server.md#estado-operativo-y-retención--2026-10-26).
+Las novedades que publicas aquí aparecen en **dos pantallas**:
+
+- El login del portal Greenhouse (`/login`).
+- El login de Efeonce ID (`https://auth.efeonce.org/login`), que es también el que ve quien entra desde Rooms («Entra a
+  Rooms»). Está en producción desde el release del 2026-11-01.
+
+Efeonce ID no tiene administración propia: lee el mismo feed público (`GET /api/public/login-announcements`).
+
+- Toma como máximo tres novedades.
+- Espera hasta 600 ms la respuesta del feed.
+- Guarda lo leído 30 segundos, además de los 5 minutos de caché del feed.
+- Si el feed falla, muestra la fotografía oficial sin titulares.
+
+Un cambio aquí cambia ambos logins: no publiques para «probar» Efeonce ID. Para mirar el carrusel con el feed real sin
+tocar nada, usa el arnés local (`pnpm auth-server:dev-ui` → `/login/public-feed-preview`; ver
+[Revisar las pantallas de Efeonce ID](operar-pantallas-efeonce-id.md)).
 
 ## Antes de empezar
 
 - Necesitas una sesión de administración (`efeonce_admin`) con la capability `login_announcements.manage`.
 - En staging, `pnpm staging:request` maneja el bypass de Vercel y la sesión del agente. Sintaxis: `pnpm staging:request [METHOD] <path> ['<json>']`.
-- Ten en cuenta que dev, staging y producción comparten la misma base de datos: **lo que publiques se ve en todos los ambientes que ya tengan el login V4**.
+- Ten en cuenta que dev, staging y producción comparten la misma base de datos: **lo que publiques se ve en todos los ambientes que ya tengan el login V4, incluido `auth.efeonce.org`**.
 - Si la novedad lleva una foto nueva, primero tiene que estar en `public/images/login/` y desplegada. La API no sube imágenes.
 
 ## Paso a paso
@@ -80,6 +93,7 @@ Manda la novedad **completa**, con el mismo formato del paso 2: el contenido se 
 
 1. Llama a `GET /api/public/login-announcements` y confirma que aparece, en el orden esperado.
 2. Abre `/login` y mira la pestaña en desktop y en 390 px. La API pública guarda en caché hasta 5 minutos.
+3. Abre `https://auth.efeonce.org/login` y confirma que la novedad también aparece ahí. Puede tardar unos 30 segundos más que en el portal.
 
 ## Qué significan los estados y respuestas
 
@@ -103,6 +117,7 @@ Códigos frecuentes en `issues`: `tab_label_required`, `title_required` (tipo `t
 
 ## Problemas comunes
 
+- **Aparece en el portal pero no en `auth.efeonce.org/login`:** espera la caché de 30 segundos del autorizador. Si el carrusel desapareció del todo, el autorizador no pudo leer el feed a tiempo (más de 600 ms, respuesta mayor a 16 KB o con formato inválido) y volvió a la fotografía oficial. Revisa que la API pública responda rápido y que la novedad pase la validación.
 - **La novedad publicada no aparece:** revisa que esté vigente (`startsAt` pasado, `endsAt` futuro o vacío), que su prioridad la deje entre las tres primeras y espera la caché de 5 minutos.
 - **La lente queda lejos del sujeto:** ajusta `lens.x` / `lens.y` (porcentaje de la foto) y `radiusRatio`; la lente se ancla a ese punto de la foto en cualquier proporción de pantalla.
 - **Una persona de cuentas u operaciones recibe 403:** hoy la API exige además sesión de administración, aunque esos roles tengan la capability (pregunta abierta en TASK-1963).
@@ -111,4 +126,5 @@ Códigos frecuentes en `issues`: `tab_label_required`, `title_required` (tipo `t
 
 - [TASK-1963](../../tasks/in-progress/TASK-1963-login-announcements-governed-reader.md) — tabla, reader, commands y API.
 - [TASK-1964](../../tasks/in-progress/TASK-1964-login-v4-premium-access-transition.md) — pantalla del login V4 que consume el reader.
+- [TASK-2064](../../tasks/in-progress/TASK-2064-efeonce-id-login-v4-rooms.md) — login V4 de Efeonce ID que consume el feed público (`src/lib/auth-server/persons/login-announcements.ts`).
 - Código: `src/lib/login-announcements/**`, `src/app/api/public/login-announcements/route.ts`, `src/app/api/admin/login-announcements/**`.

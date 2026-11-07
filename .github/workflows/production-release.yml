@@ -378,6 +378,19 @@ jobs:
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
+  # TASK-1833: opt-in definition-only Job. Provisioned means SA, narrow PG login,
+  # pinned secret and IAM were reviewed. A release never executes it or Scheduler.
+  deploy-auth-key-maintenance:
+    name: Deploy disabled Auth key maintenance Job
+    if: vars.AUTH_KEY_MAINTENANCE_PROVISIONED == 'true'
+    needs: [approval-gate]
+    uses: ./.github/workflows/auth-key-maintenance-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
   # TASK-1846 — Cloud Run JOB artifact-worker (render del Artifact Composer: Proposal + Efeonce
   # Insights). Único para staging y producción, change-gated como auth-server/ops-worker: el workflow
   # compara la etiqueta `git-sha` del Job contra target_sha y salta el build si las rutas runtime no

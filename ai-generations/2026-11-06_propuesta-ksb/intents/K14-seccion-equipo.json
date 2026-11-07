@@ -1,0 +1,26 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "team",
+  "voice": {
+    "eyebrow": "Quién lo hace",
+    "question": "Siete roles y un solo",
+    "answer": [
+      "Contacto"
+    ]
+  },
+  "body": "Los siete roles que piden las bases y **un** responsable de cuenta como contraparte única de su equipo.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+    "alt": "Una diseñadora y un diseñador de Efeonce revisan pruebas impresas sobre una mesa de luz, mientras un director sonríe detrás"
+  }
+}

@@ -1,11 +1,11 @@
 {
   "schema": "greenhouse.aiGenerationArtifacts.v1",
-  "generatedAt": "2026-10-22T21:54:10.790Z",
+  "generatedAt": "2026-11-06T12:19:05.173Z",
   "run": "ai-generations/2026-10-12_brochure-efeonce-360",
   "bucket": "efeonce-group-greenhouse-private-assets-prod",
   "prefix": "ai-generations/2026-10-12_brochure-efeonce-360",
-  "totalBytes": 120827890,
-  "fileCount": 145,
+  "totalBytes": 131338995,
+  "fileCount": 147,
   "files": [
     {
       "path": "caso-anam/base-cine2.png",
@@ -150,6 +150,18 @@
       "sizeBytes": 1549692,
       "sha256": "c151f44279a8815fa0909a1dabc5f36a1c9959b5d80e2a0e384b9a538a948d84",
       "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/channel-commerce/btl/b9-canal.png"
+    },
+    {
+      "path": "entrega-casos/caso-berel-p20.png",
+      "sizeBytes": 5713286,
+      "sha256": "9776d9117b2820a7814843cccaf379d91b5eb08358cfc65cd866ebba06376cfd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/entrega-casos/caso-berel-p20.png"
+    },
+    {
+      "path": "entrega-casos/caso-sky-p34.png",
+      "sizeBytes": 4797819,
+      "sha256": "87fa2f47a44bca48fce7973246c014ffab50de453e49d42fb34956e03354ebbe",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-12_brochure-efeonce-360/entrega-casos/caso-sky-p34.png"
     },
     {
       "path": "growth-plate/HW1b-mismo-trabajo-sin-lanyard.png",

@@ -30,7 +30,7 @@ describe.skipIf(!hasLiveDb)('TASK-1848 — recurrencia (PostgreSQL real)', () =>
 
         const schedule = await store.insertInsightSchedule(client, {
           organizationId, label: 'Live test mensual', cadence: 'monthly', timeZone: 'America/Santiago', consolidationDays: 3, catchUpLimit: 1,
-          requestTemplate: { modules: ['seo'] }, authorizedByActorKind: 'member', authorizedByUserId: 'live-user'
+          requestTemplate: { modules: ['seo', 'aeo'] }, authorizedByActorKind: 'member', authorizedByUserId: 'live-user'
         })
 
         expect(schedule).toMatchObject({ state: 'draft', reviewPolicy: 'draft_for_review', scheduleVersion: 1 })

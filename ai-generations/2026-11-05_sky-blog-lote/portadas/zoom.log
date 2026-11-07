@@ -1,0 +1,428 @@
+equipaje-bodega-v2 {"s":0.692,"top":131,"box":"0.438,0.13,0.548,0.49"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+equipaje-bodega-v2 done 
+liquidos-v2 {"s":0.78,"top":180,"box":"0.406,0.13,0.765,0.489"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+liquidos-v2 done 
+tipos-equipaje-v2 {"s":0.59,"top":217,"box":"0.358,0.13,0.653,0.49"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+tipos-equipaje-v2 done 
+noticia-gol-cl-v2 {"s":0.75,"top":86,"box":"0.425,0.13,0.485,0.49"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+noticia-gol-cl-v2 done 
+noticia-puntual-pe-v2 {"s":0.78,"top":0,"box":"0.453,0.133,0.523,0.468"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+noticia-puntual-pe-v2 done 
+cusco-calma {"s":0.514,"top":225,"box":"0.443,0.13,0.737,0.49"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+cusco-calma done 
+titicaca {"s":0.734,"top":0,"box":"0.456,0.22,0.515,0.47"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+titicaca done 
+punta-cana {"s":0.78,"top":0,"box":"0.734,0.179,0.789,0.468"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+punta-cana done 
+noticia-gol-pe {"s":0.758,"top":0,"box":"0.447,0.136,0.705,0.47"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+noticia-gol-pe done 
+lodge-selva {"s":0.72,"top":94,"box":"0.32,0.13,0.68,0.49"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+lodge-selva done 
+selva-maleta {"s":0.627,"top":0,"box":"0.475,0.232,0.525,0.47"}
+FATAL: El prompt nombra "logos". Un logo o asset de marca no se genera con inpainting: compón el SVG oficial después (EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1). Si la edición sólo toca el contexto, repite con --allow-brand.
+selva-maleta done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta/inpaint/f5f9eed54f50/candidate-1.png
+equipaje-bodega-v2 {"s":0.692,"top":131,"box":"0.438,0.13,0.548,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, -60 px, escala 1): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/equipaje-bodega-v2/inpaint/d1bd548eef6c/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+equipaje-bodega-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/equipaje-bodega-v2/inpaint/d1bd548eef6c/candidate-1.png
+liquidos-v2 {"s":0.78,"top":180,"box":"0.406,0.13,0.765,0.489"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 243/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -80 px, -120 px, escala 1.06): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/liquidos-v2/inpaint/8b0599e11fd3/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+liquidos-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/liquidos-v2/inpaint/8b0599e11fd3/candidate-1.png
+tipos-equipaje-v2 {"s":0.59,"top":217,"box":"0.358,0.13,0.653,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 250/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, -20 px, escala 1.04): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2/inpaint/bf8fa3b5f25a/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+tipos-equipaje-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tipos-equipaje-v2/inpaint/bf8fa3b5f25a/candidate-1.png
+noticia-gol-cl-v2 {"s":0.75,"top":86,"box":"0.425,0.13,0.485,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 253/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 20 px, escala 1.04): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/68050a49f77b/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+noticia-gol-cl-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/68050a49f77b/candidate-1.png
+noticia-puntual-pe-v2 {"s":0.78,"top":0,"box":"0.453,0.133,0.523,0.468"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 223/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 14.2/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2/inpaint/a7b18713f84a/manifest.json
+noticia-puntual-pe-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-pe-v2/inpaint/a7b18713f84a/candidate-1.png
+cusco-calma {"s":0.514,"top":225,"box":"0.443,0.13,0.737,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 32.9/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma/inpaint/b6cad7bab1fe/manifest.json
+cusco-calma done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cusco-calma/inpaint/b6cad7bab1fe/candidate-1.png
+titicaca {"s":0.734,"top":0,"box":"0.456,0.22,0.515,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 244/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 26.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/titicaca/inpaint/4ad41f0881b6/manifest.json
+titicaca done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/titicaca/inpaint/4ad41f0881b6/candidate-1.png
+punta-cana {"s":0.78,"top":0,"box":"0.734,0.179,0.789,0.468"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 254/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 13.6/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-cana/inpaint/5b16b33bd86c/manifest.json
+punta-cana done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-cana/inpaint/5b16b33bd86c/candidate-1.png
+noticia-gol-pe {"s":0.758,"top":0,"box":"0.447,0.136,0.705,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 236/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 20.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-pe/inpaint/ae5da30dc5a4/manifest.json
+noticia-gol-pe done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-pe/inpaint/ae5da30dc5a4/candidate-1.png
+lodge-selva {"s":0.72,"top":94,"box":"0.32,0.13,0.68,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 35.2/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lodge-selva/inpaint/da272a168407/manifest.json
+lodge-selva done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lodge-selva/inpaint/da272a168407/candidate-1.png
+selva-maleta {"s":0.627,"top":0,"box":"0.475,0.232,0.525,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 29.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta/inpaint/ed0748b60785/manifest.json
+selva-maleta done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/selva-maleta/inpaint/ed0748b60785/candidate-1.png
+ayacucho {"s":0.758,"top":0,"box":"0.439,0.19,0.697,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -80 px, 60 px, escala 1.06): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/ayacucho/inpaint/1fe2a1a17cab/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+ayacucho done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/ayacucho/inpaint/1fe2a1a17cab/candidate-1-raw.png
+catacaos {"s":0.553,"top":42,"box":"0.428,0.13,0.572,0.489"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 250/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 20 px, 160 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/catacaos/inpaint/c83e5d909902/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+catacaos done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/catacaos/inpaint/c83e5d909902/candidate-1-raw.png
+iquitos {"s":0.587,"top":0,"box":"0.383,0.147,0.571,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 241/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 21.4/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/iquitos/inpaint/a46f22c322f2/manifest.json
+iquitos done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/iquitos/inpaint/a46f22c322f2/candidate-1-raw.png
+lamas {"s":0.45,"top":164,"box":"0.423,0.13,0.613,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 253/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 67.1/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lamas/inpaint/9483012eff70/manifest.json
+lamas done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/lamas/inpaint/9483012eff70/candidate-1-raw.png
+alpaca {"s":0.45,"top":135,"box":"0.374,0.13,0.716,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 252/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 120 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/alpaca/inpaint/acb1288cc3a8/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+alpaca done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/alpaca/inpaint/acb1288cc3a8/candidate-1-raw.png
+mancora {"s":0.632,"top":76,"box":"0.311,0.13,0.689,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 213/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 21.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/mancora/inpaint/8f42542d035c/manifest.json
+mancora done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/mancora/inpaint/8f42542d035c/candidate-1-raw.png
+buenos-aires-playas {"s":0.495,"top":14,"box":"0.401,0.13,0.648,0.476"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 241/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 20 px, 160 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/buenos-aires-playas/inpaint/5643c9f9cced/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+buenos-aires-playas done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/buenos-aires-playas/inpaint/5643c9f9cced/candidate-1-raw.png
+cajamarca {"s":0.627,"top":0,"box":"0.531,0.157,0.719,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 21.5/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cajamarca/inpaint/7ec16dfc2c3b/manifest.json
+cajamarca done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cajamarca/inpaint/7ec16dfc2c3b/candidate-1-raw.png
+ninos-peru {"s":0.627,"top":0,"box":"0.469,0.188,0.613,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 218/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 20.8/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/ninos-peru/inpaint/f9c92f7df870/manifest.json
+ninos-peru done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/ninos-peru/inpaint/f9c92f7df870/candidate-1-raw.png
+candelaria {"s":0.45,"top":135,"box":"0.32,0.13,0.703,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -20 px, 60 px, escala 1.1): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/candelaria/inpaint/894f9575fcd7/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+candelaria done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/candelaria/inpaint/894f9575fcd7/candidate-1-raw.png
+noticia-talara {"s":0.507,"top":226,"box":"0.414,0.13,0.53,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 243/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 80 px, 260 px, escala 1.1): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/5af0fb76c711/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+noticia-talara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/5af0fb76c711/candidate-1-raw.png
+peru-diciembre {"s":0.78,"top":79,"box":"0.266,0.13,0.578,0.473"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 247/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -100 px, 120 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/peru-diciembre/inpaint/6fe9fe3482b1/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+peru-diciembre done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/peru-diciembre/inpaint/6fe9fe3482b1/candidate-1-raw.png
+carnaval-cajamarca {"s":0.48,"top":73,"box":"0.476,0.13,0.716,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 254/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 33.4/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/carnaval-cajamarca/inpaint/bf1b7a10c143/manifest.json
+carnaval-cajamarca done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/carnaval-cajamarca/inpaint/bf1b7a10c143/candidate-1-raw.png
+punta-sal {"s":0.758,"top":35,"box":"0.197,0.13,0.591,0.486"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 223/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 18.7/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal/inpaint/612c66a0627a/manifest.json
+punta-sal done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal/inpaint/612c66a0627a/candidate-1-raw.png
+chiclayo {"s":0.667,"top":166,"box":"0.333,0.13,0.8,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 247/255 · salida USD 0.0553
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/chiclayo/inpaint/287578315129/manifest.json
+chiclayo done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/chiclayo/inpaint/287578315129/candidate-1-raw.png
+retablo {"s":0.424,"top":189,"box":"0.331,0.13,0.678,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 76.5/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/retablo/inpaint/68a518b88f68/manifest.json
+retablo done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/retablo/inpaint/68a518b88f68/candidate-1-raw.png
+cumbemayo {"s":0.514,"top":114,"box":"0.269,0.13,0.603,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 233/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 20 px, 60 px, escala 1.02): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cumbemayo/inpaint/2faa71f26c9f/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+cumbemayo done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cumbemayo/inpaint/2faa71f26c9f/candidate-1-raw.png
+sauce {"s":0.758,"top":35,"box":"0.235,0.13,0.864,0.486"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 27.3/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/sauce/inpaint/3aa242c9235d/manifest.json
+sauce done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/sauce/inpaint/3aa242c9235d/candidate-1-raw.png
+santiago-ano-nuevo {"s":0.414,"top":209,"box":"0.417,0.13,0.666,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 250/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -40 px, 100 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/santiago-ano-nuevo/inpaint/8232b66ba8c3/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+santiago-ano-nuevo done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/santiago-ano-nuevo/inpaint/8232b66ba8c3/candidate-1-raw.png
+tacna {"s":0.563,"top":184,"box":"0.303,0.13,0.725,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+talara {"s":0.495,"top":14,"box":"0.337,0.13,0.47,0.476"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 254/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 60 px, escala 1.06): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tacna/inpaint/4b1352e77f7f/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+tacna done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tacna/inpaint/4b1352e77f7f/candidate-1-raw.png
+vilcashuaman {"s":0.462,"top":181,"box":"0.362,0.13,0.638,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 249/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 26.7/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/talara/inpaint/23ea25d4fd3e/manifest.json
+talara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/talara/inpaint/23ea25d4fd3e/candidate-1-raw.png
+tarapoto {"s":0.486,"top":197,"box":"0.403,0.13,0.622,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 250/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 120 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/vilcashuaman/inpaint/36daca1704ed/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+vilcashuaman done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/vilcashuaman/inpaint/36daca1704ed/candidate-1-raw.png
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 20 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tarapoto/inpaint/d11760124022/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+tarapoto done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/tarapoto/inpaint/d11760124022/candidate-1-raw.png
+yanahuara {"s":0.571,"top":219,"box":"0.386,0.13,0.774,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 254/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 80 px, -20 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/yanahuara/inpaint/f97809ca4562/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+yanahuara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/yanahuara/inpaint/f97809ca4562/candidate-1-raw.png
+zorritos {"s":0.706,"top":205,"box":"0.218,0.13,0.782,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 248/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 28.5/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/zorritos/inpaint/ab34d8e8f42d/manifest.json
+zorritos done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/zorritos/inpaint/ab34d8e8f42d/candidate-1-raw.png
+cena-chilena {"s":0.587,"top":0,"box":"0.265,0.147,0.764,0.47"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, 100 px, escala 1.1): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cena-chilena/inpaint/b551b3b0a513/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+cena-chilena done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cena-chilena/inpaint/b551b3b0a513/candidate-1-raw.png
+cena-peruana {"s":0.621,"top":147,"box":"0.531,0.13,0.779,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -20 px, -160 px, escala 1): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cena-peruana/inpaint/531c9cf6d0b2/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+cena-peruana done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/cena-peruana/inpaint/531c9cf6d0b2/candidate-1-raw.png
+noticia-puntual-cl {"s":0.712,"top":19,"box":"0.4,0.13,0.45,0.479"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 230/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 13.7/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-cl/inpaint/2799c752a83d/manifest.json
+noticia-puntual-cl done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-cl/inpaint/2799c752a83d/candidate-1-raw.png
+noticia-gol-cl-v2 {"s":0.75,"top":86,"box":"0.425,0.13,0.485,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 241/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 18.5/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/8448de5fbbce/manifest.json
+noticia-gol-cl-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/8448de5fbbce/candidate-1-raw.png
+noticia-talara {"s":0.507,"top":226,"box":"0.414,0.13,0.53,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 249/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 0 px, -40 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/648024bb1972/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+noticia-talara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/648024bb1972/candidate-1-raw.png
+peru-diciembre {"s":0.78,"top":79,"box":"0.266,0.13,0.578,0.473"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 227/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 16.2/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/peru-diciembre/inpaint/005e00923ec4/manifest.json
+peru-diciembre done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/peru-diciembre/inpaint/005e00923ec4/candidate-1-raw.png
+punta-sal {"s":0.758,"top":35,"box":"0.197,0.13,0.591,0.486"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 235/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 19.7/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal/inpaint/c29b67aed908/manifest.json
+punta-sal done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/punta-sal/inpaint/c29b67aed908/candidate-1-raw.png
+noticia-talara {"s":0.487,"top":260,"box":"0.417,0.13,0.529,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+FATAL: The operation was aborted due to timeout
+noticia-talara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/648024bb1972/candidate-1-raw.png
+noticia-talara {"s":0.419,"top":371,"box":"0.429,0.18,0.525,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 253/255 · salida USD 0.0553
+    ⚠ el modelo movió la zona protegida en promedio 71.0/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/f54906cb5ca6/manifest.json
+noticia-talara done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-talara/inpaint/f54906cb5ca6/candidate-1-raw.png
+noticia-gol-cl-v2 {"s":0.585,"top":300,"box":"0.442,0.18,0.488,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 252/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ 40 px, 20 px, escala 1.12): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/f9873ff16edb/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+noticia-gol-cl-v2 done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-gol-cl-v2/inpaint/f9873ff16edb/candidate-1-raw.png
+noticia-puntual-cl {"s":0.574,"top":240,"box":"0.42,0.18,0.46,0.49"}
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 100 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 255/255 · salida USD 0.0553
+    ⚠ el modelo REENCUADRÓ (≈ -60 px, 40 px, escala 1.06): la zona pegada no corresponde a lo que generó. Usa --sketch o describe la posición, o un modelo con máscara.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-cl/inpaint/215321b8c480/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+noticia-puntual-cl done ai-generations/2026-11-05_sky-blog-lote/portadas/expand/noticia-puntual-cl/inpaint/215321b8c480/candidate-1-raw.png

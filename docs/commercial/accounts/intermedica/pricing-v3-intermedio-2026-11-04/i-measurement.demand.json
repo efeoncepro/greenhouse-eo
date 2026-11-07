@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-11-04",
+    "offerId": "performance-commerce-distribution",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "intermedica-pe-intermedio-2026-11-04",
+    "offerMarketCountry": "PE",
+    "outputCurrency": "USD",
+    "periods": 3,
+    "lines": [
+      {
+        "lineId": "analyst",
+        "profile": "ECG-019",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.12"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-i-measurement-2026-11-04-v1",
+          "effectiveFrom": "2026-11-04",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "tracking",
+        "profile": "ECG-031",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.05"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-i-measurement-2026-11-04-v1",
+          "effectiveFrom": "2026-11-04",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "analyst",
+      "assigneeIds": [
+        "planned-analyst-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "tracking",
+      "assigneeIds": [
+        "planned-tracking-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.085",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "2",
+        "allocatedUnits": "0.17"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-i-measurement;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.085",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "2",
+        "allocatedUnits": "0.17"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-i-measurement;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-11-04",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

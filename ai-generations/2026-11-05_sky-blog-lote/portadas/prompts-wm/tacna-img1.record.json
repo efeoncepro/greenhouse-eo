@@ -1,0 +1,24 @@
+{
+ "registro": "D",
+ "tipo": "A",
+ "portada": true,
+ "primerPlano": "hojas de una palmera del paseo",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "tacna",
+ "input": {
+  "id": "tacna",
+  "registro": "D",
+  "tipo": "A",
+  "portada": true,
+  "lugar": "Paseo Cívico y Catedral de Tacna, Perú",
+  "escena": "el eje del Paseo Cívico de Tacna con la fachada de piedra de cantería de la Catedral y sus dos torres a un lado y el Arco Parabólico, de piedra rosácea, al otro; palmeras y bancas en primer término. El viajero, con mochila chica y gorra, camina por el paseo hacia el arco. Debe leerse como plaza cívica soleada del sur del Perú, con la piedra como protagonista. Personas: el viajero a media distancia, de espaldas o de perfil, caminando sin pose ni mirada al lente; transeúntes lejanos en actividades espontáneas; ningún rostro identificable en primer plano",
+  "hora": "media mañana del primer día del relato",
+  "clima": "cielo despejado y sol seco; luz abundante, sombras abiertas, altas luces del cielo y de la piedra conservadas",
+  "primerPlano": "hojas de una palmera del paseo",
+  "borde": "bottom edge",
+  "prohibir": "sin texto ni logos, sin rótulos legibles de negocios reales, sin banderas con escudos inventados, sin aviones, cabinas ni uniformes SKY, sin cielo reemplazado, sin stock, sin cambiar la posición real entre la Catedral, el arco y la fuente, sin nubes de lluvia",
+  "extra": "COMPOSITION, MEASURED: the subject and its critical detail (landmark, faces, hands, contact) sit only in the upper half, between 14% and 48% of the frame height and between 22% and 78% of the width, never touching the top edge; people are small enough to fit whole inside that band. The lower half stays calm and mid-toned (ground, water, street, table or the out-of-focus near element), with no faces, hands, signs or bright highlights. SKY BRANDLIFT CONSISTENCY (Daniela Ferreira, SKY Blog visual system, sheet 15): believable traveler POV at eye height; luminous natural light with open shadows and whites that keep detail; natural colour where ochres, blues and skin keep their true tones, moderate contrast, no filter, no orange-teal grade, no HDR; real optical depth: the near element very out of focus with soft optical bokeh, the subject sharp; a spontaneous everyday moment, no pose. LENS: 28–35 mm equivalent, contextual and immersive.",
+  "refLugar": "Paseo Cívico y Catedral de Tacna, Perú (its real forms, scale and spatial relationships)"
+ }
+}

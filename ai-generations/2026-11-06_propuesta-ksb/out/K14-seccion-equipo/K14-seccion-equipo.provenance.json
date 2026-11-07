@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "828dc65860fa6277d9a4417833dead829313880c1cc0fbdeea6e36a07f7d0578",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-cine",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:QS1b-un-solo-equipo",
+      "path": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png",
+      "sha256": "ed97ed6547c59a95268eefeaf6cb3510ba5b802c2359d124b7ee8eff10c0eff5"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "nativeSize": {
+    "width": 2048,
+    "height": 1152
+  },
+  "targetRectangle": {
+    "left": 970,
+    "top": 463,
+    "width": 350,
+    "height": 238
+  },
+  "threshold": "8 levels on 8-bit RGB; diagnostic threshold chosen for this review, not a perceptual or identity score",
+  "note": "Raw provider files without alignment, mask recomposition, retouch or grade. Pixel differences do not by themselves establish visible or semantic drift. The rectangle includes surrounding pixels and is not a segmentation of the frame.",
+  "rows": [
+    {
+      "from": "GF26-B",
+      "to": "GF26-B-edit1",
+      "outsideRectanglePixels": 2275996,
+      "meanAbsoluteRgbDifferenceOutside": 3.2345896038481614,
+      "pixelsWithAnyRgbChannelDifferenceAbove8": 195534,
+      "percentOutsideWithAnyRgbChannelDifferenceAbove8": 8.591139878980455,
+      "maxChannelDifferenceOutside": 216
+    },
+    {
+      "from": "GF26-B-edit1",
+      "to": "GF26-B-edit2",
+      "outsideRectanglePixels": 2275996,
+      "meanAbsoluteRgbDifferenceOutside": 3.1203562455001386,
+      "pixelsWithAnyRgbChannelDifferenceAbove8": 149910,
+      "percentOutsideWithAnyRgbChannelDifferenceAbove8": 6.58656693597001,
+      "maxChannelDifferenceOutside": 193
+    },
+    {
+      "from": "GF26-B",
+      "to": "GF26-B-edit2",
+      "outsideRectanglePixels": 2275996,
+      "meanAbsoluteRgbDifferenceOutside": 5.452946021580589,
+      "pixelsWithAnyRgbChannelDifferenceAbove8": 411914,
+      "percentOutsideWithAnyRgbChannelDifferenceAbove8": 18.098186464299587,
+      "maxChannelDifferenceOutside": 240
+    }
+  ]
+}

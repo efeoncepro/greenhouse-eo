@@ -1,0 +1,356 @@
+{
+ "schemaVersion": "pricing-v3-composition-demand/1",
+ "commercialUnit": "managed_service",
+ "brief": {
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-05",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "mambrino-chile-social-2026-11",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+   {
+    "lineId": "social",
+    "profile": "ECG-006",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.25"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: estrategia, grilla de 12 piezas, copies, publicación y reporte mensual",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   },
+   {
+    "lineId": "care",
+    "profile": "ECG-007",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.25"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: moderación L-V 8:30-19:00 y guardia de fin de semana, un local nuevo",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   },
+   {
+    "lineId": "design",
+    "profile": "ECG-003",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.2"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: carruseles, stories, retoque de fotos y adaptaciones",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   },
+   {
+    "lineId": "video",
+    "profile": "ECG-018",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.12"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: edición de 3 reels al mes",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   },
+   {
+    "lineId": "lead",
+    "profile": "ECG-016",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.08"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: ejecutivo de cuenta, reunión mensual y coordinación",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+   "kind": "not_resolved"
+  },
+  "thirdPartyCosts": [
+   {
+    "costId": "photo-session",
+    "category": "production",
+    "label": "Sesión mensual de fotografía y video gastronómico en tienda (estudio móvil y food styling)",
+    "supplier": "Fotógrafo gastronómico freelance (por confirmar)",
+    "settlement": "reinvoiced",
+    "amount": "420000",
+    "currency": "CLP",
+    "quantity": "1",
+    "periodIds": [
+     1,
+     2,
+     3
+    ],
+    "evidence": {
+     "reference": "Estimación: media jornada de fotógrafo food style con luces; cotización del proveedor por confirmar",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    }
+   },
+   {
+    "costId": "launch-coverage",
+    "category": "production",
+    "label": "Cobertura de friends & family y apertura (21 al 23 de noviembre)",
+    "supplier": "Fotógrafo gastronómico freelance (por confirmar)",
+    "settlement": "reinvoiced",
+    "amount": "380000",
+    "currency": "CLP",
+    "quantity": "1",
+    "periodIds": [
+     1
+    ],
+    "evidence": {
+     "reference": "Estimación: jornada extra de foto y video en el lanzamiento; cotización del proveedor por confirmar",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    }
+   }
+  ]
+ },
+ "work": [
+  {
+   "lineId": "social",
+   "assigneeIds": [
+    "planned-social-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "express-design",
+     "reason": "Las piezas las diseña la línea de diseño; social planifica, escribe y publica."
+    }
+   ]
+  },
+  {
+   "lineId": "care",
+   "assigneeIds": [
+    "planned-care-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": [
+    {
+     "task": "social-publishing",
+     "reason": "Esta línea modera y responde; la publicación la hace social."
+    },
+    {
+     "task": "express-design",
+     "reason": "Esta línea modera y responde; no diseña piezas."
+    }
+   ]
+  },
+  {
+   "lineId": "design",
+   "assigneeIds": [
+    "planned-design-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "video",
+   "assigneeIds": [
+    "planned-video-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  },
+  {
+   "lineId": "lead",
+   "assigneeIds": [
+    "planned-lead-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  }
+ ],
+ "serviceToolIds": [],
+ "allocations": [
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "5",
+   "serviceShare": "0.18",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "5",
+    "allocatedUnits": "0.9"
+   },
+   "reason": "Cinco asientos, uno por persona; la cuenta carga 0,9 FTE de 5.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "5",
+   "serviceShare": "0.18",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "5",
+    "allocatedUnits": "0.9"
+   },
+   "reason": "Cinco asientos, uno por persona; la cuenta carga 0,9 FTE de 5.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "adobe",
+   "priceId": "current",
+   "quantity": "1",
+   "seatCapacity": 3,
+   "serviceShare": "0.106666666666666666",
+   "driver": {
+    "unit": "assigned-user-seat",
+    "totalUnits": "3",
+    "allocatedUnits": "0.32"
+   },
+   "reason": "Diseño (0,2) y video (0,12) usan dos licencias del paquete de tres; la cuenta carga su dedicación.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "metricool",
+   "priceId": "historical",
+   "quantity": "1",
+   "seatCapacity": 1,
+   "serviceShare": "1",
+   "driver": {
+    "unit": "plan-share-conservative",
+    "totalUnits": "1",
+    "allocatedUnits": "1"
+   },
+   "reason": "Supuesto conservador: la cuenta carga el plan completo de publicación; no se reparte entre clientes.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "frame-io",
+   "priceId": "historical",
+   "quantity": "1",
+   "serviceShare": "0.12",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "1",
+    "allocatedUnits": "0.12"
+   },
+   "reason": "Revisión de reels; la cuenta carga la dedicación de video (0,12).",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  }
+ ],
+ "creditBudgets": [],
+ "fxRecordIds": [
+  "fx:CLP:USD"
+ ]
+}

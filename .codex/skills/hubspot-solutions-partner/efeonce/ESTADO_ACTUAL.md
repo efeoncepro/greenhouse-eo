@@ -190,8 +190,9 @@ reinicia los puntos managed, abre el cross-sell de Marketing Hub Pro y convierte
 
 | # | Pregunta | Por qué importa |
 |---|---|---|
-| ~~1~~ | ✅ **RESUELTA: Efeonce TIENE la Partner Certification.** → **el waiver del onboarding está disponible y no se está usando** | En un Marketing Hub Pro **borras USD 3.000 de USD 9.600 = 31% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. **Ponlo en la primera lámina** → `modules/11` § 2 |
+| ~~1~~ | ✅ **RESUELTA: Efeonce TIENE la Partner Certification.** → **el waiver del onboarding está disponible y no se está usando** | En un Marketing Hub Pro **borras USD 3.000 de USD 10.680 (USD 890 × 12, portal 2026-11-05) = 28% de descuento en el año 1**, y **el HubSpot directo no puede igualarlo**. **Ponlo en la primera lámina** → `modules/11` § 2 |
 | 2 | **¿Los USD 412 son netos post-discount?** ¿El trial que vence los infla? | Define si hay que presupuestar **USD 4.800/año** de membership |
+
 | 4 | **El proceso operativo del shared deal** (Growth Specialist, link de confirmación) | Habilita **toda** la motion de base instalada |
 | 5 | **¿Alguna comisión viva sigue colgando del esquema Provider?** | El Provider Program **muere el 2026-08-15** |
 | 6 | **El MRR gestionado exacto** según los registros de HubSpot | Cierra la calculadora sin estimaciones |

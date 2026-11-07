@@ -1,0 +1,20 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "decision",
+  "use": "proposal",
+  "recipe": "decision-plan",
+  "line": "brand",
+  "theme": "dark",
+  "voice": { "eyebrow": "09 · Cómo empezamos", "question": "¿Llegamos a la apertura?", "answer": ["Llegamos"] },
+  "body": "Si apruebas **esta semana**, la grilla de lanzamiento está en tu revisión antes del friends & family.",
+  "horizon": 20,
+  "currentStop": 1,
+  "stops": [
+    { "range": "Esta semana", "title": "Apruebas", "desc": "El plan y la forma de facturación; al día siguiente, inicio y accesos." },
+    { "range": "Antes del 21", "title": "Expectativa", "desc": "Grilla de lanzamiento aprobada y primeras publicaciones en el Instagram de Chile." },
+    { "range": "21 al 23", "title": "Apertura", "desc": "Sesión de foto y video en el friends & family y cobertura del día de apertura." }
+  ]
+}

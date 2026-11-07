@@ -1,0 +1,131 @@
+{
+  "id": "titicaca",
+  "notion_url": "https://app.notion.com/p/40239c2fefe781a28f88e841c50ba1e8",
+  "titulo": "Lago Titicaca desde Juliaca: cómo organizar Puno y las islas Uros, Taquile y Amantaní",
+  "slug": "/lago-titicaca/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "B — Viajero integrado + A Destino contextual",
+      "modificadores": "persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "lago-titicaca-uros-totora-viajera.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajera de pie en el borde de una isla flotante de totora de los Uros, mirando el lago Titicaca en una mañana despejada",
+      "que_muestra": "el borde de una isla flotante de los Uros, con la totora seca y dorada bajo los pies, y el lago Titicaca abierto y azul intenso hacia el horizonte; a un costado, el canto de una casa de totora y un islote vecino a lo lejos. La viajera, con casaca y gorro, mira el agua. Debe leerse como altiplano: cielo alto y limpio, luz fuerte, aire seco.",
+      "hora_clima": "media mañana, primera navegación del relato; cielo despejado, sol alto y viento frío; luz abundante con sombras abiertas y altas luces del cielo y del agua conservadas",
+      "personas": "la viajera a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; si aparecen habitantes de la isla, lejanos, pequeños y en actividades propias, nunca posando para el turista; ningún rostro identificable",
+      "primer_plano": "manojos de totora seca muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar a la viajera ni la línea del horizonte",
+      "ancla_pov": "Totora que cede un poco bajo tus pies, un viento frío que entra por el cuello de la casaca y un azul de lago que parece recién pintado",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin trajes típicos convertidos en disfraz ni personas posando para la cámara",
+        "sin artesanías en venta en primer plano",
+        "sin montañas nevadas inventadas en el horizonte del lago"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de una isla flotante de los Uros (borde de totora y lago abierto) en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; la viajera, la totora y la línea del lago tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «La navegación hasta Taquile es larga…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "subida a pie · otra persona integrada · escala media · luz de mediodía",
+      "registro": "E",
+      "archivo": "taquile-camino-piedra-subida-lago.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Camino de piedra que sube entre terrazas de cultivo en la isla Taquile, con el lago Titicaca abajo",
+      "que_muestra": "un camino de piedra que sube entre muros bajos de piedra y terrazas de cultivo, visto desde la posición de quien camina; un acompañante avanza unos pasos adelante y el lago azul intenso llena el fondo, con la línea de la orilla abajo.",
+      "hora_clima": "cerca del mediodía, al llegar a la isla en el relato; sol fuerte y cielo despejado; luz abundante con sombras abiertas, sin quemar el cielo ni el reflejo del agua",
+      "personas": "fotografía el viajero que sube; el acompañante, de espaldas, mira el camino o se detiene a recuperar el aire; si aparecen habitantes de la isla, lejanos y en sus actividades; nadie mira al lente; ningún rostro identificable",
+      "primer_plano": "piedras del muro del camino muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar el camino",
+      "ancla_pov": "el camino empieza a subir entre muros de piedra y terrazas de cultivo",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin trajes típicos posados ni personas mirando a la cámara",
+        "sin vegetación tropical ni árboles que no correspondan al altiplano"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de un camino de piedra de la isla Taquile con el lago de fondo en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «Es media tarde en Amantaní…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "G — Pausa sensorial",
+      "modificadores": "viajero sentado con manta · escala amplia · luz de atardecer",
+      "registro": "E",
+      "archivo": "amantani-atardecer-cerro-viajero-manta.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Viajero abrigado con una manta sentado en un cerro de la isla Amantaní, mirando el atardecer sobre el lago Titicaca",
+      "que_muestra": "un viajero sentado sobre la piedra de un cerro de Amantaní, abrigado con una manta y gorro, mirando el lago que se tiñe de naranja; abajo, terrazas de cultivo y techos de casas de adobe; ninguna lancha en el agua. La imagen demuestra lo que solo ve quien duerme en la isla: el lago al final del día, cuando las excursiones ya se fueron.",
+      "hora_clima": "atardecer, el sol bajando sobre el lago; cielo despejado; luz cálida abundante en el lago y en el rostro de perfil, sombras abiertas, sin quemar el cielo",
+      "personas": "fotografía un acompañante desde unos pasos atrás y al costado; el viajero, de espaldas o de perfil, mira el lago y no la cámara; nadie más en primer plano; ningún rostro identificable",
+      "primer_plano": "pasto seco del cerro muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al viajero ni el horizonte",
+      "ancla_pov": "vas a ver el lago encenderse en naranja y, al bajar, un cielo con tantas estrellas que el frío deja de importar un rato",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales",
+        "sin aviones",
+        "cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin cielo estrellado y atardecer a la vez en la misma imagen",
+        "sin templos ni ruinas inventadas",
+        "sin lanchas turísticas en el agua"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la vista desde un cerro de Amantaní hacia el lago en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.color",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "JUL",
+      "ciudad": "Juliaca"
+    },
+    "home_market": "PER",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-juliaca",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Totora, islas y lago sin prisa",
+    "cta": "Ver vuelos a Juliaca",
+    "archivo": "banner-ruta-lima-juliaca.webp",
+    "alt": "Banner de SKY de la ruta Lima–Juliaca: totora, islas y lago a tu ritmo",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "callout_literal": "**BANNER 1 · RUTA — va aquí: después de «Lo que tienes que saber», antes de las preguntas frecuentes**<br />**ID:** N?_BAN-1 · **Receta:** A · `ruta.color` (morado SKY, ruta dibujada)<br />**Ruta:** Lima (LIM) → Juliaca (JUL) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación<br />**Titular:** “Totora, islas y lago sin prisa” (6 palabras; la ruta Lima → Juliaca es el elemento principal y el titular va en segundo nivel)<br />**CTA (lo escribe el compositor):** Ver vuelos a Juliaca →<br />**Enlace del banner:** https://skyairline.com/flights/es/vuelos-desde-lima-a-juliaca<br />**Formatos:** 1408 × 400 px (escritorio) y 1080 × 1080 px (móvil) · `.webp` · menos de 150 KB · `loading=\"lazy\"`<br />**Archivo:** `banner-ruta-lima-juliaca.webp` · **ALT:** “Banner de SKY de la ruta Lima–Juliaca: totora, islas y lago a tu ritmo”<br />**No:** sin precios ni moneda, sin texto distinto del titular, un solo logo SKY oficial, tipografía Metric sin reemplazo"
+  },
+  "descartes": [
+    "cena en casa de familia en Amantaní — rostros reales e intimidad de una vivienda; riesgo de identidad y de lectura de «exhibición»",
+    "tejidos y chullos de Taquile en primer plano — exige fidelidad de diseños que son patrimonio y puede leerse como producto en venta",
+    "primera vista del lago desde la carretera Juliaca–Puno — postal sin acción, falta REF real del tramo",
+    "lancha saliendo del puerto de Puno entre totorales — repite la idea de navegación de la portada",
+    "cielo estrellado sobre Amantaní — difícil de lograr sin que se note generado"
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-28",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "engagementForm": "on_going",
+    "accountId": "intermedica-pe-propuesta-2026-10-28",
+    "offerMarketCountry": "PE",
+    "outputCurrency": "USD",
+    "periods": 3,
+    "lines": [
+      {
+        "lineId": "design",
+        "profile": "ECG-003",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-a-creative-2026-10-28-v1",
+          "effectiveFrom": "2026-10-28",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      },
+      {
+        "lineId": "copy",
+        "profile": "ECG-011",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.04"
+        },
+        "dedicationEvidence": {
+          "reference": "workload:intermedica-a-creative-2026-10-28-v1",
+          "effectiveFrom": "2026-10-28",
+          "effectiveUntil": "2027-02-28",
+          "status": "estimated"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": false,
+        "choices": []
+      }
+    ],
+    "adjustments": [],
+    "taxTreatment": {
+      "kind": "not_resolved"
+    }
+  },
+  "work": [
+    {
+      "lineId": "design",
+      "assigneeIds": [
+        "planned-design-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "copy",
+      "assigneeIds": [
+        "planned-copy-1"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.06",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "2",
+        "allocatedUnits": "0.12"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-a-creative;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "2",
+      "serviceShare": "0.06",
+      "driver": {
+        "unit": "estimated-fte-of-whole-named-seats",
+        "totalUnits": "2",
+        "allocatedUnits": "0.12"
+      },
+      "reason": "Un asiento por cupo; la cuenta carga dedicacion modelada. Resto de capacidad por vender/validar.",
+      "evidence": {
+        "reference": "intermedica:reparto-estimado-a-creative;sin-registro-asientos-confirmado",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3
+      ],
+      "toolId": "adobe",
+      "priceId": "current",
+      "quantity": "1",
+      "seatCapacity": 3,
+      "serviceShare": "0.026666666666666666",
+      "driver": {
+        "unit": "estimated-dedicated-fte-of-three-license-package",
+        "totalUnits": "3",
+        "allocatedUnits": "0.08"
+      },
+      "reason": "Paquete oficial de tres licencias; una persona diseno, cargo segun dedicacion. Sin descuento.",
+      "evidence": {
+        "reference": "intermedica:reparto-adobe-estimado-a-creative;factura-en-policy-v12",
+        "effectiveFrom": "2026-10-28",
+        "effectiveUntil": "2027-02-28",
+        "status": "estimated"
+      }
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [
+    "fx:CLP:USD"
+  ]
+}

@@ -1,0 +1,6 @@
+  ✂ imagen completa → 1024x1024 · la zona con contexto ocupa 77 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.025 · 1 × salida 1024x1024 low (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 249/255 · salida USD 0.0247
+    ⚠ el modelo movió la zona protegida en promedio 14.1/255: mira la unión al 100 %.
+  ✎ ./ai-generations/2026-11-05_gpt-image-2-6-canary/cli/inpaint-flare26/inpaint/f48d75333369/manifest.json

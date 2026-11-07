@@ -1,0 +1,61 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "role": "decision",
+  "recipe": "decision-why-us",
+  "theme": "light",
+  "voice": {
+    "eyebrow": "Soporte y SLA",
+    "question": "Lo crítico, en",
+    "answer": [
+      "1 hora"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 3
+  },
+  "body": "Lunes a viernes de 9:00 a 18:30 y guardia permanente para lo crítico; mantención mensual.",
+  "figures": [
+    {
+      "value": "≤ 1 h",
+      "label": "S1 crítico: caída o incidente de seguridad",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "≤ 4 h",
+      "label": "S2 alto: función clave degradada",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "≤ 1 día",
+      "label": "S3 medio: error de un reporte o usuario",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "≤ 2 días",
+      "label": "S4 bajo: consultas y mejoras",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "N1 a N3",
+      "label": "escalamiento hasta HubSpot y Microsoft",
+      "source": "SLA de esta propuesta"
+    },
+    {
+      "value": "Al abrir",
+      "label": "aviso de S1 y S2 por correo y Teams",
+      "source": "SLA de esta propuesta"
+    }
+  ],
+  "selected": 1,
+  "selection": {
+    "target": "object",
+    "label": "Fiordo Austral",
+    "participantKind": "department"
+  }
+}

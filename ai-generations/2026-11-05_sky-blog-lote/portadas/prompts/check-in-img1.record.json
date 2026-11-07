@@ -1,0 +1,22 @@
+{
+ "registro": "D",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the edge of a folded garment",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "check-in",
+ "input": {
+  "id": "check-in",
+  "registro": "D",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "bedroom of an ordinary home the night before a flight",
+  "escena": "from the traveler's own eyes, one hand holds a switched-on phone in the upper half of the frame; on the screen only a generic boarding pass with an unreadable generic QR code, no brand or name; beside it an open backpack with folded clothes and a charger on the bed. It reads as checking that everything is ready the night before, not as an app advertisement",
+  "hora": "night",
+  "clima": "indoors, warm abundant soft lamp light with open shadows; the screen does not burn out or dominate the exposure",
+  "primerPlano": "the edge of a folded garment",
+  "borde": "bottom edge",
+  "prohibir": "readable text or logos on the screen or backpack, real airline app interface, passports with readable data, blown-out white screen"
+ }
+}

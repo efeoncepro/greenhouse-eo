@@ -19,6 +19,8 @@ verificado.
 
 - [2026-10](docs/operations/agent-context-history/handoff/2026-10.md)
 
+- [2026-11](docs/operations/agent-context-history/handoff/2026-11.md)
+
 No volver a pegar historia completa en este índice.
 
 ## Entradas archivadas desde Handoff activo

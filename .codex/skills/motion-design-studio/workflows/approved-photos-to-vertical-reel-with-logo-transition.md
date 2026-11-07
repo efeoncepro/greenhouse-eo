@@ -25,9 +25,10 @@ de **Eleven Music** por el conector remoto oficial.
 1. **Cuadros clave verticales desde las fotos aprobadas.** Editar cada foto a 2:3 vertical, sin regenerar la escena:
    `pnpm ai:image --image <foto-aprobada> … gpt-image-2.5-sunburst 1024x1536` (ver la skill `greenhouse-ai-image-generator`
    para flags vigentes). En Pibank: 2 cuadros clave.
-2. **Animar cada cuadro con Omni image-to-video** (contrato en el manual CLI Omni 1.1):
+2. **Animar cada cuadro con Omni image-to-video** (contrato en el manual CLI Omni; Pibank se hizo con 1.1):
    `pnpm ai:omni --task image --staging-uri gs://… --aspect 9:16 --resolution 1080p --duration 5`
-   (≈ US$0,76 por toma de 5 s). Prohibir texto en el prompt: el texto vive en la capa gráfica.
+   (≈ US$0,76 por toma de 5 s en 1.1; ≈ US$0,52 en 1.2, el modelo por defecto desde 2026-11-05). Con 1.2 conviene
+   iterar a 720p (≈ US$0,35) y subir sólo la toma aprobada con `--task upscale --source-resolution 720p --resolution 1080p`. Prohibir texto en el prompt: el texto vive en la capa gráfica.
 3. **Capa gráfica determinística en HTML** (`graphics.html` + `render-graphics.mjs`): la página expone `seek(t)` y se
    captura cuadro a cuadro como **PNG con alfa a 30 fps**. En Pibank: titular cinético, tarjeta con tres criterios
    cuyos checks se dibujan, cortina navy y la transición punto → logo.

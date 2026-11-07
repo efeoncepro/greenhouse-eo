@@ -1,0 +1,8 @@
+  ✂ imagen completa → 2560x1440 · la zona con contexto ocupa 33 % de la imagen (umbral 25 %)
+  $ costo estimado ≈ USD 0.055 · 1 × salida 2560x1440 high (fórmula oficial de tokens × USD 30/1M; la entrada suma aparte)
+  → candidato 1/1 …
+    ✓ PASS · zona protegida idéntica bit a bit · el modelo había movido la zona protegida hasta 194/255 · salida USD 0.0553
+    ⚠ la zona editable casi no cambió (delta medio 11.3/255): mira si el modelo cumplió el pedido.
+  ✎ ./ai-generations/2026-11-05_sky-blog-lote/escenas/retoque/te3c/inpaint/c86db06e83f8/manifest.json
+  ⚠ REVISAR (código 3): la zona protegida está intacta, pero ningún candidato muestra la edición pedida (panel negro, reencuadre o zona sin cambio).
+FINTE

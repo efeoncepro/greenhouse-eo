@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "KSB · LIC-MKT-2026-001 · Nivel Esencial · 1 de 2",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "KSB Chile S.A.",
+    "taxId": "RUT 96.691.060-7",
+    "unit": "Gerencia de Marketing",
+    "contact": "Nelson Urbano Meza, Gerente de Marketing"
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Nivel Esencial",
+      "Pauta y leads"
+    ],
+    "subtitle": "SEM, LinkedIn y Meta, landings por línea de negocio, leads calificados en SAP C4C y medición del ROI. Es la primera de dos partes del nivel Esencial.",
+    "netLabel": "Honorarios netos de 12 meses"
+  },
+  "service": {
+    "name": "Agencia de Marketing Digital 2027 · Nivel Esencial · Pauta y leads"
+  },
+  "scope": {
+    "title": [
+      "Alcance"
+    ],
+    "intro": "Lo que incluye la pauta y la generación de leads del nivel Esencial durante los doce meses del servicio.",
+    "rows": [
+      {
+        "title": "Estrategia por segmento",
+        "text": "Estrategia por segmento de KSB y rampa trimestral de KPIs, revisada en el comité mensual."
+      },
+      {
+        "title": "Pauta",
+        "text": "Google Search y LinkedIn Ads todo el año, y Meta en los periodos que pida la estrategia, con montaje, segmentación, lead ads y optimización."
+      },
+      {
+        "title": "Generación de leads",
+        "text": "Landings por línea de negocio, formularios y calificación de MQL, con el traspaso de cada lead a SAP C4C. Sin email masivo."
+      },
+      {
+        "title": "Medición",
+        "text": "GA4 y Google Tag Manager, conversiones offline desde las ventas de C4C, reporte semanal de leads generados y convertidos, y reporte mensual de ROI y ROAS."
+      },
+      {
+        "title": "Cuenta",
+        "text": "Una contraparte única en Efeonce, plan anual y comité mensual con la Gerencia de Marketing."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario",
+    "phases": [
+      {
+        "label": "Diciembre de 2026",
+        "title": "Plan y línea base",
+        "text": "Plan de trabajo, accesos y auditoría de línea base con los históricos de KSB, en las fechas que fijan las bases."
+      },
+      {
+        "label": "Enero a marzo de 2027",
+        "title": "Arranque y rampa",
+        "text": "Salida de campañas, ajuste semanal y primer comité trimestral contra los KPIs de la rampa."
+      },
+      {
+        "label": "Abril a diciembre de 2027",
+        "title": "Optimización y escala",
+        "text": "Optimización por segmento y canal, y decisión de prórroga con los KPIs del año."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Oferta económica"
+    ],
+    "intro": "Honorarios de Efeonce por mes de servicio. El nivel Esencial suma esta oferta y la de Contenidos y redes. Los medios se pagan aparte, directo a cada plataforma.",
+    "summary": "Valor fijo mensual, sin porcentaje sobre los medios.",
+    "taxNote": "Valores netos, reajustables en UF. El IVA se agrega al facturar, como piden las bases."
+  },
+  "conditions": {
+    "title": [
+      "Condiciones"
+    ],
+    "rows": [
+      {
+        "title": "Medios",
+        "text": "KSB paga los medios directo a Google, LinkedIn y Meta, en cuentas a su nombre. El monto es el mínimo que recomiendan las bases; sube sólo si la estrategia lo justifica y con aprobación de KSB. Efeonce no cobra comisión sobre los medios."
+      },
+      {
+        "title": "Reajuste en UF",
+        "text": "Los valores se fijan en UF al valor del día de esta oferta. Cada factura se emite en pesos chilenos al valor de la UF del día de su emisión, así el precio se mantiene en UF durante todo el contrato."
+      },
+      {
+        "title": "Plazo",
+        "text": "Doce meses desde el inicio del servicio, con dos prórrogas posibles según las bases de la licitación."
+      },
+      {
+        "title": "Forma de pago",
+        "text": "Factura mensual por mes de servicio, al cierre de cada mes."
+      },
+      {
+        "title": "Lo que aporta KSB",
+        "text": "Accesos a GA4, Google Ads, Meta Ads Manager y lectura en SAP C4C; los históricos para la línea base; una persona que apruebe piezas y campañas; y la validación mensual de ventas con el área comercial."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Noventa días desde la fecha de esta oferta."
+      }
+    ]
+  },
+  "lines": {
+    "fee": {
+      "label": "Honorarios Efeonce · Pauta y leads",
+      "detail": "SEM, LinkedIn y Meta, leads a SAP C4C y medición",
+      "group": "Servicio"
+    }
+  }
+}

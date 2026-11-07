@@ -169,8 +169,8 @@ campaña; no reemplaza lineage, gates ni aprobación humana.
 
 Gemini Omni Flash es **video**, no un tercer generador de stills. El piloto de 2026-07-18 usó el modelo
 anterior `gemini-omni-flash-preview`; sus resultados y límites no certifican el reemplazo. La ruta local vigente
-es `pnpm ai:omni` con Gemini Omni 1.1 Cloud `gemini-omni-1.1-flash-preview` en `global`. Cubre texto, imagen,
-primer/último cuadro, referencias, edición y extensión mediante [su manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
+es `pnpm ai:omni` con Gemini Omni 1.2 Flash `gemini-omni-1.2-flash` (GA desde 2026-11-05; 1.1 Preview con `--model 1.1`)
+en `global`. Cubre texto, imagen, primer/último cuadro, referencias, edición, extensión y upscale (sólo 1.2) mediante [su manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
 Fal lista `google/gemini-omni-flash`, `/image-to-video`, `/reference-to-video` y `/edit`, pero Greenhouse **no**
 opera Omni por Fal: se conecta directo por Google (el registro de `pnpm ai:fal` no lo incluye).
 **Reafirmado 2026-09-16 por el operador:** Omni Flash y Nano Banana Pro van directo por Google, nunca por Fal (por
@@ -352,7 +352,7 @@ regla de marca universal por una sola campaña.
 ## Contrato de relevo still → motion
 
 El siguiente YAML registra el relevo del piloto de 2026-07-18 y conserva su ID de modelo histórico. Para
-una corrida nueva, elegir `gemini-omni-1.1-flash-preview` y ejecutar `pnpm ai:omni` con las entradas, GCS
+una corrida nueva, usar `gemini-omni-1.2-flash` (por defecto; `--model 1.1` sólo para reproducir clips anteriores) y ejecutar `pnpm ai:omni` con las entradas, GCS
 privado y controles del [manual vigente](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
 
 ```yaml
@@ -380,7 +380,16 @@ acceptance:
   - audio and motion have no abrupt cut
 ```
 
-## Limitaciones vigentes de Gemini Omni 1.1 Cloud
+## Limitaciones vigentes de Gemini Omni Cloud
+
+**Omni 1.2 Flash (por defecto desde 2026-11-05):** GA con PayGo estándar, ID Cloud `gemini-omni-1.2-flash` en
+`global`. Genera 3–15 s (primer/último cuadro y extensión, 3–10 s); referencias hasta 6 imágenes y, en salidas de
+más de 10 s, un solo video de referencia; edición y extensión con hasta 2 imágenes. Nueva tarea `upscale`
+(360p→720p/1080p, 720p→1080p/4K) para dibujar barato y pagar alta resolución sólo por la toma elegida, y turnos
+`--previous` sobre el clip anterior (contrato documentado, sin canary). Video ~30 % más barato que 1.1. Sin
+generación corrida todavía: los canaries de abajo son de 1.1.
+
+**Omni 1.1 Flash Preview (`--model 1.1`):**
 
 - Es **Preview** y usa el ID Cloud `gemini-omni-1.1-flash-preview`, distinto del ID Developer
   `gemini-omni-1.1-flash`. El endpoint de Cloud Interactions está en `global`; fijar el ID y validar cuota y

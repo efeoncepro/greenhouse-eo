@@ -1,0 +1,43 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "method",
+  "use": "proposal",
+  "recipe": "method-waves",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Plan 2027",
+    "question": "De la línea base a la consolidación, en",
+    "answer": [
+      "Cuatro",
+      "etapas"
+    ]
+  },
+  "body": "Cada etapa sigue la rampa de KPIs de las bases y se revisa **cada mes** con su equipo.",
+  "steps": [
+    {
+      "kicker": "Enero–marzo",
+      "name": "Ramp-up",
+      "desc": "Entrega: línea base, landings, formularios y CRM conectados."
+    },
+    {
+      "kicker": "Abril",
+      "name": "Expomin",
+      "desc": "Entrega: campaña de la feria, captura de leads y seguimiento."
+    },
+    {
+      "kicker": "Abril–septiembre",
+      "name": "Escalado",
+      "desc": "Entrega: inversión en los segmentos que mejor convierten."
+    },
+    {
+      "kicker": "Octubre–diciembre",
+      "name": "Consolidación",
+      "desc": "Entrega: informe anual y plan para la prórroga."
+    }
+  ],
+  "selectedStep": 1
+}

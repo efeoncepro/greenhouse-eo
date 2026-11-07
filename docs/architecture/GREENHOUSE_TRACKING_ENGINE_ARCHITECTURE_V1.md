@@ -470,3 +470,28 @@ URL segura y UUID/tiempo estables. SQL/flags/worker/hosts verificados. Meta Test
 ambos hosts y fuente nueva; no prueba tráfico comercial, evolución EMQ ni audiencia utilizable.
 Primera conversión comercial consentida y conciliación real siguen pendientes. Sin nuevos
 proyectos/cron/servicios. [Operación API/panel/CLI](../manual-de-uso/growth/configurar-medicion-conversiones.md).
+
+### 19.7 Delta 2026-11-05 — CLI de consulta GA4 de solo lectura (`pnpm ga4:query`)
+
+Se agregó `scripts/ga4/query.ts` (`pnpm ga4:query`) como **herramienta de operador out-of-band** para análisis
+puntuales sobre cualquier propiedad GA4: `doctor`, `report` (Data API v1beta `runReport`, paginación automática de
+100k), `funnel` (v1alpha `runFunnelReport`), `admin` (lecturas Admin API: property, keyEvents, dataStreams,
+customDimensions, customMetrics), `metadata` y `batch` (un JSON por consulta con `capturedAt`).
+
+- **Modelo de auth:** ADC local del operador impersona la SA de §19.1
+  (`greenhouse-gtm-publisher@efeonce-group.iam.gserviceaccount.com`, override `GA4_QUERY_SERVICE_ACCOUNT`) con scope
+  `analytics.readonly`; mismo patrón que `scripts/ga4/realtime-events.ts`. Exige rol Service Account Token Creator
+  del usuario sobre la SA (lo otorga una persona; un agente no se lo autoasigna) y la SA como Lector en cada
+  propiedad. Sin keys en disco; no lee `.env.local`, PostgreSQL ni Secret Manager.
+- **No es un path de runtime.** No sustituye ni comparte credenciales con la conexión GA4 por organización
+  (`src/lib/growth/analytics-ga4/`: `resolveGa4OAuthConfig`, `getGa4Connection`, `refreshGa4AccessToken`, con
+  `GOOGLE_GA4_OAUTH_CLIENT_ID` + `GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF`), que sigue siendo la única fuente de
+  portal, dashboards e Insights ([GA4 Connection UI V1](growth/ga4-connection-ui-v1.md)).
+- **Full API Parity:** sin implicancia. Es tooling de lectura del operador, no una capability de producto ni una
+  acción visible del portal; no agrega writes ni contrato que Nexa deba operar.
+- **Estado verificado 2026-11-05:** `doctor`/`report`/`admin`/`metadata`/`batch` OK en `efeoncepro.com`
+  (`486264460`). SKY (`354430952`) responde 403 hasta que el cliente agregue la SA como Lector.
+
+Manual: [consultar-ga4-por-cli.md](../manual-de-uso/growth/consultar-ga4-por-cli.md). Gotchas de análisis (pérdida
+en fila `(other)`, key events tipo pageview virtual, purchase sin valor, sin conversiones asistidas por página):
+skill `greenhouse-gtm-ga4-operator`.

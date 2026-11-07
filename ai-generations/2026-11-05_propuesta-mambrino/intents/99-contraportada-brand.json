@@ -1,0 +1,17 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "close",
+  "recipe": "close-proposal",
+  "use": "proposal",
+  "line": "brand",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-11-05_propuesta-mambrino/plates/BRD3-contraportada.png",
+    "alt": "Nexa, de espaldas con la chaqueta de Efeonce, camina por un piso pulido hacia un anillo colosal de luz naranja de la línea Brand con una esfera blanca encendida arriba"
+  }
+}

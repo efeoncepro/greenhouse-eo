@@ -221,6 +221,12 @@ de `ref/video/frames-v1` usa exactamente `veo-3.1-generate-001`. Omni tiene una 
 las capacidades de video-reference o edición stateful del proveedor quedan como superficies diferidas hasta tener
 routeId, contrato, evidencia, canary y readback propios.
 
+### Gemini Omni 1.2 Flash — nota 2026-11-05
+
+Google publicó `gemini-omni-1.2-flash` (GA en Cloud, `global`; clips de hasta 15 s y upscale). Sólo la CLI local
+`pnpm ai:omni` lo usa por defecto; **en Globe no existe route card, binding, canary ni promoción de 1.2**. No lo
+declares disponible en el Producer ni heredes evidencia de la CLI: requiere su propia candidatura.
+
 ### Gemini Omni 1.1 Flash — delta 2026-08-27
 
 Google documenta 1.1 por dos superficies con madurez, auth, límites y retención distintos. Nunca las trates como

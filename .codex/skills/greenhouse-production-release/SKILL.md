@@ -58,6 +58,13 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - `.github/workflows/{ops-worker,commercial-cost-worker,ico-batch,hubspot-greenhouse-integration}-deploy.yml`
 - `.github/workflows/{azure-teams-deploy,azure-teams-bot-deploy}.yml`
 
+> **Delta 2026-11-01 (tarde) — hotfix acotado de Efeonce ID (PR #266):** un hotfix a `main` llega al preflight con
+> `playwright_smoke` en 0 corridas, siempre. Decide de entrada: correr el smoke por `workflow_dispatch` sobre el SHA
+> (camino sin bypass) o pedir la autorización de `bypass_preflight_reason` junto con la del hotfix; el clasificador
+> de permisos bloquea el bypass sin ella. Si el job final «Transition → released» lo cancela el runner (checkout
+> colgado), el reconciliador deja el manifiesto `aborted` aunque todo esté desplegado: verificar el runtime y redespachar
+> el mismo SHA (deploys no-op), nunca tocar el manifiesto. Fila en `PRODUCTION_RELEASE_TIMING_LEDGER.md`.
+
 ## Hard Rules
 
 - Never treat a push to `main` as a completed production release.
@@ -732,6 +739,20 @@ código que producción no tiene.
 borre en silencio — **también ordena el flip por construcción**: el flag se activa exactamente cuando
 su código se despliega, nunca antes. Eso resolvió una precondición real ese día (`TASK-1792` no estaba
 en `main`; viajaba en la misma promoción).
+
+### Delta 2026-11-01 (release `935583f88db0`) — auth-server en un release por squash
+
+- **Un push a `main` dispara también `Auth Server Deploy` por `push:main`**, en espera del gate `Production` y en el
+  mismo grupo de concurrencia (`auth-server-production`, sin cancelación) que el job de Auth del orquestador. Cancelarlo
+  ANTES de disparar el orquestador, cuando todavía no existe manifest para ese SHA (sin steps ejecutados).
+- **El guard de `auth-server-deploy.yml` reconoce releases por squash** (PR #265): si el commit servido no es ancestro
+  del objetivo, acepta sólo si es ancestro de la coincidencia de árbol más antigua en `origin/develop`. Antes rechazaba
+  todo release por squash cuando Auth servía un commit de `develop` (manifest `5f2e69806eee` aborted).
+- **Si el tráfico de Auth está fijado por revisión, el deploy gobernado publica pero no sirve** y la verificación de
+  `GIT_SHA` sale roja (manifest aborted). Mover el tráfico con `update-traffic --to-latest`, hacer readback y relanzar el
+  orquestador sólo para cerrar: Auth se omite por cambio nulo y el manifest cierra `released`.
+- Un `ops-worker`/`artifact-worker` en el SHA del intento anterior es change-gate legítimo si el diff de árbol completo
+  hasta el objetivo sólo toca archivos fuera de su bundle (aquí, el workflow de Auth y su prueba).
 
 ### CI metadata and build heap — verified 2026-10-13
 

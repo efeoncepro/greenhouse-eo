@@ -1,0 +1,256 @@
+{
+ "schemaVersion": "pricing-v3-composition-demand/1",
+ "commercialUnit": "managed_service",
+ "brief": {
+  "schemaVersion": "pricing-v3-brief/1",
+  "mode": "simulation",
+  "quoteDate": "2026-11-05",
+  "offerId": "creative-managed-service",
+  "engagementCode": "monthly",
+  "engagementForm": "on_going",
+  "accountId": "mambrino-chile-social-lean-2026-11",
+  "offerMarketCountry": "CL",
+  "outputCurrency": "USD",
+  "periods": 3,
+  "lines": [
+   {
+    "lineId": "social",
+    "profile": "ECG-006",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.3"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación: grilla de 9 piezas, copies, publicación, moderación en horario hábil, reporte y contacto",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   },
+   {
+    "lineId": "video",
+    "profile": "ECG-018",
+    "talentCountry": "CL",
+    "headcount": 1,
+    "dedication": {
+     "unit": "fte",
+     "value": "0.08"
+    },
+    "dedicationEvidence": {
+     "reference": "Estimación de la práctica: edición de 2 reels al mes",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2027-02-28",
+     "status": "estimated"
+    },
+    "allocationMode": "shared",
+    "allocationPolicyId": "allocation:shared",
+    "kitId": "managed-service-core",
+    "allowUnlocalizedCost": false,
+    "choices": []
+   }
+  ],
+  "adjustments": [],
+  "taxTreatment": {
+   "kind": "not_resolved"
+  },
+  "thirdPartyCosts": [
+   {
+    "costId": "photo-session",
+    "category": "production",
+    "label": "Sesión mensual de fotografía y video gastronómico en tienda (estudio móvil y food styling)",
+    "supplier": "Fotógrafo gastronómico freelance (por confirmar)",
+    "settlement": "reinvoiced",
+    "amount": "420000",
+    "currency": "CLP",
+    "quantity": "1",
+    "periodIds": [
+     1,
+     2,
+     3
+    ],
+    "evidence": {
+     "reference": "Estimación: media jornada de fotógrafo food style con luces; cotización del proveedor por confirmar",
+     "effectiveFrom": "2026-11-05",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+    }
+   }
+  ]
+ },
+ "work": [
+  {
+   "lineId": "social",
+   "assigneeIds": [
+    "planned-social-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": [],
+   "excludedProfileTasks": []
+  },
+  {
+   "lineId": "video",
+   "assigneeIds": [
+    "planned-video-1"
+   ],
+   "tasks": [],
+   "aiToolIds": [],
+   "creditDemand": []
+  }
+ ],
+ "serviceToolIds": [],
+ "allocations": [
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "notion",
+   "priceId": "current",
+   "quantity": "2",
+   "serviceShare": "0.19",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "2",
+    "allocatedUnits": "0.38"
+   },
+   "reason": "Dos asientos, uno por persona; la cuenta carga 0,38 FTE de 2.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "microsoft-365",
+   "priceId": "current",
+   "quantity": "2",
+   "serviceShare": "0.19",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "2",
+    "allocatedUnits": "0.38"
+   },
+   "reason": "Dos asientos, uno por persona; la cuenta carga 0,38 FTE de 2.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "adobe",
+   "priceId": "current",
+   "quantity": "1",
+   "seatCapacity": 3,
+   "serviceShare": "0.026666666666666666",
+   "driver": {
+    "unit": "assigned-user-seat",
+    "totalUnits": "3",
+    "allocatedUnits": "0.08"
+   },
+   "reason": "Video (0,08) usa una licencia del paquete de tres.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "metricool",
+   "priceId": "historical",
+   "quantity": "1",
+   "seatCapacity": 1,
+   "serviceShare": "1",
+   "driver": {
+    "unit": "plan-share-conservative",
+    "totalUnits": "1",
+    "allocatedUnits": "1"
+   },
+   "reason": "Supuesto conservador: la cuenta carga el plan completo de publicación; no se reparte entre clientes.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "frame-io",
+   "priceId": "historical",
+   "quantity": "1",
+   "serviceShare": "0.08",
+   "driver": {
+    "unit": "declared-fte-share",
+    "totalUnits": "1",
+    "allocatedUnits": "0.08"
+   },
+   "reason": "Revisión de reels; la cuenta carga la dedicación de video (0,08).",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  },
+  {
+   "periodIds": [
+    1,
+    2,
+    3
+   ],
+   "toolId": "adobe-express",
+   "priceId": "current",
+   "quantity": "1",
+   "seatCapacity": 3,
+   "serviceShare": "0.1",
+   "driver": {
+    "unit": "assigned-user-seat",
+    "totalUnits": "3",
+    "allocatedUnits": "0.3"
+   },
+   "reason": "Social diseña piezas simples con una licencia de Express del paquete de tres.",
+   "evidence": {
+    "reference": "Estimación de la práctica para Mambrino Chile; sin contrastar con factura ni registro de asientos",
+    "effectiveFrom": "2026-11-05",
+    "effectiveUntil": "2027-02-28",
+    "status": "estimated"
+   }
+  }
+ ],
+ "creditBudgets": [],
+ "fxRecordIds": [
+  "fx:CLP:USD"
+ ]
+}

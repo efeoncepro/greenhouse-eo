@@ -1,0 +1,24 @@
+{
+ "registro": "E",
+ "tipo": "E",
+ "portada": true,
+ "primerPlano": "the strap of a backpack",
+ "sinPrimerPlano": null,
+ "borde": "bottom edge",
+ "id": "brasil",
+ "input": {
+  "id": "brasil",
+  "registro": "E",
+  "tipo": "E",
+  "portada": true,
+  "lugar": "departure hall of a generic modern international airport in South America (not a real identifiable airport)",
+  "escena": "the traveler's own hand holds a card-size identity document seen edge-on or from its plain back, together with a folded boarding pass; ahead, out of focus, a calm queue of travelers with backpacks moves toward distant border-control desks in a wide, bright hall with tall windows. It reads as the moment of leaving the country, not as a stressful procedure",
+  "hora": "daytime",
+  "clima": "natural daylight entering through tall windows",
+  "fotografo": "waits in the queue holding the document at chest height in the upper part of the frame, looking down at his own hand",
+  "mirada": "the document and boarding pass in the traveler's hand",
+  "primerPlano": "the strap of a backpack",
+  "borde": "bottom edge",
+  "prohibir": "readable document data, photo or number, real ID card design, PDI or airport signage, readable boarding pass text, faces in focus, airline uniforms"
+ }
+}

@@ -1,5 +1,56 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-11-06 · Estándar · Un informe «sólo blog» salió sin AEO y el operador lo rechazó.** Síntoma: la vista previa
+  de Berel octubre se corrió con `--modules=seo` (sólo el blog); el PDF no tenía capítulo de motores de respuesta
+  aunque el Grader tenía un análisis del 3 de octubre con 5 motores, competidores, citas y sentimiento. Regla: `seo`
+  siempre lleva `aeo`, lo más completo posible; el alcance de contenido recorta el capítulo SEO, nunca quita el AEO.
+  Ahora lo impone `missingCompanionModules` en el validador del encargo y en la vista previa. Rehecho: A4 32 págs.,
+  deck 25 láminas, 158 hechos.
+- **2026-11-06 · Vista previa local: `vercel env pull` + archivo, no `. <(…)`.** Las credenciales de Search Console y
+  GA4 se sacan de staging con `vercel env pull <scratchpad>/staging.env --environment=staging` y se cargan con
+  `set -a; . <archivo filtrado>`. En bash 3.2 `. <(grep …)` no carga nada y el capítulo SEO sale con
+  `module_disabled` (sólo keywords). La vista previa ahora imprime cada rechazo con su motivo: mirarlos antes de
+  componer.
+- **2026-11-06 · Lo esencial decía «ChatGPT: de 1.648 a 1.082 de 1.121».** Una parte de un total en una frase «de X a
+  Y» se leía como rango porque el total anterior era otro. `arrivalText` imprime la parte sola en esas frases.
+- **2026-11-06 · Pendiente: un motor sin período anterior queda fuera de la figura de mención por motor.** Claude
+  (33,3 %) entró al panel en octubre y `chartFor` sólo dibuja los motores comparables; sale en la afirmación y en la
+  tabla de respaldo. Dibujarlo exige que la serie admita un período anterior ausente (contrato `chart_spec_v1`).
+
+- **2026-11-05 · Las cifras de la guía que cambió de URL, con la base del control.** La lección del 2026-11-04 sobre
+  la migración de URL midió con la tabla (5 → 138, 82 → 0, combinada 87 → 138). Con el control de Search Console
+  (ISSUE-191) la URL nueva pasa de 25 a 310, la vieja de 229 a 0 y la guía combinada de 254 a 310 (+22 %). La regla no
+  cambia: mirar la página de movimientos antes de entregar; un par «sube desde casi 0 / cae a 0» con el mismo slug es
+  una migración. Al citar una cifra de una lección anterior a ISSUE-191, verificar con qué base se midió.
+- **2026-11-04 · ISSUE-191 · El capítulo SEO imprimía un subconjunto de los clics.** Síntoma: al valorizar el blog de
+  Berel, el control de Search Console sin la dimensión consulta daba 4.094 clics en octubre y el informe 1.065 (sitio:
+  32.790 vs 14.899). `seo_gsc_daily` guarda `query × page` y Google omite ahí las consultas anonimizadas. Corregido en
+  Insights: los totales, la serie semanal, la referencia del sitio y las páginas salen de
+  `readSeoSearchControlForWindow` (en vivo, `byPage`, `final`, alcance por expresión de página); las consultas siguen
+  del detalle y la cascada suma un paso medido «Consultas que Google no muestra». Si el control falla, límite — nunca
+  la tabla materializada. Regla: un total de Search Console se pide SIN `query`; la suma de `query × page` es detalle con
+  cobertura, no un total. El tablero SEO sigue leyendo la tabla (ISSUE-191 abierto por esa parte).
+- **2026-11-04 · Los textos de fuente compuestos fallan cerrado en el molde (96/90 caracteres).** Nombres de fuente
+  largos («Google Search Console (total del período, con…)») rompieron tarjeta, cascada y tablas, porque el render une
+  las fuentes de cada figura con « · ». Regla: un nombre en `GH_INSIGHTS.sources` cabe junto a los otros de su figura;
+  medir la combinación más larga, no el nombre solo. La nota de una tarjeta admite 120 en el plan y 96 en el deck.
+- **2026-11-04 · La nota de la tarjeta se imprimía en todas sus páginas.** La del valor estimado aparecía junto a los
+  clics. Ahora la nota cita el hecho de su métrica y el render la imprime sólo en la página que lo contiene.
+
+- **2026-11-04 · TASK-2033 · Una guía que cambió de URL se leyó como «la página que más cambió» (+2.660 %).**
+  Síntoma (vista previa de Berel, sólo blog, octubre 2026): la guía de pintura y barniz pasó de la raíz a
+  `/articulos/…` entre el 25 y el 27 de septiembre. Las dos URLs están en el alcance (regla exacta + prefijo), así que el
+  total del capítulo cuadra (799 → 1.065), pero el reader de movimientos las cuenta como dos páginas: una sube de 5 a
+  138 y la otra cae de 82 a 0. El planner eligió la primera como hallazgo de la página de comparación, de lo esencial y
+  de la cifra principal de las tablas de respaldo. La guía real pasó de 87 a 138 (+58,6 %). Además, las dos rutas se
+  abrevian igual y el sufijo « ·2» llevaba el nombre a 43 caracteres: el deck fallaba cerrado (slot de 40). Corregido
+  el sufijo (`uniquePageLabels` le hace lugar abreviando la base); la migración de URL NO tiene corrección en código
+  todavía. Regla: antes de entregar, mirar la página de movimientos de páginas; un par «sube desde casi 0 / cae a 0»
+  con el mismo slug es una migración, no un hallazgo, y la edición no se entrega así al cliente.
+- **2026-11-04 · `preview-edition.ts` acepta `--modules=seo` y `--title="…"`.** Para un informe «sólo blog» sobre un
+  reporte titulado SEO + AEO: `--modules` toma un subconjunto de los módulos del encargo (nunca agrega) y `--title`
+  rotula sólo el PDF local. Sin `--title`, la portada decía «… y en motores de respuesta» sin capítulo AEO.
+
 - **2026-10-12 · TASK-2033 · Cargar el logo para fondo oscuro cambió la portada y borró la línea del alcance.**
   Síntoma: al cargar la variante `on_dark` del logo de Berel, la regla `auto` pasó la portada de blanca a navy, y la
   portada navy no tiene la zona «Qué mide este informe»: el PDF dejó de decir en la portada qué contenido mide.

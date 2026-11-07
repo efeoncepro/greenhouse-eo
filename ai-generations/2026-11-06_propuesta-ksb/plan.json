@@ -1,0 +1,27 @@
+{
+  "document": "proposal",
+  "line": "growth",
+  "slides": [
+    { "recipeId": "cover-proposal-orbit", "purpose": "01 · portada (logo KSB en la órbita, sin pregunta)" },
+    { "recipeId": "decision-difference", "purpose": "02 · resumen ejecutivo: un sistema que convierte la pauta en cotizaciones medibles" },
+    { "recipeId": "section-classic", "purpose": "03 · sección · comprensión del negocio" },
+    { "recipeId": "decision-diagnosis-map", "purpose": "04 · cómo compra KSB: segmentos, especificador, distribuidor, MyKSB" },
+    { "recipeId": "decision-diagnosis-verdict", "purpose": "05 · dónde se pierde el lead hoy (fuentes públicas, 06/11)" },
+    { "recipeId": "section-cine-purpose", "purpose": "06 · sección · estrategia 2027 (plate aprobado del catálogo, QS2)" },
+    { "recipeId": "content-service-lanes", "purpose": "07 · los cuatro canales de la licitación: SEM, social, contenidos, lead gen (después: insertos 360° p40 y p52)" },
+    { "recipeId": "decision-traffic-to-revenue", "purpose": "08 · eje 1 · capa de conversión fuera de ksb.com" },
+    { "recipeId": "proposal-service-revops", "purpose": "09 · eje 2 · medición de punta a punta conectada al CRM" },
+    { "recipeId": "proposal-service-creative", "purpose": "10 · ejes 3 y 4 · demanda por segmento y contenido con gancho propio" },
+    { "recipeId": "method-waves", "purpose": "11 · plan Q1–Q4 con Expomin 2027 como hito" },
+    { "recipeId": "content-measure", "purpose": "12 · rampa de KPIs de las bases (punto 4.1)" },
+    { "recipeId": "decision-risk", "purpose": "13 · condiciones de los KPIs de funnel: línea base, SLA comercial, conversiones offline" },
+    { "recipeId": "section-cine-team", "purpose": "14 · sección · equipo", "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png" },
+    { "recipeId": "content-team", "purpose": "15 · equipo de 7 con los roles de las bases (CV en anexo A4)" },
+    { "recipeId": "section-classic", "purpose": "16 · sección · referencias (después: insertos 360° p34 Sky, p20 Berel, p62 ANAM)" },
+    { "recipeId": "content-partners", "purpose": "17 · certificaciones: Google Partners, Meta Business Partner, HubSpot Gold con insignia y readback" },
+    { "recipeId": "section-classic", "purpose": "18 · sección · propuesta económica" },
+    { "recipeId": "content-pricing", "purpose": "19 · económica por mes y servicio, montos [MONTO] hasta GO (detalle en anexo A4)" },
+    { "recipeId": "decision-next-steps", "purpose": "20 · próximos pasos: definición estrategia 15–28/12, inicio 04/01/2027" },
+    { "recipeId": "close-proposal-horizon", "purpose": "21 · contraportada con foto y «Empower your Growth»" }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:52:32.893Z",
+  "run": "ai-generations/2026-11-02_berel-lecho-logo",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-11-02_berel-lecho-logo",
+  "totalBytes": 93137112,
+  "fileCount": 31,
+  "files": [
+    {
+      "path": "01-sala.png",
+      "sizeBytes": 4529141,
+      "sha256": "ca4ae503321235f47ce3c5584ab857f8cf67fcd97e30bbe3018b0e9648fc0c37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/01-sala.png"
+    },
+    {
+      "path": "02-recamara.png",
+      "sizeBytes": 4106984,
+      "sha256": "3f43a3d39e773f46910403be80f5763931671b31d3477232c1505b47091e5161",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/02-recamara.png"
+    },
+    {
+      "path": "03-comedor.png",
+      "sizeBytes": 4601026,
+      "sha256": "f927934c8c7d8fcf78819ad330b1f65d44da281a66eceb1ae8233f4eb1701ea9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/03-comedor.png"
+    },
+    {
+      "path": "04-diagnostico.png",
+      "sizeBytes": 4144857,
+      "sha256": "e8c2e35bfc3cdab134ea569ce4967e849f817c5e521d363dd2a0c035365e3368",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/04-diagnostico.png"
+    },
+    {
+      "path": "05-exterior-v1-rechazada.png",
+      "sizeBytes": 5164008,
+      "sha256": "f544d8bdc48473f83363f2c88a9c11a8f1edc7868cee15922553484f48bfab03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/05-exterior-v1-rechazada.png"
+    },
+    {
+      "path": "05-exterior.png",
+      "sizeBytes": 5053069,
+      "sha256": "fea71b11e75358ec570dde28d0e3fbe6bbb1dd80710a824fde519ad7413d6a79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/05-exterior.png"
+    },
+    {
+      "path": "06-azotea.png",
+      "sizeBytes": 4402937,
+      "sha256": "184500768233925416513238ff2e2b23deec6a6a3adfa927752214c8bbfc0273",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/06-azotea.png"
+    },
+    {
+      "path": "07-cenital.png",
+      "sizeBytes": 6016882,
+      "sha256": "0e8c6fb8ca4f5ab3a5d730446c01c7ded909d59fc37aa9b6fe5297eaedc2e59a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/07-cenital.png"
+    },
+    {
+      "path": "08-proceso.png",
+      "sizeBytes": 4005491,
+      "sha256": "1611b4501c71b2b6081e05506e6b760aa7c28ce025d398124f94b69aac9f2737",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/08-proceso.png"
+    },
+    {
+      "path": "09-taller.png",
+      "sizeBytes": 4371266,
+      "sha256": "5302b027a8e3f1521aad8acfac3fd2813a074971eeb6675617cc7936d804c4af",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/09-taller.png"
+    },
+    {
+      "path": "10-herreria.png",
+      "sizeBytes": 4649829,
+      "sha256": "fade6d380ab4c1788ef9b2f085e20b6fd25bd07052b4ac25c798ee28308d244c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/10-herreria.png"
+    },
+    {
+      "path": "11-personas.png",
+      "sizeBytes": 4191467,
+      "sha256": "d2398affa4667919003660647b1bbbed0ee6983f9fd8bafe80309a696f0a8119",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/11-personas.png"
+    },
+    {
+      "path": "12-nocturna.png",
+      "sizeBytes": 4143748,
+      "sha256": "2a115c083e677f1c3acd48392617a96b86f094ba2c7ffbaf3f68f634161f4ba5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/12-nocturna.png"
+    },
+    {
+      "path": "13-muestra.png",
+      "sizeBytes": 4439023,
+      "sha256": "2cb5976a44dd194ea5f3d8d25583f8caad644d13a52194c7d71a5bc41969d1f0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/13-muestra.png"
+    },
+    {
+      "path": "chip-1-3404D.png",
+      "sizeBytes": 4502,
+      "sha256": "36da8c438ee4deb86ed4e64c1751768a73ff7005f0c0d93e6b01c70be1590d38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/chip-1-3404D.png"
+    },
+    {
+      "path": "chip-1-3605D.png",
+      "sizeBytes": 4502,
+      "sha256": "144502d2c7dde545697e1667293bbc3f62031621c1f0e6546fa13c1e0b135202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/chip-1-3605D.png"
+    },
+    {
+      "path": "chip-321N.png",
+      "sizeBytes": 4503,
+      "sha256": "cc1b292be8f01e8efe8f9eaa2834ef8ff7f20c50f2ba8c3ea1e1ff45abb42100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/chip-321N.png"
+    },
+    {
+      "path": "chip-4-1105D.png",
+      "sizeBytes": 4502,
+      "sha256": "b84488d4be1c6c5c6c2a9b64d96eacbfd0b2c2adbf29ae52998f36f26b5652f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/chip-4-1105D.png"
+    },
+    {
+      "path": "chip-405N.png",
+      "sizeBytes": 4504,
+      "sha256": "6cfa4fac01bc725b04989e5d70475e7f06fd7b22e81c97f42ab8438243997c65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/chip-405N.png"
+    },
+    {
+      "path": "ronda-2/01-sala.png",
+      "sizeBytes": 4712042,
+      "sha256": "6a740617de04dc0ebc8c7d5a04170dc8679563be19b0bf3ec96ec0089c56d2e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/01-sala.png"
+    },
+    {
+      "path": "ronda-2/03-comedor.png",
+      "sizeBytes": 4567456,
+      "sha256": "44a307467b60a6bb7e00a74afd52f6ea2091670fa57c89b1cadac0211b64cd5b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/03-comedor.png"
+    },
+    {
+      "path": "ronda-2/04-diagnostico.png",
+      "sizeBytes": 4363770,
+      "sha256": "48bb95a89a767de06e719c767e564568dc1fde2a025ed739c50a530f353e50da",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/04-diagnostico.png"
+    },
+    {
+      "path": "ronda-2/05-exterior.png",
+      "sizeBytes": 5522524,
+      "sha256": "fc62095e8c7c188fbd9f526cb3603d402eaf711a83cf0469003d934cadb7acbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/05-exterior.png"
+    },
+    {
+      "path": "ronda-2/chip-1-3404D.png",
+      "sizeBytes": 4502,
+      "sha256": "36da8c438ee4deb86ed4e64c1751768a73ff7005f0c0d93e6b01c70be1590d38",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/chip-1-3404D.png"
+    },
+    {
+      "path": "ronda-2/chip-1-3605D.png",
+      "sizeBytes": 4502,
+      "sha256": "144502d2c7dde545697e1667293bbc3f62031621c1f0e6546fa13c1e0b135202",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/chip-1-3605D.png"
+    },
+    {
+      "path": "ronda-2/chip-321N.png",
+      "sizeBytes": 4503,
+      "sha256": "cc1b292be8f01e8efe8f9eaa2834ef8ff7f20c50f2ba8c3ea1e1ff45abb42100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/chip-321N.png"
+    },
+    {
+      "path": "ronda-2/chip-4-1105D.png",
+      "sizeBytes": 4502,
+      "sha256": "b84488d4be1c6c5c6c2a9b64d96eacbfd0b2c2adbf29ae52998f36f26b5652f3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/chip-4-1105D.png"
+    },
+    {
+      "path": "ronda-2/chip-405N.png",
+      "sizeBytes": 4504,
+      "sha256": "6cfa4fac01bc725b04989e5d70475e7f06fd7b22e81c97f42ab8438243997c65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-2/chip-405N.png"
+    },
+    {
+      "path": "ronda-3/04-diagnostico.png",
+      "sizeBytes": 4529038,
+      "sha256": "8ef5b41e81d927993b6c20151a3e3b2bb710f275d26fee8694c0fe7d551e8d5d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-3/04-diagnostico.png"
+    },
+    {
+      "path": "ronda-3/05-exterior.png",
+      "sizeBytes": 5573025,
+      "sha256": "1e548aa5330531cb75042e1ff7ce331994c8dadf58c0ff17212f81309523baee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-3/05-exterior.png"
+    },
+    {
+      "path": "ronda-3/chip-321N.png",
+      "sizeBytes": 4503,
+      "sha256": "cc1b292be8f01e8efe8f9eaa2834ef8ff7f20c50f2ba8c3ea1e1ff45abb42100",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-11-02_berel-lecho-logo/ronda-3/chip-321N.png"
+    }
+  ]
+}

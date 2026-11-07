@@ -17,6 +17,9 @@
 | `idempotencyKey` | optional, 8–200 chars |
 | `title`, `purpose` | optional 3–200 / 3–500; name the report on first creation, ignored on revise |
 
+**Module standard (2026-11-06):** a request with `seo` must include `aeo`; `validate-request.ts` throws
+`InsightsInputError` on `modules` with `missing: ['aeo']`. Applies to manual creation, revise and schedule templates.
+
 ## Responses
 
 - Create: `202` new edition `{report, edition, idempotent:false, generation:{outcome, failedPhase, failureCode}}`;
@@ -643,3 +646,59 @@ no enumeran el contenido. La vista web sí recibe `scopeLines` en su modelo.
 
 **Fallo cerrado.** Si `readSeoContentScope` lanza, el adapter lanza y el orquestador registra el módulo SEO como
 límite. Nunca se mide el sitio completo por defecto.
+
+## Control de Search Console, valor estimado y visitas desde redes (2026-11-04 — code complete en `develop` local, sin release; verificado contra código 2026-11-05)
+
+**Versiones.** `SEO_ADAPTER_VERSION = 'seo_report_adapter_v2'` (antes v1). Las fuentes nuevas declaran `reader:
+'readSeoSearchControlForWindow'` (método `gsc_search_control_v1`) y `reader: 'readOrganicTrafficValueForWindow'`
+(método `gsc_clicks_country_cpc_v1`). GA4 sigue en `ga4_site_facts_v2` con hechos nuevos. Ediciones selladas antes no
+cambian.
+
+**Control (ISSUE-191).** `readSeoSearchControlForWindow(org, { from, toExclusive }, { scope? })` pide Search Console en
+vivo con dimensiones `[]`, `['date']` y `['page']` (paginado), `type: 'web'`, `dataState: 'final'`,
+`aggregationType: 'byPage'`; con alcance, filtro `page includingRegex` de `searchConsolePageExpression` (mismo veredicto
+que `isPathInContentScope`). Errores: `disabled`, `not_connected`, `token_unhealthy`, `query_failed`,
+`pagination_limit_reached`, `page_outside_content_scope` (Google devolvió una página fuera del alcance: falla, no
+filtra).
+
+| Hecho | Fuente desde v2 | Antes (v1) |
+| --- | --- | --- |
+| `clicks`, `impressions`, `ctr`, `position`, `clicks_week.*` | control (`evidenceRef` `gsc_control:<org>:<ventana>[:scope_vN]`) | suma de `seo_gsc_daily` |
+| `site_total.clicks`, `site_total.impressions` | control sin alcance, `role: 'reference'` | suma de `seo_gsc_daily` |
+| `driver.page.*` | control por página (`rankSearchControlPageMovers`), las dos ventanas | `seo_gsc_daily` |
+| `driver.query.*` (cascada) | detalle de `seo_gsc_daily` (cobertura declarada) | igual |
+| `driver.query.delta` `…:hidden` | **nuevo**: control − detalle en cada ventana; etiqueta «Consultas que Google no muestra», `dimension.rank: 'hidden'`, `evidenceRef` `gsc_control:hidden:…` | no existía |
+
+Con el paso `hidden`, top + «resto» + «Consultas que Google no muestra» suman exactamente el cambio de `clicks` del
+capítulo: la cascada cuadra con cifras medidas. El paso sólo existe si `clicks` tiene período anterior.
+
+**Rechazos del control.** `metricId: 'gsc'` con `not_connected` | `module_disabled` | `insufficient_data` (cualquier
+otro `errorCode`), o `no_data` sin días finales en la ventana. `driver.page` `insufficient_data` si falta el control
+por página de alguna de las dos ventanas. **Nunca** se cae a la tabla materializada.
+
+**Valor publicitario estimado.** Requiere mercado en el target SEO (`market` → país de Search Console; sin mercado:
+`organic_value` `insufficient_data`). Reader: clics de consultas visibles por página/consulta/país del control, sobre
+el alcance, valorizados con `readKeywordMarketData` del mismo mercado; nunca compra. Errores del reader:
+`not_connected`, `market_unsupported`, `collection_failed`, `reconciliation_failed`.
+
+| Hecho | `unit` | `observation` | `numerator` / `denominator` |
+| --- | --- | --- | --- |
+| `organic_value_usd` | `usd` | `estimated` | clics valorados / total del control |
+| `organic_value.valued_clicks` | `count` | `observed` | clics valorados / total del control |
+
+`coverage` `partial` con `ratio` = clics valorados / total; `freshness.asOf` = `cpcAsOf` (última captura del precio,
+no CPC del mes medido); `source` `gsc:<propiedad>+dataforseo_labs:keyword_overview:<país>`; `evidenceRef`
+`organic_value:<org>:<país>:<ventana>[:scope_vN]`; `channelId` de búsqueda. Sin ningún CPC: `organic_value` `no_data`
+(nunca US$ 0). Contrato de contenido: pregunta `outcome`; dirección `higher_is_better`; glifos `medicion` / `clic`.
+Nota de la tarjeta: «Lo que costaría comprar en Google Ads los clics con precio conocido. No es ingreso ni ahorro.»
+(`GH_INSIGHTS`, cita el hecho de su métrica y se imprime sólo en la página que lo contiene; 120 caracteres en el plan,
+96 en el deck).
+
+**Visitas desde redes (GA4).** `site.social_sessions`: sesiones de los canales Organic Social + Organic Video sobre la
+misma población que `site.organic_*` (con alcance, página de entrada del alcance); Paid Social queda fuera. `0` es un
+valor medido cuando GA4 respondió. `social_source.<red>` (`facebook`, `instagram`, `youtube`, `tiktok`, `linkedin`,
+`threads`, `x`, `pinterest`, `other`): `numerator` = sesiones de la red, `denominator` = `site.social_sessions`,
+`channelId` cuando la red tiene isotipo; máximo 3 partes, «Otras redes» (`social_source.other`) siempre al final. El
+planner no las dice como afirmaciones sueltas: un hallazgo (`socialSourceFinding`: la red que más trae, «la mayoría»
+si supera la mitad) y la tabla GA4 «Visitas desde buscadores y redes». Contrato de contenido: `outcome`. Nunca
+«búsqueda social», nunca efecto del SEO.

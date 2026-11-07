@@ -1,5 +1,5 @@
 import { AUTH_INTERNAL_LOGIN_COPY } from '@/lib/copy/auth-server-internal-login'
-import { ICON_ALERT, ICON_ARROW_RIGHT } from '../oauth/pages/icons'
+import { AUTH_ORBIT_COPY, headingText } from '@/lib/copy/auth-server-orbit'
 import { escapeHtml, layout } from '../oauth/pages/render'
 import { acceptsHtml, htmlResponse, jsonResponse, type OAuthHttpRequest } from '../oauth/http'
 
@@ -19,13 +19,13 @@ export const internalLoginFailureResponse = (
   return htmlResponse(
     status,
     layout(
-      copy.title,
-      `<section data-capture="auth-internal-login-error">
-      <h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(copy.title)}</h1>
-      <p class="id-alert" role="alert">${ICON_ALERT}<span>${escapeHtml(body)}</span></p>
-      <p class="id-muted">${escapeHtml(copy.recovery)}</p>
-      <div class="id-actions"><a class="id-primary" href="/login">${ICON_ARROW_RIGHT}${escapeHtml(copy.retryCta)}</a></div>
-    </section>`
+      headingText(AUTH_ORBIT_COPY.internalError.heading),
+      `<section class="os-surface" data-capture="auth-internal-login-error">
+      <p class="os-alert" role="alert">${escapeHtml(body)}</p>
+      <p>${escapeHtml(copy.recovery)}</p>
+      <div class="id-actions"><a class="id-primary" href="/login">${escapeHtml(copy.retryCta)}</a></div>
+    </section>`,
+      { heading: AUTH_ORBIT_COPY.internalError.heading, panel: { kind: 'word', lines: AUTH_ORBIT_COPY.errorWord } }
     ),
     responseHeaders
   )

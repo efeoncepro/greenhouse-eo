@@ -1,0 +1,28 @@
+{
+  "id": 252401,
+  "status": "private",
+  "authorId": 1,
+  "title": "Glitch Flash: Images 2.6 y la prueba de la segunda corrección",
+  "slug": "glitch-flash-images-2-6",
+  "manifest": "greenhouse-cf-glitch-flash-images-2-6",
+  "contentSha256": "978054056a217e0debcc619951033a46f7af2998cf464cbe36b406eaf02a88d4",
+  "categories": [
+    183
+  ],
+  "coverId": 252389,
+  "noindex": "1",
+  "blocks": {
+    "core/paragraph": 63,
+    "yoast-seo/table-of-contents": 1,
+    "core/heading": 12,
+    "core/image": 11,
+    "core/table": 3,
+    "core/buttons": 2,
+    "core/button": 2,
+    "efeoncepro/glitch-drop": 5,
+    "core/pullquote": 1,
+    "core/list": 1
+  },
+  "renderedDropCount": 15,
+  "editUrl": "https://efeoncepro.com/wp-admin/post.php?post=252401&action=edit"
+}

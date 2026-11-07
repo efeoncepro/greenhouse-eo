@@ -1,0 +1,130 @@
+{
+  "id": "sauce",
+  "notion_url": "https://app.notion.com/p/40239c2fefe7810394aefe63a33f31d4",
+  "titulo": "Laguna Azul de Sauce: cómo llegar desde Tarapoto y qué hacer en un día",
+  "slug": "/laguna-azul-tarapoto/",
+  "mercado": "PE",
+  "version": "v1 · 05/11/2026",
+  "imagenes": [
+    {
+      "pieza": "N?_IMG-1",
+      "rol": "portada",
+      "posicion": "arriba del gancho, antes del TL;DR",
+      "pregunta": "¿Dónde estoy?",
+      "tipo": "A — Destino contextual",
+      "modificadores": "POV del viajero · persona sola · escala amplia · luz de media mañana · orienta",
+      "registro": "D",
+      "archivo": "laguna-azul-sauce-orilla-viajero.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": false,
+      "alt": "Viajero de pie en la orilla de la Laguna Azul de Sauce, en San Martín, mirando el agua quieta rodeada de cerros con selva",
+      "que_muestra": "la Laguna Azul de Sauce vista desde la orilla: agua quieta y clara que refleja el cielo, cerros bajos cubiertos de selva alrededor y, a media distancia, un viajero de pie con el agua en los tobillos mirando hacia la laguna. Debe leerse como laguna amplia de selva alta, no como playa de mar ni como piscina de resort.",
+      "hora_clima": "media mañana, recién llegado tras el trayecto; cielo con nubes blancas y claros, sin lluvia; luz natural abundante, sombras abiertas, reflejos y altas luces del cielo conservados",
+      "personas": "el viajero a media distancia, de espaldas o de perfil, sin pose ni mirada al lente; si aparecen botes o bañistas, lejanos y pequeños, en acciones espontáneas; ningún rostro identificable",
+      "primer_plano": "hierba o una rama de la orilla muy cerca del lente y muy fuera de foco, por el borde inferior izquierdo, sin tapar al viajero ni la línea del agua",
+      "ancla_pov": "el primer reflejo del agua aparece entre los árboles",
+      "no": [
+        "sin texto ni logos",
+        "sin rótulos legibles de negocios reales ni de hoteles",
+        "sin muelles o construcciones inventadas",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin agua turquesa caribeña ni arena blanca de playa",
+        "sin sirenas ni elementos de la leyenda"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la Laguna Azul de Sauce desde la orilla en la tarea antes de generar (si no, Bloqueado)",
+      "reutilizacion": "variantes 1200 × 630 (OG/newsletter) y 1080 × 1080 recortadas del mismo maestro; el viajero, la línea del agua y los cerros tienen que sobrevivir a los recortes. Sujeto en la mitad superior central para que el H1 blanco se lea encima."
+    },
+    {
+      "pieza": "N?_IMG-2",
+      "rol": "escena",
+      "posicion": "después del párrafo «Lo primero es el agua…»",
+      "pregunta": "¿Qué hago o qué decido?",
+      "tipo": "D — POV de recorrido",
+      "modificadores": "desde la proa de un bote · otra persona integrada · escala amplia · luz de mediodía",
+      "registro": "E",
+      "archivo": "laguna-azul-sauce-bote-proa.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Vista desde la proa de un bote que avanza por la Laguna Azul de Sauce, con una acompañante mirando la orilla verde",
+      "que_muestra": "la vista desde la proa de un bote pequeño que avanza por la laguna: el agua se abre en una estela suave, el cielo se refleja en la superficie y la orilla verde con cerros queda a media distancia; una acompañante sentada adelante, de espaldas, mira hacia la orilla con una mano en el borde del bote.",
+      "hora_clima": "cerca del mediodía; cielo con nubes y claros, sin lluvia; luz natural luminosa, sombras abiertas, reflejos del cielo en el agua sin quemar",
+      "personas": "fotografía el viajero desde la banca de atrás del bote, a la altura de los ojos; la acompañante está de espaldas o de perfil y mira la orilla; el conductor del bote no aparece; nadie mira al lente; chalecos salvavidas sin logos",
+      "primer_plano": "el borde de la proa y una gota de agua sobre la madera muy cerca del lente y muy fuera de foco, por el borde inferior, sin tapar la laguna ni a la acompañante",
+      "ancla_pov": "solo queda el agua partiéndose bajo la proa",
+      "no": [
+        "sin texto ni logos",
+        "sin nombres pintados en el bote",
+        "sin rótulos legibles de negocios reales",
+        "sin motos acuáticas ni esquí en primer plano",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin agua turquesa caribeña",
+        "sin fauna inventada en el agua"
+      ],
+      "fidelidad": "lugar identificable → requiere foto real REF-01 de la Laguna Azul de Sauce desde un bote en la tarea antes de generar (si no, Bloqueado)"
+    },
+    {
+      "pieza": "N?_IMG-3",
+      "rol": "escena",
+      "posicion": "después del párrafo «A la hora de comer, pide una patarashca…»",
+      "pregunta": "¿Cómo se siente o qué demuestra?",
+      "tipo": "E — POV de mano, objeto o alimento",
+      "modificadores": "con la laguna de fondo · escala cercana · luz de mediodía en sombra",
+      "registro": "E",
+      "archivo": "patarashca-mesa-laguna-azul-sauce.webp",
+      "formato": "1408 × 768 px (11:6) · menos de 200 KB",
+      "lazy": true,
+      "alt": "Patarashca de pescado abierta sobre hoja de bijao en una mesa frente a la Laguna Azul de Sauce",
+      "que_muestra": "sobre una mesa sencilla de madera, una patarashca recién abierta: la hoja de bijao tostada y el pescado entero a la vista, con la mano del viajero entrando al cuadro con un tenedor; al fondo, fuera de foco, la laguna y la orilla verde. La relación plato–laguna es el contenido: si el fondo no se lee como la laguna, la imagen no sirve.",
+      "hora_clima": "mediodía, después del bote (el almuerzo del relato); luz natural abundante bajo un techo o en sombra abierta, sin sol duro sobre el plato; un poco de vapor visible",
+      "personas": "fotografía el viajero sentado a la mesa y mira el plato; solo su mano en cuadro; al fondo, personas pequeñas y desenfocadas en la orilla, sin rostro identificable",
+      "primer_plano": "el borde de un vaso o de la mesa muy cerca del lente y muy fuera de foco, por el borde inferior derecho, sin tapar el plato",
+      "ancla_pov": "Cuando la abres sale un vapor que huele a humo y a hierba",
+      "no": [
+        "sin texto ni logos",
+        "sin cartas ni rótulos legibles de restaurantes reales",
+        "sin aviones, cabinas ni uniformes SKY",
+        "sin cielo reemplazado",
+        "sin stock",
+        "sin pescados de mar ni mariscos",
+        "sin vajilla de restaurante de autor ni emplatado de revista"
+      ],
+      "fidelidad": "plato y lugar identificables → requiere foto real REF-01 de una patarashca y de la orilla de la Laguna Azul de Sauce en la tarea antes de generar (si no, Bloqueado)"
+    }
+  ],
+  "banner": {
+    "pieza": "N?_BAN-1",
+    "estado": "listo",
+    "motivo_bloqueo": null,
+    "receta": "ruta.foto",
+    "url": "https://skyairline.com/flights/es/vuelos-desde-lima-a-tarapoto",
+    "ruta_verificada_el": "2026-11-05",
+    "fuente": "Notion · Precios y Rutas SKY (🟢 Activa)",
+    "titular": "Bote, baño y patarashca",
+    "archivo": "banner-ruta-lima-tarapoto-laguna-azul.webp",
+    "alt": "Banner de SKY de la ruta Lima–Tarapoto: bote, baño y patarashca frente al agua",
+    "posicion": "después de «Lo que tienes que saber», antes de las preguntas frecuentes",
+    "ruta_texto": "Lima (LIM) → Tarapoto (TPP) · Home Market PER · 🟢 Activa en Precios y Rutas SKY, verificada el 05/11/2026 · volver a verificar el día de publicación",
+    "origen": {
+      "iata": "LIM",
+      "ciudad": "Lima"
+    },
+    "destino": {
+      "iata": "TPP",
+      "ciudad": "Tarapoto"
+    },
+    "home_market": "PER",
+    "cta": "Ver vuelos a Tarapoto",
+    "nota_receta": "ruta.foto: la mitad foto es un recorte de IMG 1 (laguna-azul-sauce-orilla-viajero.webp) una vez aprobada"
+  },
+  "descartes": [
+    "Balsa cruzando el Huallaga — ya es la IMG 3 de la guía de Tarapoto en 3 días",
+    "Hamaca a la sombra frente a la laguna — pausa sensorial que repite la escala de la portada",
+    "Mirador Punta del Gallinazo sobre el Huallaga — falta referencia real y la ubicación exacta está sin verificar",
+    "Kayak en el agua — acción posible, pero compite con el bote",
+    "Roca del balcón de la sirena — exige fidelidad del lugar exacto y la leyenda no se ilustra"
+  ]
+}

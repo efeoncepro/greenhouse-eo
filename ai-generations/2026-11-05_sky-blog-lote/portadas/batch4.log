@@ -1,0 +1,174 @@
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/ayacucho-img1-maestro.png (edit) …
+  ✓ 12734KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2691 (img 1504 · txt 1187) · out 13342 · total 16033
+done
+ayacucho exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/catacaos-img1-maestro.png (edit) …
+  ✓ 11392KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2699 (img 1536 · txt 1163) · out 13342 · total 16041
+done
+catacaos exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/iquitos-img1-maestro.png (edit) …
+  ✓ 11738KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2648 (img 1457 · txt 1191) · out 13342 · total 15990
+done
+iquitos exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/lamas-img1-maestro.png (edit) …
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/alpaca-img1-maestro.png (edit) …
+  ✓ 13163KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2644 (img 1452 · txt 1192) · out 13342 · total 15986
+done
+lamas exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/mancora-img1-maestro.png (edit) …
+  ✓ 12145KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2729 (img 1518 · txt 1211) · out 13342 · total 16071
+done
+alpaca exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/buenos-aires-playas-img1-maestro.png (edit) …
+  ✓ 10637KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2657 (img 1452 · txt 1205) · out 13342 · total 15999
+done
+mancora exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/manglar-img1-maestro.png (edit) …
+  ✓ 12001KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2655 (img 1452 · txt 1203) · out 13342 · total 15997
+done
+buenos-aires-playas exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/cajamarca-img1-maestro.png (edit) …
+  ✓ 14671KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2776 (img 1536 · txt 1240) · out 13342 · total 16118
+done
+manglar exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/ninos-peru-img1-maestro.png (edit) …
+  ✓ 13373KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2651 (img 1452 · txt 1199) · out 13342 · total 15993
+done
+cajamarca exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/candelaria-img1-maestro.png (edit) …
+  ✓ 11283KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2683 (img 1504 · txt 1179) · out 13342 · total 16025
+done
+ninos-peru exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/noticia-talara-img1-maestro.png (edit) …
+  ✓ 13246KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2702 (img 1452 · txt 1250) · out 13342 · total 16044
+done
+candelaria exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/carnaval-cajamarca-img1-maestro.png (edit) …
+  ✓ 8077KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2616 (img 1452 · txt 1164) · out 13342 · total 15958
+done
+noticia-talara exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/peru-diciembre-img1-maestro.png (edit) …
+  ✓ 9736KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2602 (img 1452 · txt 1150) · out 13342 · total 15944
+done
+peru-diciembre exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/punta-sal-img1-maestro.png (edit) …
+  ✓ 11731KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2669 (img 1452 · txt 1217) · out 13342 · total 16011
+done
+carnaval-cajamarca exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/chiclayo-img1-maestro.png (edit) …
+  ✓ 9647KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2630 (img 1452 · txt 1178) · out 13342 · total 15972
+done
+punta-sal exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/retablo-img1-maestro.png (edit) …
+  ✓ 9067KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2686 (img 1485 · txt 1201) · out 13342 · total 16028
+done
+chiclayo exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/cumbemayo-img1-maestro.png (edit) …
+  ✓ 11326KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2710 (img 1521 · txt 1189) · out 13342 · total 16052
+done
+retablo exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/sauce-img1-maestro.png (edit) …
+  ✓ 13905KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2645 (img 1452 · txt 1193) · out 13342 · total 15987
+done
+cumbemayo exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/santiago-ano-nuevo-img1-maestro.png (edit) …
+  ✓ 13061KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2633 (img 1452 · txt 1181) · out 13342 · total 15975
+done
+sauce exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/tacna-img1-maestro.png (edit) …
+  ✓ 12188KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2742 (img 1536 · txt 1206) · out 13342 · total 16084
+done
+santiago-ano-nuevo exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/vilcashuaman-img1-maestro.png (edit) …
+  ✓ 12181KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2643 (img 1452 · txt 1191) · out 13342 · total 15985
+done
+tacna exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/talara-img1-maestro.png (edit) …
+  ✓ 14820KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2733 (img 1536 · txt 1197) · out 13342 · total 16075
+done
+vilcashuaman exit=0
+  ✓ 11326KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2629 (img 1452 · txt 1177) · out 13342 · total 15971
+done
+talara exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/tarapoto-img1-maestro.png (edit) …
+  ✓ 12278KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2684 (img 1482 · txt 1202) · out 13342 · total 16026
+done
+tarapoto exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/yanahuara-img1-maestro.png (edit) …
+  ✓ 12793KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2721 (img 1504 · txt 1217) · out 13342 · total 16063
+done
+yanahuara exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/zorritos-img1-maestro.png (edit) …
+  ✓ 11013KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 2688 (img 1504 · txt 1184) · out 13342 · total 16030
+done
+zorritos exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/cena-chilena-img1-maestro.png …
+  ✓ 10438KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 1138 (img 0 · txt 1138) · out 13342 · total 14480
+done
+cena-chilena exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/cena-peruana-img1-maestro.png …
+  ✓ 10002KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 1164 (img 0 · txt 1164) · out 13342 · total 14506
+done
+cena-peruana exit=0
+  $ costo estimado ≈ USD 0.400 (1 × 13342 tokens de salida × USD 30/1M, fórmula oficial; la entrada suma aparte)
+→ ./ai-generations/2026-11-05_sky-blog-lote/portadas/maestros/noticia-puntual-cl-img1-maestro.png …
+  ✓ 9644KB · gpt-image-2.5-sunburst · 3840x2160 · max · clave personal
+    usage: in 1129 (img 0 · txt 1129) · out 13342 · total 14471
+done
+noticia-puntual-cl exit=0

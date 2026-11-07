@@ -64,6 +64,9 @@ export type ApiPlatformErrorCode =
   | 'offboarding_case_review_required'
   | 'rate_limited'
   | 'scope_not_allowed'
+  // TASK-2096 — operational account (Space) context: denied vs. must choose among several
+  | 'space_context_denied'
+  | 'space_selection_required'
   | 'session_revoked'
   | 'service_enablement_preview_stale'
   | 'service_enablement_blocked'

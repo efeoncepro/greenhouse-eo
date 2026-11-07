@@ -56,6 +56,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 > §Elegir modelo; video en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`. Los
 > rankings **se contradicen** (OpenArt: Seedream 5 Pro #1; Arena y Artificial Analysis: GPT Image 2.5 Sunburst y
 > Flare #1/#2, Seedream 5 Pro #8–#15): preséntalos con fecha y fuente, nunca como verdad única.
+> Delta 2026-11-05: GPT Image 2.6 (2026-11-04) entra con rankings preliminares contradictorios (Arena no lo pone sobre
+> 2.5 Sunburst; Design Arena sí) [tercero].
 
 ### 2.1 Modelos de IMAGEN
 
@@ -66,7 +68,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **Gemini 3 Pro Image** (Vertex) | edición razonada/acabado premium | mayor coste/latencia | specialist premium directo GCP |
 | **Gemini 3.1 Flash Lite Image** (Vertex) | volumen y baja latencia | lifecycle corto | scale directo GCP con refresh gate |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario | estilo cinematográfico < MJ | default del CLI `pnpm ai:image`; único con Batch; el repo ya lo usa (personaje Nexa) |
-| **GPT Image 2.5 Sunburst / Flare** (OpenAI, 2026-09-08) | Sunburst: edición precisa, máscara, pieza final (`xhigh`/`max`); Flare: generación cotidiana, más rápida, mismo costo | texto en imagen, consistencia y layout fijo siguen como limitación declarada | `pnpm ai:image --model gpt-image-2.5-sunburst` / `-flare`; costo estimable antes de gastar |
+| **GPT Image 2.5 Sunburst / Flare** (OpenAI, 2026-09-08) | Sunburst: edición precisa y pieza final (`xhigh`/`max`), **nunca con máscara** (panel negro; la zona va por `pnpm ai:inpaint`, Flare); Flare: generación cotidiana, más rápida, mismo costo | texto en imagen, consistencia y layout fijo siguen como limitación declarada | `pnpm ai:image --model gpt-image-2.5-sunburst` / `-flare`; costo estimable antes de gastar |
+| **GPT Image 2.6 Sunburst / Flare** (OpenAI, 2026-11-04) | **SVG nativo** (`--format svg`; el modelo autor se cobra aparte), **GIF animado** (`--format gif`, 640² hasta 9 cuadros), `markup` (anotaciones en edits, también 2.5; verificado) y `complexity`; mejora declarada en consistencia de edición y respuesta a bocetos [oficial, no medida] | más caro que 2.5 sólo en `low`/`medium` (~4×/~3×; igual en `high`/`xhigh`/`max`; cifras en la guía §5.1); Sunburst 2.6 con máscara = panel negro; identidad sin canario; sin Batch | `pnpm ai:image --model gpt-image-2.6-flare` / `-sunburst` (desde 2026-11-05; `--estimate` antes de gastar). Vector, micro-loop y edición con marcas; explorar barato sigue en 2.5 Flare; identidad de personas sigue en 2.5 Sunburst hasta un canario; pieza de producción raster: comparar 2.5 vs 2.6 Sunburst en la toma real |
 | **Seedream 5 Lite** (ByteDance vía fal.ai) | divergencia material rápida y barata, refs/edición de volumen | continuidad/anatomía de campaña antes del anchor | abrir 8–16 territorios y descartar barato |
 | **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | **no es 4K en fal** (máx. 2048²; > 2K nativo → Lite o GPT Image); layout extremo menos obediente en el benchmark; Edit sin máscara (devuelve raster plano) | desarrollar el mundo visual y hacer art direction regional |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept | texto-en-imagen, control literal | mood boards, editorial, hero de alto concepto |
@@ -85,7 +88,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **Veo 3.1 / Fast** (Google Vertex) | ruta premium/broadcast y ruta de escala GCP | costo/cupo y duración por endpoint | premium y scale; nunca vía Fal |
 | **Kling 3 Pro/4K** (Fal) | first/last frame, elements, multi-shot y 4K | audio/idioma y concurrencia por endpoint | especialista 4K/control |
 | **PixVerse V6** (Fal) | 1080p, audio, camera controls y buen costo/volumen | límites 1080p/duración | variantes social a escala |
-| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni`) | texto/imagen/cuadros/referencias a video; edit y extend desde MP4, audio integrado | Preview; seis modos verificados en CLI sólo a 360p/16:9/3 s (extend 6 s acumulados); 720p/1080p/4K, 9:16 y cadena stateful sin probar | generación técnica local con `--estimate` y `--yes`; QA temporal y de audio antes de usar |
+| **Gemini Omni 1.2 Flash** (Google Cloud, `pnpm ai:omni`, default desde 2026-11-05) | lo mismo que 1.1 con clips de hasta 15 s y upscale 360p/720p → 1080p/4K | GA; sin clip 1.2 generado aún en la CLI | borrador barato a 360p/720p y upscale sólo de la toma elegida |
+| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni --model 1.1`) | texto/imagen/cuadros/referencias a video; edit y extend desde MP4, audio integrado | Preview; seis modos verificados en CLI sólo a 360p/16:9/3 s (extend 6 s acumulados); 720p/1080p/4K, 9:16 y cadena stateful sin probar | generación técnica local con `--estimate` y `--yes`; QA temporal y de audio antes de usar |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO** — API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** basar nada nuevo en él |
 
 ### 2.3 Post-proceso y herramientas de mano
@@ -104,8 +108,13 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **Explorar dirección / mood / editorial** → Midjourney.
 - **Vector/logo/icono/mascota escalable y editable** → Recraft.
 - **Realismo + control de cámara / storyboard** → FLUX.2.
-- **Realista diario** → GPT Image 2.5 Flare. **Edición fiel / máscara / pieza final** → GPT Image 2.5 Sunburst.
-  **Batch** → GPT Image 2.
+- **Realista diario** → GPT Image 2.5 Flare. **Edición fiel / pieza final** → GPT Image 2.5 Sunburst (con
+  máscara → `pnpm ai:inpaint`, Flare). **Batch** → GPT Image 2.
+- **Vector desde un prompt** → Recraft o GPT Image 2.6 Flare `pnpm ai:image --format svg`. **Micro-loop GIF**
+  (sticker, loop corto) → GPT Image 2.6 Flare `pnpm ai:image --format gif`; movimiento real → `motion-design-studio`.
+  **Corrección dibujada** → `pnpm ai:image --markup` o trazos rojos sobre la foto (2.5 o 2.6). Oficio y comandos en
+  `greenhouse-ai-image-generator` §GPT Image 2.6. **Pieza final raster** → compara 2.5 y 2.6 Sunburst en la toma real
+  (mismo costo en `high`+); la identidad de personas sigue en 2.5 Sunburst hasta un canario.
 - **Divergencia de campaña barata** → Seedream 5 Lite.
 - **Material/color/atmósfera o región semántica** → Seedream 5 Pro.
   Ambos Seedream se producen con `pnpm ai:fal` (ver `greenhouse-ai-image-generator`).
@@ -124,7 +133,7 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
   duración/4K/costo en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`).
 - **Broadcast / cine** → Veo 3.1.
 - **Simple y barato** → Kling 3.0.
-- **Editar un MP4 mediante instrucción** → Gemini Omni 1.1 por `pnpm ai:omni --task edit`; la preservación fina y la cadena conversacional stateful aún no se han verificado.
+- **Editar un MP4 mediante instrucción** → Gemini Omni (1.2 por defecto) por `pnpm ai:omni --task edit`; la preservación fina y la cadena conversacional stateful aún no se han verificado.
 - **Nada nuevo sobre Sora 2** (deprecado).
 
 > **Doctrina 2026 (repetida porque es load-bearing):** los profesionales que hacen el mejor

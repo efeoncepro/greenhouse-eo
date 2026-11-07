@@ -39,6 +39,9 @@ const BY_METRIC: Readonly<Record<string, MetricGlyphKey>> = {
   keywords_tracked: 'keyword',
   organic_etv: 'visita',
   ai_sessions: 'visita',
+  'site.social_sessions': 'social',
+  organic_value_usd: 'medicion',
+  'organic_value.valued_clicks': 'clic',
   share_of_model: 'ia',
   share_of_voice: 'competencia',
   citation_share: 'enlace',
@@ -62,6 +65,7 @@ const BY_METRIC: Readonly<Record<string, MetricGlyphKey>> = {
 const BY_FAMILY: Readonly<Record<string, MetricGlyphKey>> = {
   site: 'visita',
   ai_source: 'visita',
+  social_source: 'social',
   mention_rate: 'cita',
   sov: 'competencia'
 }

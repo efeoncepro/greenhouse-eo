@@ -1,0 +1,135 @@
+{
+  "kind": "ai-inpaint-image",
+  "pipelineVersion": 1,
+  "runId": "584f8da53825",
+  "key": "584f8da53825c06eb4868d718ed123e6c3cc961e4f1785cede016671104d60ca",
+  "status": "completed",
+  "createdAt": "2026-11-05T15:44:34.795Z",
+  "inputs": {
+    "image": "/Users/jreye/Documents/creative-workbench/clients/berel/.resources-local/photos/espacios/rayados-n4-recamara.png",
+    "imageSha256": "7d6fa0d1cbee6603c60e7224551cb715908212a2edeb2d1c3eea2a411f4b5964",
+    "mask": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-11-05_berel-rayados/mask-cuadro.png",
+    "maskSha256": "6baa08971637f0104b86e14c57e3cd28129ee03d475d3ae68344d2b577d51231",
+    "maskConvention": "white-editable",
+    "width": 2048,
+    "height": 1536,
+    "sketch": null,
+    "references": []
+  },
+  "adapter": {
+    "id": "openai",
+    "provider": "openai",
+    "sendsMask": true,
+    "verifiedAt": "2026-10-02"
+  },
+  "request": {
+    "model": "gpt-image-2.6-flare",
+    "quality": "high",
+    "seed": null,
+    "count": 1,
+    "prompt": "In the marked area only, on the blue painted wall stripe above the desk: a framed print hanging straight and level, centered in the marked area. A slim matte black wooden frame, portrait orientation, with a wide plain white mat (passe-partout) and a glass front with a very faint soft reflection of the window light. The center of the mat is completely blank white paper: no image, no drawing, no text. A soft natural contact shadow under the frame on the wall, consistent with the daylight coming from the window at the left. Everything outside the marked area stays exactly as it is; do not change the framing or the scale of anything.",
+    "providerPrompt": "In the marked area only, on the blue painted wall stripe above the desk: a framed print hanging straight and level, centered in the marked area. A slim matte black wooden frame, portrait orientation, with a wide plain white mat (passe-partout) and a glass front with a very faint soft reflection of the window light. The center of the mat is completely blank white paper: no image, no drawing, no text. A soft natural contact shadow under the frame on the wall, consistent with the daylight coming from the window at the left. Everything outside the marked area stays exactly as it is; do not change the framing or the scale of anything."
+  },
+  "mask": {
+    "touchedFraction": 0.03471787770589193,
+    "editable": 103885,
+    "soft": 5328,
+    "protected": 3036515
+  },
+  "crop": {
+    "mode": "crop",
+    "box": {
+      "left": 1301,
+      "top": 0,
+      "width": 675,
+      "height": 765
+    },
+    "target": {
+      "width": 960,
+      "height": 1088
+    },
+    "aspectError": 0,
+    "reason": "la zona con contexto ocupa 16.2 % de la imagen: se genera recortada a 960x1088"
+  },
+  "estimate": {
+    "usd": 0.0461,
+    "basis": "1 × salida 960x1088 high (factor 2.6 medido sobre 2.5 × USD 30/1M; la entrada suma aparte)"
+  },
+  "candidates": [
+    {
+      "index": 1,
+      "raw": "candidate-1-raw.png",
+      "final": "candidate-1.png",
+      "diff": "candidate-1-diff.png",
+      "verdict": "PASS",
+      "reason": "zona protegida idéntica bit a bit",
+      "editedMeanDelta": 157.246,
+      "suspectFlatPanel": false,
+      "suspectMisaligned": false,
+      "maskGrownPixels": 0,
+      "alignment": {
+        "dx": 0,
+        "dy": 0,
+        "scale": 1,
+        "stillError": 2.06,
+        "bestError": 2.06,
+        "misaligned": false
+      },
+      "providerMaskSent": true,
+      "colorShift": null,
+      "protected": {
+        "pixels": 3036515,
+        "maxDelta": 0,
+        "meanDelta": 0,
+        "worst": null
+      },
+      "editable": {
+        "pixels": 103885,
+        "maxDelta": 204,
+        "meanDelta": 164.645,
+        "worst": {
+          "x": 1543,
+          "y": 517
+        }
+      },
+      "seam": {
+        "pixels": 5328,
+        "maxDelta": 79,
+        "meanDelta": 12.989,
+        "worst": {
+          "x": 1770,
+          "y": 524
+        }
+      },
+      "modelDriftInProtected": {
+        "pixels": 3036515,
+        "maxDelta": 163,
+        "meanDelta": 0.67,
+        "worst": {
+          "x": 1958,
+          "y": 518
+        }
+      },
+      "outputUsd": 0.0461,
+      "providerModel": "gpt-image-2.6-flare",
+      "usage": {
+        "input_tokens": 1169,
+        "input_tokens_details": {
+          "image_tokens": 1020,
+          "text_tokens": 149
+        },
+        "output_tokens": 1535,
+        "output_tokens_details": {
+          "image_tokens": 1535,
+          "text_tokens": 0
+        },
+        "total_tokens": 2704
+      },
+      "meta": {
+        "size": "960x1088",
+        "quality": "high",
+        "providerMask": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "provider": "google-cloud",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-1.2-flash",
+  "task": "text",
+  "interactionId": "ChAyMDUyOTYwMjdiNmM4YmU4EAgaAjJhKgRtYWlu",
+  "status": "in_progress",
+  "gcsOutput": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/omni-1-2-smoke-2026-11-05/",
+  "submittedAt": "2026-11-05T19:45:08.342Z"
+}

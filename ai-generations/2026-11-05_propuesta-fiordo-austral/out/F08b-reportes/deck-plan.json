@@ -1,0 +1,139 @@
+{
+  "tenderId": "F08b-reportes",
+  "slides": [
+    {
+      "slideId": "deck-content-report-formats",
+      "contentType": "deck.content-report-formats",
+      "slots": {
+        "frame": {
+          "line": "revenue-hubspot",
+          "margin": 140,
+          "eyebrowTop": 230,
+          "questionTop": 285,
+          "answerTop": 351,
+          "answerPx": 124,
+          "answerLeading": "--gl-ls-answer-leading=0.95",
+          "answerTracking": "--gl-ls-answer-tracking=-0.035em",
+          "answerInset": "--gl-ls-answer-inset=0px",
+          "questionWidth": "--gl-ls-question-width=640px",
+          "bodyTop": 627,
+          "bodyPx": 26,
+          "bodyWidth": 600,
+          "lumWidth": "--gl-lum-width=160px",
+          "lumBottom": "--gl-lum-bottom=62px",
+          "svBg": "--gl-sv-bg-color=#091951",
+          "svSoft": "--gl-sv-soft-color=#cfe4fa",
+          "svMuted": "--gl-sv-muted-color=#c9d6e2",
+          "svHalo": "--gl-sv-halo-color=#72ded8",
+          "svTealDark": "--gl-sv-teal-dark-color=#0e8c82",
+          "svShadow": "--gl-sv-shadow-color=#000610",
+          "svCardTo": "--gl-sv-card-to-color=#081c30",
+          "svMiniFrom": "--gl-sv-mini-from-color=#12344f",
+          "svMiniHeroFrom": "--gl-sv-mini-hero-from-color=#0f4a6e",
+          "svHeroCardTo": "--gl-sv-hero-card-to-color=#0a2640",
+          "svDocTo": "--gl-sv-doc-to-color=#f3f6fa",
+          "svDocInk": "--gl-sv-doc-ink-color=#023c70",
+          "svDocMuted": "--gl-sv-doc-muted-color=#5b6b82",
+          "svDocPanel": "--gl-sv-doc-panel-color=#eef3f9",
+          "svDocBar": "--gl-sv-doc-bar-color=#d3dce8",
+          "svDocDash": "--gl-sv-doc-dash-color=#8a9bb3",
+          "svDocNote": "--gl-sv-doc-note-color=#e8f2fd"
+        },
+        "stage": {
+          "src": "asset-ref:layer:srf-stage"
+        },
+        "beams": {
+          "src": "asset-ref:layer:srf-beams"
+        },
+        "voice": {
+          "question": "El tablero comercial se arma",
+          "answer": "Solo",
+          "eyebrow": "Reportes y dashboards"
+        },
+        "body": "Actividad por vendedor, clientes activos e inactivos y oportunidades por país, al día y con <strong>exportación a Excel</strong>.",
+        "report": {
+          "label": "Tablero comercial · datos de muestra",
+          "trendTitle": "Ganadas vs. meta · 6 meses",
+          "rankingTitle": "Pipeline por país",
+          "reading": "China concentra el pipeline. Dos clientes de España llevan 60 días sin contacto: ya tienen su tarea."
+        },
+        "kpis": [
+          {
+            "label": "Oportunidades abiertas",
+            "value": "48",
+            "delta": "▲ 6"
+          },
+          {
+            "label": "Ganadas en el trimestre",
+            "value": "12",
+            "delta": "▲ 3"
+          },
+          {
+            "label": "Clientes activos",
+            "value": "214",
+            "delta": "▲ 9"
+          }
+        ],
+        "ranking": [
+          {
+            "name": "China",
+            "share": "38%",
+            "bar": "--gl-srf-bar=100%",
+            "role": "lead"
+          },
+          {
+            "name": "Japón",
+            "share": "27%",
+            "bar": "--gl-srf-bar=71.05%",
+            "role": "rest"
+          },
+          {
+            "name": "España",
+            "share": "21%",
+            "bar": "--gl-srf-bar=55.26%",
+            "role": "rest"
+          },
+          {
+            "name": "EE. UU.",
+            "share": "14%",
+            "bar": "--gl-srf-bar=36.84%",
+            "role": "rest"
+          }
+        ],
+        "formats": [
+          {
+            "icon": "asset-ref:icon:correo-revenue-hubspot-dark-40",
+            "title": "Correo",
+            "detail": "Cada lunes",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:web-revenue-hubspot-dark-40",
+            "title": "Web y móvil",
+            "detail": "En terreno",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:presentacion-revenue-hubspot-dark-40",
+            "title": "Dashboard",
+            "detail": "Para el comité",
+            "role": "lead"
+          },
+          {
+            "icon": "asset-ref:icon:contrato-revenue-hubspot-dark-40",
+            "title": "PDF",
+            "detail": "Para circular",
+            "role": "rest"
+          },
+          {
+            "icon": "asset-ref:icon:informe-revenue-hubspot-dark-40",
+            "title": "Presentación",
+            "detail": "Lista para la gerencia",
+            "role": "rest"
+          }
+        ]
+      },
+      "template": "ContentReportFormats"
+    }
+  ]
+}

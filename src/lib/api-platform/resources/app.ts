@@ -34,6 +34,7 @@ export const buildAppContextPayload = (context: AppPlatformRequestContext) => {
       clientName: tenant.clientName,
       tenantType: tenant.tenantType,
       spaceId: tenant.spaceId ?? null,
+      spaceSelectionRequired: tenant.spaceSelectionRequired === true,
       organizationId: tenant.organizationId ?? null,
       organizationName: tenant.organizationName ?? null
     },

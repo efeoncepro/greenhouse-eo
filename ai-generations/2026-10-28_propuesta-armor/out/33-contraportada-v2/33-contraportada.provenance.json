@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "52c6dbb9e08292f87ab81e0219dab90b2187fd6c142d65161219243ead2da905",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.close-proposal",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR3v",
+      "path": "ai-generations/2026-10-28_propuesta-armor/plates/BR3v.png",
+      "sha256": "c521e96b3a1e7302064f6aa291588bd1875bc997031734ea7bd0c34c2e243e12"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

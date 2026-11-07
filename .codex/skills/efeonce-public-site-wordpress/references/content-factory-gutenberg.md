@@ -308,7 +308,7 @@ estilos, patrones y `parse_blocks` recursivo). Repetirlo antes de extender el bu
 ### Brecha: qué sabe emitir Content Factory vs. qué hay
 
 `GutenbergArticleSpec` emite estos kinds de bloque: `paragraph`, `list`, `details`, `faq`, `table` (+ `style: 'efeonce' | 'stripes'`),
-`quote`, `pullquote`, `separator`, `image`, `embed` (YouTube, + `caption`), **`glitchDrop`** y **`buttons`** (ambos
+`quote`, `pullquote`, `separator`, `image`, `embed` (YouTube/Vimeo, + `caption`), **`glitchDrop`** y **`buttons`** (ambos
 desde 2026-09-28), `code`, **`chart`** y **`growthCta`** (desde 2026-10-25), más heading/TOC por estructura y CTA en párrafo. El validador acepta además `group`, `columns`,
 `column`, `spacer`, `gallery`, pero **no hay kind** que los emita.
 
@@ -318,7 +318,7 @@ desde 2026-09-28), `code`, **`chart`** y **`growthCta`** (desde 2026-10-25), má
 | **Soportado desde 2026-09-28** | `glitchDrop` (`efeoncepro/glitch-drop`), `embed.caption`, `table.style: 'stripes'`, `buttons` (fill/outline) | ver «Extensión de GutenbergArticleSpec (implementada)» |
 | **Obligatorio en posts refrescados o nuevos (2026-10-24)** | `pullquote` (Destacado por defecto, `tone` según fondo; Cita sólo con `cite` real), `list.style: 'steps'`/`'box'`, `image.align: 'center'`, `faq` con el estilo y `schema.source: 'plugin'` | ver «Blog editorial styles» arriba y `BLOG_EDITORIAL_BLOCK_STYLES_V1.md` |
 | **Soportado desde 2026-10-25 (0.9.0), cuando el dato lo justifica** | `chart` («Gráfico Efeonce», `efeoncepro/chart`): 10 kinds, título = conclusión, fuente siempre, un solo destacado, tabla HTML con los números | ver «Gráfico Efeonce» arriba; manual `usar-graficos-en-articulos.md` |
-| **Soportado pero no usado** | `quote` como cita real, `details` sin schema, `image.linkDestination=media`, `embed` YouTube | revisar en cada spec antes de pedir bloques nuevos |
+| **Soportado pero no usado** | `quote` como cita real, `details` sin schema, `image.linkDestination=media`, `embed` YouTube/Vimeo | revisar en cada spec antes de pedir bloques nuevos |
 | **No soportado y valioso** | `core/video` nativo con caption (Glitch #16/#17) · piezas del post Glitch aprobadas en §6 (apertura navy, escaleta, banner de suscripción, «El hilo de la semana», cierre) | las piezas de §6 **no existen** como bloque ni como estilo: primero hay que registrarlas en `efeonce-editorial-blocks` (estilos de `core/group` o patrones sincronizados); sólo después Content Factory puede emitirlas |
 | **Valor medio, a demanda** | `core/columns` (comparación lado a lado), `core/code` (posts técnicos, 2 históricos), `separator` wide/dots, `image` rounded | preferir `table` a columnas para comparar; columnas exigen revisión de apilado a 390 px |
 | **No recomendado** | `core/cover` y `core/media-text` (texto sobre imagen/contraste y CSS de Ohio sin probar) · `core/tabs`/`accordion` (esconde contenido; `details` ya cubre) · `core/footnotes` (vive en post meta, el write path sólo escribe `post_content`) · `yoast/faq-block` (duplica `kind: 'faq'`) · `yoast/how-to-block` (Google retiró el rich result HowTo) · `yoast-seo/breadcrumbs`/`related-links`/`estimated-reading-time` en el cuerpo (chrome del tema) · formularios `leadin`/Jetpack/CF7 (los formularios van por Growth Forms) · resto de Jetpack (`subscriptions`, `related-posts`, `slideshow`, `image-compare`…) · `spacer` (hack de CSS) · clases custom no registradas (`is-style-fill_content`) · colores/tamaños inline de la paleta Ohio para imitar AXIS | razón en cada fila; reabrir sólo con decisión explícita |
@@ -398,7 +398,13 @@ los cuatro tipos: `validation=pass`, cero findings.
 Rich text con enlaces seguros; render `…<div class="wp-block-embed__wrapper">\nURL\n</div><figcaption class="wp-element-caption">…</figcaption></figure>`
 (la forma real de Glitch #17; desde 2026-10-26 la URL va en su propia línea, o `autoembed` no arma el reproductor). Sin caption el markup no cambia. De paso, la URL ahora se valida (`https:` y host
 `youtube.com`/`www.`/`m.`/`youtu.be`; si no, `content_factory_article_embed_url_invalid`) y se escapa en el wrapper y
-en los atributos. `core/video` nativo sigue pendiente.
+en los atributos. Desde 2026-11-05 también acepta `provider: "vimeo"`: hosts exactos `vimeo.com`,
+`www.vimeo.com` o `player.vimeo.com`, rutas de video numéricas (con hash privado opcional), HTTPS sin credenciales
+ni puerto alternativo. Conservar `?h=` del anuncio. Vimeo usa las dimensiones intrínsecas de oEmbed, sin forzar la
+clase 16:9 de YouTube; comprobar proporción y reproducción real en escritorio/móvil (el montaje de Images 2.6
+es 4:1). El filtro `EO_Editorial_Styles::responsive_vimeo` en el runtime deriva el ratio del iframe y reduce
+también su altura en Ohio (canon `BLOG_EDITORIAL_BLOCK_STYLES_V1.md`, sección Vimeo). Usar `core/embed` con caption, nunca sustituir el reproductor solicitado por un botón. `core/video`
+nativo sigue pendiente.
 
 ### 3. `table.style`: `'efeonce'` (por defecto en el blog) o `'stripes'`
 

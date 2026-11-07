@@ -1,0 +1,40 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "section",
+  "recipe": "section-cine",
+  "layout": "purpose",
+  "voice": {
+    "eyebrow": "Lo que entendimos",
+    "question": "Hoy, su venta vive en",
+    "answer": [
+      "Planillas"
+    ]
+  },
+  "body": "Su equipo vende contra la especificación de cada cliente, en cuatro regiones, y hoy lo registra en **Excel**.",
+  "pillars": [
+    {
+      "label": "4 regiones",
+      "text": "Asia, Europa, Norteamérica y Sudamérica."
+    },
+    {
+      "label": "6 plantas",
+      "text": "harina, aceite e hidrolizados de salmón."
+    },
+    {
+      "label": "10 usuarios",
+      "text": "en el CRM, según las bases."
+    }
+  ],
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-11-05_propuesta-fiordo-austral/fotos/plates/FA02-cuatro-regiones.png",
+    "alt": "Un director de Efeonce sostiene en la palma una esfera de luz a la que llegan cuatro hilos desde cuatro direcciones"
+  },
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

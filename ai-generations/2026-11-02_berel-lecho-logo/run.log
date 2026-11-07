@@ -1,0 +1,29 @@
+xargs: command line cannot be assembled, too long
+02-recamara:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+02-recamara:   ✓ 4011KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+01-sala:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+01-sala:   ✓ 4423KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+03-comedor:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+03-comedor:   ✓ 4493KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+04-diagnostico:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+04-diagnostico:   ✓ 4048KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+05-exterior:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+05-exterior:   ✓ 5043KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+07-cenital:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+07-cenital:   ✓ 5876KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+06-azotea:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+06-azotea:   ✓ 4300KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+08-proceso:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+08-proceso:   ✓ 3912KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+09-taller:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+09-taller:   ✓ 4269KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+11-personas:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+11-personas:   ✓ 4093KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+10-herreria:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+10-herreria:   ✓ 4541KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+12-nocturna:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+12-nocturna:   ✓ 4047KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+13-muestra:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+13-muestra:   ✓ 4335KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal
+05-exterior v2:   $ costo estimado ≈ USD 0.119 (1 × 3952 tokens de salida × USD 30/1M; la entrada suma aparte)
+05-exterior v2:   ✓ 4935KB · gpt-image-2.5-sunburst · 2048x1536 · xhigh · clave personal

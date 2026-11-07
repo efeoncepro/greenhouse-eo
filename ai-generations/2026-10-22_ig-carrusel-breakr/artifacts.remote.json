@@ -1,0 +1,557 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-11-06T12:44:47.676Z",
+  "run": "ai-generations/2026-10-22_ig-carrusel-breakr",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-10-22_ig-carrusel-breakr",
+  "totalBytes": 145929733,
+  "fileCount": 91,
+  "files": [
+    {
+      "path": "expandir/s1-base.png",
+      "sizeBytes": 2414635,
+      "sha256": "4f8b3c190171164052d8f53e729c6fe1463fc7123905abf11bb723a087428e22",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1-base.png"
+    },
+    {
+      "path": "expandir/s1-fundido.png",
+      "sizeBytes": 2756281,
+      "sha256": "4557e112656fd4942ad7eb9d5527e04251dac509c39d4fc07f7f56f410def093",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1-fundido.png"
+    },
+    {
+      "path": "expandir/s1-mascara.png",
+      "sizeBytes": 22968,
+      "sha256": "273dc7434393412da4929814f20000ded404877de54c6c99959cc2fe043bc847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1-mascara.png"
+    },
+    {
+      "path": "expandir/s1-relleno.png",
+      "sizeBytes": 1840323,
+      "sha256": "e478da739948769f7db59f827f338b7a5e1b5b55b5436ea3aa2def60d7e2e9ee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1-relleno.png"
+    },
+    {
+      "path": "expandir/s1.png",
+      "sizeBytes": 2971901,
+      "sha256": "9ca1cabaf704fcf0da8e682af8c315490b578c03b07cd3d88958b95ed41155a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1.png"
+    },
+    {
+      "path": "expandir/s1v2-base.png",
+      "sizeBytes": 2479700,
+      "sha256": "7777c27aeb2d3f9871b63462965442d30f9c99ecf17dd70253296c333c534ea0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2-base.png"
+    },
+    {
+      "path": "expandir/s1v2-fundido.png",
+      "sizeBytes": 2928273,
+      "sha256": "c2bce54ec5086d3fa538cb6c1e3db13092725928b69da3a5267ba2b3a7347c8d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2-fundido.png"
+    },
+    {
+      "path": "expandir/s1v2-mascara.png",
+      "sizeBytes": 22968,
+      "sha256": "273dc7434393412da4929814f20000ded404877de54c6c99959cc2fe043bc847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2-mascara.png"
+    },
+    {
+      "path": "expandir/s1v2-relleno.png",
+      "sizeBytes": 1979086,
+      "sha256": "c958adad1205d581cbeadc5afdf37ec3bd2cf5d3dcb61b29bbd01ed8f6916524",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2-relleno.png"
+    },
+    {
+      "path": "expandir/s1v2.png",
+      "sizeBytes": 3128332,
+      "sha256": "977410fdb0d5e708ff56754df138176b64308c3bb2735ce60b2ab0556abe8daf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s1v2.png"
+    },
+    {
+      "path": "expandir/s5-base.png",
+      "sizeBytes": 2022245,
+      "sha256": "6eb4dbe55a4d2f6ea6ddca5dd6ece3ced05b8ab943ddfe8d6abc11ff3190c4db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s5-base.png"
+    },
+    {
+      "path": "expandir/s5-mascara.png",
+      "sizeBytes": 22968,
+      "sha256": "273dc7434393412da4929814f20000ded404877de54c6c99959cc2fe043bc847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s5-mascara.png"
+    },
+    {
+      "path": "expandir/s5-relleno.png",
+      "sizeBytes": 1493497,
+      "sha256": "eb367ef35f92d9b6f8609e74a69aece5615149c4e8544396c51a918f187c5642",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s5-relleno.png"
+    },
+    {
+      "path": "expandir/s5.png",
+      "sizeBytes": 2541352,
+      "sha256": "be318004afc1352c02bfc34d371d32376c22d5879ce4401a83a5831192caf731",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s5.png"
+    },
+    {
+      "path": "expandir/s6-base.png",
+      "sizeBytes": 2994969,
+      "sha256": "56fbca72f8ae25f736a867069595344633b41f523e51c897c8790952086c146f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s6-base.png"
+    },
+    {
+      "path": "expandir/s6-mascara.png",
+      "sizeBytes": 25285,
+      "sha256": "8a8509f6e9da56ecc6288c69093ca112fc6ca8cfcc9645199e010209d56470d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s6-mascara.png"
+    },
+    {
+      "path": "expandir/s6-relleno.png",
+      "sizeBytes": 2263160,
+      "sha256": "05594f34e7a9ed027e38c25a247f17cabac3532d276d8fbdf64b2da4b2d5d24e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s6-relleno.png"
+    },
+    {
+      "path": "expandir/s6.png",
+      "sizeBytes": 4163069,
+      "sha256": "dec9a9d1d5b5a7ef293ac482aaa631b17e1458162b6823d2f478813b4933c705",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s6.png"
+    },
+    {
+      "path": "expandir/s8-base.png",
+      "sizeBytes": 2554213,
+      "sha256": "aa4ee6189763f20d1bcffb044fab6c474f295b7fbda974c940f27e49e363b6e9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s8-base.png"
+    },
+    {
+      "path": "expandir/s8-mascara.png",
+      "sizeBytes": 22968,
+      "sha256": "273dc7434393412da4929814f20000ded404877de54c6c99959cc2fe043bc847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s8-mascara.png"
+    },
+    {
+      "path": "expandir/s8-relleno.png",
+      "sizeBytes": 1978569,
+      "sha256": "3910fc282f32b7c1255550706ba8e70723bad48896b4d15f328bc23b77e06cf5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s8-relleno.png"
+    },
+    {
+      "path": "expandir/s8.png",
+      "sizeBytes": 3217809,
+      "sha256": "4a32018c2eb482ccaa05fe0c623386e56e9f2ec941df956a2a4b3c57df11fb7f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s8.png"
+    },
+    {
+      "path": "expandir/s9-base.png",
+      "sizeBytes": 2461346,
+      "sha256": "0c4db60006a611cf123ea19e501aa199760ecb4fd83f1f13f160ac02bf110a16",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s9-base.png"
+    },
+    {
+      "path": "expandir/s9-fundido.png",
+      "sizeBytes": 2859374,
+      "sha256": "fc3b6c2f901806bb4cda20ce7113e5b5cb08ad20208422c34130ebcbb636aadc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s9-fundido.png"
+    },
+    {
+      "path": "expandir/s9-mascara.png",
+      "sizeBytes": 22968,
+      "sha256": "273dc7434393412da4929814f20000ded404877de54c6c99959cc2fe043bc847",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s9-mascara.png"
+    },
+    {
+      "path": "expandir/s9-relleno.png",
+      "sizeBytes": 1743773,
+      "sha256": "3f8209e223cd5a97c24237ff3b4a255f8dc8c501e32b61ebf7e0767376160173",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s9-relleno.png"
+    },
+    {
+      "path": "expandir/s9.png",
+      "sizeBytes": 3039430,
+      "sha256": "a7af81ab0d780a827387ad8f26d797559a54439fc59d39e76841bac98cc73d72",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/expandir/s9.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-01.png",
+      "sizeBytes": 1725923,
+      "sha256": "c794097701f396ba3eb98ccc838d630665bc80dbde4d711a4057e48f1264310c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-01.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-02.png",
+      "sizeBytes": 1390024,
+      "sha256": "77c750ef8cb266ebda68efdbf9dd0893bd1eb634add191289a1ea81fb12a921b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-02.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-03.png",
+      "sizeBytes": 1469793,
+      "sha256": "f652192001ecd4664a081ae0be9d5f0173161694a2acb6dd6c7352441aa1b9cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-03.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-04.png",
+      "sizeBytes": 1733464,
+      "sha256": "b84dce548fd4aff7ba28cdb240265e554a8c6a74b73f9169e19e0bc30a1e83be",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-04.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-05.png",
+      "sizeBytes": 1415992,
+      "sha256": "c8b410cefb0416c42d9ede079a033de5e2cd90dd588697554e4e2962853e3f18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-05.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-06.png",
+      "sizeBytes": 1909774,
+      "sha256": "4b30e00e7ed0bf8904101b9a9ec38563e0865257ffdda8c94aeaae4de298b6c8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-06.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-07.png",
+      "sizeBytes": 1766291,
+      "sha256": "3b0939953b7981a8061be09040284a12c27941aa0e488450163fb3d5ac61517c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-07.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-08.png",
+      "sizeBytes": 1773602,
+      "sha256": "b7f9298b8052358e9fe045f09b9dc0a79f2659e073a1a5c3bdc7396d75c94653",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-08.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-09.png",
+      "sizeBytes": 1639738,
+      "sha256": "7b61e4f9ae44ad4871197bffe204b3bb4b05fc4147e8b52a290869987ac3a719",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-09.png"
+    },
+    {
+      "path": "laminas/breakr-carrusel-10.png",
+      "sizeBytes": 41691,
+      "sha256": "d6fce8785014fbf9d7462fad6c06d7f6f42180fc297163d7275bac9794c5309f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/laminas/breakr-carrusel-10.png"
+    },
+    {
+      "path": "plates/s1.png",
+      "sizeBytes": 3271162,
+      "sha256": "2a4df19fb25cbbe849753f82d8ce7f52abf7fa648e7d1e9ca3e2a62b2e5c776d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s1.png"
+    },
+    {
+      "path": "plates/s2.png",
+      "sizeBytes": 2511056,
+      "sha256": "901d4d601ccd8c3169eaf1859fecd0da034973b90335bfb7dfba9c8f685bcb91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s2.png"
+    },
+    {
+      "path": "plates/s3.png",
+      "sizeBytes": 2371262,
+      "sha256": "d06e5b01bb5c67972536c54cd33ae816f6337bf3c9a37a7a15b67234c6173c3f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s3.png"
+    },
+    {
+      "path": "plates/s4.png",
+      "sizeBytes": 2992798,
+      "sha256": "c45ff11c47545a42291926baa6367fad410fc245119ca121d23fbdc55695a5c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s4.png"
+    },
+    {
+      "path": "plates/s5.png",
+      "sizeBytes": 2790367,
+      "sha256": "2bd0e84c558d93d543a331640bf9fff9e46904ad65677f06abeddf01b4619e14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s5.png"
+    },
+    {
+      "path": "plates/s6.png",
+      "sizeBytes": 3756205,
+      "sha256": "928693bd6a4684e9d0b0e97ea7f092aa1d68dd91826bf92ae52e41897c5c2eee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s6.png"
+    },
+    {
+      "path": "plates/s7.png",
+      "sizeBytes": 2865182,
+      "sha256": "a59d6aa8a9922bfca4e4e8579d5ccc671cc8bf33a6895d000305020ef9730345",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s7.png"
+    },
+    {
+      "path": "plates/s8.png",
+      "sizeBytes": 3554510,
+      "sha256": "5b0ccc714cf2fadb2a10d36d757a1451ecc484264fbcd1235cacade07884f954",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s8.png"
+    },
+    {
+      "path": "plates/s9.png",
+      "sizeBytes": 3336255,
+      "sha256": "24b829d36dfbab3a98ecb05a62e121fafce42f59fd2f23279aeadf5dc051b600",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/plates/s9.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/descartes/breakr-bts-11-resultado-fisica-vieja-poster.png",
+      "sizeBytes": 1591886,
+      "sha256": "95cf6f53f977a57a47a9a03014bc937e41196e83b60f85b0171ad1682a19d0a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/descartes/breakr-bts-11-resultado-fisica-vieja-poster.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/descartes/breakr-bts-11-resultado-fisica-vieja.mp4",
+      "sizeBytes": 4289209,
+      "sha256": "1ef647bfc8096d7a8162e32d996adabb34f48f11c428b21d5689fdfef896000f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/descartes/breakr-bts-11-resultado-fisica-vieja.mp4"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/doc-br-hero.png",
+      "sizeBytes": 320665,
+      "sha256": "441d6fc172c9d8300d6c0fc90f8b9231fb5370ec01f308bd7ee52c16c3f3057c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/doc-br-hero.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/doc-br-sabores.png",
+      "sizeBytes": 336769,
+      "sha256": "5404ba300dec7af1a8280123ec1b8b03e97045ac5e334d6966d61e8905865aac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/doc-br-sabores.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/doc-ficha2.png",
+      "sizeBytes": 808456,
+      "sha256": "173be932166b9be3c3268eda8c4e642911b6badf86128d8d8e95c9b05d8ba995",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/doc-ficha2.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ing-audio2.png",
+      "sizeBytes": 5038,
+      "sha256": "5815ecdc9f3cdedbb4cc842cc9bd7194b9e85a16a575bff11a6b7650432f1234",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ing-audio2.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ing-video.png",
+      "sizeBytes": 371601,
+      "sha256": "323d6ec74fd135bf77219d20200737a8427a96a93b07729d2d0b9c9d067e471b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ing-video.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/logos/logo-byteplus-blanco.png",
+      "sizeBytes": 8347,
+      "sha256": "b8a2ffce748476490228ee1e021ed21193ae21e993e3dc6ac859d17072d235c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/logos/logo-byteplus-blanco.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/reakr-v1.png",
+      "sizeBytes": 929605,
+      "sha256": "48af6ea833eee70931aa6f7ba00da58758d8a9767e7bf1401ef6fe46c933a6c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/reakr-v1.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/reakr-v2.png",
+      "sizeBytes": 926550,
+      "sha256": "fb77f763ea10beac7ff89f01446b52c6c39d4b5b46419a43a37390516267ad07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/reakr-v2.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/s1-fundido.png",
+      "sizeBytes": 3024816,
+      "sha256": "05296f4f1a36bdff2c351ddef323d9843f2c719a1849767621c686eb7bc867fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/s1-fundido.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/s1v2-fundido.png",
+      "sizeBytes": 3216186,
+      "sha256": "f0fbee64be5d9c9f4f08b8bb7623b1c49e413734a936e9ec2b66970f2b3ed16c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/s1v2-fundido.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/s9-fundido.png",
+      "sizeBytes": 3130863,
+      "sha256": "095816ecbb30c714139ebeed03229e13747911640e6e21e61b2c211ab7bdcd8c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/s9-fundido.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v01.png",
+      "sizeBytes": 388177,
+      "sha256": "56ec2715ca765f571fbefe1efae58062559cdf1f7c27129719a8940b59b56425",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v01.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v02.png",
+      "sizeBytes": 389495,
+      "sha256": "59c3e9f88a7b71d684c733a339f4a850b1f232a75e834b8f93ad973b3753cc17",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v02.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v03.png",
+      "sizeBytes": 390811,
+      "sha256": "4be68fe3259ddabde185349d1083516c8519f37137abd7431e197baa4cf28c13",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v03.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v04.png",
+      "sizeBytes": 392278,
+      "sha256": "85378838f9c9979c88102093df2820012ca44707dbb94ba0083c4775acc21d5f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v04.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v05.png",
+      "sizeBytes": 402227,
+      "sha256": "34c75a542540d594e1c2a9caa766ef93cce72ca05553dbfc75f1a2caecf16ca4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v05.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v06.png",
+      "sizeBytes": 402284,
+      "sha256": "bc0ba6dc9732c45843752172fbb40d2e36a1958103f1ca25a0bb7af668a4af69",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v06.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v07.png",
+      "sizeBytes": 399191,
+      "sha256": "4d77d4a3820ce0a92893813e68ffa663dd1811c5fd0e1800804c1331308d5c83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v07.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v08.png",
+      "sizeBytes": 399212,
+      "sha256": "ad8ac7e21b1f71c9a709c724f81cbaae1a0cf289ec8e9616f429bca346937554",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v08.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v09.png",
+      "sizeBytes": 399241,
+      "sha256": "ccccec92c47bd71c35ed45a5139e925cb60fc6413996995760019cfefbb10474",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v09.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v10.png",
+      "sizeBytes": 402417,
+      "sha256": "8629631b497f716a0f1dacbaaa0d53fd05b8e84d2666db4bcdb043b592266a1e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v10.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v11.png",
+      "sizeBytes": 402413,
+      "sha256": "c4f6723047b09da8677f486fc93dd5fcdee1de4a71de16ccea435901177f4697",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v11.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v12.png",
+      "sizeBytes": 402409,
+      "sha256": "bde8e360d1bd22ce2a6f8c61e5f64209e23633dc3150bdf9d8fd65fb882403b7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v12.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v13.png",
+      "sizeBytes": 389851,
+      "sha256": "0c760acba1eb205fbe09058e7eb4181a79ad114ba84ecf393220b6483ed59cf7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v13.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v14.png",
+      "sizeBytes": 389869,
+      "sha256": "8a3f253bcf12e2fdd91b918b77fd202495dd3c5aa65e1b77c66da80793147987",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v14.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/insumos/ver/v15.png",
+      "sizeBytes": 389874,
+      "sha256": "9fa9024069e87f39442d501eb8f3c3ff9adf4360e97981fc1804f247e4e9ffdd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/insumos/ver/v15.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-01.png",
+      "sizeBytes": 1805431,
+      "sha256": "d83efc772fc64d5694ec847025230fbfea14f5d6f80d345aaa223266842f7fa4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-01.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-02.png",
+      "sizeBytes": 579738,
+      "sha256": "3ebeca795049bc2e7de4ae43990cca5f12f68ea3917568c611245cddb7d420ce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-02.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-03.png",
+      "sizeBytes": 300369,
+      "sha256": "67ca44ee55e0749206b8efafe7817768c3e174c1c5d3a3286c9fd0dbd2e68dee",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-03.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-04.png",
+      "sizeBytes": 1913651,
+      "sha256": "c7767e7ffb0e799dad1d9ed6d740a13ab3b7d697ef8b328f8b0cfd0586676a4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-04.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-05.png",
+      "sizeBytes": 105740,
+      "sha256": "cac43cd19295c3bb9bf48065a4e4e5f27bcaffe528b22c1a8fc350a784c2c821",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-05.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-06.png",
+      "sizeBytes": 1894599,
+      "sha256": "9eb583d5cc5d05e525d17e383bcc039a8d8911512129246f68daf454bd08019e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-06.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-07.png",
+      "sizeBytes": 1973470,
+      "sha256": "a664ff4f5196dd29de3e8df962afe3853a6f610667a3c22d7112b36976228ed8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-07.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-08.png",
+      "sizeBytes": 722607,
+      "sha256": "15eb420f21fd42d711bbe43e7a461853ab053591abb19a3c12e7e7267d1c7b63",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-08.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-09.png",
+      "sizeBytes": 2065102,
+      "sha256": "d4ee5a60b43d5bef0e6bb16f03557b275d7b65c75ab7c5fb8592359e75d26603",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-09.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-10.png",
+      "sizeBytes": 562806,
+      "sha256": "e5d27c3e34cbe50eb4a1bd8b4ab678d53759a557fc300dfe4115480bbc7456e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-10.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-11-resultado-poster.png",
+      "sizeBytes": 1395467,
+      "sha256": "95020e1ebe586160bf7f03847b2b58af66213b03397f9391df36bbca4895fb31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-11-resultado-poster.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-11-resultado.mp4",
+      "sizeBytes": 5254283,
+      "sha256": "2e91422e1ae700fb14b7e3539dde0ae50c2bf859cdff27e138d4436e1d4aab4c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-11-resultado.mp4"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-12.png",
+      "sizeBytes": 1649163,
+      "sha256": "5d769ee619c47b4a3c024535dbef812f7d5489e58dab274a0be587d92c8d6364",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-12.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/laminas/breakr-bts-13.png",
+      "sizeBytes": 110066,
+      "sha256": "a2416b3ce0d15ab9f6061c1059888ac5c1a3b694f377f92489cf2a4515c8dd10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/laminas/breakr-bts-13.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-01.png",
+      "sizeBytes": 1712226,
+      "sha256": "b5ff7f542c027af085bec7fde19eaeafbfbdef7b2bf44ef7ae95ca06232491c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-01.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-06.png",
+      "sizeBytes": 1894599,
+      "sha256": "9eb583d5cc5d05e525d17e383bcc039a8d8911512129246f68daf454bd08019e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-06.png"
+    },
+    {
+      "path": "v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-08.png",
+      "sizeBytes": 804125,
+      "sha256": "9c89bb121ad4daaf10b5251d660b58ea334ae7b656c512ac43e2334ffa78155f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-10-22_ig-carrusel-breakr/v2-detras-de-camaras/piloto-impacto/breakr-bts-piloto-08.png"
+    }
+  ]
+}

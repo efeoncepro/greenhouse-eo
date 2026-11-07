@@ -4,9 +4,26 @@ Estado: marco operativo interno aprobado para preparación por Julio el 15-10-20
 las cantidades finales y las metas numéricas siguen sujetos a su fuente firmada y a la auditoría. Inicio
 acordado en reunión: 01-11-2026; kickoff operativo: 02-11-2026 a las 10:00, Chile. No se verificó el calendario.
 
-Estado al 23-10-2026: auditoría consolidada entregable e informe A4 para SKY generado y revisado; correos
-redactados; **nada enviado a SKY**. El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
+Estado al 01-11-2026: informe A4 enviado el 23-10 a Pilar y Natalia; SKY restauró los nueve artículos de Perú y
+entregó administrador de WordPress; deck del kickoff armado (ver el [caso](caso-auditoria-2026-10/KICKOFF_2026-11-02_INSUMOS.md#7-deck-y-equipo-confirmados-el-01-11)).
+El expediente del encargo vive en [`caso-auditoria-2026-10/`](caso-auditoria-2026-10/README.md)
 y sus cifras salen sólo de [HECHOS.md](caso-auditoria-2026-10/HECHOS.md).
+
+Estado al 05-11-2026: los 54 artículos activos del Content Hub tienen research SEO/AEO y una versión redactada
+en POV «El Viajero» al final de su página de Notion, con ficha SEO y metadatos, callouts de imagen y de banner de
+ruta, y specs para producción (44 banners listos, 10 bloqueados por ruta no catalogada o por política de la nota).
+Está pendiente de revisión de Valentina y de aprobación de SKY; **nada se publicó**. Flujo, bloqueos y decisiones:
+[lote editorial de noviembre](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md). Ese mismo día se produjeron las imágenes del
+lote (88 banners de ruta, 43 portadas nuevas y 93 escenas, todo pendiente de revisión de Diseño y Marca SKY y sin
+subir): [producción de imágenes de noviembre](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md).
+También el 05-11 quedó lista la proyección a 24 meses y el aporte del blog a la venta pedidos en el kickoff (informe,
+planilla de búsquedas valorizadas y correo, sin enviar): [proyección](caso-auditoria-2026-10/PROYECCION_2026-11.md).
+El 06-11 las fichas del Content Hub con research o artículo quedaron plegadas en secciones (brief, research,
+artículo, fuentes y producción), para que SKY encuentre el artículo sin recorrer la página entera. La primera ronda
+de revisión de Diseño de las imágenes quedó resuelta y la entrega de OneDrive, separada en V1 y V2
+([producción de imágenes](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md)).
+El 06-11 quedó propuesto el lote de diciembre (25 reescrituras y 15 nuevos, con país del lector, ruta activa y
+calendario), cargado el mismo día en el Content Hub como «Idea», sin aprobación de SKY: [lote de diciembre](LOTE_DICIEMBRE_2026_PLAN.md).
 
 ## Resultado y alcance
 
@@ -39,7 +56,7 @@ un plazo ni una cifra de recuperación. Noviembre–enero es una ventana de trab
 | Auditoría inicial | Inventario, evidencia de la migración, problemas comprobados, hipótesis por validar y backlog priorizado con responsables/dependencias. |
 | Recuperación técnica | Recomendaciones y validación de redirecciones, indexabilidad, canonicals, robots, sitemaps, enlaces y páginas perdidas. Cada cambio necesita owner técnico y comprobación posterior. |
 | Planeación editorial | Propuesta de títulos, intención, breve sinopsis, ruta/mercado y acción nueva/refresh/consolidación. SKY aprueba antes de producir. |
-| Contenido | Brief y optimización de artículos aprobados, conforme al playbook editorial vivo. Publicación progresiva y comprobación de URL final. |
+| Contenido | Brief y optimización de artículos aprobados, conforme al playbook editorial vivo. Publicación progresiva y comprobación de URL final. Un lote sigue el [flujo editorial](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md): research → redacción → ficha SEO → callouts → specs → handoff. |
 | Medición | GA4 y GSC por blog, país y página; consultas de marca/sin marca; prioridades y evolución mensual. Valor publicitario estimado con cobertura explícita. |
 | Continuidad | Registro de decisiones, seguimiento de acciones y reporte que conecte problemas, ejecución y resultados observados. |
 
@@ -74,7 +91,9 @@ El informe A4 (23 páginas) se regenera con `pnpm exec tsx scripts/seo/sky-blog-
 | Anexo firmado + cambios aprobados | Alcance comercial, cantidades, precio, condiciones y responsabilidades contractuales. Pendiente de incorporar. |
 | [Reunión con Natalia y Pilar, 15-10](https://app.notion.com/p/3fa39c2fefe78144b63bead05c21d173) | Expectativas y compromisos, contrastados con la transcripción. |
 | [Playbook Producción · Blog SKY](https://app.notion.com/p/06531fec27634eed98b73094ba05ce5e) | Producción de artículos y handoff; enlaza las normas de voz, imagen y rutas vigentes. |
+| «SKY Blog · Sistema visual de imágenes» (Daniela Ferreira, 18 láminas, enviado el 30-10 por Teams) | Criterio fotográfico del blog. SharePoint Sky-Efeonce: `Documentos compartidos/General/SKY Blog SEO/01 Onboarding/SKY_Blog_Sistema_Visual.pdf` (sincronizado en OneDrive «Sky - Efeonce - General/SKY Blog SEO/01 Onboarding/»). Dirección por validar con el equipo; su aprobación se pidió a Marca SKY en el kickoff. |
 | Notion del cliente / Content Hub | Inventario editorial, responsables, aprobaciones, calendario y estado operativo. |
+| [Precios y Rutas SKY](https://app.notion.com/p/c6bcd3d717794691b706befbc25c4b74) | Única fuente de rutas enlazables y de banners: sólo filas 🟢 Activas del mercado del lector, con URL limpia. Sin fila, el banner queda bloqueado y se escala a Paid / Ad Ops. |
 | WordPress | Contenido y configuración efectiva; publicar se confirma abriendo la URL final. |
 | GA4 / GSC conectados a SKY | Desempeño propio. Cada fuente conserva su métrica y calendario. |
 | DataForSEO | CPC y visibilidad estimados, con mercado, fecha y metodología. |
@@ -83,14 +102,31 @@ La [Propuesta Flujo de trabajo + SKILL](https://app.notion.com/p/3ed39c2fefe780e
 es antecedente de producción visual. Para instrucciones de imágenes se siguen las referencias vigentes del
 playbook, que ha evolucionado después de esa propuesta. No copiar aquí dimensiones o reglas de voz.
 
+La producción de imágenes (fotografía editorial, gate de portada contra el hero del tema, exportación y banner de
+ruta) quedó codificada como línea gráfica en la skill `sky-blog-graphic-line` y en el Creative Workbench
+(`brands/sky-airline/blog/`), candidata desde el 02-11-2026 y pendiente de aprobación de Diseño y de Marca SKY.
+
 ## Responsables y dependencias
 
-- **Julio / liderazgo SEO Efeonce:** auditoría, prioridades, metodología, decisiones técnicas y rendición de resultados.
+Equipo Efeonce asignado a la cuenta (confirmado por Julio el 01-11-2026):
+
+- **Julio Reyes · SEO Account Strategist** (temporalmente): auditoría, prioridades, metodología, decisiones técnicas y rendición de resultados.
+- **Valentina Hoyos · Content Lead:** reemplaza a María Fernanda, que figuraba como SEO Copywriter en la oferta ganadora.
+- **Daniela Ferreira · Creative Operations Lead:** autora del sistema visual de imágenes del blog.
+- **Andrés Carlosama y Melkin Hernandez · Senior Visual Designer.** Son diseñadores: el PDF de la oferta listaba a Andrés
+  como «SEO Specialist», lo que no corresponde a la operación.
+
+Los porcentajes de dedicación de la oferta no se llevaron al kickoff porque el equipo cambió.
+
+Por SKY:
+
 - **Natalia / SKY:** prioridades editoriales y de rutas, revisión de títulos/sinopsis y coordinación del contenido.
 - **Pilar / SKY:** expectativas, evaluación del servicio y último reporte del proveedor anterior.
-- **Leandro / SKY:** habilitación técnica de WordPress y coordinación de implementación. Acceso efectivo pendiente de comprobar.
+- **Leandro / SKY:** habilitación técnica de WordPress y coordinación de implementación. SKY entregó a Efeonce acceso de
+  administrador a WordPress (confirmado el 01-11).
 - **Nachira / SKY:** gestión del anexo, según la reunión. Firma pendiente de evidencia.
-- **Equipo editorial/diseño:** ejecución conforme al playbook y a los responsables actuales de cada tarea en Notion.
+
+La ejecución editorial y de diseño sigue el playbook y a los responsables actuales de cada tarea en Notion.
 
 No borrar cuentas del proveedor anterior ni reasignar autoría durante una lectura. Cualquier transición de
 usuarios conserva contenido, autoría y acceso de recuperación. El dueño técnico valida la operación concreta.
@@ -126,7 +162,8 @@ Organización: `org-b9977f96-f7ef-4afb-bb26-7355d78c981f`. Host exacto: `blog.sk
 
 - **GA4:** propiedad `354430952`, `SKY web GA4 - Prod`, calendario America/Santiago. Para adquisición, sesiones
   con landing en el blog; para consumo, vistas/actividad por página. Son cortes distintos.
-- **GSC:** propiedad `https://blog.skyairline.com/`, búsqueda web, datos finales, calendario de Google/PT.
+- **GSC:** propiedad `https://blog.skyairline.com/`, búsqueda web, datos finales, calendario de Google/PT. Es la única
+  propiedad a la que Efeonce tiene acceso (confirmado el 01-11): no hay acceso a `www.skyairline.com`.
 - **Septiembre 2026:** 38.332 sesiones con actividad en el host y 61.984 vistas GA4, todos los canales.
   GSC: 28.718 clics, 2.080.377 impresiones, CTR 1,380423% y posición media 7,769980.
 - El top 50 GA4 ordena sesiones con actividad por página. Las sesiones de distintas páginas no son aditivas.
@@ -159,19 +196,20 @@ comparar series DataForSEO de distintas fórmulas ETV.
 
 Los siete frentes de investigación, responsables propuestos y checks de cierre se mantienen en la
 [matriz de cobertura](COBERTURA_Y_PENDIENTES_AUDITORIA_2026-10-15.md). Los pendientes del encargo del 23-10
-(envío del correo formal con el PDF, restauración de los nueve artículos de Perú, export de la propiedad GSC
-`www.skyairline.com`, acciones manuales y seguridad, acceso a WordPress, logo de SKY en Greenhouse y
-validación de escenarios en el kickoff) tienen dueño y condición de cierre en la
+(envío del correo formal, hecho el 23-10; restauración de los nueve artículos de Perú, hecha por SKY; historia de
+la propiedad GSC `www.skyairline.com`, pedida a SKY en el kickoff; acciones manuales y seguridad; acceso a WordPress,
+entregado; logo de SKY en Greenhouse y validación de escenarios en el kickoff) tienen dueño y condición de cierre en la
 [tabla del caso](caso-auditoria-2026-10/README.md#pendientes). Las dependencias comerciales y de operación
 siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 
 - Anexo firmado y cantidades finales.
 - Acceso WordPress autenticado y registros técnicos de migración. Inventario público completado: 1.697
   posts, todos rastreados; incluye demo y duplicados, no equivale a piezas editoriales únicas.
-- Registro de despliegue y cambios históricos de medición. Julio no dispone del GSC anterior; GSC conserva
-  16 meses, así que los datos de jul–sep 2025 de la propiedad `www` o de dominio se pierden entre noviembre
-  de 2026 y enero de 2027: pedir a SKY el acceso y exportarlos ahora. Mientras tanto se avanza con GA4,
-  GSC actual, archivo y cohortes; atribución causal completa todavía no disponible.
+- Registro de despliegue y cambios históricos de medición. Antes de migrar el blog vivía en `skyairline.com/blog`,
+  así que su historia está en la propiedad GSC `www.skyairline.com`, que Efeonce todavía no tiene. GSC conserva
+  16 meses: los datos de jul–sep 2025 se pierden entre noviembre de 2026 y enero de 2027. En el kickoff se pidió a
+  SKY la decisión «Historia de Search Console»: SKY da acceso a la propiedad `www` y Efeonce exporta. Mientras tanto
+  se avanza con GA4, GSC del blog, archivo y cohortes; atribución causal completa todavía no disponible.
 - Último informe del proveedor anterior y prioridades de rutas confirmadas por SKY.
 - Definición y validación del tráfico orgánico de entrada GA4 por host en informes automáticos.
 - Validación con SKY de nombres, lectura y cadencia del indicador monetario.
@@ -179,8 +217,9 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 ## Referencias de ejecución
 
 - [ADR de cuentas operativas](../../architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md)
-  Proposed y [comparación local A′/B](../../audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md):
-  A′ recomendado con owner comercial común; 97 tests PASS. Sin alta real ni cambios de Diseño; foundations pendientes.
+  aceptado el 2026-11-06 con el modelo B: un client comercial compartido y Space/Service explícito. La
+  [comparación inicial A′/B](../../audits/client-portal/2026-10-27-sky-operational-bridge-prototype/README.md) es historia.
+  Sin alta real ni cambios de Diseño; la ejecución está en EPIC-057.
 
 - [Discovery integral de cuentas SKY, 27-10](../../audits/client-portal/2026-10-27-sky-multi-account-discovery/README.md):
   una Organization, dos cuentas operativas; alternativas de bridge, identidad/acceso, sync/Notion, historia/ICO/
@@ -189,7 +228,17 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
 - [Discovery de medición del blog, 27-10](../../audits/insights/2026-10-27-sky-blog-discovery/README.md): host URL,
   GA4/GSC, histórico y proyección de citas AEO; las visitas IA en GA4 no sustituyen corridas del motor. BQ vacío
   para SKY en el rango consultado y PG sólo 11–25 de octubre al corte. Los dos dossiers conservan el diagnóstico inicial.
-- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude.
+- [Skill de la cuenta](../../../.codex/skills/sky-blog-seo/SKILL.md), espejo en Claude: identidad, alcance y estado.
+- [Método editorial del servicio](../../../.claude/skills/sky-blog-seo-editorial/SKILL.md) (skill `sky-blog-seo-editorial`,
+  desde 06-11-2026), por capítulos: [auditoría y diagnóstico](../../../.claude/skills/sky-blog-seo-editorial/references/auditoria-y-diagnostico.md),
+  [proyección, conversión y valor](../../../.claude/skills/sky-blog-seo-editorial/references/proyeccion-conversion-y-valor.md),
+  [planificación de lotes y carga al Content Hub](../../../.claude/skills/sky-blog-seo-editorial/references/planificacion-de-lotes.md),
+  [lote editorial: research a handoff](../../../.claude/skills/sky-blog-seo-editorial/references/lote-editorial.md) y
+  [producción editorial (Playbook integrado)](../../../.claude/skills/sky-blog-seo-editorial/references/produccion-editorial.md).
+- [Lote editorial de noviembre 2026](LOTE_NOVIEMBRE_2026_FLUJO_EDITORIAL.md) y su
+  [manual paso a paso](../../manual-de-uso/growth/correr-lote-editorial-blog-sky.md).
+- [Producción de imágenes del lote de noviembre 2026](LOTE_NOVIEMBRE_2026_PRODUCCION_IMAGENES.md) y su
+  [manual paso a paso](../../manual-de-uso/growth/producir-imagenes-lote-blog-sky.md).
 - [Manual del indicador](../../manual-de-uso/growth/valorar-trafico-organico.md).
 - [Funcionamiento del indicador](../../documentation/growth/valor-publicitario-organico.md).
 - [Decisión técnica](../../architecture/GREENHOUSE_ORGANIC_TRAFFIC_VALUE_DECISION_V1.md).
@@ -200,6 +249,8 @@ siguientes conservan su seguimiento propio; preparar documentos no las resuelve.
   corrige y amplía la anterior (§6).
 - [Caso de auditoría y entrega, octubre 2026](caso-auditoria-2026-10/README.md) y sus
   [hechos verificados](caso-auditoria-2026-10/HECHOS.md).
+- [Proyección a 24 meses y aporte a la venta, noviembre 2026](caso-auditoria-2026-10/PROYECCION_2026-11.md); generador
+  [`scripts/seo/sky-blog-projection-report.ts`](../../../scripts/seo/sky-blog-projection-report.ts).
 - Informe A4 y tablas de apoyo: `outputs/sky-blog-seo-audit-2026-10-23/`; generador del plan:
   [`scripts/seo/sky-blog-audit-report.ts`](../../../scripts/seo/sky-blog-audit-report.ts).
 - [Expediente comercial antecedente](../../commercial/tenders/sky-blog-2026/README.md).

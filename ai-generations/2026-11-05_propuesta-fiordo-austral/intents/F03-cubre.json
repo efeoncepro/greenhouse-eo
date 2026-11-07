@@ -1,0 +1,62 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-service-lanes",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · Sales Hub Professional",
+    "question": "Proponemos un CRM hecho para",
+    "answer": [
+      "Exportar"
+    ]
+  },
+  "lanes": [
+    {
+      "icon": "sales",
+      "title": "Clientes y contactos",
+      "products": "Smart CRM",
+      "description": "Historial completo, segmentado por país, región, mercado, tipo y estado."
+    },
+    {
+      "icon": "sales",
+      "title": "Pipeline de exportación",
+      "products": "Sales Hub",
+      "description": "Etapas de negociación, muestras, aprobación interna y seguimiento."
+    },
+    {
+      "icon": "data",
+      "title": "Especificaciones técnicas",
+      "products": "Smart CRM",
+      "description": "Proteína, FFA, humedad y certificación requerida por cliente."
+    },
+    {
+      "icon": "data",
+      "title": "Documentos",
+      "products": "SharePoint · OneDrive",
+      "description": "Contratos, certificados y correos asociados a cada cliente."
+    },
+    {
+      "icon": "revenue",
+      "title": "Reportes",
+      "products": "Sales Hub",
+      "description": "Actividad por vendedor, clientes activos y resultados por país."
+    },
+    {
+      "icon": "sales",
+      "title": "En terreno",
+      "products": "App móvil",
+      "description": "Visitas, ferias, tareas y recordatorios desde el teléfono."
+    }
+  ],
+  "phases": [
+    "Diseño y seguridad",
+    "Configuración e integración",
+    "Prueba técnica y puesta",
+    "Soporte y operación"
+  ],
+  "line": "revenue-hubspot",
+  "use": "proposal"
+}

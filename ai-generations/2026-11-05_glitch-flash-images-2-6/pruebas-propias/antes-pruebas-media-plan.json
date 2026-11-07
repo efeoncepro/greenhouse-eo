@@ -1,0 +1,164 @@
+{
+  "status": "review-only; press use not approved; media not uploaded",
+  "mediaPlan": [
+    {
+      "id": "launch-speed",
+      "section": "La velocidad sirve cuando puedes seguir pensando",
+      "blockOffset": 1,
+      "required": "Official Vimeo; reviewed preview embeds it. Governed ArticleSpec only supports YouTube; use linked thumbnail/buttons in WordPress unless native Vimeo path is verified.",
+      "video": {
+        "title": "Images 2.6 latency comparison",
+        "captionEs": "Comparación de latencia con anuncio de viajes. Reproducida a 8×: no interpretar como velocidad en tiempo real.",
+        "aspectRatio": "16:9",
+        "embedUrl": "https://player.vimeo.com/video/1243362697?h=7809127775",
+        "source": "https://openai.com/index/introducing-images-2-6/",
+        "credit": "OpenAI",
+        "verified": "URL exacta presente en videoEmbedUrl del HTML oficial vía Playwright MCP"
+      }
+    },
+    {
+      "id": "markup-vase-input-gpt-image-2-6",
+      "section": "Editar sin volver a negociar toda la imagen",
+      "blockOffset": 2,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "markup-vase-input-gpt-image-2-6",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/markup-vase-input-gpt-image-2-6.webp",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — imagen de entrada y anotación de su guía oficial",
+        "alt": "Cocina con un círculo rojo sobre el florero que se pide editar.",
+        "local": "media/markup-vase-input-gpt-image-2-6.webp",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 107138,
+        "contentType": "image/webp",
+        "captionEs": "La imagen original con una anotación que señala el jarrón: el punto de partida de la edición guiada.",
+        "width": 1200,
+        "height": 900
+      }
+    },
+    {
+      "id": "markup-vase-gpt-image-2-6-sunburst",
+      "section": "Editar sin volver a negociar toda la imagen",
+      "blockOffset": 3,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "markup-vase-gpt-image-2-6-sunburst",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/markup-vase-gpt-image-2-6-sunburst.webp",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst",
+        "alt": "La misma cocina con el florero azul y sin la anotación roja.",
+        "local": "media/markup-vase-gpt-image-2-6-sunburst.webp",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 143220,
+        "contentType": "image/webp",
+        "captionEs": "El resultado de Sunburst: jarrón azul cobalto y círculo eliminado. Ejemplo publicado por OpenAI; no es una prueba realizada por Efeonce.",
+        "width": 1448,
+        "height": 1086
+      }
+    },
+    {
+      "id": "launch-motion",
+      "section": "GIF: el movimiento también necesita una intención",
+      "blockOffset": 1,
+      "required": "Official Vimeo; reviewed preview embeds it. Governed ArticleSpec only supports YouTube; use linked thumbnail/buttons in WordPress unless native Vimeo path is verified.",
+      "video": {
+        "title": "GIF montage",
+        "captionEs": "Montaje oficial de escenas animadas generadas con Images 2.6.",
+        "aspectRatio": "2:1",
+        "embedUrl": "https://player.vimeo.com/video/1242918503?h=5974be9997",
+        "source": "https://openai.com/index/introducing-images-2-6/",
+        "credit": "OpenAI",
+        "verified": "URL exacta presente en videoEmbedUrl del HTML oficial vía Playwright MCP"
+      }
+    },
+    {
+      "id": "monkey-lantern-gpt-image-2-6-sunburst",
+      "section": "GIF: el movimiento también necesita una intención",
+      "blockOffset": 3,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "monkey-lantern-gpt-image-2-6-sunburst",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/monkey-lantern-gpt-image-2-6-sunburst.gif",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst",
+        "alt": "Personaje con abrigo verde que levanta una linterna frente a una cabaña nevada.",
+        "local": "media/monkey-lantern-gpt-image-2-6-sunburst.gif",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 1280950,
+        "contentType": "image/gif",
+        "captionEs": "GIF oficial de Sunburst: nueve fotogramas y un bucle de 1,8 segundos. La novedad se entiende mejor viéndola.",
+        "width": 512,
+        "height": 512,
+        "animation": {
+          "duration": "1.800000",
+          "nb_read_frames": "9"
+        }
+      }
+    },
+    {
+      "id": "field-and-flour-gpt-image-2-6-sunburst",
+      "section": "SVG: recibir vectores abre otra etapa de trabajo",
+      "blockOffset": 1,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "field-and-flour-gpt-image-2-6-sunburst",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/field-and-flour-gpt-image-2-6-sunburst.svg",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst",
+        "alt": "Ejemplo SVG de Field & Flour con un pan, espigas y un rodillo.",
+        "local": "media/field-and-flour-gpt-image-2-6-sunburst.svg",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 4571,
+        "contentType": "image/svg+xml",
+        "captionEs": "Un SVG generado por Sunburst para la marca ficticia Field & Flour. Sus trazados, formas y colores se pueden editar.",
+        "svgViewBox": "0 0 1024 1024"
+      }
+    },
+    {
+      "id": "infographic-coffee-machine-sp-gpt-image-2-6-sunburst",
+      "section": "Qué muestran las piezas con texto y producto",
+      "blockOffset": 1,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "infographic-coffee-machine-sp-gpt-image-2-6-sunburst",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/infographic-coffee-machine-sp-gpt-image-2-6-sunburst.webp",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst",
+        "alt": "Diagrama de una cafetera con etiquetas en español.",
+        "local": "media/infographic-coffee-machine-sp-gpt-image-2-6-sunburst.webp",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 299142,
+        "contentType": "image/webp",
+        "captionEs": "OpenAI muestra la traducción al español de una infografía conservando su estructura visual. El texto igual necesita revisión.",
+        "width": 1024,
+        "height": 1536
+      }
+    },
+    {
+      "id": "billboard-winter-gpt-image-2-6-sunburst",
+      "section": "Qué muestran las piezas con texto y producto",
+      "blockOffset": 3,
+      "required": "Upload after press-use approval, then insert real native image block with returned attachment ID.",
+      "asset": {
+        "id": "billboard-winter-gpt-image-2-6-sunburst",
+        "url": "https://developers.openai.com/images/platform/guides/image-prompting/billboard-winter-gpt-image-2-6-sunburst.webp",
+        "source": "https://developers.openai.com/api/docs/guides/image-prompting",
+        "credit": "OpenAI — ejemplo oficial de GPT Image 2.6 Sunburst",
+        "alt": "Cartel publicitario de un champú en una escena invernal.",
+        "local": "media/billboard-winter-gpt-image-2-6-sunburst.webp",
+        "license": "No licencia de reutilizacion explicita verificada; no se marca press approved.",
+        "httpStatus": 200,
+        "bytes": 261504,
+        "contentType": "image/webp",
+        "captionEs": "Una nueva condición sobre una imagen anterior: el mismo concepto de producto convertido en una escena invernal.",
+        "width": 1024,
+        "height": 1536
+      }
+    }
+  ]
+}

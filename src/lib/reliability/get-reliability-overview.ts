@@ -181,6 +181,7 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getOperationalSpaceUngrantedUsersSignal } from './queries/operational-space-ungranted-users'
 import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getInsightsEditionSignals } from './queries/insights-edition-signals'
 import { getInsightsRenderOrphanedSignal } from './queries/insights-render-orphaned'
@@ -701,6 +702,7 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  operationalSpaceUngrantedUsers?: ReliabilitySignal | null
   /** TASK-1828 — auth.issuer.jwks_unreachable + auth.signing_keys.lifecycle (emisor propio). */
   authServerSignals?: ReliabilitySignal[] | null
   /** TASK-1845 — insights.editions.failed_recent + insights.editions.stuck_generation (steady 0). */
@@ -1301,6 +1303,8 @@ export const buildReliabilityOverview = (
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
+    // TASK-2096 — personas sin cuenta operativa en clientes con varios Spaces.
+    ...(sources.operationalSpaceUngrantedUsers ? [sources.operationalSpaceUngrantedUsers] : []),
     // TASK-1828 — authorization server propio: JWKS alcanzable/consistente + ciclo de vida de llaves.
     ...(sources.authServerSignals ?? []),
     // TASK-1845 — Efeonce Insights: ediciones fallidas recientes + atascadas en generación.
@@ -2015,6 +2019,12 @@ export const getReliabilityOverview = async (
     preloadedSources.workforceUnlinkedInternalUsers !== undefined
       ? preloadedSources.workforceUnlinkedInternalUsers
       : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
+
+  // TASK-2096 — cuentas operativas: steady 0; not_configured hasta aplicar la tabla de grants.
+  const operationalSpaceUngrantedUsers =
+    preloadedSources.operationalSpaceUngrantedUsers !== undefined
+      ? preloadedSources.operationalSpaceUngrantedUsers
+      : await getOperationalSpaceUngrantedUsersSignal().catch(() => null)
 
   // TASK-1828 — señales del emisor propio (auth.efeonce.org). `not_configured` hasta que el
   // host esté publicado (AUTH_SERVER_JWKS_URL); después steady = ok.
@@ -3053,6 +3063,7 @@ export const getReliabilityOverview = async (
     ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
+    operationalSpaceUngrantedUsers,
     authServerSignals,
     insightsEditionSignals,
     insightsRenderOrphanedSignal,
