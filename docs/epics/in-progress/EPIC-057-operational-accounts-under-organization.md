@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Formalizado y revisado contra código 2026-11-06; ADR aceptado con B el 2026-11-06; TASK-2096 code complete local (laboratorio 241/241, migraciones sin aplicar); seis hijas to-do; sin split productivo`
+- Status real: `Formalizado y revisado contra código 2026-11-06; ADR aceptado con B el 2026-11-06; TASK-2096 con migraciones aplicadas y código en develop sin release; seis hijas to-do; sin split productivo`
 - Rank: `57`
 - Domain: `cross-domain|identity|data|ops`
 - Owner: `Core/Spaces + Identity + Services; Finance/Delivery/ICO/Insights por contrato; Julio aceptó el ADR (B, 2026-11-06) y decide la apertura`

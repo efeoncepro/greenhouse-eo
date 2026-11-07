@@ -43,7 +43,8 @@ export type SpaceContextRequest = {
 
 export type AuthorizedSpaceContext = {
   userId: string
-  identityProfileId: string
+  /** Null for a user without an identity profile: only the single-Space rule can authorize it. */
+  identityProfileId: string | null
   organizationId: string
   spaceId: string
   serviceId: string | null
@@ -57,7 +58,6 @@ export type SpaceContextDenialReason =
   | 'principal_not_found'
   | 'principal_inactive'
   | 'tenant_type_unsupported'
-  | 'identity_profile_missing'
   | 'grant_required'
   | 'space_not_allowed'
   | 'organization_mismatch'

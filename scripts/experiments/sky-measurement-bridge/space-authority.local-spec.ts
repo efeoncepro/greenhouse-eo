@@ -99,6 +99,16 @@ describe('TASK-2096 — HTTP matrix over the real App routes (model B)', () => {
     expect(spaceIds(result.body)).toEqual(spaces)
   })
 
+  it('a user without identity profile keeps its single Space over HTTP (2 of 7 real client users, 2026-11-06)', async () => {
+    await query(`INSERT INTO greenhouse_core.client_users(user_id,email,full_name,client_id,password_hash,password_hash_algorithm)
+      VALUES ('noprofile','noprofile@example.invalid','noprofile','client-solo',$1,'bcrypt')`, [passwordHash])
+    await query(`INSERT INTO greenhouse_core.user_role_assignments(user_id,role_code) VALUES ('noprofile','client_manager')`)
+    const token = await bearer('noprofile')
+
+    expect(spaceIds((await call(listSpaces, '/api/platform/app/spaces', token)).body)).toEqual(['space-solo'])
+    expect((await call(listServices, '/api/platform/app/spaces/space-solo/services', token, { spaceId: 'space-solo' })).status).toBe(200)
+  })
+
   it('a person with no grant in a multi-Space client gets an empty enumeration and 404 on both Spaces', async () => {
     const token = await bearer('ungranted')
 

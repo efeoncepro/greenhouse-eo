@@ -410,6 +410,6 @@ ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service ex
 EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
 TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
 determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. Señal `identity.operational_space.ungranted_user`; `pnpm test`
-y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Pendiente:** aplicar las migraciones
-`20261106230331669` y `20261106230745107` (bloqueadas por orden detrás de `20261029092236733` de TASK-1833, que falla con `ops`: falta crear con admin/migrator el rol
-`greenhouse_auth_key_maintenance NOLOGIN`; intento del 2026-11-06 revertido sin cambios).
+y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Migraciones aplicadas** a la base
+compartida el 2026-11-06 (las dos de TASK-2096 y la de TASK-1833, con el rol `greenhouse_auth_key_maintenance` creado por migrator);
+verificadas. **Pendiente:** release del código a producción.

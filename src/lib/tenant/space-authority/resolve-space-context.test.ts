@@ -44,6 +44,15 @@ describe('TASK-2096 — Space authority resolver policy', () => {
     })
   })
 
+  it('a user without identity profile keeps the single-Space rule, and can never get a grant-based Space', async () => {
+    expect(await resolveSpaceContext({ userId: 'u1', need: 'create' },
+      opts({ principal: { identity_profile_id: null }, clientSpaces: [space('space-design')] })))
+      .toMatchObject({ status: 'authorized', context: { identityProfileId: null, source: 'single_space_client' } })
+    expect(await resolveSpaceContext({ userId: 'u1', need: 'read' },
+      opts({ principal: { identity_profile_id: null }, clientSpaces: [space('space-design'), space('space-seo')], grants: [grant('space-seo')] })))
+      .toEqual({ status: 'denied', reason: 'grant_required' })
+  })
+
   it('a multi-Space client without grants confers nothing: no default department', async () => {
     const fx = { clientSpaces: [space('space-design'), space('space-seo')] }
 
@@ -91,8 +100,7 @@ describe('TASK-2096 — Space authority resolver policy', () => {
     [null, 'principal_not_found'],
     [{ active: false }, 'principal_inactive'],
     [{ status: 'disabled' }, 'principal_inactive'],
-    [{ tenant_type: 'efeonce_internal' }, 'tenant_type_unsupported'],
-    [{ identity_profile_id: null }, 'identity_profile_missing']
+    [{ tenant_type: 'efeonce_internal' }, 'tenant_type_unsupported']
   ])('principal %o is denied as %s, read fresh on every call', async (principal, reason) => {
     expect(await resolveSpaceContext({ userId: 'u1', need: 'read' }, opts({ principal, clientSpaces: [space('space-design')] })))
       .toEqual({ status: 'denied', reason })

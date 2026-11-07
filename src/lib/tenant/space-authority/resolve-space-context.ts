@@ -50,8 +50,8 @@ type GrantRow = SpaceRow & { grant_id: string; version: number; verbs: string[] 
 const ALL_VERBS: SpaceAccessVerb[] = ['read', 'create']
 
 type ResolvedPrincipal =
-  | { ok: true; userId: string; identityProfileId: string; clientId: string }
-  | { ok: false; reason: 'principal_not_found' | 'principal_inactive' | 'tenant_type_unsupported' | 'identity_profile_missing' }
+  | { ok: true; userId: string; identityProfileId: string | null; clientId: string }
+  | { ok: false; reason: 'principal_not_found' | 'principal_inactive' | 'tenant_type_unsupported' }
 
 const readPrincipal = async (userId: string, readQuery: ReadQuery): Promise<ResolvedPrincipal> => {
   const rows = await readQuery<PrincipalRow>(
@@ -66,18 +66,22 @@ const readPrincipal = async (userId: string, readQuery: ReadQuery): Promise<Reso
 
   if (row.active !== true || row.status !== 'active') return { ok: false, reason: 'principal_inactive' }
   if (row.tenant_type !== 'client' || !row.client_id) return { ok: false, reason: 'tenant_type_unsupported' }
-  if (!row.identity_profile_id) return { ok: false, reason: 'identity_profile_missing' }
 
+  // A user without an identity profile can hold no grant (grants are per person), but still keeps the
+  // single-Space behaviour, which derives from being a user of the client. Measured 2026-11-06: 2 of 7
+  // active client users have no profile.
   return { ok: true, userId: row.user_id, identityProfileId: row.identity_profile_id, clientId: row.client_id }
 }
 
 const listAuthorizedSpacesForPrincipal = async (
-  principal: { identityProfileId: string; clientId: string },
+  principal: { identityProfileId: string | null; clientId: string },
   need: SpaceAccessVerb,
   readQuery: ReadQuery
 ): Promise<AuthorizedSpace[]> => {
+  const profileId = principal.identityProfileId
+
   const [grants, governedOrganizations, clientSpaces] = await Promise.all([
-    readQuery<GrantRow>(
+    profileId === null ? Promise.resolve([] as GrantRow[]) : readQuery<GrantRow>(
       `SELECT g.grant_id, g.version, g.verbs, s.space_id, s.public_id AS space_public_id,
               s.organization_id, o.organization_name
          FROM greenhouse_core.space_access_grants g
@@ -91,13 +95,13 @@ const listAuthorizedSpacesForPrincipal = async (
           AND g.valid_from <= now()
           AND (g.valid_to IS NULL OR g.valid_to > now())
           AND $3 = ANY (g.verbs)`,
-      [principal.identityProfileId, principal.clientId, need]
+      [profileId, principal.clientId, need]
     ),
-    readQuery<{ organization_id: string }>(
+    profileId === null ? Promise.resolve([] as { organization_id: string }[]) : readQuery<{ organization_id: string }>(
       `SELECT DISTINCT organization_id
          FROM greenhouse_core.space_access_grants
         WHERE identity_profile_id = $1 AND active = true`,
-      [principal.identityProfileId]
+      [profileId]
     ),
     readQuery<SpaceRow>(
       `SELECT s.space_id, s.public_id AS space_public_id, s.organization_id, o.organization_name
@@ -154,7 +158,7 @@ export const listAuthorizedSpaces = async (
 }
 
 const toContext = (
-  principal: { userId: string; identityProfileId: string },
+  principal: { userId: string; identityProfileId: string | null },
   space: AuthorizedSpace,
   need: SpaceAccessVerb,
   serviceId: string | null

@@ -9,6 +9,11 @@ nada aplicado. Para aplicarla, alguien con credencial admin o migrator crea ante
 `CREATE ROLE greenhouse_auth_key_maintenance NOLOGIN;` (la migración lo respeta con `IF NOT EXISTS`) y después
 corre `pnpm migrate:up` con `ops`. Mientras siga pendiente, bloquea por orden las dos migraciones de TASK-2096.
 
+**Resuelto el mismo día**, con autorización explícita del operador: se creó con `greenhouse_migrator_user` sólo
+`greenhouse_auth_key_maintenance NOLOGIN` (sin login, superusuario ni CREATEROLE) y `pnpm migrate:up` con `ops` aplicó la
+migración; `signing_key_rotation_operations` y `signing_key_rotation_events` existen. El LOGIN, su contraseña y el
+provisionamiento del Job siguen pendientes en esta task.
+
 ## Delta 2026-10-29 — Job aislado aceptado para candidato local
 
 Julio aprobó Cloud Run Job aislado con identidad propia, tick diario y

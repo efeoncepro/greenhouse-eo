@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `Code complete local 2026-11-06, rollout pendiente: 4 slices + señal en develop; laboratorio 243/243 en PG16, pnpm test y pnpm build verdes; migraciones sin aplicar a la base compartida`
+- Status real: `2026-11-06: migraciones aplicadas a la base compartida y verificadas; código en develop sin release a producción. Laboratorio 244/244, pnpm test y pnpm build verdes; resolver = Space de sesión en 7/7 usuarios cliente reales`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -290,9 +290,17 @@ Plan y auditoría: [TASK-2096-plan.md](../plans/TASK-2096-plan.md). Cuatro slice
 Señal `identity.operational_space.ungranted_user` agregada. `pnpm build` verde (125 s, pico ~5,2 GB) tras corregir dos errores
 de tipos ajenos que rompían el build de `develop` (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).
 Pendiente para cerrar: aplicar las dos migraciones a la base compartida, release del código a producción y revocación
-durante un write (primer write por Space, TASK-2097/2099). Intento de aplicación 2026-11-06 autorizado por el operador:
-bloqueado porque la migración previa de TASK-1833 falla con `ops` (`permission denied to create role`); se revirtió sin
-cambios (`session_360` con la misma huella, 116 filas). Detalle y desbloqueo en TASK-1833.
+durante un write (primer write por Space, TASK-2097/2099).
+
+**Aplicación 2026-11-06 (autorizada por el operador).** Primer intento revertido sin cambios: la migración previa de
+TASK-1833 falla con `ops` (`permission denied to create role`). Con autorización explícita se creó con
+`greenhouse_migrator_user` sólo el rol vacío `greenhouse_auth_key_maintenance NOLOGIN` y luego `pnpm migrate:up` con
+`ops` aplicó las tres. Verificado en READ ONLY: las tres en `pgmigrations`; `session_360` = 116 filas/116 usuarios, 0 con
+selección pendiente y misma huella md5 en las 19 columnas originales; `space_access_grants` con dueño `greenhouse_ops`,
+índice único, runtime sin `DELETE`, 0 filas; tablas de TASK-1833 creadas. Ejercicio real: señal `ok`; resolver = Space de
+sesión en 7/7 usuarios cliente activos. Ese ejercicio destapó que 2 de 7 no tienen `identity_profile_id`: el resolver ya no
+los deniega (conservan la regla de un solo Space; sólo no pueden recibir grants).
+Pendiente para cerrar: release del código a producción y revocación durante un write.
 `pnpm test` completo en `ae0881e4be`: 2150 archivos, 21 842 tests, 0 fallas.
 Manual de uso: no aplica todavía; nadie puede otorgar Spaces sin el command de TASK-2099 (dueño: EPIC-057).
 

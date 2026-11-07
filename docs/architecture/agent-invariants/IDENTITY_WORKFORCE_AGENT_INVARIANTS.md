@@ -948,7 +948,7 @@ un client comercial, varios Spaces, contexto Space/Service explícito por reques
 - **Señal.** `identity.operational_space.ungranted_user` (data_quality, steady 0; `not_configured` sin la tabla):
   personas activas de un cliente con varios Spaces sin ningún grant vigente. **NUNCA** abrir una segunda cuenta
   operativa con esta señal fuera de 0.
-- **Rollout.** Las dos migraciones existen en `migrations/` y se probaron en PG16 efímero; aplicarlas a la base
-  compartida (dev/staging/prod) requiere autorización explícita. Orden: la vista nueva puede ir antes del código
-  (salida idéntica a la vigente para los 116 usuarios, medido en `READ ONLY` el 2026-11-06, y el código anterior
-  ignora las columnas agregadas); la tabla de grants debe existir antes de que las rutas `/spaces` reciban tráfico.
+- **Sin perfil de identidad.** Un usuario sin `identity_profile_id` no puede recibir grants, pero conserva la regla de un
+  solo Space (medido 2026-11-06: 2 de 7 usuarios cliente activos). **NUNCA** denegarlo por falta de perfil.
+- **Rollout.** Las dos migraciones están aplicadas a la base compartida desde el 2026-11-06 (verificadas). La vista se aplicó antes del código
+  (salida idéntica para los 116 usuarios, misma huella md5; el código anterior ignora las columnas agregadas).
