@@ -159,7 +159,7 @@ Manda sobre el cuerpo cuando se contradigan.
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En staging (2026-09-28): develop 5568a3f54 (sin promover a main por orden del operador). Flag ON en staging (Vercel staging + Job + ops-worker 00728-9vk); Production OFF. Smoke real verde en los SEIS catálogos (deck, overlays, stills con plate subido, y la edición de Glitch con 9 fotos: carrusel, stills y overlays) + canary de Insights verde. Falta: canary de Proposal, merge de efeonce-mcp#22 tras el release de Greenhouse, criterios Delta b (TASK-1930/1931)`
+- Status real: `2026-11-07: código en main (release ff6fd900ce). Flag ON en staging (Vercel staging + Job + ops-worker 00795-vnv); Vercel Production sin la var (OFF). Smoke real verde en los SEIS catálogos (2026-09-28) + canary de Insights y de Proposal (prnd-e14a2cd5, 2026-11-07) verdes. Falta: aprobación del operador para prender en Production y repetir el smoke allí, merge de efeonce-mcp#22, criterios Delta b (TASK-1930/1931)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -555,10 +555,12 @@ Reglas obligatorias:
 - [ ] Con el flag OFF, el consumer no reclama jobs y el endpoint rechaza pedidos.
       — Parcial: con tests (`commands.test.ts` → `render_disabled`; `dispatch.test.ts` → no despacha). Falta
       verificarlo contra el runtime desplegado.
-- [ ] Proposal e Insights renderizan igual en staging con el consumer nuevo desplegado.
-      — Parcial: Insights verificado — `irun-1f520d8d…` (deck de una edición sintética de Greenhouse Demo nunca
-      renderizada) `completed` al primer intento con el consumer de marca desplegado. Proposal sin canary: no hubo
-      renders de Proposal y su consumer va primero y no cambió (tests y CI verdes).
+- [x] Proposal e Insights renderizan igual en staging con el consumer nuevo desplegado.
+      — Evidencia: Insights `irun-1f520d8d…` (deck de una edición sintética de Greenhouse Demo nunca renderizada)
+      `completed` al primer intento con el consumer de marca desplegado. Proposal (2026-11-07, Job `artifact-worker`
+      con `BRAND_RENDER_ENABLED=true`, `ops-worker-00795-vnv` en `71a238c089`): `prnd-e14a2cd5…` sobre la propuesta
+      sonda `prop-94e5268c…` (audiencia `internal`, plan real de SKY, 28 láminas) → `completed` al primer intento,
+      40,4 s, PDF 15,9 MB (`asset-d3ca7764…`), 28 previews, sin warnings.
 - [ ] La tool MCP está federada (tool, scope, manifiesto, tests, release) y opera contra staging.
       — Parcial: tools y lane ecosystem en Greenhouse (`mcp:manifest:check` verde, 67 tools) + scope
       `efeonce.mcp.brand.write` en la paridad; federación hecha en `efeonce-mcp` rama `feat/task-1921-brand-render`
