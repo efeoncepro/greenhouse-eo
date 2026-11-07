@@ -290,7 +290,9 @@ Plan y auditoría: [TASK-2096-plan.md](../plans/TASK-2096-plan.md). Cuatro slice
 Señal `identity.operational_space.ungranted_user` agregada. `pnpm build` verde (125 s, pico ~5,2 GB) tras corregir dos errores
 de tipos ajenos que rompían el build de `develop` (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).
 Pendiente para cerrar: aplicar las dos migraciones a la base compartida, release del código a producción y revocación
-durante un write (primer write por Space, TASK-2097/2099).
+durante un write (primer write por Space, TASK-2097/2099). Intento de aplicación 2026-11-06 autorizado por el operador:
+bloqueado porque la migración previa de TASK-1833 falla con `ops` (`permission denied to create role`); se revirtió sin
+cambios (`session_360` con la misma huella, 116 filas). Detalle y desbloqueo en TASK-1833.
 `pnpm test` completo en `ae0881e4be`: 2150 archivos, 21 842 tests, 0 fallas.
 Manual de uso: no aplica todavía; nadie puede otorgar Spaces sin el command de TASK-2099 (dueño: EPIC-057).
 

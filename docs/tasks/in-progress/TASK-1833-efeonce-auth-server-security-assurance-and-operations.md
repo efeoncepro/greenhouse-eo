@@ -1,5 +1,14 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-11-06 — la migración no se aplica con el perfil `ops`
+
+Al aplicar las migraciones pendientes (pedido del operador en la sesión de TASK-2096),
+`20261029092236733_task-1833-auth-key-maintenance` falló con `permission denied to create role`: `greenhouse_ops`
+no tiene `CREATEROLE` (sí lo tienen `postgres` y `greenhouse_migrator_user`). La transacción se revirtió y no quedó
+nada aplicado. Para aplicarla, alguien con credencial admin o migrator crea antes
+`CREATE ROLE greenhouse_auth_key_maintenance NOLOGIN;` (la migración lo respeta con `IF NOT EXISTS`) y después
+corre `pnpm migrate:up` con `ops`. Mientras siga pendiente, bloquea por orden las dos migraciones de TASK-2096.
+
 ## Delta 2026-10-29 — Job aislado aceptado para candidato local
 
 Julio aprobó Cloud Run Job aislado con identidad propia, tick diario y
