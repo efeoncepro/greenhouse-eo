@@ -7,6 +7,15 @@ const STATUS_FIELD_RE = /^-\s+([^:]+):\s*(.*)$/
 const TASK_ID_RE = /TASK-\d{3,}(?:\.\d+)?/
 const CANONICAL_TASK_FILE_RE = /^TASK-\d{3,}-/
 
+export const taskIdFromFilename = filename => filename.match(/^(TASK-\d{3,}(?:\.\d+|[a-z])?)-.+\.md$/)?.[1] ?? null
+
+// An explanation after `none` can name previously closed blockers.
+export const hasDeclaredTaskBlocker = value => {
+  const raw = value?.trim()
+
+  return Boolean(raw && !/^`?none`?[ \t]*(?:$|[(.,;:—-]|\r?\n)/i.test(raw))
+}
+
 const stripInlineCode = value => value.trim().replace(/^`(.+)`$/, '$1').trim()
 
 const normalizeHeading = value =>

@@ -48,8 +48,15 @@ Si el operador dice `mantente en develop`, `stay on develop` o equivalente:
 pnpm codex:task-hook TASK-### --develop
 ```
 
-La salida del hook sustituye el bloque `## Prompt canónico` de este documento
-con la ruta real de la task y, si aplica, la excepcion de rama.
+El CLI resuelve el ID exacto a partir del nombre del archivo. Acepta IDs numéricos,
+decimales y sufijos alfabéticos históricos. Tanto por ID como por ruta, exige una
+task única en `docs/tasks/{to-do,in-progress}`, rechaza un lifecycle declarado que
+contradiga su carpeta y aplica la regla de `Blocked by` de `task:lint`, incluido
+`none` con explicación. Los documentos históricos sin lifecycle usan su carpeta.
+
+La salida sustituye el bloque `## Prompt canónico` con la ruta real y las
+autorizaciones explícitas de rama y delegación. Sigue el [router de contexto](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
+y la política de autorización de `AGENTS.md`.
 
 ## Alias recomendado
 
@@ -107,16 +114,17 @@ Si el bloque falta, tiene placeholders o contradice el código, corrige la task 
 
 GOAL PREFLIGHT
 
-Antes de ejecutar el hook para una `TASK-###`, verifica si el operador ya dio un
-`/goal` explícito en la conversación actual.
+Antes de ejecutar el hook para una `TASK-###`, verifica el objetivo confirmado
+en la conversación. Al retomar, consulta el Goal activo si Codex permite leerlo.
+Reutilízalo cuando corresponda a la misma task y al alcance que aprobó el operador.
 
-- Si NO hay `/goal` explícito y el operador pide ejecutar/implementar/continuar
+- Si falta un objetivo explícito y confirmado y el operador pide ejecutar/implementar/continuar
   una task, no empieces implementación todavía: propone un `/goal` recomendado
   para esa task y espera confirmación del operador.
 - El `/goal` recomendado debe incluir objetivo de cierre, evidencia obligatoria,
   límites de alcance, estado correcto si falta rollout (`code complete, rollout
 pendiente` u `operativamente bloqueado`) y si conviene `mantente en develop` o
-  `con subagentes`.
+  `con subagentes`. Incluye el criterio de UI/UX cuando aplique.
 - Si el operador acepta el goal o entrega uno propio, continúa con el hook
   (`pnpm codex:task-hook ...`) usando `--develop` y/o `--subagents` cuando
   corresponda.
@@ -208,12 +216,13 @@ Durante Discovery decide explícitamente `sequential` vs `fork` usando
 Si el operador pidió explícitamente subagentes, delegación, trabajo paralelo o
 el hook imprimió `subagentes autorizados`:
 
-- Antes de cerrar el plan, carga el tooling multi-agent disponible. En Codex
-  desktop normalmente está lazy-loaded: usa `tool_search` con una consulta como
-  `multi-agent subagent spawn manage agents` para exponer `multi_agent_v1`.
-- Si el plan decide `fork`, spawnea subagentes `explorer` para preguntas
-  read-only independientes o `worker` para slices de implementación con scope de
-  archivos exclusivo.
+- Antes de cerrar el plan, usa primero las herramientas de colaboración que la
+  sesión ya expone. Descubre herramientas adicionales si el cliente ofrece esa vía.
+- Si el plan decide `fork`, asigna exploración de solo lectura para preguntas
+  independientes o implementación con archivos exclusivos. Declara el rol en el
+  brief y usa un perfil de agente cuando el cliente lo permita.
+- Hereda modelo y esfuerzo por defecto. Usa un override si la autorización, el
+  riesgo de la tarea y las opciones disponibles en la sesión lo justifican.
 - Cada subagente debe recibir contexto autocontenido: task, slice, archivos que
   puede tocar, archivos que no puede tocar, interfaces a respetar, skills que
   debe leer y acceptance criteria propios.
@@ -278,14 +287,23 @@ Guía Codex vigente:
 
 UI/UX GOAL GUARD
 
-Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visible, copy visible, layout, interacción, motion, primitive, flow o requiere GVC, fija antes de escribir JSX/copy visible un objetivo de sesión verificable para no salir del loop visual antes de tiempo.
+Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visible,
+copy visible, layout, interacción, motion, primitive, flow o requiere GVC,
+incorpora estos criterios al objetivo aprobado antes de escribir JSX o copy visible.
+Inclúyelos al proponer el Goal. Si el objetivo ya está confirmado, regístralos en
+Audit/Plan como condiciones de cierre de ese mismo objetivo.
 
-- En Claude Code, usa `/goal` explícitamente.
-- En Codex, usa el mecanismo nativo equivalente de goal cuando esté disponible; si no puedes activarlo desde el harness, copia la condición en Audit/Plan y trátala como gate duro de cierre.
-
-Condición mínima recomendada:
-
-    /goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la task declara UI ready y permanece no hasta que el wireframe/UI contract tengan implementation mapping, GVC scenario plan y design decision log; si se declara UI ready yes, pnpm task:lint --task TASK-### pasa sin findings; el wireframe está declarado en la task, existe bajo docs/ui/wireframes y pasa pnpm ui:wireframe-check --task TASK-###; si hay flow, sidecar, drawer, modal, popover o navegación cruzada, el flow contract está declarado, existe bajo docs/ui/flows y pasa pnpm ui:flow-check --task TASK-###; si hay motion o microinteracciones no triviales, el motion contract está declarado, existe bajo docs/ui/motion y pasa pnpm ui:motion-check --task TASK-###; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
+- Carga las skills de product design aplicables antes de JSX. Mantén `UI ready: no`
+  hasta que el contrato de UI tenga mapping de implementación, escenarios GVC y
+  registro de decisiones. Para `UI ready: yes`, `pnpm task:lint --task TASK-###` debe pasar sin hallazgos.
+- Declara el wireframe en la task bajo `docs/ui/wireframes` y valida con `pnpm ui:wireframe-check --task TASK-###`.
+  Para flows y motion aplicables, declara sus contratos bajo `docs/ui/flows` y
+  `docs/ui/motion` y corre `pnpm ui:flow-check --task TASK-###` y `pnpm ui:motion-check --task TASK-###` según corresponda.
+- Documenta la decisión de reutilizar, extender o crear la primitive. Usa los tokens
+  y la capa canónica de copy visible.
+- Ejecuta GVC en desktop y mobile, revisa los PNG y verifica `scrollWidth == clientWidth`
+  en desktop y a 390 px. Resuelve overlaps, clipping y errores de consola o página,
+  o registra el bloqueo exacto con evidencia. Sincroniza docs, handoff y gates aplicables.
 
 No declares UI lista si esa condición no está demostrada en la conversación con comandos, rutas de captura y hallazgos resueltos o bloqueadores exactos.
 
@@ -336,8 +354,16 @@ Antes de cerrar:
 - Lista migrations/capabilities/events/signals nuevos si existen.
 - Lista docs actualizadas.
 - Documenta drift detectado, riesgos y follow-ups.
-- Sincroniza lifecycle/carpeta/README de la task solo si el estado real lo justifica.
+- Actualiza `Status real` y marca en `Acceptance Criteria` los criterios respaldados
+  por evidencia. Deja los pendientes sin marcar y registra el motivo.
+- Corre `pnpm task:lint --task TASK-###` antes de mover la task. Sincroniza lifecycle,
+  carpeta, registry y README cuando el estado real justifique el cambio.
+  Para sufijos alfabéticos históricos, usa `pnpm task:lint --changed` sobre la
+  edición de la task y registra la cobertura, ya que el filtro focal acepta IDs numéricos y decimales.
 - Actualiza `Handoff.md` con continuidad útil.
+- Completa el Goal nativo cuando la evidencia satisface todo el alcance que aprobó
+  el operador. Si ese alcance era código local, el Goal puede cerrar mientras la
+  task conserva rollout pendiente. Si el Goal exige rollout, verifica el runtime antes de cerrarlo.
 ```
 
 ## Protocolo de actualización continua

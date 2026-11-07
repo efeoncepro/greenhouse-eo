@@ -10,6 +10,12 @@ tras automatización. Skills B2B/HubSpot espejo, manuales y evidencia por canal;
 
 [Historial interno](docs/changelog/internal/README.md).
 
+## 2026-11-07 — Codex valida la task exacta antes de implementar
+
+El hook resuelve la identidad desde el archivo activo, rechaza rutas e IDs ambiguos y comparte con `task:lint` la
+regla de bloqueadores. El harness reutiliza el objetivo confirmado, usa la colaboración disponible en la sesión y
+pasa pruebas de regresión en el chequeo que ejecutará CI. [Contrato](docs/operations/CODEX_EXECUTION_PROMPT_V1.md).
+
 ## 2026-11-06 — SKY BLACK 2026: la animación se entrega sólo en MP4 y los degradados van sólo donde hacen falta
 
 Rondas 11 y 12 del lote «GIF + POPUP» y de las rutas de Perú. Ya no se entrega GIF: la animación va como MP4 con audio,
@@ -532,9 +538,3 @@ Autoría V2 local: borradores incompletos por perfil, importación previa con re
 - Sustituida la alternativa textual por firma gráfica siempre, incluidos seguimientos manuales, programados y secuencias; transporte sin HTML deja el envío pendiente. [Decisión y procedimiento](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md). Routers y skills actualizados, sin envíos ni cambios de configuración.
 
 [Historial interno](docs/changelog/internal/README.md).
-
-## 2026-10-21 — Prospección creativa y secuencias izipay
-
-- Documentados InMail de Ana Paula, email/CRM de Odoo y cuatro contactos/correos de izipay; tres secuencias programadas, Laura sin inscripción por rebote.
-- Skills espejo: excepción individual de correo inferido, NDR frente a Apollo, clonación independiente, persistencia y readback.
-- Capacidad de producción/fabricación local corregida por Julio; sin inferir propiedad ni nuevos permisos. [Registro y límites](docs/commercial/follow-up-agent/runs/2026-10-21-agencia-creativa-izipay.md).

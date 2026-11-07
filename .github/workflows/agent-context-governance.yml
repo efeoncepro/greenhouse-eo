@@ -14,9 +14,16 @@ on:
       - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
       - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
       - docs/operations/CODEX_EXECUTION_PROMPT_V1.md
+      - docs/tasks/TASK_PROCESS.md
       - .claude/commands/implement-task.md
       - .claude/skills/greenhouse-documentation-governor/SKILL.md
       - .codex/skills/greenhouse-documentation-governor/SKILL.md
+      - .codex/skills/greenhouse-task-execution-hook/SKILL.md
+      - scripts/codex-task-hook.mjs
+      - scripts/check-codex-task-harness.mjs
+      - scripts/ci/__tests__/codex-task-hook.test.mjs
+      - scripts/ci/task-lint/**
+      - .github/workflows/agent-context-governance.yml
       - scripts/check-context-handoff.mjs
       - scripts/maintenance/rotate-handoff-context.mjs
       - scripts/maintenance/rotate-handoff-context.test.mjs
@@ -36,9 +43,16 @@ on:
       - docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md
       - docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md
       - docs/operations/CODEX_EXECUTION_PROMPT_V1.md
+      - docs/tasks/TASK_PROCESS.md
       - .claude/commands/implement-task.md
       - .claude/skills/greenhouse-documentation-governor/SKILL.md
       - .codex/skills/greenhouse-documentation-governor/SKILL.md
+      - .codex/skills/greenhouse-task-execution-hook/SKILL.md
+      - scripts/codex-task-hook.mjs
+      - scripts/check-codex-task-harness.mjs
+      - scripts/ci/__tests__/codex-task-hook.test.mjs
+      - scripts/ci/task-lint/**
+      - .github/workflows/agent-context-governance.yml
       - scripts/check-context-handoff.mjs
       - scripts/maintenance/rotate-handoff-context.mjs
       - scripts/maintenance/rotate-handoff-context.test.mjs
@@ -76,3 +90,5 @@ jobs:
         run: pnpm docs:context-check:strict
       - name: Test context and changelog rotation
         run: node --test scripts/maintenance/rotate-handoff-context.test.mjs
+      - name: Verify Codex task harness
+        run: pnpm codex:task-hook:check

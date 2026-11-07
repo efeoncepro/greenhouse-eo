@@ -28,16 +28,18 @@ changes unless the operator explicitly asks to use the TASK hook.
 
 ## Goal Preflight
 
-Before running the hook for an execution request, check whether the operator has
-already provided an explicit `/goal` in the current conversation.
+Before running the hook for an execution request, check for an explicit,
+confirmed objective for the same task and scope. When resuming, read the active
+native Goal if the client exposes it and reuse it when it matches that approval.
 
 - If the operator asks Codex to execute, implement, or continue a `TASK-###` and
-  has not provided `/goal`, first propose a recommended `/goal` for that task and
+  has no matching confirmed objective, first propose a `/goal` for that task and
   wait for the operator to approve it or provide their own.
 - The recommended goal must include closure objective, required evidence, scope
   limits, correct state when rollout/runtime evidence is missing, and whether
-  `mantente en develop` or subagents are recommended.
-- If the operator already provided `/goal`, continue to the required command.
+  `mantente en develop` or subagents are recommended. Include UI readiness
+  criteria when applicable.
+- If the operator already provided or confirmed the goal, continue to the required command.
 - If the operator explicitly says to execute without a goal, document the
   exception in Audit/Plan/Handoff and continue to the required command.
 
@@ -97,18 +99,19 @@ do not create an alternate tree as a workaround.
 
 ## Notes
 
-- The command resolves the active task file under `docs/tasks/{to-do,in-progress}`.
-- It blocks completed tasks and tasks with declared blockers.
+- The command resolves the exact task ID from a canonical file under
+  `docs/tasks/{to-do,in-progress}`. It accepts decimal IDs and historical letter
+  suffixes, and rejects inactive tasks, ambiguous IDs, lifecycle conflicts and
+  declared blockers. `none` with an explanation is valid.
 - It substitutes the canonical execution prompt from
   `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`.
-- For UI/UX tasks, that prompt requires an explicit UI enterprise-ready goal
-  guard before JSX/copy work: use Claude Code `/goal` when running there, or the
-  native Codex goal mechanism/equivalent hard gate when running in Codex.
+- For UI/UX tasks, apply the readiness criteria to the approved objective before
+  JSX or copy work. Keep the criteria in Audit/Plan if the native Goal is unavailable.
 - For explicitly authorized subagent runs, that prompt requires Codex to load
-  available multi-agent tooling when Discovery/Plan selects `fork`, assign
-  disjoint ownership, and consolidate/verify the combined result.
+  available collaboration tooling when Discovery/Plan selects `fork`, inherit
+  model and effort by default, assign disjoint ownership, and verify the combined result.
 - `pnpm codex:task-hook:check` verifies the hook, prompt, aliases, entrypoint
-  references, and a live active-task smoke.
+  references, regression fixtures and a live active-task smoke. CI runs the same check.
 - This is not a Git hook or runtime listener; Codex must execute the command when
   this trigger matches.
 
@@ -126,5 +129,5 @@ After changing this skill, run:
 ```bash
 pnpm codex:task-hook:check
 pnpm docs:closure-check
-pnpm docs:context-check
+pnpm docs:context-check:strict
 ```

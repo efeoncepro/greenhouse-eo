@@ -1809,9 +1809,10 @@ const cases = [
       )
 
       const explained = lintTasks({ repoRoot: root, options: { task: 'TASK-998' } })
+      const closed = lintTasks({ repoRoot: root, options: { task: 'TASK-801' } })
 
       assert.equal(
-        [...explained.errors, ...explained.warnings].filter(item => item.rule === 'stale-blocker').length,
+        [...explained.errors, ...explained.warnings, ...closed.errors].filter(item => item.rule === 'stale-blocker').length,
         0
       )
 

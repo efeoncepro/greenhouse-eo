@@ -2,6 +2,12 @@
 
 [Historial de sesiones](Handoff.archive.md).
 
+## 2026-11-07 — Hook de implementación Codex V1
+
+Admisión y colaboración alineadas con el [contrato V1](docs/operations/CODEX_EXECUTION_PROMPT_V1.md).
+En `develop` local, el checker pasó con fixtures y el smoke del backlog. El workflow de contexto
+ejecutará ese mismo checker cuando el cambio llegue a CI.
+
 ## 2026-11-06 — SKY BLACK 2026: rutas foco de Chile y Perú internacional (popup + story)
 
 - 16 rutas (Notion «Rutas foco (KV LISTO)» y BLACK SKY PE 26): CL DOM Concepción, Calama, Antofagasta; CL INTER Cusco,
@@ -349,14 +355,3 @@ Skills `efeonce-graphic-line`, `efeonce-auth` y `axis-design-system` actualizada
 cambiado en `develop`** (teja de Efeonce ID vía `scripts/auth-server/efeonce-id-favicon.ts`; 743 pruebas de
 `src/lib/auth-server` verdes, verificado en el arnés): llega a producción sólo con un release gobernado. Pendiente: fijar
 `axis-brand-assets` ≥ 0.4.31 en Greenhouse (TASK-2014), lockup del formulario y botón «Continuar con Efeonce ID».
-
-## 2026-11-01 — Cloud Build: paquete de subida 986 → 131 MB
-
-`.gcloudignore` excluye `/ai-generations/`, `/outputs/`, `/generated/` y `/scripts/frontend/` (anclados a la raíz;
-sin anclar, `ai-generations/` también atrapaba `scripts/ai-generations/`). Verificado con
-`gcloud meta list-files-for-upload`: solo salen archivos de esas cuatro carpetas y siguen presentes todas las rutas
-que copian los 8 Dockerfiles de `services/`. No se borra nada del repo. Al empujar a develop, los filtros de ruta de
-`artifact-worker`, `commercial-cost-worker` y `auth-server` disparan un deploy a staging, que es la prueba real
-(empujado a develop; los 4 deploys de workers a staging salieron verdes). El operador compró el CUD de Cloud SQL
-`greenhouse-pg-dev-us-east4-3y` (3 años, us-east4, USD 0,03/h ≈ 21,60/mes, inicio 2026-11-01 16:00 PT) y canceló
-Looker Studio Pro (verificado). Proyección: ~CLP170k/mes desde diciembre.

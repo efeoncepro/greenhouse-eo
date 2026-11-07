@@ -4,6 +4,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
+import { hasDeclaredTaskBlocker, parseTaskMarkdown, taskIdFromFilename } from './ci/task-lint/parser.mjs'
+
 const repoRoot = resolve(process.cwd())
 const failures = []
 
@@ -51,10 +53,11 @@ requireIncludes('CODEX prompt', sources.prompt, 'greenhouse-documentation-govern
 requireIncludes('CODEX prompt', sources.prompt, 'GOAL PREFLIGHT')
 requireIncludes('CODEX prompt', sources.prompt, 'propone un `/goal` recomendado')
 requireIncludes('CODEX prompt', sources.prompt, 'UI/UX GOAL GUARD')
-requireIncludes('CODEX prompt', sources.prompt, '/goal [TASK-###] UI enterprise-ready')
+requireIncludes('CODEX prompt', sources.prompt, 'incorpora estos criterios al objetivo aprobado')
 requireIncludes('CODEX prompt', sources.prompt, 'SUBAGENT TOOLING')
-requireIncludes('CODEX prompt', sources.prompt, 'multi_agent_v1')
 requireIncludes('CODEX prompt', sources.prompt, 'fork recomendado, no autorizado/no disponible')
+requireIncludes('CODEX prompt', sources.prompt, 'Status real')
+requireIncludes('CODEX prompt', sources.prompt, 'pnpm task:lint --task')
 requireIncludes('CODEX prompt', sources.prompt, 'MODULAR PLACEMENT CONTRACT')
 requireIncludes('CODEX prompt', sources.prompt, 'MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md')
 requireIncludes('CODEX prompt', sources.prompt, 'Future candidate home')
@@ -94,11 +97,22 @@ rejectIncludes('worktree tombstone active git worktree call', sources.worktreeSc
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'vercel:nextjs')
 rejectIncludes('CODEX prompt stale skill', sources.prompt, 'modern-ui-architect')
 rejectIncludes('CODEX prompt stale slice rule', sources.prompt, 'llevas más de 3 slices sin commit')
+rejectIncludes('CODEX prompt stale collaboration tool', sources.prompt, 'multi_agent_v1')
 
 const promptBlock = sources.prompt?.match(/## Prompt canónico\s+(`{3,})md\n([\s\S]*?)\n\1/)
 
 if (!promptBlock) {
   failures.push('CODEX prompt: could not extract canonical prompt block')
+}
+
+try {
+  execFileSync(process.execPath, ['--test', 'scripts/ci/__tests__/codex-task-hook.test.mjs'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  })
+} catch (error) {
+  failures.push(`hook fixture tests failed: ${error.stdout || error.stderr || error.message}`)
 }
 
 const activeTask = findActiveTask()
@@ -107,7 +121,7 @@ if (!activeTask) {
   failures.push('No active unblocked task found under docs/tasks/{in-progress,to-do} for hook smoke')
 } else {
   try {
-    const output = execFileSync('node', ['scripts/codex-task-hook.mjs', activeTask, '--develop', '--prompt-only'], {
+    const output = execFileSync(process.execPath, ['scripts/codex-task-hook.mjs', activeTask, '--develop', '--prompt-only'], {
       cwd: repoRoot,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe']
@@ -122,7 +136,7 @@ if (!activeTask) {
     }
 
     const subagentOutput = execFileSync(
-      'node',
+      process.execPath,
       ['scripts/codex-task-hook.mjs', activeTask, '--develop', '--subagents', '--prompt-only'],
       {
         cwd: repoRoot,
@@ -165,19 +179,15 @@ function findActiveTask() {
     if (!existsSync(absoluteDir)) continue
 
     for (const filePath of listMarkdownFiles(absoluteDir).sort()) {
-      const fileName = basename(filePath)
-      const id = fileName.match(/TASK-\d{3,}(?:\.\d+)?/)?.[0]
+      const id = taskIdFromFilename(basename(filePath))
 
       if (!id) continue
 
       const source = readFileSync(filePath, 'utf8')
+      const { lifecycle, status: { fields } } = parseTaskMarkdown({ filePath, repoRoot, source })
 
-      const blockedBy = source
-        .match(/^\s*-\s*Blocked by:\s*(.+?)\s*$/m)?.[1]
-        ?.replace(/`/g, '')
-        .trim()
-
-      if (blockedBy && blockedBy !== 'none') continue
+      if (lifecycle && lifecycle !== dir) continue
+      if (hasDeclaredTaskBlocker(fields['Blocked by'] ?? fields['blocked by'])) continue
 
       return id
     }

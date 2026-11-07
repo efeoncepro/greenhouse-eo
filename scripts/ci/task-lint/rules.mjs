@@ -2,6 +2,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { hasDeclaredTaskBlocker } from './parser.mjs'
+
 const REQUIRED_SECTIONS = [
   'summary',
   'why this task exists',
@@ -1162,13 +1164,7 @@ const TASK_REF_RE = /TASK-(\d{3,4})/g
 const parseBlockedByIds = task => {
   const raw = task.status?.fields?.['Blocked by'] ?? task.status?.fields?.['blocked by'] ?? ''
 
-  if (!raw) return []
-
-  // `none` es el VALOR del campo; lo que venga despues entre parentesis es prosa que explica por que
-  // se desbloqueo — y esa explicacion normalmente NOMBRA a los blockers que cerraron. Exigir que la
-  // nota omita los IDs para no disparar el guard destruye justo el contexto util, asi que basta con
-  // que `none` sea el primer token.
-  if (/^`?none`?\s*(?:$|[(.,;:—-])/i.test(raw.trim())) return []
+  if (!hasDeclaredTaskBlocker(raw)) return []
 
   const ids = new Set()
 
@@ -1234,7 +1230,7 @@ const loadActiveBlockedBy = context => {
     const line = source.split(/\r?\n/).find(item => /^-\s*Blocked by:/i.test(item))
 
     if (!line) continue
-    if (/`?none`?\s*$/i.test(line.replace(/^-\s*Blocked by:\s*/i, ''))) continue
+    if (!hasDeclaredTaskBlocker(line.replace(/^-\s*Blocked by:\s*/i, ''))) continue
 
     for (const match of line.matchAll(TASK_REF_RE)) {
       const blockerId = `TASK-${match[1]}`

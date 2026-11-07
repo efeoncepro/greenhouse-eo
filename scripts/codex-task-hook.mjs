@@ -1,22 +1,24 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { basename, join, relative, resolve } from 'node:path'
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs'
+import { basename, join, relative, resolve, sep } from 'node:path'
 
-const TASK_ID_PATTERN = /TASK-\d{3,}(?:\.\d+)?(?!\d)/
-const BARE_TASK_ID_PATTERN = /^\d{3,}(?:\.\d+)?$/
-const TASK_DIRS = ['to-do', 'in-progress', 'complete']
+import { hasDeclaredTaskBlocker, parseTaskMarkdown, taskIdFromFilename } from './ci/task-lint/parser.mjs'
 
-const options = parseArgs(process.argv.slice(2))
+const TASK_REF_PATTERN = /^(?:TASK-)?(\d{3,}(?:\.\d+|[a-z])?)$/
+const ACTIVE_TASK_DIRS = ['to-do', 'in-progress']
+const TASK_DIRS = [...ACTIVE_TASK_DIRS, 'complete', 'cancelled']
 const repoRoot = resolve(process.cwd())
 
-if (options.help) {
-  printHelp()
-  process.exit(0)
-}
-
 try {
+  const options = parseArgs(process.argv.slice(2))
+
+  if (options.help) {
+    printHelp()
+    process.exit(0)
+  }
+
   const task = resolveTask(repoRoot, options.taskRef)
   const prompt = buildPrompt(repoRoot, task, options)
 
@@ -125,36 +127,40 @@ Options:
 }
 
 function resolveTask(repoRoot, taskRef) {
-  const directPath = resolve(repoRoot, taskRef)
+  const ref = taskRef.replace(/^\[(TASK-[^\]]+)\]$/, '$1')
+  const idMatch = ref.match(TASK_REF_PATTERN)
+  const directPath = idMatch ? null : resolve(repoRoot, ref)
+  const taskId = idMatch ? `TASK-${idMatch[1]}` : taskIdFromFilename(basename(directPath))
 
-  if (existsSync(directPath) && statSync(directPath).isFile()) {
-    return readTask(repoRoot, directPath)
+  if (!taskId || (directPath && !TASK_DIRS.includes(taskFolder(repoRoot, directPath)))) {
+    throw new Error(`Invalid TASK ref "${taskRef}". Expected a TASK id or a task markdown path under docs/tasks.`)
   }
 
-  const normalizedTaskRef = BARE_TASK_ID_PATTERN.test(taskRef) ? `TASK-${taskRef}` : taskRef
-  const idMatch = normalizedTaskRef.match(TASK_ID_PATTERN)
+  const matches = listTaskFiles(repoRoot).filter(filePath => taskIdFromFilename(basename(filePath)) === taskId)
 
-  if (!idMatch) {
-    throw new Error(`Invalid TASK ref "${taskRef}". Expected TASK-###, bare ###, or a task markdown path.`)
+  if (directPath && !matches.includes(directPath)) {
+    throw new Error(`No canonical task file found at ${relative(repoRoot, directPath)}.`)
   }
-
-  const taskId = idMatch[0]
-  const matches = listTaskFiles(repoRoot).filter(filePath => basename(filePath).startsWith(`${taskId}-`))
 
   if (matches.length === 0) {
-    throw new Error(`No task file found for ${taskId} under docs/tasks/{to-do,in-progress,complete}.`)
+    throw new Error(`No task file found for ${taskId} under docs/tasks/{to-do,in-progress,complete,cancelled}.`)
   }
 
-  const activeMatches = matches.filter(filePath => /\/docs\/tasks\/(to-do|in-progress)\//.test(filePath))
-  const selected = activeMatches[0] ?? matches[0]
+  const activeMatches = matches.filter(filePath => ACTIVE_TASK_DIRS.includes(taskFolder(repoRoot, filePath)))
 
-  if (matches.length > 1 && activeMatches.length > 1) {
+  if (activeMatches.length > 1) {
     throw new Error(
-      `Multiple active task files found for ${taskId}: ${matches.map(filePath => relative(repoRoot, filePath)).join(', ')}`
+      `Multiple active task files found for ${taskId}: ${activeMatches.map(filePath => relative(repoRoot, filePath)).join(', ')}`
     )
   }
 
-  return readTask(repoRoot, selected)
+  return readTask(repoRoot, directPath ?? activeMatches[0] ?? matches[0], taskId)
+}
+
+function taskFolder(repoRoot, filePath) {
+  const [docs, tasks, folder] = relative(repoRoot, filePath).split(sep)
+
+  return docs === 'docs' && tasks === 'tasks' ? folder : null
 }
 
 function listTaskFiles(repoRoot) {
@@ -173,71 +179,51 @@ function listMarkdownFiles(dir) {
 
   const files = []
 
-  for (const entry of readdirSync(dir)) {
-    const absolute = join(dir, entry)
-    const stats = statSync(absolute)
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const absolute = join(dir, entry.name)
 
-    if (stats.isDirectory()) {
+    if (entry.isDirectory()) {
       files.push(...listMarkdownFiles(absolute))
       continue
     }
 
-    if (entry.endsWith('.md')) files.push(absolute)
+    if (entry.isFile() && taskIdFromFilename(entry.name)) files.push(absolute)
   }
 
   return files
 }
 
-function readTask(repoRoot, filePath) {
+function readTask(repoRoot, filePath, id) {
+  const relativePath = relative(repoRoot, filePath)
+  const folder = taskFolder(repoRoot, filePath)
+
+  if (!ACTIVE_TASK_DIRS.includes(folder)) {
+    throw new Error(`${id} is ${folder} at ${relativePath}. Do not execute it as an active task.`)
+  }
+
+  if (realpathSync(filePath) !== join(realpathSync(repoRoot), relativePath)) {
+    throw new Error(`${relativePath} resolves through a symbolic link. Use a canonical task file.`)
+  }
+
   const source = readFileSync(filePath, 'utf8')
-  const id = source.match(TASK_ID_PATTERN)?.[0] ?? basename(filePath).match(TASK_ID_PATTERN)?.[0]
+  const { lifecycle, status: { fields: status } } = parseTaskMarkdown({ filePath, repoRoot, source })
+  const declaredLifecycle = lifecycle?.match(/^`?([a-z-]+)`?(?=\s|$)/i)?.[1].toLowerCase()
 
-  if (!id) {
-    throw new Error(`Could not detect TASK id in ${relative(repoRoot, filePath)}.`)
+  if (lifecycle && declaredLifecycle !== folder) {
+    throw new Error(`${id} lifecycle conflicts with ${folder} at ${relativePath}: ${lifecycle}.`)
   }
 
-  const status = parseStatus(source)
+  const blockedBy = status['Blocked by'] ?? status['blocked by']
 
-  if (status.Lifecycle === 'complete' || /\/docs\/tasks\/complete\//.test(filePath)) {
-    throw new Error(
-      `${id} is already complete at ${relative(repoRoot, filePath)}. Do not execute it as an active task.`
-    )
-  }
-
-  const blockedBy = status['Blocked by']
-
-  if (blockedBy && blockedBy !== 'none' && blockedBy !== '`none`') {
+  if (hasDeclaredTaskBlocker(blockedBy)) {
     throw new Error(`${id} declares blockers: ${blockedBy}. Resolve or document the blocker before execution.`)
   }
 
   return {
     id,
-    path: filePath,
-    relativePath: relative(repoRoot, filePath),
-    source,
+    relativePath,
     status
   }
-}
-
-function parseStatus(source) {
-  const status = {}
-  const statusMatch = source.match(/## Status\s+([\s\S]*?)(?:\n## |\n<!--|$)/)
-
-  if (!statusMatch) return status
-
-  for (const line of statusMatch[1].split(/\r?\n/)) {
-    const match = line.match(/^\s*-\s*([^:]+):\s*(.+?)\s*$/)
-
-    if (!match) continue
-
-    status[match[1].trim()] = stripTicks(match[2].trim())
-  }
-
-  return status
-}
-
-function stripTicks(value) {
-  return value.replace(/^`|`$/g, '').trim()
 }
 
 function buildPrompt(repoRoot, task, hookOptions) {

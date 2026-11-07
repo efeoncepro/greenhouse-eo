@@ -61,7 +61,8 @@ Canon: [`GREENHOUSE_OPERATING_LOOP_V1.md`](docs/operations/GREENHOUSE_OPERATING_
 Si el pedido menciona `TASK-###`, `[TASK-###]`, su ruta o los aliases `/implement-task TASK-###`,
 `/implement-task ###`, `/task TASK-###` o `/task ###`, y pide ejecutar/implementar/continuar:
 
-1. Si no hay `/goal` explícito en la conversación, proponer uno y esperar confirmación.
+1. Reutilizar el objetivo explícito y confirmado para la misma task y alcance. Si falta, proponer un `/goal`
+   y esperar confirmación. [Contrato del harness Codex](docs/operations/CODEX_EXECUTION_PROMPT_V1.md).
 2. Con el goal confirmado, ejecutar `pnpm codex:task-hook TASK-###` antes de implementar.
 3. Usar `--develop` o `--subagents` únicamente cuando el operador lo haya autorizado.
 
