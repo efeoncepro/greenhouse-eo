@@ -51,7 +51,8 @@ describe('Gemini Omni Cloud CLI contract', () => {
     expect('duration' in request.response_format[0]).toBe(task !== 'edit')
     expect('aspect_ratio' in request.response_format[0]).toBe(!['edit', 'extend'].includes(task))
     expect('previous_interaction_id' in request).toBe(false)
-    expect(request.input.slice(1).map(item => (item as { type: string }).type)).toEqual([
+    expect(request.input).toBeDefined()
+    expect(request.input!.slice(1).map(item => (item as { type: string }).type)).toEqual([
       ...images.map(() => 'image'),
       ...videos.map(() => 'video')
     ])

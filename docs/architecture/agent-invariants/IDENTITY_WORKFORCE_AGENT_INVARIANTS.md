@@ -945,6 +945,9 @@ un client comercial, varios Spaces, contexto Space/Service explícito por reques
 - **Primer consumidor.** App lane `GET /api/platform/app/spaces`, `/spaces/{spaceId}/services` y
   `/spaces/{spaceId}/services/{serviceId}`: Space ajeno o Service fuera del Space → 404; varios Spaces sin elegir
   → 409 `space_selection_required`. Insights espera su vínculo informe→Space (TASK-1960) antes de filtrar por Space.
+- **Señal.** `identity.operational_space.ungranted_user` (data_quality, steady 0; `not_configured` sin la tabla):
+  personas activas de un cliente con varios Spaces sin ningún grant vigente. **NUNCA** abrir una segunda cuenta
+  operativa con esta señal fuera de 0.
 - **Rollout.** Las dos migraciones existen en `migrations/` y se probaron en PG16 efímero; aplicarlas a la base
   compartida (dev/staging/prod) requiere autorización explícita. Orden: la vista nueva puede ir antes del código
   (salida idéntica a la vigente para los 116 usuarios, medido en `READ ONLY` el 2026-11-06, y el código anterior

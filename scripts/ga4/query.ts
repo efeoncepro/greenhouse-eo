@@ -279,7 +279,10 @@ const doctor = async (args: Args) => {
     metrics: [{ name: 'sessions' }]
   })
 
-  console.log(`✓ Data API: ${probe.rows?.[0]?.metricValues?.[0]?.value ?? 0} sesiones ayer`)
+  // `runReport` acumula filas como `unknown[]`; aquí sólo se lee el primer valor del probe.
+  const firstRow = probe.rows?.[0] as { metricValues?: { value?: string }[] } | undefined
+
+  console.log(`✓ Data API: ${firstRow?.metricValues?.[0]?.value ?? 0} sesiones ayer`)
 }
 
 const batch = async (args: Args, propertyId: string) => {

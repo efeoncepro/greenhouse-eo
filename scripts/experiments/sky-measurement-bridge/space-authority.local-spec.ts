@@ -24,6 +24,7 @@ import { closeGreenhousePostgres, runGreenhousePostgresQuery as query } from '@/
 import { createFirstPartyAppSession } from '@/lib/api-platform/core/app-sessions'
 import { grantSpaceAccess, listAuthorizedSpaces, resolveSpaceContext, revalidateSpaceContext, revokeSpaceAccess,
   SpaceAccessGrantError } from '@/lib/tenant/space-authority'
+import { getOperationalSpaceUngrantedUsersSignal } from '@/lib/reliability/queries/operational-space-ungranted-users'
 import { GET as listSpaces } from '@/app/api/platform/app/spaces/route'
 import { GET as listServices } from '@/app/api/platform/app/spaces/[spaceId]/services/route'
 import { GET as getService } from '@/app/api/platform/app/spaces/[spaceId]/services/[serviceId]/route'
@@ -247,5 +248,20 @@ describe('TASK-2096 — grants store and table contract (real migration)', () =>
   it('a single-Space client keeps today\'s behaviour without any grant; an explicit grant then governs', async () => {
     expect((await listAuthorizedSpaces('solo', 'create')).map(s => [s.spaceId, s.source])).toEqual([['space-solo', 'single_space_client']])
     expect(await designHistory()).toHaveLength(2)
+  })
+})
+
+describe('TASK-2096 — reliability signal over the real tables', () => {
+  it('counts the active person of the multi-Space client with no grant, and clears when granted', async () => {
+    const before = await getOperationalSpaceUngrantedUsersSignal()
+
+    expect(before).toMatchObject({ severity: 'warning', evidence: expect.arrayContaining([{ kind: 'metric', label: 'count', value: '1' }]) })
+    await grantSpaceAccess({ identityProfileId: 'person-ungranted', spaceId: 'space-design', verbs: ['read'], reason, actorUserId: actor })
+    expect((await getOperationalSpaceUngrantedUsersSignal()).severity).toBe('ok')
+  })
+
+  it('a disabled person or a single-Space client never counts', async () => {
+    await query(`UPDATE greenhouse_core.client_users SET active=false,status='disabled' WHERE user_id='ungranted'`)
+    expect((await getOperationalSpaceUngrantedUsersSignal()).severity).toBe('ok')
   })
 })

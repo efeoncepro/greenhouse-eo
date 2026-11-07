@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api|migration`
 - Epic: `EPIC-057`
-- Status real: `Code complete local 2026-11-06, rollout pendiente: 4 slices en develop, laboratorio 241/241 sobre PG16 con las migraciones reales; migraciones sin aplicar a la base compartida; falta señal de reliability y revocación durante write`
+- Status real: `Code complete local 2026-11-06, rollout pendiente: 4 slices + señal en develop; laboratorio 243/243 en PG16, pnpm test y pnpm build verdes; migraciones sin aplicar a la base compartida`
 - Rank: `2096`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -250,7 +250,7 @@ Ninguna para documentación o fixtures. Integraciones/providers/operadores requi
 - [x] Dos pestañas con contextos distintos no se redirigen por una preferencia global; cambiar updated_at de Space no cambia el contexto efectivo. Evidencia: casos «two tabs» y «updated_at» del spec nuevo; `bridge-postgres` y `permissions-context` reescritos.
 - [ ] Source of truth, API/command y consumidores conciliados con código/schema real; capability + grant + prueba de paridad cuando corresponda. Pendiente: el command HTTP de grants (TASK-2099) y la migración de los ~50 consumidores de `spaceId` de sesión (TASK-2100). La autoridad por Space no es capability, así que no hay grant en `runtime.ts`.
 - [x] Invariantes, frontera tenant/Space, concurrencia e idempotencia verificadas con negativos y control externo. Evidencia: grant concurrente deja una fila activa, versión vieja rechazada, revocación idempotente, CHECKs de tabla, org de control.
-- [ ] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados. Hecho: DDL, sin backfill, rollback, errores App sanitizados y evento de auditoría en la misma transacción. Falta: señal de reliability (selección pendiente / ambigüedad de sesión).
+- [x] DDL/destinos permitidos, backfill y rollback explícitos; errores sanitizados, audit y señales del dueño comprobados. Evidencia: DDL con CHECKs, sin backfill, rollback, errores App sanitizados, evento de auditoría en la misma transacción y señal `identity.operational_space.ungranted_user` probada contra PG16 (cuenta 1 → ok tras otorgar).
 - [x] Evidencia runtime local separa componentes reales de mocks; no acredita producción ni historia real por inferencia. Evidencia: cabecera de mocks del spec nuevo (sólo transporte outbox, audit de login y metadata UI); historia de Diseño sin cambios por digest.
 - [x] Con dos Spaces activos del mismo client, la resolución de sesión es determinista y no elige por orden de filas: login, refresh y App devuelven el contexto autorizado o un estado explícito de selección pendiente. Evidencia: migración `20261106230331669` + `spaceSelectionRequired` en token/sesión/App; salida idéntica a la vista viva para 116 usuarios (READ ONLY).
 - [x] La matriz local carga `session_360` desde la migración vigente, no desde `scripts/setup-postgres-identity-v2.sql`. Evidencia: `run-local.mjs` aplica la sección Up de las migraciones TASK-2096.
@@ -287,8 +287,10 @@ Plan y auditoría: [TASK-2096-plan.md](../plans/TASK-2096-plan.md). Cuatro slice
 - **Slice 4:** rutas App `/spaces`, `/spaces/{spaceId}/services`, `/spaces/{spaceId}/services/{serviceId}`.
   Desvío del plan: el consumidor es Services, que tiene `space_id` propio; Insights espera TASK-1960.
 
-Pendiente para cerrar: aplicar las dos migraciones a la base compartida (autorización explícita), señal de reliability,
-revocación durante un write (primer write por Space) y `pnpm build` (no corrido: requiere autorización por memoria del equipo).
+Señal `identity.operational_space.ungranted_user` agregada. `pnpm build` verde (125 s, pico ~5,2 GB) tras corregir dos errores
+de tipos ajenos que rompían el build de `develop` (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).
+Pendiente para cerrar: aplicar las dos migraciones a la base compartida, release del código a producción y revocación
+durante un write (primer write por Space, TASK-2097/2099).
 `pnpm test` completo en `ae0881e4be`: 2150 archivos, 21 842 tests, 0 fallas.
 Manual de uso: no aplica todavía; nadie puede otorgar Spaces sin el command de TASK-2099 (dueño: EPIC-057).
 

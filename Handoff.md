@@ -409,6 +409,6 @@ corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin có
 ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service explícito). ADR, `DECISIONS_INDEX`,
 EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
 TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
-determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. **Pendiente:** aplicar las migraciones
-`20261106230331669` y `20261106230745107` a la base compartida (requiere autorización), señal de reliability y `pnpm build`
-(`pnpm test` completo verde: 21 842 tests). Typecheck global con 2 errores ajenos (`scripts/ga4/query.ts`, `gemini-omni-cli.test.ts`).
+determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. Señal `identity.operational_space.ungranted_user`; `pnpm test`
+y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Pendiente:** aplicar las migraciones
+`20261106230331669` y `20261106230745107` (antes está pendiente `20261029092236733` de TASK-1833: `migrate:up` aplica las tres).
