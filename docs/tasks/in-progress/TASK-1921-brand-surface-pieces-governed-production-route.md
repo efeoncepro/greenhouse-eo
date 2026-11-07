@@ -159,7 +159,7 @@ Manda sobre el cuerpo cuando se contradigan.
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `2026-11-07: código en main (release ff6fd900ce). Flag ON en staging (Vercel staging + Job + ops-worker 00795-vnv); Vercel Production sin la var (OFF). Smoke real verde en los SEIS catálogos (2026-09-28) + canary de Insights y de Proposal (prnd-e14a2cd5, 2026-11-07) verdes. Falta: aprobación del operador para prender en Production y repetir el smoke allí, merge de efeonce-mcp#22, criterios Delta b (TASK-1930/1931)`
+- Status real: `2026-11-07: EN PRODUCCIÓN. Código en main (release ff6fd900ce) y flag ON en Production (redeploy greenhouse-5xcnto8ev, autorizado por el operador) y staging; canary productivo brq-284740d0 → graphic-line-deck completed (PDF 681 KB). Smoke real verde en los SEIS catálogos (2026-09-28) + canary de Insights y de Proposal (prnd-e14a2cd5, 2026-11-07) verdes. Falta: merge de efeonce-mcp#22 (tool MCP) y su canary, criterios Delta b (TASK-1930/1931)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -552,9 +552,10 @@ Reglas obligatorias:
       lente) y `brq-32ce5f78…` → edición 17 de Glitch con 9 fotos: `glitch-carousel` (PDF 10 láminas),
       `glitch-stills` (7 PNG) y `glitch-overlays` (18 PNG) `completed` al primer intento, con la falla en bytes
       calculada en el worker. Descargas por el proxy autenticado: 200.
-- [ ] Con el flag OFF, el consumer no reclama jobs y el endpoint rechaza pedidos.
-      — Parcial: con tests (`commands.test.ts` → `render_disabled`; `dispatch.test.ts` → no despacha). Falta
-      verificarlo contra el runtime desplegado.
+- [x] Con el flag OFF, el consumer no reclama jobs y el endpoint rechaza pedidos.
+      — Evidencia: tests (`commands.test.ts` → `render_disabled`; `dispatch.test.ts` → no despacha) y producción el
+      2026-11-07 antes del flip: `POST /api/platform/ecosystem/brand-render/requests` → `503 render_disabled`, sin
+      pedido creado.
 - [x] Proposal e Insights renderizan igual en staging con el consumer nuevo desplegado.
       — Evidencia: Insights `irun-1f520d8d…` (deck de una edición sintética de Greenhouse Demo nunca renderizada)
       `completed` al primer intento con el consumer de marca desplegado. Proposal (2026-11-07, Job `artifact-worker`
