@@ -132,6 +132,29 @@ no menciona AEO; hay que sumarle los hallazgos de motores de respuesta antes de 
 **Pendiente:** Claude (33,3 %) no entra a la figura de mención por motor porque no tiene período anterior; sale en
 texto y tabla (requiere cambiar `chart_spec_v1`).
 
+## 2026-11-06 — SKY: EPIC transversal formalizado
+
+[EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md) coordina TASK-2094
+(baseline 204 pruebas del 01-11) y siete nuevas TASK-2096–2102, todas to-do: autoridad/contexto, routing,
+Finance, alta hija local, readers/cache, historia y operación durable. Insights/portal mantienen sus dueñas
+2033/1960/1848/1849/1992 y1852–1857; GSC1655 conserva productor. No se reparentan ni duplican.
+[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), B recomendado;
+aceptación/apertura pendientes. Próximo ejecutable: TASK-2096 local, previa toma/plan de implementación.
+Grafo por hitos: foundation1852 consumible; gate SKY SEO1852 espera QA2094. Preparación2102 antes del canary,
+observación después; sin ciclo de cierre total. [QA documental](docs/audits/client-portal/2026-11-06-operational-accounts-epic/README.md).
+Registro y commit sólo documentales; no nueva corrida de tests runtime, no cambios en producción ni historia Diseño.
+Revisión contra código el mismo día ([hallazgos](docs/audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)):
+B se mantiene. Laboratorio usaba `session_360` del script de setup; la vigente elige Space sin orden. Cookie de usuario
+inactivo conserva claims sin límite; un P&L cerrado se reescribe. Tasks 2096–2102 con impact/archivos/criterios
+corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin código ni producción. Disco local al 98%.
+ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service explícito). ADR, `DECISIONS_INDEX`,
+EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
+TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
+determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. Señal `identity.operational_space.ungranted_user`; `pnpm test`
+y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Migraciones aplicadas** a la base
+compartida el 2026-11-06 (las dos de TASK-2096 y la de TASK-1833, con el rol `greenhouse_auth_key_maintenance` creado por migrator);
+verificadas. **Pendiente:** release del código a producción.
+
 ## 2026-11-05 — Insights Berel octubre «sólo blog»: clics completos (ISSUE-191), valor estimado y redes
 
 **Código (develop, sin push ni release):** `f45230b2e`, `a01a043dc`, `4c2de9aca`, `b583cd93f`. El capítulo SEO de
@@ -337,79 +360,3 @@ que copian los 8 Dockerfiles de `services/`. No se borra nada del repo. Al empuj
 (empujado a develop; los 4 deploys de workers a staging salieron verdes). El operador compró el CUD de Cloud SQL
 `greenhouse-pg-dev-us-east4-3y` (3 años, us-east4, USD 0,03/h ≈ 21,60/mes, inicio 2026-11-01 16:00 PT) y canceló
 Looker Studio Pro (verificado). Proyección: ~CLP170k/mes desde diciembre.
-
-## 2026-11-01 — Kortex retirado: respaldo, Vercel pausado, proyecto GCP cerrado
-
-**Actualización:** el operador cerró `efeonce-kortex-dev` (estado `DELETE_REQUESTED`, se puede deshacer con
-`gcloud projects undelete` durante 30 días); el respaldo en `efeonce-group-kortex-archive` sigue intacto.
-
-Decisión del operador: Kortex no continúa. Respaldo verificado de `kortex-pg-dev` (`kortex_app` 41 tablas +
-`postgres`) en `gs://efeonce-group-kortex-archive/` (clase ARCHIVE, proyecto efeonce-group); la base quedó otra vez
-STOPPED/NEVER. Proyecto Vercel `kortex` (`prj_8ylpHC3DI1EdRO1hjZfwWPrk5Y1O`) pausado, responde 503. Pendiente humano:
-`gcloud projects delete efeonce-kortex-dev` (bloqueado al agente por la regla de borrado irreversible; restaurable
-30 días), que corta ~CLP11k/mes. Las rutas `/api/admin/kortex/*` y la señal `platform.kortex.github.ci_last_status`
-siguen en el código: la primera queda sin backend (0 requests en 30 días); la segunda lee GitHub y no se rompe.
-
-## 2026-11-01 — GCP: limpieza de imágenes y tarballs de Cloud Build
-
-Octubre cerró en ~CLP258k netos (junio 111k). Aplicado con autorización del operador: cleanup policy
-`keep-15-most-recent` + `delete-older-than-30d` (enforced) en `cloud-run-source-deploy` us-east4 y us-central1
-(simulación previa: 241 versiones viejas, 0 imágenes vivas; artifact-worker y notion-bq-sync sirven la más
-reciente), y lifecycle `age 30` sobre `gs://efeonce-group_cloudbuild/source/` (2.452 tarballs, 327 GB; soft
-delete de 7 días). Ahorro esperado ~CLP25–30k/mes, no confirmado hasta la factura de diciembre. Pendiente: cada
-tarball pesa ~727 MB porque `.gcloudignore` no excluye `ai-generations/`, `outputs/` ni `generated/` (ningún
-Dockerfile las copia). Decisiones abiertas: kortex-pg-dev detenida (11k), Looker Studio Pro (8.7k), clamav
-min=1 (19.5k), balanceador MCP (25k).
-
-## 2026-11-01 — Globe: listeners suspendidos con IP conservada
-
-Aplicado exclusivamente retiro HTTP/HTTPS del balanceador (`0/0/2`); IP original reservada, SQL STOPPED/NEVER
-y cuatro schedulers PAUSED. Forecast CLP22–23k/mes, no ahorro confirmado. Reactivación automática de listeners
-en `draining`, sin cambiar DNS; [estado y evidencia](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
-Monitor actualizado, Terraform validate y 35 tests PASS. Sin deploy de servicios ni despertar SQL.
-
-
-**31/10 — Prospección focal:** [Wequips/Mambrino](docs/audits/commercial/2026-10-31-wequips-mambrino-docs-skills.md).
-Mayra: NDR de correo inferido, sin reintento. Dayanna: Apollo Verified/2 créditos, Contact/Primary y email SENT
-comprobados; LinkedIn previo. Pendientes Commercial: respuesta/brief, secundaria vacía y verificación de
-segmentos Mambrino. Skills espejo y canon actualizados; sin nueva comunicación o secuencia en este cierre.
-
-## 2026-11-01 — Efeonce ID en `main` con carrusel; Rooms con entrada 307 y nombre del espacio
-
-Release `935583f88db0-544b3943-a041-4fe6-9e62-03aca45c6c8f` (run `41284120477`) `released` al tercer intento:
-`auth-server-00170-qlx` al 100 %, first-party/OTP ON, Login V4 con carrusel también en la entrada a Rooms; tráfico a la
-última revisión, rollback a `00169-4pq`. Intentos 1 y 2 abortados por [ISSUE-184](docs/issues/resolved/ISSUE-184-auth-deploy-guard-rejected-squash-releases.md)
-(guard vs squash, PR #265) y [ISSUE-185](docs/issues/resolved/ISSUE-185-auth-governed-deploy-revision-without-traffic.md)
-(tráfico fijado); CI rojo previo por [ISSUE-186](docs/issues/resolved/ISSUE-186-growth-seo-tests-broke-at-etv-cutover.md).
-PR #263/#264 cerradas, retención levantada. Rooms PR #9–#11 en producción: 307 sin sesión ([ISSUE-188](docs/issues/resolved/ISSUE-188-rooms-anonymous-entry-rsc-redirect-flash.md)),
-`organization.rename` + espacio «Efeonce» ([manual](docs/manual-de-uso/rooms/nombrar-espacio-de-trabajo.md)) y gate de
-migraciones revisadas ([ISSUE-187](docs/issues/resolved/ISSUE-187-rooms-reviewed-migrations-inventory-blocked-deploy.md)).
-Sin verificar: Sentry del release y login humano Efeonce ID → Rooms (TASK-2064/2085 siguen in-progress). Próximo:
-TASK-2086 (delegación interactiva para Rooms) y TASK-1833 antes de cualquier cliente real.
-Después (local, sin push): [TASK-1833 conciliada](docs/tasks/in-progress/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md)
-y la rama local de Codex `codex/auth-pr-develop-stack` integrada en `develop` (`e09d72d70`): revocación/recuperación atómicas,
-413, OTP con fallo cerrado, Job de rotación (migración sin aplicar) y verificación post-deploy del tráfico. Requiere release a
-`main`; la llave de firma (KMS v1/v2 del 04-09) dispara `auth.keys.rotation_overdue` hacia el 23-11.
-
-## 2026-11-06 — SKY: EPIC transversal formalizado
-
-[EPIC-057](docs/epics/in-progress/EPIC-057-operational-accounts-under-organization.md) coordina TASK-2094
-(baseline 204 pruebas del 01-11) y siete nuevas TASK-2096–2102, todas to-do: autoridad/contexto, routing,
-Finance, alta hija local, readers/cache, historia y operación durable. Insights/portal mantienen sus dueñas
-2033/1960/1848/1849/1992 y1852–1857; GSC1655 conserva productor. No se reparentan ni duplican.
-[ADR Proposed](docs/architecture/GREENHOUSE_OPERATIONAL_ACCOUNTS_UNDER_ORGANIZATION_DECISION_V1.md), B recomendado;
-aceptación/apertura pendientes. Próximo ejecutable: TASK-2096 local, previa toma/plan de implementación.
-Grafo por hitos: foundation1852 consumible; gate SKY SEO1852 espera QA2094. Preparación2102 antes del canary,
-observación después; sin ciclo de cierre total. [QA documental](docs/audits/client-portal/2026-11-06-operational-accounts-epic/README.md).
-Registro y commit sólo documentales; no nueva corrida de tests runtime, no cambios en producción ni historia Diseño.
-Revisión contra código el mismo día ([hallazgos](docs/audits/client-portal/2026-11-06-operational-accounts-code-review/README.md)):
-B se mantiene. Laboratorio usaba `session_360` del script de setup; la vigente elige Space sin orden. Cookie de usuario
-inactivo conserva claims sin límite; un P&L cerrado se reescribe. Tasks 2096–2102 con impact/archivos/criterios
-corregidos y dueño único por archivo; criterios nuevos en 1960 y 2094. Sin código ni producción. Disco local al 98%.
-ADR aceptado el mismo día: Julio eligió B (client compartido, Space/Service explícito). ADR, `DECISIONS_INDEX`,
-EPIC, TASK-2094/2096–2102 y el README del servicio SKY Blog actualizados; sin migrations, filas reales ni apertura.
-TASK-2096 code complete local (in-progress, `develop`, sin push): revocación de sesión y magic link, `session_360`
-determinista, grants por Space y rutas App `/spaces`; laboratorio 241/241. Señal `identity.operational_space.ungranted_user`; `pnpm test`
-y `pnpm build` verdes (se corrigieron 2 errores de tipos ajenos que rompían el build). **Migraciones aplicadas** a la base
-compartida el 2026-11-06 (las dos de TASK-2096 y la de TASK-1833, con el rol `greenhouse_auth_key_maintenance` creado por migrator);
-verificadas. **Pendiente:** release del código a producción.

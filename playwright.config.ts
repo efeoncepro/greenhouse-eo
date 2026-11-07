@@ -58,6 +58,12 @@ const chromiumUse = {
 export default defineConfig({
   testDir: './tests/e2e',
   testMatch: /.*\.spec\.ts/,
+  // En CI Playwright captura por defecto `git diff <base del PR> HEAD` para los metadatos del
+  // reporte, y acumula TODA la salida en un string antes de recortarla a 100 KB. Un PR grande
+  // (la promoción develop→main #268, 2026-11-07: ~13 M de líneas por `ai-generations/`) revienta
+  // con `RangeError: Invalid string length` dentro del handler de stdout, fuera de su `.catch`, y
+  // el smoke cae sin correr un solo test. El diff no se usa en ningún reporte; el commit sí.
+  captureGitInfo: { commit: true, diff: false },
   fullyParallel: true,
   forbidOnly: IS_CI,
   retries: IS_CI ? 2 : 0,
