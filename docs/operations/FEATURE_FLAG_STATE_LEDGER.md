@@ -865,6 +865,19 @@ elegibilidad y policy publicada por fuente/versión; EC se decide por separado. 
 
 **UI / Design tokens:** `HOME_V2_ENABLED` (TASK-696/780) · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED` (default ON; emergency revert to legacy azure; 2026-07-18). `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED` is retired and no longer read by runtime.
 
+**Leídos desde un env inyectado — registrados 2026-11-07** (`pnpm flags:audit` no los veía: se leen como
+`env.FLAG` sobre un parámetro `env: EnvSource = process.env`, ni como `process.env.FLAG` ni como literal; el
+escáner vive ahora en `scripts/ci/lib/flag-reference-scanner.mjs` con prueba de comportamiento, y por la misma
+causa los ocho flags de Insights salían como «env var muerta» estando ON en Production):
+`GREENHOUSE_MCP_TOKEN_EXCHANGE_ENABLED` — Vercel únicamente (`src/lib/sister-platforms/mcp-token-exchange.ts`,
+ruta `/api/integrations/v1/sister-platforms/oauth/token`); **Production `true`** (leído con `vercel env pull`
+2026-11-07), staging presente · `RELIABILITY_SYNTHETIC_ENABLED` — Vercel (cron
+`/api/cron/reliability-synthetic`); **kill switch con default ON cuando la var falta**, sin setear en ningún
+environment (estado diseñado) · `RELIABILITY_AI_OBSERVER_ENABLED` — ops-worker únicamente (TASK-638); default
+`true` en `services/ops-worker/deploy.sh`, **`true` en la revisión activa `ops-worker-00794-wd8`** (2026-11-07) ·
+`CLOUD_COST_AI_COPILOT_ENABLED` — ops-worker únicamente (`src/lib/cloud/finops-ai/runner.ts`); opt-in, default
+`false` en `deploy.sh` y **`false` en `ops-worker-00794-wd8`** (estado diseñado, sin pendiente).
+
 **Kortex bridge / sister platform:** `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` · `KORTEX_COMMAND_ADAPTER_ENABLED` · `KORTEX_COMMAND_ADMIN_ENABLED` · `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED` · `KORTEX_GITHUB_COMMANDS_ENABLED` · `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED`.
 
 **Auth server propio / EPIC-044** (`services/auth-server/deploy.sh`, runtime **auth-server únicamente**):
